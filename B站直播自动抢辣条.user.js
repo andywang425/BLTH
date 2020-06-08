@@ -1,5 +1,5 @@
 // ==UserScript==
-// @namespace     https://greasyfork.org/en/users/475234-andywang425
+// @namespace     https://github.com/andywang425
 // @name          B站直播自动抢辣条
 // @name:en       B站直播自动抢辣条
 // @author        andywang425
