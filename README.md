@@ -1,6 +1,7 @@
 # Bilibili-SGTH
 油猴脚本。自动参加抽奖，完成每日任务。
 另含B站API及[OCRAD](https://github.com/antimatter15/ocrad.js)  
+### 点击[Bilibili-SGTH](https://github.com/andywang425/BilibiliSGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)安装脚本  
 
 >感谢SeaLoong的BilibiliAPI v1.4.6。本脚本使用的BilibiliAPI_Mod为在此基础上的修改版。  
 ## 本脚本会自动抢辣条~和亲密度~
