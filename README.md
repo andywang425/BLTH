@@ -12,7 +12,7 @@ _2020.5.14起领取上船奖励不加亲密度改为辣条_
 如果开启抽奖附加延迟，可能出现领不到礼物的情况，请降低或取消延迟。  
 这个脚本参考了[逆回十六夜](https://greasyfork.org/en/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1%E4%BA%8C%E4%BB%A3by%E5%8D%81%E5%85%AD%E5%A4%9C)和[SeaLoong](https://github.com/SeaLoong/Bilibili-LRHH)的代码。  
 **所有设置更改后均需要刷新后才能生效。**  
-**使用前建议先关闭广告拦截插件，否则脚本可能无法正常运行**
+**使用前建议先关闭广告拦截插件，否则脚本可能无法正常运行**  
 我的b站id:[Andy425](https://space.bilibili.com/358483030)  
 辣条交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天。  
 _如果有什么建议可以给我提Issues或在b站私信我，我会试着改进~_  
