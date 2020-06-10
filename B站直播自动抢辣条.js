@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       2.5.4
+// @version       2.5.5
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -32,7 +32,7 @@ const tz_offset = new Date().getTimezoneOffset() + 480;
 const ts_ms = () => Date.now();
 const ts_s = () => Math.round(ts_ms() / 1000);
 if (!logSwitch) {
-    console.log = () => {};//关闭控制台日志输出
+    console.log = () => { };//关闭控制台日志输出
 }
 let Live_info = {
     room_id: undefined,
@@ -53,14 +53,15 @@ const delayCall = (callback, delay = 10e3) => {
     }, delay);
     return p;
 };
-const runTomorrow = (callback) => {
+const runTomorrow = (callback,msg) => {
     const t = new Date();
+    let name = msg || ' ';
     t.setMinutes(t.getMinutes() + tz_offset);
     t.setDate(t.getDate() + 1);
     t.setHours(0, 1, 0, 0);
     t.setMinutes(t.getMinutes() - tz_offset);
     setTimeout(callback, t - ts_ms());
-    console.log('runTomorrow', t.toString());
+    console.log('runTomorrow', name + " " + t.toString());
 };
 const newWindow = {
     init: () => {
@@ -216,13 +217,6 @@ function addStyle() {
         `)
 }
 function init() {//API初始化
-    try {
-        BAPI.setCommonArgs(BAPI.getCookie('bili_jct'));// 设置token
-    } catch (err) {
-        console.error(`[${NAME}]`, err);
-        return;
-    }
-
     const MY_API = {
         CONFIG_DEFAULT: {
             TIME_RELOAD: 60,//直播间重载时间
@@ -265,7 +259,13 @@ function init() {//API初始化
             SILVER_COUNT: 0,
             CLEAR_TS: 0,
         },
-        init:  () => {
+        init: () => {
+            try {
+                BAPI.setCommonArgs(BAPI.getCookie('bili_jct'));// 设置token
+            } catch (err) {
+                console.error(`[${NAME}]`, err);
+                return;
+            }
             let p = $.Deferred();
             try {
                 MY_API.loadConfig().then(() => {
@@ -294,7 +294,7 @@ function init() {//API初始化
 
             return p;
         },
-        loadConfig:  () => {//加载配置函数
+        loadConfig: () => {//加载配置函数
             let p = $.Deferred();
             try {
                 let config = JSON.parse(localStorage.getItem(`${NAME}_CONFIG`));
@@ -312,7 +312,7 @@ function init() {//API初始化
             }
             return p
         },
-        loadCache:  () => {//加载CACHE
+        loadCache: () => {//加载CACHE
             let p = $.Deferred();
             try {
                 let cache = JSON.parse(localStorage.getItem(`${NAME}_CACHE`));
@@ -329,7 +329,7 @@ function init() {//API初始化
             }
             return p
         },
-        saveConfig:  () => {//保存配置函数
+        saveConfig: () => {//保存配置函数
             try {
                 localStorage.setItem(`${NAME}_CONFIG`, JSON.stringify(MY_API.CONFIG));
                 MY_API.chatLog('配置已保存');
@@ -340,7 +340,7 @@ function init() {//API初始化
                 return false
             }
         },
-        saveCache:  () => {//保存配置函数
+        saveCache: () => {//保存配置函数
             try {
                 localStorage.setItem(`${NAME}_CACHE`, JSON.stringify(MY_API.CACHE));
                 console.log('CACHE已保存', MY_API.CACHE);
@@ -350,7 +350,7 @@ function init() {//API初始化
                 return false
             }
         },
-        setDefaults:  () => {//重置配置函数
+        setDefaults: () => {//重置配置函数
             MY_API.CONFIG = MY_API.CONFIG_DEFAULT;
             MY_API.CACHE = MY_API.CACHE_DEFAULT;
             MY_API.saveConfig();
@@ -360,7 +360,7 @@ function init() {//API初始化
                 window.location.reload()
             }, 3000);
         },
-        setDailyTasksDefaults:  () => {
+        setDailyTasksDefaults: () => {
             window.toast('3秒后刷新页面并再次执行每日任务', 'info')
             setTimeout(() => {
                 MY_API.CACHE = MY_API.CACHE_DEFAULT;
@@ -368,7 +368,7 @@ function init() {//API初始化
                 window.location.reload()
             }, 3000);
         },
-        loadGiftCount:  () => {//读取礼物数量
+        loadGiftCount: () => {//读取礼物数量
             try {
                 let config = JSON.parse(localStorage.getItem(`${NAME}_GIFT_COUNT`));
                 for (let item in MY_API.GIFT_COUNT) {
@@ -380,7 +380,7 @@ function init() {//API初始化
                 console.log('读取统计失败', e);
             }
         },
-        saveGiftCount:  () => {
+        saveGiftCount: () => {
             try {
                 localStorage.setItem(`${NAME}_GIFT_COUNT`, JSON.stringify(MY_API.GIFT_COUNT));
                 console.log('统计保存成功', MY_API.GIFT_COUNT);
@@ -389,7 +389,7 @@ function init() {//API初始化
                 console.log('统计保存出错', e);
                 return false
             }
-        }, 
+        },
         addGift: (count) => {
             MY_API.GIFT_COUNT.COUNT += count;
             $('#giftCount span:eq(0)').text(MY_API.GIFT_COUNT.COUNT);
@@ -405,9 +405,9 @@ function init() {//API初始化
             $('#giftCount span:eq(2)').text(MY_API.GIFT_COUNT.SILVER_COUNT);
             MY_API.saveGiftCount();
         },
-        checkUpdate: () =>{
+        checkUpdate: () => {
             window.open('https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js', '_blank').location;
-        },  
+        },
 
         creatSetBox: () => {//创建设置框
             //添加按钮
@@ -421,7 +421,7 @@ function init() {//API初始化
                     div.hide();
                     let ct = $('.attention-btn-ctnr');
                     ct.animate({ scrollTop: 0 }, 0);
-                    ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10);
+                    //ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10);
                     document.getElementById('hiderbtn').innerHTML = "显示窗口和抽奖信息";
                 }
                 else {
@@ -559,7 +559,7 @@ function init() {//API初始化
 </fieldset>
 
 <label style ="color: darkblue">
-        v2.5.4 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+        v2.5.5 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
 </label>
 `);
 
@@ -1234,14 +1234,14 @@ function init() {//API初始化
                     if (!MY_API.CONFIG.AUTO_GROUP_SIGN) return $.Deferred().resolve();
                     if (!checkNewDay(MY_API.CACHE.AUTO_GROUP_SIGH_TS)) {
                         // 同一天，不再检查应援团签到
-                        runTomorrow(MY_API.GroupSign.run);
+                        runTomorrow(MY_API.GroupSign.run, '应援团签到');
                         return $.Deferred().resolve();
                     }
                     return MY_API.GroupSign.getGroups().then((list) => {
                         return MY_API.GroupSign.signInList(list).then(() => {
                             MY_API.CACHE.AUTO_GROUP_SIGH_TS = ts_ms();
                             MY_API.saveCache();
-                            runTomorrow(MY_API.GroupSign.run);
+                            runTomorrow(MY_API.GroupSign.run, '应援团签到');
 
                         }, () => delayCall(() => MY_API.GroupSign.run()));
 
@@ -1355,7 +1355,7 @@ function init() {//API初始化
                     //if (!MY_API.CONFIG.DailyReward) return $.Deferred().resolve();
                     if (!checkNewDay(MY_API.CACHE.DailyReward_TS)) {
                         // 同一天，不执行每日任务
-                        runTomorrow(MY_API.DailyReward.run);
+                        runTomorrow(MY_API.DailyReward.run, '每日任务');
                         return $.Deferred().resolve();
                     }
                     return BAPI.DailyReward.exp().then((response) => {
@@ -1366,7 +1366,7 @@ function init() {//API初始化
                             return MY_API.DailyReward.dynamic().then(() => {
                                 MY_API.CACHE.DailyReward_TS = ts_ms();
                                 MY_API.saveCache();
-                                runTomorrow(MY_API.DailyReward.run);
+                                runTomorrow(MY_API.DailyReward.run, '每日任务');
                             });
                         } else {
                             window.toast(`[自动每日奖励]${response.message}`, 'caution');
@@ -1403,13 +1403,13 @@ function init() {//API初始化
                     if (!MY_API.CONFIG.LIVE_SIGN) return $.Deferred().resolve();
                     if (!checkNewDay(MY_API.CACHE.LiveReward_TS)) {
                         // 同一天，不执行
-                        runTomorrow(MY_API.LiveReward.run);
+                        runTomorrow(MY_API.LiveReward.run, '直播签到');
                         return $.Deferred().resolve();
                     }
                     MY_API.LiveReward.dailySignIn()
                     MY_API.CACHE.LiveReward_TS = ts_ms();
                     MY_API.saveCache();
-                    runTomorrow(MY_API.LiveReward.run);
+                    runTomorrow(MY_API.LiveReward.run, '直播签到');
                 } catch (err) {
                     window.toast('[自动直播签到]运行时出现异常', 'error');
                     console.error(`[${NAME}]`, err);
@@ -1439,13 +1439,13 @@ function init() {//API初始化
                     if (!MY_API.CONFIG.SILVER2COIN) return $.Deferred().resolve();
                     if (!checkNewDay(MY_API.CACHE.Silver2Coin_TS)) {
                         // 同一天，不再兑换硬币
-                        runTomorrow(MY_API.Exchange.runS2C);
+                        runTomorrow(MY_API.Exchange.runS2C, '瓜子换硬币');
                         return $.Deferred().resolve();
                     }
                     return MY_API.Exchange.silver2coin().then(() => {
                         MY_API.CACHE.Silver2Coin_TS = ts_ms();
                         MY_API.saveCache();
-                        runTomorrow(MY_API.Exchange.runS2C);
+                        runTomorrow(MY_API.Exchange.runS2C, '瓜子换硬币');
                     }, () => delayCall(() => MY_API.Exchange.runS2C()));
                 } catch (err) {
                     window.toast('[银瓜子换硬币]运行时出现异常，已停止', 'error');
@@ -1567,7 +1567,7 @@ function init() {//API初始化
                     }
                     if (!checkNewDay(MY_API.CACHE.TreasureBox_TS)) {
                         MY_API.TreasureBox.setMsg('今日<br>已领完');
-                        runTomorrow(MY_API.TreasureBox.run);
+                        runTomorrow(MY_API.TreasureBox.run, '领银瓜子宝箱');
                         return;
                     }
                     MY_API.TreasureBox.getCurrentTask().then((response) => {
@@ -1597,7 +1597,7 @@ function init() {//API初始化
                             // window.toast(`[自动领取瓜子]${response.msg}`, 'info');
                             MY_API.CACHE.TreasureBox_TS = ts_ms();
                             MY_API.saveCache();
-                            runTomorrow(MY_API.TreasureBox.run);
+                            runTomorrow(MY_API.TreasureBox.run, '领银瓜子宝箱');
                         } else if (response.code === -500) {
                             // 请先登录!
                             location.reload();
@@ -1652,7 +1652,6 @@ function init() {//API初始化
                         case 400: // 400: 访问被拒绝
                             if (response.msg.indexOf('拒绝') > -1) {
                                 Live_info.blocked = true;
-                                //Essential.DataSync.down();
                                 MY_API.TreasureBox.setMsg('拒绝<br>访问');
                                 window.toast('[自动领取瓜子]访问被拒绝，您的帐号可能已经被关小黑屋，已停止', 'error');
                                 return $.Deferred().reject();
@@ -1829,46 +1828,48 @@ function init() {//API初始化
     };
 
     MY_API.init().then(() => {//主函数
-        let stoprun = false;
         try {
+            const promiseInit = $.Deferred();
             const uniqueCheck = () => {
                 const t = Date.now();
-                if (t - MY_API.CACHE.UNIQUE_CHECK >= 0 && t - MY_API.CACHE.UNIQUE_CHECK <= 10e3) {
+                if (t - MY_API.CACHE.UNIQUE_CHECK >= 0 && t - MY_API.CACHE.UNIQUE_CHECK <= 15e3) {
                     // 其他脚本正在运行
                     $('.link-toast').hide();
                     $('.igiftMsg').hide();
+                    MY_API.CONFIG.AUTO_TREASUREBOX = false;
                     window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
-                    stoprun = true;
+                    return promiseInit.reject();
                 }
                 // 没有其他脚本正在运行
-                return;
+                return promiseInit.resolve();
             };
-            uniqueCheck()
-            let timer_unique;
-            const uniqueMark = () => {
-                timer_unique = setTimeout(uniqueMark, 1e3);
-                MY_API.CACHE.UNIQUE_CHECK = Date.now();
-                MY_API.saveCache();
-            };
-            window.addEventListener('unload', () => {
-                if (timer_unique) {
-                    clearTimeout(timer_unique);
-                    MY_API.CACHE.UNIQUE_CHECK = 0;
+            uniqueCheck().then(() => {
+                let timer_unique;
+                const uniqueMark = () => {
+                    timer_unique = setTimeout(uniqueMark, 10e3);
+                    MY_API.CACHE.UNIQUE_CHECK = Date.now();
                     MY_API.saveCache();
+                };
+                window.addEventListener('unload', () => {
+                    if (timer_unique) {
+                        clearTimeout(timer_unique);
+                        MY_API.CACHE.UNIQUE_CHECK = 0;
+                        MY_API.saveCache();
+                    }
+                });
+                uniqueMark();
+                if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid))) {//登陆判断
+                    MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
+                    return
                 }
-            });
-            uniqueMark();
+                console.log(MY_API.CONFIG);
+                StartPlunder(MY_API);
+            })
         }
         catch (e) {
             console.error('重复运行检测错误', e);
         }
-        if (stoprun == true) return;
-        if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid))) {//登陆判断
-            MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
-            return
-        }
-        console.log(MY_API.CONFIG);
-        StartPlunder(MY_API);
+
     });
 }
 
