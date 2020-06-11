@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       2.5.5
+// @version       2.5.6
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -66,7 +66,6 @@ const runTomorrow = (callback,msg) => {
 const newWindow = {
     init: () => {
         return newWindow.Toast.init().then(() => {
-            // return newWindow.AlertDialog.init();
         });
     },
     Toast: { //设置右上角弹窗
@@ -74,7 +73,6 @@ const newWindow = {
             try {
                 const list = [];
                 window.toast = (msg, type = 'info', timeout = 5e3) => {
-                    //let d = new Date().toLocaleTimeString();
                     switch (type) {
                         case 'success':
                         case 'info':
@@ -98,7 +96,7 @@ const newWindow = {
                             list.forEach((v) => {
                                 v.style.top = (parseInt(v.style.top, 10) - 40) + 'px';
                             });
-                            $(a).remove();//$($(`<div class="link-toast ${type} fixed"><span class="toast-text">${msg}</span></div>`)[0];).remove();
+                            $(a).remove();
                         }, 200);
                     }, timeout);
                 };
@@ -453,7 +451,7 @@ function init() {//API初始化
 <fieldset class="igiftMsg_fs">
      <legend style = "color: black">今日统计</legend>
             <div id="giftCount" style="font-size: large; text-shadow: 1px 1px #00000066; color: blueviolet;">
-            辣条&nbsp;<span>${MY_API.GIFT_COUNT.COUNT}</span> <s>亲密度</s>&nbsp;<span>${MY_API.GIFT_COUNT.LOVE_COUNT}</span>
+            辣条&nbsp;<span>${MY_API.GIFT_COUNT.COUNT}</span>
             银瓜子&nbsp;<span>${MY_API.GIFT_COUNT.SILVER_COUNT}万</span>
             <button style="font-size: small" class="igiftMsg_btn" data-action="save">保存所有设置</button>
             </div>
@@ -496,57 +494,55 @@ function init() {//API初始化
 
 <fieldset class="igiftMsg_fs">
     <legend style = "color: black">每日任务设置</legend>
-    <div style ="line-height: 15px; color: black" data-toggle="LOGIN">
+    <div data-toggle="LOGIN" style ="line-height: 15px; color: black">
     <input style="vertical-align: text-top;" type="checkbox">
     登陆
     </div>
-    <div style ="line-height: 15px; color: black" data-toggle="WATCH">
+    <div data-toggle="WATCH" style ="line-height: 15px; color: black">
     <input style="vertical-align: text-top;" type="checkbox">
     观看视频
     </div>
-    <div style ="line-height: 15px; color: black" data-toggle="COIN">
-    <input style="vertical-align: text-top;" type="checkbox">
-    自动投币<input class="coin_number igiftMsg_input" style="width: 40px;" type="text">个   
+    <div data-toggle="COIN" style ="line-height: 15px; color: black">
+    <label style="cursor: pointer">
+    <input style="cursor: pointer; vertical-align: text-top;" type="checkbox">
+    自动投币<input class="coin_number igiftMsg_input" style="width: 40px;" type="text">个
+    </label> 
     </div>
-    <div style ="line-height: 15px; color: black" data-toggle="SHARE">
+    <div data-toggle="SHARE" style ="line-height: 15px; color: black">
     <input style="vertical-align: text-top;" type="checkbox">
     分享视频
     </div>
-    </div>
-    <div style ="line-height: 15px; color: black" data-toggle="SILVER2COIN">
+    <div data-toggle="SILVER2COIN"style ="line-height: 15px; color: black">
     <input style="vertical-align: text-top;" type="checkbox">
     银瓜子换硬币
     </div>
-    <div style ="line-height: 15px; color: black" data-toggle="LIVE_SIGN">
+    <div data-toggle="LIVE_SIGN" style ="line-height: 15px; color: black">
     <input style="vertical-align: text-top;" type="checkbox">
     直播区签到
     </div>
-    <div style ="line-height: 15px" data-toggle="AUTO_GROUP_SIGN">
-    <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+    <div data-toggle="AUTO_GROUP_SIGN" style ="line-height: 15px; color: darkgreen">
         <input style="vertical-align: text-top;" type="checkbox">
         应援团签到
-    </label> 
     </div>
-    <div style ="line-height: 15px" data-toggle="AUTO_TREASUREBOX">
-    <label style="cursor: pointer; margin: 5px auto; color: purple">
+    <div data-toggle="AUTO_TREASUREBOX" style ="line-height: 15px; color: purple">
         <input style="vertical-align: text-top;" type="checkbox">
         自动领银瓜子宝箱
-    </label> 
     </div>
     <div><button data-action="reset_dailyTasks" style="color: red;" class="igiftMsg_btn">再次执行每日任务</button></div>
     </fieldset>
 <fieldset class="igiftMsg_fs">
     <legend style = "color: black">其他设置</legend>
-    <div style = "color: black" data-toggle="TIME_RELOAD">
+    <div data-toggle="TIME_RELOAD" style = "color: black">
     本直播间重载时间(整数,刷新后生效)：
     <input class="delay-seconds igiftMsg_input" type="text" style="width: 30px;">分
-    <div style = "line-height: 15px" data-toggle="IN_TIME_RELOAD_DISABLE">
-        <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+    </div>
+    <div data-toggle="IN_TIME_RELOAD_DISABLE" style = "line-height: 15px">
+        <label style="margin: 5px auto; color: darkgreen">
             <input style="vertical-align: text-top;" type="checkbox">不抽奖时段不重载直播间
         </label>        
     </div>
-    <div style = "line-height: 15px" data-toggle="FORCE_LOTTERY">
-        <label style="cursor: pointer; margin: 5px auto; color: red;">
+    <div data-toggle="FORCE_LOTTERY" style = "line-height: 15px">
+        <label style="margin: 5px auto; color: red;">
             <input style="vertical-align: text-top;" type="checkbox">进入小黑屋后强制重复抽奖(危)
         </label>
     </div>
@@ -559,7 +555,7 @@ function init() {//API初始化
 </fieldset>
 
 <label style ="color: darkblue">
-        v2.5.5 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+        v2.5.6 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
 </label>
 `);
 
@@ -570,18 +566,6 @@ function init() {//API初始化
             div.find('div[data-toggle="RANDOM_SKIP"] .per').val((parseInt(MY_API.CONFIG.RANDOM_SKIP)).toString());
             div.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val((parseInt(MY_API.CONFIG.RANDOM_SEND_DANMU)).toString());
             div.find('div[data-toggle="MAX_GIFT"] .num').val((parseInt(MY_API.CONFIG.MAX_GIFT)).toString());
-            if (MY_API.CONFIG.RANDOM_DELAY) div.find('div[data-toggle="RANDOM_DELAY"] input').attr('checked', '');
-            if (MY_API.CONFIG.TIME_AREA_DISABLE) div.find('div[data-toggle="TIME_AREA_DISABLE"] input').attr('checked', '');
-            if (MY_API.CONFIG.IN_TIME_RELOAD_DISABLE) div.find('div[data-toggle="IN_TIME_RELOAD_DISABLE"] input').attr('checked', '');
-            if (MY_API.CONFIG.AUTO_GROUP_SIGN) div.find('div[data-toggle="AUTO_GROUP_SIGN"] input').attr('checked', '');
-            if (MY_API.CONFIG.FORCE_LOTTERY) div.find('div[data-toggle="FORCE_LOTTERY"] input').attr('checked', '');
-            if (MY_API.CONFIG.LOGIN) div.find('div[data-toggle="LOGIN"] input').attr('checked', '');
-            if (MY_API.CONFIG.WATCH) div.find('div[data-toggle="WATCH"] input').attr('checked', '');
-            if (MY_API.CONFIG.COIN) div.find('div[data-toggle="COIN"] input').attr('checked', '');
-            if (MY_API.CONFIG.SHARE) div.find('div[data-toggle="SHARE"] input').attr('checked', '');
-            if (MY_API.CONFIG.LIVE_SIGN) div.find('div[data-toggle="LIVE_SIGN"] input').attr('checked', '');
-            if (MY_API.CONFIG.AUTO_TREASUREBOX) div.find('div[data-toggle="AUTO_TREASUREBOX"] input').attr('checked', '');
-            if (MY_API.CONFIG.SILVER2COIN) div.find('div[data-toggle="SILVER2COIN"] input').attr('checked', '');
             div.find('div[data-toggle="COIN"] .coin_number').val(MY_API.CONFIG.COIN_NUMBER.toString());
             div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val(MY_API.CONFIG.RND_DELAY_START.toString());
             div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val(MY_API.CONFIG.RND_DELAY_END.toString());
@@ -670,64 +654,6 @@ function init() {//API初始化
             div.find('button[data-action="reset_dailyTasks"]').click(() => {//重置每日任务状态
                 MY_API.setDailyTasksDefaults();
             });
-
-            div.find('div[data-toggle="RANDOM_DELAY"] input:checkbox').change(() => {//RANDOM_DELAY按钮（控制开关）
-                MY_API.CONFIG.RANDOM_DELAY = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-
-            div.find('div[data-toggle="RANDOM_DELAY"] [data-action="save"] input').click(() => {//RANDOM_DELAY按钮（控制输入的两个时间）
-                MY_API.CONFIG.RND_DELAY_START = parseInt(div.find('div[data-toggle="RANDOM_DELAY"].RND_DELAY_START').val());
-                MY_API.CONFIG.RND_DELAY_END = parseInt(div.find('div[data-toggle="RANDOM_DELAY"].RND_DELAY_END').val());
-                MY_API.saveConfig()
-            });
-
-            div.find('div[data-toggle="TIME_AREA_DISABLE"] input:checkbox').change(() => {//TIME_AREA_DISABLE按钮（控制开关）
-                MY_API.CONFIG.TIME_AREA_DISABLE = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-            div.find('div[data-toggle="AUTO_GROUP_SIGN"] input:checkbox').change(() => {//应援团签到(控制开关)
-                MY_API.CONFIG.AUTO_GROUP_SIGN = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-            div.find('div[data-toggle="FORCE_LOTTERY"] input:checkbox').change(() => {//黑屋强制领奖(控制开关)
-                MY_API.CONFIG.FORCE_LOTTERY = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-            div.find('div[data-toggle="LOGIN"] input:checkbox').change(() => {//自动登陆(控制开关)
-                MY_API.CONFIG.LOGIN = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-            div.find('div[data-toggle="WATCH"] input:checkbox').change(() => {//自动观看(控制开关)
-                MY_API.CONFIG.WATCH = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-            div.find('div[data-toggle="COIN"] input:checkbox').change(() => {//自动投币(控制开关)
-                MY_API.CONFIG.COIN = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-            div.find('div[data-toggle="SHARE"] input:checkbox').change(() => {//自动分享(控制开关)
-                MY_API.CONFIG.SHARE = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-            div.find('div[data-toggle="SILVER2COIN"] input:checkbox').change(() => {//银瓜子换硬币(控制开关)
-                MY_API.CONFIG.SILVER2COIN = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-            div.find('div[data-toggle="LIVE_SIGN"] input:checkbox').change(() => {//直播签到(控制开关)
-                MY_API.CONFIG.LIVE_SIGN = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-            div.find('div[data-toggle="AUTO_TREASUREBOX"] input:checkbox').change(() => {//自动领宝箱(控制开关)
-                MY_API.CONFIG.AUTO_TREASUREBOX = $(this).prop('checked');
-                MY_API.saveConfig()
-            });
-
-            div.find('div[data-toggle="IN_TIME_RELOAD_DISABLE"] input:checkbox').change(() => {//IN_TIME_RELOAD_DISABLE控制非抢礼物时间直播间是否刷新开关
-                MY_API.CONFIG.IN_TIME_RELOAD_DISABLE = $(this).prop('checked');
-                MY_API.saveConfig();
-            });
-
             div.find('#resetArea [data-action="countReset"]').click(() => {//清空统计数据按钮
                 MY_API.GIFT_COUNT = {
                     COUNT: 0,
@@ -740,6 +666,31 @@ function init() {//API初始化
                     window.location.reload()
                 }, 3000);
             });
+
+            let checkList = [
+                'RANDOM_DELAY',
+                'TIME_AREA_DISABLE',
+                'AUTO_GROUP_SIGN',
+                'FORCE_LOTTERY',
+                'LOGIN',
+                'WATCH',
+                'COIN',
+                'SHARE',
+                'SILVER2COIN',
+                'LIVE_SIGN',
+                'IN_TIME_RELOAD_DISABLE',
+                'AUTO_TREASUREBOX',
+                'IN_TIME_RELOAD_DISABLE'
+            ];
+            for (let i of checkList) {//绑定所有checkbox事件
+                let input = div.find(`div[data-toggle="${i}"] input:checkbox`);
+                if (MY_API.CONFIG[i]) input.attr('checked', '');
+                input.change(function () {
+                    MY_API.CONFIG[i] = $(this).prop('checked');
+                    MY_API.saveConfig()
+                });
+            };
+
         },
 
         chatLog: function (text, type = 'info') {//自定义提示
@@ -1333,7 +1284,7 @@ function init() {//API初始化
                 return BAPI.dynamic_svr.dynamic_new(Live_info.uid, 8).then((response) => {
                     console.log('DailyReward.dynamic: API.dynamic_svr.dynamic_new', response);
                     if (response.code === 0) {
-                        if (response.data.cards[0]) {
+                        if (response.data.exist_gap === 1) {
                             const obj = JSON.parse(response.data.cards[0].card);
                             const p1 = MY_API.DailyReward.watch(obj.aid, obj.cid);
                             const p2 = MY_API.DailyReward.coin(response.data.cards, Math.max(MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10, 0));
