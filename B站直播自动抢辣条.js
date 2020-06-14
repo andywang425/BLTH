@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       2.5.6
+// @version       2.5.7
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -178,7 +178,7 @@ function addStyle() {
          
         input[type=checkbox]:after {
             position: absolute;
-            width: 7px;
+            width: 8px;
             height: 10px;
             top: 0;
             content: " ";
@@ -198,7 +198,7 @@ function addStyle() {
         }
          
         input[type=checkbox]:disabled:after {
-            width: 7px;
+            width: 8px;
             height: 10px;
             top: 0;
             color: #fff;
@@ -253,7 +253,7 @@ function init() {//API初始化
         CACHE: {},
         GIFT_COUNT: {
             COUNT: 0,
-            LOVE_COUNT: 0,
+            //LOVE_COUNT: 0,
             SILVER_COUNT: 0,
             CLEAR_TS: 0,
         },
@@ -287,8 +287,7 @@ function init() {//API初始化
             }
             setTimeout(() => {
                 MY_API.TreasureBox.init();
-            }
-                , 3000);
+            }, 5000);
 
             return p;
         },
@@ -408,6 +407,15 @@ function init() {//API初始化
         },
 
         creatSetBox: () => {//创建设置框
+            let unnecessaryList = [//移除不必要的页面元素
+                '#my-dear-haruna-vm',//2233
+                '.june-activity-entry',//活动入口
+                '.rank-banner',//周星计划
+                '.chaos-pk-banner'//大乱斗信息
+            ];
+            for(let i of unnecessaryList) {
+                $(i).remove();
+            };
             //添加按钮
             let btn = $('<button style="display: inline-block; float: left; margin-right: 7px;background-color: #23ade5;color: #fff;border-radius: 4px;border: none; padding:4px; cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">隐藏窗口和抽奖信息<br></button>');
 
@@ -555,7 +563,7 @@ function init() {//API初始化
 </fieldset>
 
 <label style ="color: darkblue">
-        v2.5.6 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+        v2.5.7 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
 </label>
 `);
 
@@ -577,6 +585,7 @@ function init() {//API初始化
 
             div.find('div[id="giftCount"] [data-action="save"]').click(() => {//保存按钮
                 //TIME_AREA_DISABLE按钮（控制输入的两个小时两个分钟）
+                let val = undefined;
                 let val1 = MY_API.CONFIG.TIME_AREA_START_H0UR = parseInt(div.find('div[data-toggle="TIME_AREA_DISABLE"] .startHour').val());
                 let val2 = MY_API.CONFIG.TIME_AREA_END_H0UR = parseInt(div.find('div[data-toggle="TIME_AREA_DISABLE"] .endHour').val());
                 let val3 = MY_API.CONFIG.TIME_AREA_START_MINUTE = parseInt(div.find('div[data-toggle="TIME_AREA_DISABLE"] .startMinute').val());
