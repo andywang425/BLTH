@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       2.5.7
+// @version       2.6
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -230,6 +230,7 @@ function init() {//API初始化
             MAX_GIFT: 99999,//辣条上限
             IN_TIME_RELOAD_DISABLE: false,//休眠时段是否禁止刷新直播间 false为刷新
             RANDOM_SEND_DANMU: 0,//随机弹幕发送概率
+            CHECK_HOUR_ROOM_INTERVAL: 120,//小时间检查间隔时间(秒)
             AUTO_GROUP_SIGN: true,//应援团签到开关
             LIVE_SIGN: true,//直播区签到
             FORCE_LOTTERY: false,//黑屋强制抽奖
@@ -253,7 +254,6 @@ function init() {//API初始化
         CACHE: {},
         GIFT_COUNT: {
             COUNT: 0,
-            //LOVE_COUNT: 0,
             SILVER_COUNT: 0,
             CLEAR_TS: 0,
         },
@@ -392,26 +392,21 @@ function init() {//API初始化
             $('#giftCount span:eq(0)').text(MY_API.GIFT_COUNT.COUNT);
             MY_API.saveGiftCount();
         },
-        addLove: (count) => {
-            MY_API.GIFT_COUNT.LOVE_COUNT += count;
-            $('#giftCount span:eq(1)').text(MY_API.GIFT_COUNT.LOVE_COUNT);
-            MY_API.saveGiftCount();
-        },
         addSilver: (count) => {
             MY_API.GIFT_COUNT.SILVER_COUNT += (count * 10);
             $('#giftCount span:eq(2)').text(MY_API.GIFT_COUNT.SILVER_COUNT);
             MY_API.saveGiftCount();
         },
         checkUpdate: () => {
-            window.open('https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js', '_blank').location;
+            window.open('https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js', '_blank').location;
         },
 
         creatSetBox: () => {//创建设置框
             let unnecessaryList = [//移除不必要的页面元素
                 '#my-dear-haruna-vm',//2233
                 '.june-activity-entry',//活动入口
-                '.rank-banner',//周星计划
-                '.chaos-pk-banner'//大乱斗信息
+                //'.rank-banner',//周星计划
+                //'.chaos-pk-banner'//大乱斗信息
             ];
             for(let i of unnecessaryList) {
                 $(i).remove();
@@ -420,21 +415,20 @@ function init() {//API初始化
             let btn = $('<button style="display: inline-block; float: left; margin-right: 7px;background-color: #23ade5;color: #fff;border-radius: 4px;border: none; padding:4px; cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">隐藏窗口和抽奖信息<br></button>');
 
             btn.click(() => {
-
                 if (msgHide == false) {
                     msgHide = true;
                     $('.igiftMsg').hide();
                     div.hide();
-                    let ct = $('.attention-btn-ctnr');
+                    let ct = $('.chat-history-list');
                     ct.animate({ scrollTop: 0 }, 0);
-                    //ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10);
+                    setTimeout(() => {ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10)}, 100);
                     document.getElementById('hiderbtn').innerHTML = "显示窗口和抽奖信息";
                 }
                 else {
                     msgHide = false;
                     $('.igiftMsg').show();
                     div.show();
-                    let ct = $('.attention-btn-ctnr');
+                    let ct = $('.chat-history-list');
                     ct.animate({ scrollTop: ct.prop("scrollHeight") }, 0);
                     document.getElementById('hiderbtn').innerHTML = "隐藏窗口和抽奖信息";
                 }
@@ -497,6 +491,12 @@ function init() {//API初始化
         <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
         抽奖时活跃弹幕发送概率(整数0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 20px;" type="text">%
         </label>
+    </div>
+    <div data-toggle="CHECK_HOUR_ROOM_INTERVAL">
+    <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+        检查小时榜间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒
+    </label>
+</div>
     </div>
 </fieldset>
 
@@ -563,7 +563,7 @@ function init() {//API初始化
 </fieldset>
 
 <label style ="color: darkblue">
-        v2.5.7 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+        v2.6 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
 </label>
 `);
 
@@ -581,10 +581,11 @@ function init() {//API初始化
             div.find('div[data-toggle="TIME_AREA_DISABLE"] .endHour').val(MY_API.CONFIG.TIME_AREA_END_H0UR.toString());
             div.find('div[data-toggle="TIME_AREA_DISABLE"] .startMinute').val(MY_API.CONFIG.TIME_AREA_START_MINUTE.toString());
             div.find('div[data-toggle="TIME_AREA_DISABLE"] .endMinute').val(MY_API.CONFIG.TIME_AREA_END_MINUTE.toString());
+            div.find('div[data-toggle="CHECK_HOUR_ROOM_INTERVAL"] .num').val(MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL.toString());
 
 
             div.find('div[id="giftCount"] [data-action="save"]').click(() => {//保存按钮
-                //TIME_AREA_DISABLE按钮（控制输入的两个小时两个分钟）
+                //TIME_AREA_DISABLE（控制输入的两个小时两个分钟）
                 let val = undefined;
                 let val1 = MY_API.CONFIG.TIME_AREA_START_H0UR = parseInt(div.find('div[data-toggle="TIME_AREA_DISABLE"] .startHour').val());
                 let val2 = MY_API.CONFIG.TIME_AREA_END_H0UR = parseInt(div.find('div[data-toggle="TIME_AREA_DISABLE"] .endHour').val());
@@ -602,14 +603,14 @@ function init() {//API初始化
                 MY_API.CONFIG.TIME_AREA_END_H0UR = val2;
                 MY_API.CONFIG.TIME_AREA_START_MINUTE = val3;
                 MY_API.CONFIG.TIME_AREA_END_MINUTE = val4;
-                //RANDOM_SKIP save按钮
+                //RANDOM_SKIP save
                 val = parseInt(div.find('div[data-toggle="RANDOM_SKIP"] .per').val());
                 if (val < 0 || val > 100) {
                     MY_API.chatLog('[随机跳过礼物]数据小于等于0或大于10000');
                     return
                 }
                 MY_API.CONFIG.RANDOM_SKIP = val;
-                //RANDOM_SEND_DANMU save按钮
+                //RANDOM_SEND_DANMU save
                 val = parseInt(div.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val());
                 if (val > 5) {
                     MY_API.chatLog("[活跃弹幕]为维护直播间弹幕氛围,弹幕发送概率不得大于5%");
@@ -620,17 +621,17 @@ function init() {//API初始化
                     return
                 }
                 MY_API.CONFIG.RANDOM_SEND_DANMU = val;
-                //MAX_GIFT save按钮
+                //MAX_GIFT save
                 val = parseInt(div.find('div[data-toggle="MAX_GIFT"] .num').val());
                 MY_API.CONFIG.MAX_GIFT = val;
-                //TIME_RELOAD save按钮
+                //TIME_RELOAD save
                 val = parseInt(div.find('div[data-toggle="TIME_RELOAD"] .delay-seconds').val());
                 if (val <= 0 || val > 10000) {
                     MY_API.chatLog('[直播间重载时间]数据小于等于0或大于10000');
                     return
                 }
                 MY_API.CONFIG.TIME_RELOAD = val;
-                //RANDOM_DELAY按钮
+                //RANDOM_DELAY
                 val = parseInt(div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val());
                 val2 = parseInt(div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val());
 
@@ -644,13 +645,20 @@ function init() {//API初始化
                 }
                 MY_API.CONFIG.RND_DELAY_START = val;
                 MY_API.CONFIG.RND_DELAY_END = val2;
-                //COIN按钮
+                //COIN
                 val = parseInt(div.find('div[data-toggle="COIN"] .coin_number').val());
                 if (val < 0) {
                     MY_API.chatLog("[自动投币]数据小于0");
                     return
                 }
                 MY_API.CONFIG.COIN_NUMBER = val;
+                //CHECK_HOUR_ROOM_INTERVAL
+                val = parseInt(div.find('div[data-toggle="CHECK_HOUR_ROOM_INTERVAL"] .num').val());
+                if (val <= 0) {
+                    MY_API.chatLog("[检查小时榜间隔]数据小于等于0");
+                    return
+                }
+                MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL = val;
                 MY_API.saveConfig();
             });
 
@@ -666,7 +674,6 @@ function init() {//API初始化
             div.find('#resetArea [data-action="countReset"]').click(() => {//清空统计数据按钮
                 MY_API.GIFT_COUNT = {
                     COUNT: 0,
-                    LOVE_COUNT: 0,
                     CLEAR_TS: 0,
                 };
                 MY_API.saveGiftCount();
@@ -997,9 +1004,6 @@ function init() {//API初始化
                                         if (msg.indexOf('辣条') > -1) {
                                             MY_API.addGift(num);
                                         }
-                                        else if (msg.indexOf('亲密度') > -1) {
-                                            MY_API.addLove(num);
-                                        }
                                         else if (msg.indexOf('银瓜子') > -1) {
                                             MY_API.addSilver(num);
                                         }
@@ -1015,9 +1019,6 @@ function init() {//API初始化
                                         if (msg.indexOf('辣条') > -1) {
                                             MY_API.addGift(num);
                                         }
-                                        else if (msg.indexOf('亲密度') > -1) {
-                                            MY_API.addLove(num);
-                                        }
                                         else if (msg.indexOf('银瓜子') > -1) {
                                             MY_API.addSilver(num);
                                         }
@@ -1031,9 +1032,6 @@ function init() {//API初始化
                                     if (num) {
                                         if (msg.indexOf('辣条') > -1) {
                                             MY_API.addGift(num);
-                                        }
-                                        else if (msg.indexOf('亲密度') > -1) {
-                                            MY_API.addLove(num);
                                         }
                                         else if (msg.indexOf('银瓜子') > -1) {
                                             MY_API.addSilver(num);
@@ -1594,6 +1592,7 @@ function init() {//API初始化
                             return $.Deferred().resolve();
                         case -902: // -902: 验证码错误
                         case -901: // -901: 验证码过期
+                        case -10017: // -10017: 验证码过期
                             return MY_API.TreasureBox.captcha.calc().then((captcha) => {
                                 return MY_API.TreasureBox.getAward(captcha, cnt);
                             });
@@ -1681,14 +1680,13 @@ function init() {//API初始化
                 // 删除了未使用的变量
                 OCR: {
                     getGrayscaleMap: (context, rate = 235, width = 120, height = 40) => {
-                        function getGrayscale(x, y) {
-                            const pixel = context.getImageData(x, y, 1, 1).data;
-                            return pixel ? (77 * pixel[0] + 150 * pixel[1] + 29 * pixel[2] + 128) >> 8 : 0;
-                        }
+                        const pixelMap = context.getImageData(0, 0, width, height).data;
                         const map = [];
                         for (let y = 0; y < height; y++) { // line y
                             for (let x = 0; x < width; x++) { // column x
-                                const gray = getGrayscale(x, y);
+                                const index = (y * width + x) * 4;
+                                const pixel = pixelMap.slice(index, index + 4);
+                                const gray = pixel ? (77 * pixel[0] + 150 * pixel[1] + 29 * pixel[2] + 128) >> 8 : 0;
                                 map.push(gray > rate ? gray : 0);
                             }
                         }
@@ -1716,7 +1714,7 @@ function init() {//API初始化
                         }
                         return map;
                     },
-                    execMap: (connectMap, rate = 4) => {
+                    /*execMap: (connectMap, rate = 4) => {
                         const map = [];
                         const connectMapLength = connectMap.length;
                         for (let i = 0; i < connectMapLength; ++i) {
@@ -1742,7 +1740,7 @@ function init() {//API初始化
                             else map.push(0);
                         }
                         return map;
-                    }
+                    }*/
                 },
                 eval: (fn) => {
                     let Fn = Function;
@@ -1754,23 +1752,14 @@ function init() {//API初始化
                 // 1.将correctStr声明在correctQuestion函数内部，并修改相关引用
                 // 2.在correctStr中增加'>': 3
                 correctStr: {
-                    'g': 9,
-                    'z': 2,
-                    'Z': 2,
-                    'o': 0,
-                    'l': 1,
-                    'B': 8,
-                    'O': 0,
-                    'S': 6,
-                    's': 6,
-                    'i': 1,
-                    'I': 1,
+                    'i': 1, 'I': 1, '|': 1, 'l': 1,
+                    'o': 0, 'O': 0, 'D': 0,
+                    'S': 6, 's': 6, 'b': 6,
+                    'R': 8, 'B': 8,
+                    'z': 2, 'Z': 2,
                     '.': '-',
                     '_': 4,
-                    'b': 6,
-                    'R': 8,
-                    '|': 1,
-                    'D': 0,
+                    'g': 9,
                     '>': 3
                 },
                 correctQuestion: (question) => {
@@ -1780,7 +1769,13 @@ function init() {//API初始化
                         let a = MY_API.TreasureBox.captcha.correctStr[question[i]];
                         q += (a !== undefined ? a : question[i]);
                     }
-                    if (q[2] === '4') q[2] = '+';
+                    if (q[2] === '4') q[2] = '+'; //若第三位为4则替换为+
+                    for (let c = 0; c <= parseInt(q.length - 2); c++) {//'1 => 7
+                        if(q[c] === '\'' && q[c+1] === '1') {
+                            q[c] = '7';
+                            q.splice(c + 1, 1)
+                        }
+                    }
                     return q;
                 }
             }
@@ -1838,7 +1833,6 @@ function StartPlunder(API) {
     let LT_Timer = () => {//判断是否清空辣条数量
         if (checkNewDay(API.GIFT_COUNT.CLEAR_TS)) {
             API.GIFT_COUNT.COUNT = 0;
-            API.GIFT_COUNT.LOVE_COUNT = 0;
             API.GIFT_COUNT.CLEAR_TS = dateNow();
             API.saveGiftCount();
             console.log('清空辣条数量')
@@ -1899,7 +1893,16 @@ function StartPlunder(API) {
     };
 
     setTimeout(check_top_room, 6e3);//加载脚本后6秒检查一次小时榜
-    let check_timer = setInterval(check_top_room, 120e3);//小时榜刷新间隔，原十分钟
+    let FnTimer = parseInt(API.CONFIG.CHECK_HOUR_ROOM_INTERVAL * 1000);
+    let check_timer = setInterval(setInFn, FnTimer);
+    function setInFn() {
+        check_top_room();
+        FnTimer -= 1000;
+        clearInterval(check_timer);
+        if (FnTimer > 0) {
+            check_timer = setInterval(setInFn, FnTimer);
+        }
+    }
 
 
     let reset = (delay) => {
