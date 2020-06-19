@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       2.6
+// @version       2.6.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -563,7 +563,7 @@ function init() {//API初始化
 </fieldset>
 
 <label style ="color: darkblue">
-        v2.6 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+        v2.6.1 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
 </label>
 `);
 
@@ -1893,16 +1893,7 @@ function StartPlunder(API) {
     };
 
     setTimeout(check_top_room, 6e3);//加载脚本后6秒检查一次小时榜
-    let FnTimer = parseInt(API.CONFIG.CHECK_HOUR_ROOM_INTERVAL * 1000);
-    let check_timer = setInterval(setInFn, FnTimer);
-    function setInFn() {
-        check_top_room();
-        FnTimer -= 1000;
-        clearInterval(check_timer);
-        if (FnTimer > 0) {
-            check_timer = setInterval(setInFn, FnTimer);
-        }
-    }
+    let check_timer = setInterval(check_top_room, parseInt(API.CONFIG.CHECK_HOUR_ROOM_INTERVAL * 1000));
 
 
     let reset = (delay) => {
