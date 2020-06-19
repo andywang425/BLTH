@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BilibiliAPI_mod
-// @namespace    https://greasyfork.org/en/users/475234-andywang425
+// @namespace    https://github.com/andywang425
 // @version      1.2
 // @description  BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上进行补充。
 // @author       SeaLoong,andywang425
@@ -1343,7 +1343,7 @@ var BilibiliAPI = {
     /**
     * 获取cookie
     * @param name
-    * @returns cookie {string|boolean}
+    * @returns {string|boolean}
     */
     getCookie:(name) => {
         let cookies = document.cookie.split(';');
