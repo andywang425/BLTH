@@ -1,4 +1,6 @@
-# Bilibili-SGTH
+# Bilibili-SGTH  
+**Bilibili Spicy Gluten and Task Helper**  
+
 ![MIT License](https://img.shields.io/badge/license-MIT-green) ![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-unsupport-red.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium  83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
 油猴脚本。自动参加抽奖，完成每日任务。  
 另含BilibiliAPI_Mod及[OCRAD](https://github.com/antimatter15/ocrad.js)。  
@@ -46,8 +48,18 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
   
    8.自动领银瓜子宝箱 
 
-以上功能涉及参数可自定义  
+以上功能涉及参数可自定义。  
+
+所有输入的数据必须为整数。  
+自动送礼目前只会送出辣条和亿圆。如果要填写多个优先送礼房间，每个房间号之间需用半角逗号,隔开。如 666,777,888 (其实就是数组的格式)。为0则不送。若不勾选送礼优先高等级粉丝牌则优先送低等级粉丝牌。  
+礼物到期时间:将要在这个时间段里过期的礼物会被送出。  
+送礼设置优先级:  
+优先送礼房间>送礼优先高等级粉丝牌。  
+即如果勾选了送满全部勋章且辣条足够，那么会先给优先送礼房间送礼（前提是你得有优先房间的粉丝勋章），然后再给剩下粉丝勋章中等级由高到低的牌子送礼。  
+如果只指定了优先送礼房间，但未勾选送满全部勋章，则会把将要过期的礼物送给粉丝勋章列表中的第一个粉丝牌。  
 ## 更新日志
+>### 3.0  
+>增加自动送礼功能;更新源换为jsdelivr，访问更快;界面调整，增加简要说明。
 >### 2.6.1  
 >修复检查小时榜的bug
 >### 2.6  
