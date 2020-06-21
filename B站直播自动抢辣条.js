@@ -16,8 +16,8 @@
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
-// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@master/BilibiliAPI_Mod.min.js
-// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@master/OCRAD.min.js
+// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@1.2/BilibiliAPI_Mod.min.js
+// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@1.2/OCRAD.min.js
 // @grant        none
 // ==/UserScript==
 let msgHide = false; //UI隐藏开关
