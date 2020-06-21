@@ -5,14 +5,14 @@
 // @author        andywang425
 // @description   自动参与Bilibili直播区广播礼物及小时榜房间礼物的抽奖;完成每日任务
 // @description:en 自动参与Bilibili直播区广播礼物及小时榜房间礼物的抽奖;完成每日任务
-// @updateURL     https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
-// @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
+// @updateURL     https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
+// @downloadURL    https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
 // @homepageURL   https://github.com/andywang425/Bilibili-SGTH/
 // @supportURL    https://github.com/andywang425/Bilibili-SGTH/issues
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.0
+// @version       3.0.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -32,16 +32,16 @@ const tz_offset = new Date().getTimezoneOffset() + 480;
 const ts_ms = () => Date.now();
 const ts_s = () => Math.round(ts_ms() / 1000);
 if (!logSwitch) {
-    console.log = () => {};//关闭控制台日志输出
+    console.log = () => { };//关闭控制台日志输出
 }
 let Live_info = {
     room_id: undefined,
     uid: undefined,
-    ruid : undefined,
+    ruid: undefined,
     mobile_verify: undefined,
     gift_list: undefined,
-    rnd : undefined,
-    visit_id : undefined
+    rnd: undefined,
+    visit_id: undefined
 };
 const runUntilSucceed = (callback, delay = 0, period = 100) => {
     setTimeout(() => {
@@ -57,7 +57,7 @@ const delayCall = (callback, delay = 10e3) => {
     }, delay);
     return p;
 };
-const runTomorrow = (callback,msg) => {
+const runTomorrow = (callback, msg) => {
     const t = new Date();
     let name = msg || ' ';
     t.setMinutes(t.getMinutes() + tz_offset);
@@ -258,11 +258,11 @@ function init() {//API初始化
             AUTO_TREASUREBOX: true,//每日宝箱
             SILVER2COIN: false,//银瓜子换硬币
             AUTO_GIFT: false,//自动送礼
-            GIFT_INTERVAL : 10,//送礼检查间隔
-            GIFT_SORT : false,//送礼优先高等级
-            AUTO_GIFT_ROOMID : "0",//送礼优先房间
-            GIFT_LIMIT : 86400,//礼物到期时间
-            SEND_ALL_GIFT : false//送满全部勋章
+            GIFT_INTERVAL: 10,//送礼检查间隔
+            GIFT_SORT: false,//送礼优先高等级
+            AUTO_GIFT_ROOMID: "0",//送礼优先房间
+            GIFT_LIMIT: 86400,//礼物到期时间
+            SEND_ALL_GIFT: false//送满全部勋章
         },
         CACHE_DEFAULT: {
             UNIQUE_CHECK: 0,//唯一运行检测
@@ -431,7 +431,7 @@ function init() {//API初始化
                 //'.rank-banner',//周星计划
                 //'.chaos-pk-banner'//大乱斗信息
             ];
-            for(let i of unnecessaryList) {
+            for (let i of unnecessaryList) {
                 $(i).remove();
             };
             //添加按钮
@@ -444,7 +444,7 @@ function init() {//API初始化
                     div.hide();
                     let ct = $('.chat-history-list');
                     ct.animate({ scrollTop: 0 }, 0);
-                    setTimeout(() => {ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10)}, 100);
+                    setTimeout(() => { ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10) }, 100);
                     document.getElementById('hiderbtn').innerHTML = "显示窗口和抽奖信息";
                 }
                 else {
@@ -473,165 +473,169 @@ function init() {//API初始化
             });
 
             div.append(`
-<fieldset class="igiftMsg_fs">
-     <legend style = "color: black">今日统计</legend>
-            <div id="giftCount" style="font-size: large; text-shadow: 1px 1px #00000066; color: blueviolet;">
-            辣条&nbsp;<span>${MY_API.GIFT_COUNT.COUNT}</span>
-            银瓜子&nbsp;<span>${MY_API.GIFT_COUNT.SILVER_COUNT}万</span>
-            <button style="font-size: small" class="igiftMsg_btn" data-action="save">保存所有设置</button>
-            </div>
-</fieldset>
-
-<fieldset class="igiftMsg_fs" style="float: right;">
-     <legend style = "color: black">低调设置</legend>
-     <div data-toggle="RANDOM_DELAY">
-        <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-        <input style="vertical-align: text-top;" type="checkbox">抽奖附加随机延迟
-        <input class="RND_DELAY_START igiftMsg_input" style="width: 20px;vertical-align: top;" type="text">~
-        <input class="RND_DELAY_END igiftMsg_input" style="width: 20px;vertical-align: top;" type="text">s
-        </label>
-    </div>
-    <div data-toggle="TIME_AREA_DISABLE">
-        <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-        <input style="vertical-align: text-top;" type="checkbox">启用
-        <input class="startHour igiftMsg_input" style="width: 20px;" type="text">点
-        <input class="startMinute igiftMsg_input" style="width: 20px;" type="text">分至
-        <input class="endHour igiftMsg_input" style="width: 20px;" type="text">点
-        <input class="endMinute igiftMsg_input" style="width: 20px;" type="text">分不抽奖(24小时制)
-        </label>
-    </div>
-    <div data-toggle="RANDOM_SKIP">
-        <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-        随机跳过礼物(0到100,为0则不跳过)<input class="per igiftMsg_input" style="width: 20px;" type="text">%
-        </label>
-    </div>
-    <div data-toggle="MAX_GIFT">
-        <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-        当天最多抢辣条数量<input class="num igiftMsg_input" style="width: 100px;" type="text">
-        </label>
-    </div>
-    <div data-toggle="RANDOM_SEND_DANMU">
-        <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-        抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 20px;" type="text">%
-        </label>
-    </div>
-    <div data-toggle="CHECK_HOUR_ROOM_INTERVAL">
-    <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-        检查小时榜间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒
-    </label>
-</div>
-    </div>
-    <fieldset class="igiftMsg_fs">
-<legend style = "color: black">说明</legend>
-    所有输入的数据必须为整数。<br>
-    自动送礼中如果要填写多个优先送礼房间，<br>
-    每个房间号之间需用半角逗号,隔开。<br>
-    如 666,777,888。为0则不送。<br>
-    若不勾选送礼优先高等级粉丝牌则优先送低等级粉丝牌。<br>
-    送礼设置优先级:<br>
-    优先送礼房间>送礼优先高等级粉丝牌
-</fieldset>
-</fieldset>
-
-<fieldset class="igiftMsg_fs">
-    <legend style = "color: black">每日任务设置</legend>
-    <div data-toggle="LOGIN" style ="line-height: 15px; color: black">
-    <input style="vertical-align: text-top;" type="checkbox">
-    登陆
-    </div>
-    <div data-toggle="WATCH" style ="line-height: 15px; color: black">
-    <input style="vertical-align: text-top;" type="checkbox">
-    观看视频
-    </div>
-    <div data-toggle="COIN" style ="line-height: 15px; color: black">
-    <label style="cursor: pointer">
-    <input style="cursor: pointer; vertical-align: text-top;" type="checkbox">
-    自动投币<input class="coin_number igiftMsg_input" style="width: 40px;" type="text">个
-    </label>
-    </div>
-    <div data-toggle="SHARE" style ="line-height: 15px; color: black">
-    <input style="vertical-align: text-top;" type="checkbox">
-    分享视频
-    </div>
-    <div data-toggle="SILVER2COIN"style ="line-height: 15px; color: black">
-    <input style="vertical-align: text-top;" type="checkbox">
-    银瓜子换硬币
-    </div>
-    <div data-toggle="LIVE_SIGN" style ="line-height: 15px; color: black">
-    <input style="vertical-align: text-top;" type="checkbox">
-    直播区签到
-    </div>
-    <div data-toggle="AUTO_GROUP_SIGN" style ="line-height: 15px; color: darkgreen">
-        <input style="vertical-align: text-top;" type="checkbox">
-        应援团签到
-    </div>
-    <div data-toggle="AUTO_TREASUREBOX" style ="line-height: 15px; color: purple">
-        <input style="vertical-align: text-top;" type="checkbox">
-        自动领银瓜子宝箱
-    </div>
-
-    <div data-toggle="AUTO_GIFT" style ="line-height: 15px; color: purple">
-        <input style="vertical-align: text-top;" type="checkbox">
-        自动送礼
-    </div>
-
-    <div data-toggle="AUTO_GIFT_ROOMID" style ="line-height: 15px; color: purple">
-        优先送礼房间
-        <input class="num igiftMsg_input" style="width: 150px;" type="text">
-    </div>
-
-    <div data-toggle="GIFT_INTERVAL" style ="line-height: 15px; color: purple">
-        检查间隔
-        <input class="num igiftMsg_input" style="width: 25px;" type="text">
-        分钟
-    </div>
-    <div data-toggle="GIFT_LIMIT" style ="line-height: 15px; color: purple">
-        礼物到期时间
-        <input class="num igiftMsg_input" style="width: 100px;" type="text">
-        秒
-    </div>
-    <div data-toggle="GIFT_SORT" style ="line-height: 15px; color: purple">
-        <input style="vertical-align: text-top;" type="checkbox">
-        送礼优先高等级粉丝牌
-    </div>
-    <div data-toggle="SEND_ALL_GIFT" style ="line-height: 15px; color: purple">
-        <input style="vertical-align: text-top;" type="checkbox">
-        送满全部勋章
-    </div>
-    <div><button data-action="reset_dailyTasks" style="color: red;" class="igiftMsg_btn">再次执行每日任务</button></div>
-    </fieldset>
-
-<fieldset class="igiftMsg_fs">
-    <legend style = "color: black">其他设置</legend>
-    <div data-toggle="TIME_RELOAD" style = "color: black">
-    本直播间重载时间(刷新后生效)：
-    <input class="delay-seconds igiftMsg_input" type="text" style="width: 30px;">分
-    </div>
-    <div data-toggle="IN_TIME_RELOAD_DISABLE" style = "line-height: 15px">
-        <label style="margin: 5px auto; color: darkgreen">
-            <input style="vertical-align: text-top;" type="checkbox">不抽奖时段不重载直播间
-        </label>
-    </div>
-    <div data-toggle="FORCE_LOTTERY" style = "line-height: 15px">
-        <label style="margin: 5px auto; color: red;">
-            <input style="vertical-align: text-top;" type="checkbox">进入小黑屋后强制重复抽奖(危)
-        </label>
-    </div>
-    <div id = "resetArea">
-        <button data-action="reset" style="color: red;" class="igiftMsg_btn">重置所有为默认</button>
-        <button style="font-size: small" class="igiftMsg_btn" data-action="countReset">重置统计</button>
-        <button style="font-size: small; color: green;" class="igiftMsg_btn" data-action="checkUpdate">检查更新</button>
-    </div>
-
-</fieldset>
-
-<label style ="color: darkblue">
-        v3.0 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
-</label>
+            <fieldset class="igiftMsg_fs">
+            <legend style = "color: black">今日统计</legend>
+                   <div id="giftCount" style="font-size: large; text-shadow: 1px 1px #00000066; color: blueviolet;">
+                   辣条&nbsp;<span>${MY_API.GIFT_COUNT.COUNT}</span>
+                   银瓜子&nbsp;<span>${MY_API.GIFT_COUNT.SILVER_COUNT}万</span>
+                   <button style="font-size: small" class="igiftMsg_btn" data-action="save">保存所有设置</button>
+                   </div>
+       </fieldset>
+       
+       <fieldset class="igiftMsg_fs" >
+            <legend style = "color: black">低调设置</legend>
+            <div data-toggle="RANDOM_DELAY">
+               <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+               <input style="vertical-align: text-top;" type="checkbox">抽奖附加随机延迟
+               <input class="RND_DELAY_START igiftMsg_input" style="width: 20px;vertical-align: top;" type="text">~
+               <input class="RND_DELAY_END igiftMsg_input" style="width: 20px;vertical-align: top;" type="text">s
+               </label>
+           </div>
+           <div data-toggle="TIME_AREA_DISABLE">
+               <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+               <input style="vertical-align: text-top;" type="checkbox">启用
+               <input class="startHour igiftMsg_input" style="width: 20px;" type="text">点
+               <input class="startMinute igiftMsg_input" style="width: 20px;" type="text">分至
+               <input class="endHour igiftMsg_input" style="width: 20px;" type="text">点
+               <input class="endMinute igiftMsg_input" style="width: 20px;" type="text">分不抽奖(24小时制)
+               </label>
+           </div>
+           <div data-toggle="RANDOM_SKIP">
+               <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+               随机跳过礼物(0到100,为0则不跳过)<input class="per igiftMsg_input" style="width: 20px;" type="text">%
+               </label>
+           </div>
+           <div data-toggle="MAX_GIFT">
+               <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+               当天最多抢辣条数量<input class="num igiftMsg_input" style="width: 100px;" type="text">
+               </label>
+           </div>
+           <div data-toggle="RANDOM_SEND_DANMU">
+               <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+               抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 20px;" type="text">%
+               </label>
+           </div>
+           <div data-toggle="CHECK_HOUR_ROOM_INTERVAL">
+           <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+               检查小时榜间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒
+           </label>
+       </div>
+           </div>
+       
+       </fieldset>
+       
+       <fieldset class="igiftMsg_fs" style="float: left;">
+           <legend style = "color: black">每日任务设置</legend>
+           <div data-toggle="LOGIN" style ="line-height: 15px; color: black">
+           <input style="vertical-align: text-top;" type="checkbox">
+           登陆
+           </div>
+           <div data-toggle="WATCH" style ="line-height: 15px; color: black">
+           <input style="vertical-align: text-top;" type="checkbox">
+           观看视频
+           </div>
+           <div data-toggle="COIN" style ="line-height: 15px; color: black">
+           <label style="cursor: pointer">
+           <input style="cursor: pointer; vertical-align: text-top;" type="checkbox">
+           自动投币<input class="coin_number igiftMsg_input" style="width: 40px;" type="text">个
+           </label>
+           </div>
+           <div data-toggle="SHARE" style ="line-height: 15px; color: black">
+           <input style="vertical-align: text-top;" type="checkbox">
+           分享视频
+           </div>
+           <div data-toggle="SILVER2COIN"style ="line-height: 15px; color: black">
+           <input style="vertical-align: text-top;" type="checkbox">
+           银瓜子换硬币
+           </div>
+           <div data-toggle="LIVE_SIGN" style ="line-height: 15px; color: black">
+           <input style="vertical-align: text-top;" type="checkbox">
+           直播区签到
+           </div>
+           <div data-toggle="AUTO_GROUP_SIGN" style ="line-height: 15px; color: darkgreen">
+               <input style="vertical-align: text-top;" type="checkbox">
+               应援团签到
+           </div>
+           <div data-toggle="AUTO_TREASUREBOX" style ="line-height: 15px; color: purple">
+               <input style="vertical-align: text-top;" type="checkbox">
+               自动领银瓜子宝箱
+           </div>
+       
+           <div data-toggle="AUTO_GIFT" style ="line-height: 15px; color: purple">
+               <input style="vertical-align: text-top;" type="checkbox">
+               自动送礼
+           </div>
+       
+           <div data-toggle="AUTO_GIFT_ROOMID" style ="line-height: 15px; color: purple">
+               优先送礼房间
+               <input class="num igiftMsg_input" style="width: 150px;" type="text">
+           </div>
+       
+           <div data-toggle="GIFT_INTERVAL" style ="line-height: 15px; color: purple">
+               检查间隔
+               <input class="num igiftMsg_input" style="width: 25px;" type="text">
+               分钟
+           </div>
+           <div data-toggle="GIFT_LIMIT" style ="line-height: 15px; color: purple">
+               礼物到期时间
+               <input class="num igiftMsg_input" style="width: 100px;" type="text">
+               秒
+           </div>
+           <div data-toggle="GIFT_SORT" style ="line-height: 15px; color: purple">
+               <input style="vertical-align: text-top;" type="checkbox">
+               送礼优先高等级粉丝牌
+           </div>
+           <div data-toggle="SEND_ALL_GIFT" style ="line-height: 15px; color: purple">
+               <input style="vertical-align: text-top;" type="checkbox">
+               送满全部勋章
+           </div>
+           <div><button data-action="reset_dailyTasks" style="color: red;" class="igiftMsg_btn">再次执行每日任务</button></div>
+           </fieldset>
+           <fieldset class="igiftMsg_fs">
+       <legend style = "color: black">说明</legend>
+           所有输入的数据必须为整数。<br>
+           自动送礼目前只会送出辣条和亿圆。<br>
+           礼物到期时间: 将要在这个时间段里过期的礼物会被送出<br>
+           勾选送满全部勋章时无论是否将要过期都会被送出<br>
+           如果要填写多个优先送礼房间，<br>
+           每个房间号之间需用半角逗号,隔开。<br>
+           如 666,777,888。为0则不送。<br>
+           如果没有这些房间的粉丝牌也不送。<br>
+           无论【优先高等级粉丝牌】如何设置，会根据【送满全部勋章】<br>
+           （勾选则补满，否则只送到期的）条件去按优先送礼房间先后顺序送礼。<br>
+           之后根据【优先高等级粉丝牌】决定先送高级还是低级（勾选先高级，不勾选先低级）。
+       </fieldset>
+       <fieldset class="igiftMsg_fs">
+           <legend style = "color: black">其他设置</legend>
+           <div data-toggle="TIME_RELOAD" style = "color: black">
+           本直播间重载时间(刷新后生效)：
+           <input class="delay-seconds igiftMsg_input" type="text" style="width: 30px;">分
+           </div>
+           <div data-toggle="IN_TIME_RELOAD_DISABLE" style = "line-height: 15px">
+               <label style="margin: 5px auto; color: darkgreen">
+                   <input style="vertical-align: text-top;" type="checkbox">不抽奖时段不重载直播间
+               </label>
+           </div>
+           <div data-toggle="FORCE_LOTTERY" style = "line-height: 20px">
+               <label style="margin: 5px auto; color: red;">
+                   <input style="vertical-align: text-top;" type="checkbox">进入小黑屋后强制重复抽奖(危)
+               </label>
+           </div>
+           <div id = "resetArea">
+               <button data-action="reset" style="color: red;" class="igiftMsg_btn">重置所有为默认</button>
+               <button style="font-size: small" class="igiftMsg_btn" data-action="countReset">重置统计</button>
+               <button style="font-size: small; color: green;" class="igiftMsg_btn" data-action="checkUpdate">检查更新</button>
+           </div>
+       
+       </fieldset>
+       
+       <label style ="color: darkblue; font-size:large;">
+               v3.0.1 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+       </label>
 `);
 
-           // $('.live-player-mounter').append(div);
-           $('.bilibili-live-player').append(div);
+            // $('.live-player-mounter').append(div);
+            $('.bilibili-live-player').append(div);
 
             //对应配置状态
             div.find('div[data-toggle="TIME_RELOAD"] .delay-seconds').val(MY_API.CONFIG.TIME_RELOAD.toString());
@@ -730,12 +734,12 @@ function init() {//API初始化
                 //AUTO_GIFT_ROOMID
                 val = div.find('div[data-toggle="AUTO_GIFT_ROOMID"] .num').val();
                 valArray = val.split(",");
-                for (let i = 0; i < valArray.length; i++){
-                    if (valArray[i] === ''){
-                       valArray[i] = 0;
-                 　　}
+                for (let i = 0; i < valArray.length; i++) {
+                    if (valArray[i] === '') {
+                        valArray[i] = 0;
+                    }
                 };
-                val = valArray.join(","); 
+                val = valArray.join(",");
                 console.log(val);
                 MY_API.CONFIG.AUTO_GIFT_ROOMID = val;
                 //GIFT_INTERVAL
@@ -1864,7 +1868,7 @@ function init() {//API初始化
                     }
                     if (q[2] === '4') q[2] = '+'; //若第三位为4则替换为+
                     for (let c = 0; c <= parseInt(q.length - 2); c++) {//'1 => 7
-                        if(q[c] === '\'' && q[c+1] === '1') {
+                        if (q[c] === '\'' && q[c + 1] === '1') {
                             q[c] = '7';
                             q.splice(c + 1, 1)
                         }
@@ -1873,7 +1877,7 @@ function init() {//API初始化
                 }
             }
         }, // Constantly Run, Need Init
-        Gift : {
+        Gift: {
             interval: 600e3,
             run_timer: undefined,
             ruid: undefined,
@@ -1929,48 +1933,48 @@ function init() {//API初始化
                     }
                     await MY_API.Gift.getMedalList();
                     console.log('Gift.run: Gift.getMedalList().then: Gift.medal_list', MY_API.Gift.medal_list);
-                    if(MY_API.Gift.medal_list && MY_API.Gift.medal_list.length>0){
-                        MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(it=>it.dayLimit-it.today_feed>0 && it.level < 20);
-                        if(MY_API.CONFIG.GIFT_SORT){
-                            MY_API.Gift.medal_list.sort((a,b)=>{
-                                if(b.level-a.level==0){
-                                    return b.intimacy-a.intimacy;
+                    if (MY_API.Gift.medal_list && MY_API.Gift.medal_list.length > 0) {
+                        MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(it => it.dayLimit - it.today_feed > 0 && it.level < 20);
+                        if (MY_API.CONFIG.GIFT_SORT) {
+                            MY_API.Gift.medal_list.sort((a, b) => {
+                                if (b.level - a.level == 0) {
+                                    return b.intimacy - a.intimacy;
                                 }
-                                return b.level-a.level;
+                                return b.level - a.level;
                             });
-                        }else{
-                            MY_API.Gift.medal_list.sort((a,b)=>{
-                                if(a.level-b.level==0){
-                                    return a.intimacy-b.intimacy;
+                        } else {
+                            MY_API.Gift.medal_list.sort((a, b) => {
+                                if (a.level - b.level == 0) {
+                                    return a.intimacy - b.intimacy;
                                 }
-                                return a.level-b.level;
+                                return a.level - b.level;
                             });
                         }
-                        if(MY_API.CONFIG.AUTO_GIFT_ROOMID && MY_API.CONFIG.AUTO_GIFT_ROOMID.length>0){
+                        if (MY_API.CONFIG.AUTO_GIFT_ROOMID && MY_API.CONFIG.AUTO_GIFT_ROOMID.length > 0) {
                             let sortRooms = MY_API.CONFIG.AUTO_GIFT_ROOMID.split(",");
                             sortRooms.reverse();
-                            for(let froom of sortRooms){
-                                let rindex = MY_API.Gift.medal_list.findIndex(r=>r.roomid==froom);
-                                if(rindex!=-1){
+                            for (let froom of sortRooms) {
+                                let rindex = MY_API.Gift.medal_list.findIndex(r => r.roomid == froom);
+                                if (rindex != -1) {
                                     let tmp = MY_API.Gift.medal_list[rindex];
-                                    MY_API.Gift.medal_list.splice(rindex,1);
+                                    MY_API.Gift.medal_list.splice(rindex, 1);
                                     MY_API.Gift.medal_list.unshift(tmp);
                                 }
                             }
                         }
                         let limit = MY_API.CONFIG.GIFT_LIMIT;
-                        for(let v of MY_API.Gift.medal_list){
+                        for (let v of MY_API.Gift.medal_list) {
                             let response = await BAPI.room.room_init(parseInt(v.roomid, 10));
                             MY_API.Gift.room_id = parseInt(response.data.room_id, 10);
                             MY_API.Gift.ruid = v.target_id;
                             MY_API.Gift.remain_feed = v.day_limit - v.today_feed;
-                            if(MY_API.Gift.remain_feed > 0){
+                            if (MY_API.Gift.remain_feed > 0) {
                                 await MY_API.Gift.getBagList();
                                 let now = ts_s();
-                                if(!MY_API.CONFIG.SEND_ALL_GIFT){
+                                if (!MY_API.CONFIG.SEND_ALL_GIFT) {
                                     //送之前查一次有没有可送的
-                                    let pass = MY_API.Gift.bag_list.filter(r=>![4, 3, 9, 10].includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
-                                    if(pass.length==0){
+                                    let pass = MY_API.Gift.bag_list.filter(r => ![4, 3, 9, 10].includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
+                                    if (pass.length == 0) {
                                         break;
                                     }
                                 }
@@ -1979,9 +1983,9 @@ function init() {//API初始化
                                 if (MY_API.Gift.remain_feed > 0) {
                                     window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度未满[${v.today_feed}/${v.day_limit}]，预计需要[${MY_API.Gift.remain_feed}]送礼开始`, 'info');
                                     await MY_API.Gift.sendGift(v);
-                                    if(!MY_API.CONFIG.SEND_ALL_GIFT){
-                                        let pass = MY_API.Gift.bag_list.filter(r=>![4, 3, 9, 10].includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
-                                        if(pass.length==0){
+                                    if (!MY_API.CONFIG.SEND_ALL_GIFT) {
+                                        let pass = MY_API.Gift.bag_list.filter(r => ![4, 3, 9, 10].includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
+                                        if (pass.length == 0) {
                                             break;
                                         }
                                     }
@@ -1999,7 +2003,7 @@ function init() {//API初始化
                     return $.Deferred().reject();
                 }
             },
-            sendGift: (medal,i = 0) => {
+            sendGift: (medal, i = 0) => {
                 if (i >= MY_API.Gift.bag_list.length) {
                     return $.Deferred().resolve();
                 }
@@ -2012,11 +2016,11 @@ function init() {//API初始化
                 if (
                     //特殊礼物排除
                     (![3, 4, 9, 10, 39, 30588, 30587, 30586, 30585].includes(v.gift_id)
-                     //满足到期时间
-                     && v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT)
+                        //满足到期时间
+                        && v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT)
                     )
                     //或者全部送满
-                    || MY_API.CONFIG.SEND_ALL_GIFT){
+                    || MY_API.CONFIG.SEND_ALL_GIFT) {
                     // 检查SEND_ALL_GIFT和礼物到期时间 送当天到期的
                     const feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
                     if (feed > 0) {
@@ -2033,15 +2037,15 @@ function init() {//API初始化
                                 } else {
                                     window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常:${response.msg}`, 'caution');
                                 }
-                                return MY_API.Gift.sendGift(medal,i + 1);
+                                return MY_API.Gift.sendGift(medal, i + 1);
                             }, () => {
                                 window.toast('[自动送礼]包裹送礼失败，请检查网络', 'error');
-                                return delayCall(() => MY_API.Gift.sendGift(medal,i));
+                                return delayCall(() => MY_API.Gift.sendGift(medal, i));
                             });
                         }
                     }
                 }
-                return MY_API.Gift.sendGift(medal,i + 1);
+                return MY_API.Gift.sendGift(medal, i + 1);
             }
         } // Once Run every 10 minutes
 
