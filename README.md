@@ -1,8 +1,7 @@
 # Bilibili-SGTH  
 **Bilibili Spicy Gluten and Task Helper**  
 
-![MIT License](https://img.shields.io/badge/license-MIT-green) ![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-unsupport-red.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium  83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
-油猴脚本。自动参加抽奖，完成每日任务。  
+![MIT License](https://img.shields.io/badge/license-MIT-green) ![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-unsupport-red.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
 另含BilibiliAPI_Mod及[OCRAD](https://github.com/antimatter15/ocrad.js)。  
 ### 点击[Bilibili-SGTH_1](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)或[Bilibili-SGTH_2](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)或[Bilibili-SGTH_3](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)(访问较快)安装脚本  
 
@@ -15,7 +14,7 @@ _2020.5.14起领取上船奖励不加亲密度改为辣条_
 如果开启抽奖附加延迟，可能出现领不到礼物的情况，请降低或取消延迟。  
 这个脚本的部分代码来源于[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)的[B站直播自动抢辣条二代by十六夜](https://greasyfork.org/en/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1%E4%BA%8C%E4%BB%A3by%E5%8D%81%E5%85%AD%E5%A4%9C)和[SeaLoong](https://github.com/SeaLoong)的[Bilibili-LRHH](https://github.com/SeaLoong/Bilibili-LRHH)。  
 **部分设置更改后需要刷新才能生效。**  
-**使用前建议先关闭广告拦截插件，否则脚本可能无法正常运行。**  
+**使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。**  
 我的b站id:[Andy425](https://space.bilibili.com/358483030)  
 辣条交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，如果有问题可以进群寻求帮助。欢迎进来聊天~  
 _如果有什么建议可以给我提Issues或在b站私信我，我会试着改进~_  
@@ -52,6 +51,9 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
    
 以上功能涉及参数可自定义，所有输入的数据必须为整数。  
 ### 说明
+**关于脚本代码格式**  
+默认安装的[B站直播自动抢辣条.user.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)是用UglifyJS压缩后的脚本。  
+原格式的脚本为[B站直播自动抢辣条.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)。  
 **关于自动送礼**  
 + 自动送礼目前只会送出辣条和亿圆。  
 + 如果要填写多个优先送礼房间，每个房间号之间需用半角逗号,隔开。如 666,777,888 (其实就是数组的格式)。为0则不送。若不勾选送礼优先高等级粉丝牌则优先送低等级粉丝牌。  
@@ -64,6 +66,8 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
   1. 如果勾选了送满全部勋章且指定优先送礼房间，会先按顺序依次给优先送礼房间送礼（前提是你得有优先房间的粉丝勋章），无视礼物过期时间。之后若勾选了优先高等级粉丝牌，则按等级由高到低给剩余粉丝牌送礼。否则按等级由低到等高给剩余粉丝牌送礼。
   2. 如果未勾选送满全部勋章但指定了优先送礼房间，那么会先给优先送礼房间送出即将过期礼物（前提是你得有优先房间的粉丝勋章）。然后若勾选了优先高等级粉丝牌，则给剩下粉丝勋章中等级由高到低的牌子送出即将过期礼物。否则按等级由低到高给剩余粉丝牌送出即将过期礼物。
 ## 更新日志
+>### 3.1  
+>支持自定义送礼时间，取消送礼检查间隔选项。脚本会在指定的一分钟内集中送礼。  
 >### 3.0.1  
 >补充脚本内说明;界面调整;更新源换为jsdelivr。 
 >### 3.0  
