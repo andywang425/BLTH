@@ -316,7 +316,7 @@ function init() {//API初始化
             }
             setTimeout(() => {
                 MY_API.TreasureBox.init();
-            }, 5000);
+            }, 5750);
 
             return p;
         },
@@ -388,6 +388,7 @@ function init() {//API初始化
         },
         ReDoDailyTasks: () => {
             window.toast('3秒后再次执行每日任务', 'info')
+            
             setTimeout(() => {
                 MY_API.CACHE = MY_API.CACHE_DEFAULT;
                 MY_API.GroupSign.run();//应援团签到
