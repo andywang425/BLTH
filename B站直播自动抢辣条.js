@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.2
+// @version       3.2.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -431,7 +431,7 @@ function init() {//API初始化
             MY_API.saveGiftCount();
         },
         checkUpdate: () => {
-            window.open('https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js', '_blank').location;
+            window.open('https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js', '_blank').location;
         },
         removeUnnecessary : () => {//移除不必要的页面元素
             let unnecessaryList = [
@@ -500,8 +500,8 @@ function init() {//API初始化
             <div data-toggle="RANDOM_DELAY">
                <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
                <input style="vertical-align: text-top;" type="checkbox">抽奖附加随机延迟
-               <input class="RND_DELAY_START igiftMsg_input" style="width: 20px;vertical-align: top;" type="text">~
-               <input class="RND_DELAY_END igiftMsg_input" style="width: 20px;vertical-align: top;" type="text">s
+               <input class="RND_DELAY_START igiftMsg_input" style="width: 30px;vertical-align: top;" type="text">~
+               <input class="RND_DELAY_END igiftMsg_input" style="width: 30px;vertical-align: top;" type="text">s
                </label>
            </div>
            <div data-toggle="TIME_AREA_DISABLE">
@@ -515,7 +515,7 @@ function init() {//API初始化
            </div>
            <div data-toggle="RANDOM_SKIP">
                <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-               随机跳过礼物(0到100,为0则不跳过)<input class="per igiftMsg_input" style="width: 20px;" type="text">%
+               随机跳过礼物(0到100,为0则不跳过)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
                </label>
            </div>
            <div data-toggle="MAX_GIFT">
@@ -525,7 +525,7 @@ function init() {//API初始化
            </div>
            <div data-toggle="RANDOM_SEND_DANMU">
                <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-               抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 20px;" type="text">%
+               抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
                </label>
            </div>
            <div data-toggle="CHECK_HOUR_ROOM_INTERVAL">
@@ -644,7 +644,7 @@ function init() {//API初始化
        
        </fieldset>
        <label style ="color: darkblue; font-size:large;">
-       v3.2 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+       v3.2.1 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
         </label>
        </div>
 
@@ -654,22 +654,22 @@ function init() {//API初始化
 
 
             //对应配置状态
-            div.find('div[data-toggle="TIME_RELOAD"] .delay-seconds').val(MY_API.CONFIG.TIME_RELOAD.toString());
-            div.find('div[data-toggle="RANDOM_SKIP"] .per').val((parseInt(MY_API.CONFIG.RANDOM_SKIP)).toString());
-            div.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val((parseInt(MY_API.CONFIG.RANDOM_SEND_DANMU)).toString());
+            div.find('div[data-toggle="TIME_RELOAD"] .delay-seconds').val(parseInt(MY_API.CONFIG.TIME_RELOAD).toString());
+            div.find('div[data-toggle="RANDOM_SKIP"] .per').val((parseFloat(MY_API.CONFIG.RANDOM_SKIP)).toString());
+            div.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val((parseFloat(MY_API.CONFIG.RANDOM_SEND_DANMU)).toString());
             div.find('div[data-toggle="MAX_GIFT"] .num').val((parseInt(MY_API.CONFIG.MAX_GIFT)).toString());
-            div.find('div[data-toggle="COIN"] .coin_number').val(MY_API.CONFIG.COIN_NUMBER.toString());
-            div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val(MY_API.CONFIG.RND_DELAY_START.toString());
-            div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val(MY_API.CONFIG.RND_DELAY_END.toString());
-            div.find('div[data-toggle="TIME_AREA_DISABLE"] .startHour').val(MY_API.CONFIG.TIME_AREA_START_H0UR.toString());
-            div.find('div[data-toggle="TIME_AREA_DISABLE"] .endHour').val(MY_API.CONFIG.TIME_AREA_END_H0UR.toString());
-            div.find('div[data-toggle="TIME_AREA_DISABLE"] .startMinute').val(MY_API.CONFIG.TIME_AREA_START_MINUTE.toString());
-            div.find('div[data-toggle="TIME_AREA_DISABLE"] .endMinute').val(MY_API.CONFIG.TIME_AREA_END_MINUTE.toString());
-            div.find('div[data-toggle="CHECK_HOUR_ROOM_INTERVAL"] .num').val(MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL.toString());
+            div.find('div[data-toggle="COIN"] .coin_number').val(parseInt(MY_API.CONFIG.COIN_NUMBER).toString());
+            div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val(parseFloat(MY_API.CONFIG.RND_DELAY_START).toString());
+            div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val(parseFloat(MY_API.CONFIG.RND_DELAY_END).toString());
+            div.find('div[data-toggle="TIME_AREA_DISABLE"] .startHour').val(parseInt(MY_API.CONFIG.TIME_AREA_START_H0UR).toString());
+            div.find('div[data-toggle="TIME_AREA_DISABLE"] .endHour').val(parseInt(MY_API.CONFIG.TIME_AREA_END_H0UR).toString());
+            div.find('div[data-toggle="TIME_AREA_DISABLE"] .startMinute').val(parseInt(MY_API.CONFIG.TIME_AREA_START_MINUTE).toString());
+            div.find('div[data-toggle="TIME_AREA_DISABLE"] .endMinute').val(parseInt(MY_API.CONFIG.TIME_AREA_END_MINUTE).toString());
+            div.find('div[data-toggle="CHECK_HOUR_ROOM_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL).toString());
             div.find('div[data-toggle="AUTO_GIFT_ROOMID"] .num').val((MY_API.CONFIG.AUTO_GIFT_ROOMID).toString());
             div.find('div[data-toggle="GIFT_SEND_TIME"] .Hour').val(MY_API.CONFIG.GIFT_SEND_HOUR.toString());
             div.find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val(MY_API.CONFIG.GIFT_SEND_MINUTE.toString());
-            div.find('div[data-toggle="GIFT_LIMIT"] .num').val(MY_API.CONFIG.GIFT_LIMIT.toString());
+            div.find('div[data-toggle="GIFT_LIMIT"] .num').val(parseInt(MY_API.CONFIG.GIFT_LIMIT).toString());
 
 
             div.find('div[id="giftCount"] [data-action="save"]').click(() => {//保存按钮
@@ -693,14 +693,14 @@ function init() {//API初始化
                 MY_API.CONFIG.TIME_AREA_START_MINUTE = val3;
                 MY_API.CONFIG.TIME_AREA_END_MINUTE = val4;
                 //RANDOM_SKIP save
-                val = parseInt(div.find('div[data-toggle="RANDOM_SKIP"] .per').val());
+                val = parseFloat(div.find('div[data-toggle="RANDOM_SKIP"] .per').val());
                 if (val < 0 || val > 100) {
-                    MY_API.chatLog('[随机跳过礼物]数据小于等于0或大于10000');
+                    MY_API.chatLog('[随机跳过礼物]数据小于0或大于100');
                     return
                 }
                 MY_API.CONFIG.RANDOM_SKIP = val;
                 //RANDOM_SEND_DANMU save
-                val = parseInt(div.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val());
+                val = parseFloat(div.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val());
                 if (val > 5) {
                     MY_API.chatLog("[活跃弹幕]为维护直播间弹幕氛围,弹幕发送概率不得大于5%");
                     return
@@ -721,8 +721,8 @@ function init() {//API初始化
                 }
                 MY_API.CONFIG.TIME_RELOAD = val;
                 //RANDOM_DELAY
-                val = parseInt(div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val());
-                val2 = parseInt(div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val());
+                val = parseFloat(div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val());
+                val2 = parseFloat(div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val());
 
                 if (val < 0 || val2 > 100) {
                     MY_API.chatLog('[抽奖延时]数据小于0或大于100');
@@ -1054,7 +1054,7 @@ function init() {//API初始化
             switch (type) {//防止重复抽奖上船PK
                 case 'gift':
                     if (MY_API.Id_list_history.isIn(data.raffleId, 'raffle')) {
-                        MYDEBUG('礼物重复');
+                        MYDEBUG('礼物重复', `raffleId ${data.raffleId}`);
                         return
                     } else {
                         MY_API.raffleId_list.push(data.raffleId);
@@ -1063,7 +1063,7 @@ function init() {//API初始化
                     break;
                 case 'guard':
                     if (MY_API.Id_list_history.isIn(data.id, 'guard')) {
-                        MYDEBUG('舰长重复');
+                        MYDEBUG('舰长重复', `id ${data.id}`);
                         return
                     } else {
                         MY_API.guardId_list.push(data.id);
@@ -1072,7 +1072,7 @@ function init() {//API初始化
                     break;
                 case 'pk':
                     if (MY_API.Id_list_history.isIn(data.id, 'pk')) {
-                        MYDEBUG('pk重复');
+                        MYDEBUG('pk重复', `id ${data.id}`);
                         return
                     } else {
                         MY_API.pkId_list.push(data.id);
@@ -1131,7 +1131,7 @@ function init() {//API初始化
                         switch (type) {
                             case 'gift':
                                 MY_API.gift_join(roomId, data.raffleId, data.type).then(function (msg, num) {
-                                    aa.text('获得' + msg);
+                                    aa.text(msg);
                                     if (num) {
                                         if (msg.indexOf('辣条') > -1) {
                                             MY_API.addGift(num);
@@ -1146,7 +1146,7 @@ function init() {//API初始化
                                 break;
                             case 'guard':
                                 MY_API.guard_join(roomId, data.id).then(function (msg, num) {
-                                    aa.text('获得' + msg);
+                                    aa.text(msg);
                                     if (num) {
                                         if (msg.indexOf('辣条') > -1) {
                                             MY_API.addGift(num);
@@ -1160,7 +1160,7 @@ function init() {//API初始化
                                 break;
                             case 'pk':
                                 MY_API.pk_join(roomId, data.id).then(function (msg, num) {
-                                    aa.text('获得' + msg);
+                                    aa.text(msg);
                                     if (num) {
                                         if (msg.indexOf('辣条') > -1) {
                                             MY_API.addGift(num);
@@ -2339,8 +2339,8 @@ function inTimeArea(sH, eH, sM, eM) {
  */
 function probability(val) {
     if (val <= 0) return false;
-    let rad = Math.ceil(Math.random() * 100);
-    return val >= rad
+    let rad = Math.random();
+    return (val / 100) >= rad
 }
 
 const dateNow = () => Date.now();
