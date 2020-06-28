@@ -1,26 +1,27 @@
 # Bilibili-SGTH  
 **Bilibili Spicy Gluten and Task Helper**  
 
-![MIT License](https://img.shields.io/badge/license-MIT-green) ![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-unsupport-red.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
-另含BilibiliAPI_Mod及[OCRAD](https://github.com/antimatter15/ocrad.js)。  
-### 点击以下任一链接安装脚本
-#### 1.githubusercontent源：[Bilibili-SGTH_1](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)(可能被墙)  
-#### 2.github源：[Bilibili-SGTH_2](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)(访问慢)  
-#### 3.jsdelivr源：[Bilibili-SGTH_3](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)(访问快但可能不是最新版)  
+![MIT License](https://img.shields.io/badge/license-MIT-green) ![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-pass-green.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
 
+### 点击以下任一链接安装脚本
+### 1.github源：[Bilibili-SGTH_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
+### 2.jsdelivr源：[Bilibili-SGTH_2](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)(访问快但可能不是最新版)  
+### 3.githubusercontent源：[Bilibili-SGTH_3](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 >感谢SeaLoong的BilibiliAPI v1.4.6。本脚本使用的BilibiliAPI_Mod为在此基础上的修改版。  
-## 本脚本会自动抢辣条<del>和亲密度</del>，完成每日任务。  
-_2020.5.14起领取上船奖励不加亲密度改为辣条_  
+## 本脚本用于自动参与抽奖抢辣条，完成每日任务。  
+
 #### 使用方法 
-登陆bilibili后打开任意b站直播间启用脚本。启用脚本后你可以使用win10的多桌面功能，在另一个桌面做其它事情。  
+在油猴中启用脚本，登陆bilibili后打开任意b站直播间。  
 #### 一些建议
 不建议24小时挂着脚本，容易进小黑屋。勾选低调设置可以降低进小黑屋概率。  
 启用脚本后不要去抢小时榜房间和广播的礼物，重复抢次数多了会进小黑屋。  
+_注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽奖，领银瓜子宝箱等，与主站无关。_  
 如果开启抽奖附加延迟，可能出现领不到礼物的情况，请降低或取消延迟。  
 **部分设置更改后需要刷新页面才能生效。**  
 **使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。**  
 #### 其它信息
 这个脚本的部分代码来源于[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)的[B站直播自动抢辣条二代by十六夜](https://greasyfork.org/en/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1%E4%BA%8C%E4%BB%A3by%E5%8D%81%E5%85%AD%E5%A4%9C)和[SeaLoong](https://github.com/SeaLoong)的[Bilibili-LRHH](https://github.com/SeaLoong/Bilibili-LRHH)。  
+[BilibiliAPI_Mod](https://github.com/andywang425/Bilibili-SGTH/blob/master/BilibiliAPI_Mod.js)：API库及常用函数。[OCRAD](https://github.com/antimatter15/ocrad.js)：用于识别领银瓜子宝箱验证码。  
 我的b站id:[Andy425](https://space.bilibili.com/358483030)  
 辣条交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天~  
 _如果有什么建议可以给我提Issues或在b站私信我，我会试着改进~_  
@@ -32,9 +33,10 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 + 能设置当天最多抢辣条数量  
 + 抽奖前模拟进入目标房间  
 + 抽奖前概率发送活跃弹幕（防检测）  
-+ 点击**直播画面上方**按钮隐藏/显示脚本口和抽奖信息  
-+ 进入小黑屋时强制重复抽奖直到成功，最多尝试5次（**危**）  
++ 点击**直播画面上方**按钮隐藏/显示脚本窗口和抽奖信息  
++ 进入小黑屋后强制重复抽奖直到成功，最多尝试5次（**危**）  
 + 屏蔽不必要的页面元素防止遮挡界面或按钮（目前有2233模型，端午活动入口）  
++ 定时刷新直播间  
 + 自动完成每日任务
 
    1.登陆主站
@@ -55,7 +57,7 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 
    9.自动送礼
    
-以上功能涉及参数可自定义，所有输入的数据必须为数字。  
+以上功能涉及参数可自定义，所有输入的数据必须为数字或数组。  
 ## 说明
 **关于脚本代码格式**  
 默认安装的[B站直播自动抢辣条.user.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)是用UglifyJS压缩后的脚本。  
@@ -72,16 +74,26 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 + 送礼设置优先级:  
   优先送礼房间>优先高等级粉丝牌>送满全部勋章。  
 + 送礼设置逻辑规则:  
-  无论【优先高等级粉丝牌】如何设置，会根据【送满全部勋章】（勾选则补满，否则只送到期的）条件去按优先送礼房间先后顺序送礼。  
+  无论【优先高等级粉丝牌】如何设置，会根据【送满全部勋章】（勾选则无视是否到期补满亲密度，否则只送到期的）条件去按优先送礼房间先后顺序送礼。  
   之后根据【优先高等级粉丝牌】决定先送高级还是低级（勾选先高级，不勾选先低级）。  
   1. 如果勾选了送满全部勋章且指定优先送礼房间，会先按顺序依次给优先送礼房间送礼（前提是你得有优先房间的粉丝勋章），无视礼物过期时间。之后若勾选了优先高等级粉丝牌，则按等级由高到低给剩余粉丝牌送礼。否则按等级由低到等高给剩余粉丝牌送礼。
   2. 如果未勾选送满全部勋章但指定了优先送礼房间，那么会先给优先送礼房间送出即将过期礼物（前提是你得有优先房间的粉丝勋章）。然后若勾选了优先高等级粉丝牌，则给剩下粉丝勋章中等级由高到低的牌子送出即将过期礼物。否则按等级由低到高给剩余粉丝牌送出即将过期礼物。  
++ 【剩余礼物】指送完了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。会在指定送礼时间被送出。  
++ 【剩余礼物送礼直播间】和【剩余礼物送礼直播间拥有者UID】必须对应。任意一项填0则不送剩余礼物。  
 
-**关于其它任务设置**  
+**关于任务执行时间**  
 + 初次启用某一项任务时立刻执行。  
 + 登陆主站，观看视频，自动投币，分享视频，银瓜子换硬币，领银瓜子宝箱，直播区签到每日凌晨0点1分时时执行。  
 + 应援团签到在你上一次使用脚本签到的24小时后执行。  
+
+**其它设置说明**  
++ 定时重载直播间是为了防止脚本因长时间运行出现bug。  
++ 重置所有为默认：指将设置和任务执行时间缓存重置为默认。  
++ 再次执行每日任务会使相关缓存重置为默认，会影响下次应援团签到时间。  
+
 ## 更新日志
+>### 3.3
+>增加剩余礼物送礼功能。修复了包裹内无可送礼物时送礼导致的bug。聊天区提示及控制台日志优化。  
 >### 3.2.1
 >活跃弹幕池修改；领银瓜子宝箱初始化时间滞后；部分输入支持浮点数  
 >### 3.2  
