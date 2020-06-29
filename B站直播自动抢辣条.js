@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.3
+// @version       3.4
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect     passport.bilibili.com
@@ -626,7 +626,7 @@
     
            </fieldset>
            <label style ="color: darkblue; font-size:large;">
-           v3.3 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+           v3.4 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
             </label>
            </div>
     
