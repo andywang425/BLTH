@@ -28,7 +28,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 本脚本使用的库：
 + [BilibiliAPI_Mod](https://github.com/andywang425/Bilibili-SGTH/blob/master/BilibiliAPI_Mod.js)：B站API及常用函数。  
 + [OCRAD](https://github.com/antimatter15/ocrad.js)：用于识别领银瓜子宝箱验证码。  
-+ [libBilibiliToken](https://github.com/andywang425/Bilibili-SGTH/blob/master/libBilibiliToken.js)：获取移动端token。  
++ [libBilibiliToken](https://github.com/andywang425/Bilibili-SGTH/blob/master/libBilibiliToken.user.js)：获取移动端token。  
 
 我的b站id:[Andy425](https://space.bilibili.com/358483030)  
 辣条交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天或者提点建议~  
