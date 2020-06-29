@@ -1,14 +1,13 @@
 # Bilibili-SGTH  
 **Bilibili Spicy Gluten and Task Helper**  
 
-![MIT License](https://img.shields.io/badge/license-MIT-green) ![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-pass-green.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
+![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-pass-green.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
 
 ### 点击以下任一链接安装脚本
 ### 1.github源：[Bilibili-SGTH_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 ### 2.jsdelivr源：[Bilibili-SGTH_2](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)(访问快但可能不是最新版)  
 ### 3.githubusercontent源：[Bilibili-SGTH_3](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 >感谢SeaLoong的BilibiliAPI v1.4.6。本脚本使用的BilibiliAPI_Mod为在此基础上的修改版。  
-## 本脚本用于自动参与抽奖抢辣条，完成每日任务。  
 
 #### 使用方法 
 在油猴中启用脚本，登陆bilibili后打开任意b站直播间。  
@@ -20,10 +19,19 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 **部分设置更改后需要刷新页面才能生效。**  
 **使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。**  
 #### 其它信息
-这个脚本的部分代码来源于[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)的[B站直播自动抢辣条二代by十六夜](https://greasyfork.org/en/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1%E4%BA%8C%E4%BB%A3by%E5%8D%81%E5%85%AD%E5%A4%9C)和[SeaLoong](https://github.com/SeaLoong)的[Bilibili-LRHH](https://github.com/SeaLoong/Bilibili-LRHH)。  
-[BilibiliAPI_Mod](https://github.com/andywang425/Bilibili-SGTH/blob/master/BilibiliAPI_Mod.js)：API库及常用函数。[OCRAD](https://github.com/antimatter15/ocrad.js)：用于识别领银瓜子宝箱验证码。  
+这个项目的部分代码来源于以下几个项目:
++ [B站直播自动抢辣条二代by十六夜](https://greasyfork.org/en/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1%E4%BA%8C%E4%BB%A3by%E5%8D%81%E5%85%AD%E5%A4%9C) by [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)
++ [Bilibili-LRHH](https://github.com/SeaLoong/Bilibili-LRHH) by [SeaLoong](https://github.com/SeaLoong)  
++ [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) by [pjy612](https://github.com/pjy612)
++ [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) by [lzghzr](https://github.com/lzghzr)  
+
+本脚本使用的库：
++ [BilibiliAPI_Mod](https://github.com/andywang425/Bilibili-SGTH/blob/master/BilibiliAPI_Mod.js)：B站API及常用函数。  
++ [OCRAD](https://github.com/antimatter15/ocrad.js)：用于识别领银瓜子宝箱验证码。  
++ [libBilibiliToken](https://github.com/andywang425/Bilibili-SGTH/blob/master/libBilibiliToken.js)：获取移动端token。  
+
 我的b站id:[Andy425](https://space.bilibili.com/358483030)  
-辣条交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天~  
+辣条交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天或者提点建议~  
 _如果有什么建议可以给我提Issues或在b站私信我，我会试着改进~_  
 ## 功能细节 
 
@@ -34,7 +42,7 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 + 抽奖前模拟进入目标房间  
 + 抽奖前概率发送活跃弹幕（防检测）  
 + 点击**直播画面上方**按钮隐藏/显示脚本窗口和抽奖信息  
-+ 进入小黑屋后强制重复抽奖直到成功，最多尝试5次（**危**）  
++ 进入小黑屋后强制重复抽奖直到成功，最多尝试5次  
 + 屏蔽不必要的页面元素防止遮挡界面或按钮（目前有2233模型，端午活动入口）  
 + 定时刷新直播间  
 + 自动完成每日任务
@@ -57,6 +65,8 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 
    9.自动送礼
    
+   10.模拟移动端心跳，领双端观看直播奖励
+
 以上功能涉及参数可自定义，所有输入的数据必须为数字或数组。  
 ## 说明
 **关于脚本代码格式**  
@@ -91,7 +101,15 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 + 重置所有为默认：指将设置和任务执行时间缓存重置为默认。  
 + 再次执行每日任务会使相关缓存重置为默认，会影响下次应援团签到时间。  
 
+**关于运行日志**  
+脚本默认开启运行日志，打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。若想关闭日志可以在脚本头部加入`console.log = () => {}`。  
+如果使用脚本过程中遇到问题，可以在控制台中寻找相关错误信息。若无法解决可以提issue，并给出错误信息和问题描述。  
+## 许可证  
+![MIT License](https://img.shields.io/badge/license-MIT-green)  
+
 ## 更新日志
+>### 3.4
+>支持模拟移动端心跳，领双端观看直播奖励。  
 >### 3.3
 >增加剩余礼物送礼功能。修复了包裹内无可送礼物时送礼导致的bug。聊天区提示及控制台日志优化。  
 >### 3.2.1
