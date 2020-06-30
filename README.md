@@ -1,7 +1,7 @@
 # Bilibili-SGTH  
 **Bilibili Spicy Gluten and Task Helper**  
 
-![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-pass-green.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
+![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-pass-green.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-unsupport-red.svg)  
 
 ### 点击以下任一链接安装脚本
 ### 1.github源：[Bilibili-SGTH_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
@@ -28,7 +28,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 本脚本使用的库：
 + [BilibiliAPI_Mod](https://github.com/andywang425/Bilibili-SGTH/blob/master/BilibiliAPI_Mod.js)：B站API及常用函数。  
 + [OCRAD](https://github.com/antimatter15/ocrad.js)：用于识别领银瓜子宝箱验证码。  
-+ [libBilibiliToken](https://github.com/andywang425/Bilibili-SGTH/blob/master/libBilibiliToken.user.js)：获取移动端token。  
++ [libBilibiliToken](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveClientHeart/BiliveClientHeart.user.js)：获取移动端token。  
 
 我的b站id:[Andy425](https://space.bilibili.com/358483030)  
 辣条交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天或者提点建议~  
