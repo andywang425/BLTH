@@ -705,6 +705,26 @@ var BilibiliAPI = {
                         roomid: roomid
                     }
                 });
+            },
+            join_ex: (id, roomid ,access_token, appKey, headers, captcha_token = "", captcha_phrase = "", color = 16777215) => {
+                // 参加节奏风暴
+                let param = TokenUtil.signQuery(KeySign.sort({
+                    id:id,
+                    access_key:access_token,
+                    appkey:appKey,
+                    actionKey:'appkey',
+                    build:5561000,
+                    channel:'bili',
+                    device:'android',
+                    mobi_app:'android',
+                    platform:'android',
+                }));
+                return BilibiliAPI.ajaxWithCommonArgs({
+                    method: 'POST',
+                    url: `xlive/lottery-interface/v1/storm/Join?${param}`,
+                    headers:headers,
+                    roomid:roomid
+                });
             }
         },
         lottery: {
@@ -1354,7 +1374,23 @@ var BilibiliAPI = {
           return decodeURIComponent(c[1]);
          }
         }
-       }
+       },
+       //
+    /**
+    * 合并请求参数
+    * @param obj
+    * @returns {string}
+    */
+    KeySign : {
+        sort:(obj)=>{
+            let keys = Object.keys(obj).sort();
+            let p=[];
+            for(let key of keys){
+                p.push(`${key}=${obj[key]}`);
+            }
+            return p.join('&');
+        }
+    }
 }
 
 BilibiliAPI.DanmuWebSocket.headerLength = 16;
