@@ -63,7 +63,8 @@ var BilibiliAPI = {
     },
     Storm: {
         check: (roomid) => BilibiliAPI.lottery.Storm.check(roomid),
-        join: (id, captcha_token, captcha_phrase, roomid, color) => BilibiliAPI.lottery.Storm.join(id, captcha_token, captcha_phrase, roomid, color)
+        join: (id, captcha_token, captcha_phrase, roomid, color) => BilibiliAPI.lottery.Storm.join(id, captcha_token, captcha_phrase, roomid, color),
+        join_ex: (id, roomid ,access_token, appKey, headers, captcha_token = "", captcha_phrase = "", color = 16777215) => BilibiliAPI.lottery.Storm.join_ex(id, roomid ,access_token, appKey, headers, captcha_token = "", captcha_phrase = "", color = 16777215)
     },
     HeartBeat: {
         web: () => BilibiliAPI.user.userOnlineHeart(),
