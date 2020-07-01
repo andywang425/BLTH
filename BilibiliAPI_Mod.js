@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BilibiliAPI_mod
 // @namespace    https://github.com/andywang425
-// @version      1.2
+// @version      1.3
 // @description  BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上进行补充。
 // @author       SeaLoong,andywang425
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
