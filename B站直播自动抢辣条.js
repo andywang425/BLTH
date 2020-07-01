@@ -18,9 +18,9 @@
 // @connect     passport.bilibili.com
 // @connect     api.live.bilibili.com
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
-// @require      https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/BilibiliAPI_Mod.js
-// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.2.1/OCRAD.min.js
-// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.2.1/libBilibiliToken.user.js
+// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.1/BilibiliAPI_Mod.min.js
+// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3/OCRAD.min.js
+// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3/libBilibiliToken.user.js
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @grant       GM_xmlhttpRequest
