@@ -102,6 +102,9 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 **关于运行日志**  
 脚本默认开启运行日志，打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。若想关闭日志可以在脚本头部加入`console.log = () => {}`。  
 如果使用脚本过程中遇到问题，可以在控制台中寻找相关错误信息。若无法解决可以提issue，并给出错误信息和问题描述。  
+
+**关于反馈**  
+反馈前请先阅读[bug_report.md](https://github.com/andywang425/Bilibili-SGTH/blob/master/bug_report.md)  
 ## 许可证  
 ![MIT License](https://img.shields.io/badge/license-MIT-green)  
 
