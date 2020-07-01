@@ -5,8 +5,10 @@
 
 ### 点击以下任一链接安装脚本
 ### 1.github源：[Bilibili-SGTH_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
-### 2.jsdelivr源：[Bilibili-SGTH_2](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)(访问快但可能不是最新版)  
+### 2.gitcdn源：[Bilibili-SGTH_2](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 ### 3.githubusercontent源：[Bilibili-SGTH_3](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
+### 4.cnpmjs源：[Bilibili-SGTH_4](https://github.com.cnpmjs.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
+### 5.jsdelivr源：[Bilibili-SGTH_5](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)(访问快但可能不是最新版)    
 >感谢SeaLoong的BilibiliAPI v1.4.6。本脚本使用的BilibiliAPI_Mod为在此基础上的修改版。  
 
 #### 使用方法 
@@ -96,10 +98,15 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 + 登陆主站，观看视频，自动投币，分享视频，银瓜子换硬币，领银瓜子宝箱，直播区签到每日凌晨0点1分时时执行。  
 + 应援团签到在你上一次使用脚本签到的24小时后执行。  
 
+**关于节奏风暴**  
++ 仅会参加被广播的节奏风暴。  
++ 这个功能目前处于实验阶段，且风险较大。如有问题可以进行反馈。  
+
 **其它设置说明**  
 + 定时重载直播间是为了防止脚本因长时间运行出现bug。  
 + 重置所有为默认：指将设置和任务执行时间缓存重置为默认。  
-+ 再次执行每日任务会使相关缓存重置为默认，会影响下次应援团签到时间。  
++ 再次执行每日任务会使相关缓存重置为默认，会影响下次应援团签到时间。若脚本运行正常则无需点击此按钮。  
++ 抽奖前随机延时能把抽奖分散开来，避免短时间内抽奖次数过多被风控。  
 
 **关于运行日志**  
 脚本默认开启运行日志，打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。若想关闭日志可以在脚本头部加入`console.log = () => {}`。  
@@ -108,6 +115,8 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 ![MIT License](https://img.shields.io/badge/license-MIT-green)  
 
 ## 更新日志
+>### 3.5
+>新增节奏风暴抽奖功能；由于设置太多，现在界面可以上下滚动。重置统计时间更精准，误差在1秒内。  
 >### 3.4
 >支持模拟移动端心跳，领双端观看直播奖励。  
 >### 3.3
