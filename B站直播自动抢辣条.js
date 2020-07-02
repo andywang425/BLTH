@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.5
+// @version       3.5.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect     passport.bilibili.com
@@ -21,8 +21,6 @@
 // @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/BilibiliAPI_Mod.min.js
 // @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
 // @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/libBilibiliToken.user.js
-// @grant       GM_getValue
-// @grant       GM_setValue
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
 /*
@@ -101,14 +99,17 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
     };
     const appToken = new BilibiliToken();
     const baseQuery = `actionKey=appkey&appkey=${BilibiliToken.appKey}&build=5561000&channel=bili&device=android&mobi_app=android&platform=android&statistics=%7B%22appId%22%3A1%2C%22platform%22%3A3%2C%22version%22%3A%225.57.0%22%2C%22abtest%22%3A%22%22%7D`;
-    let tokenData = JSON.parse(GM_getValue('userToken', '{}'));
+    //let tokenData = JSON.parse(GM_getValue('userToken', '{}'));
+    let tokenData = JSON.parse(localStorage.getItem(`${NAME}_userToken`));
     let userToken = undefined;
     const setToken = async () => {
         userToken = await appToken.getToken();
         if (userToken === undefined)
             return console.error(GM_info.script.name, '未获取到token');
         tokenData = userToken;
-        GM_setValue('userToken', JSON.stringify(tokenData));
+        //GM_setValue('userToken', JSON.stringify(tokenData));
+        localStorage.setItem(`${NAME}_userToken`, JSON.stringify(tokenData));
+        MYDEBUG(`${NAME}_userToken`, tokenData);
         return 'OK';
     };
     const newWindow = {
@@ -705,7 +706,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             
                     </fieldset>
                     <label style="color: darkblue; font-size:large;">
-                        v3.5 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+                        v3.5.1 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
                     </label>
                 </div>
             </div>
@@ -2249,17 +2250,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             return $.Deferred().resolve();
                         }
                         /*
-                        const appToken = new BilibiliToken();
-                        const baseQuery = `actionKey=appkey&appkey=${BilibiliToken.appKey}&build=5561000&channel=bili&device=android&mobi_app=android&platform=android&statistics=%7B%22appId%22%3A1%2C%22platform%22%3A3%2C%22version%22%3A%225.57.0%22%2C%22abtest%22%3A%22%22%7D`;
-                        let tokenData = JSON.parse(GM_getValue('userToken', '{}'));
-                        const setToken = async () => {
-                            const userToken = await appToken.getToken();
-                            if (userToken === undefined)
-                                return console.error(GM_info.script.name, '未获取到token');
-                            tokenData = userToken;
-                            GM_setValue('userToken', JSON.stringify(tokenData));
-                            return 'OK';
-                        };*/
                         const getInfo = () => XHR({
                             GM: true,
                             anonymous: true,
@@ -2267,7 +2257,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             url: `https://passport.bilibili.com/x/passport-login/oauth2/info?${appToken.signLoginQuery(`access_key=${tokenData.access_token}`)}`,
                             responseType: 'json',
                             headers: appToken.headers
-                        });
+                        });*/
                         const mobileOnline = () => {
                             XHR({
                                 GM: true,
@@ -2281,13 +2271,13 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         };
                         const getWatchingAward = () => {
                             if (checkNewDay(MY_API.CACHE.MobileHeartBeat_TS)) {
-                                MY_API.CACHE.MobileHeartBeat_TS = ts_ms();
-                                MY_API.saveCache();
                                 BAPI.activity.receive_award('double_watch_task').then((response) => {
                                     if (response.code === 0) {
                                         window.toast('[双端观看直播]奖励领取成功', 'success');
                                         MYDEBUG('MobileHeartBeat GetAward', response);
                                         clearInterval(HBinterval);
+                                        MY_API.CACHE.MobileHeartBeat_TS = ts_ms();
+                                        MY_API.saveCache();
                                         runMidnight(MY_API.MobileHeartBeat.run, '移动端心跳');
                                         return $.Deferred().resolve();
                                     }
@@ -2299,7 +2289,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                         return $.Deferred().resolve();
                                     }
                                     else {
-                                        window.toast('[双端观看直播]其它错误', 'warning');
+                                        window.toast(`[双端观看直播]${response}`, 'warning');
                                         MYDEBUG('MobileHeartBeat GetAward', response);
                                         clearInterval(HBinterval);
                                         runMidnight(MY_API.MobileHeartBeat.run, '移动端心跳');
@@ -2323,6 +2313,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         if (tokenData.access_token === undefined && await setToken() === undefined)
                             return;
                         else {
+                            /*
                             const userInfo = await getInfo();
                             if (userInfo === undefined)
                                 return console.error(GM_info.script.name, '获取用户信息错误');
@@ -2330,6 +2321,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 return;
                             else if (userInfo.body.data.mid !== Live_info.uid && await setToken() === undefined)
                                 return;
+                            */
                         }
                         MYDEBUG('MobileHeartBeat', '开始客户端心跳');
                         mobileOnline();
@@ -2574,13 +2566,13 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
     function StartPlunder(API) {
         'use strict';
         //清空辣条数量
-        if(checkNewDay(API.GIFT_COUNT.CLEAR_TS)) clearStat();
         let clearStat = () => {
             API.GIFT_COUNT.COUNT = 0;
             API.GIFT_COUNT.CLEAR_TS = dateNow();
             API.saveGiftCount();
             MYDEBUG('已清空辣条数量')
         }
+        if(checkNewDay(API.GIFT_COUNT.CLEAR_TS)) clearStat();
         runExactMidnight(clearStat, '重置统计')
         setTimeout(() => {
             API.removeUnnecessary();
@@ -2642,12 +2634,13 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
         let reset = (delay) => {
             setTimeout(() => {//重置直播间
                 if (API.raffleId_list.length > 0 || API.guardId_list.length > 0 || API.pkId_list.length > 0) {
-                    MYDEBUG('还有礼物没抽，延迟30s后刷新直播间');
-                    reset(30000);
+                    MYDEBUG('还有礼物没抽，延迟15s后刷新直播间');
+                    reset(15000);
                     return
                 }
                 if (inTimeArea(API.CONFIG.TIME_AREA_START_H0UR, API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE)
                     && API.CONFIG.IN_TIME_RELOAD_DISABLE) {//在不抽奖时段且不抽奖时段不刷新开启
+                    reset(getIntervalTime(API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE));
                     return;
                 }
                 /* if (API.blocked || API.max_blocked) { //被阻止不刷新直播间
