@@ -10,6 +10,14 @@
 ### 4.cnpmjs源：[Bilibili-SGTH_4](https://github.com.cnpmjs.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 ### 5.jsdelivr源：[Bilibili-SGTH_5](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)    
 _(3，4，5访问快但可能不是最新版)_  
+<details>
+<summary>展开查看旧版链接</summary>  
+
+### v3.3 —— 最后一个不使用GM函数的版本，支持火狐。    
+#### github源：[Bilibili-SGTH_old_1](https://github.com/andywang425/Bilibili-SGTH/raw/v1.2.1/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
+#### jsdelivr源：[Bilibili-SGTH_old_2](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@1.2.1/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
+</details>
+
 >感谢SeaLoong的BilibiliAPI v1.4.6。本脚本使用的BilibiliAPI_Mod为在此基础上的修改版。  
 
 #### 使用方法 
@@ -104,7 +112,7 @@ _如果有什么建议可以给我提Issues或在b站私信我，我会试着改
 如果使用脚本过程中遇到问题，可以在控制台中寻找相关错误信息。若无法解决可以提issue，并给出错误信息和问题描述。  
 
 **关于反馈**  
-反馈前请先阅读[bug_report.md](https://github.com/andywang425/Bilibili-SGTH/blob/master/bug_report.md)  
+反馈前请先阅读[bug_report.md](https://github.com/andywang425/Bilibili-SGTH/blob/master/bug_report.md)。不符合规范的反馈可能会被关闭。  
 ## 许可证  
 ![MIT License](https://img.shields.io/badge/license-MIT-green)  
 
