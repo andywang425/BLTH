@@ -802,9 +802,10 @@ var BilibiliAPI = {
                 }
             });
         },
-        getTopRealTimeHour:() => {
+        getTopRealTimeHour:(areaId) => {
             return BilibiliAPI.ajax({
                 url: 'rankdb/v1/Rank2018/getTop?type=master_realtime_hour&type_id=areaid_realtime_hour'
+                + `&area_id=${areaId}`
             })
         }
     },
