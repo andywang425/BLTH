@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.5.2
+// @version       3.5.3
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect     passport.bilibili.com
@@ -20,7 +20,7 @@
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
 // @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@1.3.3/BilibiliAPI_Mod.min.js
 // @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
-// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/libBilibiliToken.user.js
+// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.4/libBilibiliToken.user.js
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
 /*
@@ -105,7 +105,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
     const setToken = async () => {
         userToken = await appToken.getToken();
         if (userToken === undefined)
-            return console.error(GM_info.script.name, '未获取到token');
+            return console.error('setToken', '未获取到token');
         tokenData = userToken;
         //GM_setValue('userToken', JSON.stringify(tokenData));
         localStorage.setItem(`${NAME}_userToken`, JSON.stringify(tokenData));
@@ -326,7 +326,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         p.resolve()
                     }
                     else {
-                        console.error('APPtoken初始化出错', e)
+                        console.error('APPtoken初始化出错', msg)
                         window.toast('APPtoken初始化出错', 'error')
                         p.reject()
                     }
@@ -706,7 +706,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             
                     </fieldset>
                     <label style="color: darkblue; font-size:large;">
-                        v3.5.2 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+                        v3.5.3 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
                     </label>
                 </div>
             </div>
@@ -2784,7 +2784,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
     function XHR(XHROptions) {
         return new Promise(resolve => {
             const onerror = (error) => {
-                console.error(GM_info.script.name, error);
+                console.error('XHR', error);
                 resolve(undefined);
             };
             if (XHROptions.GM) {
