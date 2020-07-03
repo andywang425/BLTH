@@ -6,8 +6,8 @@
 ### 点击以下任一链接安装脚本
 ### 1.github源：[Bilibili-SGTH_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 ### 2.githubusercontent源：[Bilibili-SGTH_2](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
-### 3.gitcdn源：[Bilibili-SGTH_3](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
-### 4.cnpmjs源：[Bilibili-SGTH_4](https://github.com.cnpmjs.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
+### 3.cnpmjs源：[Bilibili-SGTH_3](https://github.com.cnpmjs.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
+### 4.gitcdn源：[Bilibili-SGTH_4](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 ### 5.jsdelivr源：[Bilibili-SGTH_5](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)    
 _(3，4，5访问快但可能不是最新版)_  
 <details>
@@ -72,7 +72,7 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 以上功能涉及参数可自定义，所有输入的数据必须为数字或数组。  
 ## 说明
 **关于脚本代码格式**  
-默认安装的[B站直播自动抢辣条.user.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)是用UglifyJS压缩后的脚本。  
+默认安装的[B站直播自动抢辣条.user.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)是压缩后的脚本。  
 原格式的脚本为[B站直播自动抢辣条.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)。  
 **关于输入数据格式**  
 + 浮点数(小数)或整数: 抽奖前附加随机延迟，随机跳过礼物，抽奖时概率发送活跃弹幕。  
@@ -119,6 +119,8 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 ![MIT License](https://img.shields.io/badge/license-MIT-green)  
 
 ## 更新日志
+>### 3.5.2
+>现在可以检查所有分区的小时榜，能参与的抽奖数量大幅增加。  
 >### 3.5.1
 >修复读取统计错误的bug；修复开启不抽奖时段不刷新直播间后导致的不会刷新页面的bug；尝试修复多次调用info接口导致大会员被封的问题；不再使用GM_getValue和GM_setValue两个GM函数。  
 >### 3.5
