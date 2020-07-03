@@ -12,13 +12,13 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.5.1
+// @version       3.5.2
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect     passport.bilibili.com
 // @connect     api.live.bilibili.com
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
-// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/BilibiliAPI_Mod.min.js
+// @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@1.3.3/BilibiliAPI_Mod.min.js
 // @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
 // @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/libBilibiliToken.user.js
 // @grant       GM_xmlhttpRequest
@@ -706,7 +706,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             
                     </fieldset>
                     <label style="color: darkblue; font-size:large;">
-                        v3.5.1 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+                        v3.5.2 <a href="https://github.com/andywang425/Bilibili-SGTH/" target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
                     </label>
                 </div>
             </div>
@@ -2310,18 +2310,9 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             }
                         }
 
-                        if (tokenData.access_token === undefined && await setToken() === undefined)
+                        if (tokenData.access_token === undefined && await setToken() === undefined) {
+                            MYDEBUG('MobileHeartBeat', 'token设置失败');
                             return;
-                        else {
-                            /*
-                            const userInfo = await getInfo();
-                            if (userInfo === undefined)
-                                return console.error(GM_info.script.name, '获取用户信息错误');
-                            if (userInfo.body.code !== 0 && await setToken() === undefined)
-                                return;
-                            else if (userInfo.body.data.mid !== Live_info.uid && await setToken() === undefined)
-                                return;
-                            */
                         }
                         MYDEBUG('MobileHeartBeat', '开始客户端心跳');
                         mobileOnline();
@@ -2596,7 +2587,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 });
             }
         });
-        let check_top_room = () => { //检查小时榜房间时钟
+        let check_top_room = () => { //检查小时榜房间
             if (API.GIFT_COUNT.COUNT >= API.CONFIG.MAX_GIFT) {//判断是否超过辣条限制
                 MYDEBUG('超过今日辣条限制，不参与抽奖');
                 API.max_blocked = true;
@@ -2617,19 +2608,38 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 return
             }
 
-            BAPI.rankdb.getTopRealTimeHour().then(function (data) {
-                let list = data.data.list;// [{id: ,link:}]
-                API.chatLog('检查小时榜房间的礼物', 'warning');
-                MYDEBUG('小时榜房间列表', list);
-                for (let i of list) {
-                    API.checkRoom(i.roomid, `小时榜-${i.area_v2_parent_name}区`);
-                }
-            })
+            const AreaIdList = [
+                '小时总榜',
+                '娱乐小时榜',
+                '网游小时榜',
+                '手游小时榜',
+                '绘画小时榜',
+                '电台小时榜',
+                '单机小时榜',
+            ];
+            let AreaNum = 0;
+            let checkHourRank = (areaId) => {
+                BAPI.rankdb.getTopRealTimeHour(areaId).then((data) => {
+                    let list = data.data.list;// [{id: ,link:}]
+                    API.chatLog(`检查${AreaIdList[areaId]}房间的礼物`, 'warning');
+                    MYDEBUG(`${AreaIdList[areaId]}房间列表`, list);
+                    for (let i of list) {
+                        API.checkRoom(i.roomid, `小时榜-${i.area_v2_parent_name}区`);
+                    }
+                })
+            };   
+            let timer = setInterval(() => {
+                    if (AreaNum <= AreaIdList.length - 1) {
+                        checkHourRank(AreaNum);
+                        AreaNum++;
+                    }
+                    else {
+                        clearInterval(timer)
+                    }
+                }, 1000);
         };
-
         setTimeout(check_top_room, 6e3);//加载脚本后6秒检查一次小时榜
         let check_timer = setInterval(check_top_room, parseInt(API.CONFIG.CHECK_HOUR_ROOM_INTERVAL * 1000));
-
 
         let reset = (delay) => {
             setTimeout(() => {//重置直播间
@@ -2640,7 +2650,9 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 }
                 if (inTimeArea(API.CONFIG.TIME_AREA_START_H0UR, API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE)
                     && API.CONFIG.IN_TIME_RELOAD_DISABLE) {//在不抽奖时段且不抽奖时段不刷新开启
-                    reset(getIntervalTime(API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE));
+                    let resetTime = getIntervalTime(API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE);
+                    reset(resetTime);
+                    MYDEBUG(`处于休眠时间段，将在${resetTime}毫秒后刷新直播间`);
                     return;
                 }
                 /* if (API.blocked || API.max_blocked) { //被阻止不刷新直播间
