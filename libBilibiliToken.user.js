@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name        libBilibiliToken
 // @namespace   https://github.com/lzghzr/TampermonkeyJS
-// @version     0.0.3
-// @author      lzghzr
-// @description 哔哩哔哩cookie获取token
+// @version     0.0.4
+// @author      lzghzr,andywang425
+// @description 哔哩哔哩cookie获取token test
 // @match       *://*.bilibili.com/*
 // @connect     passport.bilibili.com
+// @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
 // @license     MIT
 // @grant       GM_xmlhttpRequest
 // @run-at      document-start
@@ -134,11 +135,22 @@ class BilibiliToken {
             return poll.body.data;
         return console.error('qrcodePoll', poll);
     }
+    getCookie = (name) => {
+        let cookies = this._W.document.cookie.split(';');
+        let c;
+        for(var i=0; i<cookies.length ; i++){
+         c = cookies[i].split('=');
+         if (c[0].replace(' ', '') == name) {
+          return decodeURIComponent(c[1]);
+         }
+        }
+       };
     async getToken() {
-        const cookie = this._W.document.cookie.match(/bili_jct=(?<csrf>.*?);/);
-        if (cookie === null || cookie.groups === undefined)
+        const cookie = this.getCookie('bili_jct');
+        //const cookie = this._W.document.cookie.match(/bili_jct=(?<csrf>.*?);/);
+        if (cookie === null)
             return console.error('getToken', 'cookie获取失败');
-        const csrf = cookie.groups['csrf'];
+        const csrf = cookie;
         const authCode = await this.getAuthCode();
         if (authCode === undefined)
             return;
