@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BilibiliAPI_mod
 // @namespace    https://github.com/andywang425
-// @version      1.3
+// @version      1.3.3
 // @description  BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上进行补充。
 // @author       SeaLoong,andywang425
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -802,6 +802,16 @@ var BilibiliAPI = {
                 }
             });
         },
+        /*
+            area_id :
+            0    小时总榜
+            1    娱乐小时榜
+            2    网游小时榜
+            3    手游小时榜
+            4    绘画小时榜
+            5    电台小时榜
+            6    单机小时榜
+        */
         getTopRealTimeHour:(areaId) => {
             return BilibiliAPI.ajax({
                 url: 'rankdb/v1/Rank2018/getTop?type=master_realtime_hour&type_id=areaid_realtime_hour'
