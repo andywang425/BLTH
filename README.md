@@ -1,7 +1,7 @@
 # Bilibili-SGTH  
 **Bilibili Spicy Gluten and Task Helper**  
 
-![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-unsupport-red.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-unsupport-red.svg)  
+![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-unsupport-red.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
 
 ### 点击以下任一链接安装脚本
 ### 1.github源：[Bilibili-SGTH_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
@@ -13,7 +13,7 @@ _(3，4，5访问快但可能不是最新版)_
 <details>
 <summary>展开查看旧版链接</summary>  
 
-### v3.3 —— 最后一个不使用GM函数的版本，支持火狐。    
+### v3.3 —— 最后一个不使用GM函数的版本  
 #### github源：[Bilibili-SGTH_old_1](https://github.com/andywang425/Bilibili-SGTH/raw/v1.2.1/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 #### jsdelivr源：[Bilibili-SGTH_old_2](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@1.2.1/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 </details>
@@ -119,6 +119,8 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 ![MIT License](https://img.shields.io/badge/license-MIT-green)  
 
 ## 更新日志
+>### 3.5.3
+>修复火狐特有的一个关于正则表达式的bug。现在支持火狐啦~  
 >### 3.5.2
 >现在可以检查所有分区的小时榜，能参与的抽奖数量大幅增加。  
 >### 3.5.1
