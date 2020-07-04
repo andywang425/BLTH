@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BilibiliAPI_mod
 // @namespace    https://github.com/andywang425
-// @version      1.3.3
+// @version      1.4
 // @description  BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上进行补充。
 // @author       SeaLoong,andywang425
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -288,6 +288,17 @@ var BilibiliAPI = {
                     type: type // 8: 投稿视频; 268435455: 全部
                 }
             });
+        },
+        space_history: (visitor_uid, host_uid, offset_dynamic_id, need_top) => {
+            return BilibiliAPI.ajax({
+                url: 'dynamic_svr/v1/dynamic_svr/space_history',
+                data: {
+                    visitor_uid: visitor_uid,
+                    host_uid: host_uid,
+                    offset_dynamic_id: offset_dynamic_id,
+                    need_top: need_top
+                }
+            })
         }
     },
     exchange: {
@@ -966,6 +977,31 @@ var BilibiliAPI = {
         }
     },
     x: {
+        getUserSpace: (mid, ps, tid, pn, keyword, order, jsonp) => { //查看用户动态
+            return BilibiliAPI.ajax({
+                url: '//api.bilibili.com/x/space/arc/search',
+                data:{
+                    mid: mid, //uid
+                    ps: ps, //30
+                    tid: tid, //0
+                    pn: pn, //1 2 3页数
+                    keyword: keyword, //''
+                    order: order, //pubdate
+                    jsonp: jsonp //jsonp
+                }//BilibiliAPI.x.getUserSpace(375504219, 30, 0, 1, '', 'pubdate', 'jsonp').then((re) => {console.log(re)})
+            });
+        },
+        getCoinInfo: (callback, jsonp, aid, _) => { //获取视频投币状态
+            return BilibiliAPI.ajax({
+                url: '//api.bilibili.com/x/web-interface/archive/coins',
+                data: {
+                    callback: callback, //jqueryCallback_bili_1465130006244295 数字含义未知 此项可以为空''
+                    jsonp: jsonp, //jsonp
+                    aid: aid,
+                    _: _ //当前时间戳
+                }
+            })
+        },
         coin_add: (aid, multiply = 1) => {
             // 投币
             return BilibiliAPI.ajaxWithCommonArgs({
