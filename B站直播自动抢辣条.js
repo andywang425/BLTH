@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.5.4
+// @version       3.5.4.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect     passport.bilibili.com
@@ -712,7 +712,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             
                     </fieldset>
                     <label style="color: darkblue; font-size:large;">
-                        v3.5.4 <a href="https://github.com/andywang425/Bilibili-SGTH/"
+                        v3.5.4.1 <a href="https://github.com/andywang425/Bilibili-SGTH/"
                             target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
                     </label>
                 </div>
@@ -2342,29 +2342,28 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 headers: appToken.headers
                             });
                         };
-                        const EndFunc = () => {
-                            MYDEBUG('MobileHeartBeat GetAward', response);
+                        const EndFunc = (re) => {
+                            MYDEBUG('MobileHeartBeat GetAward', re);
                             clearInterval(HBinterval);
                             MY_API.CACHE.MobileHeartBeat_TS = ts_ms();
                             MY_API.saveCache();
                             runMidnight(MY_API.MobileHeartBeat.run, '移动端心跳');
                         };
                         const getWatchingAward = () => {
-                            if (checkNewDay(MY_API.CACHE.MobileHeartBeat_TS)) {
                                 BAPI.activity.receive_award('double_watch_task').then((response) => {
                                     if (response.code === 0) {
                                         window.toast('[双端观看直播]奖励领取成功', 'success');
-                                        EndFunc();
+                                        EndFunc(response);
                                         return $.Deferred().resolve();
                                     }
                                     else if (response.code === -400) {
                                         window.toast('[双端观看直播]奖励已领取', 'info');
-                                        EndFunc();
+                                        EndFunc(response);
                                         return $.Deferred().resolve();
                                     }
                                     else {
                                         window.toast(`[双端观看直播]${response}`, 'warning');
-                                        EndFunc();
+                                        EndFunc(response);
                                         return $.Deferred().resolve();
                                     }
                                 }, (err) => {
@@ -2373,13 +2372,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                     clearInterval(HBinterval);
                                     return delayCall(() => MY_API.MobileHeartBeat.run());
                                 });
-                            }
-                            else {
-                                MYDEBUG('[双端观看直播]', '同一天不领取');
-                                clearInterval(HBinterval);
-                                runMidnight(MY_API.MobileHeartBeat.run, '移动端心跳');
-                                return $.Deferred().resolve();
-                            }
                         }
 
                         if (tokenData.access_token === undefined && await setToken() === undefined) {
@@ -2457,7 +2449,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             return $.Deferred().resolve();
                         }
                         return BAPI.Storm.check(roomid).then((response) => {
-                            DEBUG('MY_API.Storm.run: MY_API.API.Storm.check', response);
+                            MYDEBUG('MY_API.Storm.run: MY_API.API.Storm.check', response);
                             if (response.code === 0) {
                                 var data = response.data;
                                 MY_API.Storm.join(data.id, data.roomid, Math.round(new Date().getTime() / 1000) + data.time);
@@ -2521,7 +2513,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 } else {
                                     response = await BAPI.Storm.join(id, captcha_token = '', captcha_phrase = '', roomid);
                                 }
-                                DEBUG('MY_API.Storm.join: MY_API.API.Storm.join', response);
+                                MYDEBUG('MY_API.Storm.join: MY_API.API.Storm.join', response);
                                 if (response.code) {
                                     if (response.msg.indexOf("领取") != -1) {
                                         MY_API.Storm.over(id);
