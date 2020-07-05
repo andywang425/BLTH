@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.5.4.1
+// @version       3.5.5
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect     passport.bilibili.com
@@ -257,6 +257,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 WATCH: true,//观看视频
                 COIN: false,//投币
                 COIN_NUMBER: 0,//投币数量
+                COIN_TYPE: 'COIN_DYN',//投币方法 动态/UID
                 COIN_UID: 0,//投币up主
                 SHARE: true,//分享
                 AUTO_TREASUREBOX: true,//每日宝箱
@@ -274,7 +275,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 STORM: false,//节奏风暴
                 STORM_QUEUE_SIZE: 3,//允许同时参与的风暴次数
                 STORM_MAX_COUNT: 100,//单个风暴最大尝试次数
-                STORM_ONE_LIMIT: 200//单个风暴参与次数间隔（毫秒）
+                STORM_ONE_LIMIT: 200,//单个风暴参与次数间隔（毫秒）
+                ROOM_ENTRY:100//抽奖前模拟进入房间概率
             },
             CACHE_DEFAULT: {
                 UNIQUE_CHECK: 0,//唯一运行检测
@@ -548,6 +550,11 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
                             </label>
                         </div>
+                        <div data-toggle="ROOM_ENTRY">
+                        <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+                            抽奖前模拟进入目标房间概率<input class="per igiftMsg_input" style="width: 30px;" type="text">%
+                        </label>
+                    </div>
                         <div data-toggle="CHECK_HOUR_ROOM_INTERVAL">
                             <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
                                 检查小时榜间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒
@@ -572,9 +579,16 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 自动投币<input class="coin_number igiftMsg_input" style="width: 40px;" type="text">个(0-5)
                             </label>
                         </div>
-                        <div data-toggle="COIN_UID" style=" color: black">
+                        <div data-toggle="COIN_TYPE" style=" color: black">
+                            <div data-toggle="COIN_UID">
+                            <input style="vertical-align: text-top;" type="radio" name="COIN_TYPE">
                             给用户(UID:<input class="num igiftMsg_input" style="width: 80px;" type="text">)
                             的视频投币
+                            </div>
+                            <div data-toggle="COIN_DYN">
+                                <input style="vertical-align: text-top;" type="radio" name="COIN_TYPE">
+                                给动态中的的视频投币
+                            </div>
                         </div>
                         <div data-toggle="SHARE" style=" color: black">
                             <input style="vertical-align: text-top;" type="checkbox">
@@ -683,7 +697,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         剩余礼物也会在指定送礼时间被送出。<br>
                         参与节奏风暴风险较大，如果没有实名可能无法参加。<br>
                         脚本仅能参加广播中的节奏风暴。<br>
-                        【给用户(UID:___)的视频投币】若填0则给动态中的视频依次投币
+                        【给用户(UID:___)的视频投币】若填0则给动态中的视频依次投币(因为无UID为0的用户)
             
                     </fieldset>
                     <fieldset class="igiftMsg_fs" style="line-height: 15px">
@@ -712,7 +726,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             
                     </fieldset>
                     <label style="color: darkblue; font-size:large;">
-                        v3.5.4.1 <a href="https://github.com/andywang425/Bilibili-SGTH/"
+                        v${GM_info.script.version} <a href="https://github.com/andywang425/Bilibili-SGTH/"
                             target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
                     </label>
                 </div>
@@ -722,7 +736,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 $('.live-player-mounter').append(div);
 
 
-                //对应配置状态
+                //显示对应配置状态
+                div.find('div[data-toggle="ROOM_ENTRY"] .per').val((parseFloat(MY_API.CONFIG.ROOM_ENTRY)).toString());
                 div.find('div[data-toggle="COIN_UID"] .num').val(parseInt(MY_API.CONFIG.COIN_UID).toString());
                 div.find('div[data-toggle="STORM_MAX_COUNT"] .num').val(parseInt(MY_API.CONFIG.STORM_MAX_COUNT).toString());
                 div.find('div[data-toggle="STORM_ONE_LIMIT"] .num').val(parseInt(MY_API.CONFIG.STORM_ONE_LIMIT).toString());
@@ -874,8 +889,10 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     //COIN_UID
                     val = parseInt(div.find('div[data-toggle="COIN_UID"] .num').val());
                     MY_API.CONFIG.COIN_UID = val;
+                    //ROOM_ENTRY
+                    val = parseFloat(div.find('div[data-toggle="ROOM_ENTRY"] .per').val());
+                    MY_API.CONFIG.ROOM_ENTRY = val;
                     MY_API.saveConfig();
-
                 });
 
                 div.find('button[data-action="reset"]').click(() => {//重置按钮
@@ -930,7 +947,27 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         MY_API.saveConfig()
                     });
                 };
-
+                $('input:text').bind('keydown', function(event) {//绑定回车保存
+                    　　if (event.keyCode == "13") {
+                            MY_API.saveConfig();
+                    　　}
+                });
+                if(MY_API.CONFIG.COIN_TYPE == 'COIN_DYN') {
+                    $("div[data-toggle='COIN_DYN'] input:radio").attr('checked', '');
+                } else {
+                    $("div[data-toggle='COIN_UID'] input:radio").attr('checked', '');
+                };
+                
+                $("input:radio[name='COIN_TYPE']").change(function (){ //拨通
+                    let a = $("div[data-toggle='COIN_DYN'] input:radio").is(':checked');
+                    if(a == true) {
+                        MY_API.CONFIG.COIN_TYPE = 'COIN_DYN';
+                    }
+                    else {
+                        MY_API.CONFIG.COIN_TYPE = 'COIN_UID';
+                    }
+                    MY_API.saveConfig();
+                });
             },
 
             chatLog: function (text, type = 'info') {//自定义提示
@@ -1095,7 +1132,9 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 } else {
                     MY_API.RoomId_list.push(roomId);
                 }
-                BAPI.room.room_entry_action(roomId);//直播间进入记录
+                if(probability(MY_API.CONFIG.ROOM_ENTRY)) {
+                    BAPI.room.room_entry_action(roomId);//直播间进入记录
+                }
                 if (probability(MY_API.CONFIG.RANDOM_SEND_DANMU)) {//概率发活跃弹幕
                     BAPI.sendLiveDanmu(MY_API.auto_danmu_list[Math.floor(Math.random() * 12)], roomId).then((response) => {
                         MYDEBUG('弹幕发送返回信息', response);
@@ -1621,7 +1660,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 const obj = JSON.parse(response.data.cards[0].card);
                                 const p1 = MY_API.DailyReward.watch(obj.aid, obj.cid);
                                 let p2 = undefined;
-                                if (MY_API.CONFIG.COIN_UID == 0) {
+                                if (MY_API.CONFIG.COIN_UID == 0 || MY_API.CONFIG.COIN_TYPE == 'COIN_DYN') {
                                     p2 = MY_API.DailyReward.coin(response.data.cards, Math.max(MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10, 0));
                                 } else {
                                     p2 = MY_API.DailyReward.UserSpace(MY_API.CONFIG.COIN_UID, 30, 0, 1, '', 'pubdate', 'jsonp');
@@ -2673,7 +2712,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             }
 
             const AreaIdList = [
-                //'小时总榜',   总榜中的抽奖肯定在对应分区榜
+                '小时总榜',
                 '娱乐小时榜',
                 '网游小时榜',
                 '手游小时榜',
@@ -2681,7 +2720,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 '电台小时榜',
                 '单机小时榜',
             ];
-            let AreaNum = 1;
+            let AreaNum = 1;//总榜中的抽奖肯定在对应分区榜，无需检查
             let checkHourRank = (areaId) => {
                 BAPI.rankdb.getTopRealTimeHour(areaId).then((data) => {
                     let list = data.data.list;// [{id: ,link:}]
