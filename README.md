@@ -21,7 +21,7 @@ _(4，5访问快但可能不是最新版)_
 >感谢SeaLoong的BilibiliAPI v1.4.6。本脚本使用的BilibiliAPI_Mod为在此基础上的修改版。  
 
 #### 使用方法 
-在油猴中启用脚本，登陆bilibili后打开任意b站直播间。  
+在Tampermonkey中启用脚本，登陆bilibili后打开任意b站直播间。  
 #### 一些建议
 不建议24小时挂着脚本，容易进小黑屋。勾选低调设置可以降低进小黑屋概率。  
 启用脚本后不要去抢小时榜房间和广播的礼物，重复抢次数多了会进小黑屋。  
@@ -30,11 +30,11 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 **部分设置更改后需要刷新页面才能生效。**  
 **使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。**  
 #### 其它信息
-这个项目的部分代码来源于以下几个项目:
-+ [B站直播自动抢辣条二代by十六夜](https://greasyfork.org/en/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1%E4%BA%8C%E4%BB%A3by%E5%8D%81%E5%85%AD%E5%A4%9C) by [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)
-+ [Bilibili-LRHH](https://github.com/SeaLoong/Bilibili-LRHH) by [SeaLoong](https://github.com/SeaLoong)  
-+ [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) by [pjy612](https://github.com/pjy612)
-+ [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) by [lzghzr](https://github.com/lzghzr)  
+这个项目的部分代码来源于以下几个项目:  
++ [B站直播自动抢辣条二代by十六夜](https://greasyfork.org/en/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1%E4%BA%8C%E4%BB%A3by%E5%8D%81%E5%85%AD%E5%A4%9C) (MIT) by [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)
++ [Bilibili-LRHH](https://github.com/SeaLoong/Bilibili-LRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
++ [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/Bilibili-LRHH_) by [pjy612](https://github.com/pjy612)
++ [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
 
 本脚本使用的库：
 + [BilibiliAPI_Mod](https://github.com/andywang425/Bilibili-SGTH/blob/master/BilibiliAPI_Mod.js)：B站API及常用函数。  
@@ -54,7 +54,7 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 + 抽奖前概率发送活跃弹幕（防检测）  
 + 点击**直播画面上方**按钮隐藏/显示脚本窗口和抽奖信息  
 + 进入小黑屋后强制重复抽奖直到成功，最多尝试5次  
-+ 屏蔽不必要的页面元素防止遮挡界面或按钮（目前有2233模型，端午活动入口）  
++ 屏蔽不必要的页面元素防止遮挡界面或按钮（目前有2233模型）  
 + 定时刷新直播间  
 + 自动完成每日任务  
    1.登陆主站  
@@ -64,9 +64,9 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
    5.银瓜子换硬币  
    6.直播区签到  
    7.应援团签到  
-   8.自动领银瓜子宝箱   
-   9.自动送礼  
-   10.模拟移动端心跳，领双端观看直播奖励  
+   8.自动领银瓜子宝箱  
+   9.模拟移动端心跳，领双端观看直播奖励  
++ 自动送礼  
 
 以上功能涉及参数可自定义，所有输入的数据必须为数字或数组。  
 ## 说明
@@ -74,7 +74,7 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 默认安装的[B站直播自动抢辣条.user.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)是压缩后的脚本。  
 原格式的脚本为[B站直播自动抢辣条.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)。  
 **关于输入数据格式**  
-+ 浮点数(小数)或整数: 抽奖前附加随机延迟，随机跳过礼物，抽奖时概率发送活跃弹幕，抽奖前模拟进入目标房间概率。  
++ 浮点数(小数)或整数: 抽奖前附加随机延迟，随机跳过礼物，抽奖时概率发送活跃弹幕。  
 + 数组(或单个整数): 优先送礼房间。  
 + 其余只支持整数。  
 
@@ -118,11 +118,13 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 如果使用脚本过程中遇到问题，可以在控制台中寻找相关错误信息。若无法解决可以进行反馈，并给出错误信息和问题描述。  
 
 **关于反馈**  
-反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/Bilibili-SGTH/blob/master/bug_report.md)。不符合规范的反馈可能会被关闭。  
+反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/Bilibili-SGTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。不符合规范的反馈可能会被关闭。  
 ## 许可证  
 ![MIT License](https://img.shields.io/badge/license-MIT-green)  
 
 ## 更新日志
+>### 3.6
+>取消了模拟进入房间概率，改为记录进入过的房间号（上限100）。若发现进入过了则不会重复进入。修复了自动投币会给UP不是指定UID用户的联合投稿视频投币的bug。修复多次获取APPToken的bug。修复回车保存无效的bug。应援团签到时间改为第二天8点。  
 >### 3.5.5
 >修复检查小时榜分区的bug。投币设置选项优化。支持输入框回车保存。  
 >### 3.5.4.1
@@ -197,7 +199,5 @@ _中间一段日志丢失_
 >### 1.6  
 >更新css样式,窗口更好看了。  
 >### 1.5.3  
->随机延迟算法优化：随机延时包括最大和最小值;最大最小值相同时延时固定。  
->### 1.5.2  
->增加选项:不抽奖时不重载直播间；左下角显示版本号。  
+>随机延迟算法优化：随机延时包括最大和最小值;最大最小值相同时延时固定。    
 _更早的日志就不显示了~_
