@@ -3,8 +3,8 @@
 // @name          B站直播自动抢辣条
 // @name:en       B站直播自动抢辣条
 // @author        andywang425
-// @description   自动参与Bilibili直播区广播礼物，小时榜房间礼物，广播节奏风暴抽奖;完成每日任务
-// @description:en 自动参与Bilibili直播区广播礼物，小时榜房间礼物，广播节奏风暴抽奖;完成每日任务
+// @description   自动参与Bilibili直播区抽奖;完成每日任务
+// @description:en 自动参与Bilibili直播区抽奖;完成每日任务
 // @updateURL     https://github.com.cnpmjs.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
 // @downloadURL    https://github.com.cnpmjs.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
 // @homepageURL   https://github.com/andywang425/Bilibili-SGTH/
@@ -12,11 +12,11 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.5.5
+// @version       3.6
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
-// @connect     passport.bilibili.com
-// @connect     api.live.bilibili.com
+// @connect      passport.bilibili.com
+// @connect      api.live.bilibili.com
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
 // @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.4/BilibiliAPI_Mod.min.js
 // @require      https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
@@ -39,7 +39,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
     let debugSwitch = true; //控制开关
     let NAME = 'IGIFTMSG';
     let BAPI = BilibiliAPI;
-    let DanMuServerHost;
+    //let DanMuServerHost;
     let gift_join_try = 0;
     let guard_join_try = 0;
     let pk_join_try = 0;
@@ -54,7 +54,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
         mobile_verify: undefined,
         gift_list: undefined,
         rnd: undefined,
-        visit_id: undefined
+        visit_id: undefined,
+        identification: undefined
     };
     const runUntilSucceed = (callback, delay = 0, period = 100) => {
         setTimeout(() => {
@@ -97,6 +98,16 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
         setTimeout(callback, t - ts_ms());
         MYDEBUG('runExactMidnight', name + " " + t.toString());
     };
+    const runTomorrow = (callback, hour, minute, msg) => {//明天运行，可自定义时间
+        const t = new Date();
+        let name = msg || ' ';
+        t.setMinutes(t.getMinutes() + tz_offset);
+        t.setDate(t.getDate() + 1);
+        t.setHours(hour, minute, 0, 0);
+        t.setMinutes(t.getMinutes() - tz_offset);
+        setTimeout(callback, t - ts_ms());
+        MYDEBUG('runTomorrow', name + " " + t.toString());
+    }
     const appToken = new BilibiliToken();
     const baseQuery = `actionKey=appkey&appkey=${BilibiliToken.appKey}&build=5561000&channel=bili&device=android&mobi_app=android&platform=android&statistics=%7B%22appId%22%3A1%2C%22platform%22%3A3%2C%22version%22%3A%225.57.0%22%2C%22abtest%22%3A%22%22%7D`;
     //let tokenData = JSON.parse(GM_getValue('userToken', '{}'));
@@ -165,6 +176,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
                 if (W.BilibiliLive === undefined || parseInt(W.BilibiliLive.UID) === 0 || isNaN(parseInt(W.BilibiliLive.UID))) {
                     loadInfo(1000);
+                    window.toast(`[${GM_info.script.name}]请先登陆`, 'warning');
                     MYDEBUG('无配置信息');
                 } else {
                     Live_info.room_id = W.BilibiliLive.ROOMID;
@@ -172,6 +184,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     BAPI.live_user.get_info_in_room(Live_info.room_id).then((response) => {
                         MYDEBUG('InitData: API.live_user.get_info_in_room', response);
                         Live_info.mobile_verify = response.data.info.mobile_verify;
+                        Live_info.identification = response.data.info.identification;
                     });
                     BAPI.gift.gift_config().then((response) => {
                         MYDEBUG('InitData: API.gift.gift_config', response);
@@ -236,47 +249,46 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
     function init() {//API初始化
         const MY_API = {
             CONFIG_DEFAULT: {
-                TIME_RELOAD: 60,//直播间重载时间
-                RANDOM_DELAY: true,//抽奖随机延迟
-                RND_DELAY_START: 2,//延迟最小值
-                RND_DELAY_END: 5,//延迟最大值
-                TIME_AREA_DISABLE: true,//不抽奖时段开关
-                TIME_AREA_START_H0UR: 2,//不抽奖开始小时
-                TIME_AREA_END_H0UR: 8,//不抽奖结束小时
-                TIME_AREA_START_MINUTE: 0,//不抽奖开始分钟
-                TIME_AREA_END_MINUTE: 0,//不抽奖结束分钟
-                RANDOM_SKIP: 0,//随机跳过抽奖概率
-                MAX_GIFT: 99999,//辣条上限
-                IN_TIME_RELOAD_DISABLE: false,//休眠时段是否禁止刷新直播间 false为刷新
-                RANDOM_SEND_DANMU: 0,//随机弹幕发送概率
-                CHECK_HOUR_ROOM_INTERVAL: 120,//小时间检查间隔时间(秒)
+                AUTO_GIFT: false,//自动送礼
+                AUTO_GIFT_ROOMID: "0",//送礼优先房间
                 AUTO_GROUP_SIGN: true,//应援团签到开关
-                LIVE_SIGN: true,//直播区签到
-                FORCE_LOTTERY: false,//黑屋强制抽奖
-                LOGIN: true,//主站登陆
-                WATCH: true,//观看视频
+                AUTO_TREASUREBOX: true,//每日宝箱
+                CHECK_HOUR_ROOM_INTERVAL: 120,//小时间检查间隔时间(秒)
                 COIN: false,//投币
                 COIN_NUMBER: 0,//投币数量
-                COIN_TYPE: 'COIN_DYN',//投币方法 动态/UID
+                COIN_TYPE: "COIN_DYN",//投币方法 动态/UID
                 COIN_UID: 0,//投币up主
-                SHARE: true,//分享
-                AUTO_TREASUREBOX: true,//每日宝箱
-                SILVER2COIN: false,//银瓜子换硬币
-                AUTO_GIFT: false,//自动送礼
+                FORCE_LOTTERY: false,//黑屋强制抽奖
+                GIFT_LIMIT: 86400,//礼物到期时间
                 GIFT_SEND_HOUR: 23,//送礼小时
                 GIFT_SEND_MINUTE: 59,//送礼分钟
                 GIFT_SORT: false,//送礼优先高等级
-                AUTO_GIFT_ROOMID: "0",//送礼优先房间
-                GIFT_LIMIT: 86400,//礼物到期时间
-                SEND_ALL_GIFT: false,//送满全部勋章
-                SPARE_GIFT_ROOM: '0',//剩余礼物送礼房间
-                SPARE_GIFT_UID: '0',//剩余礼物送礼uid
+                IN_TIME_RELOAD_DISABLE: false,//休眠时段是否禁止刷新直播间 false为刷新
+                LIVE_SIGN: true,//直播区签到
+                LOGIN: true,//主站登陆
+                MAX_GIFT: 99999,//辣条上限
                 MOBILE_HEARTBEAT: true,//移动端心跳
+                RANDOM_DELAY: true,//抽奖随机延迟
+                RANDOM_SEND_DANMU: 0,//随机弹幕发送概率
+                RANDOM_SKIP: 0,//随机跳过抽奖概率
+                RND_DELAY_END: 5,//延迟最大值
+                RND_DELAY_START: 2,//延迟最小值
+                SEND_ALL_GIFT: false,//送满全部勋章
+                SHARE: true,//分享
+                SILVER2COIN: false,//银瓜子换硬币
+                SPARE_GIFT_ROOM: "0",//剩余礼物送礼房间
+                SPARE_GIFT_UID: "0",//剩余礼物送礼uid
                 STORM: false,//节奏风暴
-                STORM_QUEUE_SIZE: 3,//允许同时参与的风暴次数
                 STORM_MAX_COUNT: 100,//单个风暴最大尝试次数
                 STORM_ONE_LIMIT: 200,//单个风暴参与次数间隔（毫秒）
-                ROOM_ENTRY:100//抽奖前模拟进入房间概率
+                STORM_QUEUE_SIZE: 3,//允许同时参与的风暴次数
+                TIME_AREA_DISABLE: true,//不抽奖时段开关
+                TIME_AREA_END_H0UR: 8,//不抽奖结束小时
+                TIME_AREA_END_MINUTE: 0,//不抽奖结束分钟
+                TIME_AREA_START_H0UR: 2,//不抽奖开始小时
+                TIME_AREA_START_MINUTE: 0,//不抽奖开始分钟
+                TIME_RELOAD: 60,//直播间重载时间
+                WATCH: true,//观看视频
             },
             CACHE_DEFAULT: {
                 UNIQUE_CHECK: 0,//唯一运行检测
@@ -323,17 +335,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     window.toast('CACHE初始化出错', 'error')
                     p.reject()
                 }
-                setToken().then((msg) => {
-                    if (msg == 'OK') {
-                        window.toast('APPtoken载入成功', 'success')
-                        p.resolve()
-                    }
-                    else {
-                        console.error('APPtoken初始化出错', msg)
-                        window.toast('APPtoken初始化出错', 'error')
-                        p.reject()
-                    }
-                });
+
                 setTimeout(() => {
                     MY_API.TreasureBox.init();
                 }, 5750);
@@ -459,7 +461,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             removeUnnecessary: () => {//移除不必要的页面元素
                 let unnecessaryList = [
                     '#my-dear-haruna-vm',//2233
-                    '.june-activity-entry',//活动入口
+                    //'.june-activity-entry',//活动入口
                     //'.rank-banner',//周星计划
                     //'.chaos-pk-banner'//大乱斗信息
                 ];
@@ -550,11 +552,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
                             </label>
                         </div>
-                        <div data-toggle="ROOM_ENTRY">
-                        <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-                            抽奖前模拟进入目标房间概率<input class="per igiftMsg_input" style="width: 30px;" type="text">%
-                        </label>
-                    </div>
                         <div data-toggle="CHECK_HOUR_ROOM_INTERVAL">
                             <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
                                 检查小时榜间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒
@@ -737,7 +734,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
 
 
                 //显示对应配置状态
-                div.find('div[data-toggle="ROOM_ENTRY"] .per').val((parseFloat(MY_API.CONFIG.ROOM_ENTRY)).toString());
                 div.find('div[data-toggle="COIN_UID"] .num').val(parseInt(MY_API.CONFIG.COIN_UID).toString());
                 div.find('div[data-toggle="STORM_MAX_COUNT"] .num').val(parseInt(MY_API.CONFIG.STORM_MAX_COUNT).toString());
                 div.find('div[data-toggle="STORM_ONE_LIMIT"] .num').val(parseInt(MY_API.CONFIG.STORM_ONE_LIMIT).toString());
@@ -761,8 +757,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 div.find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val(MY_API.CONFIG.GIFT_SEND_MINUTE.toString());
                 div.find('div[data-toggle="GIFT_LIMIT"] .num').val(parseInt(MY_API.CONFIG.GIFT_LIMIT).toString());
 
-
-                div.find('div[id="giftCount"] [data-action="save"]').click(() => {//保存按钮
+                function saveAction() {
                     //TIME_AREA_DISABLE（控制输入的两个小时两个分钟）
                     let val = undefined;
                     let valArray = undefined;
@@ -848,13 +843,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     };
                     val = valArray.join(",");
                     MY_API.CONFIG.AUTO_GIFT_ROOMID = val;
-                    //GIFT_INTERVAL
-                    val = parseInt(div.find('div[data-toggle="GIFT_INTERVAL"] .num').val());
-                    if (val <= 0) {
-                        MY_API.chatLog("[检查送礼间隔]数据小于等于0", 'warning');
-                        return
-                    }
-                    MY_API.CONFIG.GIFT_INTERVAL = val;
                     //GIFT_LIMIT
                     val = parseInt(div.find('div[data-toggle="GIFT_LIMIT"] .num').val());
                     MY_API.CONFIG.GIFT_LIMIT = val;
@@ -889,10 +877,10 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     //COIN_UID
                     val = parseInt(div.find('div[data-toggle="COIN_UID"] .num').val());
                     MY_API.CONFIG.COIN_UID = val;
-                    //ROOM_ENTRY
-                    val = parseFloat(div.find('div[data-toggle="ROOM_ENTRY"] .per').val());
-                    MY_API.CONFIG.ROOM_ENTRY = val;
                     MY_API.saveConfig();
+                };
+                div.find('div[id="giftCount"] [data-action="save"]').click(() => {//保存按钮
+                    saveAction();
                 });
 
                 div.find('button[data-action="reset"]').click(() => {//重置按钮
@@ -947,20 +935,20 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         MY_API.saveConfig()
                     });
                 };
-                $('input:text').bind('keydown', function(event) {//绑定回车保存
-                    　　if (event.keyCode == "13") {
-                            MY_API.saveConfig();
-                    　　}
+                $('input:text').bind('keydown', function (event) {//绑定回车保存
+                    if (event.keyCode == "13") {
+                        saveAction();
+                    }
                 });
-                if(MY_API.CONFIG.COIN_TYPE == 'COIN_DYN') {
+                if (MY_API.CONFIG.COIN_TYPE == 'COIN_DYN') {
                     $("div[data-toggle='COIN_DYN'] input:radio").attr('checked', '');
                 } else {
                     $("div[data-toggle='COIN_UID'] input:radio").attr('checked', '');
                 };
-                
-                $("input:radio[name='COIN_TYPE']").change(function (){ //拨通
+
+                $("input:radio[name='COIN_TYPE']").change(function () { //投币模式变化
                     let a = $("div[data-toggle='COIN_DYN'] input:radio").is(':checked');
-                    if(a == true) {
+                    if (a == true) {
                         MY_API.CONFIG.COIN_TYPE = 'COIN_DYN';
                     }
                     else {
@@ -1031,8 +1019,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             max_blocked: false,
             listen: (roomId, uid, area = '本直播间') => {
                 BAPI.room.getConf(roomId).then((response) => {
-                    DanMuServerHost = response.data.host;
-                    MYDEBUG('服务器地址', response);
+                    //DanMuServerHost = response.data.host;
+                    MYDEBUG(`获取弹幕服务器信息 ${area}`, response);
                     let wst = new BAPI.DanmuWebSocket(uid, roomId, response.data.host_server_list, response.data.token);
                     wst.bind((newWst) => {
                         wst = newWst;
@@ -1119,6 +1107,41 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     MY_API.chatLog('获取弹幕服务器地址错误', 'error')
                 });
             },
+            EntryRoom_list_history: {//进入房间历史记录缓存
+                add: function (EntryRoom) {
+                    let EntryRoom_list = [];
+                    try {
+                        let config = JSON.parse(localStorage.getItem(`${NAME}_EntryRoom_list`));
+                        EntryRoom_list = [].concat(config.list);
+                        EntryRoom_list.push(EntryRoom);
+                        if (EntryRoom_list.length > 100) {
+                            EntryRoom_list.splice(0, 50);//删除前50条数据
+                        }
+                        localStorage.setItem(`${NAME}_EntryRoom_list`, JSON.stringify({ list: EntryRoom_list }));
+                        MYDEBUG(`${NAME}_EntryRoom_list_add`, EntryRoom_list);
+                    } catch (e) {
+                        EntryRoom_list.push(EntryRoom);
+                        localStorage.setItem(`${NAME}_EntryRoom_list`, JSON.stringify({ list: EntryRoom_list }));
+                    }
+                },
+                isIn: function (EntryRoom) {
+                    let EntryRoom_list = [];
+                    try {
+                        let config = JSON.parse(localStorage.getItem(`${NAME}_EntryRoom_list`));
+                        if (config === null) {
+                            EntryRoom_list = [];
+                        } else {
+                            EntryRoom_list = [].concat(config.list);
+                        }
+                        MYDEBUG(`${NAME}_EntryRoom_list_read`, config);
+                        return EntryRoom_list.indexOf(EntryRoom) > -1
+                    } catch (e) {
+                        localStorage.setItem(`${NAME}_EntryRoom_list`, JSON.stringify({ list: EntryRoom_list }));
+                        MYDEBUG('读取' + `${NAME}_EntryRoom_list` + '缓存错误已重置');
+                        return EntryRoom_list.indexOf(EntryRoom) > -1
+                    }
+                }
+            },
             RoomId_list: [],
             err_roomId: [],
             auto_danmu_list: ["(=・ω・=)", "（￣▽￣）", "nice", "666", "kksk", "(⌒▽⌒)", "(｀・ω・´)", "╮(￣▽￣)╭", "(￣3￣)", "Σ( ￣□￣||)",
@@ -1132,8 +1155,9 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 } else {
                     MY_API.RoomId_list.push(roomId);
                 }
-                if(probability(MY_API.CONFIG.ROOM_ENTRY)) {
+                if (!MY_API.EntryRoom_list_history.isIn(roomId)) {
                     BAPI.room.room_entry_action(roomId);//直播间进入记录
+                    MY_API.EntryRoom_list_history.add(roomId);//加入列表
                 }
                 if (probability(MY_API.CONFIG.RANDOM_SEND_DANMU)) {//概率发活跃弹幕
                     BAPI.sendLiveDanmu(MY_API.auto_danmu_list[Math.floor(Math.random() * 12)], roomId).then((response) => {
@@ -1500,22 +1524,27 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 run: () => {//执行应援团任务
                     try {
                         if (!MY_API.CONFIG.AUTO_GROUP_SIGN) return $.Deferred().resolve();
-                        let alternateTime = GetTomorrowIntervalTime(MY_API.CACHE.AUTO_GROUP_SIGH_TS);
+                        /*let alternateTime = GetTomorrowIntervalTime(MY_API.CACHE.AUTO_GROUP_SIGH_TS);
                         if (alternateTime < 86400 * 1e3) { //间隔小于24小时
                             setTimeout(MY_API.GroupSign.run, alternateTime);
                             let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
                             MYDEBUG("[自动应援团签到]", `将在${runTime}进行应援团签到`);
                             return $.Deferred().resolve();
+                        }*/
+                        if (!checkNewDay(MY_API.CACHE.AUTO_GROUP_SIGH_TS)) {
+                            runTomorrow(MY_API.GroupSign.run, 8, 0, '应援团签到');
+                            return $.Deferred().resolve();
                         }
                         return MY_API.GroupSign.getGroups().then((list) => {
                             return MY_API.GroupSign.signInList(list).then(() => {
                                 MY_API.CACHE.AUTO_GROUP_SIGH_TS = ts_ms();
-                                MY_API.saveCache();
+                                MY_API.saveCache();/*
                                 alternateTime = GetTomorrowIntervalTime(MY_API.CACHE.AUTO_GROUP_SIGH_TS);
                                 setTimeout(MY_API.GroupSign.run, alternateTime);
                                 let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
-                                MYDEBUG("[自动应援团签到]", `将在${runTime}进行应援团签到`);
-
+                                MYDEBUG("[自动应援团签到]", `将在${runTime}进行应援团签到`);*/
+                                runTomorrow(MY_API.GroupSign.run, 8, 0, '应援团签到');
+                                return $.Deferred().resolve();
                             }, () => delayCall(() => MY_API.GroupSign.run()));
 
                         }, () => delayCall(() => MY_API.GroupSign.run()));
@@ -1565,7 +1594,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     let num = Math.min(2, n);
                     if (one) num = 1;
                     BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
-                        if (re.data.multiply == 2) {
+                        if (re.data.multiply === 2) {
                             MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
                             return MY_API.DailyReward.coin(vlist, n, i + 1);
                         }
@@ -1593,7 +1622,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         }
                     })
                 },
-                coin_uid: (vlist, n, pagenum, i = 0, one = false) => {
+                coin_uid: (vlist, n, pagenum, uid, i = 0, one = false) => {
                     if (!MY_API.CONFIG.COIN) return $.Deferred().resolve();
                     if (MY_API.DailyReward.coin_exp >= MY_API.CONFIG.COIN_NUMBER * 10) {
                         window.toast('[自动每日奖励][每日投币]今日投币已完成', 'info');
@@ -1603,12 +1632,16 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         MY_API.DailyReward.UserSpace(MY_API.CONFIG.COIN_UID, 30, 0, pagenum++, '', 'pubdate', 'jsonp');
                     }
                     const obj = vlist[i];
+                    if (obj.is_union_video === 1 || obj.mid != uid) {
+                        MYDEBUG('DailyReward.coin_uid', `联合投稿且UP不是指定UID用户 aid = ${obj.aid}`)
+                        return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uid, i + 1);
+                    }
                     let num = Math.min(2, n);
                     if (one) num = 1;
                     BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
-                        if (re.data.multiply == 2) {
+                        if (re.data.multiply === 2) {
                             MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
-                            return MY_API.DailyReward.coin_uid(vlist, n, pagenum, i + 1);
+                            return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uid, i + 1);
                         }
                         else {
                             return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
@@ -1616,21 +1649,21 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 if (response.code === 0) {
                                     MY_API.DailyReward.coin_exp += num * 10;
                                     window.toast(`[自动每日奖励][每日投币]投币成功(av=${obj.aid},num=${num})`, 'success');
-                                    return MY_API.DailyReward.coin_uid(vlist, n - num, pagenum, i + 1);
+                                    return MY_API.DailyReward.coin_uid(vlist, n - num, pagenum, uid, i + 1);
                                 } else if (response.code === -110) {
                                     window.toast('[自动每日奖励][每日投币]未绑定手机，已停止', 'error');
                                     return $.Deferred().reject();
                                 } else if (response.code === 34003) {
                                     // 非法的投币数量
-                                    if (one) return MY_API.DailyReward.coin_uid(vlist, n, pagenum, i + 1);
-                                    return MY_API.DailyReward.coin_uid(vlist, n, i, pagenum, true);
+                                    if (one) return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uid, i + 1);
+                                    return MY_API.DailyReward.coin_uid(vlist, n, i, pagenum, uid, true);
                                 } else if (response.code === 34005) {
                                     // 塞满啦！先看看库存吧~
-                                    return MY_API.DailyReward.coin_uid(vlist, n, pagenum, i + 1);
+                                    return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uid, i + 1);
                                 }
                                 window.toast(`[自动每日奖励][每日投币]'${response.msg}`, 'caution');
-                                return MY_API.DailyReward.coin_uid(vlist, n, pagenum, i + 1);
-                            }, () => delayCall(() => MY_API.DailyReward.coin_uid(vlist, n, pagenum, i)));
+                                return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uid, i + 1);
+                            }, () => delayCall(() => MY_API.DailyReward.coin_uid(vlist, n, pagenum, uid, i)));
                         }
                     });
 
@@ -1683,7 +1716,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         MYDEBUG('DailyReward.UserSpace: API.dynamic_svr.UserSpace', response);
                         if (response.code === 0) {
                             if (!!response.data.list.vlist) {
-                                const p1 = MY_API.DailyReward.coin_uid(response.data.list.vlist, Math.max(MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10, 0), pn);
+                                const p1 = MY_API.DailyReward.coin_uid(response.data.list.vlist, Math.max(MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10, 0), pn, uid);
                                 return p1;
                             } else {
                                 window.toast('[自动每日奖励]"空间-投稿视频"中暂无视频', 'info');
@@ -2370,6 +2403,11 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             runMidnight(MY_API.MobileHeartBeat.run, '移动端心跳');
                             return $.Deferred().resolve();
                         }
+                        if (Live_info.mobile_verify === false) {
+                            window.toast('[移动端心跳]未绑定手机，已停止', 'warning');
+                            MYDEBUG('MobileHeartBeat', `未绑定手机 mobile_verify = ${Live_info.mobile_verify}`);
+                            return $.Deferred().resolve();
+                        }
                         const mobileOnline = () => {
                             XHR({
                                 GM: true,
@@ -2389,39 +2427,38 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             runMidnight(MY_API.MobileHeartBeat.run, '移动端心跳');
                         };
                         const getWatchingAward = () => {
-                                BAPI.activity.receive_award('double_watch_task').then((response) => {
-                                    if (response.code === 0) {
-                                        window.toast('[双端观看直播]奖励领取成功', 'success');
-                                        EndFunc(response);
-                                        return $.Deferred().resolve();
-                                    }
-                                    else if (response.code === -400) {
-                                        window.toast('[双端观看直播]奖励已领取', 'info');
-                                        EndFunc(response);
-                                        return $.Deferred().resolve();
-                                    }
-                                    else {
-                                        window.toast(`[双端观看直播]${response}`, 'warning');
-                                        EndFunc(response);
-                                        return $.Deferred().resolve();
-                                    }
-                                }, (err) => {
-                                    window.toast('[双端观看直播]奖励领取失败，请检查网络', 'error');
-                                    console.error('MobileHeartBeat GetAward', err);
-                                    clearInterval(HBinterval);
-                                    return delayCall(() => MY_API.MobileHeartBeat.run());
-                                });
+                            BAPI.activity.receive_award('double_watch_task').then((response) => {
+                                if (response.code === 0) {
+                                    window.toast('[双端观看直播]奖励领取成功', 'success');
+                                    EndFunc(response);
+                                    return $.Deferred().resolve();
+                                }
+                                else if (response.code === -400) {
+                                    window.toast('[双端观看直播]奖励已领取', 'info');
+                                    EndFunc(response);
+                                    return $.Deferred().resolve();
+                                }
+                                else {
+                                    window.toast(`[双端观看直播]${response}`, 'warning');
+                                    EndFunc(response);
+                                    return $.Deferred().resolve();
+                                }
+                            }, (err) => {
+                                window.toast('[双端观看直播]奖励领取失败，请检查网络', 'error');
+                                console.error('MobileHeartBeat GetAward', err);
+                                clearInterval(HBinterval);
+                                return delayCall(() => MY_API.MobileHeartBeat.run());
+                            });
                         }
-
-                        if (tokenData.access_token === undefined && await setToken() === undefined) {
+                        if (await setToken() === undefined && tokenData.access_token === undefined) {
                             MYDEBUG('MobileHeartBeat', 'token设置失败');
                             return;
                         }
                         MYDEBUG('MobileHeartBeat', '开始客户端心跳');
                         mobileOnline();
                         let HBinterval = undefined;
-                        HBinterval = setInterval(() => mobileOnline(), 5 * 60 * 1000);
-                        setTimeout(() => getWatchingAward(), 6 * 60 * 1000);
+                        HBinterval = setInterval(() => mobileOnline(), 300 * 1e3);
+                        setTimeout(() => getWatchingAward(), 360 * 1e3);
                     }
 
             },
@@ -2790,11 +2827,13 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             return intervalTime
         }
     }
+
     /**
      * （1000000000） 获取到明天的目标时间戳所在的相同【时间点】所需时间（毫秒）
      * @param date 整数 时间戳
      * @returns {number} intervalTime
      */
+    /*
     function GetTomorrowIntervalTime(date) {
         let intervalTime = ts_ms() - date;
         MYDEBUG("[GetTomorrowIntervalTime]获取间隔时间", intervalTime + '毫秒');
@@ -2804,7 +2843,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
         else {
             return 24 * 3600 * 1e3 - intervalTime;
         }
-    }
+    }*/
     /**
      * （23,50） 当前时间是否为23:50
      * @param hour 整数 小时
