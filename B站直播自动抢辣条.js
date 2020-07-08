@@ -11,8 +11,8 @@
 // @supportURL    https://github.com/andywang425/Bilibili-SGTH/issues
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
-// @license       MIT
-// @version       3.6
+// @license       MIT License
+// @version       3.6.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -258,6 +258,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 COIN_NUMBER: 0,//投币数量
                 COIN_TYPE: "COIN_DYN",//投币方法 动态/UID
                 COIN_UID: 0,//投币up主
+                EXCLUDE_ROOMID: "0",//送礼排除房间号
                 FORCE_LOTTERY: false,//黑屋强制抽奖
                 GIFT_LIMIT: 86400,//礼物到期时间
                 GIFT_SEND_HOUR: 23,//送礼小时
@@ -623,6 +624,11 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             优先送礼房间
                             <input class="num igiftMsg_input" style="width: 150px;" type="text">
                         </div>
+
+                        <div data-toggle="EXCLUDE_ROOMID" style=" color: purple">
+                            不送礼房间
+                            <input class="num igiftMsg_input" style="width: 150px;" type="text">
+                        </div>
             
                         <div data-toggle="GIFT_SEND_TIME" style=" color: purple">
                             送礼时间
@@ -753,6 +759,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 div.find('div[data-toggle="TIME_AREA_DISABLE"] .endMinute').val(parseInt(MY_API.CONFIG.TIME_AREA_END_MINUTE).toString());
                 div.find('div[data-toggle="CHECK_HOUR_ROOM_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL).toString());
                 div.find('div[data-toggle="AUTO_GIFT_ROOMID"] .num').val((MY_API.CONFIG.AUTO_GIFT_ROOMID).toString());
+                div.find('div[data-toggle="EXCLUDE_ROOMID"] .num').val((MY_API.CONFIG.EXCLUDE_ROOMID).toString());
                 div.find('div[data-toggle="GIFT_SEND_TIME"] .Hour').val(MY_API.CONFIG.GIFT_SEND_HOUR.toString());
                 div.find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val(MY_API.CONFIG.GIFT_SEND_MINUTE.toString());
                 div.find('div[data-toggle="GIFT_LIMIT"] .num').val(parseInt(MY_API.CONFIG.GIFT_LIMIT).toString());
@@ -843,6 +850,16 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     };
                     val = valArray.join(",");
                     MY_API.CONFIG.AUTO_GIFT_ROOMID = val;
+                    //EXCLUDE_ROOMID
+                    val = div.find('div[data-toggle="EXCLUDE_ROOMID"] .num').val();
+                    valArray = val.split(",");
+                    for (let i = 0; i < valArray.length; i++) {
+                        if (valArray[i] === '') {
+                            valArray[i] = 0;
+                        }
+                    };
+                    val = valArray.join(",");
+                    MY_API.CONFIG.EXCLUDE_ROOMID = val;
                     //GIFT_LIMIT
                     val = parseInt(div.find('div[data-toggle="GIFT_LIMIT"] .num').val());
                     MY_API.CONFIG.GIFT_LIMIT = val;
@@ -1011,9 +1028,11 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         });
                 }
                 if (msgHide == false) {
-                    ct.find('#chat-items').append(div);//向聊天框加入信息
-                    ct.scrollTop(ct.prop("scrollHeight"));//滚动到底部
+                    ct.find('#chat-items').append(div);//向聊天框加入信息  
+                } else {
+                    ct.find('#chat-items').append(div.hide());//向聊天框加入信息
                 }
+                ct.scrollTop(ct.prop("scrollHeight"));//滚动到底部
             },
             blocked: false,
             max_blocked: false,
@@ -1319,8 +1338,10 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 });
                 if (msgHide == false) {
                     ct.find('#chat-items').append(div);//向聊天框加入信息
-                    ct.scrollTop(ct.prop("scrollHeight"));//滚动到底部
+                } else {
+                    ct.find('#chat-items').append(div.hide());//向聊天框加入信息                 
                 }
+                ct.scrollTop(ct.prop("scrollHeight"));//滚动到底部
                 let timer = setInterval(() => {
                     aa.text(`等待抽奖倒计时${delay}秒`);
                     if (delay <= 0) {
@@ -1533,6 +1554,9 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         }*/
                         if (!checkNewDay(MY_API.CACHE.AUTO_GROUP_SIGH_TS)) {
                             runTomorrow(MY_API.GroupSign.run, 8, 0, '应援团签到');
+                            return $.Deferred().resolve();
+                        } else if (new Date().getHours() < 8 && MY_API.CACHE.AUTO_GROUP_SIGH_TS != 0) {
+                            setTimeout(MY_API.GroupSign.run, getIntervalTime(8, 0));
                             return $.Deferred().resolve();
                         }
                         return MY_API.GroupSign.getGroups().then((list) => {
@@ -2266,6 +2290,11 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                     }
                                 }
                             }
+                            //排除直播间
+                            if (MY_API.CONFIG.EXCLUDE_ROOMID != '0' && MY_API.CONFIG.EXCLUDE_ROOMID.length > 0) {//!=0仅为了加快运行速度
+                                ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID.split(",");
+                                MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
+                            }
                             let limit = MY_API.CONFIG.GIFT_LIMIT;
                             for (let v of MY_API.Gift.medal_list) {
                                 let response = await BAPI.room.room_init(parseInt(v.roomid, 10));
@@ -2354,14 +2383,16 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     }
                     if (MY_API.Gift.time <= 0) MY_API.Gift.time = ts_s();
                     const v = MY_API.Gift.bag_list[i];
-                    if (
+                    if ((
                         //特殊礼物排除
                         (!MY_API.Gift.notSendGiftList.includes(v.gift_id)
                             //满足到期时间
                             && v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT)
                         )
                         //或者全部送满
-                        || MY_API.CONFIG.SEND_ALL_GIFT) {
+                        || MY_API.CONFIG.SEND_ALL_GIFT) &&
+                        //永久礼物不送
+                        v.expire_at > MY_API.Gift.time) {
                         // 检查SEND_ALL_GIFT和礼物到期时间 送当天到期的
                         if (v.gift_id == undefined) {
                             return $.Deferred().resolve();
