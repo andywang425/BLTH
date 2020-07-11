@@ -11,8 +11,8 @@
 // @supportURL    https://github.com/andywang425/Bilibili-SGTH/issues
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
-// @license       MIT License
-// @version       3.6.1
+// @license       MIT
+// @version       3.6.2
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -453,7 +453,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             },
             addSilver: (count) => {
                 MY_API.GIFT_COUNT.SILVER_COUNT += (count * 10);
-                $('#giftCount span:eq(2)').text(MY_API.GIFT_COUNT.SILVER_COUNT);
+                $('#giftCount span:eq(1)').text(MY_API.GIFT_COUNT.SILVER_COUNT);
                 MY_API.saveGiftCount();
             },
             checkUpdate: () => {
@@ -462,7 +462,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             removeUnnecessary: () => {//移除不必要的页面元素
                 let unnecessaryList = [
                     '#my-dear-haruna-vm',//2233
-                    //'.june-activity-entry',//活动入口
+                    '.july-activity-entry'//活动入口
                     //'.rank-banner',//周星计划
                     //'.chaos-pk-banner'//大乱斗信息
                 ];
@@ -738,7 +738,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
 
                 $('.live-player-mounter').append(div);
 
-
                 //显示对应配置状态
                 div.find('div[data-toggle="COIN_UID"] .num').val(parseInt(MY_API.CONFIG.COIN_UID).toString());
                 div.find('div[data-toggle="STORM_MAX_COUNT"] .num').val(parseInt(MY_API.CONFIG.STORM_MAX_COUNT).toString());
@@ -917,7 +916,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     };
                     MY_API.saveGiftCount();
                     $('#giftCount span:eq(0)').text(MY_API.GIFT_COUNT.COUNT);
-                    $('#giftCount span:eq(2)').text(MY_API.GIFT_COUNT.SILVER_COUNT);
+                    $('#giftCount span:eq(1)').text(MY_API.GIFT_COUNT.SILVER_COUNT);
                     MY_API.chatLog('已重置统计数据');
                 });
                 div.find('button[data-action="sendGiftNow"]').click(() => {//立刻开始送礼
@@ -2207,8 +2206,9 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 bag_list: undefined,
                 time: undefined,
                 remain_feed: undefined,
-                notSendGiftList: [3, 4, 9, 10, 39, 30588, 30587, 30586, 30585],
+                //notSendGiftList: [3, 4, 9, 10, 39, 30588, 30587, 30586, 30585],
                 //B坷垃,喵娘,爱心便当,蓝白胖次,节奏风暴,如意小香包,软糯白糖粽,飘香大肉粽,端午茗茶
+                sendGiftList: [1, 6],//辣条，亿圆
                 getMedalList: (page = 1) => {
                     if (page === 1) MY_API.Gift.medal_list = [];
                     return BAPI.i.medal(page, 25).then((response) => {
@@ -2306,7 +2306,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                     let now = ts_s();
                                     if (!MY_API.CONFIG.SEND_ALL_GIFT) {
                                         //送之前查一次有没有可送的
-                                        let pass = MY_API.Gift.bag_list.filter(r => !MY_API.Gift.notSendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
+                                        let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
                                         if (pass.length == 0) {
                                             break;
                                         }
@@ -2317,7 +2317,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                         window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度未满[${v.today_feed}/${v.day_limit}]，预计需要[${MY_API.Gift.remain_feed}]送礼开始`, 'info');
                                         await MY_API.Gift.sendGift(v);
                                         if (!MY_API.CONFIG.SEND_ALL_GIFT) {
-                                            let pass = MY_API.Gift.bag_list.filter(r => !MY_API.Gift.notSendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
+                                            let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
                                             if (pass.length == 0) {
                                                 break;
                                             }
@@ -2345,7 +2345,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         let limit = 86400;
                         let now = ts_s();
                         if (//剩余礼物,今日送完所有牌子后若有小于1天的礼物则送礼。检查有没有可送的
-                            MY_API.Gift.bag_list.filter(r => !MY_API.Gift.notSendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit)).length != 0
+                            MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit)).length != 0
                             && //满足到期时间小于一天
                             v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < 86400
                                 && MY_API.CONFIG.SPARE_GIFT_ROOM != '0' && MY_API.CONFIG.SPARE_GIFT_UID != '0'
@@ -2384,8 +2384,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     if (MY_API.Gift.time <= 0) MY_API.Gift.time = ts_s();
                     const v = MY_API.Gift.bag_list[i];
                     if ((
-                        //特殊礼物排除
-                        (!MY_API.Gift.notSendGiftList.includes(v.gift_id)
+                        //只送特定礼物
+                        (MY_API.Gift.sendGiftList.includes(v.gift_id)
                             //满足到期时间
                             && v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT)
                         )
