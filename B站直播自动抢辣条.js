@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.6.2
+// @version       3.7
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -55,7 +55,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
         gift_list: undefined,
         rnd: undefined,
         visit_id: undefined,
-        identification: undefined
+        identification: undefined,
+        bili_jct: undefined
     };
     const runUntilSucceed = (callback, delay = 0, period = 100) => {
         setTimeout(() => {
@@ -195,6 +196,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             if (i < Live_info.gift_list.length - 1) Live_info.gift_list_str += '，';
                         });
                     });
+                    Live_info.bili_jct = BAPI.getCookie('bili_jct');
                     Live_info.ruid = W.BilibiliLive.ANCHOR_UID;
                     Live_info.rnd = W.BilibiliLive.RND;
                     Live_info.visit_id = W.__statisObserver ? W.__statisObserver.__visitId : '';
@@ -290,6 +292,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 TIME_AREA_START_MINUTE: 0,//不抽奖开始分钟
                 TIME_RELOAD: 60,//直播间重载时间
                 WATCH: true,//观看视频
+                LITTLE_HEART: false,//跳转房间获取小心心
+                REMOVE_ELEMENT:true//跳转后移除直播画面，弹幕并静音
             },
             CACHE_DEFAULT: {
                 UNIQUE_CHECK: 0,//唯一运行检测
@@ -299,7 +303,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 TreasureBox_TS: 0,//银瓜子宝箱
                 Silver2Coin_TS: 0,//银瓜子换硬币
                 Gift_TS: 0,//自动送礼
-                MobileHeartBeat_TS: 0//移动端心跳
+                MobileHeartBeat_TS: 0,//移动端心跳
+                GotoRoomId: 0//跳转房间号
             },
             CONFIG: {},
             CACHE: {},
@@ -310,7 +315,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             },
             init: () => {
                 try {
-                    BAPI.setCommonArgs(BAPI.getCookie('bili_jct'));// 设置token
+                    BAPI.setCommonArgs(Live_info.bili_jct);// 设置token
                 } catch (err) {
                     console.error(`[${NAME}]`, err);
                     return;
@@ -624,7 +629,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             优先送礼房间
                             <input class="num igiftMsg_input" style="width: 150px;" type="text">
                         </div>
-
+            
                         <div data-toggle="EXCLUDE_ROOMID" style=" color: purple">
                             不送礼房间
                             <input class="num igiftMsg_input" style="width: 150px;" type="text">
@@ -703,6 +708,19 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         【给用户(UID:___)的视频投币】若填0则给动态中的视频依次投币(因为无UID为0的用户)
             
                     </fieldset>
+                    <fieldset class="igiftMsg_fs">
+                        <legend style="color: black">小心心</legend>
+                        <div data-toggle="LITTLE_HEART" style="line-height: 15px">
+                            <label style="margin: 5px auto; color: black">
+                                <input style="vertical-align: text-top;" type="checkbox"> 自动跳转房间获取小心心
+                            </label>
+                        </div>
+                        <div data-toggle="REMOVE_ELEMENT" style="line-height: 15px">
+                        <label style="margin: 5px auto; color: black">
+                            <input style="vertical-align: text-top;" type="checkbox"> 跳转房间后移除直播画面并静音
+                        </label>
+                    </div>
+                    </fieldset>
                     <fieldset class="igiftMsg_fs" style="line-height: 15px">
                         <legend style="color: black">其他设置</legend>
                         <div data-toggle="TIME_RELOAD" style="color: black">
@@ -739,7 +757,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 $('.live-player-mounter').append(div);
 
                 //显示对应配置状态
-                div.find('div[data-toggle="COIN_UID"] .num').val(parseInt(MY_API.CONFIG.COIN_UID).toString());
                 div.find('div[data-toggle="STORM_MAX_COUNT"] .num').val(parseInt(MY_API.CONFIG.STORM_MAX_COUNT).toString());
                 div.find('div[data-toggle="STORM_ONE_LIMIT"] .num').val(parseInt(MY_API.CONFIG.STORM_ONE_LIMIT).toString());
                 div.find('div[data-toggle="STORM_QUEUE_SIZE"] .num').val(parseInt(MY_API.CONFIG.STORM_QUEUE_SIZE).toString());
@@ -941,7 +958,9 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     "GIFT_SORT",
                     "SEND_ALL_GIFT",
                     'MOBILE_HEARTBEAT',
-                    'STORM'
+                    'STORM',
+                    'LITTLE_HEART',
+                    'REMOVE_ELEMENT'
                 ];
                 for (let i of checkList) {//绑定所有checkbox事件
                     let input = div.find(`div[data-toggle="${i}"] input:checkbox`);
@@ -2676,7 +2695,94 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     return $.Deferred().resolve();
                 }
             },
+            LITTLE_HEART: {
+                medalRoom_list: undefined,
+                getMedalRoomList: (page = 1) => {
+                    if (page === 1) MY_API.LITTLE_HEART.medalRoom_list = [];
+                    return BAPI.i.medal(page, 25).then((response) => {
+                        MYDEBUG('LITTLE_HEART.getMedalRoomList: API.i.medal', response);
+                        //MY_API.Gift.medal_list = MY_API.Gift.medal_list.concat(response.data.fansMedalList);
+                        for (let i of response.data.fansMedalList) {
+                            MY_API.LITTLE_HEART.medalRoom_list = MY_API.LITTLE_HEART.medalRoom_list.concat(i.roomid);
+                        }
+                        MYDEBUG('MY_API.LITTLE_HEART.medalRoom_list', MY_API.LITTLE_HEART.medalRoom_list)
+                        if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) MY_API.LITTLE_HEART.getMedalRoomList(page + 1);
+                    }, () => {
+                        window.toast('[小心心]获取勋章列表失败，请检查网络', 'error');
+                        return delayCall(() => MY_API.LITTLE_HEART.getMedalRoomList(page));
+                    });
+                },
 
+                checkRoomList: async(roomList) => {
+                    MYDEBUG(`MY_API.LITTLE_HEART.checkRoomList start`);
+                    let returnRoom = undefined;
+                    for (let r of roomList) {
+                        await BAPI.room.get_info(r).then((re) => {
+                            if (re.data.live_status === 1) {
+                                MYDEBUG('MY_API.LITTLE_HEART.checkRoomList returnRoom', r)
+                                returnRoom = r;
+                                return
+                            }
+                        }, () => {
+                            window.toast('[小心心]获取房间信息失败，请检查网络', 'error');
+                            return delayCall(() => MY_API.LITTLE_HEART.checkRoomList(roomList));
+                        })
+                        if(returnRoom != undefined) break;
+                    };
+                    if(returnRoom != undefined) {
+                        return returnRoom
+                    } else {
+                    window.toast('[小心心]当前粉丝勋章列表中无正在直播房间，5分钟后重试');
+                    return delayCall(() => MY_API.LITTLE_HEART.getMedalRoomList(page), 300e3);
+                    }
+                },
+                checkRoom: (roomid) => {
+                    BAPI.room.get_info(roomid).then((re) => {
+                        if (re.live_status === 1) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    }, () => {
+                        window.toast('[小心心]获取房间信息失败，请检查网络', 'error');
+                        return delayCall(() => MY_API.LITTLE_HEART.checkRoomList(roomList));
+                    })
+                },
+                run: async () => {
+                    if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
+                    let targetRoomId = undefined;
+                    await MY_API.LITTLE_HEART.getMedalRoomList();
+                    targetRoomId = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
+                    if (Live_info.room_id == MY_API.CACHE.GotoRoomId || MY_API.LITTLE_HEART.checkRoom(Live_info.room_id) == true) {
+                            // 移除元素
+                            if(MY_API.CONFIG.REMOVE_ELEMENT == true) {
+                            $('.bilibili-live-player-video-stream').remove();
+                            $('.bilibili-live-player-video-danmaku').remove();
+                            };
+                        window.toast(`[小心心]当前房间${Live_info.room_id}能够获取小心心，无需跳转`);
+                        let checkInterval = undefined;
+                        checkInterval = setInterval(async () => {
+                            if(MY_API.LITTLE_HEART.checkRoom(Live_info.room_id) == false) {
+                                clearInterval(checkInterval);
+                                targetRoomId = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
+                                MY_API.CACHE.GotoRoomId = targetRoomId;
+                                MY_API.saveCache();
+                                window.toast(`[小心心]3秒后跳转至房间${targetRoomId}`, 'warning');
+                                setTimeout(() => {
+                                    window.location.href = `https://live.bilibili.com/${String(targetRoomId)}`;
+                                }, 15000);
+                            }
+                        }, 3e3);
+                    } else {
+                    MY_API.CACHE.GotoRoomId = targetRoomId;
+                    MY_API.saveCache();
+                    window.toast(`[小心心]3秒后跳转至房间${targetRoomId}`, 'warning');
+                    setTimeout(() => {
+                        window.location.href = `https://live.bilibili.com/${String(targetRoomId)}`;
+                    }, 3000);
+                };
+                }
+            }
         };
 
         MY_API.init().then(() => {//主函数
@@ -2736,6 +2842,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
         }
         if (checkNewDay(API.GIFT_COUNT.CLEAR_TS)) clearStat();
         runExactMidnight(clearStat, '重置统计')
+        API.LITTLE_HEART.run();//小心心
         setTimeout(() => {
             API.removeUnnecessary();
             API.GroupSign.run();//应援团签到
@@ -2745,7 +2852,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             API.TreasureBox.run();//领宝箱
             API.Gift.run();//送礼物
             API.MobileHeartBeat.run();//移动端心跳
-        }, 6e3);//脚本加载后6秒执行每日任务，移除页面元素
+        }, 6e3);//脚本加载后6秒执行任务
         API.creatSetBox();//创建设置框
         BAPI.room.getList().then((response) => {//获取各分区的房间号
             MYDEBUG('直播间列表', response);
@@ -2835,6 +2942,34 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
 
         reset(API.CONFIG.TIME_RELOAD * 60000);//单位1分钟，重新加载直播间
     }
+
+    function getAllcookie() {
+        let allCookie = '';
+        let cookieItems = [
+            '_uuid',
+            'buvid3',
+            'sid',
+            'DedeUserID',
+            'DedeUserID__ckMd5',
+            'bili_jct',
+            'LIVE_BUVID',
+            'CURRENT_FNVAL',
+            'rpdid',
+            'Hm_lvt_8a6d461cf92ec46bd14513876885e489',
+            'CURRENT_QUALITY',
+            'Hm_lvt_8a6e55dbd2870f0f5bc9194cddf32a02',
+            `bp_video_offset_${Live_info.uid}`,
+            `bp_t_offset_${Live_info.uid}`,
+            'PVID'
+        ];
+        let co = undefined;
+        for (let c of cookieItems) {
+            co = BAPI.getCookie(c);
+            allCookie = allCookie + c + '=' + co + ';';
+        };
+        MYDEBUG('allcookie', allCookie)
+        return allCookie;
+    };
 
     /**
      * （23,50） 获取与目标时间在时间轴上的间隔时间,24小时制（毫秒）
