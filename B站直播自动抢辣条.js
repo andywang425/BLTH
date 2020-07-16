@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.7
+// @version       3.7.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -177,7 +177,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
                 if (W.BilibiliLive === undefined || parseInt(W.BilibiliLive.UID) === 0 || isNaN(parseInt(W.BilibiliLive.UID))) {
                     loadInfo(1000);
-                    window.toast(`[${GM_info.script.name}]请先登陆`, 'warning');
+                    window.toast(`[${GM_info.script.name}]无配置信息`, 'warning');
                     MYDEBUG('无配置信息');
                 } else {
                     Live_info.room_id = W.BilibiliLive.ROOMID;
@@ -293,7 +293,9 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 TIME_RELOAD: 60,//直播间重载时间
                 WATCH: true,//观看视频
                 LITTLE_HEART: false,//跳转房间获取小心心
-                REMOVE_ELEMENT:true//跳转后移除直播画面，弹幕并静音
+                REMOVE_ELEMENT_2233: false,//移除2233
+                REMOVE_ELEMENT_july: false,//移除夏日活动入口
+                REMOVE_ELEMENT_player: false//移除直播画面并静音
             },
             CACHE_DEFAULT: {
                 UNIQUE_CHECK: 0,//唯一运行检测
@@ -304,7 +306,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 Silver2Coin_TS: 0,//银瓜子换硬币
                 Gift_TS: 0,//自动送礼
                 MobileHeartBeat_TS: 0,//移动端心跳
-                GotoRoomId: 0//跳转房间号
             },
             CONFIG: {},
             CACHE: {},
@@ -467,13 +468,22 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             removeUnnecessary: () => {//移除不必要的页面元素
                 let unnecessaryList = [
                     '#my-dear-haruna-vm',//2233
-                    '.july-activity-entry'//活动入口
-                    //'.rank-banner',//周星计划
-                    //'.chaos-pk-banner'//大乱斗信息
+                    '.july-activity-entry',//活动入口
+                    '.bilibili-live-player'
                 ];
-                for (let i of unnecessaryList) {
-                    $(i).remove();
+                const removeUntiSucceed = (settingName, list_id) => {
+                    setInterval(() => {
+                        if (MY_API.CONFIG[settingName] === true && $(unnecessaryList[list_id]).length > 0) {
+                            $(unnecessaryList[list_id]).remove();
+                        } else {
+                            return
+                        }
+                    }, 200);
+
                 };
+                removeUntiSucceed('REMOVE_ELEMENT_2233', 0);
+                removeUntiSucceed('REMOVE_ELEMENT_july', 1);
+                removeUntiSucceed('REMOVE_ELEMENT_player', 2);
             },
             creatSetBox: () => {//创建设置框
                 //添加按钮
@@ -516,242 +526,255 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 });
                 div.append(`
                 <div id='allsettings'>
-                <fieldset class="igiftMsg_fs">
-                    <legend style="color: black">今日统计</legend>
-                    <div id="giftCount" style="font-size: large; text-shadow: 1px 1px #00000066; color: blueviolet;">
-                        辣条&nbsp;<span>${MY_API.GIFT_COUNT.COUNT}</span>
-                        银瓜子&nbsp;<span>${MY_API.GIFT_COUNT.SILVER_COUNT}万</span>
-                        <button style="font-size: small" class="igiftMsg_btn" data-action="save">保存所有设置</button>
-                    </div>
-                </fieldset>
-                <div id="left_fieldset" style="float:left;">
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">低调设置</legend>
-                        <div data-toggle="RANDOM_DELAY">
-                            <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-                                <input style="vertical-align: text-top;" type="checkbox">抽奖附加随机延迟
-                                <input class="RND_DELAY_START igiftMsg_input" style="width: 30px;vertical-align: top;" type="text">~
-                                <input class="RND_DELAY_END igiftMsg_input" style="width: 30px;vertical-align: top;" type="text">s
-                            </label>
-                        </div>
-                        <div data-toggle="TIME_AREA_DISABLE">
-                            <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-                                <input style="vertical-align: text-top;" type="checkbox">启用
-                                <input class="startHour igiftMsg_input" style="width: 20px;" type="text">点
-                                <input class="startMinute igiftMsg_input" style="width: 20px;" type="text">分至
-                                <input class="endHour igiftMsg_input" style="width: 20px;" type="text">点
-                                <input class="endMinute igiftMsg_input" style="width: 20px;" type="text">分不抽奖(24小时制)
-                            </label>
-                        </div>
-                        <div data-toggle="RANDOM_SKIP">
-                            <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-                                随机跳过礼物(0到100,为0则不跳过)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
-                            </label>
-                        </div>
-                        <div data-toggle="MAX_GIFT">
-                            <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-                                当天最多抢辣条数量<input class="num igiftMsg_input" style="width: 100px;" type="text">
-                            </label>
-                        </div>
-                        <div data-toggle="RANDOM_SEND_DANMU">
-                            <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-                                抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
-                            </label>
-                        </div>
-                        <div data-toggle="CHECK_HOUR_ROOM_INTERVAL">
-                            <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
-                                检查小时榜间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒
-                            </label>
-                        </div>
-            
-                    </fieldset>
-            
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">每日任务设置</legend>
-                        <div data-toggle="LOGIN" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            登陆
-                        </div>
-                        <div data-toggle="WATCH" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            观看视频
-                        </div>
-                        <div data-toggle="COIN" style=" color: black">
-                            <label style="cursor: pointer">
-                                <input style="cursor: pointer; vertical-align: text-top;" type="checkbox">
-                                自动投币<input class="coin_number igiftMsg_input" style="width: 40px;" type="text">个(0-5)
-                            </label>
-                        </div>
-                        <div data-toggle="COIN_TYPE" style=" color: black">
-                            <div data-toggle="COIN_UID">
-                            <input style="vertical-align: text-top;" type="radio" name="COIN_TYPE">
-                            给用户(UID:<input class="num igiftMsg_input" style="width: 80px;" type="text">)
-                            的视频投币
-                            </div>
-                            <div data-toggle="COIN_DYN">
-                                <input style="vertical-align: text-top;" type="radio" name="COIN_TYPE">
-                                给动态中的的视频投币
-                            </div>
-                        </div>
-                        <div data-toggle="SHARE" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            分享视频
-                        </div>
-                        <div data-toggle="SILVER2COIN" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            银瓜子换硬币
-                        </div>
-                        <div data-toggle="LIVE_SIGN" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            直播区签到
-                        </div>
-                        <div data-toggle="AUTO_GROUP_SIGN" style=" color: darkgreen">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            应援团签到
-                        </div>
-                        <div data-toggle="MOBILE_HEARTBEAT" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            模拟移动端心跳 + 领双端观看直播奖励
-                        </div>
-                        <div data-toggle="AUTO_TREASUREBOX" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            自动领银瓜子宝箱
-                        </div>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">自动送礼设置</legend>
-                        <div data-toggle="AUTO_GIFT" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            自动送礼
-                        </div>
-            
-                        <div data-toggle="AUTO_GIFT_ROOMID" style=" color: purple">
-                            优先送礼房间
-                            <input class="num igiftMsg_input" style="width: 150px;" type="text">
-                        </div>
-            
-                        <div data-toggle="EXCLUDE_ROOMID" style=" color: purple">
-                            不送礼房间
-                            <input class="num igiftMsg_input" style="width: 150px;" type="text">
-                        </div>
-            
-                        <div data-toggle="GIFT_SEND_TIME" style=" color: purple">
-                            送礼时间
-                            <input class="Hour igiftMsg_input" style="width: 20px;" type="text">点
-                            <input class="Minute igiftMsg_input" style="width: 20px;" type="text">分
-                            <button style="font-size: small" class="igiftMsg_btn" data-action="sendGiftNow">立刻开始送礼</button>
-                        </div>
-                        <div data-toggle="GIFT_LIMIT" style=" color: purple">
-                            礼物到期时间
-                            <input class="num igiftMsg_input" style="width: 100px;" type="text">
-                            秒
-                        </div>
-                        <div data-toggle="GIFT_SORT" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            送礼优先高等级粉丝牌
-                        </div>
-                        <div data-toggle="SEND_ALL_GIFT" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            送满全部勋章
-                        </div>
-                        <div data-toggle="SPARE_GIFT_ROOM" style=" color: black">
-                            剩余礼物送礼直播间：
-                            <input class="num igiftMsg_input" type="text" style="width: 100px;">
-                        </div>
-                        <div data-toggle="SPARE_GIFT_UID" style=" color: black">
-                            剩余礼物送礼直播间拥有者UID：
-                            <input class="num igiftMsg_input" type="text" style="width: 100px;">
-                        </div>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">节奏风暴设置</legend>
-                        <div data-toggle="STORM" style="line-height: 15px">
-                            <label style="margin: 5px auto; color: #ff5200">
-                                <input style="vertical-align: text-top;" type="checkbox">参与节奏风暴
-                            </label>
-                        </div>
-                        <div data-toggle="STORM_QUEUE_SIZE" style="color: black">
-                            允许同时参与的节奏风暴次数：
-                            <input class="num igiftMsg_input" type="text" style="width: 30px;">
-                        </div>
-                        <div data-toggle="STORM_MAX_COUNT" style="color: black">
-                            单个风暴最大尝试次数：
-                            <input class="num igiftMsg_input" type="text" style="width: 30px;">
-                        </div>
-                        <div data-toggle="STORM_ONE_LIMIT" style="color: black">
-                            单个风暴参与次数间隔：
-                            <input class="num igiftMsg_input" type="text" style="width: 30px;">
-                            毫秒
-                        </div>
-                    </fieldset>
+    <fieldset class="igiftMsg_fs">
+        <legend style="color: black">今日统计</legend>
+        <div id="giftCount" style="font-size: large; text-shadow: 1px 1px #00000066; color: blueviolet;">
+            辣条&nbsp;<span>${MY_API.GIFT_COUNT.COUNT}</span>
+            银瓜子&nbsp;<span>${MY_API.GIFT_COUNT.SILVER_COUNT}万</span>
+            <button style="font-size: small" class="igiftMsg_btn" data-action="save">保存所有设置</button>
+        </div>
+    </fieldset>
+    <div id="left_fieldset" style="float:left;">
+        <fieldset class="igiftMsg_fs">
+            <legend style="color: black">低调设置</legend>
+            <div data-toggle="RANDOM_DELAY">
+                <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+                    <input style="vertical-align: text-top;" type="checkbox">抽奖附加随机延迟
+                    <input class="RND_DELAY_START igiftMsg_input" style="width: 30px;vertical-align: top;" type="text">~
+                    <input class="RND_DELAY_END igiftMsg_input" style="width: 30px;vertical-align: top;" type="text">s
+                </label>
+            </div>
+            <div data-toggle="TIME_AREA_DISABLE">
+                <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+                    <input style="vertical-align: text-top;" type="checkbox">启用
+                    <input class="startHour igiftMsg_input" style="width: 20px;" type="text">点
+                    <input class="startMinute igiftMsg_input" style="width: 20px;" type="text">分至
+                    <input class="endHour igiftMsg_input" style="width: 20px;" type="text">点
+                    <input class="endMinute igiftMsg_input" style="width: 20px;" type="text">分不抽奖(24小时制)
+                </label>
+            </div>
+            <div data-toggle="RANDOM_SKIP">
+                <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+                    随机跳过礼物(0到100,为0则不跳过)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
+                </label>
+            </div>
+            <div data-toggle="MAX_GIFT">
+                <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+                    当天最多抢辣条数量<input class="num igiftMsg_input" style="width: 100px;" type="text">
+                </label>
+            </div>
+            <div data-toggle="RANDOM_SEND_DANMU">
+                <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+                    抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
+                </label>
+            </div>
+            <div data-toggle="CHECK_HOUR_ROOM_INTERVAL">
+                <label style="cursor: pointer; margin: 5px auto; color: darkgreen">
+                    检查小时榜间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒
+                </label>
+            </div>
+
+        </fieldset>
+
+        <fieldset class="igiftMsg_fs">
+            <legend style="color: black">每日任务设置</legend>
+            <div data-toggle="LOGIN" style=" color: black">
+                <input style="vertical-align: text-top;" type="checkbox">
+                登陆
+            </div>
+            <div data-toggle="WATCH" style=" color: black">
+                <input style="vertical-align: text-top;" type="checkbox">
+                观看视频
+            </div>
+            <div data-toggle="COIN" style=" color: black">
+                <label style="cursor: pointer">
+                    <input style="cursor: pointer; vertical-align: text-top;" type="checkbox">
+                    自动投币<input class="coin_number igiftMsg_input" style="width: 40px;" type="text">个(0-5)
+                </label>
+            </div>
+            <div data-toggle="COIN_TYPE" style=" color: black">
+                <div data-toggle="COIN_UID">
+                <input style="vertical-align: text-top;" type="radio" name="COIN_TYPE">
+                给用户(UID:<input class="num igiftMsg_input" style="width: 80px;" type="text">)
+                的视频投币
                 </div>
-            
-            
-            
-                <div id="right_fieldset" style="float:left;">
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">说明</legend>
-                        自动送礼目前只会送出辣条和亿圆。<br>
-                        礼物到期时间: 将要在这个时间段里过期的礼物会被送出<br>
-                        勾选送满全部勋章时无论是否将要过期都会被送出<br>
-                        如果要填写多个优先送礼房间，<br>
-                        每个房间号之间需用半角逗号,隔开。<br>
-                        如 666,777,888。为0则不送。<br>
-                        如果没有这些房间的粉丝牌也不送。<br>
-                        无论【优先高等级粉丝牌】如何设置，会根据【送满全部勋章】<br>
-                        （勾选则补满，否则只送到期的）条件去按优先送礼房间先后顺序送礼。<br>
-                        之后根据【优先高等级粉丝牌】决定先送高级还是低级（勾选先高级，不勾选先低级）。<br>
-                        剩余礼物:指送完了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。<br>
-                        剩余礼物也会在指定送礼时间被送出。<br>
-                        参与节奏风暴风险较大，如果没有实名可能无法参加。<br>
-                        脚本仅能参加广播中的节奏风暴。<br>
-                        【给用户(UID:___)的视频投币】若填0则给动态中的视频依次投币(因为无UID为0的用户)
-            
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">小心心</legend>
-                        <div data-toggle="LITTLE_HEART" style="line-height: 15px">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox"> 自动跳转房间获取小心心
-                            </label>
-                        </div>
-                        <div data-toggle="REMOVE_ELEMENT" style="line-height: 15px">
-                        <label style="margin: 5px auto; color: black">
-                            <input style="vertical-align: text-top;" type="checkbox"> 跳转房间后移除直播画面并静音
-                        </label>
-                    </div>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs" style="line-height: 15px">
-                        <legend style="color: black">其他设置</legend>
-                        <div data-toggle="TIME_RELOAD" style="color: black">
-                            本直播间刷新时间：
-                            <input class="delay-seconds igiftMsg_input" type="text" style="width: 30px;">分
-                        </div>
-                        <div data-toggle="IN_TIME_RELOAD_DISABLE" style="line-height: 15px">
-                            <label style="margin: 5px auto; color: darkgreen">
-                                <input style="vertical-align: text-top;" type="checkbox">不抽奖时段不重载直播间
-                            </label>
-                        </div>
-                        <div data-toggle="FORCE_LOTTERY" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: red;">
-                                <input style="vertical-align: text-top;" type="checkbox">访问被拒绝后强制重复抽奖(最多5次)
-                            </label>
-                        </div>
-                        <div id="resetArea">
-                            <button data-action="reset" style="color: red;" class="igiftMsg_btn">重置所有为默认</button>
-                            <button data-action="redo_dailyTasks" style="color: red;" class="igiftMsg_btn">再次执行每日任务</button>
-                            <button style="font-size: small" class="igiftMsg_btn" data-action="countReset">重置统计</button>
-                            <button style="font-size: small; color: green;" class="igiftMsg_btn"
-                                data-action="checkUpdate">检查更新</button>
-                        </div>
-            
-                    </fieldset>
-                    <label style="color: darkblue; font-size:large;">
-                        v${GM_info.script.version} <a href="https://github.com/andywang425/Bilibili-SGTH/"
-                            target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
-                    </label>
+                <div data-toggle="COIN_DYN">
+                    <input style="vertical-align: text-top;" type="radio" name="COIN_TYPE">
+                    给动态中的的视频投币
                 </div>
             </div>
+            <div data-toggle="SHARE" style=" color: black">
+                <input style="vertical-align: text-top;" type="checkbox">
+                分享视频
+            </div>
+            <div data-toggle="SILVER2COIN" style=" color: black">
+                <input style="vertical-align: text-top;" type="checkbox">
+                银瓜子换硬币
+            </div>
+            <div data-toggle="LIVE_SIGN" style=" color: black">
+                <input style="vertical-align: text-top;" type="checkbox">
+                直播区签到
+            </div>
+            <div data-toggle="AUTO_GROUP_SIGN" style=" color: darkgreen">
+                <input style="vertical-align: text-top;" type="checkbox">
+                应援团签到
+            </div>
+            <div data-toggle="MOBILE_HEARTBEAT" style=" color: purple">
+                <input style="vertical-align: text-top;" type="checkbox">
+                模拟移动端心跳 + 领双端观看直播奖励
+            </div>
+            <div data-toggle="AUTO_TREASUREBOX" style=" color: purple">
+                <input style="vertical-align: text-top;" type="checkbox">
+                自动领银瓜子宝箱
+            </div>
+        </fieldset>
+        <fieldset class="igiftMsg_fs">
+            <legend style="color: black">自动送礼设置</legend>
+            <div data-toggle="AUTO_GIFT" style=" color: purple">
+                <input style="vertical-align: text-top;" type="checkbox">
+                自动送礼
+            </div>
+
+            <div data-toggle="AUTO_GIFT_ROOMID" style=" color: purple">
+                优先送礼房间
+                <input class="num igiftMsg_input" style="width: 150px;" type="text">
+            </div>
+
+            <div data-toggle="EXCLUDE_ROOMID" style=" color: purple">
+                不送礼房间
+                <input class="num igiftMsg_input" style="width: 150px;" type="text">
+            </div>
+
+            <div data-toggle="GIFT_SEND_TIME" style=" color: purple">
+                送礼时间
+                <input class="Hour igiftMsg_input" style="width: 20px;" type="text">点
+                <input class="Minute igiftMsg_input" style="width: 20px;" type="text">分
+                <button style="font-size: small" class="igiftMsg_btn" data-action="sendGiftNow">立刻开始送礼</button>
+            </div>
+            <div data-toggle="GIFT_LIMIT" style=" color: purple">
+                礼物到期时间
+                <input class="num igiftMsg_input" style="width: 100px;" type="text">
+                秒
+            </div>
+            <div data-toggle="GIFT_SORT" style=" color: purple">
+                <input style="vertical-align: text-top;" type="checkbox">
+                送礼优先高等级粉丝牌
+            </div>
+            <div data-toggle="SEND_ALL_GIFT" style=" color: purple">
+                <input style="vertical-align: text-top;" type="checkbox">
+                送满全部勋章
+            </div>
+            <div data-toggle="SPARE_GIFT_ROOM" style=" color: black">
+                剩余礼物送礼直播间：
+                <input class="num igiftMsg_input" type="text" style="width: 100px;">
+            </div>
+            <div data-toggle="SPARE_GIFT_UID" style=" color: black">
+                剩余礼物送礼直播间拥有者UID：
+                <input class="num igiftMsg_input" type="text" style="width: 100px;">
+            </div>
+        </fieldset>
+        <fieldset class="igiftMsg_fs">
+            <legend style="color: black">节奏风暴设置</legend>
+            <div data-toggle="STORM" style="line-height: 15px">
+                <label style="margin: 5px auto; color: #ff5200">
+                    <input style="vertical-align: text-top;" type="checkbox">参与节奏风暴
+                </label>
+            </div>
+            <div data-toggle="STORM_QUEUE_SIZE" style="color: black">
+                允许同时参与的节奏风暴次数：
+                <input class="num igiftMsg_input" type="text" style="width: 30px;">
+            </div>
+            <div data-toggle="STORM_MAX_COUNT" style="color: black">
+                单个风暴最大尝试次数：
+                <input class="num igiftMsg_input" type="text" style="width: 30px;">
+            </div>
+            <div data-toggle="STORM_ONE_LIMIT" style="color: black">
+                单个风暴参与次数间隔：
+                <input class="num igiftMsg_input" type="text" style="width: 30px;">
+                毫秒
+            </div>
+        </fieldset>
+    </div>
+
+
+
+    <div id="right_fieldset" style="float:left;">
+        <fieldset class="igiftMsg_fs">
+            <legend style="color: black">说明</legend>
+            自动送礼目前只会送出辣条和亿圆。<br>
+            礼物到期时间: 将要在这个时间段里过期的礼物会被送出<br>
+            勾选送满全部勋章时无论是否将要过期都会被送出<br>
+            如果要填写多个优先送礼房间，<br>
+            每个房间号之间需用半角逗号,隔开。<br>
+            如 666,777,888。为0则不送。<br>
+            如果没有这些房间的粉丝牌也不送。<br>
+            无论【优先高等级粉丝牌】如何设置，会根据【送满全部勋章】<br>
+            （勾选则补满，否则只送到期的）条件去按优先送礼房间先后顺序送礼。<br>
+            之后根据【优先高等级粉丝牌】决定先送高级还是低级（勾选先高级，不勾选先低级）。<br>
+            剩余礼物:指送完了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。<br>
+            剩余礼物也会在指定送礼时间被送出。<br>
+            参与节奏风暴风险较大，如果没有实名可能无法参加。<br>
+            脚本仅能参加广播中的节奏风暴。<br>
+            【给用户(UID:___)的视频投币】若填0则给动态中的视频依次投币(因为无UID为0的用户)
+
+        </fieldset>
+        <fieldset class="igiftMsg_fs">
+            <legend style="color: black">小心心</legend>
+            <div data-toggle="LITTLE_HEART" style="line-height: 15px">
+                <label style="margin: 5px auto; color: black">
+                    <input style="vertical-align: text-top;" type="checkbox"> 自动跳转房间获取小心心
+                </label>
+            </div>
+        </fieldset>
+        <fieldset class="igiftMsg_fs">
+            <legend style="color: black">内容屏蔽</legend>
+            <div data-toggle="REMOVE_ELEMENT_2233" style="line-height: 15px">
+                <label style="margin: 5px auto; color: black">
+                    <input style="vertical-align: text-top;" type="checkbox"> 移除2233模型
+                </label>
+            </div>
+            <div data-toggle="REMOVE_ELEMENT_july" style="line-height: 15px">
+                <label style="margin: 5px auto; color: black">
+                    <input style="vertical-align: text-top;" type="checkbox"> 移除夏日活动入口
+                </label>
+            </div>
+            <div data-toggle="REMOVE_ELEMENT_player" style="line-height: 15px">
+            <label style="margin: 5px auto; color: black">
+                <input style="vertical-align: text-top;" type="checkbox"> 移除直播画面
+            </label>
+        </div>
+        </fieldset>
+        <fieldset class="igiftMsg_fs" style="line-height: 15px">
+            <legend style="color: black">其他设置</legend>
+            <div data-toggle="TIME_RELOAD" style="color: black">
+                本直播间刷新时间：
+                <input class="delay-seconds igiftMsg_input" type="text" style="width: 30px;">分
+            </div>
+            <div data-toggle="IN_TIME_RELOAD_DISABLE" style="line-height: 15px">
+                <label style="margin: 5px auto; color: darkgreen">
+                    <input style="vertical-align: text-top;" type="checkbox">不抽奖时段不重载直播间
+                </label>
+            </div>
+            <div data-toggle="FORCE_LOTTERY" style="line-height: 20px">
+                <label style="margin: 5px auto; color: red;">
+                    <input style="vertical-align: text-top;" type="checkbox">访问被拒绝后强制重复抽奖(最多5次)
+                </label>
+            </div>
+            <div id="resetArea">
+                <button data-action="reset" style="color: red;" class="igiftMsg_btn">重置所有为默认</button>
+                <button data-action="redo_dailyTasks" style="color: red;" class="igiftMsg_btn">再次执行每日任务</button>
+                <button style="font-size: small" class="igiftMsg_btn" data-action="countReset">重置统计</button>
+                <button style="font-size: small; color: green;" class="igiftMsg_btn"
+                    data-action="checkUpdate">检查更新</button>
+            </div>
+
+        </fieldset>
+        <label style="color: darkblue; font-size:large;">
+            v${GM_info.script.version} <a href="https://github.com/andywang425/Bilibili-SGTH/"
+                target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+        </label>
+    </div>
+</div>
     `);
 
                 $('.live-player-mounter').append(div);
@@ -767,6 +790,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 div.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val((parseFloat(MY_API.CONFIG.RANDOM_SEND_DANMU)).toString());
                 div.find('div[data-toggle="MAX_GIFT"] .num').val((parseInt(MY_API.CONFIG.MAX_GIFT)).toString());
                 div.find('div[data-toggle="COIN"] .coin_number').val(parseInt(MY_API.CONFIG.COIN_NUMBER).toString());
+                div.find('div[data-toggle="COIN_UID"] .num').val(parseInt(MY_API.CONFIG.COIN_UID).toString());
                 div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val(parseFloat(MY_API.CONFIG.RND_DELAY_START).toString());
                 div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val(parseFloat(MY_API.CONFIG.RND_DELAY_END).toString());
                 div.find('div[data-toggle="TIME_AREA_DISABLE"] .startHour').val(parseInt(MY_API.CONFIG.TIME_AREA_START_H0UR).toString());
@@ -960,7 +984,9 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     'MOBILE_HEARTBEAT',
                     'STORM',
                     'LITTLE_HEART',
-                    'REMOVE_ELEMENT'
+                    'REMOVE_ELEMENT_2233',
+                    'REMOVE_ELEMENT_july',
+                    'REMOVE_ELEMENT_player'
                 ];
                 for (let i of checkList) {//绑定所有checkbox事件
                     let input = div.find(`div[data-toggle="${i}"] input:checkbox`);
@@ -1727,7 +1753,15 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         return delayCall(() => MY_API.DailyReward.share(aid));
                     });
                 },
-                dynamic: () => {
+                dynamic: async () => {
+                    let endTask = false;
+                    let throwCoinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
+                    endTask = await BAPI.getuserinfo().then((re) => {
+                        MYDEBUG('DailyReward.dynamic: API.getuserinfo', re);
+                        if(re.data.biliCoin < throwCoinNum) return true
+                        else return false
+                    });
+                    if (endTask === true) return $.Deferred().resolve();
                     return BAPI.dynamic_svr.dynamic_new(Live_info.uid, 8).then((response) => {
                         MYDEBUG('DailyReward.dynamic: API.dynamic_svr.dynamic_new', response);
                         if (response.code === 0) {
@@ -1736,7 +1770,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 const p1 = MY_API.DailyReward.watch(obj.aid, obj.cid);
                                 let p2 = undefined;
                                 if (MY_API.CONFIG.COIN_UID == 0 || MY_API.CONFIG.COIN_TYPE == 'COIN_DYN') {
-                                    p2 = MY_API.DailyReward.coin(response.data.cards, Math.max(MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10, 0));
+                                    p2 = MY_API.DailyReward.coin(response.data.cards, Math.max(throwCoinNum, 0));
                                 } else {
                                     p2 = MY_API.DailyReward.UserSpace(MY_API.CONFIG.COIN_UID, 30, 0, 1, '', 'pubdate', 'jsonp');
                                 }
@@ -1758,7 +1792,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         MYDEBUG('DailyReward.UserSpace: API.dynamic_svr.UserSpace', response);
                         if (response.code === 0) {
                             if (!!response.data.list.vlist) {
-                                const p1 = MY_API.DailyReward.coin_uid(response.data.list.vlist, Math.max(MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10, 0), pn, uid);
+                                let throwCoinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
+                                const p1 = MY_API.DailyReward.coin_uid(response.data.list.vlist, Math.max(throwCoinNum, 0), pn, uid);
                                 return p1;
                             } else {
                                 window.toast('[自动每日奖励]"空间-投稿视频"中暂无视频', 'info');
@@ -1918,12 +1953,13 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             div.append(MY_API.TreasureBox.DOM.canvas);
                             MY_API.TreasureBox.DOM.div_tip.after(MY_API.TreasureBox.DOM.div_timer);
                             treasure_box.after(div);
+                            /*
                             if (!Live_info.mobile_verify) {
                                 MY_API.TreasureBox.setMsg('未绑定<br>手机');
                                 window.toast('[自动领取瓜子]未绑定手机，已停止', 'caution');
                                 p.resolve();
                                 return true;
-                            }
+                            }*/
                             try {
                                 if (OCRAD);
                             } catch (err) {
@@ -2713,7 +2749,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     });
                 },
 
-                checkRoomList: async(roomList) => {
+                checkRoomList: async (roomList) => {
                     MYDEBUG(`MY_API.LITTLE_HEART.checkRoomList start`);
                     let returnRoom = undefined;
                     for (let r of roomList) {
@@ -2727,60 +2763,52 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                             window.toast('[小心心]获取房间信息失败，请检查网络', 'error');
                             return delayCall(() => MY_API.LITTLE_HEART.checkRoomList(roomList));
                         })
-                        if(returnRoom != undefined) break;
+                        if (returnRoom != undefined) break;
                     };
-                    if(returnRoom != undefined) {
+                    if (returnRoom != undefined) {
                         return returnRoom
                     } else {
-                    window.toast('[小心心]当前粉丝勋章列表中无正在直播房间，5分钟后重试');
-                    return delayCall(() => MY_API.LITTLE_HEART.getMedalRoomList(page), 300e3);
+                        window.toast('[小心心]当前粉丝勋章列表中无正在直播房间，5分钟后重试');
+                        return delayCall(() => MY_API.LITTLE_HEART.getMedalRoomList(page), 300e3);
                     }
                 },
-                checkRoom: (roomid) => {
-                    BAPI.room.get_info(roomid).then((re) => {
-                        if (re.live_status === 1) {
-                            return true
+                checkRoom: async (roomid) => {
+                    let roomCheck = undefined;
+                    await BAPI.room.get_info(roomid).then((re) => {
+                        if (re.data.live_status === 1) {//live_status=1
+                            roomCheck = true;
                         } else {
-                            return false
+                            roomCheck = false;
                         }
                     }, () => {
                         window.toast('[小心心]获取房间信息失败，请检查网络', 'error');
                         return delayCall(() => MY_API.LITTLE_HEART.checkRoomList(roomList));
-                    })
+                    });
+                    return roomCheck;
                 },
                 run: async () => {
                     if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
-                    let targetRoomId = undefined;
                     await MY_API.LITTLE_HEART.getMedalRoomList();
-                    targetRoomId = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                    if (Live_info.room_id == MY_API.CACHE.GotoRoomId || MY_API.LITTLE_HEART.checkRoom(Live_info.room_id) == true) {
-                            // 移除元素
-                            if(MY_API.CONFIG.REMOVE_ELEMENT == true) {
-                            $('.bilibili-live-player-video-stream').remove();
-                            $('.bilibili-live-player-video-danmaku').remove();
-                            };
+                    let targetRoomId = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
+                    if (await MY_API.LITTLE_HEART.checkRoom(Live_info.room_id) === true) {
                         window.toast(`[小心心]当前房间${Live_info.room_id}能够获取小心心，无需跳转`);
                         let checkInterval = undefined;
                         checkInterval = setInterval(async () => {
-                            if(MY_API.LITTLE_HEART.checkRoom(Live_info.room_id) == false) {
+                            if (MY_API.LITTLE_HEART.checkRoom(Live_info.room_id) == false) {
                                 clearInterval(checkInterval);
                                 targetRoomId = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                                MY_API.CACHE.GotoRoomId = targetRoomId;
-                                MY_API.saveCache();
-                                window.toast(`[小心心]3秒后跳转至房间${targetRoomId}`, 'warning');
+                                window.toast(`[小心心]15秒后跳转至房间${targetRoomId}`, 'warning');
                                 setTimeout(() => {
                                     window.location.href = `https://live.bilibili.com/${String(targetRoomId)}`;
                                 }, 15000);
                             }
-                        }, 3e3);
+                        }, 300e3);
                     } else {
-                    MY_API.CACHE.GotoRoomId = targetRoomId;
-                    MY_API.saveCache();
-                    window.toast(`[小心心]3秒后跳转至房间${targetRoomId}`, 'warning');
-                    setTimeout(() => {
-                        window.location.href = `https://live.bilibili.com/${String(targetRoomId)}`;
-                    }, 3000);
-                };
+                        window.toast(`[小心心]5.5秒后跳转至房间${targetRoomId}`, 'warning');
+                        setTimeout(() => {
+                            window.location.href = `https://live.bilibili.com/${String(targetRoomId)}`;
+                        }, 5500);
+                    };
                 }
             }
         };
@@ -2843,8 +2871,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
         if (checkNewDay(API.GIFT_COUNT.CLEAR_TS)) clearStat();
         runExactMidnight(clearStat, '重置统计')
         API.LITTLE_HEART.run();//小心心
+        API.removeUnnecessary();//移除页面元素
         setTimeout(() => {
-            API.removeUnnecessary();
             API.GroupSign.run();//应援团签到
             API.DailyReward.run();//每日任务
             API.LiveReward.run();//直播每日任务
@@ -2942,7 +2970,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
 
         reset(API.CONFIG.TIME_RELOAD * 60000);//单位1分钟，重新加载直播间
     }
-
+/*
     function getAllcookie() {
         let allCookie = '';
         let cookieItems = [
@@ -2969,7 +2997,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
         };
         MYDEBUG('allcookie', allCookie)
         return allCookie;
-    };
+    };*/
 
     /**
      * （23,50） 获取与目标时间在时间轴上的间隔时间,24小时制（毫秒）
