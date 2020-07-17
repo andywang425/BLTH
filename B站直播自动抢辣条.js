@@ -462,9 +462,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 $('#giftCount span:eq(1)').text(MY_API.GIFT_COUNT.SILVER_COUNT);
                 MY_API.saveGiftCount();
             },
-            checkUpdate: () => {
-                window.open('https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js', '_blank').location;
-            },
             removeUnnecessary: () => {//移除不必要的页面元素
                 let unnecessaryList = [
                     '#my-dear-haruna-vm',//2233
@@ -764,8 +761,6 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 <button data-action="reset" style="color: red;" class="igiftMsg_btn">重置所有为默认</button>
                 <button data-action="redo_dailyTasks" style="color: red;" class="igiftMsg_btn">再次执行每日任务</button>
                 <button style="font-size: small" class="igiftMsg_btn" data-action="countReset">重置统计</button>
-                <button style="font-size: small; color: green;" class="igiftMsg_btn"
-                    data-action="checkUpdate">检查更新</button>
             </div>
 
         </fieldset>
