@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.7.1
+// @version       3.7.2
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -262,7 +262,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 COIN_UID: 0,//投币up主
                 EXCLUDE_ROOMID: "0",//送礼排除房间号
                 FORCE_LOTTERY: false,//黑屋强制抽奖
-                GIFT_LIMIT: 86400,//礼物到期时间
+                GIFT_LIMIT: 1,//礼物到期时间(天)
                 GIFT_SEND_HOUR: 23,//送礼小时
                 GIFT_SEND_MINUTE: 59,//送礼分钟
                 GIFT_SORT: false,//送礼优先高等级
@@ -384,6 +384,19 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 }
                 return p
             },
+            newMeaasge: (version) => {
+                let newMsg = `${version}更新提示：\n3.7.2版本后礼物到期时间的单位由秒改为天，老用户请注意。\n本提示仅会出现一次。`;
+                try {
+                    let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
+                    if ((cache == undefined || cache == null || cache != '3.7.2') && 
+                    version == '3.7.2') { //更新公告时需要修改
+                        alert(newMsg);
+                        localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version); 
+                    }
+                } catch (e) {
+                    MYDEBUG('提示信息CACHE载入配置失败', e);
+                }
+            },
             saveConfig: () => {//保存配置函数
                 try {
                     localStorage.setItem(`${NAME}_CONFIG`, JSON.stringify(MY_API.CONFIG));
@@ -469,14 +482,15 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     '.bilibili-live-player'
                 ];
                 const removeUntiSucceed = (settingName, list_id) => {
+                    if (MY_API.CONFIG[settingName] === true) {
                     setInterval(() => {
-                        if (MY_API.CONFIG[settingName] === true && $(unnecessaryList[list_id]).length > 0) {
+                        if ($(unnecessaryList[list_id]).length > 0) {
                             $(unnecessaryList[list_id]).remove();
                         } else {
                             return
                         }
                     }, 200);
-
+                }
                 };
                 removeUntiSucceed('REMOVE_ELEMENT_2233', 0);
                 removeUntiSucceed('REMOVE_ELEMENT_july', 1);
@@ -650,8 +664,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
             </div>
             <div data-toggle="GIFT_LIMIT" style=" color: purple">
                 礼物到期时间
-                <input class="num igiftMsg_input" style="width: 100px;" type="text">
-                秒
+                <input class="num igiftMsg_input" style="width: 20px;" type="text">
+                天
             </div>
             <div data-toggle="GIFT_SORT" style=" color: purple">
                 <input style="vertical-align: text-top;" type="checkbox">
@@ -1678,6 +1692,10 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 } else if (response.code === 34005) {
                                     // 塞满啦！先看看库存吧~
                                     return MY_API.DailyReward.coin(cards, n, i + 1);
+                                } else if (response.code === -104) {
+                                    //硬币余额不足
+                                    window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
+                                    return $.Deferred().reject();
                                 }
                                 window.toast(`[自动每日奖励][每日投币]'${response.msg}`, 'caution');
                                 return MY_API.DailyReward.coin(cards, n, i + 1);
@@ -1723,6 +1741,10 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 } else if (response.code === 34005) {
                                     // 塞满啦！先看看库存吧~
                                     return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uid, i + 1);
+                                } else if (response.code === -104) {
+                                    //硬币余额不足
+                                    window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
+                                    return $.Deferred().reject();
                                 }
                                 window.toast(`[自动每日奖励][每日投币]'${response.msg}`, 'caution');
                                 return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uid, i + 1);
@@ -1749,14 +1771,18 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     });
                 },
                 dynamic: async () => {
-                    let endTask = false;
-                    let throwCoinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
-                    endTask = await BAPI.getuserinfo().then((re) => {
+                    let throwCoinNum = undefined;
+                    let coinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
+                    throwCoinNum = await BAPI.getuserinfo().then((re) => {
                         MYDEBUG('DailyReward.dynamic: API.getuserinfo', re);
-                        if(re.data.biliCoin < throwCoinNum) return true
-                        else return false
+                        if(re.data.biliCoin < coinNum) return re.data.biliCoin
+                        else return coinNum
                     });
-                    if (endTask === true) return $.Deferred().resolve();
+                    if (throwCoinNum === 0) {
+                        return $.Deferred().resolve();
+                    } else if (throwCoinNum < coinNum) {
+                        window.toast(`[自动每日奖励][每日投币]剩余硬币不足，仅能投${throwCoinNum}个币`, 'warning');                      
+                    };
                     return BAPI.dynamic_svr.dynamic_new(Live_info.uid, 8).then((response) => {
                         MYDEBUG('DailyReward.dynamic: API.dynamic_svr.dynamic_new', response);
                         if (response.code === 0) {
@@ -2345,7 +2371,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                                 ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID.split(",");
                                 MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
                             }
-                            let limit = MY_API.CONFIG.GIFT_LIMIT;
+                            let limit = MY_API.CONFIG.GIFT_LIMIT * 86400;
                             for (let v of MY_API.Gift.medal_list) {
                                 let response = await BAPI.room.room_init(parseInt(v.roomid, 10));
                                 MY_API.Gift.room_id = parseInt(response.data.room_id, 10);
@@ -2397,7 +2423,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         if (//剩余礼物,今日送完所有牌子后若有小于1天的礼物则送礼。检查有没有可送的
                             MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit)).length != 0
                             && //满足到期时间小于一天
-                            v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < 86400
+                            v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < limit
                                 && MY_API.CONFIG.SPARE_GIFT_ROOM != '0' && MY_API.CONFIG.SPARE_GIFT_UID != '0'
                                 && feed > 0)) {
                             let giftnum = v.gift_num;
@@ -2437,13 +2463,13 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         //只送特定礼物
                         (MY_API.Gift.sendGiftList.includes(v.gift_id)
                             //满足到期时间
-                            && v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT)
+                            && v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT * 86400)
                         )
                         //或者全部送满
                         || MY_API.CONFIG.SEND_ALL_GIFT) &&
                         //永久礼物不送
-                        v.expire_at > MY_API.Gift.time) {
-                        // 检查SEND_ALL_GIFT和礼物到期时间 送当天到期的
+                        v.corner_mark != '永久') {
+                        // 检查SEND_ALL_GIFT和礼物到期时间 送到期时间内的
                         if (v.gift_id == undefined) {
                             return $.Deferred().resolve();
                         }
@@ -2842,7 +2868,8 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid))) {//登陆判断
                         MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
                         return
-                    }
+                    };
+                    MY_API.newMeaasge(GM_info.script.version);//新版本提示信息
                     MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
                     StartPlunder(MY_API);
                 })
