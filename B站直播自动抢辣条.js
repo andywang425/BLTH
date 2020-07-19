@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.7.2
+// @version       3.7.2.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -53,6 +53,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
         ruid: undefined,
         mobile_verify: undefined,
         gift_list: undefined,
+        //gift_list_str: undefined,
         rnd: undefined,
         visit_id: undefined,
         identification: undefined,
@@ -189,12 +190,30 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                     });
                     BAPI.gift.gift_config().then((response) => {
                         MYDEBUG('InitData: API.gift.gift_config', response);
-                        Live_info.gift_list = response.data;
+                        if(!!response.data && $.isArray(response.data)){
+                            Live_info.gift_list = response.data;
+                        } else if(!!response.data.list && $.isArray(response.data.list)){
+                            Live_info.gift_list = response.data.list;
+                        } else{
+                            Live_info.gift_list = [
+                                {
+                                    "id": 6,//亿圆
+                                    "price": 1000
+                                }, {
+                                    "id": 1,//辣条
+                                    "price": 100
+                                }, { 
+                                    'id': 30607, //小心心
+                                    'price': 5000 
+                                }];
+                            window.toast('直播间礼物数据获取失败，使用备用数据', 'error');
+                        }
+                        /*
                         Live_info.gift_list.forEach((v, i) => {
                             if (i % 3 === 0) Live_info.gift_list_str += '<br>';
                             Live_info.gift_list_str += `${v.id}：${v.name}`;
                             if (i < Live_info.gift_list.length - 1) Live_info.gift_list_str += '，';
-                        });
+                        });*/
                     });
                     Live_info.bili_jct = BAPI.getCookie('bili_jct');
                     Live_info.ruid = W.BilibiliLive.ANCHOR_UID;
@@ -385,11 +404,14 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                 return p
             },
             newMeaasge: (version) => {
-                let newMsg = `${version}更新提示：\n3.7.2版本后礼物到期时间的单位由秒改为天，老用户请注意。\n本提示仅会出现一次。`;
+                let newMsg = `${version}更新提示：\n
+                3.7.2版本后礼物到期时间的单位由秒改为天，老用户请注意。\n
+                等b站删除辣条后项目和脚本可能会改名。\n
+                本提示仅会出现一次。`;
                 try {
                     let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '3.7.2') && 
-                    version == '3.7.2') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '3.7.2.1') && 
+                    version == '3.7.2.1') { //更新公告时需要修改
                         alert(newMsg);
                         localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version); 
                     }
@@ -2197,7 +2219,7 @@ https://hub.fastgit.org/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4
                         });
                     },
                     // 对B站验证码进行处理
-                    // 代码来源：https://github.com/zacyu/bilibili-helper/blob/master/src/bilibili_live.js
+                    // 代码来源：https://github.com/zacyu/bilibili-helper/
                     // 删除了未使用的变量
                     OCR: {
                         getGrayscaleMap: (context, rate = 235, width = 120, height = 40) => {
