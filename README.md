@@ -129,11 +129,13 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 + [Bilibili-LRHH](https://github.com/SeaLoong/Bilibili-LRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/Bilibili-LRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
++ [bilibili-pcheartbeat](https://github.com/lkeme/bilibili-pcheartbeat) (GPL3) by [lkeme](https://github.com/lkeme/)  
 
 本脚本使用的库：  
 + [BilibiliAPI_Mod](https://github.com/andywang425/Bilibili-SGTH/blob/master/BilibiliAPI_Mod.js)：B站API及常用函数。  
-+ [OCRAD](https://github.com/antimatter15/ocrad.js)：用于识别领银瓜子宝箱验证码。  
++ [OCRAD](https://github.com/antimatter15/ocrad.js)：识别领银瓜子宝箱验证码。  
 + [libBilibiliToken](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveClientHeart/BiliveClientHeart.user.js)：获取移动端token。  
++ [bilibili-pcheartbeat](https://github.com/lkeme/bilibili-pcheartbeat)：计算PC心跳的请求参数`s`。  
 
 感谢以上这些项目的作者~ 
 
