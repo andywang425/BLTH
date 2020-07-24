@@ -3,8 +3,8 @@
 // @name          B站直播自动抢辣条
 // @name:en       B站直播自动抢辣条
 // @author        andywang425
-// @description   自动参与Bilibili直播区抽奖;完成每日任务，自动送礼，获取小心心
-// @description:en 自动参与Bilibili直播区抽奖;完成每日任务，自动送礼，获取小心心
+// @description   自动参与Bilibili直播区抽奖;完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
+// @description:en 自动参与Bilibili直播区抽奖;完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
 // @updateURL     https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
 // @homepageURL   https://github.com/andywang425/Bilibili-SGTH/
@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.8
+// @version       3.8.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -321,6 +321,7 @@
                 Silver2Coin_TS: 0,//银瓜子换硬币
                 Gift_TS: 0,//自动送礼
                 MobileHeartBeat_TS: 0,//移动端心跳
+                LittleHeart_TS: 0
             },
             CONFIG: {},
             CACHE: {},
@@ -399,17 +400,17 @@
                 }
                 return p
             },
-            newMeaasge: (version) => {
+            newMessage: (version) => {
                 let newMsg = `${version}更新提示：\n
                 等b站删除辣条后脚本会改名，\n
                 （greasyfork用户可忽略以下部分）所以更新链接也会变化。\n
                 改名后，我会发布B站直播自动抢辣条的最终版本。\n
                 安装这个版本后脚本会提示你安装改名后的新脚本。\n
-                本提示仅会出现一次。`;
+                本提示在每个版本仅会出现一次。`;
                 try {
                     let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '3.8') &&
-                        version != '0') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '3.8.1') &&
+                        version == '3.8.1') { //更新公告时需要修改
                         alert(newMsg);
                         localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
                     }
@@ -753,7 +754,7 @@
                         <legend style="color: black">小心心</legend>
                         <div data-toggle="LITTLE_HEART" style="line-height: 15px">
                             <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox"> 自动获取小心心
+                                <input style="vertical-align: text-top;" type="checkbox"> 自动发送心跳包获取小心心
                             </label>
                         </div>
                         <div data-toggle="LIGHT_MEDALS" style=" color: purple">
@@ -2337,22 +2338,23 @@
                 bag_list: undefined,
                 time: undefined,
                 remain_feed: undefined,
+                over: false,
                 //notSendGiftList: [3, 4, 9, 10, 39, 30588, 30587, 30586, 30585],
                 //B坷垃,喵娘,爱心便当,蓝白胖次,节奏风暴,如意小香包,软糯白糖粽,飘香大肉粽,端午茗茶
                 sendGiftList: [1, 6, 30607],//辣条，亿圆, 小心心
-                getMedalList: (page = 1) => {
+                getMedalList: async (page = 1) => {
                     if (page === 1) MY_API.Gift.medal_list = [];
-                    return BAPI.i.medal(page, 25).then((response) => {
+                    return await BAPI.i.medal(page, 25).then((response) => {
                         MYDEBUG('Gift.getMedalList: API.i.medal', response);
                         MY_API.Gift.medal_list = MY_API.Gift.medal_list.concat(response.data.fansMedalList);
                         if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) return MY_API.Gift.getMedalList(page + 1);
                     }, () => {
                         window.toast('[自动送礼]获取勋章列表失败，请检查网络', 'error');
-                        return delayCall(() => MY_API.Gift.getMedalList(page));
+                        return delayCall(() => MY_API.Gift.getMedalList());
                     });
                 },
-                getBagList: () => {
-                    return BAPI.gift.bag_list().then((response) => {
+                getBagList: async () => {
+                    return await BAPI.gift.bag_list().then((response) => {
                         MYDEBUG('Gift.getBagList: API.gift.bag_list', response);
                         MY_API.Gift.bag_list = response.data.list;
                         MY_API.Gift.time = response.data.time;
@@ -2404,10 +2406,10 @@
                         const feed = MY_API.Gift.getFeedByGiftID(30607);//小心心
                         let light_roomid = MY_API.CONFIG.LIGHT_MEDALS.split(",");
                         let unLightedMedals = undefined;
-                        if (MY_API.CONFIG.LIGHT_METHOD == 'LIGHT_WHITE') {
+                        if (MY_API.CONFIG.LIGHT_METHOD == 'LIGHT_WHITE') {//白名单
                             unLightedMedals = medal_list.filter(m => m.is_lighted == 0 && m.day_limit - m.today_feed >= feed &&
                                 light_roomid.findIndex(it => it == m.roomid) >= 0)
-                        } else {
+                        } else {//黑名单
                             unLightedMedals = medal_list.filter(m => m.is_lighted == 0 && m.day_limit - m.today_feed >= feed &&
                                 light_roomid.findIndex(it => it == m.roomid) == -1)
                         };
@@ -2467,6 +2469,7 @@
                             return $.Deferred().resolve();
 
                         };
+                        MY_API.Gift.over = false
                         await MY_API.Gift.getMedalList();
                         let medal_list = MY_API.Gift.medal_list;
                         MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', medal_list);
@@ -2504,6 +2507,8 @@
                                             let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
                                             if (pass.length == 0) {
                                                 break;
+                                            } else {
+                                                MY_API.Gift.bag_list = pass;
                                             }
                                         }
                                     } else {
@@ -2511,6 +2516,8 @@
                                     }
                                 }
                             }
+                            MY_API.CACHE.Gift_TS = ts_ms();
+                            MY_API.saveCache();
                         }
                         await MY_API.Gift.getBagList();
                         let i = 0;
@@ -2544,7 +2551,7 @@
                                 }
                             }, () => {
                                 window.toast('[自动送礼](剩余礼物)包裹送礼失败，请检查网络', 'error');
-                                return delayCall(() => MY_API.Gift.sendGift(medal, i));
+                                return delayCall(() => MY_API.Gift.sendGift(medal));
                             });
                         }
 
@@ -2557,33 +2564,32 @@
                     SEND_GIFT_NOW = false;
                     nextTimeDebug();
                 },
-                sendGift: (medal, i = 0) => {
-                    if (i >= MY_API.Gift.bag_list.length) {
-                        return $.Deferred().resolve();
-                    }
+                sendGift: async (medal) => {
+                    await MY_API.Gift.getBagList();
                     if (MY_API.Gift.remain_feed <= 0) {
                         window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`, 'info');
                         return $.Deferred().resolve();
                     }
                     if (MY_API.Gift.time <= 0) MY_API.Gift.time = ts_s();
-                    const v = MY_API.Gift.bag_list[i];
-                    if ((
-                        //只送特定礼物
-                        (MY_API.Gift.sendGiftList.includes(v.gift_id)
-                            //满足到期时间
-                            && v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT * 86400)
-                        )
-                        //或者全部送满
-                        || MY_API.CONFIG.SEND_ALL_GIFT) &&
-                        //永久礼物不送
-                        v.corner_mark != '永久') {
-                        // 检查SEND_ALL_GIFT和礼物到期时间 送到期时间内的
-                        if (v.gift_id == undefined) {
-                            return $.Deferred().resolve();
+
+                    if (!MY_API.CONFIG.SEND_ALL_GIFT) {
+                        //送之前查一次有没有可送的
+                        let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 &&
+                            r.expire_at > MY_API.Gift.time && (r.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT * 86400)
+                            && r.corner_mark != '永久');
+                        if (pass.length == 0) {
+                            MY_API.Gift.over = true;
+                            return;
+                        } else {
+                            MY_API.bag_list = pass;
                         }
-                        if (v == undefined) {
-                            return $.Deferred().resolve();
+                    }
+                    for (const v of MY_API.Gift.bag_list) {
+                        if (medal.day_limit - medal.today_feed <= 0) {
+                            window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`,'info');
+                            return;
                         }
+
                         const feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
                         if (feed > 0) {
                             let feed_num = Math.floor(MY_API.Gift.remain_feed / feed);
@@ -2599,15 +2605,13 @@
                                     } else {
                                         window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常:${response.msg}`, 'caution');
                                     }
-                                    return MY_API.Gift.sendGift(medal, i + 1);
                                 }, () => {
                                     window.toast('[自动送礼]包裹送礼失败，请检查网络', 'error');
-                                    return delayCall(() => MY_API.Gift.sendGift(medal, i));
+                                    return delayCall(() => MY_API.Gift.sendGift(medal));
                                 });
                             }
                         }
                     }
-                    return MY_API.Gift.sendGift(medal, i + 1);
                 }
             },
             MobileHeartBeat: {
@@ -3020,13 +3024,16 @@
                 },
                 run: async () => {
                     if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
+                    if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
+                        window.toast('[web心跳]', '今日小心心已全部获取');
+                    }
                     await MY_API.LITTLE_HEART.getMedalRoomList();
                     let targetRoomId = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
                     window.toast(`[小心心]发送房间${targetRoomId}的E心跳`, 'info');
                     let payLoad = await MY_API.LITTLE_HEART.heartBeat_E(targetRoomId);
                     let heartBeatTime = 1;
                     let Timer = setInterval(async () => {
-                        if (heartBeatTime <= 7) {
+                        if (heartBeatTime <= 24) {
                             if (await MY_API.LITTLE_HEART.checkRoom(targetRoomId) === true) {
                                 window.toast(`[小心心]发送房间${targetRoomId}的X心跳`, 'info');
                                 MYDEBUG('[web心跳] heartBeatTime次数', heartBeatTime);
@@ -3038,6 +3045,8 @@
                                 return MY_API.LITTLE_HEART.run();
                             }
                         } else {
+                            MY_API.CACHE.LittleHeart_TS = ts_ms();
+                            MY_API.saveCache();
                             window.toast('[小心心]任务完成', 'success');
                             clearInterval(Timer);
                         }
@@ -3081,7 +3090,7 @@
                         MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
                         return
                     };
-                    MY_API.newMeaasge(GM_info.script.version);//新版本提示信息
+                    MY_API.newMessage(GM_info.script.version);//新版本提示信息
                     MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
                     StartPlunder(MY_API);
                 })
@@ -3182,17 +3191,23 @@
         let check_timer = setInterval(check_top_room, parseInt(API.CONFIG.CHECK_HOUR_ROOM_INTERVAL * 1000));
 
         let reset = (delay) => {
-            setTimeout(() => {//重置直播间
+            let resetTimer = setTimeout(() => {//重置直播间
                 if (API.raffleId_list.length > 0 || API.guardId_list.length > 0 || API.pkId_list.length > 0) {
-                    MYDEBUG('还有礼物没抽，延迟15s后刷新直播间');
+                    MYDEBUG('[刷新直播间]', '还有礼物没抽，延迟15s后刷新直播间');
                     reset(15000);
+                    return
+                }
+                if (checkNewDay(API.CACHE.LittleHeart_TS)) {
+                    MYDEBUG('[刷新直播间]', '正在发送pc心跳包获取小心心，10分钟后再次检查');
+                    clearTimeout(resetTimer);
+                    reset(600e3);
                     return
                 }
                 if (inTimeArea(API.CONFIG.TIME_AREA_START_H0UR, API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE)
                     && API.CONFIG.IN_TIME_RELOAD_DISABLE) {//在不抽奖时段且不抽奖时段不刷新开启
                     let resetTime = getIntervalTime(API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE);
                     reset(resetTime);
-                    MYDEBUG(`处于休眠时间段，将在${resetTime}毫秒后刷新直播间`);
+                    MYDEBUG('[刷新直播间]', `处于休眠时间段，将在${resetTime}毫秒后刷新直播间`);
                     return;
                 }
                 /* if (API.blocked || API.max_blocked) { //被阻止不刷新直播间
@@ -3372,5 +3387,5 @@
         });
     };
 
-   
+
 })();
