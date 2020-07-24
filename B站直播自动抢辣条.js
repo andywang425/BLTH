@@ -12,15 +12,18 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.7.3
+// @version       3.8
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
 // @connect      api.live.bilibili.com
-//@require https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
-//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.4/BilibiliAPI_Mod.min.js
-//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
-//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.4/libBilibiliToken.user.js
+// @connect      live-trace.bilibili.com
+// @require https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
+// @require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.4/BilibiliAPI_Mod.min.js
+// @require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
+// @require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.4/libBilibiliToken.user.js
+// @require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v2.0/enc.min.js
+// @grant       unsafeWindow
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
 (function () {
@@ -112,7 +115,7 @@
             tokenData.time = ts_s() + tokenData.expires_in;
             localStorage.setItem(`${NAME}_Token`, JSON.stringify(tokenData));
             userToken = tokenData;
-        }; 
+        };
         MYDEBUG(`${NAME}_userToken`, tokenData);
         return 'OK';
     };
@@ -181,11 +184,11 @@
                     });
                     BAPI.gift.gift_config().then((response) => {
                         MYDEBUG('InitData: API.gift.gift_config', response);
-                        if(!!response.data && $.isArray(response.data)){
+                        if (!!response.data && $.isArray(response.data)) {
                             Live_info.gift_list = response.data;
-                        } else if(!!response.data.list && $.isArray(response.data.list)){
+                        } else if (!!response.data.list && $.isArray(response.data.list)) {
                             Live_info.gift_list = response.data.list;
-                        } else{
+                        } else {
                             Live_info.gift_list = [
                                 {
                                     "id": 6,//亿圆
@@ -193,9 +196,9 @@
                                 }, {
                                     "id": 1,//辣条
                                     "price": 100
-                                }, { 
+                                }, {
                                     'id': 30607, //小心心
-                                    'price': 5000 
+                                    'price': 5000
                                 }];
                             window.toast('直播间礼物数据获取失败，使用备用数据', 'error');
                         }
@@ -398,15 +401,17 @@
             },
             newMeaasge: (version) => {
                 let newMsg = `${version}更新提示：\n
-                3.7.2版本后礼物到期时间的单位由秒改为天，老用户请注意。\n
-                等b站删除辣条后项目和脚本可能会改名。\n
+                等b站删除辣条后脚本会改名，\n
+                （greasyfork用户可忽略以下部分）所以更新链接也会变化。\n
+                改名后，我会发布B站直播自动抢辣条的最终版本。\n
+                安装这个版本后脚本会提示你安装改名后的新脚本。\n
                 本提示仅会出现一次。`;
                 try {
                     let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '3.7.2.1') && 
-                    version == '3.7.2.1') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '3.8') &&
+                        version != '0') { //更新公告时需要修改
                         alert(newMsg);
-                        localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version); 
+                        localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
                     }
                 } catch (e) {
                     MYDEBUG('提示信息CACHE载入配置失败', e);
@@ -498,14 +503,14 @@
                 ];
                 const removeUntiSucceed = (settingName, list_id) => {
                     if (MY_API.CONFIG[settingName] === true) {
-                    setInterval(() => {
-                        if ($(unnecessaryList[list_id]).length > 0) {
-                            $(unnecessaryList[list_id]).remove();
-                        } else {
-                            return
-                        }
-                    }, 200);
-                }
+                        setInterval(() => {
+                            if ($(unnecessaryList[list_id]).length > 0) {
+                                $(unnecessaryList[list_id]).remove();
+                            } else {
+                                return
+                            }
+                        }, 200);
+                    }
                 };
                 removeUntiSucceed('REMOVE_ELEMENT_2233', 0);
                 removeUntiSucceed('REMOVE_ELEMENT_july', 1);
@@ -748,7 +753,7 @@
                         <legend style="color: black">小心心</legend>
                         <div data-toggle="LITTLE_HEART" style="line-height: 15px">
                             <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox"> 自动跳转房间获取小心心
+                                <input style="vertical-align: text-top;" type="checkbox"> 自动获取小心心
                             </label>
                         </div>
                         <div data-toggle="LIGHT_MEDALS" style=" color: purple">
@@ -1055,7 +1060,7 @@
                 } else {
                     $("div[data-toggle='LIGHT_BLACK'] input:radio").attr('checked', '');
                 };
-                
+
                 $("input:radio[name='COIN_TYPE']").change(function () { //投币模式变化
                     let a = $("div[data-toggle='COIN_DYN'] input:radio").is(':checked');
                     if (a == true) {
@@ -1825,13 +1830,13 @@
                     let coinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
                     throwCoinNum = await BAPI.getuserinfo().then((re) => {
                         MYDEBUG('DailyReward.dynamic: API.getuserinfo', re);
-                        if(re.data.biliCoin < coinNum) return re.data.biliCoin
+                        if (re.data.biliCoin < coinNum) return re.data.biliCoin
                         else return coinNum
                     });
                     if (throwCoinNum === 0) {
                         return $.Deferred().resolve();
                     } else if (throwCoinNum < coinNum) {
-                        window.toast(`[自动每日奖励][每日投币]剩余硬币不足，仅能投${throwCoinNum}个币`, 'warning');                      
+                        window.toast(`[自动每日奖励][每日投币]剩余硬币不足，仅能投${throwCoinNum}个币`, 'warning');
                     };
                     return BAPI.dynamic_svr.dynamic_new(Live_info.uid, 8).then((response) => {
                         MYDEBUG('DailyReward.dynamic: API.dynamic_svr.dynamic_new', response);
@@ -2364,57 +2369,58 @@
                     }
                     return 0;
                 },
-                sort_medals:(medals)=>{
-                    if(MY_API.CONFIG.GIFT_SORT){
-                        medals.sort((a,b)=>{
-                            if(b.level-a.level==0){
-                                return b.intimacy-a.intimacy;
+                sort_medals: (medals) => {
+                    if (MY_API.CONFIG.GIFT_SORT) {
+                        medals.sort((a, b) => {
+                            if (b.level - a.level == 0) {
+                                return b.intimacy - a.intimacy;
                             }
-                            return b.level-a.level;
+                            return b.level - a.level;
                         });
-                    }else{
-                        medals.sort((a,b)=>{
-                            if(a.level-b.level==0){
-                                return a.intimacy-b.intimacy;
+                    } else {
+                        medals.sort((a, b) => {
+                            if (a.level - b.level == 0) {
+                                return a.intimacy - b.intimacy;
                             }
-                            return a.level-b.level;
+                            return a.level - b.level;
                         });
                     }
-                    if(MY_API.CONFIG.AUTO_GIFT_ROOMID && MY_API.CONFIG.AUTO_GIFT_ROOMID.length > 0){
+                    if (MY_API.CONFIG.AUTO_GIFT_ROOMID && MY_API.CONFIG.AUTO_GIFT_ROOMID.length > 0) {
                         let sortRooms = MY_API.CONFIG.AUTO_GIFT_ROOMID.split(",");
                         sortRooms.reverse();
-                        for(let froom of sortRooms){
-                            let rindex = medals.findIndex(r=>r.roomid==froom);
-                            if(rindex!=-1){
+                        for (let froom of sortRooms) {
+                            let rindex = medals.findIndex(r => r.roomid == froom);
+                            if (rindex != -1) {
                                 let tmp = medals[rindex];
-                                medals.splice(rindex,1);
+                                medals.splice(rindex, 1);
                                 medals.unshift(tmp);
                             }
                         }
                     }
                     return medals;
                 },
-                auto_light: async(medal_list) => {
-                    try{
+                auto_light: async (medal_list) => {
+                    try {
                         const feed = MY_API.Gift.getFeedByGiftID(30607);//小心心
                         let light_roomid = MY_API.CONFIG.LIGHT_MEDALS.split(",");
                         let unLightedMedals = undefined;
                         if (MY_API.CONFIG.LIGHT_METHOD == 'LIGHT_WHITE') {
                             unLightedMedals = medal_list.filter(m => m.is_lighted == 0 && m.day_limit - m.today_feed >= feed &&
-                            light_roomid.findIndex(it => it == m.roomid) >= 0)} else {
+                                light_roomid.findIndex(it => it == m.roomid) >= 0)
+                        } else {
                             unLightedMedals = medal_list.filter(m => m.is_lighted == 0 && m.day_limit - m.today_feed >= feed &&
                                 light_roomid.findIndex(it => it == m.roomid) == -1)
-                            };
-                        if(unLightedMedals && unLightedMedals.length > 0){
+                        };
+                        if (unLightedMedals && unLightedMedals.length > 0) {
                             unLightedMedals = MY_API.Gift.sort_medals(unLightedMedals);
                             await MY_API.Gift.getBagList();
                             let heartBags = MY_API.Gift.bag_list.filter(r => r.gift_id == 30607);
-                            if(heartBags && heartBags.length > 0){
-                                for(let medal of unLightedMedals){
+                            if (heartBags && heartBags.length > 0) {
+                                for (let medal of unLightedMedals) {
                                     let gift = heartBags.find(g => g.gift_id == 30607 && g.gift_num > 0);
-                                    if(gift){
+                                    if (gift) {
                                         let remain_feed = medal.day_limit - medal.today_feed;
-                                        if(remain_feed - feed >= 0) {
+                                        if (remain_feed - feed >= 0) {
                                             let response = await BAPI.room.room_init(parseInt(medal.roomid, 10));
                                             let send_room_id = parseInt(response.data.room_id, 10);
                                             let feed_num = 1;
@@ -2424,7 +2430,7 @@
                                                 medal.today_feed += feed_num * feed;
                                                 remain_feed -= feed_num * feed;
                                                 window.toast(`[自动送礼]勋章[${medal.medalName}]点亮成功，送出${feed_num}个${gift.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离升级还需[${remain_feed}]`, 'success');
-                                                MYDEBUG('Gift.auto_light',`勋章[${medal.medalName}]点亮成功，送出${feed_num}个${gift.gift_name}，[${medal.today_feed}/${medal.day_limit}]`)
+                                                MYDEBUG('Gift.auto_light', `勋章[${medal.medalName}]点亮成功，送出${feed_num}个${gift.gift_name}，[${medal.today_feed}/${medal.day_limit}]`)
                                             } else {
                                                 window.toast(`[自动送礼]勋章[${medal.medalName}]点亮失败【${response.msg}】`, 'caution');
                                             }
@@ -2435,7 +2441,7 @@
                                 }
                             }
                         }
-                    } catch(e) {
+                    } catch (e) {
                         console.error(e);
                         window.toast(`[自动送礼]点亮勋章出错:${e}`, 'error');
                     }
@@ -2465,14 +2471,14 @@
                         let medal_list = MY_API.Gift.medal_list;
                         MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', medal_list);
                         if (medal_list && medal_list.length > 0) {
-                            medal_list = medal_list.filter(it=>it.day_limit-it.today_feed>0 && it.level < 20);
+                            medal_list = medal_list.filter(it => it.day_limit - it.today_feed > 0 && it.level < 20);
                             medal_list = MY_API.Gift.sort_medals(medal_list);
                             //排除直播间
                             if (MY_API.CONFIG.EXCLUDE_ROOMID && MY_API.CONFIG.EXCLUDE_ROOMID.length > 0) {
                                 ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID.split(",");
                                 medal_list = medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
                             };
-                            if(MY_API.CONFIG.LIGHT_MEDALS != "0")   await MY_API.Gift.auto_light(medal_list);//点亮勋章
+                            if (MY_API.CONFIG.LIGHT_MEDALS != "0") await MY_API.Gift.auto_light(medal_list);//点亮勋章
                             let limit = MY_API.CONFIG.GIFT_LIMIT * 86400;
                             for (let v of medal_list) {
                                 let response = await BAPI.room.room_init(parseInt(v.roomid, 10));
@@ -2909,29 +2915,133 @@
                     });
                     return roomCheck;
                 },
+                heartBeat_E: async (roomid) => {
+                    let payload = {
+                        'id': `[1, 34, 0, ${String(roomid)}]`,
+                        'device': '["c4ca4238a0b923820dcc509a6f75849b","55e2620e-a2b9-4086-bd9a-bc399ba13480"]',
+                        'ts': ts_s(),
+                        'is_patch': 0,
+                        'heart_beat': '[]',
+                        'ua': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36',
+                        'csrf_token': Live_info.bili_jct,
+                        'csrf': Live_info.bili_jct,
+                        'heartbeat_interval': '',
+                        'secret_key': '',
+                        'heartbeat_interval': '',
+                        'visit_id': ''
+                    };
+                    let data = encodeURI(BAPI.KeySign.sort(payload));
+                    MYDEBUG('data encode', data)
+                    let header = {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Origin': 'https://live.bilibili.com',
+                        'Referer': `https://live.bilibili.com/${String(roomid)}`,
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
+                        'Cookie': Live_info.bili_jct,
+                    };
+                    MYDEBUG('[web心跳]', 'E 首次心跳');
+                    let response = await XHR({
+                        GM: true,
+                        anonymous: false,
+                        method: 'POST',
+                        url: `https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E`,
+                        responseType: 'json',
+                        headers: header,
+                        data: data
+                    });
+                    MYDEBUG('[web心跳]E返回', response);
+                    payload['ets'] = parseInt(response.data.timestamp);
+                    MYDEBUG('[web心跳] payload[ets]', payload['ets']);
+                    payload['secret_key'] = String(response.data.secret_key);
+                    MYDEBUG('[web心跳] payload[secret_key]', payload['secret_key']);
+                    payload['heartbeat_interval'] = parseInt(response.data.heartbeat_interval);
+                    MYDEBUG('[web心跳] payload[heartbeat_interval]', payload['heartbeat_interval']);
+                    MYDEBUG('[web心跳]E返回payload', payload);
+                    return payload
+                },
+                heartBeat_X: async (index, payload, room_id) => {
+                    const header = {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Origin': 'https://live.bilibili.com',
+                        'Referer': `https://live.bilibili.com/${String(room_id)}`,
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
+                        'Cookie': Live_info.bili_jct,
+                    };
+                    const s_data = {
+                        "t": {
+                            'id': `[1, 34, ${String(index)}, ${String(room_id)}]`,
+                            "device": payload['device'],  // LIVE_BUVID
+                            "ets": payload['ets'],
+                            "benchmark": payload['secret_key'],
+                            "time": payload['heartbeat_interval'],
+                            "ts": ts_s(),
+                            "ua": payload['ua']
+                        },
+                        "r": [2, 5, 1, 4]
+                    };
+                    let t = s_data['t'];
+                    MYDEBUG('[web心跳]s_data[r]', s_data['r']);
+                    MYDEBUG('[web心跳]s_data[t]', s_data['t']);
+                    bilibiliPcHeartBeat.run(JSON.stringify(s_data['t']), s_data['r'], String(room_id))
+                    await sleep(1e3)
+                    MYDEBUG('[web心跳]UniqueFinalS', bilibiliPcHeartBeat.ANSWER);
+
+                    let newpayload = {
+                        's': String(bilibiliPcHeartBeat.ANSWER),
+                        'id': t['id'],
+                        'device': t['device'],
+                        'ets': t['ets'],
+                        'benchmark': String(t['benchmark']),
+                        'time': String(t['time']),
+                        'ts': t['ts'],
+                        "ua": t['ua'],
+                        'csrf_token': Live_info.bili_jct,
+                        'csrf': Live_info.bili_jct,
+                        'visit_id': '',
+                    };
+                    let data = encodeURI(BAPI.KeySign.sort(newpayload));
+                    MYDEBUG('[web心跳]data', data);
+                    MYDEBUG('[web心跳]', `X 第${index}次心跳`);
+                    let response = await XHR({
+                        GM: true,
+                        anonymous: false,
+                        method: 'POST',
+                        url: `https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X`,
+                        responseType: 'json',
+                        headers: header,
+                        data: data
+                    });
+                    MYDEBUG(`[web心跳]X 第${index}次心跳返回`, response);
+                    newpayload['ets'] = response.data.timestamp;
+                    newpayload['secret_key'] = response.data.secret_key;
+                    newpayload['heartbeat_interval'] = response.data.heartbeat_interval;
+                    MYDEBUG('[web]心跳X返回newpayload', newpayload);
+                    return newpayload
+                },
                 run: async () => {
                     if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
                     await MY_API.LITTLE_HEART.getMedalRoomList();
                     let targetRoomId = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                    if (await MY_API.LITTLE_HEART.checkRoom(Live_info.room_id) === true) {
-                        window.toast(`[小心心]当前房间${Live_info.room_id}能够获取小心心，无需跳转`);
-                        let checkInterval = undefined;
-                        checkInterval = setInterval(async () => {
-                            if (MY_API.LITTLE_HEART.checkRoom(Live_info.room_id) == false) {
-                                clearInterval(checkInterval);
-                                targetRoomId = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                                window.toast(`[小心心]15秒后跳转至房间${targetRoomId}`, 'warning');
-                                setTimeout(() => {
-                                    window.location.href = `https://live.bilibili.com/${String(targetRoomId)}`;
-                                }, 15000);
+                    window.toast(`[小心心]发送房间${targetRoomId}的E心跳`, 'info');
+                    let payLoad = await MY_API.LITTLE_HEART.heartBeat_E(targetRoomId);
+                    let heartBeatTime = 1;
+                    let Timer = setInterval(async () => {
+                        if (heartBeatTime <= 7) {
+                            if (await MY_API.LITTLE_HEART.checkRoom(targetRoomId) === true) {
+                                window.toast(`[小心心]发送房间${targetRoomId}的X心跳`, 'info');
+                                MYDEBUG('[web心跳] heartBeatTime次数', heartBeatTime);
+                                payLoad = await MY_API.LITTLE_HEART.heartBeat_X(heartBeatTime, payLoad, targetRoomId);
+                                heartBeatTime = heartBeatTime + 1;
+                            } else {
+                                window.toast(`[小心心]当前房间未开播，重新寻找开播房间`, 'warning');
+                                clearInterval(Timer);
+                                return MY_API.LITTLE_HEART.run();
                             }
-                        }, 300e3);
-                    } else {
-                        window.toast(`[小心心]5.5秒后跳转至房间${targetRoomId}`, 'warning');
-                        setTimeout(() => {
-                            window.location.href = `https://live.bilibili.com/${String(targetRoomId)}`;
-                        }, 5500);
-                    };
+                        } else {
+                            window.toast('[小心心]任务完成', 'success');
+                            clearInterval(Timer);
+                        }
+                    }, 299e3)
                 }
             }
         };
@@ -3094,34 +3204,6 @@
 
         reset(API.CONFIG.TIME_RELOAD * 60000);//单位1分钟，重新加载直播间
     }
-/*
-    function getAllcookie() {
-        let allCookie = '';
-        let cookieItems = [
-            '_uuid',
-            'buvid3',
-            'sid',
-            'DedeUserID',
-            'DedeUserID__ckMd5',
-            'bili_jct',
-            'LIVE_BUVID',
-            'CURRENT_FNVAL',
-            'rpdid',
-            'Hm_lvt_8a6d461cf92ec46bd14513876885e489',
-            'CURRENT_QUALITY',
-            'Hm_lvt_8a6e55dbd2870f0f5bc9194cddf32a02',
-            `bp_video_offset_${Live_info.uid}`,
-            `bp_t_offset_${Live_info.uid}`,
-            'PVID'
-        ];
-        let co = undefined;
-        for (let c of cookieItems) {
-            co = BAPI.getCookie(c);
-            allCookie = allCookie + c + '=' + co + ';';
-        };
-        MYDEBUG('allcookie', allCookie)
-        return allCookie;
-    };*/
 
     /**
      * （23,50） 获取与目标时间在时间轴上的间隔时间,24小时制（毫秒）
@@ -3216,6 +3298,14 @@
             else return false;
         }
     }
+    function sleep(millisecond) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve()
+            }, millisecond)
+        })
+    }
+
     /**
      * 概率
      * @param val
@@ -3256,7 +3346,7 @@
                         XHROptions.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
                 }
                 XHROptions.timeout = 30 * 1000;
-                XHROptions.onload = res => resolve({ response: res, body: res.response });
+                XHROptions.onload = res => { resolve(res.response) };
                 XHROptions.onerror = onerror;
                 XHROptions.ontimeout = onerror;
                 GM_xmlhttpRequest(XHROptions);
@@ -3281,4 +3371,6 @@
             }
         });
     };
+
+   
 })();
