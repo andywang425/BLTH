@@ -18,11 +18,11 @@
 // @connect      passport.bilibili.com
 // @connect      api.live.bilibili.com
 // @connect      live-trace.bilibili.com
-// @require https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
-// @require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.4/BilibiliAPI_Mod.min.js
-// @require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
-// @require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.4/libBilibiliToken.user.js
-// @require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v2.0/enc.min.js
+//@require https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.4/BilibiliAPI_Mod.min.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.4/libBilibiliToken.user.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v2.0/enc.min.js
 // @grant       unsafeWindow
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
