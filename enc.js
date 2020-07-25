@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         bilibili_pc_heartbeat
 // @namespace    https://github.com/lkeme/bilibili-pcheartbeat
-// @version      0.1
+// @version      0.2
 // @description  bilibili PC心跳
 // @author       lkeme, andywang425
 // @run-at       document-end
@@ -47,12 +47,12 @@ var bilibiliPcHeartBeat = {
                 return wasm_instance
                     .then(async (wasm_instance) => {
                         var exports = await instance.initialize(wasm_instance);
-                        console.log("Finished loading Rust wasm module 'app'");
+                        console.log('[bilibili_pc_heartbeat]', "Finished loading Rust wasm module 'app'");
                         //console.log('export', exports)
                         return exports;
                     })
                     .catch(function (error) {
-                        console.log("Error loading Rust wasm module 'app':", error);
+                        console.log('[bilibili_pc_heartbeat]', "Error loading Rust wasm module 'app':", error);
                         throw error;
                     });
                 //}
@@ -830,9 +830,9 @@ var bilibiliPcHeartBeat = {
                             //console.log(r);
                             try {
                                 var a = await Module.STDWEB_PRIVATE.prepare_any_arg(t);
-                                console.log('t', a);
+                                console.log('[bilibili_pc_heartbeat] t', a);
                                 var b = await Module.STDWEB_PRIVATE.prepare_any_arg(r)
-                                console.log('r', b);
+                                console.log('[bilibili_pc_heartbeat] r', b);
                                 var c = await Module.instance.exports.spyder(a, b)
                                 //console.log('spyder',c);
                                 //var d = await Module.STDWEB_PRIVATE.acquire_tmp(c);
@@ -841,12 +841,12 @@ var bilibiliPcHeartBeat = {
                                 //console.log("↓---加密后s数据---↓")
                                 //var success = Module.STDWEB_PRIVATE.acquire_tmp(Module.exports.spyder(Module.STDWEB_PRIVATE.prepare_any_arg(t), Module.STDWEB_PRIVATE.prepare_any_arg(r)));
                                 var success = await Module.STDWEB_PRIVATE.acquire_tmp(c);
-                                console.log('success', success);
+                                console.log('[bilibili_pc_heartbeat] success', success);
                                 bilibiliPcHeartBeat.ANSWER = success;
                                 return success;
                                 //return d;
                             } catch (e) {
-                                console.log(e);
+                                console.log('[bilibili_pc_heartbeat]',e);
                             }
                             // return Module.STDWEB_PRIVATE.acquire_tmp(Module.instance.exports.spyder(Module.STDWEB_PRIVATE.prepare_any_arg(t), Module.STDWEB_PRIVATE.prepare_any_arg(r)))
                         }
@@ -861,7 +861,7 @@ var bilibiliPcHeartBeat = {
                          });
                          var r = [2, 5, 1, 4]*/
 
-                        console.log('开始计算resultS');
+                        console.log('[bilibili_pc_heartbeat]', '开始计算resultS');
                         return await Module.exports.spyder(mainScriptT, mainScriptR);
                         //__web_on_grow();
                         //return resultS
