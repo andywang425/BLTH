@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.8.1
+// @version       3.8.2
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -275,9 +275,12 @@
                 COIN_UID: 0,//投币up主
                 EXCLUDE_ROOMID: "0",//送礼排除房间号
                 FORCE_LOTTERY: false,//黑屋强制抽奖
+                FORCE_LIGHT: false,//忽略亲密上限点亮
                 GIFT_LIMIT: 1,//礼物到期时间(天)
                 GIFT_SEND_HOUR: 23,//送礼小时
                 GIFT_SEND_MINUTE: 59,//送礼分钟
+                GIFT_INTERVAL: 5,//送礼间隔
+                GIFT_METHOD: "GIFT_TIME",//送礼策略
                 GIFT_SORT: false,//送礼优先高等级
                 IN_TIME_RELOAD_DISABLE: false,//休眠时段是否禁止刷新直播间 false为刷新
                 LIVE_SIGN: true,//直播区签到
@@ -319,9 +322,10 @@
                 LiveReward_TS: 0,//直播每日任务
                 TreasureBox_TS: 0,//银瓜子宝箱
                 Silver2Coin_TS: 0,//银瓜子换硬币
-                Gift_TS: 0,//自动送礼
+                Gift_TS: 0,//自动送礼（定时）
+                GiftInterval_TS: 0,//自动送礼（间隔）
                 MobileHeartBeat_TS: 0,//移动端心跳
-                LittleHeart_TS: 0
+                LittleHeart_TS: 0//小心心
             },
             CONFIG: {},
             CACHE: {},
@@ -409,8 +413,8 @@
                 本提示在每个版本仅会出现一次。`;
                 try {
                     let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '3.8.1') &&
-                        version == '3.8.1') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '3.8.2') &&
+                        version == '3.8.2') { //更新公告时需要修改
                         alert(newMsg);
                         localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
                     }
@@ -676,13 +680,21 @@
                             不送礼房间
                             <input class="num igiftMsg_input" style="width: 150px;" type="text">
                         </div>
-            
+                        <div data-toggle="GIFT_INTERVAL" style=" color: black">
+                            <input style="vertical-align: text-top;" type="radio" name="GIFT_TYPE">
+                            间隔
+                            <input class="num igiftMsg_input" style="width: 30px;" type="text">
+                            分钟送礼
+                        </div>
                         <div data-toggle="GIFT_SEND_TIME" style=" color: purple">
+                            <input style="vertical-align: text-top;" type="radio" name="GIFT_TYPE">
+                            定时送礼<br>
                             送礼时间
                             <input class="Hour igiftMsg_input" style="width: 20px;" type="text">点
                             <input class="Minute igiftMsg_input" style="width: 20px;" type="text">分
                             <button style="font-size: small" class="igiftMsg_btn" data-action="sendGiftNow">立刻开始送礼</button>
                         </div>
+                        
                         <div data-toggle="GIFT_LIMIT" style=" color: purple">
                             礼物到期时间
                             <input class="num igiftMsg_input" style="width: 20px;" type="text">
@@ -733,7 +745,7 @@
                 <div id="right_fieldset" style="float:left;">
                     <fieldset class="igiftMsg_fs">
                         <legend style="color: black">说明</legend>
-                        自动送礼目前只会送出辣条和亿圆。<br>
+                        自动送礼目前只会送出辣条，亿圆和小心心。<br>
                         礼物到期时间: 将要在这个时间段里过期的礼物会被送出<br>
                         勾选送满全部勋章时无论是否将要过期都会被送出<br>
                         如果要填写多个优先送礼房间，<br>
@@ -772,6 +784,11 @@
                             <input style="vertical-align: text-top;" type="radio" name="LIGHT_TYPE">
                             黑名单
                         </div>
+                    </div>
+                    <div data-toggle="FORCE_LIGHT" style="line-height: 15px">
+                    <label style="margin: 5px auto; color: black">
+                        <input style="vertical-align: text-top;" type="checkbox"> 点亮勋章时忽略亲密度上限
+                    </label>
                     </div>
                     </fieldset>
                     <fieldset class="igiftMsg_fs">
@@ -826,6 +843,7 @@
                 $('.live-player-mounter').append(div);
 
                 //显示对应配置状态
+                div.find('div[data-toggle="GIFT_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.GIFT_INTERVAL).toString());
                 div.find('div[data-toggle="LIGHT_MEDALS"] .num').val(MY_API.CONFIG.LIGHT_MEDALS.toString());
                 div.find('div[data-toggle="STORM_MAX_COUNT"] .num').val(parseInt(MY_API.CONFIG.STORM_MAX_COUNT).toString());
                 div.find('div[data-toggle="STORM_ONE_LIMIT"] .num').val(parseInt(MY_API.CONFIG.STORM_ONE_LIMIT).toString());
@@ -1036,7 +1054,8 @@
                     'LITTLE_HEART',
                     'REMOVE_ELEMENT_2233',
                     'REMOVE_ELEMENT_july',
-                    'REMOVE_ELEMENT_player'
+                    'REMOVE_ELEMENT_player',
+                    "FORCE_LIGHT"
                 ];
                 for (let i of checkList) {//绑定所有checkbox事件
                     let input = div.find(`div[data-toggle="${i}"] input:checkbox`);
@@ -1061,6 +1080,11 @@
                 } else {
                     $("div[data-toggle='LIGHT_BLACK'] input:radio").attr('checked', '');
                 };
+                if (MY_API.CONFIG.GIFT_METHOD == 'GIFT_INTERVAL') {
+                    $("div[data-toggle='GIFT_INTERVAL'] input:radio").attr('checked', '');
+                } else {
+                    $("div[data-toggle='GIFT_SEND_TIME'] input:radio").attr('checked', '');
+                };
 
                 $("input:radio[name='COIN_TYPE']").change(function () { //投币模式变化
                     let a = $("div[data-toggle='COIN_DYN'] input:radio").is(':checked');
@@ -1079,6 +1103,16 @@
                     }
                     else {
                         MY_API.CONFIG.LIGHT_METHOD = 'LIGHT_BLACK';
+                    }
+                    MY_API.saveConfig();
+                });
+                $("input:radio[name='GIFT_TYPE']").change(function () { //送礼模式变化
+                    let a = $("div[data-toggle='GIFT_INTERVAL'] input:radio").is(':checked');
+                    if (a == true) {
+                        MY_API.CONFIG.GIFT_METHOD = 'GIFT_INTERVAL';
+                    }
+                    else {
+                        MY_API.CONFIG.GIFT_METHOD = 'GIFT_SEND_TIME';
                     }
                     MY_API.saveConfig();
                 });
@@ -2339,6 +2373,7 @@
                 time: undefined,
                 remain_feed: undefined,
                 over: false,
+                run_timer: undefined,
                 //notSendGiftList: [3, 4, 9, 10, 39, 30588, 30587, 30586, 30585],
                 //B坷垃,喵娘,爱心便当,蓝白胖次,节奏风暴,如意小香包,软糯白糖粽,飘香大肉粽,端午茗茶
                 sendGiftList: [1, 6, 30607],//辣条，亿圆, 小心心
@@ -2413,6 +2448,7 @@
                             unLightedMedals = medal_list.filter(m => m.is_lighted == 0 && m.day_limit - m.today_feed >= feed &&
                                 light_roomid.findIndex(it => it == m.roomid) == -1)
                         };
+                        MYDEBUG('[auto_light]即将点亮勋章房间列表',unLightedMedals);
                         if (unLightedMedals && unLightedMedals.length > 0) {
                             unLightedMedals = MY_API.Gift.sort_medals(unLightedMedals);
                             await MY_API.Gift.getBagList();
@@ -2422,7 +2458,7 @@
                                     let gift = heartBags.find(g => g.gift_id == 30607 && g.gift_num > 0);
                                     if (gift) {
                                         let remain_feed = medal.day_limit - medal.today_feed;
-                                        if (remain_feed - feed >= 0) {
+                                        if (remain_feed - feed >= 0 || MY_API.CONFIG.FORCE_LIGHT) {
                                             let response = await BAPI.room.room_init(parseInt(medal.roomid, 10));
                                             let send_room_id = parseInt(response.data.room_id, 10);
                                             let feed_num = 1;
@@ -2454,21 +2490,46 @@
                         return delayCall(() => MY_API.Gift.run());
                     };
                     const nextTimeDebug = () => {
+                        if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME") {
                         let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
-                        setTimeout(MY_API.Gift.run, alternateTime);
+                        MY_API.Gift.run_timer = setTimeout(MY_API.Gift.run, alternateTime);
                         let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
                         MYDEBUG("[自动送礼]", `将在${runTime}进行自动送礼`);
+                        MY_API.CACHE.Gift_TS = ts_ms();
+                        MY_API.saveCache();
+                        } else {
+                            MYDEBUG("[自动送礼]", `将在${MY_API.CONFIG.GIFT_INTERVAL}分钟后进行自动送礼`);
+                            MY_API.CACHE.GiftInterval_TS = ts_ms();
+                            MY_API.saveCache();
+                        }
+                        return
                     }
                     try {
                         if (!MY_API.CONFIG.AUTO_GIFT) return $.Deferred().resolve();
-                        if (!isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && SEND_GIFT_NOW == false) {
+                        if (MY_API.Gift.run_timer) clearTimeout(MY_API.Gift.run_timer);
+                        if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && SEND_GIFT_NOW == false) {
                             let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
-                            setTimeout(MY_API.Gift.run, alternateTime);
+                            MY_API.Gift.run_timer = setTimeout(MY_API.Gift.run, alternateTime);
                             let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
                             MYDEBUG("[自动送礼]", `将在${runTime}进行自动送礼`);
                             return $.Deferred().resolve();
 
-                        };
+                        } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && SEND_GIFT_NOW == false) {
+                            let GiftInterval = MY_API.CONFIG.GIFT_INTERVAL * 60e3;
+                            if (MY_API.CACHE.GiftInterval_TS) {
+                                const interval = ts_ms() - MY_API.CACHE.GiftInterval_TS;
+                                if (interval < GiftInterval) {
+                                    let intervalTime = GiftInterval - interval;
+                                    MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(), intervalTime);
+                                    MYDEBUG("[自动送礼]", `将在${intervalTime}毫秒后进行自动送礼`);
+                                    return;
+                                }
+                            }
+                            else {
+                                MY_API.CACHE.GiftInterval_TS = ts_ms();
+                                MY_API.saveCache();
+                            }
+                        }
                         MY_API.Gift.over = false
                         await MY_API.Gift.getMedalList();
                         let medal_list = MY_API.Gift.medal_list;
@@ -2481,7 +2542,7 @@
                                 ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID.split(",");
                                 medal_list = medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
                             };
-                            if (MY_API.CONFIG.LIGHT_MEDALS != "0") await MY_API.Gift.auto_light(medal_list);//点亮勋章
+                            if (MY_API.CONFIG.LIGHT_MEDALS != undefined) await MY_API.Gift.auto_light(medal_list);//点亮勋章
                             let limit = MY_API.CONFIG.GIFT_LIMIT * 86400;
                             for (let v of medal_list) {
                                 let response = await BAPI.room.room_init(parseInt(v.roomid, 10));
@@ -2498,8 +2559,6 @@
                                             break;
                                         }
                                     };
-                                    MY_API.CACHE.Gift_TS = ts_ms();
-                                    MY_API.saveCache();
                                     if (MY_API.Gift.remain_feed > 0) {
                                         window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度未满[${v.today_feed}/${v.day_limit}]，预计需要[${MY_API.Gift.remain_feed}]送礼开始`, 'info');
                                         await MY_API.Gift.sendGift(v);
@@ -2516,8 +2575,6 @@
                                     }
                                 }
                             }
-                            MY_API.CACHE.Gift_TS = ts_ms();
-                            MY_API.saveCache();
                         }
                         await MY_API.Gift.getBagList();
                         let i = 0;
@@ -2563,6 +2620,7 @@
                     }
                     SEND_GIFT_NOW = false;
                     nextTimeDebug();
+                    return $.Deferred().resolve();
                 },
                 sendGift: async (medal) => {
                     await MY_API.Gift.getBagList();
