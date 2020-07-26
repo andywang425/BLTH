@@ -1,3 +1,31 @@
+// ==UserScript==
+// @namespace     https://github.com/andywang425
+// @name          B站直播自动抢辣条
+// @name:en       B站直播自动抢辣条
+// @author        andywang425
+// @description   自动参与Bilibili直播区抽奖;完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
+// @description:en 自动参与Bilibili直播区抽奖;完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
+// @updateURL     https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
+// @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
+// @homepageURL   https://github.com/andywang425/Bilibili-SGTH/
+// @supportURL    https://github.com/andywang425/Bilibili-SGTH/issues
+// @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
+// @copyright     2020, andywang425 (https://github.com/andywang425)
+// @license       MIT
+// @version       3.8.2
+// @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
+// @run-at       document-end
+// @connect      passport.bilibili.com
+// @connect      api.live.bilibili.com
+// @connect      live-trace.bilibili.com
+//@require https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.4/BilibiliAPI_Mod.min.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.4/libBilibiliToken.user.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v2.0/enc.min.js
+// @grant       unsafeWindow
+// @grant       GM_xmlhttpRequest
+// ==/UserScript==
 (function(){let msgHide=false;let debugSwitch=true;let NAME='IGIFTMSG';let BAPI=BilibiliAPI;let gift_join_try=0;let guard_join_try=0;let pk_join_try=0;let SEND_GIFT_NOW=false;const tz_offset=new Date().getTimezoneOffset()+480;const ts_ms=()=>Date.now();const ts_s=()=>Math.round(ts_ms()/1000);let Live_info={room_id:undefined,uid:undefined,ruid:undefined,mobile_verify:undefined,gift_list:undefined,rnd:undefined,visit_id:undefined,identification:undefined,bili_jct:undefined};const runUntilSucceed=(callback,delay=0,period=100)=>{setTimeout(()=>{if(!callback())runUntilSucceed(callback,period,period);},delay);};const delayCall=(callback,delay=10e3)=>{const p=$.Deferred();setTimeout(()=>{const t=callback();if(t&&t.then)t.then((arg1,arg2,arg3,arg4,arg5,arg6)=>p.resolve(arg1,arg2,arg3,arg4,arg5,arg6));else p.resolve();},delay);return p;};const MYDEBUG=(sign,...data)=>{if(!debugSwitch)return;let d=new Date();d=`[${NAME}][${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}]`;if(data.length===1){console.log(d,`${sign}:`,data[0]);return}
 console.log(d,`${sign}:`,data);};const runMidnight=(callback,msg)=>{const t=new Date();let name=msg||' ';t.setMinutes(t.getMinutes()+tz_offset);t.setDate(t.getDate()+1);t.setHours(0,1,0,0);t.setMinutes(t.getMinutes()-tz_offset);setTimeout(callback,t-ts_ms());MYDEBUG('runMidnight',name+" "+t.toString());};const runExactMidnight=(callback,msg)=>{const t=new Date();let name=msg||' ';t.setMinutes(t.getMinutes()+tz_offset);t.setDate(t.getDate()+1);t.setHours(0,0,0,0);t.setMinutes(t.getMinutes()-tz_offset);setTimeout(callback,t-ts_ms());MYDEBUG('runExactMidnight',name+" "+t.toString());};const runTomorrow=(callback,hour,minute,msg)=>{const t=new Date();let name=msg||' ';t.setMinutes(t.getMinutes()+tz_offset);t.setDate(t.getDate()+1);t.setHours(hour,minute,0,0);t.setMinutes(t.getMinutes()-tz_offset);setTimeout(callback,t-ts_ms());MYDEBUG('runTomorrow',name+" "+t.toString());}
 const appToken=new BilibiliToken();const baseQuery=`actionKey=appkey&appkey=${BilibiliToken.appKey}&build=5561000&channel=bili&device=android&mobi_app=android&platform=android&statistics=%7B%22appId%22%3A1%2C%22platform%22%3A3%2C%22version%22%3A%225.57.0%22%2C%22abtest%22%3A%22%22%7D`;let userToken=undefined;let tokenData=JSON.parse(localStorage.getItem(`${NAME}_userToken`))||{};const setToken=async()=>{if(tokenData.time>ts_s()){userToken=userToken;}else{tokenData=await appToken.getToken();tokenData.time=ts_s()+tokenData.expires_in;localStorage.setItem(`${NAME}_Token`,JSON.stringify(tokenData));userToken=tokenData;};MYDEBUG(`${NAME}_userToken`,tokenData);return'OK';};const newWindow={init:()=>{return newWindow.Toast.init().then(()=>{});},Toast:{init:()=>{try{const list=[];window.toast=(msg,type='info',timeout=5e3)=>{switch(type){case'success':case'info':break;case'caution':break;case'error':break;default:type='info';}
