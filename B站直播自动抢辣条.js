@@ -3,8 +3,8 @@
 // @name          B站直播自动抢辣条
 // @name:en       B站直播自动抢辣条
 // @author        andywang425
-// @description   自动参与Bilibili直播区抽奖;完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
-// @description:en 自动参与Bilibili直播区抽奖;完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
+// @description   自动参与Bilibili直播区抽奖(虽然几乎没了);完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
+// @description:en 自动参与Bilibili直播区抽奖(虽然几乎没了);完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
 // @updateURL     https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
 // @homepageURL   https://github.com/andywang425/Bilibili-SGTH/
@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.8.2
+// @version       3.9
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -22,9 +22,9 @@
 //@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.4/BilibiliAPI_Mod.min.js
 //@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
 //@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.4/libBilibiliToken.user.js
-//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v2.0/enc.min.js
 // @grant       unsafeWindow
 // @grant       GM_xmlhttpRequest
+// @grant       GM_openInTab
 // ==/UserScript==
 (function () {
     let msgHide = false; //UI隐藏开关
@@ -36,6 +36,7 @@
     let guard_join_try = 0;
     let pk_join_try = 0;
     let SEND_GIFT_NOW = false;//立刻送出礼物
+    const UA = window && window.navigator ? window.navigator.userAgent : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36";
     const tz_offset = new Date().getTimezoneOffset() + 480;
     const ts_ms = () => Date.now();//当前毫秒
     const ts_s = () => Math.round(ts_ms() / 1000);//当前秒
@@ -406,15 +407,16 @@
             },
             newMessage: (version) => {
                 let newMsg = `${version}更新提示：\n
-                等b站删除辣条后脚本会改名，\n
-                （greasyfork用户可忽略以下部分）所以更新链接也会变化。\n
-                改名后，我会发布B站直播自动抢辣条的最终版本。\n
+                请阅读一下脚本说明中的小心心部分，获取方式有变动。\n
+                等b站删除辣条后脚本会改名(目前好像就剩个流星雨有抽奖了)，
+                （greasyfork用户可忽略以下部分）所以更新链接也会变化。
+                改名后，我会发布B站直播自动抢辣条的最终版本。
                 安装这个版本后脚本会提示你安装改名后的新脚本。\n
                 本提示在每个版本仅会出现一次。`;
                 try {
                     let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '3.8.2') &&
-                        version == '3.8.2') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '3.9') &&
+                        version == '3.9') { //更新公告时需要修改
                         alert(newMsg);
                         localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
                     }
@@ -766,7 +768,7 @@
                         <legend style="color: black">小心心</legend>
                         <div data-toggle="LITTLE_HEART" style="line-height: 15px">
                             <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox"> 自动发送心跳包获取小心心
+                                <input style="vertical-align: text-top;" type="checkbox"> 自动后台循环开关标签页获取小心心
                             </label>
                         </div>
                         <div data-toggle="LIGHT_MEDALS" style=" color: purple">
@@ -1677,7 +1679,8 @@
 
                         } else {
                             window.toast(`[自动应援团签到]'${response.msg}`, 'caution');
-                            return MY_API.GroupSign.signInList(list, i);
+                            //return MY_API.GroupSign.signInList(list, i);
+                            return $.Deferred().reject();
                         }
                         return $.when(MY_API.GroupSign.signInList(list, i + 1), p);
                     }, () => {
@@ -2448,7 +2451,7 @@
                             unLightedMedals = medal_list.filter(m => m.is_lighted == 0 && m.day_limit - m.today_feed >= feed &&
                                 light_roomid.findIndex(it => it == m.roomid) == -1)
                         };
-                        MYDEBUG('[auto_light]即将点亮勋章房间列表',unLightedMedals);
+                        MYDEBUG('[auto_light]即将点亮勋章房间列表', unLightedMedals);
                         if (unLightedMedals && unLightedMedals.length > 0) {
                             unLightedMedals = MY_API.Gift.sort_medals(unLightedMedals);
                             await MY_API.Gift.getBagList();
@@ -2542,7 +2545,7 @@
                                 ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID.split(",");
                                 medal_list = medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
                             };
-                            if (MY_API.CONFIG.LIGHT_MEDALS != undefined) await MY_API.Gift.auto_light(medal_list);//点亮勋章
+                            await MY_API.Gift.auto_light(medal_list);//点亮勋章
                             let limit = MY_API.CONFIG.GIFT_LIMIT * 86400;
                             for (let v of medal_list) {
                                 let response = await BAPI.room.room_init(parseInt(v.roomid, 10));
@@ -2635,6 +2638,14 @@
                         let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 &&
                             r.expire_at > MY_API.Gift.time && (r.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT * 86400)
                             && r.corner_mark != '永久');
+                        if (pass.length == 0) {
+                            MY_API.Gift.over = true;
+                            return;
+                        } else {
+                            MY_API.bag_list = pass;
+                        }
+                    } else {
+                        let pass = MY_API.Gift.bag_list.filter(r => r.gift_num > 0 && r.corner_mark != '永久');
                         if (pass.length == 0) {
                             MY_API.Gift.over = true;
                             return;
@@ -2923,7 +2934,8 @@
                 }
             },
             LITTLE_HEART: {
-                medalRoom_list: undefined,
+                medalRoom_list: [],
+                liveRoom_list: [],
                 getMedalRoomList: (page = 1) => {
                     if (page === 1) MY_API.LITTLE_HEART.medalRoom_list = [];
                     return BAPI.i.medal(page, 25).then((response) => {
@@ -2941,21 +2953,19 @@
                 },
 
                 checkRoomList: async (roomList) => {
-                    MYDEBUG(`MY_API.LITTLE_HEART.checkRoomList start`);
-                    let returnRoom = undefined;
+                    let returnRoom = [];
                     for (let r of roomList) {
                         await BAPI.room.get_info(r).then((re) => {
                             if (re.data.live_status === 1) {
-                                MYDEBUG('MY_API.LITTLE_HEART.checkRoomList returnRoom', r)
-                                returnRoom = r;
+                                returnRoom = returnRoom.concat(re.data.room_id);
                                 return
                             }
                         }, () => {
                             window.toast('[小心心]获取房间信息失败，请检查网络', 'error');
                             return delayCall(() => MY_API.LITTLE_HEART.checkRoomList(roomList));
-                        })
-                        if (returnRoom != undefined) break;
+                        });
                     };
+                    MYDEBUG('MY_API.LITTLE_HEART.checkRoomList returnRoom', returnRoom)
                     if (returnRoom != undefined) {
                         return returnRoom
                     } else {
@@ -2977,138 +2987,34 @@
                     });
                     return roomCheck;
                 },
-                heartBeat_E: async (roomid) => {
-                    let payload = {
-                        'id': `[1, 34, 0, ${String(roomid)}]`,
-                        'device': '["c4ca4238a0b923820dcc509a6f75849b","55e2620e-a2b9-4086-bd9a-bc399ba13480"]',
-                        'ts': ts_s(),
-                        'is_patch': 0,
-                        'heart_beat': '[]',
-                        'ua': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36',
-                        'csrf_token': Live_info.bili_jct,
-                        'csrf': Live_info.bili_jct,
-                        'heartbeat_interval': '',
-                        'secret_key': '',
-                        'heartbeat_interval': '',
-                        'visit_id': ''
-                    };
-                    let data = encodeURI(BAPI.KeySign.sort(payload));
-                    MYDEBUG('data encode', data)
-                    let header = {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Origin': 'https://live.bilibili.com',
-                        'Referer': `https://live.bilibili.com/${String(roomid)}`,
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
-                        'Cookie': Live_info.bili_jct,
-                    };
-                    MYDEBUG('[web心跳]', 'E 首次心跳');
-                    let response = await XHR({
-                        GM: true,
-                        anonymous: false,
-                        method: 'POST',
-                        url: `https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E`,
-                        responseType: 'json',
-                        headers: header,
-                        data: data
-                    });
-                    MYDEBUG('[web心跳]E返回', response);
-                    payload['ets'] = parseInt(response.data.timestamp);
-                    MYDEBUG('[web心跳] payload[ets]', payload['ets']);
-                    payload['secret_key'] = String(response.data.secret_key);
-                    MYDEBUG('[web心跳] payload[secret_key]', payload['secret_key']);
-                    payload['heartbeat_interval'] = parseInt(response.data.heartbeat_interval);
-                    MYDEBUG('[web心跳] payload[heartbeat_interval]', payload['heartbeat_interval']);
-                    MYDEBUG('[web心跳]E返回payload', payload);
-                    return payload
-                },
-                heartBeat_X: async (index, payload, room_id) => {
-                    const header = {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'Origin': 'https://live.bilibili.com',
-                        'Referer': `https://live.bilibili.com/${String(room_id)}`,
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
-                        'Cookie': Live_info.bili_jct,
-                    };
-                    const s_data = {
-                        "t": {
-                            'id': `[1, 34, ${String(index)}, ${String(room_id)}]`,
-                            "device": payload['device'],  // LIVE_BUVID
-                            "ets": payload['ets'],
-                            "benchmark": payload['secret_key'],
-                            "time": payload['heartbeat_interval'],
-                            "ts": ts_s(),
-                            "ua": payload['ua']
-                        },
-                        "r": [2, 5, 1, 4]
-                    };
-                    let t = s_data['t'];
-                    MYDEBUG('[web心跳]s_data[r]', s_data['r']);
-                    MYDEBUG('[web心跳]s_data[t]', s_data['t']);
-                    bilibiliPcHeartBeat.run(JSON.stringify(s_data['t']), s_data['r'], String(room_id))
-                    await sleep(1e3)
-                    MYDEBUG('[web心跳]UniqueFinalS', bilibiliPcHeartBeat.ANSWER);
-
-                    let newpayload = {
-                        's': String(bilibiliPcHeartBeat.ANSWER),
-                        'id': t['id'],
-                        'device': t['device'],
-                        'ets': t['ets'],
-                        'benchmark': String(t['benchmark']),
-                        'time': String(t['time']),
-                        'ts': t['ts'],
-                        "ua": t['ua'],
-                        'csrf_token': Live_info.bili_jct,
-                        'csrf': Live_info.bili_jct,
-                        'visit_id': '',
-                    };
-                    let data = encodeURI(BAPI.KeySign.sort(newpayload));
-                    MYDEBUG('[web心跳]data', data);
-                    MYDEBUG('[web心跳]', `X 第${index}次心跳`);
-                    let response = await XHR({
-                        GM: true,
-                        anonymous: false,
-                        method: 'POST',
-                        url: `https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X`,
-                        responseType: 'json',
-                        headers: header,
-                        data: data
-                    });
-                    MYDEBUG(`[web心跳]X 第${index}次心跳返回`, response);
-                    newpayload['ets'] = response.data.timestamp;
-                    newpayload['secret_key'] = response.data.secret_key;
-                    newpayload['heartbeat_interval'] = response.data.heartbeat_interval;
-                    MYDEBUG('[web]心跳X返回newpayload', newpayload);
-                    return newpayload
+                doHeartBeat: async (roomId) => {
+                    if (MY_API.LITTLE_HEART.liveRoom_list.indexOf(roomId) == -1) return
+                    window.toast(`[小心心]在新标签页中打开房间${roomId}【请勿点击】`, 'info');
+                    MYDEBUG('[小心心]打开标签页房间', MY_API.LITTLE_HEART.liveRoom_list);
+                    let openInTabCallBcak = await GM_openInTab(`https://live.bilibili.com/${String(roomId)}`, 'loadInBackground');
+                    let tabTimer = setInterval(async() => {
+                        if(!!openInTabCallBcak) openInTabCallBcak.close();
+                        if (MY_API.LITTLE_HEART.checkRoom(roomId)) {
+                        openInTabCallBcak = await GM_openInTab(`https://live.bilibili.com/${String(roomId)}`, 'loadInBackground');
+                        } else {//不开播则删除房间记录，重新运行run
+                            window.toast(`[小心心]房间${roomId}下播，即将再次寻找开播房间`, 'info');
+                            clearInterval(tabTimer);
+                            delListItem(roomId, MY_API.LITTLE_HEART.liveRoom_list);
+                            return MY_API.LITTLE_HEART.run();
+                        }
+                    }, 310e3);
+                    return
                 },
                 run: async () => {
                     if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
                     if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
-                        window.toast('[web心跳]', '今日小心心已全部获取');
+                        window.toast('[小心心]', '今日小心心已全部获取');
                     }
                     await MY_API.LITTLE_HEART.getMedalRoomList();
-                    let targetRoomId = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                    window.toast(`[小心心]发送房间${targetRoomId}的E心跳`, 'info');
-                    let payLoad = await MY_API.LITTLE_HEART.heartBeat_E(targetRoomId);
-                    let heartBeatTime = 1;
-                    let Timer = setInterval(async () => {
-                        if (heartBeatTime <= 24) {
-                            if (await MY_API.LITTLE_HEART.checkRoom(targetRoomId) === true) {
-                                window.toast(`[小心心]发送房间${targetRoomId}的X心跳`, 'info');
-                                MYDEBUG('[web心跳] heartBeatTime次数', heartBeatTime);
-                                payLoad = await MY_API.LITTLE_HEART.heartBeat_X(heartBeatTime, payLoad, targetRoomId);
-                                heartBeatTime = heartBeatTime + 1;
-                            } else {
-                                window.toast(`[小心心]当前房间未开播，重新寻找开播房间`, 'warning');
-                                clearInterval(Timer);
-                                return MY_API.LITTLE_HEART.run();
-                            }
-                        } else {
-                            MY_API.CACHE.LittleHeart_TS = ts_ms();
-                            MY_API.saveCache();
-                            window.toast('[小心心]任务完成', 'success');
-                            clearInterval(Timer);
-                        }
-                    }, 299e3)
+                    MY_API.LITTLE_HEART.liveRoom_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
+                    for(let room of MY_API.LITTLE_HEART.liveRoom_list) {
+                        await MY_API.LITTLE_HEART.doHeartBeat(room);
+                    }
                 }
             }
         };
@@ -3263,7 +3169,7 @@
                 }
                 if (inTimeArea(API.CONFIG.TIME_AREA_START_H0UR, API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE)
                     && API.CONFIG.IN_TIME_RELOAD_DISABLE) {//在不抽奖时段且不抽奖时段不刷新开启
-                    let resetTime = getIntervalTime(API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE);
+                    let resetTime = getIntervalTime(API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE) + 60e3;
                     reset(resetTime);
                     MYDEBUG('[刷新直播间]', `处于休眠时间段，将在${resetTime}毫秒后刷新直播间`);
                     return;
@@ -3299,6 +3205,15 @@
         else {
             return intervalTime
         }
+    }
+    /**
+     * 删除一维数组中指定元素
+     * @param item 元素
+     * @param list 数组
+     * @returns {boolean}
+     */
+    function delListItem(item, list) {
+        list.splice(list.indexOf(item), 1)
     }
 
     /**
@@ -3370,7 +3285,8 @@
                 return true
             else return false;
         }
-    }
+    };
+
     function sleep(millisecond) {
         return new Promise(resolve => {
             setTimeout(() => {
