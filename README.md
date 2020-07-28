@@ -10,7 +10,7 @@
 ### 4.jsdelivr源：[Bilibili-SGTH_5](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)    
 <details>
 <summary><strong>展开查看原格式版链接</strong></summary>      
-需要自己复制到tampermonkey中新建脚本进行安装。
+需要自行复制到tampermonkey中新建脚本进行安装。
 
 ### 1.github源：[Bilibili-SGTH_Origin_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)  
 ### 2.githubusercontent源：[Bilibili-SGTH_Origin_2](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)  
@@ -55,7 +55,7 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
    7.应援团签到  
    8.自动领银瓜子宝箱  
    9.模拟移动端心跳，领双端观看直播奖励  
-+ 自动发心跳包获取小心心  
++ 自动后台循环开关标签页获取小心心  
 + 自动点亮勋章
 + 自动送礼  
 
