@@ -3,22 +3,29 @@
 
 ![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-unsupport-red.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
 
++ 在 Tampermonkey 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
++ 不保证能通过其它油猴插件(Greasemonkey/Violentmonkey等)运行。  
+
+----------------------------------
+
 ### 点击以下任一链接安装脚本
 ### 1.github源：[Bilibili-SGTH_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
 ### 2.githubusercontent源：[Bilibili-SGTH_2](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
-### 3.gitcdn源：[Bilibili-SGTH_4](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
-### 4.jsdelivr源：[Bilibili-SGTH_5](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)    
+### 3.gitcdn源：[Bilibili-SGTH_3](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
+### 4.jsdelivr源：[Bilibili-SGTH_4](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)    
 <details>
 <summary><strong>展开查看原格式版链接</strong></summary>      
 需要自行复制到tampermonkey中新建脚本进行安装。
 
 ### 1.github源：[Bilibili-SGTH_Origin_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)  
 ### 2.githubusercontent源：[Bilibili-SGTH_Origin_2](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)  
-### 3.gitcdn源：[Bilibili-SGTH_Origin_4](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)  
-### 4.jsdelivr源：[Bilibili-SGTH_Origin_5](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)    
+### 3.gitcdn源：[Bilibili-SGTH_Origin_3](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)  
+### 4.jsdelivr源：[Bilibili-SGTH_Origin_4 ](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)    
 </details>
 
 _(3，4访问快但可能不是最新版)_
+
+-------------------------------
 
 #### 使用方法 
 在Tampermonkey中启用脚本，登陆bilibili后打开任意b站直播间。  
@@ -111,10 +118,11 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 + 因为b站最近一直在加各种请求参数校验，目前通过在后台打开新标签页的方式来获取小心心。  
   几乎不占用cpu，gpu和带宽（除非你点进了脚本打开的标签页）。
 + 检测到包裹内有一组24个7天的小心心后会停止打开标签页，并关闭之前打开的标签页。  
++ 在获取完所有小心心之前直播间不刷新。  
++ 关闭（或刷新）运行脚本的网页后会关闭所有由脚本打开的标签页。  
 + 点亮勋章指送出一个小心心。  
 + 点亮勋章会在自动送礼之前进行。  
 + 若不勾选【点亮勋章时忽略亲密度上限】，则仅会点亮当日剩余亲密度大于等于小心心亲密度的勋章。  
-+ 在获取完所有小心心之前直播间不刷新。  
 + 勋章点亮模式说明
   + 白名单：点亮【自动点亮勋章房间号】所对应的粉丝勋章。
   + 黑名单：点亮所有粉丝勋章中除了【自动点亮勋章房间号】所对应勋章的粉丝勋章。  
@@ -142,21 +150,24 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 + [Bilibili-LRHH](https://github.com/SeaLoong/Bilibili-LRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/Bilibili-LRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
-+ <del>[bilibili-pcheartbeat](https://github.com/lkeme/bilibili-pcheartbeat) (GPL3) by [lkeme](https://github.com/lkeme/)</del>  
++ <del>[bilibili-pcheartbeat](https://github.com/lkeme/bilibili-pcheartbeat) (GPL3) by [lkeme](https://github.com/lkeme/)</del>（现已弃用）  
 
 本脚本使用的库：  
 + [BilibiliAPI_Mod](https://github.com/andywang425/Bilibili-SGTH/blob/master/BilibiliAPI_Mod.js)：B站API及常用函数。  
 + [OCRAD](https://github.com/antimatter15/ocrad.js)：识别领银瓜子宝箱验证码。  
 + [libBilibiliToken](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveClientHeart/BiliveClientHeart.user.js)：获取移动端token。  
-+ <del>[bilibili-pcheartbeat](https://github.com/lkeme/bilibili-pcheartbeat)：计算PC心跳的请求参数`s`。</del>  
++ <del>[bilibili-pcheartbeat](https://github.com/lkeme/bilibili-pcheartbeat)：计算PC心跳的请求参数`s`。</del>（现已弃用）  
 
 感谢以上这些项目的作者~ 
 
 ## 更新日志
+>### 3.9.1.1
+>优化小心心模块：优化小心心上限的检测；不重复打开已打开的标签页；关闭（或刷新）脚本运行的直播间后由脚本打开的标签页会被关闭。
+>领银瓜子宝箱验证码错误后延时150毫秒再尝试，降低风控概率。    
 >### 3.9.1
 >增加输入项【打开标签页数量上限】防止一下开太多导致浏览器崩溃；增加今日小心心是否全部获取的判定，全部获取后关闭标签页。  
 >### 3.9
->改为使用后台打开标签页的方式获取小心心；修复点亮勋章和自动送礼的一些小bug；更换压缩方式为Babili。  
+>改为使用后台打开标签页的方式获取小心心；修复点亮勋章和自动送礼的一些小bug。  
 >### 3.8.2
 >新功能：【间隔__分钟送礼】，【点亮勋章时忽略亲密度上限】。送礼和点亮算法优化。  
 >### 3.8.1

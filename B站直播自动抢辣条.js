@@ -3,8 +3,8 @@
 // @name          B站直播自动抢辣条
 // @name:en       B站直播自动抢辣条
 // @author        andywang425
-// @description   自动参与Bilibili直播区抽奖(虽然几乎没了);完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
-// @description:en 自动参与Bilibili直播区抽奖(虽然几乎没了);完成每日任务，领银瓜子宝箱，自动送礼，获取小心心，批量点亮勋章
+// @description   自动参与Bilibili直播区抽奖(现在极少)，完成每日任务，领银瓜子宝箱，自动送礼，自动获取小心心，批量点亮勋章
+// @description:en 自动参与Bilibili直播区抽奖(现在极少)，完成每日任务，领银瓜子宝箱，自动送礼，自动获取小心心，批量点亮勋章
 // @updateURL     https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js
 // @homepageURL   https://github.com/andywang425/Bilibili-SGTH/
@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.9.1
+// @version       3.9.1.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -37,6 +37,7 @@
     let pk_join_try = 0;
     let SEND_GIFT_NOW = false;//立刻送出礼物
     let openInTabCallBcak_list = [];
+    let liveRoom_list = [];
     const UA = window && window.navigator ? window.navigator.userAgent : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36";
     const tz_offset = new Date().getTimezoneOffset() + 480;
     const ts_ms = () => Date.now();//当前毫秒
@@ -2206,7 +2207,7 @@
                     if (MY_API.TreasureBox.DOM.div_timer) MY_API.TreasureBox.DOM.div_timer.hide();
                     if (MY_API.TreasureBox.DOM.div_tip) MY_API.TreasureBox.DOM.div_tip.html(htmltext);
                 },
-                getAward: (captcha, cnt = 0) => {
+                getAward: async (captcha, cnt = 0) => {
                     if (!MY_API.CONFIG.AUTO_TREASUREBOX) return $.Deferred().reject();
                     if (cnt > 3) return $.Deferred().resolve(); // 3次时间未到，重新运行任务
                     return BAPI.TreasureBox.getAward(MY_API.TreasureBox.time_start, MY_API.TreasureBox.time_end, captcha).then((response) => {
@@ -2220,6 +2221,7 @@
                             case -902: // -902: 验证码错误
                             case -901: // -901: 验证码过期
                             case -10017: // -10017: 验证码过期
+                                await sleep(150);
                                 return MY_API.TreasureBox.captcha.calc().then((captcha) => {
                                     return MY_API.TreasureBox.getAward(captcha, cnt);
                                 });
@@ -3001,9 +3003,9 @@
                     return roomCheck;
                 },
                 doHeartBeat: async (roomId) => {
-                    if (MY_API.LITTLE_HEART.liveRoom_list.indexOf(roomId) == -1) return
+                    if (liveRoom_list.indexOf(roomId) == -1) return
                     window.toast(`[小心心]在新标签页中打开房间${roomId}【请勿点击】`, 'info');
-                    MYDEBUG('[小心心]打开标签页房间', MY_API.LITTLE_HEART.liveRoom_list);
+                    MYDEBUG('[小心心]打开标签页房间', liveRoom_list);
                     let openInTabCallBcak = await GM_openInTab(`https://live.bilibili.com/${String(roomId)}`, 'loadInBackground');
                     openInTabCallBcak_list.push(openInTabCallBcak);
                     let tabTimer = setInterval(async() => {;
@@ -3018,23 +3020,49 @@
                         } else {//不开播则删除房间记录，重新运行run
                             window.toast(`[小心心]房间${roomId}下播，即将再次寻找开播房间`, 'info');
                             clearInterval(tabTimer);
-                            delListItem(roomId, MY_API.LITTLE_HEART.liveRoom_list);
+                            delListItem(roomId, liveRoom_list);
                             delListItem(openInTabCallBcak, openInTabCallBcak_list)
                             return MY_API.LITTLE_HEART.run();
                         }
                     }, 310e3);
                     return
                 },
+                checkHeart : () => {
+                    const checkbag = () => {
+                        BAPI.gift.bag_list().then((re) => {
+                            MYDEBUG('[小心心]检查包裹', re)
+                            let heart = re.data.list.filter(r => r.gift_id == 30607 && r.gift_num == 24 && r.corner_mark == "7天");
+                            MYDEBUG('[小心心]包裹内7天24个小心心', heart);
+                            if(heart.length > 0) {
+                                clearInterval(timer);
+                                window.toast('[小心心]今日小心心已全部获取', 'success');
+                                MY_API.CACHE.LittleHeart_TS = ts_ms();
+                                MY_API.saveCache();
+                                MYDEBUG('[小心心]', openInTabCallBcak_list)
+                                closeAllTab(openInTabCallBcak_list);
+                                return
+                            }
+                        })
+                    }
+                    checkbag();
+                    let timer = setInterval(() => {
+                        checkbag();
+                    }, 300e3);
+                    return
+                },
                 run: async () => {
                     if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
                     if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
-                        window.toast('[小心心]今日小心心已全部获取', 'success');
+                        //window.toast('[小心心]今日小心心已全部获取', 'success');
+                        //closeAllTab(openInTabCallBcak_list);
                         return $.Deferred().resolve();
                     }
                     await MY_API.LITTLE_HEART.getMedalRoomList();
-                    MY_API.LITTLE_HEART.liveRoom_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                    let tabNum = 0;
-                    for(let room of MY_API.LITTLE_HEART.liveRoom_list) {
+                    let room_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
+                    liveRoom_list  = room_list.filter(r => !liveRoom_list.includes(r));
+                    let tabNum = liveRoom_list.length;
+                    if (!tabNum) return 
+                    for(let room of liveRoom_list) {
                         if(tabNum < MY_API.CONFIG.MAX_TAB) {
                         await MY_API.LITTLE_HEART.doHeartBeat(room);
                         tabNum++;
@@ -3042,26 +3070,7 @@
                             break;
                         }
                     };
-                    let timer = setInterval(() => {
-                        BAPI.gift.bag_list().then((re) => {
-                            MYDEBUG('[小心心]检查包裹', re)
-                            let heart = re.data.list.filter(r => r.gift_id == 30607 && r.gift_num == 24 && r.corner_mark == "7天");
-                            MYDEBUG('[小心心]包裹内7天24个小心心', heart);
-                            if(heart.length > 0) {
-                                clearInterval(timer);
-                                window.toast('[小心心]今日获取小心心已到上限', 'success');
-                                MY_API.CACHE.LittleHeart_TS = ts_ms();
-                                MY_API.saveCache();
-                                MYDEBUG('[小心心]', openInTabCallBcak_list)
-                                if (openInTabCallBcak_list != undefined) {
-                                    for(let tab of openInTabCallBcak_list) {
-                                        tab.close();
-                                    }
-                                }
-                                return
-                            }
-                        })
-                    }, 300e3);
+                    MY_API.LITTLE_HEART.checkHeart();
                     return
                 }
             }
@@ -3079,9 +3088,10 @@
                         MY_API.CONFIG.AUTO_TREASUREBOX = false;
                         window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
                         return promiseInit.reject();
-                    }
+                    } else {
                     // 没有其他脚本正在运行
                     return promiseInit.resolve();
+                    }
                 };
                 uniqueCheck().then(() => {
                     let timer_unique;
@@ -3096,6 +3106,7 @@
                             MY_API.CACHE.UNIQUE_CHECK = 0;
                             MY_API.saveCache();
                         }
+                        closeAllTab(openInTabCallBcak_list);
                     });
                     uniqueMark();
                     if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid))) {//登陆判断
@@ -3124,7 +3135,7 @@
             MYDEBUG('已清空辣条数量')
         }
         if (checkNewDay(API.GIFT_COUNT.CLEAR_TS)) clearStat();
-        runExactMidnight(clearStat, '重置统计')
+        runExactMidnight(clearStat, '重置统计');
         API.LITTLE_HEART.run();//小心心
         API.removeUnnecessary();//移除页面元素
         setTimeout(() => {
@@ -3210,7 +3221,7 @@
                     return
                 }
                 if (checkNewDay(API.CACHE.LittleHeart_TS)) {
-                    MYDEBUG('[刷新直播间]', '正在发送pc心跳包获取小心心，10分钟后再次检查');
+                    MYDEBUG('[刷新直播间]', '正在发送获取小心心，10分钟后再次检查');
                     clearTimeout(resetTimer);
                     reset(600e3);
                     return
@@ -3263,7 +3274,20 @@
     function delListItem(item, list) {
         list.splice(list.indexOf(item), 1)
     }
-
+    
+    /**
+     * 关闭所有打开的标签
+     * @param item 元素
+     * @param list 数组
+     */
+    function closeAllTab(tabCallBack_list) {
+        if (tabCallBack_list != undefined) {
+            for(let tab of tabCallBack_list) {
+                tab.close();
+            }
+        }
+        return
+    }
     /**
      * （1000000000） 获取到明天的目标时间戳所在的相同【时间点】所需时间（毫秒）
      * @param date 整数 时间戳
