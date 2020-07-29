@@ -2207,10 +2207,10 @@
                     if (MY_API.TreasureBox.DOM.div_timer) MY_API.TreasureBox.DOM.div_timer.hide();
                     if (MY_API.TreasureBox.DOM.div_tip) MY_API.TreasureBox.DOM.div_tip.html(htmltext);
                 },
-                getAward: async (captcha, cnt = 0) => {
+                getAward: (captcha, cnt = 0) => {
                     if (!MY_API.CONFIG.AUTO_TREASUREBOX) return $.Deferred().reject();
                     if (cnt > 3) return $.Deferred().resolve(); // 3次时间未到，重新运行任务
-                    return BAPI.TreasureBox.getAward(MY_API.TreasureBox.time_start, MY_API.TreasureBox.time_end, captcha).then((response) => {
+                    return BAPI.TreasureBox.getAward(MY_API.TreasureBox.time_start, MY_API.TreasureBox.time_end, captcha).then(async (response) => {
                         MYDEBUG('TreasureBox.getAward: getAward', response);
                         switch (response.code) {
                             case 0:
