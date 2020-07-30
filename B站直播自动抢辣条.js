@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       3.9.1.1
+// @version       3.9.1.2
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -3060,8 +3060,7 @@
                     await MY_API.LITTLE_HEART.getMedalRoomList();
                     let room_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
                     liveRoom_list  = room_list.filter(r => !liveRoom_list.includes(r));
-                    let tabNum = liveRoom_list.length;
-                    if (!tabNum) return 
+                    let tabNum = 0;
                     for(let room of liveRoom_list) {
                         if(tabNum < MY_API.CONFIG.MAX_TAB) {
                         await MY_API.LITTLE_HEART.doHeartBeat(room);
