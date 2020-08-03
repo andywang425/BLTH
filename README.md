@@ -1,7 +1,7 @@
-# Bilibili-SGTH  
-**Bilibili Spicy Gluten and Task Helper**  
+# BLTH  
+**Bilibili Live Tasks Helper**  
 
-![ECMAScript 6](https://img.shields.io/badge/ECMAScript_6-pass-green.svg) ![ECMAScript 5](https://img.shields.io/badge/ECMAScript_5-unsupport-red.svg) ![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
+![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
 
 + 在 Tampermonkey 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
 + 不保证能通过其它油猴插件(Greasemonkey/Violentmonkey等)运行。  
@@ -9,18 +9,16 @@
 ----------------------------------
 
 ### 点击以下任一链接安装脚本
-### 1.github源：[Bilibili-SGTH_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
-### 2.githubusercontent源：[Bilibili-SGTH_2](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
-### 3.gitcdn源：[Bilibili-SGTH_3](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)  
-### 4.jsdelivr源：[Bilibili-SGTH_4](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)    
+### 1.githubusercontent源：[Bilibili-SGTH_2](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
+### 2.gitcdn源：[Bilibili-SGTH_3](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
+### 3.jsdelivr源：[Bilibili-SGTH_4](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)    
 <details>
 <summary><strong>展开查看原格式版链接</strong></summary>      
 需要自行复制到tampermonkey中新建脚本进行安装。
-
-### 1.github源：[Bilibili-SGTH_Origin_1](https://github.com/andywang425/Bilibili-SGTH/raw/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)  
-### 2.githubusercontent源：[Bilibili-SGTH_Origin_2](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)  
-### 3.gitcdn源：[Bilibili-SGTH_Origin_3](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)  
-### 4.jsdelivr源：[Bilibili-SGTH_Origin_4 ](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)    
+ 
+### 1.githubusercontent源：[Bilibili-SGTH_Origin_2](https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)  
+### 2.gitcdn源：[Bilibili-SGTH_Origin_3](https://gitcdn.xyz/repo/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)  
+### 3.jsdelivr源：[Bilibili-SGTH_Origin_4 ](https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)    
 </details>
 
 _(3，4访问快但可能不是最新版)_
@@ -30,8 +28,7 @@ _(3，4访问快但可能不是最新版)_
 #### 使用方法 
 在Tampermonkey中启用脚本，登陆bilibili后打开任意b站直播间。  
 #### 一些建议
-不建议24小时挂着脚本，容易进小黑屋。勾选低调设置可以降低进小黑屋概率。  
-启用脚本后不要去抢小时榜房间和广播的礼物，重复抢次数多了会进小黑屋。  
+启用脚本后不要参与小时榜和广播礼物的抽奖，重复抢次数多了会进小黑屋。  
 _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽奖，领银瓜子宝箱等，与主站无关。_  
 如果开启抽奖附加延迟，可能出现领不到礼物的情况，请降低或取消延迟。  
 **部分设置更改后需要刷新页面才能生效。**  
@@ -72,10 +69,10 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 本脚本在三个平台上的代码格式有所不同
 + github: 压缩和原格式都有，默认安装压缩格式
 + openuserjs: 第一次安装为原格式，若用tempermonkey更新则会变为压缩格式
-+ greasyfork: 原格式（无法通过tampermonkey自动更新）
++ greasyfork: 原格式
 
-注：项目文件中的[B站直播自动抢辣条.user.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.user.js)是压缩后的脚本。  
-原格式的脚本为[B站直播自动抢辣条.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1.js)。  
+注：项目文件中的[B站直播自动抢辣条.user.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)是压缩后的脚本。  
+原格式的脚本为[B站直播自动抢辣条.js](https://github.com/andywang425/Bilibili-SGTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)。  
 
 **关于输入数据格式**  
 + 浮点数(小数)或整数: 抽奖前附加随机延迟，随机跳过礼物，抽奖时概率发送活跃弹幕。  
@@ -161,6 +158,8 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 感谢以上这些项目的作者~ 
 
 ## 更新日志
+>### 4.0
+>改名；尝试修复自动送礼的一个bug。 
 >### 3.9.1.2
 >【小心心】修复标签页计数bug。  
 >### 3.9.1.1
