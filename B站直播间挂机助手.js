@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       4.0.1
+// @version       4.0.2
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -143,13 +143,12 @@
                                 type = 'info';
                         }
                         const a = $(`<div class="link-toast ${type} fixed"><span class="toast-text">${msg}</span></div>`)[0];
-                        if(msgHide == 'show') {
-                            document.body.appendChild(a);
-                        } else {
-                            document.body.appendChild(a.hide());
-                        }
+                        document.body.appendChild(a);
                         a.style.top = (document.body.scrollTop + list.length * 40 + 10) + 'px';
                         a.style.left = (document.body.offsetWidth + document.body.scrollLeft - a.offsetWidth - 5) + 'px';
+                        if(msgHide == 'hide') {
+                            $('.link-toast').hide();
+                        }
                         list.push(a);
                         setTimeout(() => {
                             a.className += ' out';
