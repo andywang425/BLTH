@@ -7,12 +7,12 @@
 // @description:en 自动参与Bilibili直播区抽奖(现在极少)，完成每日任务，领银瓜子宝箱，自动送礼，自动获取小心心，批量点亮勋章
 // @updateURL     https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
-// @homepageURL   https://github.com/andywang425/Bilibili-SGTH/
-// @supportURL    https://github.com/andywang425/Bilibili-SGTH/issues
+// @homepageURL   https://github.com/andywang425/BLTH/
+// @supportURL    https://github.com/andywang425/BLTH/issues
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       4.0
+// @version       4.0.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -27,9 +27,9 @@
 // @grant       GM_openInTab
 // ==/UserScript==
 (function () {
-    let msgHide = false; //UI隐藏开关
     let debugSwitch = true; //控制开关
     let NAME = 'IGIFTMSG';
+    let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide'; //UI隐藏开关
     let BAPI = BilibiliAPI;
     //let DanMuServerHost;
     let gift_join_try = 0;
@@ -38,7 +38,6 @@
     let SEND_GIFT_NOW = false;//立刻送出礼物
     let openInTabCallBcak_list = [];
     let liveRoom_list = [];
-    const UA = window && window.navigator ? window.navigator.userAgent : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36";
     const tz_offset = new Date().getTimezoneOffset() + 480;
     const ts_ms = () => Date.now();//当前毫秒
     const ts_s = () => Math.round(ts_ms() / 1000);//当前秒
@@ -144,7 +143,11 @@
                                 type = 'info';
                         }
                         const a = $(`<div class="link-toast ${type} fixed"><span class="toast-text">${msg}</span></div>`)[0];
-                        document.body.appendChild(a);
+                        if(msgHide == 'show') {
+                            document.body.appendChild(a);
+                        } else {
+                            document.body.appendChild(a.hide());
+                        }
                         a.style.top = (document.body.scrollTop + list.length * 40 + 10) + 'px';
                         a.style.left = (document.body.offsetWidth + document.body.scrollLeft - a.offsetWidth - 5) + 'px';
                         list.push(a);
@@ -173,7 +176,7 @@
         let loadInfo = (delay) => {
             setTimeout(() => {
                 const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
-                if (W.BilibiliLive === undefined || parseInt(W.BilibiliLive.UID) === 0 || isNaN(parseInt(W.BilibiliLive.UID))) {
+                if ((W.BilibiliLive === undefined || parseInt(W.BilibiliLive.UID) === 0 || isNaN(parseInt(W.BilibiliLive.UID))) && !!!Live_info) {
                     loadInfo(1000);
                     window.toast(`[${GM_info.script.name}]无配置信息`, 'warning');
                     MYDEBUG('无配置信息');
@@ -529,25 +532,30 @@
             },
             creatSetBox: () => {//创建设置框
                 //添加按钮
-                let btn = $('<button style="display: inline-block; float: left; margin-right: 7px;background-color: #23ade5;color: #fff;border-radius: 4px;border: none; padding:4px; cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">隐藏窗口和抽奖信息<br></button>');
+                const btnmsg = msgHide == 'hide' ? '显示窗口和提示信息' : '隐藏窗口和提示信息';
+                let btn = $(`<button style="display: inline-block; float: left; margin-right: 7px;background-color: #23ade5;color: #fff;border-radius: 4px;border: none; padding:4px; cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
 
                 btn.click(() => {
-                    if (msgHide == false) {
-                        msgHide = true;
+                    if (msgHide == 'show') {//false 显示=>隐藏
+                        msgHide = 'hide';
+                        localStorage.setItem(`${NAME}_msgHide`, msgHide);
                         $('.igiftMsg').hide();
                         div.hide();
+                        $('.link-toast').hide();
                         let ct = $('.chat-history-list');
                         ct.animate({ scrollTop: 0 }, 0);
                         setTimeout(() => { ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10) }, 100);
-                        document.getElementById('hiderbtn').innerHTML = "显示窗口和抽奖信息";
+                        document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
                     }
                     else {
-                        msgHide = false;
+                        msgHide = 'show';
+                        localStorage.setItem(`${NAME}_msgHide`, msgHide);
                         $('.igiftMsg').show();
+                        $('.link-toast').show();
                         div.show();
                         let ct = $('.chat-history-list');
                         ct.animate({ scrollTop: ct.prop("scrollHeight") }, 0);
-                        document.getElementById('hiderbtn').innerHTML = "隐藏窗口和抽奖信息";
+                        document.getElementById('hiderbtn').innerHTML = "隐藏窗口和提示信息";
                     }
                 });
                 $('.attention-btn-ctnr').append(btn);
@@ -615,7 +623,11 @@
                                 检查小时榜间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒
                             </label>
                         </div>
-            
+                        <div data-toggle="FORCE_LOTTERY" style="line-height: 20px">
+                        <label style="margin: 5px auto; color: red;">
+                            <input style="vertical-align: text-top;" type="checkbox">访问被拒绝后强制重复抽奖(最多5次)
+                        </label>
+                    </div>
                     </fieldset>
             
                     <fieldset class="igiftMsg_fs">
@@ -661,13 +673,13 @@
                             <input style="vertical-align: text-top;" type="checkbox">
                             应援团签到
                         </div>
-                        <div data-toggle="MOBILE_HEARTBEAT" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            模拟移动端心跳 + 领双端观看直播奖励
-                        </div>
                         <div data-toggle="AUTO_TREASUREBOX" style=" color: purple">
                             <input style="vertical-align: text-top;" type="checkbox">
                             自动领银瓜子宝箱
+                        </div>
+                        <div data-toggle="MOBILE_HEARTBEAT" style=" color: gray">
+                        <input style="vertical-align: text-top;" type="checkbox">
+                        模拟移动端心跳
                         </div>
                     </fieldset>
                     <fieldset class="igiftMsg_fs">
@@ -832,11 +844,6 @@
                                 <input style="vertical-align: text-top;" type="checkbox">不抽奖时段不重载直播间
                             </label>
                         </div>
-                        <div data-toggle="FORCE_LOTTERY" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: red;">
-                                <input style="vertical-align: text-top;" type="checkbox">访问被拒绝后强制重复抽奖(最多5次)
-                            </label>
-                        </div>
                         <div id="resetArea">
                             <button data-action="reset" style="color: red;" class="igiftMsg_btn">重置所有为默认</button>
                             <button data-action="redo_dailyTasks" style="color: red;" class="igiftMsg_btn">再次执行所有任务</button>
@@ -845,14 +852,17 @@
             
                     </fieldset>
                     <label style="color: darkblue; font-size:large;">
-                        v${GM_info.script.version} <a href="https://github.com/andywang425/Bilibili-SGTH/"
+                        v${GM_info.script.version} <a href="https://github.com/andywang425/BLTH"
                             target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
                     </label>
                 </div>
             </div>
     `);
-
-                $('.live-player-mounter').append(div);
+                if (msgHide == 'show') {
+                    $('.live-player-mounter').append(div);
+                } else {
+                    $('.live-player-mounter').append(div.hide());
+                }
 
                 //显示对应配置状态
                 div.find('div[data-toggle="MAX_TAB"] .num').val(parseInt(MY_API.CONFIG.MAX_TAB).toString());
@@ -1186,7 +1196,7 @@
                             'background': 'rgb(233, 230, 255) none repeat scroll 0% 0%',
                         });
                 }
-                if (msgHide == false) {
+                if (msgHide == 'show') {//false
                     ct.find('#chat-items').append(div);//向聊天框加入信息  
                 } else {
                     ct.find('#chat-items').append(div.hide());//向聊天框加入信息
@@ -1495,7 +1505,7 @@
                     'border': '1px solid rgb(203, 195, 255)',
                     'background': 'rgb(233, 230, 255) none repeat scroll 0% 0%',
                 });
-                if (msgHide == false) {
+                if (msgHide == 'show') {//false
                     ct.find('#chat-items').append(div);//向聊天框加入信息
                 } else {
                     ct.find('#chat-items').append(div.hide());//向聊天框加入信息                 
@@ -2557,7 +2567,7 @@
                             medal_list = MY_API.Gift.sort_medals(medal_list);
                             //排除直播间
                             if (MY_API.CONFIG.EXCLUDE_ROOMID && MY_API.CONFIG.EXCLUDE_ROOMID.length > 0) {
-                                ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID.split(",");
+                                const ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID.split(",");
                                 medal_list = medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
                             };
                             await MY_API.Gift.auto_light(medal_list);//点亮勋章
