@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       4.0.2
+// @version       4.0.3
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-end
 // @connect      passport.bilibili.com
@@ -146,7 +146,7 @@
                         document.body.appendChild(a);
                         a.style.top = (document.body.scrollTop + list.length * 40 + 10) + 'px';
                         a.style.left = (document.body.offsetWidth + document.body.scrollLeft - a.offsetWidth - 5) + 'px';
-                        if(msgHide == 'hide') {
+                        if (msgHide == 'hide') {
                             $('.link-toast').hide();
                         }
                         list.push(a);
@@ -175,7 +175,7 @@
         let loadInfo = (delay) => {
             setTimeout(() => {
                 const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
-                if ((W.BilibiliLive === undefined || parseInt(W.BilibiliLive.UID) === 0 || isNaN(parseInt(W.BilibiliLive.UID))) && !!!Live_info) {
+                if ((W.BilibiliLive === undefined || parseInt(W.BilibiliLive.UID) === 0 || isNaN(parseInt(W.BilibiliLive.UID)))) {
                     loadInfo(1000);
                     window.toast(`[${GM_info.script.name}]无配置信息`, 'warning');
                     MYDEBUG('无配置信息');
@@ -530,6 +530,12 @@
                 removeUntiSucceed('REMOVE_ELEMENT_player', 2);
             },
             creatSetBox: () => {//创建设置框
+                const eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter']//确保必要元素已加载
+                for (const ele of eleList) {
+                    if ($(ele).length == 0) {
+                        return delayCall(() => MY_API.creatSetBox(), 200);
+                    }
+                }
                 //添加按钮
                 const btnmsg = msgHide == 'hide' ? '显示窗口和提示信息' : '隐藏窗口和提示信息';
                 let btn = $(`<button style="display: inline-block; float: left; margin-right: 7px;background-color: #23ade5;color: #fff;border-radius: 4px;border: none; padding:4px; cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
@@ -559,7 +565,7 @@
                 });
                 $('.attention-btn-ctnr').append(btn);
                 let div = $('<div>');
-                let settingTableHeight = $(`.live-player-mounter`).height()
+                let settingTableHeight = $('.live-player-mounter').height()
                 div.css({
                     'width': 'auto',
                     'height': settingTableHeight,
@@ -1894,18 +1900,14 @@
                         if (re.data.biliCoin < coinNum) return re.data.biliCoin
                         else return coinNum
                     });
-                    if (throwCoinNum === 0) {
-                        return $.Deferred().resolve();
-                    } else if (throwCoinNum < coinNum) {
-                        window.toast(`[自动每日奖励][每日投币]剩余硬币不足，仅能投${throwCoinNum}个币`, 'warning');
-                    };
+                    if (throwCoinNum < coinNum) window.toast(`[自动每日奖励][每日投币]剩余硬币不足，仅能投${throwCoinNum}个币`, 'warning');
                     return BAPI.dynamic_svr.dynamic_new(Live_info.uid, 8).then((response) => {
                         MYDEBUG('DailyReward.dynamic: API.dynamic_svr.dynamic_new', response);
                         if (response.code === 0) {
                             if (!!response.data.cards) {
                                 const obj = JSON.parse(response.data.cards[0].card);
                                 const p1 = MY_API.DailyReward.watch(obj.aid, obj.cid);
-                                let p2 = undefined;
+                                let p2;
                                 if (MY_API.CONFIG.COIN_UID == 0 || MY_API.CONFIG.COIN_TYPE == 'COIN_DYN') {
                                     p2 = MY_API.DailyReward.coin(response.data.cards, Math.max(throwCoinNum, 0));
                                 } else {
