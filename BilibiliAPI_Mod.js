@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BilibiliAPI_mod
 // @namespace    https://github.com/andywang425
-// @version      1.4
+// @version      1.5
 // @description  BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上进行补充。
 // @author       SeaLoong,andywang425
 // @require      https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
@@ -586,6 +586,17 @@ var BilibiliAPI = {
                     owner_id: owner_id
                 }
             });
+        },
+        buy_medal: (master_uid, coin_type = 'metal', platform = 'android') => {
+            return BilibiliAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '//api.vc.bilibili.com/link_group/v1/member/buy_medal',
+                data: {
+                    master_uid: master_uid,
+                    coin_type: coin_type,      
+                    platform: platform,
+                },
+            })
         }
     },
     live: {
@@ -606,12 +617,12 @@ var BilibiliAPI = {
         }
     },
     live_user: {
-        get_anchor_in_room: (roomid) => {//获取直播间在线用户失效
+        get_anchor_in_room: (roomid) => {//获取主播信息
             return BilibiliAPI.ajax({
                 url: 'live_user/v1/UserInfo/get_anchor_in_room?roomid=' + roomid
             });
         },
-        get_info_in_room: (roomid) => {
+        get_info_in_room: (roomid) => {//获取直播间信息
             return BilibiliAPI.ajax({
                 url: 'live_user/v1/UserInfo/get_info_in_room?roomid=' + roomid
             });
