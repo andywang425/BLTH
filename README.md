@@ -19,9 +19,10 @@ _(带有Origin字样的为原格式脚本。gitcdn，jsdelivr访问快但可能�
 
 -------------------------------
 
-#### 使用方法 
+### 使用方法 
 在Tampermonkey中启用脚本，登陆bilibili后打开任意b站直播间。  
-#### 一些建议
+### 一些建议
+**本脚本加载的库文件较多，初次使用时若出现看不到控制面板的情况，请尝试刷新页面。**  
 启用脚本后不要参与小时榜和广播礼物的抽奖，重复抢次数多了会进小黑屋。  
 _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽奖，领银瓜子宝箱等，与主站无关。_  
 如果开启抽奖附加延迟，可能出现领不到礼物的情况，请降低或取消延迟。  
@@ -81,8 +82,6 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 + 送礼设置逻辑规则:  
   无论【优先高等级粉丝牌】如何设置，会根据【送满全部勋章】（勾选则无视是否到期补满亲密度，否则只送到期的）条件去按优先送礼房间先后顺序送礼。  
   之后根据【优先高等级粉丝牌】决定先送高级还是低级（勾选先高级，不勾选先低级）。  
-  1. 如果勾选了送满全部勋章且指定优先送礼房间，会先按顺序依次给优先送礼房间送礼（前提是你得有优先房间的粉丝勋章），无视礼物过期时间。之后若勾选了优先高等级粉丝牌，则按等级由高到低给剩余粉丝牌送礼。否则按等级由低到等高给剩余粉丝牌送礼。
-  2. 如果未勾选送满全部勋章但指定了优先送礼房间，那么会先给优先送礼房间送出即将过期礼物（前提是你得有优先房间的粉丝勋章）。然后若勾选了优先高等级粉丝牌，则给剩下粉丝勋章中等级由高到低的牌子送出即将过期礼物。否则按等级由低到高给剩余粉丝牌送出即将过期礼物。  
 + 不会送出永久礼物。  
 + 【剩余礼物】指送完了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。会在指定送礼时间被送出。  
 + 【剩余礼物送礼直播间】和【剩余礼物送礼直播间拥有者UID】必须对应。任意一项填0则不送剩余礼物。  
@@ -104,22 +103,22 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 + 这个功能目前处于实验阶段，且风险较大。  
 
 **关于内容屏蔽**  
-+ 【移除直播画面】本质上是删除了`bilibili-live-player`这个类，不能节省流量，但可以降低GPU使用率。  
-在不开播的房间也可以使用，会把直播画面区域背景变为纯白。  
++ 【拦截直播流并静音】若勾选了此选项，会拦截当前页面的所有直播流（包括为了获取小心心打开的隐形窗口）。勾选后需刷新网页才能生效。建议与【自动获取小心心】搭配使用。  
 
 **关于小心心**  
-+ 因为技术上的原因，目前通过在后台循环开关标签页的方式来获取小心心。  
-  几乎不占用cpu，gpu和带宽（除非你点进了脚本打开的标签页）。
-+ 检测到包裹内有一组24个7天的小心心后会停止打开标签页，并关闭之前打开的标签页。  
++ 因为技术上的原因，目前通过打开隐形窗口的方式来获取小心心。  
++ 检测到包裹内有一组24个7天的小心心后会停止，并关闭之前打开的隐形窗口。  
 + 在获取完所有小心心之前直播间不刷新。  
-+ 关闭（或刷新）运行脚本的网页后会关闭所有由脚本打开的标签页。  
-+ 点亮勋章指送出一个小心心。  
-+ 点亮勋章会在自动送礼之前进行。  
-+ 若不勾选【点亮勋章时忽略亲密度上限】，则仅会点亮当日剩余亲密度大于等于小心心亲密度的勋章。  
++ 关闭（或刷新）运行脚本的网页后会关闭所有由脚本打开的隐形窗口。  
++ 点亮勋章指送出一个小心心；点亮勋章会在自动送礼之前进行。    
++ 若不勾选【点亮勋章时忽略亲密度上限】，则仅会点亮当日剩余亲密度大于等于小心心亲密度的勋章。   
 + 勋章点亮模式说明
   + 白名单：点亮【自动点亮勋章房间号】所对应的粉丝勋章。
   + 黑名单：点亮所有粉丝勋章中除了【自动点亮勋章房间号】所对应勋章的粉丝勋章。  
   _提示：如果想点亮所有勋章，选黑名单然后不填写拥有勋章的房间号即可。_  
+
+**关于购买粉丝勋章**  
+调用官方api（`api.vc.bilibili.com/link_group/v1/member/buy_medal`），消耗20硬币购买某位UP的粉丝勋章。  
 
 **其它设置说明**  
 + 定时重载直播间是为了防止脚本因长时间运行出现bug。  
@@ -145,17 +144,22 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 + [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/BLRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
-+ <del>[bilibili-pcheartbeat](https://github.com/lkeme/bilibili-pcheartbeat) (GPL3) by [lkeme](https://github.com/lkeme/)</del>（现已弃用）  
++ [layer](https://github.com/sentsin/layer) (MIT) by [sentsin](https://github.com/sentsin)  
 
 本脚本使用的库：  
-+ [BilibiliAPI_Mod](https://github.com/andywang425/BLTH/blob/master/BilibiliAPI_Mod.js)：B站API及常用函数。  
-+ [OCRAD](https://github.com/antimatter15/ocrad.js)：识别领银瓜子宝箱验证码。  
-+ [libBilibiliToken](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveClientHeart/BiliveClientHeart.user.js)：获取移动端token。  
-+ <del>[bilibili-pcheartbeat](https://github.com/lkeme/bilibili-pcheartbeat)：计算PC心跳的请求参数`s`。</del>（现已弃用）  
++ [BilibiliAPI_Mod.js](https://github.com/andywang425/BLTH/blob/master/BilibiliAPI_Mod.js)：B站API及常用函数。  
++ [OCRAD.js](https://github.com/antimatter15/ocrad.js)：识别领银瓜子宝箱验证码。  
++ [libBilibiliToken.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveClientHeart/BiliveClientHeart.user.js)：获取移动端token。  
++ [layer.js](https://github.com/sentsin/layer)：创建弹窗，信息框等  
+
+本脚本引用的外部资源：
++ [layer.css](https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css)：layer.js的内置样式  
 
 感谢以上这些项目的作者~  
 
 ## 更新日志
+>### 4.1
+>获取小心心方式改为打开隐形窗口，效率更高更稳定；新增拦截直播流功能，建议与获取小心心配套使用；新增购买勋章功能  
 >### 4.0.3
 >修复在弱网条件下脚本窗口无法加载的问题；修复特殊情况下部分每日任务不运行的问题。  
 >### 4.0.2

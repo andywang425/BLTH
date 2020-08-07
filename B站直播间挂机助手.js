@@ -12,31 +12,50 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       4.0.3
+// @version       4.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
-// @run-at       document-end
+// @run-at       document-start
 // @connect      passport.bilibili.com
 // @connect      api.live.bilibili.com
 // @connect      live-trace.bilibili.com
 //@require https://cdn.jsdelivr.net/gh/jquery/jquery@3.2.1/dist/jquery.min.js
-//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.4/BilibiliAPI_Mod.min.js
-//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.2/OCRAD.min.js
-//@require https://cdn.jsdelivr.net/gh/andywang425/Bilibili-SGTH@v1.3.4/libBilibiliToken.user.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/BLTH@v2.1/BilibiliAPI_Mod.min.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/BLTH@v1.3.2/OCRAD.min.js
+//@require https://cdn.jsdelivr.net/gh/andywang425/BLTH@v1.3.4/libBilibiliToken.user.js
+//@require https:///cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/layer.js
+// @resource layerCss https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css
 // @grant       unsafeWindow
 // @grant       GM_xmlhttpRequest
 // @grant       GM_openInTab
+// @grant       GM_addStyle
+// @grant       GM_getResourceText
 // ==/UserScript==
 (function () {
-    let debugSwitch = true; //控制开关
-    let NAME = 'IGIFTMSG';
+    const NAME = 'IGIFTMSG';
+    const block_live = localStorage.getItem(`${NAME}_block_live`) || 'pass'; //UI隐藏开关
+    const originFetch = unsafeWindow.fetch;
+    if (block_live == 'block') {
+        unsafeWindow.fetch = (arg) => {
+            console.log('fetch arg', arg)
+            if (arg.indexOf('bilivideo.com') > -1) {
+                //拦截直播流
+                new Promise(() => {
+                    throw new Error();
+                });
+            } else {
+                return originFetch(arg);
+            }
+        }
+    }
+    const debugSwitch = true; //控制开关
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide'; //UI隐藏开关
-    let BAPI = BilibiliAPI;
+    const BAPI = BilibiliAPI;
     //let DanMuServerHost;
     let gift_join_try = 0;
     let guard_join_try = 0;
     let pk_join_try = 0;
     let SEND_GIFT_NOW = false;//立刻送出礼物
-    let openInTabCallBcak_list = [];
+    let layerIndex_list = [];
     let liveRoom_list = [];
     const tz_offset = new Date().getTimezoneOffset() + 480;
     const ts_ms = () => Date.now();//当前毫秒
@@ -264,7 +283,9 @@
                 'z-index': '10001';
             }
         </style>
-            `)
+            `);
+        const layerCss = GM_getResourceText('layerCss');
+        GM_addStyle(layerCss);
     }
     function init() {//API初始化
         const MY_API = {
@@ -278,6 +299,7 @@
                 COIN_NUMBER: 0,//投币数量
                 COIN_TYPE: "COIN_DYN",//投币方法 动态/UID
                 COIN_UID: 0,//投币up主
+                BLOCK_LIVE_VIDEO: false,//拦截直播流并静音
                 EXCLUDE_ROOMID: "0",//送礼排除房间号
                 FORCE_LOTTERY: false,//黑屋强制抽奖
                 FORCE_LIGHT: false,//忽略亲密上限点亮
@@ -290,7 +312,7 @@
                 IN_TIME_RELOAD_DISABLE: false,//休眠时段是否禁止刷新直播间 false为刷新
                 LIVE_SIGN: true,//直播区签到
                 LOGIN: true,//主站登陆
-                LITTLE_HEART: false,//跳转房间获取小心心
+                LITTLE_HEART: false,//打开隐形窗口获取小心心
                 LIGHT_MEDALS: "0",//点亮勋章
                 LIGHT_METHOD: "LIGHT_WHITE",
                 MAX_GIFT: 99999,//辣条上限
@@ -301,7 +323,6 @@
                 RANDOM_SKIP: 0,//随机跳过抽奖概率
                 REMOVE_ELEMENT_2233: false,//移除2233
                 REMOVE_ELEMENT_july: false,//移除夏日活动入口
-                REMOVE_ELEMENT_player: false,//移除直播画面并静音
                 RND_DELAY_END: 5,//延迟最大值
                 RND_DELAY_START: 2,//延迟最小值
                 SEND_ALL_GIFT: false,//送满全部勋章
@@ -525,6 +546,13 @@
                         }, 200);
                     }
                 };
+                const mute = () => {
+                    window.localStorage["videoVolume"] = 0;
+                    if (!!!window.localStorage["videoVolume"]) {
+                        delayCall(() => mute, 200);
+                    }
+                }
+                if(MY_API.CONFIG.BLOCK_LIVE_VIDEO) mute();    
                 removeUntiSucceed('REMOVE_ELEMENT_2233', 0);
                 removeUntiSucceed('REMOVE_ELEMENT_july', 1);
                 removeUntiSucceed('REMOVE_ELEMENT_player', 2);
@@ -767,34 +795,22 @@
             
                 <div id="right_fieldset" style="float:left;">
                     <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">说明</legend>
-                        自动送礼目前只会送出辣条，亿圆和小心心。<br>
-                        礼物到期时间: 将要在这个时间段里过期的礼物会被送出<br>
-                        勾选送满全部勋章时无论是否将要过期都会被送出<br>
-                        如果要填写多个优先送礼房间，<br>
-                        每个房间号之间需用半角逗号,隔开。(不送礼房间，自动点亮勋章房间号同理)<br>
-                        如 666,777,888。为0则不送。<br>
-                        如果没有这些房间的粉丝牌也不送。<br>
-                        无论【优先高等级粉丝牌】如何设置，会根据【送满全部勋章】<br>
-                        （勾选则补满，否则只送到期的）条件去按优先送礼房间先后顺序送礼。<br>
-                        之后根据【优先高等级粉丝牌】决定先送高级还是低级（勾选先高级，不勾选先低级）。<br>
-                        剩余礼物:指送完了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。<br>
-                        剩余礼物也会在指定送礼时间被送出。<br>
-                        参与节奏风暴风险较大，如果没有实名可能无法参加。<br>
-                        脚本仅能参加广播中的节奏风暴。<br>
-                        【给用户(UID:___)的视频投币】若填0则给动态中的视频依次投币(因为无UID为0的用户)
-            
+                        <legend style="color: black">购买粉丝勋章</legend>
+                        <div data-toggle="BUY_MEDAL" style="color: black; line-height: 15px">
+                        输入粉丝勋章对应房间号：<input class="num igiftMsg_input" type="text" style="width: 60px">
+                        <button  class="igiftMsg_btn" data-action="buy_medal">点击购买勋章</button>
+                    </div>
                     </fieldset>
                     <fieldset class="igiftMsg_fs">
                         <legend style="color: black">小心心</legend>
                         <div data-toggle="LITTLE_HEART" style="line-height: 15px">
                             <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox"> 自动后台循环开关标签页获取小心心
+                                <input style="vertical-align: text-top;" type="checkbox"> 自动获取小心心
                             </label>
                         </div>
                         <div data-toggle="MAX_TAB" style="line-height: 15px">
                         <label style="margin: 5px auto; color: black">
-                            打开标签页数量上限
+                            打开窗口数量上限
                             <input class="num igiftMsg_input" type="text" style="width: 30px;">
                         </label>
                     </div>
@@ -832,9 +848,9 @@
                                 <input style="vertical-align: text-top;" type="checkbox"> 移除夏日活动入口
                             </label>
                         </div>
-                        <div data-toggle="REMOVE_ELEMENT_player" style="line-height: 15px">
+                        <div data-toggle="BLOCK_LIVE_VIDEO" style="line-height: 15px">
                         <label style="margin: 5px auto; color: black">
-                            <input style="vertical-align: text-top;" type="checkbox"> 移除直播画面
+                            <input style="vertical-align: text-top;" type="checkbox"> 拦截直播流并静音
                         </label>
                     </div>
                     </fieldset>
@@ -1035,8 +1051,45 @@
                     MY_API.CONFIG.MAX_TAB = val;
                     MY_API.saveConfig();
                 };
+                function buyFanMedal(room_id) {
+                    return BAPI.live_user.get_anchor_in_room(room_id).then(function (response) {
+                        MYDEBUG('API.live_user.get_anchor_in_room response', response)
+                        if (response.code === 0) {
+                            layer.confirm(`是否消耗20硬币购买主播【${response.data.info.uname}】的粉丝勋章？`, {
+                                title: '购买勋章',
+                                btn: ['是', '否'] //按钮
+                            }, function () {
+                                return BAPI.link_group.buy_medal(response.data.info.uid).then((re) => {
+                                    MYDEBUG('API.link_group.buy_medal re', re);
+                                    if (re.code === 0) {
+                                        layer.msg('✔ 购买成功', {
+                                            time: 2000
+                                        });
+                                    } else {
+                                        layer.msg(`❌ 购买失败 ${re.message}`, {
+                                            time: 2500
+                                        });
+                                    }
+                                })
+                            }, function () {
+                                layer.msg('已取消购买', {
+                                    time: 2000
+                                });
+                            });
+
+                        } else {
+                            layer.msg(`检查房间出错 ${response.message}`, {
+                                time: 2500
+                            });
+                        }
+                    });
+                }
                 div.find('div[id="giftCount"] [data-action="save"]').click(() => {//保存按钮
                     saveAction();
+                });
+                div.find('div[data-toggle="BUY_MEDAL"] [data-action="buy_medal"]').click(function () {//购买勋章
+                    const room_id = parseInt(div.find('div[data-toggle="BUY_MEDAL"] .num').val());
+                    buyFanMedal(room_id);
                 });
 
                 div.find('button[data-action="reset"]').click(() => {//重置按钮
@@ -1085,7 +1138,7 @@
                     'LITTLE_HEART',
                     'REMOVE_ELEMENT_2233',
                     'REMOVE_ELEMENT_july',
-                    'REMOVE_ELEMENT_player',
+                    'BLOCK_LIVE_VIDEO',
                     "FORCE_LIGHT"
                 ];
                 for (let i of checkList) {//绑定所有checkbox事件
@@ -1096,6 +1149,11 @@
                         MY_API.saveConfig()
                     });
                 };
+                if (MY_API.CONFIG.BLOCK_LIVE_VIDEO) {
+                    localStorage.setItem(`${NAME}_block_live`, 'block');
+                } else {
+                    localStorage.setItem(`${NAME}_block_live`, 'pass');
+                }
                 $('input:text').bind('keydown', function (event) {//绑定回车保存
                     if (event.keyCode == "13") {
                         saveAction();
@@ -3018,25 +3076,47 @@
                 },
                 doHeartBeat: async (roomId) => {
                     if (liveRoom_list.indexOf(roomId) == -1) return
-                    window.toast(`[小心心]在新标签页中打开房间${roomId}【请勿点击】`, 'info');
+                    //window.toast(`[小心心]在新标签页中打开房间${roomId}【请勿点击】`, 'info');
                     MYDEBUG('[小心心]打开标签页房间', liveRoom_list);
-                    let openInTabCallBcak = await GM_openInTab(`https://live.bilibili.com/${String(roomId)}`, 'loadInBackground');
-                    openInTabCallBcak_list.push(openInTabCallBcak);
-                    let tabTimer = setInterval(async () => {
-                        ;
-                        if (openInTabCallBcak != undefined) openInTabCallBcak.close();
+                    const index = layer.open({
+                        title: `${roomId}`,
+                        type: 2,
+                        shade: 0,
+                        content: `https://live.bilibili.com/${roomId}`,
+                        success: function (layero, index) {
+                            MYDEBUG(`[小心心]房间${roomId}`, `layero = ${layero}, index = ${index}`)
+                            const originFetch = unsafeWindow.fetch;
+                            unsafeWindow.fetch = (arg) => {
+                                if (arg.indexOf('bilivideo.com') > -1) {
+                                    //拦截直播流
+                                    new Promise(() => {
+                                        throw new Error();
+                                    });
+                                }
+                                else {
+                                    return originFetch(arg);
+                                }
+                            }
+                        },
+                        end: () => {
+                            clearInterval(Timer);
+                            delListItem(roomId, liveRoom_list);
+                            delListItem(index, layerIndex_list)
+                        }
+                    });
+                    layer.style(index, { // 隐藏弹窗
+                        display: 'none',
+                    });
+                    let Timer = setInterval(async () => {
                         if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
-                            clearInterval(tabTimer);
+                            clearInterval(Timer);
                             MYDEBUG('[小心心]', `今日任务完成，房间${roomId}不再打开`);
                             return
                         }
-                        if (MY_API.LITTLE_HEART.checkRoom(roomId)) {
-                            openInTabCallBcak = await GM_openInTab(`https://live.bilibili.com/${String(roomId)}`, 'loadInBackground');
-                        } else {//不开播则删除房间记录，重新运行run
-                            window.toast(`[小心心]房间${roomId}下播，即将再次寻找开播房间`, 'info');
-                            clearInterval(tabTimer);
-                            delListItem(roomId, liveRoom_list);
-                            delListItem(openInTabCallBcak, openInTabCallBcak_list)
+                        if (!MY_API.LITTLE_HEART.checkRoom(roomId)) {
+                            //不开播则删除房间记录，重新运行run
+                            window.toast(`[小心心]房间${roomId}下播，再次寻找开播房间`, 'info');
+                            layer.close(index);
                             return MY_API.LITTLE_HEART.run();
                         }
                     }, 310e3);
@@ -3053,9 +3133,8 @@
                                 window.toast('[小心心]今日小心心已全部获取', 'success');
                                 MY_API.CACHE.LittleHeart_TS = ts_ms();
                                 MY_API.saveCache();
-                                MYDEBUG('[小心心]', openInTabCallBcak_list)
-                                closeAllTab(openInTabCallBcak_list);
-                                return
+                                closeAllIndex(layerIndex_list);
+                                return runMidnight(MY_API.LITTLE_HEART.run, "获取小心心");
                             }
                         })
                     }
@@ -3068,13 +3147,25 @@
                 run: async () => {
                     if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
                     if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
-                        //window.toast('[小心心]今日小心心已全部获取', 'success');
-                        //closeAllTab(openInTabCallBcak_list);
-                        return $.Deferred().resolve();
+                        return runMidnight(MY_API.LITTLE_HEART.run, "获取小心心");
+                    }
+                    if (!MY_API.CONFIG.BLOCK_LIVE_VIDEO) {
+                        layer.confirm('若不勾选【拦截直播流并静音】将耗费大量流量，是否继续？', {
+                            title: '警告',
+                            btn: ['是', '否'] //按钮
+                        }, function () {
+                            layer.msg('那算了╮(￣▽￣)╭',{
+                                time: 2000
+                            })
+                        }, function () {
+                            layer.msg('勾选【拦截直播流并静音】后需刷新页面使其生效', {
+                                time: 2500
+                            });
+                        });
                     }
                     await MY_API.LITTLE_HEART.getMedalRoomList();
-                    let room_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                    liveRoom_list = room_list.filter(r => !liveRoom_list.includes(r));
+                    liveRoom_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
+                    //liveRoom_list = room_list.filter(r => !liveRoom_list.includes(r));
                     let tabNum = 0;
                     for (let room of liveRoom_list) {
                         if (tabNum < MY_API.CONFIG.MAX_TAB) {
@@ -3097,6 +3188,7 @@
                     const t = Date.now();
                     if (t - MY_API.CACHE.UNIQUE_CHECK >= 0 && t - MY_API.CACHE.UNIQUE_CHECK <= 15e3) {
                         // 其他脚本正在运行
+                        unsafeWindow.fetch = originFetch;
                         $('.link-toast').hide();
                         $('.igiftMsg').hide();
                         MY_API.CONFIG.AUTO_TREASUREBOX = false;
@@ -3120,7 +3212,7 @@
                             MY_API.CACHE.UNIQUE_CHECK = 0;
                             MY_API.saveCache();
                         }
-                        closeAllTab(openInTabCallBcak_list);
+                        closeAllIndex(layerIndex_list);
                     });
                     uniqueMark();
                     if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid))) {//登陆判断
@@ -3290,14 +3382,13 @@
     }
 
     /**
-     * 关闭所有打开的标签
-     * @param item 元素
-     * @param list 数组
+     * 关闭所有由layer打开的index
+     * @param layerIndex_list 数组
      */
-    function closeAllTab(tabCallBack_list) {
-        if (tabCallBack_list != undefined) {
-            for (let tab of tabCallBack_list) {
-                tab.close();
+    function closeAllIndex(list) {
+        if (list != undefined) {
+            for (const Index of list) {
+                layer.close(Index)
             }
         }
         return
