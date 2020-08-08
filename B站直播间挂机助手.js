@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       4.1
+// @version       4.1.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-start
 // @connect      passport.bilibili.com
@@ -33,17 +33,18 @@
 (function () {
     const NAME = 'IGIFTMSG';
     const block_live = localStorage.getItem(`${NAME}_block_live`) || 'pass'; //UI隐藏开关
-    const originFetch = unsafeWindow.fetch;
+    const originFetch = fetch;
     if (block_live == 'block') {
-        unsafeWindow.fetch = (arg) => {
-            console.log('fetch arg', arg)
-            if (arg.indexOf('bilivideo.com') > -1) {
-                //拦截直播流
-                new Promise(() => {
+        unsafeWindow.fetch = (...arg) => {
+            console.log('fetch arg', ...arg);
+            if (arg[0].indexOf('bilivideo.com') > -1) {
+                //console.log('拦截直播流')
+                return new Promise(() => {
                     throw new Error();
                 });
             } else {
-                return originFetch(arg);
+                //console.log('通过')
+                return originFetch(...arg);
             }
         }
     }
@@ -317,12 +318,12 @@
                 LIGHT_METHOD: "LIGHT_WHITE",
                 MAX_GIFT: 99999,//辣条上限
                 MAX_TAB: 5,//标签页上限
-                MOBILE_HEARTBEAT: true,//移动端心跳
+                MOBILE_HEARTBEAT: false,//移动端心跳
                 RANDOM_DELAY: true,//抽奖随机延迟
                 RANDOM_SEND_DANMU: 0,//随机弹幕发送概率
                 RANDOM_SKIP: 0,//随机跳过抽奖概率
                 REMOVE_ELEMENT_2233: false,//移除2233
-                REMOVE_ELEMENT_july: false,//移除夏日活动入口
+                REMOVE_ELEMENT_activity: false,//移除夏日活动入口
                 RND_DELAY_END: 5,//延迟最大值
                 RND_DELAY_START: 2,//延迟最小值
                 SEND_ALL_GIFT: false,//送满全部勋章
@@ -532,7 +533,7 @@
             removeUnnecessary: () => {//移除不必要的页面元素
                 let unnecessaryList = [
                     '#my-dear-haruna-vm',//2233
-                    '.july-activity-entry',//活动入口
+                    '.activity-entry',//活动入口
                     '.bilibili-live-player'
                 ];
                 const removeUntiSucceed = (settingName, list_id) => {
@@ -554,7 +555,7 @@
                 }
                 if(MY_API.CONFIG.BLOCK_LIVE_VIDEO) mute();    
                 removeUntiSucceed('REMOVE_ELEMENT_2233', 0);
-                removeUntiSucceed('REMOVE_ELEMENT_july', 1);
+                removeUntiSucceed('REMOVE_ELEMENT_activity', 1);
                 removeUntiSucceed('REMOVE_ELEMENT_player', 2);
             },
             creatSetBox: () => {//创建设置框
@@ -843,9 +844,9 @@
                                 <input style="vertical-align: text-top;" type="checkbox"> 移除2233模型
                             </label>
                         </div>
-                        <div data-toggle="REMOVE_ELEMENT_july" style="line-height: 15px">
+                        <div data-toggle="REMOVE_ELEMENT_activity" style="line-height: 15px">
                             <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox"> 移除夏日活动入口
+                                <input style="vertical-align: text-top;" type="checkbox"> 移除活动入口
                             </label>
                         </div>
                         <div data-toggle="BLOCK_LIVE_VIDEO" style="line-height: 15px">
@@ -1137,7 +1138,7 @@
                     'STORM',
                     'LITTLE_HEART',
                     'REMOVE_ELEMENT_2233',
-                    'REMOVE_ELEMENT_july',
+                    'REMOVE_ELEMENT_activity',
                     'BLOCK_LIVE_VIDEO',
                     "FORCE_LIGHT"
                 ];
@@ -1146,14 +1147,14 @@
                     if (MY_API.CONFIG[i]) input.attr('checked', '');
                     input.change(function () {
                         MY_API.CONFIG[i] = $(this).prop('checked');
-                        MY_API.saveConfig()
+                        MY_API.saveConfig();
+                        if (MY_API.CONFIG.BLOCK_LIVE_VIDEO) {
+                            localStorage.setItem(`${NAME}_block_live`, 'block');
+                        } else {
+                            localStorage.setItem(`${NAME}_block_live`, 'pass');
+                        }
                     });
                 };
-                if (MY_API.CONFIG.BLOCK_LIVE_VIDEO) {
-                    localStorage.setItem(`${NAME}_block_live`, 'block');
-                } else {
-                    localStorage.setItem(`${NAME}_block_live`, 'pass');
-                }
                 $('input:text').bind('keydown', function (event) {//绑定回车保存
                     if (event.keyCode == "13") {
                         saveAction();
@@ -3076,28 +3077,12 @@
                 },
                 doHeartBeat: async (roomId) => {
                     if (liveRoom_list.indexOf(roomId) == -1) return
-                    //window.toast(`[小心心]在新标签页中打开房间${roomId}【请勿点击】`, 'info');
                     MYDEBUG('[小心心]打开标签页房间', liveRoom_list);
                     const index = layer.open({
                         title: `${roomId}`,
                         type: 2,
                         shade: 0,
                         content: `https://live.bilibili.com/${roomId}`,
-                        success: function (layero, index) {
-                            MYDEBUG(`[小心心]房间${roomId}`, `layero = ${layero}, index = ${index}`)
-                            const originFetch = unsafeWindow.fetch;
-                            unsafeWindow.fetch = (arg) => {
-                                if (arg.indexOf('bilivideo.com') > -1) {
-                                    //拦截直播流
-                                    new Promise(() => {
-                                        throw new Error();
-                                    });
-                                }
-                                else {
-                                    return originFetch(arg);
-                                }
-                            }
-                        },
                         end: () => {
                             clearInterval(Timer);
                             delListItem(roomId, liveRoom_list);
@@ -3107,6 +3092,7 @@
                     layer.style(index, { // 隐藏弹窗
                         display: 'none',
                     });
+                    layerIndex_list.push(index);
                     let Timer = setInterval(async () => {
                         if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
                             clearInterval(Timer);
@@ -3165,7 +3151,6 @@
                     }
                     await MY_API.LITTLE_HEART.getMedalRoomList();
                     liveRoom_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                    //liveRoom_list = room_list.filter(r => !liveRoom_list.includes(r));
                     let tabNum = 0;
                     for (let room of liveRoom_list) {
                         if (tabNum < MY_API.CONFIG.MAX_TAB) {
@@ -3175,7 +3160,7 @@
                             break;
                         }
                     };
-                    MY_API.LITTLE_HEART.checkHeart();
+                    MY_API.LITTLE_HEART.checkHeart();  
                     return
                 }
             }
