@@ -10,12 +10,10 @@
 
 ### 点击以下任一链接安装脚本
 ### 1.githubusercontent源：[BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
-### 2.gitcdn源：[BLTH_gitcdn](https://gitcdn.xyz/repo/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
-### 3.jsdelivr源：[BLTH_jsdelivr](https://cdn.jsdelivr.net/gh/andywang425/BLTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
-### 4.greasyfork源： [BLTH_Origin_greasyfork](https://greasyfork.org/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B/code/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
-### 5.openuserjs源：[BLTH_Origin_openuserjs](https://openuserjs.org/install/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
+### 2.greasyfork源： [BLTH_Origin_greasyfork](https://greasyfork.org/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B/code/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
+### 3.openuserjs源：[BLTH_Origin_openuserjs](https://openuserjs.org/install/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
 
-_(带有Origin字样的为原格式脚本。gitcdn，jsdelivr访问快但可能不是最新版)_
+_(带有Origin字样的为原格式脚本)_
 
 -------------------------------
 
@@ -32,31 +30,39 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 辣条交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天或者提点建议~    
 ## 功能细节 
 
-_脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到。_  
+脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到。
+点击**直播画面上方**按钮隐藏/显示脚本窗口和提示信息。    
+
+<details>
+<summary>自动抽奖</summary>
+
 + 抽奖前随机延迟  
 + 特定时段不参与抽奖  
 + 随机跳过抽奖  
 + 能设置当天最多抢辣条数量  
 + 抽奖前模拟进入目标房间  
-+ 抽奖前概率发送活跃弹幕（防检测）  
-+ 点击**直播画面上方**按钮隐藏/显示脚本窗口和提示信息  
++ 抽奖前发送活跃弹幕（防检测）  
 + 进入小黑屋后强制重复抽奖直到成功，最多尝试5次  
-+ 屏蔽不必要的页面元素  
-+ 定时刷新直播间  
-+ 自动完成每日任务  
-   1.登陆主站  
-   2.观看视频  
-   3.自动投币，可指定给某用户的视频投币  
-   4.分享视频  
-   5.银瓜子换硬币  
-   6.直播区签到  
-   7.应援团签到  
-   8.自动领银瓜子宝箱  
-   9.模拟移动端心跳（现在没用，暂时保留）  
-+ 自动后台循环开关标签页获取小心心  
-+ 自动点亮勋章
+</details>
+<details>
+<summary>自动完成每日任务</summary>  
+
+    1.登陆主站  
+    2.观看视频  
+    3.自动投币，可指定给某用户的视频投币  
+    4.分享视频  
+    5.银瓜子换硬币  
+    6.直播区签到  
+    7.应援团签到  
+    8.自动领银瓜子宝箱  
+    9.模拟移动端心跳（现在没用，暂时保留）  
+</details>
+
++ 自动获取小心心  
++ 自动点亮勋章  
 + 自动送礼  
 + 快捷购买粉丝勋章  
++ 屏蔽不必要的内容  
 
 以上功能涉及参数可自定义。  
 ## 说明
@@ -70,7 +76,7 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 原格式的脚本为[B站直播间挂机助手.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)。  
 
 **关于输入数据格式**  
-+ 浮点数(小数)或整数: 抽奖前附加随机延迟，随机跳过礼物，抽奖时概率发送活跃弹幕。  
++ 浮点数(小数)或整数: 抽奖前附加随机延迟，随机跳过礼物。  
 + 数组(或单个整数): 优先送礼房间，不送礼房间, 自动点亮勋章房间号。  
 + 其余只支持整数。  
 
@@ -107,7 +113,7 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 + 【拦截直播流并静音】若勾选了此选项，会拦截当前页面的所有直播流（包括为了获取小心心打开的隐形窗口）。勾选后需刷新网页才能生效。建议与【自动获取小心心】搭配使用。  
 
 **关于小心心**  
-+ 因为技术上的原因，目前通过打开隐形窗口的方式来获取小心心。  
++ 因为技术上的原因，目前通过打开隐形窗口的方式来获取小心心。若出现卡顿，浏览器崩溃等情况，请把【打开窗口数量上限】的值调小。  
 + 检测到包裹内有一组24个7天的小心心后会停止，并关闭之前打开的隐形窗口。  
 + 在获取完所有小心心之前直播间不刷新。  
 + 关闭（或刷新）运行脚本的网页后会关闭所有由脚本打开的隐形窗口。  
@@ -120,6 +126,7 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 
 **关于购买粉丝勋章**  
 调用官方api（`api.vc.bilibili.com/link_group/v1/member/buy_medal`），消耗20硬币购买某位UP的粉丝勋章。  
+默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。  
 
 **其它设置说明**  
 + 定时重载直播间是为了防止脚本因长时间运行出现bug。  
@@ -142,7 +149,7 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 ![MIT License](https://img.shields.io/badge/license-MIT-green)  
 ## 其它信息  
 这个项目的部分代码来源于以下几个项目:  
-+ [b站直播心心助手](https://greasyfork.org/en/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E8%87%AA%E5%8A%A8%E6%8A%A2%E8%BE%A3%E6%9D%A1%E4%BA%8C%E4%BB%A3by%E5%8D%81%E5%85%AD%E5%A4%9C) (MIT) by [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)
++ [b站直播心心助手](https://greasyfork.org/zh-CN/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E5%BF%83%E5%BF%83%E5%8A%A9%E6%89%8B) (MIT) by [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)
 + [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/BLRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
@@ -160,7 +167,7 @@ _脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到�
 感谢以上这些项目的作者~  
 
 ## 更新日志
->### 4.1.1
->bug fix：1. 拦截直播流误伤其它脚本请求 2.移除活动入口失效 3.小心心获取完后未关闭iframe层窗口  
+>### 4.1.2
+>修复拦截直播流失效的问题；拦截直播流不再拦截当前所在观看的直播。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  

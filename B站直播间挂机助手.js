@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       4.1.1
+// @version       4.1.2
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-start
 // @connect      passport.bilibili.com
@@ -32,22 +32,14 @@
 // ==/UserScript==
 (function () {
     const NAME = 'IGIFTMSG';
-    const block_live = localStorage.getItem(`${NAME}_block_live`) || 'pass'; //UI隐藏开关
+    const block_live = localStorage.getItem(`${NAME}_block_live`) || 'pass';
     const originFetch = fetch;
+    blockLiveStream();
     if (block_live == 'block') {
-        unsafeWindow.fetch = (...arg) => {
-            console.log('fetch arg', ...arg);
-            if (arg[0].indexOf('bilivideo.com') > -1) {
-                //console.log('拦截直播流')
-                return new Promise(() => {
-                    throw new Error();
-                });
-            } else {
-                //console.log('通过')
-                return originFetch(...arg);
-            }
-        }
-    }
+        setInterval(() => {
+            blockLiveStream();
+        }, 2000);
+    };
     const debugSwitch = true; //控制开关
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide'; //UI隐藏开关
     const BAPI = BilibiliAPI;
@@ -300,7 +292,7 @@
                 COIN_NUMBER: 0,//投币数量
                 COIN_TYPE: "COIN_DYN",//投币方法 动态/UID
                 COIN_UID: 0,//投币up主
-                BLOCK_LIVE_VIDEO: false,//拦截直播流并静音
+                BLOCK_LIVE_VIDEO: true,//拦截挂小心心打开窗口的直播流并静音
                 EXCLUDE_ROOMID: "0",//送礼排除房间号
                 FORCE_LOTTERY: false,//黑屋强制抽奖
                 FORCE_LIGHT: false,//忽略亲密上限点亮
@@ -433,22 +425,19 @@
                 return p
             },
             newMessage: (version) => {
-                let newMsg = `${version}更新提示：\n
-                请阅读一下脚本说明中的小心心部分，获取方式有变动。\n
-                等b站删除辣条后脚本会改名(目前好像就剩个流星雨有抽奖了)，
-                （greasyfork用户可忽略以下部分）所以更新链接也会变化。
-                改名后，我会发布B站直播自动抢辣条的最终版本。
-                安装这个版本后脚本会提示你安装改名后的新脚本。\n
-                本提示在每个版本仅会出现一次。`;
                 try {
                     let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '3.9') &&
-                        version == '3.9') { //更新公告时需要修改
-                        alert(newMsg);
+                    if ((cache == undefined || cache == null || cache != '4.1.2') &&
+                        version == '4.1.2') { //更新公告时需要修改
+                        layer.open({
+                            title: `${version}更新提示`,
+                            content: `目前拦截直播流功能不会拦截你所正在观看的直播啦。
+                            由于b站最近更新较多，拦截直播流功能可能还会失效。`
+                          });
                         localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
                     }
                 } catch (e) {
-                    MYDEBUG('提示信息CACHE载入配置失败', e);
+                    MYDEBUG('提示信息CACHE载入失败', e);
                 }
             },
             saveConfig: () => {//保存配置函数
@@ -553,7 +542,7 @@
                         delayCall(() => mute, 200);
                     }
                 }
-                if(MY_API.CONFIG.BLOCK_LIVE_VIDEO) mute();    
+                if (MY_API.CONFIG.BLOCK_LIVE_VIDEO) mute();
                 removeUntiSucceed('REMOVE_ELEMENT_2233', 0);
                 removeUntiSucceed('REMOVE_ELEMENT_activity', 1);
                 removeUntiSucceed('REMOVE_ELEMENT_player', 2);
@@ -798,8 +787,9 @@
                     <fieldset class="igiftMsg_fs">
                         <legend style="color: black">购买粉丝勋章</legend>
                         <div data-toggle="BUY_MEDAL" style="color: black; line-height: 15px">
-                        输入粉丝勋章对应房间号：<input class="num igiftMsg_input" type="text" style="width: 60px">
+                        输入粉丝勋章对应房间号：<input class="num igiftMsg_input" type="text" value = ${Live_info.room_id} onclick="select();" style="width: 70px">
                         <button  class="igiftMsg_btn" data-action="buy_medal">点击购买勋章</button>
+                        （花费20硬币）
                     </div>
                     </fieldset>
                     <fieldset class="igiftMsg_fs">
@@ -851,7 +841,7 @@
                         </div>
                         <div data-toggle="BLOCK_LIVE_VIDEO" style="line-height: 15px">
                         <label style="margin: 5px auto; color: black">
-                            <input style="vertical-align: text-top;" type="checkbox"> 拦截直播流并静音
+                            <input style="vertical-align: text-top;" type="checkbox"> 拦截挂小心心打开窗口的直播流并静音
                         </label>
                     </div>
                     </fieldset>
@@ -1056,7 +1046,7 @@
                     return BAPI.live_user.get_anchor_in_room(room_id).then(function (response) {
                         MYDEBUG('API.live_user.get_anchor_in_room response', response)
                         if (response.code === 0) {
-                            layer.confirm(`是否消耗20硬币购买主播【${response.data.info.uname}】的粉丝勋章？`, {
+                            layer.confirm(`是否消耗20硬币购买UP主【${response.data.info.uname}】的粉丝勋章？`, {
                                 title: '购买勋章',
                                 btn: ['是', '否'] //按钮
                             }, function () {
@@ -3082,7 +3072,7 @@
                         title: `${roomId}`,
                         type: 2,
                         shade: 0,
-                        content: `https://live.bilibili.com/${roomId}`,
+                        content: `https://live.bilibili.com/${roomId}?cut`,
                         end: () => {
                             clearInterval(Timer);
                             delListItem(roomId, liveRoom_list);
@@ -3130,37 +3120,42 @@
                     }, 300e3);
                     return
                 },
-                run: async () => {
+                run: () => {
                     if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
                     if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
                         return runMidnight(MY_API.LITTLE_HEART.run, "获取小心心");
-                    }
+                    };
+                    const runFunc = async () => {
+                        await MY_API.LITTLE_HEART.getMedalRoomList();
+                        liveRoom_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
+                        let tabNum = 0;
+                        for (let room of liveRoom_list) {
+                            if (tabNum < MY_API.CONFIG.MAX_TAB) {
+                                await MY_API.LITTLE_HEART.doHeartBeat(room);
+                                tabNum++;
+                            } else {
+                                break;
+                            }
+                        };
+                        MY_API.LITTLE_HEART.checkHeart();
+                    };
                     if (!MY_API.CONFIG.BLOCK_LIVE_VIDEO) {
-                        layer.confirm('若不勾选【拦截直播流并静音】将耗费大量流量，是否继续？', {
+                        layer.confirm('若不勾选【拦截挂小心心打开窗口的直播流并静音】将耗费大量流量，是否继续？', {
                             title: '警告',
                             btn: ['是', '否'] //按钮
-                        }, function () {
-                            layer.msg('那算了╮(￣▽￣)╭',{
+                        }, async () => {
+                            layer.msg('那算了╮(￣▽￣)╭', {
                                 time: 2000
-                            })
+                            });
+                            runFunc();
                         }, function () {
-                            layer.msg('勾选【拦截直播流并静音】后需刷新页面使其生效', {
+                            layer.msg('勾选【拦截挂小心心打开窗口的直播流并静音】后需刷新页面使其生效', {
                                 time: 2500
                             });
                         });
+                    } else {
+                        runFunc();
                     }
-                    await MY_API.LITTLE_HEART.getMedalRoomList();
-                    liveRoom_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                    let tabNum = 0;
-                    for (let room of liveRoom_list) {
-                        if (tabNum < MY_API.CONFIG.MAX_TAB) {
-                            await MY_API.LITTLE_HEART.doHeartBeat(room);
-                            tabNum++;
-                        } else {
-                            break;
-                        }
-                    };
-                    MY_API.LITTLE_HEART.checkHeart();  
                     return
                 }
             }
@@ -3173,14 +3168,13 @@
                     const t = Date.now();
                     if (t - MY_API.CACHE.UNIQUE_CHECK >= 0 && t - MY_API.CACHE.UNIQUE_CHECK <= 15e3) {
                         // 其他脚本正在运行
-                        unsafeWindow.fetch = originFetch;
                         $('.link-toast').hide();
                         $('.igiftMsg').hide();
                         MY_API.CONFIG.AUTO_TREASUREBOX = false;
                         window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
                         return promiseInit.reject();
                     } else {
-                        // 没有其他脚本正在运行
+                        // 没有其他脚本正在运行 /https?:\/\/live\.bilibili\.com\/.*\?cut/.test(window.location.href)
                         return promiseInit.resolve();
                     }
                 };
@@ -3378,6 +3372,20 @@
         }
         return
     }
+    function blockLiveStream() {
+        unsafeWindow.fetch = (...arg) => {
+            console.log('fetch arg', ...arg);
+            if (arg[0].indexOf('bilivideo.com') > -1 && /https?:\/\/live\.bilibili\.com\/.*\?cut/.test(window.location.href)) {
+                console.log('拦截直播流')
+                return //new Promise(() => {
+                //throw new Error();
+                //});
+            } else {
+                console.log('通过')
+                return originFetch(...arg);
+            }
+        }
+    };
     /**
      * （1000000000） 获取到明天的目标时间戳所在的相同【时间点】所需时间（毫秒）
      * @param date 整数 时间戳
