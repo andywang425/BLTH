@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       4.1.2
+// @version       4.1.3
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-start
 // @connect      passport.bilibili.com
@@ -23,19 +23,17 @@
 //@require https://cdn.jsdelivr.net/gh/andywang425/BLTH@v1.3.2/OCRAD.min.js
 //@require https://cdn.jsdelivr.net/gh/andywang425/BLTH@v1.3.4/libBilibiliToken.user.js
 //@require https:///cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/layer.js
-// @resource layerCss https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css
 // @grant       unsafeWindow
 // @grant       GM_xmlhttpRequest
 // @grant       GM_openInTab
-// @grant       GM_addStyle
 // @grant       GM_getResourceText
 // ==/UserScript==
 (function () {
     const NAME = 'IGIFTMSG';
     const block_live = localStorage.getItem(`${NAME}_block_live`) || 'pass';
     const originFetch = fetch;
-    blockLiveStream();
     if (block_live == 'block') {
+        blockLiveStream();
         setInterval(() => {
             blockLiveStream();
         }, 2000);
@@ -44,27 +42,27 @@
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide'; //UI隐藏开关
     const BAPI = BilibiliAPI;
     //let DanMuServerHost;
-    let gift_join_try = 0;
-    let guard_join_try = 0;
-    let pk_join_try = 0;
-    let SEND_GIFT_NOW = false;//立刻送出礼物
-    let layerIndex_list = [];
-    let liveRoom_list = [];
+    let gift_join_try = 0,
+        guard_join_try = 0,
+        pk_join_try = 0,
+        SEND_GIFT_NOW = false,//立刻送出礼物
+        layerIndex_list = [],
+        liveRoom_list = [],
+        Live_info = {
+            room_id: undefined,
+            uid: undefined,
+            ruid: undefined,
+            mobile_verify: undefined,
+            gift_list: undefined,
+            //gift_list_str: undefined,
+            rnd: undefined,
+            visit_id: undefined,
+            identification: undefined,
+            bili_jct: undefined
+        };
     const tz_offset = new Date().getTimezoneOffset() + 480;
     const ts_ms = () => Date.now();//当前毫秒
     const ts_s = () => Math.round(ts_ms() / 1000);//当前秒
-    let Live_info = {
-        room_id: undefined,
-        uid: undefined,
-        ruid: undefined,
-        mobile_verify: undefined,
-        gift_list: undefined,
-        //gift_list_str: undefined,
-        rnd: undefined,
-        visit_id: undefined,
-        identification: undefined,
-        bili_jct: undefined
-    };
     const runUntilSucceed = (callback, delay = 0, period = 100) => {
         setTimeout(() => {
             if (!callback()) runUntilSucceed(callback, period, period);
@@ -119,11 +117,11 @@
     const appToken = new BilibiliToken();
     const baseQuery = `actionKey=appkey&appkey=${BilibiliToken.appKey}&build=5561000&channel=bili&device=android&mobi_app=android&platform=android&statistics=%7B%22appId%22%3A1%2C%22platform%22%3A3%2C%22version%22%3A%225.57.0%22%2C%22abtest%22%3A%22%22%7D`;
     //let tokenData = JSON.parse(GM_getValue('userToken', '{}'));
-    let userToken = undefined;
-    let tokenData = JSON.parse(localStorage.getItem(`${NAME}_userToken`)) || {};
+    let userToken = undefined,
+        tokenData = JSON.parse(localStorage.getItem(`${NAME}_userToken`)) || {};
     const setToken = async () => {
         if (tokenData.time > ts_s()) {
-            userToken = userToken;
+            userToken = tokenData;
         } else {
             tokenData = await appToken.getToken();
             tokenData.time = ts_s() + tokenData.expires_in;
@@ -277,8 +275,8 @@
             }
         </style>
             `);
-        const layerCss = GM_getResourceText('layerCss');
-        GM_addStyle(layerCss);
+        //加载layer样式。如果用GM_addStyle加载会无法使用icon，原因不明
+        $('head').append('<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css">');
     }
     function init() {//API初始化
         const MY_API = {
@@ -292,7 +290,7 @@
                 COIN_NUMBER: 0,//投币数量
                 COIN_TYPE: "COIN_DYN",//投币方法 动态/UID
                 COIN_UID: 0,//投币up主
-                BLOCK_LIVE_VIDEO: true,//拦截挂小心心打开窗口的直播流并静音
+                BLOCK_LIVE_VIDEO: true,//拦截挂小心心打开窗口的直播流
                 EXCLUDE_ROOMID: "0",//送礼排除房间号
                 FORCE_LOTTERY: false,//黑屋强制抽奖
                 FORCE_LIGHT: false,//忽略亲密上限点亮
@@ -427,13 +425,14 @@
             newMessage: (version) => {
                 try {
                     let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.1.2') &&
-                        version == '4.1.2') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '4.1.3') &&
+                        version == '4.1.3') { //更新公告时需要修改
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `目前拦截直播流功能不会拦截你所正在观看的直播啦。
-                            由于b站最近更新较多，拦截直播流功能可能还会失效。`
-                          });
+                            content: `由于B站更新，如果拦截直播流每个窗口只能获取1个小心心。
+                            所以现在采用循环开关窗口的方式获取小心心。
+                            效率会降低，如果你不在乎这些流量可以不开拦截直播流功能。`
+                        });
                         localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
                     }
                 } catch (e) {
@@ -541,8 +540,8 @@
                     if (!!!window.localStorage["videoVolume"]) {
                         delayCall(() => mute, 200);
                     }
-                }
-                if (MY_API.CONFIG.BLOCK_LIVE_VIDEO) mute();
+                };
+                if(MY_API.CONFIG.LITTLE_HEART) mute();
                 removeUntiSucceed('REMOVE_ELEMENT_2233', 0);
                 removeUntiSucceed('REMOVE_ELEMENT_activity', 1);
                 removeUntiSucceed('REMOVE_ELEMENT_player', 2);
@@ -841,7 +840,7 @@
                         </div>
                         <div data-toggle="BLOCK_LIVE_VIDEO" style="line-height: 15px">
                         <label style="margin: 5px auto; color: black">
-                            <input style="vertical-align: text-top;" type="checkbox"> 拦截挂小心心打开窗口的直播流并静音
+                            <input style="vertical-align: text-top;" type="checkbox"> 拦截挂小心心打开窗口的直播流
                         </label>
                     </div>
                     </fieldset>
@@ -1053,12 +1052,14 @@
                                 return BAPI.link_group.buy_medal(response.data.info.uid).then((re) => {
                                     MYDEBUG('API.link_group.buy_medal re', re);
                                     if (re.code === 0) {
-                                        layer.msg('✔ 购买成功', {
-                                            time: 2000
+                                        layer.msg('购买成功', {
+                                            time: 2000,
+                                            icon: 1
                                         });
                                     } else {
-                                        layer.msg(`❌ 购买失败 ${re.message}`, {
-                                            time: 2500
+                                        layer.msg(`购买失败 ${re.message}`, {
+                                            time: 2500,
+                                            icon: 2
                                         });
                                     }
                                 })
@@ -3067,14 +3068,14 @@
                 },
                 doHeartBeat: async (roomId) => {
                     if (liveRoom_list.indexOf(roomId) == -1) return
-                    MYDEBUG('[小心心]打开标签页房间', liveRoom_list);
+                    MYDEBUG('[小心心]打开房间', liveRoom_list);
                     const index = layer.open({
                         title: `${roomId}`,
                         type: 2,
                         shade: 0,
                         content: `https://live.bilibili.com/${roomId}?cut`,
                         end: () => {
-                            clearInterval(Timer);
+                            clearTimeout(Timer);
                             delListItem(roomId, liveRoom_list);
                             delListItem(index, layerIndex_list)
                         }
@@ -3083,9 +3084,8 @@
                         display: 'none',
                     });
                     layerIndex_list.push(index);
-                    let Timer = setInterval(async () => {
+                    let Timer = setTimeout(async () => {
                         if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
-                            clearInterval(Timer);
                             MYDEBUG('[小心心]', `今日任务完成，房间${roomId}不再打开`);
                             return
                         }
@@ -3094,9 +3094,11 @@
                             window.toast(`[小心心]房间${roomId}下播，再次寻找开播房间`, 'info');
                             layer.close(index);
                             return MY_API.LITTLE_HEART.run();
-                        }
+                        };//如果小心心未全部获取且开播，关闭窗口再打开
+                        MYDEBUG('[小心心]关闭窗口 roomId', roomId);
+                        layer.close(index);
+                        return MY_API.LITTLE_HEART.doHeartBeat(roomId);
                     }, 310e3);
-                    return
                 },
                 checkHeart: () => {
                     const checkbag = () => {
@@ -3117,7 +3119,7 @@
                     checkbag();
                     let timer = setInterval(() => {
                         checkbag();
-                    }, 300e3);
+                    }, 310e3);
                     return
                 },
                 run: () => {
@@ -3140,7 +3142,7 @@
                         MY_API.LITTLE_HEART.checkHeart();
                     };
                     if (!MY_API.CONFIG.BLOCK_LIVE_VIDEO) {
-                        layer.confirm('若不勾选【拦截挂小心心打开窗口的直播流并静音】将耗费大量流量，是否继续？', {
+                        layer.confirm('若不勾选【拦截挂小心心打开窗口的直播流】将耗费大量流量，是否继续？', {
                             title: '警告',
                             btn: ['是', '否'] //按钮
                         }, async () => {
@@ -3149,7 +3151,7 @@
                             });
                             runFunc();
                         }, function () {
-                            layer.msg('勾选【拦截挂小心心打开窗口的直播流并静音】后需刷新页面使其生效', {
+                            layer.msg('勾选【拦截挂小心心打开窗口的直播流】后需刷新页面使其生效', {
                                 time: 2500
                             });
                         });
@@ -3377,9 +3379,9 @@
             console.log('fetch arg', ...arg);
             if (arg[0].indexOf('bilivideo.com') > -1 && /https?:\/\/live\.bilibili\.com\/.*\?cut/.test(window.location.href)) {
                 console.log('拦截直播流')
-                return //new Promise(() => {
-                //throw new Error();
-                //});
+                return new Promise(() => {
+                throw new Error();
+                });
             } else {
                 console.log('通过')
                 return originFetch(...arg);
