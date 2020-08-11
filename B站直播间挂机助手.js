@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       4.1.4
+// @version       4.1.4.1
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-start
 // @connect      passport.bilibili.com
@@ -3078,10 +3078,10 @@
                             delListItem(roomId, liveRoom_list);
                             delListItem(index, layerIndex_list)
                         }
-                    });/*
+                    });
                     layer.style(index, { // 隐藏弹窗
                         display: 'none',
-                    });*/
+                    });
                     layerIndex_list.push(index);
                     let Timer = setTimeout(async () => {
                         if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
