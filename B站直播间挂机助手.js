@@ -3,8 +3,8 @@
 // @name          B站直播间挂机助手
 // @name:en       B站直播间挂机助手
 // @author        andywang425
-// @description   自动参与Bilibili直播区抽奖(现在极少)，完成每日任务，领银瓜子宝箱，自动送礼，自动获取小心心，批量点亮勋章
-// @description:en 自动参与Bilibili直播区抽奖(现在极少)，完成每日任务，领银瓜子宝箱，自动送礼，自动获取小心心，批量点亮勋章
+// @description   自动参与Bilibili直播区抽奖(现在极少)，直播区签到，完成主站每日任务，领银瓜子宝箱，自动送礼，自动获取小心心，批量点亮勋章，快捷购买粉丝勋章
+// @description:en 自动参与Bilibili直播区抽奖(现在极少)，直播区签到，完成主站每日任务，领银瓜子宝箱，自动送礼，自动获取小心心，批量点亮勋章，快捷购买粉丝勋章
 // @updateURL     https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL   https://github.com/andywang425/BLTH/
@@ -12,7 +12,7 @@
 // @icon          https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright     2020, andywang425 (https://github.com/andywang425)
 // @license       MIT
-// @version       4.1.3
+// @version       4.1.4
 // @include      /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at       document-start
 // @connect      passport.bilibili.com
@@ -31,13 +31,11 @@
 (function () {
     const NAME = 'IGIFTMSG';
     const block_live = localStorage.getItem(`${NAME}_block_live`) || 'pass';
-    const originFetch = fetch;
-    if (block_live == 'block') {
-        blockLiveStream();
-        setInterval(() => {
-            blockLiveStream();
-        }, 2000);
+    //const originFetch = fetch;
+    if (block_live == 'block' && /https?:\/\/live\.bilibili\.com\/.*\?cut/.test(window.location.href)) {
+        return blockLiveStream();
     };
+    window.localStorage["LIVE_PLAYER_STATUS"] = window.localStorage["LIVE_PLAYER_STATUS"].replace("flash", 'html5');
     const debugSwitch = true; //控制开关
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide'; //UI隐藏开关
     const BAPI = BilibiliAPI;
@@ -425,13 +423,14 @@
             newMessage: (version) => {
                 try {
                     let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.1.3') &&
-                        version == '4.1.3') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '4.1.4') &&
+                        version == '4.1.4') { //更新公告时需要修改
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `由于B站更新，如果拦截直播流每个窗口只能获取1个小心心。
-                            所以现在采用循环开关窗口的方式获取小心心。
-                            效率会降低，如果你不在乎这些流量可以不开拦截直播流功能。`
+                            content: `因为技术原因，现在改为用flash播放的方式拦截直播流。
+                            如果想要用脚本挂小心心，请禁用flash（大多数浏览器默认禁用）。
+                            距离flash被淘汰还有几个月的时间，在此期间我会再想想其它方法。
+                            如果你有好的想法欢迎反馈。`
                         });
                         localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
                     }
@@ -3079,10 +3078,10 @@
                             delListItem(roomId, liveRoom_list);
                             delListItem(index, layerIndex_list)
                         }
-                    });
+                    });/*
                     layer.style(index, { // 隐藏弹窗
                         display: 'none',
-                    });
+                    });*/
                     layerIndex_list.push(index);
                     let Timer = setTimeout(async () => {
                         if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
@@ -3374,7 +3373,7 @@
         }
         return
     }
-    function blockLiveStream() {
+    function blockLiveStream() {/*
         unsafeWindow.fetch = (...arg) => {
             console.log('fetch arg', ...arg);
             if (arg[0].indexOf('bilivideo.com') > -1 && /https?:\/\/live\.bilibili\.com\/.*\?cut/.test(window.location.href)) {
@@ -3386,7 +3385,9 @@
                 console.log('通过')
                 return originFetch(...arg);
             }
-        }
+        }*/
+        if($('[data-title="Flash播放器"]').length > 0) $('[data-title="Flash播放器"]').click();
+        else setTimeout(() => blockLiveStream(), 200);
     };
     /**
      * （1000000000） 获取到明天的目标时间戳所在的相同【时间点】所需时间（毫秒）
