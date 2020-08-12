@@ -12,7 +12,9 @@
 // @icon           https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright      2020, andywang425 (https://github.com/andywang425)
 // @license        MIT
-// @compatible     chrome 80 or later; firefox 77 or later
+// @compatible     chrome 80 or later
+// @compatible     firefox 77 or later
+// @compatible     opera 69 or later
 // @version        4.2
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
