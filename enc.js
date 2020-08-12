@@ -3,7 +3,7 @@
 // @namespace    https://github.com/lkeme/bilibili-pcheartbeat
 // @version      0.2
 // @description  bilibili PC心跳
-// @author       lkeme, andywang425
+// @author       lkeme
 // @run-at       document-end
 // @include       * 
 // @license      GPL3
