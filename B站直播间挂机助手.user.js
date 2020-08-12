@@ -23,7 +23,7 @@
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@56149b5a33cf4b1318a6806d7edb06a4fbefcf4a/BilibiliAPI_Mod.min.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@56149b5a33cf4b1318a6806d7edb06a4fbefcf4a/OCRAD.min.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@56149b5a33cf4b1318a6806d7edb06a4fbefcf4a/libBilibiliToken.user.js
-// @require       https:///cdn.jsdelivr.net/gh/sentsin/layer@0018e1a54fbfb455d7b30d5a2901294dd0ab52c5/dist/layer.js
+// @require       https://cdn.jsdelivr.net/gh/sentsin/layer@0018e1a54fbfb455d7b30d5a2901294dd0ab52c5/dist/layer.js
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // @grant        GM_openInTab
