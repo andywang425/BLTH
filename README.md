@@ -113,6 +113,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 + 【拦截直播流并静音】若勾选了此选项，会拦截为了获取小心心打开的隐形窗口的直播流。勾选后需刷新网页才能生效。建议与【自动获取小心心】搭配使用。  
 
 **关于小心心**  
++ 使用本功能前请先禁用flash插件。  
 + 因为技术上的原因，目前通过打开隐形窗口的方式来获取小心心。若出现卡顿，浏览器崩溃等情况，请把【打开窗口数量上限】的值调小。  
 + 检测到包裹内有一组24个7天的小心心后会停止，并关闭之前打开的隐形窗口。  
 + 在获取完所有小心心之前直播间不刷新。  
@@ -142,9 +143,10 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。不符合规范的反馈可能会被关闭。
 
 ## 已知问题
-1.[#12](https://github.com/andywang425/BLTH/issues/12)  
+1. [#12](https://github.com/andywang425/BLTH/issues/12)  
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后，打开`启用Ajax Hook API`。  
-2.【拦截直播流】功能可能仅在Tampermonkey上可用。  
+2. 【拦截直播流】功能可能仅在Tampermonkey上可用。  
+3. 如果使用firefox浏览器，脚本窗口的布局会调整为单列模式（若在火狐上强制使用双列排版，窗口布局会变得很奇怪，原因不明）。  
 ## 许可证  
 ![MIT License](https://img.shields.io/badge/license-MIT-green)  
 ## 其它信息  
@@ -167,7 +169,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 感谢以上这些项目的作者~  
 
 ## 更新日志
->### 4.1.4.1
->上个版本调试完没隐藏小心心窗口，尴尬。赶紧修复。    
+>### 4.2
+>控制面板美化；对火狐做了些兼容性调整；运行效率优化；修复挂小心心失效的问题；通过更加规范的方式引入库文件（jsDelivr GitHub commit-specific references）。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
