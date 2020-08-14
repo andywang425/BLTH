@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.2
+// @version        4.2.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -28,8 +28,6 @@
 // @require       https://cdn.jsdelivr.net/gh/sentsin/layer@0018e1a54fbfb455d7b30d5a2901294dd0ab52c5/dist/layer.js
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
-// @grant        GM_openInTab
-// @grant        GM_getResourceText
 // ==/UserScript==
 (function () {
     const NAME = 'IGIFTMSG';
@@ -54,7 +52,6 @@
             ruid: undefined,
             mobile_verify: undefined,
             gift_list: undefined,
-            //gift_list_str: undefined,
             rnd: undefined,
             visit_id: undefined,
             identification: undefined,
@@ -430,12 +427,12 @@
                         version == '4.2') { //更新公告时需要修改
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
-                        } 
+                        }
                         layer.open({
                             title: `${version}更新提示`,
                             content: `1.修复了小心心模块 2.美化了控制面板<br>
-                            如果使用过程中遇到问题，欢迎去${linkMsg('github','https://github.com/andywang425/BLTH/issues')}
-                            （或者进qq群${linkMsg('1106094437',"https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}）反馈。`
+                            如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
+                            （或者进qq群${linkMsg('1106094437', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}）反馈。`
                         });
                         localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
                     }
@@ -538,14 +535,14 @@
                             }
                         }, 200);
                     }
-                };
+                };/*
                 const mute = () => {
                     window.localStorage["videoVolume"] = 0;
                     if (!window.localStorage["videoVolume"]) {
                         delayCall(() => mute, 200);
                     }
-                };
-                if (MY_API.CONFIG.LITTLE_HEART) mute();
+                };*/
+                //if (MY_API.CONFIG.LITTLE_HEART) mute();
                 removeUntiSucceed('REMOVE_ELEMENT_2233', 0);
                 removeUntiSucceed('REMOVE_ELEMENT_activity', 1);
                 removeUntiSucceed('REMOVE_ELEMENT_player', 2);
@@ -1025,7 +1022,7 @@
                             function buyFanMedal(room_id) {
                                 return BAPI.live_user.get_anchor_in_room(room_id).then(function (response) {
                                     MYDEBUG('API.live_user.get_anchor_in_room response', response)
-                                    if (response.code === 0) {
+                                    if (response.code === 0 && !!response.data.info) {
                                         layer.confirm(`是否消耗20硬币购买UP主【${response.data.info.uname}】的粉丝勋章？`, {
                                             title: '购买勋章',
                                             btn: ['是', '否'] //按钮
@@ -1043,14 +1040,20 @@
                                                         icon: 2
                                                     });
                                                 }
-                                            })
+                                            });
                                         }, function () {
                                             layer.msg('已取消购买', {
                                                 time: 2000
                                             });
                                         });
 
-                                    } else {
+                                    } 
+                                    else if (response.code === 0 && response.data.info === undefined){
+                                        layer.msg(`房间不存在`, {
+                                            time: 2500
+                                        });
+                                    }
+                                    else {
                                         layer.msg(`检查房间出错 ${response.message}`, {
                                             time: 2500
                                         });
@@ -1192,29 +1195,29 @@
                 };
                 let isClick = true;
                 btn.click(() => {
-                    if(isClick) {
-                    isClick = false;
-                    setTimeout(function(){isClick = true}, 200);
-                    if (msgHide == 'show') {//显示=>隐藏
-                        msgHide = 'hide';
-                        localStorage.setItem(`${NAME}_msgHide`, msgHide);
-                        $('.igiftMsg').hide();
-                        $('.link-toast').hide();
-                        layer.close(mainIndex);
-                        ct.animate({ scrollTop: 0 }, 0);
-                        setTimeout(() => { ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10) }, 100);
-                        document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
+                    if (isClick) {
+                        isClick = false;
+                        setTimeout(function () { isClick = true }, 200);
+                        if (msgHide == 'show') {//显示=>隐藏
+                            msgHide = 'hide';
+                            localStorage.setItem(`${NAME}_msgHide`, msgHide);
+                            $('.igiftMsg').hide();
+                            $('.link-toast').hide();
+                            layer.close(mainIndex);
+                            ct.animate({ scrollTop: 0 }, 0);
+                            setTimeout(() => { ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10) }, 100);
+                            document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
+                        }
+                        else {
+                            msgHide = 'show';
+                            localStorage.setItem(`${NAME}_msgHide`, msgHide);
+                            $('.igiftMsg').show();
+                            $('.link-toast').show();
+                            openMainWindow();
+                            ct.animate({ scrollTop: ct.prop("scrollHeight") }, 0);
+                            document.getElementById('hiderbtn').innerHTML = "隐藏窗口和提示信息";
+                        }
                     }
-                    else {
-                        msgHide = 'show';
-                        localStorage.setItem(`${NAME}_msgHide`, msgHide);
-                        $('.igiftMsg').show();
-                        $('.link-toast').show();
-                        openMainWindow();
-                        ct.animate({ scrollTop: ct.prop("scrollHeight") }, 0);
-                        document.getElementById('hiderbtn').innerHTML = "隐藏窗口和提示信息";
-                    }
-                }   
                 });
                 $('.attention-btn-ctnr').append(btn);
                 if (!MY_API.CACHE.DailyReward_TS) {
@@ -2684,42 +2687,7 @@
                                 }
                             }
                         }
-                        await MY_API.Gift.getBagList();
-                        let i = 0;
-                        for (i = 0; i <= MY_API.Gift.bag_list.length - 1; i++) {
-                            if (MY_API.Gift.bag_list[i].gift_id == 1) {
-                                break;
-                            }
-                        }
-                        let v = MY_API.Gift.bag_list[i];
-                        if (v == undefined) {
-                            SEND_GIFT_NOW = false;
-                            nextTimeDebug();
-                            return $.Deferred().resolve();
-                        }
-                        let feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
-                        let limit = 86400;
-                        let now = ts_s();
-                        if (//剩余礼物,今日送完所有牌子后若有小于1天的礼物则送礼。检查有没有可送的
-                            MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit)).length != 0
-                            && //满足到期时间小于一天
-                            v.expire_at > MY_API.Gift.time && (v.expire_at - MY_API.Gift.time < limit
-                                && MY_API.CONFIG.SPARE_GIFT_ROOM != '0' && MY_API.CONFIG.SPARE_GIFT_UID != '0'
-                                && feed > 0)) {
-                            let giftnum = v.gift_num;
-                            return BAPI.gift.bag_send(Live_info.uid, v.gift_id, MY_API.CONFIG.SPARE_GIFT_UID, giftnum, v.bag_id, MY_API.CONFIG.SPARE_GIFT_ROOM, Live_info.rnd).then((response) => {
-                                MYDEBUG('Gift.sendGift(剩余礼物): API.gift.bag_send', response);
-                                if (response.code === 0) {
-                                    window.toast(`[自动送礼](剩余礼物)房间[${MY_API.CONFIG.SPARE_GIFT_ROOM}] 送礼成功，送出${giftnum}个${v.gift_name}`, 'success');
-                                } else {
-                                    window.toast(`[自动送礼](剩余礼物)房间[${MY_API.CONFIG.SPARE_GIFT_ROOM}] 送礼异常:${response.msg}`, 'caution');
-                                }
-                            }, () => {
-                                window.toast('[自动送礼](剩余礼物)包裹送礼失败，请检查网络', 'error');
-                                return delayCall(() => MY_API.Gift.sendGift(medal));
-                            });
-                        }
-
+                        await MY_API.Gift.sendRemainGift(MY_API.CONFIG.SPARE_GIFT_ROOM);
                     } catch (err) {
                         FailFunc();
                         window.toast('[自动送礼]运行时出现异常，已停止', 'error');
@@ -2742,8 +2710,7 @@
                     if (!MY_API.CONFIG.SEND_ALL_GIFT) {
                         //送之前查一次有没有可送的
                         let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 &&
-                            r.expire_at > MY_API.Gift.time && (r.expire_at - MY_API.Gift.time < MY_API.CONFIG.GIFT_LIMIT * 86400)
-                            && r.corner_mark != '永久');
+                            r.corner_mark.substring(0, r.corner_mark.indexOf("天")) == MY_API.CONFIG.GIFT_LIMIT);
                         if (pass.length == 0) {
                             MY_API.Gift.over = true;
                             return;
@@ -2765,12 +2732,13 @@
                             window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`, 'info');
                             return;
                         }
-
-                        const feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
+                        let feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
+                        if (v.gift_id === 30607) feed = 50;
                         if (feed > 0) {
                             let feed_num = Math.floor(MY_API.Gift.remain_feed / feed);
                             if (feed_num > v.gift_num) feed_num = v.gift_num;
                             if (feed_num > 0) {
+                                MYDEBUG('[自动送礼]送出礼物类型', v.gift_name);
                                 await BAPI.gift.bag_send(Live_info.uid, v.gift_id, MY_API.Gift.ruid, feed_num, v.bag_id, MY_API.Gift.room_id, Live_info.rnd).then((response) => {
                                     MYDEBUG('Gift.sendGift: API.gift.bag_send', response);
                                     if (response.code === 0) {
@@ -2783,6 +2751,51 @@
                                     }
                                 }, () => {
                                     window.toast('[自动送礼]包裹送礼失败，请检查网络', 'error');
+                                    return delayCall(() => MY_API.Gift.sendGift(medal));
+                                });
+                            }
+                        }
+                    }
+                },
+                sendRemainGift: async (ROOM_ID) => {
+                    await MY_API.Gift.getBagList();
+                    let bag_list;
+                    if (MY_API.Gift.time <= 0) MY_API.Gift.time = ts_s();
+                    if (!MY_API.CONFIG.SEND_ALL_GIFT) {
+                        //送之前查一次有没有可送的
+                        let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 &&
+                            r.corner_mark == `1天`);
+                        if (pass.length == 0) {
+                            MY_API.Gift.over = true;
+                            return;
+                        } else {
+                            bag_list = pass;
+                        }
+                    } else {
+                        let pass = MY_API.Gift.bag_list.filter(r => r.gift_num > 0 && r.corner_mark != '永久');
+                        if (pass.length == 0) {
+                            MY_API.Gift.over = true;
+                            return;
+                        } else {
+                            bag_list = pass;
+                        }
+                    }
+                    MYDEBUG('【剩余礼物】bag_list', bag_list);
+                    for (let v of bag_list) {
+                        const feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
+                        if (feed > 0) {
+                            let feed_num = v.gift_num;
+                            if (feed_num > 0) {
+                                await BAPI.gift.bag_send(Live_info.uid, v.gift_id, MY_API.Gift.ruid, feed_num, v.bag_id, ROOM_ID, Live_info.rnd).then((response) => {
+                                    MYDEBUG('Gift.sendGift: API.gift.bag_send', response);
+                                    if (response.code === 0) {
+                                        v.gift_num -= feed_num;
+                                        window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼成功，送出${feed_num}个${v.gift_name}`, 'success');
+                                    } else {
+                                        window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼异常:${response.msg}`, 'caution');
+                                    }
+                                }, () => {
+                                    window.toast('[自动送礼]【剩余礼物】包裹送礼失败，请检查网络', 'error');
                                     return delayCall(() => MY_API.Gift.sendGift(medal));
                                 });
                             }
@@ -3413,7 +3426,7 @@
             }
 
         }*/
-        if($(".live-icon-un-mute").length > 0) $(".live-icon-un-mute").click();
+        if ($(".live-icon-un-mute").length > 0) $(".live-icon-un-mute").click();
         else setTimeout(() => blockLiveStream(), 200);
         setTimeout(() => {
             if ($('[data-title="Flash播放器"]').length > 0) $('[data-title="Flash播放器"]').click();

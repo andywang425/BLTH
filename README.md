@@ -1,8 +1,7 @@
 # BLTH  
 **Bilibili Live Tasks Helper**  
 
-![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)  
-
+![TamperMonkey 4.10](https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg) ![Chromium 83](https://img.shields.io/badge/Chromium_83-pass-green.svg) ![Firefox 77](https://img.shields.io/badge/Firefox_77-pass-green.svg)
 + 在 Tampermonkey 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
 + 不保证能通过其它油猴插件(Greasemonkey/Violentmonkey等)运行。  
 
@@ -18,7 +17,10 @@ _(带有Origin字样的为原格式脚本)_
 -------------------------------
 
 ### 使用方法 
-在Tampermonkey中启用脚本，登陆bilibili后打开任意b站直播间。  
+在Tampermonkey中启用脚本，登陆bilibili后打开任意b站直播间。 
+
+-------------------------------
+
 ### 一些建议
 **本脚本加载的库文件较多，初次使用时若出现看不到控制面板的情况，请尝试刷新页面。**  
 启用脚本后不要参与小时榜和广播礼物的抽奖，重复抢次数多了会进小黑屋。  
@@ -28,6 +30,9 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 **使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。**  
 
 辣条交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天或者提点建议~    
+
+-------------------------------
+
 ## 功能细节 
 
 脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到。
@@ -65,6 +70,9 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 + 屏蔽不必要的内容  
 
 以上功能涉及参数可自定义。  
+
+-------------------------------
+
 ## 说明
 **关于脚本代码格式**  
 本脚本在三个平台上的代码格式有所不同
@@ -142,13 +150,28 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 **关于反馈**  
 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。不符合规范的反馈可能会被关闭。
 
+-------------------------------
+
 ## 已知问题
 1. [#12](https://github.com/andywang425/BLTH/issues/12)  
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后，打开`启用Ajax Hook API`。  
 2. 【拦截直播流】功能可能仅在Tampermonkey上可用。  
 3. 如果使用firefox浏览器，脚本窗口的布局会调整为单列模式（若在火狐上强制使用双列排版，窗口布局会变得很奇怪，原因不明）。  
+
+-------------------------------
+
+## 捐赠作者
+|<center>支付宝</center>|<center>微信</center>|
+|------|-----|
+|![Alipay](https://cdn.jsdelivr.net/gh/andywang425/BLTH@f69046d3b14a1f8f780b6e8a292ab5e2e1e217ab/img/Alipay.jpg)|![WeChat](https://cdn.jsdelivr.net/gh/andywang425/BLTH@d6c829897640a1edd3bca3fe6c91ae5d86b1355b/img/WeChat.jpg)|
+
+-------------------------------
+
 ## 许可证  
 ![MIT License](https://img.shields.io/badge/license-MIT-green)  
+
+-------------------------------
+
 ## 其它信息  
 这个项目的部分代码来源于以下几个项目:  
 + [b站直播心心助手](https://greasyfork.org/zh-CN/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E5%BF%83%E5%BF%83%E5%8A%A9%E6%89%8B) (MIT) by [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)
@@ -168,8 +191,10 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 
 感谢以上这些项目的作者~  
 
+-------------------------------
+
 ## 更新日志
->### 4.2
->控制面板美化；对火狐做了些兼容性调整；运行效率优化；修复挂小心心失效的问题；通过更加规范的方式引入库文件（jsDelivr GitHub commit-specific references）。  
+>### 4.2.1
+>修复自动送礼不送小心心的bug；增加购买勋章输入错误提示。    
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
