@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.2.1
+// @version        4.2.1.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -2687,7 +2687,7 @@
                                 }
                             }
                         }
-                        await MY_API.Gift.sendRemainGift(MY_API.CONFIG.SPARE_GIFT_ROOM);
+                        await MY_API.Gift.sendRemainGift(MY_API.CONFIG.SPARE_GIFT_ROOM, MY_API.CONFIG.SPARE_GIFT_UID);
                     } catch (err) {
                         FailFunc();
                         window.toast('[自动送礼]运行时出现异常，已停止', 'error');
@@ -2757,7 +2757,7 @@
                         }
                     }
                 },
-                sendRemainGift: async (ROOM_ID) => {
+                sendRemainGift: async (ROOM_ID, UID) => {
                     await MY_API.Gift.getBagList();
                     let bag_list;
                     if (MY_API.Gift.time <= 0) MY_API.Gift.time = ts_s();
@@ -2783,10 +2783,11 @@
                     MYDEBUG('【剩余礼物】bag_list', bag_list);
                     for (let v of bag_list) {
                         const feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
+                        //if (v.gift_id === 30607) feed = 50;
                         if (feed > 0) {
                             let feed_num = v.gift_num;
                             if (feed_num > 0) {
-                                await BAPI.gift.bag_send(Live_info.uid, v.gift_id, MY_API.Gift.ruid, feed_num, v.bag_id, ROOM_ID, Live_info.rnd).then((response) => {
+                                await BAPI.gift.bag_send(Live_info.uid, v.gift_id, UID, feed_num, v.bag_id, ROOM_ID, Live_info.rnd).then((response) => {
                                     MYDEBUG('Gift.sendGift: API.gift.bag_send', response);
                                     if (response.code === 0) {
                                         v.gift_num -= feed_num;
