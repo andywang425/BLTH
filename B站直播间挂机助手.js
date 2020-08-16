@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.2.1.1
+// @version        4.2.1.2
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -25,7 +25,7 @@
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@56149b5a33cf4b1318a6806d7edb06a4fbefcf4a/BilibiliAPI_Mod.min.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@56149b5a33cf4b1318a6806d7edb06a4fbefcf4a/OCRAD.min.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@56149b5a33cf4b1318a6806d7edb06a4fbefcf4a/libBilibiliToken.user.js
-// @require       https://cdn.jsdelivr.net/gh/sentsin/layer@0018e1a54fbfb455d7b30d5a2901294dd0ab52c5/dist/layer.js
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@b40278754a4da6605c16e0cf2228a7ec73b676b0/layer.js
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
@@ -273,8 +273,8 @@
             }
         </style>
             `);
-        //加载layer样式。如果用GM_addStyle加载会无法使用icon，原因不明
-        $('head').append('<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css">');
+        //加载layer样式。如果用GM_addStyle加载会无法使用icon
+        $('head').append('<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css" id="layuicss-layer">');
     }
     function init() {//API初始化
         const MY_API = {
@@ -831,8 +831,8 @@
 
         </fieldset>
         <label style="color: darkblue; font-size:large;">
-            v${GM_info.script.version} <a href="https://github.com/andywang425/BLTH"
-                target="_blank">更多说明和更新日志见github上的项目说明(点我)</a>
+             <a href="https://github.com/andywang425/BLTH"
+                target="_blank">v${GM_info.script.version}&nbsp;更多信息见github上的项目说明(点我)</a>
         </label>
     </div>
 </div>
@@ -1047,8 +1047,8 @@
                                             });
                                         });
 
-                                    } 
-                                    else if (response.code === 0 && response.data.info === undefined){
+                                    }
+                                    else if (response.code === 0 && response.data.info === undefined) {
                                         layer.msg(`房间不存在`, {
                                             time: 2500
                                         });
@@ -1152,8 +1152,8 @@
                             };
 
                             $("input:radio[name='COIN_TYPE']").change(function () { //投币模式变化
-                                let a = $("div[data-toggle='COIN_DYN'] input:radio").is(':checked');
-                                if (a == true) {
+                                const check = $("div[data-toggle='COIN_DYN'] input:radio").is(':checked');
+                                if (check == true) {
                                     MY_API.CONFIG.COIN_TYPE = 'COIN_DYN';
                                 }
                                 else {
@@ -1162,8 +1162,8 @@
                                 MY_API.saveConfig();
                             });
                             $("input:radio[name='LIGHT_TYPE']").change(function () { //点亮勋章模式变化
-                                let a = $("div[data-toggle='LIGHT_WHITE'] input:radio").is(':checked');
-                                if (a == true) {
+                                const check = $("div[data-toggle='LIGHT_WHITE'] input:radio").is(':checked');
+                                if (check == true) {
                                     MY_API.CONFIG.LIGHT_METHOD = 'LIGHT_WHITE';
                                 }
                                 else {
@@ -1172,8 +1172,8 @@
                                 MY_API.saveConfig();
                             });
                             $("input:radio[name='GIFT_TYPE']").change(function () { //送礼模式变化
-                                let a = $("div[data-toggle='GIFT_INTERVAL'] input:radio").is(':checked');
-                                if (a == true) {
+                                const check = $("div[data-toggle='GIFT_INTERVAL'] input:radio").is(':checked');
+                                if (check == true) {
                                     MY_API.CONFIG.GIFT_METHOD = 'GIFT_INTERVAL';
                                 }
                                 else {
@@ -2509,6 +2509,7 @@
                     });
                 },
                 getFeedByGiftID: (gift_id) => {
+                    if (gift_id === 30607) return 50;//小心心
                     for (let i = Live_info.gift_list.length - 1; i >= 0; --i) {
                         if (Live_info.gift_list[i].id === gift_id) {
                             return Math.ceil(Live_info.gift_list[i].price / 100);
@@ -2653,7 +2654,6 @@
                                 medal_list = medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
                             };
                             await MY_API.Gift.auto_light(medal_list);//点亮勋章
-                            let limit = MY_API.CONFIG.GIFT_LIMIT * 86400;
                             for (let v of medal_list) {
                                 if (MY_API.Gift.over) break;
                                 let response = await BAPI.room.room_init(parseInt(v.roomid, 10));
@@ -2662,25 +2662,9 @@
                                 MY_API.Gift.remain_feed = v.day_limit - v.today_feed;
                                 if (MY_API.Gift.remain_feed > 0) {
                                     await MY_API.Gift.getBagList();
-                                    let now = ts_s();
-                                    if (!MY_API.CONFIG.SEND_ALL_GIFT) {
-                                        //送之前查一次有没有可送的
-                                        let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
-                                        if (pass.length == 0) {
-                                            break;
-                                        }
-                                    };
                                     if (MY_API.Gift.remain_feed > 0) {
                                         window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度未满[${v.today_feed}/${v.day_limit}]，预计需要[${MY_API.Gift.remain_feed}]送礼开始`, 'info');
                                         await MY_API.Gift.sendGift(v);
-                                        if (!MY_API.CONFIG.SEND_ALL_GIFT) {
-                                            let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 && r.expire_at > now && (r.expire_at - now < limit));
-                                            if (pass.length == 0) {
-                                                break;
-                                            } else {
-                                                MY_API.Gift.bag_list = pass;
-                                            }
-                                        }
                                     } else {
                                         window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度已满`, 'info');
                                     }
@@ -2710,7 +2694,8 @@
                     if (!MY_API.CONFIG.SEND_ALL_GIFT) {
                         //送之前查一次有没有可送的
                         let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 &&
-                            r.corner_mark.substring(0, r.corner_mark.indexOf("天")) == MY_API.CONFIG.GIFT_LIMIT);
+                            r.corner_mark.substring(0, r.corner_mark.indexOf("天")) <= MY_API.CONFIG.GIFT_LIMIT);
+                        MYDEBUG("pass", pass)
                         if (pass.length == 0) {
                             MY_API.Gift.over = true;
                             return;
@@ -2733,7 +2718,6 @@
                             return;
                         }
                         let feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
-                        if (v.gift_id === 30607) feed = 50;
                         if (feed > 0) {
                             let feed_num = Math.floor(MY_API.Gift.remain_feed / feed);
                             if (feed_num > v.gift_num) feed_num = v.gift_num;
@@ -2758,6 +2742,7 @@
                     }
                 },
                 sendRemainGift: async (ROOM_ID, UID) => {
+                    if (ROOM_ID == 0 || UID == 0) return $.Deferred().resolve();
                     await MY_API.Gift.getBagList();
                     let bag_list;
                     if (MY_API.Gift.time <= 0) MY_API.Gift.time = ts_s();
@@ -2780,10 +2765,9 @@
                             bag_list = pass;
                         }
                     }
-                    MYDEBUG('【剩余礼物】bag_list', bag_list);
+                    MYDEBUG('[自动送礼]【剩余礼物】bag_list', bag_list);
                     for (let v of bag_list) {
                         const feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
-                        //if (v.gift_id === 30607) feed = 50;
                         if (feed > 0) {
                             let feed_num = v.gift_num;
                             if (feed_num > 0) {
@@ -3129,7 +3113,7 @@
                     let Timer = setTimeout(async () => {
                         if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
                             MYDEBUG('[小心心]', `今日任务完成，房间${roomId}不再打开`);
-                            return
+                            return $.Deferred().resolve();
                         }
                         if (!MY_API.LITTLE_HEART.checkRoom(roomId)) {
                             //不开播则删除房间记录，重新运行run
@@ -3142,10 +3126,14 @@
                 checkHeart: () => {
                     const checkbag = () => {
                         BAPI.gift.bag_list().then((re) => {
-                            MYDEBUG('[小心心]检查包裹', re)
-                            let heart = re.data.list.filter(r => r.gift_id == 30607 && r.gift_num == 24 && r.corner_mark == "7天");
-                            MYDEBUG('[小心心]包裹内7天24个小心心', heart);
-                            if (heart.length > 0) {
+                            MYDEBUG('[小心心]检查包裹', re);
+                            const allHeart = re.data.list.filter(r => r.gift_id == 30607 && r.corner_mark == "7天");
+                            let todayHeart = 0;
+                            for (const heart of allHeart) {
+                                MYDEBUG(`[小心心]检测包裹内7天小心心${heart.gift_num}个`, heart);
+                                todayHeart += heart.gift_num;
+                            }
+                            if (todayHeart === 24) {
                                 clearInterval(timer);
                                 window.toast('[小心心]今日小心心已全部获取', 'success');
                                 MY_API.CACHE.LittleHeart_TS = ts_ms();
@@ -3167,6 +3155,7 @@
                         return runMidnight(MY_API.LITTLE_HEART.run, "获取小心心");
                     };
                     const runFunc = async () => {
+                        MY_API.LITTLE_HEART.checkHeart();
                         await MY_API.LITTLE_HEART.getMedalRoomList();
                         liveRoom_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
                         let tabNum = 0;
@@ -3177,8 +3166,7 @@
                             } else {
                                 break;
                             }
-                        };
-                        MY_API.LITTLE_HEART.checkHeart();
+                        }
                     };
                     if (!MY_API.CONFIG.BLOCK_LIVE_VIDEO) {
                         layer.confirm('若不勾选【拦截挂小心心打开窗口的直播流】将耗费大量流量，是否继续？', {
@@ -3462,7 +3450,7 @@
         if (h == hour && m == minute) {
             return true
         } else {
-            MYDEBUG("错误时间");
+            MYDEBUG("isTime", "错误时间");
             return false
         }
     }

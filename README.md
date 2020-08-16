@@ -40,34 +40,37 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 
 <details>
 <summary>自动抽奖</summary>
+<ul>
+<li>抽奖前随机延迟</li>
+<li>特定时段不参与抽奖</li>
+<li>随机跳过抽奖</li>
+<li>能设置当天最多抢辣条数量</li>
+<li>抽奖前模拟进入目标房间</li>
+<li>抽奖前发送活跃弹幕（防检测）</li>
+<li>进入小黑屋后强制重复抽奖直到成功，最多尝试5次</li>
+</ul>
+</details>  
 
-+ 抽奖前随机延迟  
-+ 特定时段不参与抽奖  
-+ 随机跳过抽奖  
-+ 能设置当天最多抢辣条数量  
-+ 抽奖前模拟进入目标房间  
-+ 抽奖前发送活跃弹幕（防检测）  
-+ 进入小黑屋后强制重复抽奖直到成功，最多尝试5次  
-</details>
 <details>
 <summary>自动完成每日任务</summary>  
+<ul>
+<li>登陆主站</li>  
+<li>观看视频</li>  
+<li>自动投币（可指定给某用户的视频投币）</li>  
+<li>分享视频</li>  
+<li>银瓜子换硬币</li>  
+<li>直播区签到</li>  
+<li>应援团签到</li>  
+<li>领银瓜子宝箱</li>  
+<li>模拟移动端心跳（现在没用，暂时保留）</li>  
+</ul>
+</details>  
 
-    1.登陆主站  
-    2.观看视频  
-    3.自动投币，可指定给某用户的视频投币  
-    4.分享视频  
-    5.银瓜子换硬币  
-    6.直播区签到  
-    7.应援团签到  
-    8.自动领银瓜子宝箱  
-    9.模拟移动端心跳（现在没用，暂时保留）  
-</details>
-
-+ 自动获取小心心  
-+ 自动点亮勋章  
-+ 自动送礼  
-+ 快捷购买粉丝勋章  
-+ 屏蔽不必要的内容  
+<li>自动获取小心心</li>  
+<li>自动点亮勋章</li>  
+<li>自动送礼</li>  
+<li>快捷购买粉丝勋章</li>  
+<li>屏蔽不必要的内容</li>  
 
 以上功能涉及参数可自定义。  
 
@@ -98,7 +101,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
   无论【优先高等级粉丝牌】如何设置，会根据【送满全部勋章】（勾选则无视是否到期补满亲密度，否则只送到期的）条件去按优先送礼房间先后顺序送礼。  
   之后根据【优先高等级粉丝牌】决定先送高级还是低级（勾选先高级，不勾选先低级）。  
 + 不会送出永久礼物。  
-+ 【剩余礼物】指送完了所有粉丝牌，但仍有剩余的将在1天内过期的且送出后能得到经验值的礼物。  
++ 【剩余礼物】指送完了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。  
 + 【剩余礼物送礼直播间】和【剩余礼物送礼直播间拥有者UID】必须对应。任意一项填0则不送剩余礼物。  
 
 **关于自动投币**
@@ -118,7 +121,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 + 这个功能目前处于实验阶段，且风险较大。  
 
 **关于内容屏蔽**  
-+ 【拦截直播流并静音】若勾选了此选项，会拦截为了获取小心心打开的隐形窗口的直播流。勾选后需刷新网页才能生效。建议与【自动获取小心心】搭配使用。  
++ 【拦截挂小心心打开窗口的直播流】若勾选了此选项，会拦截为了获取小心心打开的隐形窗口的直播流。勾选后需刷新网页才能生效。建议与【自动获取小心心】搭配使用。  
 
 **关于小心心**  
 + 使用本功能前请先禁用flash插件。  
@@ -145,6 +148,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 
 **关于运行日志**  
 脚本默认开启运行日志，打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。若想关闭日志可以在脚本头部加入`console.log = () => {}`。  
+启用【自动获取小心心】后当前日志会被清除。因为B站播放器初始化的时候控制台日志会被清空。  
 如果使用脚本过程中遇到问题，可以在控制台中寻找相关错误信息。若无法解决可以进行反馈，并给出错误信息和问题描述。  
 
 **关于反馈**  
@@ -155,8 +159,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 ## 已知问题
 1. [#12](https://github.com/andywang425/BLTH/issues/12)  
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后，打开`启用Ajax Hook API`。  
-2. 【拦截直播流】功能可能仅在Tampermonkey上可用。  
-3. 如果使用firefox浏览器，脚本窗口的布局会调整为单列模式（若在火狐上强制使用双列排版，窗口布局会变得很奇怪，原因不明）。  
+2. 【拦截挂小心心打开窗口的直播流】功能可能仅在Tampermonkey上可用。  
 
 -------------------------------
 
@@ -171,15 +174,16 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 + [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/BLRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
++ [ocrad.js](https://github.com/antimatter15/ocrad.js) (GPL-3.0) by [antimatter15](https://github.com/antimatter15)  
 + [layer](https://github.com/sentsin/layer) (MIT) by [sentsin](https://github.com/sentsin)  
 
 本脚本使用的库：  
-+ [BilibiliAPI_Mod.js](https://github.com/andywang425/BLTH/blob/master/BilibiliAPI_Mod.js)：B站API及常用函数。  
-+ [OCRAD.js](https://github.com/antimatter15/ocrad.js)：识别领银瓜子宝箱验证码。  
-+ [libBilibiliToken.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveClientHeart/BiliveClientHeart.user.js)：获取移动端token。  
-+ [layer.js](https://github.com/sentsin/layer)：创建弹窗，信息框等  
++ [BilibiliAPI_Mod.min.js](https://github.com/andywang425/BLTH/blob/master/BilibiliAPI_Mod.js) (MIT)：B站API及常用函数。  
++ [OCRAD.min.js](https://github.com/antimatter15/ocrad.js) (GPL-3.0)：识别领银瓜子宝箱验证码。  
++ [libBilibiliToken.user.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveClientHeart/BiliveClientHeart.user.js) (MIT)：获取移动端token。  
++ [layer.js](https://github.com/sentsin/layer) (MIT)：创建弹窗，信息框等  
 
-本脚本引用的外部资源：
+本脚本引用的外部资源：  
 + [layer.css](https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css)：layer.js的内置样式  
 
 感谢以上这些项目的作者~  
@@ -187,7 +191,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 -------------------------------
 
 ## 更新日志
->### 4.2.1.1
->修复自动送礼送剩余礼物异常的bug。  
+>### 4.2.1.2
+>修改layer.js使其不主动加载css，避免发出错误请求；自动送礼优化和bug修复；修复因同一天过期的小心心不在一组，小心心模块不停止运行的bug。    
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
