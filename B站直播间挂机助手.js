@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.2.2
+// @version        4.2.3
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -33,7 +33,7 @@
     const NAME = 'IGIFTMSG';
     const block_live = localStorage.getItem(`${NAME}_block_live`) || 'pass';
     //const originFetch = fetch;
-    if (block_live == 'block' && /https?:\/\/live\.bilibili\.com\/.*\?cut/.test(window.location.href)) {
+    if (block_live == 'block' && /https?:\/\/live\.bilibili\.com\/.*\?visit_id=1cut2cut3cut/.test(window.location.href)) {
         return blockLiveStream();
     };
     window.localStorage["LIVE_PLAYER_STATUS"] = window.localStorage["LIVE_PLAYER_STATUS"].replace("flash", 'html5');
@@ -44,6 +44,8 @@
         guard_join_try = 0,
         pk_join_try = 0,
         SEND_GIFT_NOW = false,//立刻送出礼物
+        LIGHT_MEDAL_NOW = false,//立刻点亮勋章
+        hideBtnClickable = true,
         layerIndex_list = [],
         liveRoom_list = [],
         Live_info = {
@@ -420,15 +422,15 @@
             },
             newMessage: (version) => {
                 try {
-                    let cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.2.2') &&
-                        version == '4.2.2') { //更新公告时需要修改
+                    const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
+                    if ((cache == undefined || cache == null || cache != '4.2.3') &&
+                        version == '4.2.3') { //更新公告时需要修改
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
                         }
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `1.增加新选项（参与抽奖，检查小时榜）<br>2.窗口UI细节改进<br>3.剩余礼物UID改为自动获取<br>
+                            content: `1.增加新选项【立刻点亮勋章】<br>2.小心心模块优化<br>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
                             （或者进qq群${linkMsg('1106094437', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}）反馈。
@@ -799,6 +801,7 @@
                 <input style="vertical-align: text-top;" type="radio" name="LIGHT_TYPE">
                 黑名单
             </div>
+            <button style="font-size: small" class="igiftMsg_btn" data-action="lightMedalNow">立刻点亮勋章</button>
         </div>
         <div data-toggle="FORCE_LIGHT" style="line-height: 15px">
         <label style="margin: 5px auto; color: black">
@@ -1101,6 +1104,10 @@
                                 SEND_GIFT_NOW = true;
                                 MY_API.Gift.run();
                             });
+                            $(div).find('button[data-action="lightMedalNow"]').click(() => {//立刻点亮勋章
+                                LIGHT_MEDAL_NOW = true;
+                                MY_API.Gift.run();
+                            });
                             const checkList = [
                                 'RANDOM_DELAY',
                                 'TIME_AREA_DISABLE',
@@ -1218,11 +1225,10 @@
                         }
                     });
                 };
-                let isClick = true;
                 btn.click(() => {
-                    if (isClick) {
-                        isClick = false;
-                        setTimeout(function () { isClick = true }, 200);
+                    if (hideBtnClickable) {
+                        hideBtnClickable = false;
+                        setTimeout(function () { hideBtnClickable = true }, 200);
                         if (msgHide == 'show') {//显示=>隐藏
                             msgHide = 'hide';
                             localStorage.setItem(`${NAME}_msgHide`, msgHide);
@@ -2643,14 +2649,14 @@
                     try {
                         if (!MY_API.CONFIG.AUTO_GIFT) return $.Deferred().resolve();
                         if (MY_API.Gift.run_timer) clearTimeout(MY_API.Gift.run_timer);
-                        if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && SEND_GIFT_NOW == false) {
+                        if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW) {
                             let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
                             MY_API.Gift.run_timer = setTimeout(MY_API.Gift.run, alternateTime);
                             let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
                             MYDEBUG("[自动送礼]", `将在${runTime}进行自动送礼`);
                             return $.Deferred().resolve();
 
-                        } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && SEND_GIFT_NOW == false) {
+                        } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW) {
                             let GiftInterval = MY_API.CONFIG.GIFT_INTERVAL * 60e3;
                             if (MY_API.CACHE.GiftInterval_TS) {
                                 const interval = ts_ms() - MY_API.CACHE.GiftInterval_TS;
@@ -2679,6 +2685,10 @@
                                 medal_list = medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
                             };
                             await MY_API.Gift.auto_light(medal_list);//点亮勋章
+                            if (LIGHT_MEDAL_NOW) {
+                                LIGHT_MEDAL_NOW = false;
+                                return $.Deferred().resolve();
+                            }
                             for (let v of medal_list) {
                                 if (MY_API.Gift.over) break;
                                 let response = await BAPI.room.room_init(parseInt(v.roomid, 10));
@@ -3133,7 +3143,8 @@
                         title: `${roomId}`,
                         type: 2,
                         shade: 0,
-                        content: `https://live.bilibili.com/${roomId}?cut`,
+                        zIndex: 0,
+                        content: `https://live.bilibili.com/${roomId}?visit_id=1cut2cut3cut`,
                         end: () => {
                             clearTimeout(Timer);
                             delListItem(roomId, liveRoom_list);
@@ -3438,7 +3449,7 @@
     function blockLiveStream() {/*
         unsafeWindow.fetch = (...arg) => {
             console.log('fetch arg', ...arg);
-            if (arg[0].indexOf('bilivideo.com') > -1 && /https?:\/\/live\.bilibili\.com\/.*\?cut/.test(window.location.href)) {
+            if (arg[0].indexOf('bilivideo.com') > -1) {
                 console.log('拦截直播流')
                 return new Promise(() => {
                 throw new Error();
@@ -3449,12 +3460,19 @@
             }
 
         }*/
-        if ($(".live-icon-un-mute").length > 0) $(".live-icon-un-mute").click();
-        else setTimeout(blockLiveStream, 200);
-        setTimeout(() => {
-            if ($('[data-title="Flash播放器"]').length > 0) $('[data-title="Flash播放器"]').click();
-            else setTimeout(blockLiveStream, 200);
-        }, 4000);
+        let muteTimer = setInterval(() => {
+            if ($(".live-icon-un-mute").length > 0) {
+                $(".live-icon-un-mute").click();
+                clearInterval(muteTimer)
+            }
+        }, 200);
+
+        let flashTimer = setInterval(() => {
+            if ($('[data-title="Flash播放器"]').length > 0) {
+                $('[data-title="Flash播放器"]').click();
+                clearInterval(flashTimer)
+            }
+        }, 5000);
     };
     /**
      * （1000000000） 获取到明天的目标时间戳所在的相同【时间点】所需时间（毫秒）

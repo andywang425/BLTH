@@ -49,10 +49,9 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 <li>抽奖前发送活跃弹幕（防检测）</li>
 <li>进入小黑屋后强制重复抽奖直到成功，最多尝试5次</li>
 </ul>
-</details>  
-
+</details>
 <details>
-<summary>自动完成每日任务</summary>  
+<summary>自动完成每日任务</summary>
 <ul>
 <li>登陆主站</li>  
 <li>观看视频</li>  
@@ -160,6 +159,8 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 1. [#12](https://github.com/andywang425/BLTH/issues/12)  
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后，打开`启用Ajax Hook API`。  
 2. 【拦截挂小心心打开窗口的直播流】功能可能仅在Tampermonkey上可用。  
+3. 由于B站服务器限制，无法给[共青团中央](https://live.bilibili.com/54)送礼。  
+4. 在[湊-阿库娅Official](https://live.bilibili.com/14917277)的直播间启用脚本时，右上角可能会不停地出现提示`[B站直播间挂机助手]无配置信息`，但不影响使用。  
 
 -------------------------------
 
@@ -178,6 +179,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 + [layer](https://github.com/sentsin/layer) (MIT) by [sentsin](https://github.com/sentsin)  
 
 本脚本使用的库：  
++ [jquery](https://github.com/jquery/jquery) (MIT)  
 + [BilibiliAPI_Mod.min.js](https://github.com/andywang425/BLTH/blob/master/BilibiliAPI_Mod.js) (MIT)：B站API及常用函数。  
 + [OCRAD.min.js](https://github.com/antimatter15/ocrad.js) (GPL-3.0)：识别领银瓜子宝箱验证码。  
 + [libBilibiliToken.user.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveClientHeart/BiliveClientHeart.user.js) (MIT)：获取移动端token。  
@@ -192,6 +194,6 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 
 ## 更新日志
 >### 4.2.2
->增加新选项（参与抽奖，检查小时榜）；剩余礼物UID改为自动获取；窗口UI细节改进。  
+>增加新选项【立刻点亮勋章】；小心心模块优化。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
