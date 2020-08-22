@@ -15,28 +15,23 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.2.3
+// @version        4.3
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
 // @connect       api.live.bilibili.com
 // @connect       live-trace.bilibili.com
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@56149b5a33cf4b1318a6806d7edb06a4fbefcf4a/BilibiliAPI_Mod.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@56149b5a33cf4b1318a6806d7edb06a4fbefcf4a/OCRAD.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@56149b5a33cf4b1318a6806d7edb06a4fbefcf4a/libBilibiliToken.user.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@b40278754a4da6605c16e0cf2228a7ec73b676b0/layer.js
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/BilibiliAPI_Mod.min.js
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/OCRAD.min.js
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/layer.js
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/libBilibiliToken.js
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/libWasmHash.js
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 (function () {
     const NAME = 'IGIFTMSG';
-    const block_live = localStorage.getItem(`${NAME}_block_live`) || 'pass';
-    //const originFetch = fetch;
-    if (block_live == 'block' && /https?:\/\/live\.bilibili\.com\/.*\?visit_id=1cut2cut3cut/.test(window.location.href)) {
-        return blockLiveStream();
-    };
-    window.localStorage["LIVE_PLAYER_STATUS"] = window.localStorage["LIVE_PLAYER_STATUS"].replace("flash", 'html5');
     const debugSwitch = true; //控制开关
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide'; //UI隐藏开关
     const BAPI = BilibiliAPI;
@@ -47,11 +42,11 @@
         LIGHT_MEDAL_NOW = false,//立刻点亮勋章
         hideBtnClickable = true,
         layerIndex_list = [],
-        liveRoom_list = [],
         Live_info = {
             room_id: undefined,
             uid: undefined,
             ruid: undefined,
+            tid: undefined,
             mobile_verify: undefined,
             gift_list: undefined,
             rnd: undefined,
@@ -116,9 +111,8 @@
     }
     const appToken = new BilibiliToken();
     const baseQuery = `actionKey=appkey&appkey=${BilibiliToken.appKey}&build=5561000&channel=bili&device=android&mobi_app=android&platform=android&statistics=%7B%22appId%22%3A1%2C%22platform%22%3A3%2C%22version%22%3A%225.57.0%22%2C%22abtest%22%3A%22%22%7D`;
-    //let tokenData = JSON.parse(GM_getValue('userToken', '{}'));
     let userToken = undefined,
-        tokenData = JSON.parse(localStorage.getItem(`${NAME}_userToken`)) || {};
+        tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || {};
     const setToken = async () => {
         if (tokenData.time > ts_s()) {
             userToken = tokenData;
@@ -128,7 +122,7 @@
             localStorage.setItem(`${NAME}_Token`, JSON.stringify(tokenData));
             userToken = tokenData;
         };
-        MYDEBUG(`${NAME}_userToken`, tokenData);
+        MYDEBUG(`${NAME}_Token`, tokenData);
         return 'OK';
     };
     const newWindow = {
@@ -183,7 +177,7 @@
 
     $(() => {//DOM完毕，等待弹幕加载完成
         let loadInfo = (delay) => {
-            setTimeout(() => {
+            setTimeout(async () => {
                 const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
                 if ((W.BilibiliLive === undefined || parseInt(W.BilibiliLive.UID) === 0 || isNaN(parseInt(W.BilibiliLive.UID)))) {
                     loadInfo(1000);
@@ -192,12 +186,13 @@
                 } else {
                     Live_info.room_id = W.BilibiliLive.ROOMID;
                     Live_info.uid = W.BilibiliLive.UID;
-                    BAPI.live_user.get_info_in_room(Live_info.room_id).then((response) => {
+                    Live_info.tid = W.BilibiliLive.ANCHOR_UID;
+                    await BAPI.live_user.get_info_in_room(Live_info.room_id).then((response) => {
                         MYDEBUG('InitData: API.live_user.get_info_in_room', response);
                         Live_info.mobile_verify = response.data.info.mobile_verify;
                         Live_info.identification = response.data.info.identification;
                     });
-                    BAPI.gift.gift_config().then((response) => {
+                    await BAPI.gift.gift_config().then((response) => {
                         MYDEBUG('InitData: API.gift.gift_config', response);
                         if (!!response.data && $.isArray(response.data)) {
                             Live_info.gift_list = response.data;
@@ -243,7 +238,7 @@
             this.splice(index, 1);
         }
     };
-    function addStyle() {
+    const addStyle = () => {
         $('head').append(`
         <style>
             .igiftMsg_input{
@@ -276,7 +271,7 @@
         </style>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css" id="layuicss-layer">
             `);
-    }
+    };
     function init() {//API初始化
         const MY_API = {
             CONFIG_DEFAULT: {
@@ -284,7 +279,6 @@
                 AUTO_GIFT_ROOMID: "0",//送礼优先房间
                 AUTO_GROUP_SIGN: true,//应援团签到开关
                 AUTO_TREASUREBOX: true,//每日宝箱
-                BLOCK_LIVE_VIDEO: true,//拦截挂小心心打开窗口的直播流
                 CHECK_HOUR_ROOM: true,//检查小时榜
                 CHECK_HOUR_ROOM_INTERVAL: 600,//小时间检查间隔时间(秒)
                 COIN: false,//投币
@@ -304,12 +298,11 @@
                 LOTTERY: true,//参与抽奖
                 LIVE_SIGN: true,//直播区签到
                 LOGIN: true,//主站登陆
-                LITTLE_HEART: false,//打开隐形窗口获取小心心
+                LITTLE_HEART: false,//获取小心心
                 LIGHT_MEDALS: "0",//点亮勋章
                 LIGHT_METHOD: "LIGHT_WHITE",
                 MAX_GIFT: 99999,//辣条上限
-                MAX_TAB: 5,//标签页上限
-                MOBILE_HEARTBEAT: false,//移动端心跳
+                NOSLEEP: true,//防挂机检测
                 RANDOM_DELAY: true,//抽奖随机延迟
                 RANDOM_SEND_DANMU: 0,//随机弹幕发送概率
                 RANDOM_SKIP: 0,//随机跳过抽奖概率
@@ -382,7 +375,6 @@
                 }
 
                 setTimeout(MY_API.TreasureBox.init, 5750);
-
                 return p;
             },
             loadConfig: () => {//加载配置函数
@@ -423,14 +415,14 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.2.3') &&
-                        version == '4.2.3') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '4.3') &&
+                        version == '4.3') { //更新公告时需要修改
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
-                        }
+                        };
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `1.增加新选项【立刻点亮勋章】<br>2.小心心模块优化<br>
+                            content: `<strong>1.通过发送心跳包的方式获取小心心，且无论目标房间是否开播都能获取小心心<br>2.新增防挂机检测功能<br></strong>3.删除了之前的移动端心跳功能<br>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
                             （或者进qq群${linkMsg('1106094437', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}）反馈。
@@ -527,8 +519,13 @@
                     '.activity-entry',//活动入口
                     '.bilibili-live-player'
                 ];
-                const removeUntiSucceed = (settingName, list_id) => {
-                    if (MY_API.CONFIG[settingName] === true) {
+                const settingNameList = [
+                    'REMOVE_ELEMENT_2233',
+                    'REMOVE_ELEMENT_activity',
+                    'REMOVE_ELEMENT_player'
+                ];
+                const removeUntiSucceed = (list_id) => {
+                    if (MY_API.CONFIG[settingNameList[list_id]]) {
                         setInterval(() => {
                             if ($(unnecessaryList[list_id]).length > 0) {
                                 $(unnecessaryList[list_id]).remove();
@@ -537,22 +534,18 @@
                             }
                         }, 200);
                     }
-                };/*
-                const mute = () => {
-                    window.localStorage["videoVolume"] = 0;
-                    if (!window.localStorage["videoVolume"]) {
-                        delayCall(() => mute, 200);
-                    }
-                };*/
-                //if (MY_API.CONFIG.LITTLE_HEART) mute();
-                removeUntiSucceed('REMOVE_ELEMENT_2233', 0);
-                removeUntiSucceed('REMOVE_ELEMENT_activity', 1);
-                removeUntiSucceed('REMOVE_ELEMENT_player', 2);
+                };
+                for (let i = 0; i < unnecessaryList.length - 1; i++) {
+                    removeUntiSucceed(i);
+                };
+                if (MY_API.CONFIG.NOSLEEP) {
+                    setInterval(() => document.dispatchEvent(new Event('visibilitychange')), 10 * 60 * 1000);
+                }
             },
             creatSetBox: () => {//创建设置框
                 const eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter']//确保必要元素已加载
                 for (const ele of eleList) {
-                    if ($(ele).length == 0) {
+                    if ($(ele).length === 0) {
                         return delayCall(() => MY_API.creatSetBox(), 200);
                     }
                 }
@@ -679,10 +672,6 @@
                 <input style="vertical-align: text-top;" type="checkbox">
                 自动领银瓜子宝箱
             </div>
-            <div data-toggle="MOBILE_HEARTBEAT" style=" color: gray">
-            <input style="vertical-align: text-top;" type="checkbox">
-            模拟移动端心跳
-            </div>
         </fieldset>
         <fieldset class="igiftMsg_fs">
             <legend style="color: black">自动送礼设置</legend>
@@ -780,12 +769,6 @@
                     <input style="vertical-align: text-top;" type="checkbox"> 自动获取小心心
                 </label>
             </div>
-            <div data-toggle="MAX_TAB" style="line-height: 15px">
-            <label style="margin: 5px auto; color: black">
-                打开隐形窗口数量上限
-                <input class="num igiftMsg_input" type="text" style="width: 30px;">
-            </label>
-        </div>
             <div data-toggle="LIGHT_MEDALS" style=" color: purple">
                 自动点亮勋章房间号
             <input class="num igiftMsg_input" style="width: 300px;" type="text">
@@ -823,10 +806,10 @@
                     移除活动入口
                 </label>
             </div>
-            <div data-toggle="BLOCK_LIVE_VIDEO" style="line-height: 15px">
+            <div data-toggle="NOSLEEP" style="line-height: 20px">
             <label style="margin: 5px auto; color: black">
                 <input style="vertical-align: text-top;" type="checkbox">
-                拦截挂小心心打开窗口的直播流
+                屏蔽挂机检测
             </label>
         </div>
         </fieldset>
@@ -842,6 +825,7 @@
                     不抽奖时段不刷新直播间
                 </label>
             </div>
+
             <div id="resetArea">
                 <button data-action="reset" style="color: red;" class="igiftMsg_btn">重置所有为默认</button>
                 <button data-action="redo_dailyTasks" style="color: red;" class="igiftMsg_btn">再次执行所有任务</button>
@@ -1124,15 +1108,14 @@
                                 'IN_TIME_RELOAD_DISABLE',
                                 "AUTO_GIFT",
                                 "SEND_ALL_GIFT",
-                                'MOBILE_HEARTBEAT',
                                 'STORM',
                                 'LITTLE_HEART',
                                 'REMOVE_ELEMENT_2233',
                                 'REMOVE_ELEMENT_activity',
-                                'BLOCK_LIVE_VIDEO',
                                 "FORCE_LIGHT",
                                 "LOTTERY",
-                                "CHECK_HOUR_ROOM"
+                                "CHECK_HOUR_ROOM",
+                                "NOSLEEP"
                             ];
                             for (const i of checkList) {//绑定所有checkbox事件
                                 let input = $(div).find(`div[data-toggle="${i}"] input:checkbox`);
@@ -1140,11 +1123,6 @@
                                 input.change(function () {
                                     MY_API.CONFIG[i] = $(this).prop('checked');
                                     MY_API.saveConfig();
-                                    if (MY_API.CONFIG.BLOCK_LIVE_VIDEO) {
-                                        localStorage.setItem(`${NAME}_block_live`, 'block');
-                                    } else {
-                                        localStorage.setItem(`${NAME}_block_live`, 'pass');
-                                    }
                                 });
                             };
                             $('input:text').bind('keydown', function (event) {//绑定回车保存
@@ -2612,7 +2590,7 @@
                                                 window.toast(`[自动送礼]勋章[${medal.medalName}]点亮成功，送出${feed_num}个${gift.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离升级还需[${remain_feed}]`, 'success');
                                                 MYDEBUG('Gift.auto_light', `勋章[${medal.medalName}]点亮成功，送出${feed_num}个${gift.gift_name}，[${medal.today_feed}/${medal.day_limit}]`)
                                             } else {
-                                                window.toast(`[自动送礼]勋章[${medal.medalName}]点亮失败【${response.msg}】`, 'caution');
+                                                window.toast(`[自动送礼]勋章[${medal.medalName}]点亮失败【${rsp.msg}】`, 'caution');
                                             }
                                         }
                                         continue;
@@ -2832,73 +2810,7 @@
                     }
                 }
             },
-            MobileHeartBeat: {
-                run:
-                    async () => {
-                        if (MY_API.CONFIG.MOBILE_HEARTBEAT == false) return $.Deferred().resolve();
-                        if (!checkNewDay(MY_API.CACHE.MobileHeartBeat_TS)) {
-                            runMidnight(MY_API.MobileHeartBeat.run, '移动端心跳');
-                            return $.Deferred().resolve();
-                        }
-                        if (Live_info.mobile_verify === false) {
-                            window.toast('[移动端心跳]未绑定手机，已停止', 'warning');
-                            MYDEBUG('MobileHeartBeat', `未绑定手机 mobile_verify = ${Live_info.mobile_verify}`);
-                            return $.Deferred().resolve();
-                        }
-                        const mobileOnline = () => {
-                            XHR({
-                                GM: true,
-                                anonymous: true,
-                                method: 'POST',
-                                url: `https://api.live.bilibili.com/heartbeat/v1/OnLine/mobileOnline?${BilibiliToken.signQuery(`access_key=${tokenData.access_token}&${baseQuery}`)}`,
-                                data: `room_id=${Live_info.room_id}&scale=xxhdpi`,
-                                responseType: 'json',
-                                headers: appToken.headers
-                            });
-                        };
-                        const EndFunc = (re) => {
-                            MYDEBUG('MobileHeartBeat GetAward', re);
-                            clearInterval(HBinterval);
-                            MY_API.CACHE.MobileHeartBeat_TS = ts_ms();
-                            MY_API.saveCache();
-                            runMidnight(MY_API.MobileHeartBeat.run, '移动端心跳');
-                        };
-                        const getWatchingAward = () => {
-                            BAPI.activity.receive_award('double_watch_task').then((response) => {
-                                if (response.code === 0) {
-                                    window.toast('[双端观看直播]奖励领取成功', 'success');
-                                    EndFunc(response);
-                                    return $.Deferred().resolve();
-                                }
-                                else if (response.code === -400) {
-                                    window.toast('[双端观看直播]奖励已领取', 'info');
-                                    EndFunc(response);
-                                    return $.Deferred().resolve();
-                                }
-                                else {
-                                    window.toast(`[双端观看直播]${response}`, 'warning');
-                                    EndFunc(response);
-                                    return $.Deferred().resolve();
-                                }
-                            }, (err) => {
-                                window.toast('[双端观看直播]奖励领取失败，请检查网络', 'error');
-                                console.error('MobileHeartBeat GetAward', err);
-                                clearInterval(HBinterval);
-                                return delayCall(() => MY_API.MobileHeartBeat.run());
-                            });
-                        }
-                        if (await setToken() === undefined && tokenData.access_token === undefined) {
-                            MYDEBUG('MobileHeartBeat', 'token设置失败');
-                            return;
-                        }
-                        MYDEBUG('MobileHeartBeat', '开始客户端心跳');
-                        mobileOnline();
-                        let HBinterval = undefined;
-                        HBinterval = setInterval(() => mobileOnline(), 300 * 1e3);
-                        setTimeout(getWatchingAward, 360 * 1e3);
-                    }
 
-            },
             stormQueue: [],//n节奏风暴队列
             stormBlack: false,//n节奏风暴黑屋
             stormIdSet: {//风暴历史记录缓存
@@ -3083,154 +2995,179 @@
                 }
             },
             LITTLE_HEART: {
-                medalRoom_list: [],
-                liveRoom_list: [],
-                getMedalRoomList: (page = 1) => {
-                    if (page === 1) MY_API.LITTLE_HEART.medalRoom_list = [];
-                    return BAPI.i.medal(page, 25).then((response) => {
-                        MYDEBUG('LITTLE_HEART.getMedalRoomList: API.i.medal', response);
-                        //MY_API.Gift.medal_list = MY_API.Gift.medal_list.concat(response.data.fansMedalList);
-                        for (let i of response.data.fansMedalList) {
-                            MY_API.LITTLE_HEART.medalRoom_list = MY_API.LITTLE_HEART.medalRoom_list.concat(i.roomid);
-                        }
-                        MYDEBUG('MY_API.LITTLE_HEART.medalRoom_list', MY_API.LITTLE_HEART.medalRoom_list)
-                        if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) MY_API.LITTLE_HEART.getMedalRoomList(page + 1);
-                    }, () => {
-                        window.toast('[小心心]获取勋章列表失败，请检查网络', 'error');
-                        return delayCall(() => MY_API.LITTLE_HEART.getMedalRoomList(page));
+                getInfo: () => XHR({
+                    GM: true,
+                    anonymous: true,
+                    method: 'GET',
+                    url: `https://passport.bilibili.com/x/passport-login/oauth2/info?${appToken.signLoginQuery(`access_key=${tokenData.access_token}`)}`,
+                    responseType: 'json',
+                    headers: appToken.headers
+                }),
+                mobileOnline: () => XHR({
+                    GM: true,
+                    anonymous: true,
+                    method: 'POST',
+                    url: `https://api.live.bilibili.com/heartbeat/v1/OnLine/mobileOnline?${BilibiliToken.signQuery(`access_key=${tokenData.access_token}&${baseQuery}`)}`,
+                    data: `room_id=${Live_info.room_id}&scale=xxhdpi`,
+                    responseType: 'json',
+                    headers: appToken.headers
+                }),
+                RandomHex: (length) => {
+                    const words = '0123456789abcdef';
+                    let randomID = '';
+                    randomID += words[Math.floor(Math.random() * 15) + 1];
+                    for (let i = 0; i < length - 1; i++)
+                        randomID += words[Math.floor(Math.random() * 16)];
+                    return randomID;
+                },
+                uuid: () => MY_API.LITTLE_HEART.RandomHex(32).replace(/(\w{8})(\w{4})\w(\w{3})\w(\w{3})(\w{12})/, `$1-$2-4$3-${'89ab'[Math.floor(Math.random() * 4)]}$4-$5`),
+                getFansMedal: async () => {
+                    const funsMedals = await XHR({
+                        GM: true,
+                        anonymous: true,
+                        method: 'GET',
+                        url: `https://api.live.bilibili.com/fans_medal/v1/FansMedal/get_list_in_room?${BilibiliToken.signQuery(`access_key=${tokenData.access_token}&target_id=${Live_info.tid}&uid=${Live_info.uid}&${baseQuery}`)}`,
+                        responseType: 'json',
+                        headers: appToken.headers
                     });
+                    if (funsMedals !== undefined && funsMedals.response.status === 200)
+                        if (funsMedals.body.code === 0)
+                            if (funsMedals.body.data.length > 0)
+                                return funsMedals.body.data;
                 },
-
-                checkRoomList: async (roomList) => {
-                    let returnRoom = [];
-                    for (let r of roomList) {
-                        await BAPI.room.get_info(r).then((re) => {
-                            if (re.data.live_status === 1) {
-                                returnRoom = returnRoom.concat(re.data.room_id);
-                                return
-                            }
-                        }, () => {
-                            window.toast('[小心心]获取房间信息失败，请检查网络', 'error');
-                            return delayCall(() => MY_API.LITTLE_HEART.checkRoomList(roomList));
-                        });
-                    };
-                    MYDEBUG('MY_API.LITTLE_HEART.checkRoomList returnRoom', returnRoom)
-                    if (returnRoom != undefined) {
-                        return returnRoom
-                    } else {
-                        window.toast('[小心心]当前粉丝勋章列表中无正在直播房间，5分钟后重试');
-                        return delayCall(() => MY_API.LITTLE_HEART.getMedalRoomList(page), 300e3);
-                    }
-                },
-                checkRoom: async (roomid) => {
-                    let roomCheck = undefined;
-                    await BAPI.room.get_info(roomid).then((re) => {
-                        if (re.data.live_status === 1) {//live_status=1
-                            roomCheck = true;
-                        } else {
-                            roomCheck = false;
-                        }
-                    }, () => {
-                        window.toast('[小心心]获取房间信息失败，请检查网络', 'error');
-                        return delayCall(() => MY_API.LITTLE_HEART.checkRoomList(roomList));
+                getGiftNum: async () => {
+                    let count = 0;
+                    const bagInfo = await XHR({
+                        GM: true,
+                        anonymous: true,
+                        method: 'GET',
+                        url: `https://api.live.bilibili.com/xlive/app-room/v1/gift/bag_list?${BilibiliToken.signQuery(`access_key=${tokenData.access_token}&room_id=${Live_info.room_id}&${baseQuery}`)}`,
+                        responseType: 'json',
+                        headers: appToken.headers
                     });
-                    return roomCheck;
+                    if (bagInfo !== undefined && bagInfo.response.status === 200)
+                        if (bagInfo.body.code === 0)
+                            if (bagInfo.body.data.list.length > 0)
+                                for (const giftData of bagInfo.body.data.list)
+                                    if (giftData.gift_id === 30607) {
+                                        const expire = (giftData.expire_at - Date.now() / 1000) / 60 / 60 / 24;
+                                        if (expire > 6 && expire <= 7)
+                                            count += giftData.gift_num;
+                                    }
+                    return count;
                 },
-                doHeartBeat: async (roomId) => {
-                    if (liveRoom_list.indexOf(roomId) == -1) return
-                    MYDEBUG('[小心心]打开房间', liveRoom_list);
-                    const index = layer.open({
-                        title: `${roomId}`,
-                        type: 2,
-                        shade: 0,
-                        zIndex: 0,
-                        content: `https://live.bilibili.com/${roomId}?visit_id=1cut2cut3cut`,
-                        end: () => {
-                            clearTimeout(Timer);
-                            delListItem(roomId, liveRoom_list);
-                            delListItem(index, layerIndex_list)
-                        }
+                mobileHeartBeat: async (postJSON) => {
+                    const wasm = new WasmHash();
+                    await wasm.init();
+                    const clientSign = (data) => wasm.hash('BLAKE2b512', wasm.hash('SHA3-384', wasm.hash('SHA384', wasm.hash('SHA3-512', wasm.hash('SHA512', JSON.stringify(data))))));
+                    const sign = clientSign(postJSON);
+                    let postData = '';
+                    for (const i in postJSON)
+                        postData += `${i}=${encodeURIComponent(postJSON[i])}&`;
+                    postData += `client_sign=${sign}`;
+                    const mobileHeartBeat = await XHR({
+                        GM: true,
+                        anonymous: true,
+                        method: 'POST',
+                        url: 'https://live-trace.bilibili.com/xlive/data-interface/v1/heartbeat/mobileHeartBeat',
+                        data: BilibiliToken.signQuery(`access_key=${tokenData.access_token}&${postData}&${baseQuery}`),
+                        responseType: 'json',
+                        headers: appToken.headers
                     });
-                    layer.style(index, { // 隐藏弹窗
-                        display: 'none',
-                    });
-                    layerIndex_list.push(index);
-                    let Timer = setTimeout(async () => {
-                        if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
-                            MYDEBUG('[小心心]', `今日任务完成，房间${roomId}不再打开`);
-                            return $.Deferred().resolve();
-                        }
-                        if (!MY_API.LITTLE_HEART.checkRoom(roomId)) {
-                            //不开播则删除房间记录，重新运行run
-                            window.toast(`[小心心]房间${roomId}下播，再次寻找开播房间`, 'info');
-                            layer.close(index);
-                            return MY_API.LITTLE_HEART.run();
-                        }
-                    }, 310e3);
+                    if (mobileHeartBeat !== undefined && mobileHeartBeat.response.status === 200)
+                        if (mobileHeartBeat.body.code === 0)
+                            return true;
+                    return false;
                 },
-                checkHeart: () => {
-                    const checkbag = () => {
-                        BAPI.gift.bag_list().then((re) => {
-                            MYDEBUG('[小心心]检查包裹', re);
-                            const allHeart = re.data.list.filter(r => r.gift_id == 30607 && r.corner_mark == "7天");
-                            let todayHeart = 0;
-                            for (const heart of allHeart) {
-                                MYDEBUG(`[小心心]检测包裹内7天小心心${heart.gift_num}个`, heart);
-                                todayHeart += heart.gift_num;
-                            }
-                            if (todayHeart === 24) {
-                                clearInterval(timer);
-                                window.toast('[小心心]今日小心心已全部获取', 'success');
-                                MY_API.CACHE.LittleHeart_TS = ts_ms();
-                                MY_API.saveCache();
-                                closeAllIndex(layerIndex_list);
-                                return runMidnight(MY_API.LITTLE_HEART.run, "获取小心心");
-                            }
-                        })
-                    }
-                    checkbag();
-                    let timer = setInterval(() => {
-                        checkbag();
-                    }, 310e3);
-                    return
-                },
-                run: () => {
+                run: async () => {
                     if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
                     if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
-                        return runMidnight(MY_API.LITTLE_HEART.run, "获取小心心");
+                        runMidnight(MY_API.LITTLE_HEART.run, '获取小心心');
+                        return $.Deferred().resolve();
+                    }
+                    const mobileHeartBeatJSON = {
+                        platform: 'android',
+                        uuid: MY_API.LITTLE_HEART.uuid(),
+                        buvid: appToken.buvid,
+                        seq_id: '1',
+                        room_id: '{room_id}',
+                        parent_id: '6',
+                        area_id: '283',
+                        timestamp: '{timestamp}',
+                        secret_key: 'axoaadsffcazxksectbbb',
+                        watch_time: '300',
+                        up_id: '{target_id}',
+                        up_level: '40',
+                        jump_from: '30000',
+                        gu_id: MY_API.LITTLE_HEART.RandomHex(43),
+                        play_type: '0',
+                        play_url: '',
+                        s_time: '0',
+                        data_behavior_id: '',
+                        data_source_id: '',
+                        up_session: 'l:one:live:record:{room_id}:{last_wear_time}',
+                        visit_id: MY_API.LITTLE_HEART.RandomHex(32),
+                        watch_status: '%7B%22pk_id%22%3A0%2C%22screen_status%22%3A1%7D',
+                        click_id: MY_API.LITTLE_HEART.uuid(),
+                        session_id: '',
+                        player_type: '0',
+                        client_ts: '{client_ts}'
                     };
-                    const runFunc = async () => {
-                        MY_API.LITTLE_HEART.checkHeart();
-                        await MY_API.LITTLE_HEART.getMedalRoomList();
-                        liveRoom_list = await MY_API.LITTLE_HEART.checkRoomList(MY_API.LITTLE_HEART.medalRoom_list);
-                        let tabNum = 0;
-                        for (let room of liveRoom_list) {
-                            if (tabNum < MY_API.CONFIG.MAX_TAB) {
-                                await MY_API.LITTLE_HEART.doHeartBeat(room);
-                                tabNum++;
-                            } else {
-                                break;
+                    const endFunc = () => {
+                        window.toast('[小心心]今日小心心已全部获取', 'success');
+                        clearInterval(mobileOnlineTimer);
+                        MY_API.CACHE.LittleHeart_TS = ts_ms();
+                        MY_API.saveCache();
+                        runMidnight(MY_API.LITTLE_HEART.run, '获取小心心');
+                    }
+                    if (tokenData.access_token === undefined && await setToken() === undefined)
+                        return;
+                    else if (!tokenData.access_token && !tokenData.mid && !tokenData.refresh_token) {
+                        const userInfo = await MY_API.LITTLE_HEART.getInfo();
+                        MYDEBUG('[小心心]userInfo', userInfo);
+                        if (userInfo === undefined)
+                            return console.error(GM_info.script.name, '获取用户信息错误');
+                        if (userInfo.body.code !== 0 && await setToken() === undefined)
+                            return;
+                        else if (userInfo.body.data.mid !== Live_info.uid && await setToken() === undefined)
+                            return;
+                    }
+                    MYDEBUG('[小心心]', '开始客户端心跳');
+                    MY_API.LITTLE_HEART.mobileOnline();
+                    let mobileOnlineTimer = setInterval(() => MY_API.LITTLE_HEART.mobileOnline(), 5 * 60 * 1000);
+                    const giftNum = await MY_API.LITTLE_HEART.getGiftNum();
+                    if (giftNum < 24) {
+                        const fansMedal = await MY_API.LITTLE_HEART.getFansMedal();
+                        if (fansMedal !== undefined) {
+                            const control = 24 - giftNum;
+                            const loopNum = Math.ceil(control / fansMedal.length);
+                            let count = 0;
+                            for (let i = 0; i < loopNum; i++) {
+                                for (const funsMedalData of fansMedal) {
+                                    if (count >= control)
+                                        break;
+                                    const postData = Object.assign({}, mobileHeartBeatJSON, {
+                                        room_id: funsMedalData.room_id.toString(),
+                                        timestamp: (BilibiliToken.TS - 300).toString(),
+                                        up_id: funsMedalData.target_id.toString(),
+                                        up_session: `l:one:live:record:${funsMedalData.room_id}:${funsMedalData.last_wear_time}`,
+                                        client_ts: BilibiliToken.TS.toString()
+                                    });
+                                    await MY_API.LITTLE_HEART.mobileHeartBeat(postData);
+                                    count++;
+                                }
+                                if (count >= control) {
+                                    endFunc();
+                                    break;
+                                }
+                                else
+                                    await sleep(300 * 1000);
                             }
                         }
-                    };
-                    if (!MY_API.CONFIG.BLOCK_LIVE_VIDEO) {
-                        layer.confirm('若不勾选【拦截挂小心心打开窗口的直播流】将耗费大量流量，是否继续？', {
-                            title: '警告',
-                            btn: ['是', '否'] //按钮
-                        }, async () => {
-                            layer.msg('那算了╮(￣▽￣)╭', {
-                                time: 2000
-                            });
-                            runFunc();
-                        }, function () {
-                            layer.msg('勾选【拦截挂小心心打开窗口的直播流】后需刷新页面使其生效', {
-                                time: 2500
-                            });
-                        });
                     } else {
-                        runFunc();
+                        endFunc();
                     }
-                    return
+                    return $.Deferred().resolve();
                 }
             }
         };
@@ -3239,16 +3176,16 @@
             try {
                 const promiseInit = $.Deferred();
                 const uniqueCheck = () => {
-                    const t = Date.now();
+                    const t = ts_ms();
                     if (t - MY_API.CACHE.UNIQUE_CHECK >= 0 && t - MY_API.CACHE.UNIQUE_CHECK <= 15e3) {
                         // 其他脚本正在运行
-                        $('.link-toast').hide();
-                        $('.igiftMsg').hide();
+                        $('.link-toast').remove();
+                        $('.igiftMsg').remove();
                         MY_API.CONFIG.AUTO_TREASUREBOX = false;
                         window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
                         return promiseInit.reject();
                     } else {
-                        // 没有其他脚本正在运行 /https?:\/\/live\.bilibili\.com\/.*\?cut/.test(window.location.href)
+                        // 没有其他脚本正在运行
                         return promiseInit.resolve();
                     }
                 };
@@ -3296,16 +3233,15 @@
         if (checkNewDay(API.GIFT_COUNT.CLEAR_TS)) clearStat();
         runExactMidnight(clearStat, '重置统计');
         API.creatSetBox();//创建设置框
-        API.LITTLE_HEART.run();//小心心
         API.removeUnnecessary();//移除页面元素
         setTimeout(() => {
+            API.LITTLE_HEART.run();//小心心
             API.GroupSign.run();//应援团签到
             API.DailyReward.run();//每日任务
             API.LiveReward.run();//直播每日任务
             API.Exchange.runS2C();//银瓜子换硬币
             API.TreasureBox.run();//领宝箱
             API.Gift.run();//送礼物
-            API.MobileHeartBeat.run();//移动端心跳
         }, 6e3);//脚本加载后6秒执行任务
         if (API.CONFIG.LOTTERY) {
             BAPI.room.getList().then((response) => {//获取各分区的房间号
@@ -3409,14 +3345,15 @@
      * @returns {number} intervalTime
      */
     function getIntervalTime(hour, minute) {
-        let myDate = new Date();
-        let h = myDate.getHours();
-        let m = myDate.getMinutes();
-        let s = myDate.getSeconds();
-        let TargetTime = hour * 3600 * 1e3 + minute * 60 * 1e3;
-        let nowTime = h * 3600 * 1e3 + m * 60 * 1e3 + s * 1e3;
-        let intervalTime = TargetTime - nowTime;
-        MYDEBUG("[getIntervalTime]获取间隔时间", intervalTime + '毫秒');
+        const myDate = new Date();
+        const h = myDate.getHours();
+        const m = myDate.getMinutes();
+        const s = myDate.getSeconds();
+        const TargetTime = hour * 3600 * 1e3 + minute * 60 * 1e3;
+        const nowTime = h * 3600 * 1e3 + m * 60 * 1e3 + s * 1e3;
+        const intervalTime = TargetTime - nowTime;
+        const intervalDate = new Date(intervalTime);
+        MYDEBUG("[getIntervalTime]获取间隔时间", `${intervalDate.getHours()}时${intervalDate.getMinutes()}分`);
         if (intervalTime < 0) {
             return 24 * 3600 * 1e3 + intervalTime
         }
@@ -3446,34 +3383,6 @@
         }
         return
     }
-    function blockLiveStream() {/*
-        unsafeWindow.fetch = (...arg) => {
-            console.log('fetch arg', ...arg);
-            if (arg[0].indexOf('bilivideo.com') > -1) {
-                console.log('拦截直播流')
-                return new Promise(() => {
-                throw new Error();
-                });
-            } else {
-                console.log('通过')
-                return originFetch(...arg);
-            }
-
-        }*/
-        let muteTimer = setInterval(() => {
-            if ($(".live-icon-un-mute").length > 0) {
-                $(".live-icon-un-mute").click();
-                clearInterval(muteTimer)
-            }
-        }, 200);
-
-        let flashTimer = setInterval(() => {
-            if ($('[data-title="Flash播放器"]').length > 0) {
-                $('[data-title="Flash播放器"]').click();
-                clearInterval(flashTimer)
-            }
-        }, 5000);
-    };
     /**
      * （1000000000） 获取到明天的目标时间戳所在的相同【时间点】所需时间（毫秒）
      * @param date 整数 时间戳
@@ -3503,7 +3412,7 @@
         if (h == hour && m == minute) {
             return true
         } else {
-            MYDEBUG("isTime", "错误时间");
+            MYDEBUG("isTime 错误时间", `目标时间${hour}时${minute}分，当前时间${h}时${m}分`);
             return false
         }
     }
@@ -3582,7 +3491,7 @@
     function XHR(XHROptions) {
         return new Promise(resolve => {
             const onerror = (error) => {
-                console.error('XHR', error);
+                console.error(GM_info.script.name, error);
                 resolve(undefined);
             };
             if (XHROptions.GM) {
@@ -3593,7 +3502,7 @@
                         XHROptions.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
                 }
                 XHROptions.timeout = 30 * 1000;
-                XHROptions.onload = res => { resolve(res.response) };
+                XHROptions.onload = res => resolve({ response: res, body: res.response });
                 XHROptions.onerror = onerror;
                 XHROptions.ontimeout = onerror;
                 GM_xmlhttpRequest(XHROptions);
@@ -3617,7 +3526,7 @@
                 xhr.send(XHROptions.data);
             }
         });
-    };
+    }
 
 
 })();

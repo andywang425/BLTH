@@ -120,14 +120,11 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 + 这个功能目前处于实验阶段，且风险较大。  
 
 **关于内容屏蔽**  
-+ 【拦截挂小心心打开窗口的直播流】若勾选了此选项，会拦截为了获取小心心打开的隐形窗口的直播流。勾选后需刷新网页才能生效。建议与【自动获取小心心】搭配使用。  
++ 【屏蔽挂机检测】脚本每十分钟触发一次页面可见性改变事件防检测。  
 
 **关于小心心**  
-+ 使用本功能前请先禁用flash插件。  
-+ 因为技术上的原因，目前通过打开隐形窗口的方式来获取小心心。若出现卡顿，浏览器崩溃等情况，请把【打开窗口数量上限】的值调小。  
-+ 检测到包裹内有24个7天的小心心后会停止，并关闭之前打开的隐形窗口。  
++ 通过发送客户端心跳包获取小心心。检测到包裹内有24个7天的小心心后会停止。  
 + 在获取完所有小心心之前直播间不刷新。  
-+ 关闭（或刷新）运行脚本的网页后会关闭所有由脚本打开的隐形窗口。  
 + 点亮勋章指送出一个小心心；点亮勋章会在自动送礼之前进行。    
 + 若不勾选【点亮勋章时忽略亲密度上限】，则仅会点亮当日剩余亲密度大于等于小心心亲密度的勋章。   
 + 勋章点亮模式说明
@@ -180,9 +177,9 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 
 本脚本使用的库：  
 + [jquery](https://github.com/jquery/jquery) (MIT)  
-+ [BilibiliAPI_Mod.min.js](https://github.com/andywang425/BLTH/blob/master/BilibiliAPI_Mod.js) (MIT)：B站API及常用函数。  
++ [BilibiliAPI_Mod.min.js](https://github.com/andywang425/BLTH/blob/master/library_files/BilibiliAPI_Mod.js) (MIT)：B站API及常用函数。  
 + [OCRAD.min.js](https://github.com/antimatter15/ocrad.js) (GPL-3.0)：识别领银瓜子宝箱验证码。  
-+ [libBilibiliToken.user.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveClientHeart/BiliveClientHeart.user.js) (MIT)：获取移动端token。  
++ [libBilibiliToken.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libBilibiliToken/libBilibiliToken.js) (MIT)：获取移动端token。  
 + [layer.js](https://github.com/sentsin/layer) (MIT)：创建弹窗，信息框等  
 
 本脚本引用的外部资源：  
@@ -193,7 +190,7 @@ _注：这里的小黑屋并非主站的小黑屋，是指被b站风控限制抽
 -------------------------------
 
 ## 更新日志
->### 4.2.2
->增加新选项【立刻点亮勋章】；小心心模块优化。  
+>### 4.3
+>通过发送心跳包的方式获取小心心；添加屏蔽挂机检测功能；删除了之前的移动端心跳功能；其它细节上的优化。再次感谢[lzghzr](https://github.com/lzghzr)。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
