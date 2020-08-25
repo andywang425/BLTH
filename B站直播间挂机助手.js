@@ -286,7 +286,7 @@
                 DANMU_CONTENT: ["这是一条弹幕"],//弹幕内容
                 DANMU_ROOMID: ["22474988"],//发弹幕房间号
                 DANMU_INTERVAL_TIME: ["10"],//弹幕间隔时间
-                EXCLUDE_ROOMID: "0",//送礼排除房间号
+                EXCLUDE_ROOMID: ["0"],//送礼排除房间号
                 FORCE_LOTTERY: false,//黑屋强制抽奖
                 FORCE_LIGHT: false,//忽略亲密上限点亮
                 GIFT_LIMIT: 1,//礼物到期时间(天)
@@ -423,10 +423,13 @@
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
                         };
+                        MY_API.CONFIG = MY_API.CONFIG_DEFAULT;
+                        MY_API.CACHE = MY_API.CACHE_DEFAULT;
                         layer.open({
                             title: `${version}更新提示`,
                             content: `<strong>1.新增自动发弹幕功能</strong><br>
-                            ${linkMsg('使用前建议先看下说明(点我前往对应说明处)','https://github.com/andywang425/BLTH/blob/master/README.md#弹幕设置')}<br><hr>
+                            ${linkMsg('使用前建议先看下说明(点我前往对应说明处)','https://github.com/andywang425/BLTH/blob/master/README.md#弹幕设置')}<br>
+                            2.由于部分代码重写所以这次更新后设置和缓存会重置以免产生bug。<br><hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
                             （或者进qq群${linkMsg('1106094437', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}）反馈。
