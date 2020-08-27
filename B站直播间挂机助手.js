@@ -3,8 +3,8 @@
 // @name           B站直播间挂机助手
 // @name:en        B站直播间挂机助手
 // @author         andywang425
-// @description    自动参与Bilibili直播区抽奖(现在极少)，直播区签到，完成主站每日任务，领银瓜子宝箱，自动送礼，自动获取小心心，批量点亮勋章，快捷购买粉丝勋章
-// @description:en 自动参与Bilibili直播区抽奖(现在极少)，直播区签到，完成主站每日任务，领银瓜子宝箱，自动送礼，自动获取小心心，批量点亮勋章，快捷购买粉丝勋章
+// @description    自动参与Bilibili直播区抽奖(现在极少)，直播区签到，完成主站每日任务，自动送礼，自动获取小心心，批量点亮勋章，自动参加被广播的节奏风暴(几乎没有)，自动发弹幕，快捷购买粉丝勋章
+// @description:en 自动参与Bilibili直播区抽奖(现在极少)，直播区签到，完成主站每日任务，自动送礼，自动获取小心心，批量点亮勋章，自动参加被广播的节奏风暴(几乎没有)，自动发弹幕，快捷购买粉丝勋章
 // @updateURL      https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH/
@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.4
+// @version        4.4.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -23,7 +23,6 @@
 // @connect       live-trace.bilibili.com
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/BilibiliAPI_Mod.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/OCRAD.min.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/layer.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/libBilibiliToken.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/libWasmHash.js
@@ -32,7 +31,7 @@
 // ==/UserScript==
 (function () {
     const NAME = 'IGIFTMSG',
-        debugSwitch = true, //控制开关 
+        debugSwitch = true, //日志控制开关 
         BAPI = BilibiliAPI,
         UA = navigator.userAgent,
         tz_offset = new Date().getTimezoneOffset() + 480,
@@ -272,11 +271,10 @@
     function init() {//API初始化
         const MY_API = {
             CONFIG_DEFAULT: {
-                AUTO_DANMU: false,//定时发送弹幕
+                AUTO_DANMU: false,//发送弹幕
                 AUTO_GIFT: false,//自动送礼
                 AUTO_GIFT_ROOMID: ["0"],//送礼优先房间
                 AUTO_GROUP_SIGN: true,//应援团签到开关
-                AUTO_TREASUREBOX: true,//每日宝箱
                 CHECK_HOUR_ROOM: false,//检查小时榜
                 CHECK_HOUR_ROOM_INTERVAL: 600,//小时间检查间隔时间(秒)
                 COIN: false,//投币
@@ -285,7 +283,7 @@
                 COIN_UID: 0,//投币up主
                 DANMU_CONTENT: ["这是一条弹幕"],//弹幕内容
                 DANMU_ROOMID: ["22474988"],//发弹幕房间号
-                DANMU_INTERVAL_TIME: ["10"],//弹幕间隔时间
+                DANMU_INTERVAL_TIME: ["10m"],//弹幕发送时间
                 EXCLUDE_ROOMID: ["0"],//送礼排除房间号
                 FORCE_LOTTERY: false,//黑屋强制抽奖
                 FORCE_LIGHT: false,//忽略亲密上限点亮
@@ -335,7 +333,6 @@
                 AUTO_GROUP_SIGH_TS: 0,//应援团执行时间，用于判断是否为新的一天
                 DailyReward_TS: 0,//其它每日任务
                 LiveReward_TS: 0,//直播每日任务
-                TreasureBox_TS: 0,//银瓜子宝箱
                 Silver2Coin_TS: 0,//银瓜子换硬币
                 Gift_TS: 0,//自动送礼（定时）
                 GiftInterval_TS: 0,//自动送礼（间隔）
@@ -376,8 +373,6 @@
                     window.toast('CACHE初始化出错', 'error')
                     p.reject()
                 }
-
-                setTimeout(MY_API.TreasureBox.init, 5750);
                 return p;
             },
             loadConfig: () => {//加载配置函数
@@ -418,18 +413,19 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.4') &&
-                        version == '4.4') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '4.4.1') &&
+                        version == '4.4.1') { //更新公告时需要修改
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
                         };
-                        MY_API.CONFIG = MY_API.CONFIG_DEFAULT;
-                        MY_API.CACHE = MY_API.CACHE_DEFAULT;
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `<strong>1.新增自动发弹幕功能</strong><br>
-                            ${linkMsg('使用前建议先看下说明(点我前往对应说明处)','https://github.com/andywang425/BLTH/blob/master/README.md#弹幕设置')}<br>
-                            2.由于部分代码重写所以这次更新后设置和缓存会重置以免产生bug。<br><hr>
+                            content: `<strong>1.新增自动发定时弹幕功能</strong><br>
+                            ${linkMsg('使用前建议先看下说明(点我前往对应说明处)', 'https://github.com/andywang425/BLTH/blob/master/README.md#弹幕设置')}<br>
+                            2.调整了弹幕设置-发送时间的填写方法。<br>
+                            3.修复检查小时榜间隔时间无法修改的bug。<br>
+                            4.删除了领银瓜子宝箱的功能。<br>
+                            <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
                             （或者进qq群${linkMsg('1106094437', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}）反馈。
@@ -452,7 +448,7 @@
                     return false
                 }
             },
-            saveCache: (logswitch=true) => {//保存配置函数
+            saveCache: (logswitch = true) => {//保存配置函数
                 try {
                     localStorage.setItem(`${NAME}_CACHE`, JSON.stringify(MY_API.CACHE));
                     if (logswitch) {
@@ -482,7 +478,6 @@
                     MY_API.DailyReward.run();//每日任务
                     MY_API.LiveReward.run();//直播每日任务
                     MY_API.Exchange.runS2C();//银瓜子换硬币
-                    MY_API.TreasureBox.run();//领宝箱
                     MY_API.Gift.run();//送礼物
                     MY_API.LITTLE_HEART.run();//小心心
                     MY_API.AUTO_DANMU.run();//发弹幕
@@ -675,10 +670,6 @@
                             <input style="vertical-align: text-top;" type="checkbox">
                             应援团签到
                         </div>
-                        <div data-toggle="AUTO_TREASUREBOX" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            自动领银瓜子宝箱
-                        </div>
                     </fieldset>
                     <fieldset class="igiftMsg_fs">
                         <legend style="color: black">自动送礼设置</legend>
@@ -830,13 +821,13 @@
                         <legend style="color: black">弹幕设置</legend>
                         <div data-toggle="AUTO_DANMU">
                             <input style="vertical-align: text-top;" type="checkbox">
-                            定时弹幕<br>
+                            自动发弹幕<br>
                             弹幕内容
                             <input class="Danmu igiftMsg_input" style="width: 330px;" type="text"><br>
                             房间号
                             <input class="Roomid igiftMsg_input" style="width: 330px;" type="text"><br>
-                            间隔时间
-                            <input class="Time igiftMsg_input" style="width: 330px;" type="text">分
+                            发送时间
+                            <input class="Time igiftMsg_input" style="width: 330px;" type="text">
                         </div>
                         <button style="font-size: small" class="igiftMsg_btn" data-action="sendDanmuNow">立刻发送弹幕</button>
                         <button style="font-size: small" class="igiftMsg_btn" data-action="clearDanmuCache">清除弹幕缓存</button>
@@ -983,7 +974,7 @@
                                 }
                                 MY_API.CONFIG.COIN_NUMBER = val;
                                 //CHECK_HOUR_ROOM_INTERVAL
-                                val = parseInt($(div).find('div[data-toggle="CHECK_HOUR_ROOM_INTERVAL"] .num').val());
+                                val = parseInt($(div).find('div[data-toggle="CHECK_HOUR_ROOM"] .num').val());
                                 if (val <= 0) {
                                     MY_API.chatLog("[检查小时榜间隔]数据小于等于0", 'warning');
                                     return
@@ -1071,14 +1062,10 @@
                                 valArray = val3.split(",");
                                 for (let i = 0; i < valArray.length; i++) {
                                     if (valArray[i] === '') {
-                                        valArray[i] = '10';
+                                        valArray[i] = '10m';
                                     }
                                 };
                                 val3 = valArray;
-                                if (parseFloat(val3) <= 0) {
-                                    MY_API.chatLog("[弹幕设置]间隔时间必须大于0", 'warning');
-                                    return
-                                }
                                 MY_API.CONFIG.DANMU_CONTENT = val1;
                                 MY_API.CONFIG.DANMU_ROOMID = val2;
                                 MY_API.CONFIG.DANMU_INTERVAL_TIME = val3;
@@ -1183,7 +1170,6 @@
                                 'LIVE_SIGN',
                                 'IN_TIME_RELOAD_DISABLE',
                                 'TIME_RELOAD',
-                                'AUTO_TREASUREBOX',
                                 'IN_TIME_RELOAD_DISABLE',
                                 "AUTO_GIFT",
                                 "SEND_ALL_GIFT",
@@ -2216,349 +2202,6 @@
                     }
                 }
             }, // Once Run every day
-            TreasureBox: {//领宝箱
-                timer: undefined,
-                time_end: undefined,
-                time_start: undefined,
-                promise: {
-                    calc: undefined,
-                    timer: undefined
-                },
-                DOM: {
-                    image: undefined,
-                    canvas: undefined,
-                    div_tip: undefined,
-                    div_timer: undefined
-                },
-                init: () => {
-                    if (!MY_API.CONFIG.AUTO_TREASUREBOX) return $.Deferred().resolve();
-                    const p = $.Deferred();
-                    runUntilSucceed(() => {
-                        try {
-                            if ($('.draw-box.gift-left-part').length) {
-                                window.toast('[自动领取瓜子]当前直播间有实物抽奖，暂停领瓜子功能', 'caution');
-                                p.resolve();
-                                return true;
-                            }
-                            let treasure_box = $('#gift-control-vm div.treasure-box.p-relative');
-                            if (!treasure_box.length) return false;
-                            treasure_box = treasure_box.first();
-                            treasure_box.attr('id', 'old_treasure_box');
-                            treasure_box.hide();
-                            const div = $(`<div id="${NAME}_treasure_div" class="treasure-box p-relative" style="min-width: 46px;display: inline-block;float: left;padding: 22px 0 0 15px;"></div>`);
-                            MY_API.TreasureBox.DOM.div_tip = $(`<div id="${NAME}_treasure_div_tip" class="t-center b-box none-select">自动<br>领取中</div>`);
-                            MY_API.TreasureBox.DOM.div_timer = $(`<div id="${NAME}_treasure_div_timer" class="t-center b-box none-select">0</div>`);
-                            MY_API.TreasureBox.DOM.image = $(`<img id="${NAME}_treasure_image" style="display:none">`);
-                            MY_API.TreasureBox.DOM.canvas = $(`<canvas id="${NAME}_treasure_canvas" style="display:none" height="40" width="120"></canvas>`);
-                            const css_text = 'min-width: 40px;padding: 2px 3px;margin-top: 3px;font-size: 12px;color: #fff;background-color: rgba(0,0,255,.5);border-radius: 10px;';
-                            MY_API.TreasureBox.DOM.div_tip[0].style = css_text;
-                            MY_API.TreasureBox.DOM.div_timer[0].style = css_text;
-                            div.append(MY_API.TreasureBox.DOM.div_tip);
-                            div.append(MY_API.TreasureBox.DOM.image);
-                            div.append(MY_API.TreasureBox.DOM.canvas);
-                            MY_API.TreasureBox.DOM.div_tip.after(MY_API.TreasureBox.DOM.div_timer);
-                            treasure_box.after(div);
-                            /*
-                            if (!Live_info.mobile_verify) {
-                                MY_API.TreasureBox.setMsg('未绑定<br>手机');
-                                window.toast('[自动领取瓜子]未绑定手机，已停止', 'caution');
-                                p.resolve();
-                                return true;
-                            }*/
-                            try {
-                                if (OCRAD);
-                            } catch (err) {
-                                MY_API.TreasureBox.setMsg('初始化<br>失败');
-                                window.toast('[自动领取瓜子]OCRAD初始化失败，请检查网络', 'error');
-                                console.error(`[${NAME}]`, err);
-                                p.resolve();
-                                return true;
-                            }
-                            MY_API.TreasureBox.timer = setInterval(() => {
-                                let t = parseInt(MY_API.TreasureBox.DOM.div_timer.text(), 10);
-                                if (isNaN(t)) t = 0;
-                                if (t > 0) MY_API.TreasureBox.DOM.div_timer.text(`${t - 1}s`);
-                                else MY_API.TreasureBox.DOM.div_timer.hide();
-                            }, 1e3);
-                            MY_API.TreasureBox.DOM.image[0].onload = () => {
-                                // 实现功能类似 https://github.com/bilibili-helper/bilibili-helper-o/tree/master/src/js/modules/treasure
-                                const ctx = MY_API.TreasureBox.DOM.canvas[0].getContext('2d');
-                                ctx.font = '40px agencyfbbold';
-                                ctx.textBaseline = 'top';
-                                ctx.clearRect(0, 0, MY_API.TreasureBox.DOM.canvas[0].width, MY_API.TreasureBox.DOM.canvas[0].height);
-                                ctx.drawImage(MY_API.TreasureBox.DOM.image[0], 0, 0);
-                                const grayscaleMap = MY_API.TreasureBox.captcha.OCR.getGrayscaleMap(ctx);
-                                const filterMap = MY_API.TreasureBox.captcha.OCR.orderFilter2In3x3(grayscaleMap);
-                                ctx.clearRect(0, 0, 120, 40);
-                                for (let i = 0; i < filterMap.length; ++i) {
-                                    const gray = filterMap[i];
-                                    ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
-                                    ctx.fillRect(i % 120, Math.round(i / 120), 1, 1);
-                                }
-                                try {
-                                    const question = MY_API.TreasureBox.captcha.correctQuestion(OCRAD(ctx.getImageData(0, 0, 120, 40)));
-                                    MYDEBUG('TreasureBox.DOM.image.load', 'question =', question);
-                                    const answer = MY_API.TreasureBox.captcha.eval(question);
-                                    MYDEBUG('TreasureBox.DOM.image.load', 'answer =', answer);
-                                    if (answer !== undefined) {
-                                        //window.toast(`[自动领取瓜子]验证码识别结果: ${question} = ${answer}`, 'info');
-                                        console.info(`[${NAME}][自动领取瓜子]验证码识别结果: ${question} = ${answer}`);
-                                        MY_API.TreasureBox.promise.calc.resolve(answer);
-                                    }
-                                } catch (err) {
-                                    MY_API.TreasureBox.promise.calc.reject();
-                                }
-                            };
-                            p.resolve();
-                            return true;
-                        } catch (err) {
-                            window.toast('[自动领取瓜子]初始化时出现异常，已停止', 'error');
-                            console.error(`[${NAME}]`, err);
-                            p.reject();
-                            return true;
-                        }
-                    });
-                    return p;
-                },
-                run: () => {
-                    try {
-                        if (!MY_API.CONFIG.AUTO_TREASUREBOX || !MY_API.TreasureBox.timer) return;
-                        if (Live_info.blocked) {
-                            MY_API.TreasureBox.setMsg('小黑屋');
-                            window.toast('[自动领取瓜子]帐号被关小黑屋，停止领取瓜子', 'caution');
-                            return;
-                        }
-                        if (!checkNewDay(MY_API.CACHE.TreasureBox_TS)) {
-                            MY_API.TreasureBox.setMsg('今日<br>已领完');
-                            runMidnight(MY_API.TreasureBox.run, '领银瓜子宝箱');
-                            return;
-                        }
-                        MY_API.TreasureBox.getCurrentTask().then((response) => {
-                            MYDEBUG('TreasureBox.run: TreasureBox.getCurrentTask().then', response);
-                            if (response.code === 0) {
-                                // 获取任务成功
-                                MY_API.TreasureBox.promise.timer = $.Deferred();
-                                MY_API.TreasureBox.promise.timer.then(() => {
-                                    MY_API.TreasureBox.captcha.calc().then((captcha) => {
-                                        // 验证码识别完成
-                                        MY_API.TreasureBox.getAward(captcha).then(() => MY_API.TreasureBox.run(), () => MY_API.TreasureBox.run());
-                                    }, () => TreasureBox.run());
-                                });
-                                MY_API.TreasureBox.time_end = response.data.time_end;
-                                MY_API.TreasureBox.time_start = response.data.time_start;
-                                let t = MY_API.TreasureBox.time_end - ts_s() + 1;
-                                if (t < 0) t = 0;
-                                setTimeout(() => {
-                                    if (MY_API.TreasureBox.promise.timer) MY_API.TreasureBox.promise.timer.resolve();
-                                }, t * 1e3);
-                                MY_API.TreasureBox.DOM.div_timer.text(`${t}s`);
-                                MY_API.TreasureBox.DOM.div_timer.show();
-                                MY_API.TreasureBox.DOM.div_tip.html(`轮数<br>${response.data.times}/${response.data.max_times}<br>银瓜子<br>${response.data.silver}`);
-                            } else if (response.code === -10017) {
-                                // 今天所有的宝箱已经领完!
-                                MY_API.TreasureBox.setMsg('今日<br>已领完');
-                                // window.toast(`[自动领取瓜子]${response.msg}`, 'info');
-                                MY_API.CACHE.TreasureBox_TS = ts_ms();
-                                MY_API.saveCache();
-                                runMidnight(MY_API.TreasureBox.run, '领银瓜子宝箱');
-                            } else if (response.code === -500) {
-                                // 请先登录!
-                                location.reload();
-                            } else {
-                                window.toast(`[自动领取瓜子]${response.msg}`, 'caution');
-                                return MY_API.TreasureBox.run();
-                            }
-                        });
-                    } catch (err) {
-                        MY_API.TreasureBox.setMsg('运行<br>异常');
-                        window.toast('[自动领取瓜子]运行时出现异常，已停止', 'error');
-                        console.error(`[${NAME}]`, err);
-                    }
-                },
-                setMsg: (htmltext) => {
-                    if (!MY_API.CONFIG.AUTO_TREASUREBOX) return;
-                    if (MY_API.TreasureBox.promise.timer) {
-                        MY_API.TreasureBox.promise.timer.reject();
-                        MY_API.TreasureBox.promise.timer = undefined;
-                    }
-                    if (MY_API.TreasureBox.DOM.div_timer) MY_API.TreasureBox.DOM.div_timer.hide();
-                    if (MY_API.TreasureBox.DOM.div_tip) MY_API.TreasureBox.DOM.div_tip.html(htmltext);
-                },
-                getAward: (captcha, cnt = 0) => {
-                    if (!MY_API.CONFIG.AUTO_TREASUREBOX) return $.Deferred().reject();
-                    if (cnt > 3) return $.Deferred().resolve(); // 3次时间未到，重新运行任务
-                    return BAPI.TreasureBox.getAward(MY_API.TreasureBox.time_start, MY_API.TreasureBox.time_end, captcha).then(async (response) => {
-                        MYDEBUG('TreasureBox.getAward: getAward', response);
-                        switch (response.code) {
-                            case 0:
-                                window.toast(`[自动领取瓜子]领取了 ${response.data.awardSilver} 银瓜子`, 'success');
-                            case -903: // -903: 已经领取过这个宝箱
-                                // window.toast('[自动领取瓜子]已经领取过这个宝箱', 'caution');
-                                return $.Deferred().resolve();
-                            case -902: // -902: 验证码错误
-                            case -901: // -901: 验证码过期
-                            case -10017: // -10017: 验证码过期
-                                await sleep(150);
-                                return MY_API.TreasureBox.captcha.calc().then((captcha) => {
-                                    return MY_API.TreasureBox.getAward(captcha, cnt);
-                                });
-                            case -800: // -800：未绑定手机
-                                MY_API.TreasureBox.setMsg('未绑定<br>手机');
-                                window.toast('[自动领取瓜子]未绑定手机，已停止', 'caution');
-                                return $.Deferred().reject();
-                            case -500: // -500：领取时间未到, 请稍后再试
-                                const p = $.Deferred();
-                                setTimeout(() => {
-                                    MY_API.TreasureBox.captcha.calc().then((captcha) => {
-                                        MY_API.TreasureBox.getAward(captcha, cnt + 1).then(() => p.resolve(), () => p.reject());
-                                    }, () => p.reject());
-                                }, 3e3);
-                                return p;
-                            case 400: // 400: 访问被拒绝
-                                if (response.msg.indexOf('拒绝') > -1) {
-                                    Live_info.blocked = true;
-                                    MY_API.TreasureBox.setMsg('拒绝<br>访问');
-                                    window.toast('[自动领取瓜子]访问被拒绝，您的帐号可能已经被关小黑屋，已停止', 'error');
-                                    return $.Deferred().reject();
-                                }
-                                window.toast(`[自动领取瓜子]${response.msg}`, 'caution');
-                                return $.Deferred().resolve();
-                            default: // 其他错误
-                                window.toast(`[自动领取瓜子]${response.msg}`, 'caution');
-                        }
-                    }, () => {
-                        window.toast('[自动领取瓜子]获取任务失败，请检查网络', 'error');
-                        return delayCall(() => MY_API.TreasureBox.getAward(captcha, cnt));
-                    });
-                },
-                getCurrentTask: () => {
-                    if (!MY_API.CONFIG.AUTO_TREASUREBOX) return $.Deferred().reject();
-                    return BAPI.TreasureBox.getCurrentTask().then((response) => {
-                        MYDEBUG('TreasureBox.getCurrentTask: API.TreasureBox.getCurrentTask', response);
-                        return $.Deferred().resolve(response);
-                    }, () => {
-                        window.toast('[自动领取瓜子]获取当前任务失败，请检查网络', 'error');
-                        return delayCall(() => MY_API.TreasureBox.getCurrentTask());
-                    });
-                },
-                captcha: {
-                    cnt: 0,
-                    calc: () => {
-                        if (!MY_API.CONFIG.AUTO_TREASUREBOX) {
-                            MY_API.TreasureBox.captcha.cnt = 0;
-                            return $.Deferred().reject();
-                        }
-                        if (MY_API.TreasureBox.captcha.cnt > 20) { // 允许验证码无法识别的次数
-                            // 验证码识别失败
-                            MY_API.TreasureBox.setMsg('验证码<br>识别<br>失败');
-                            window.toast('[自动领取瓜子]验证码识别失败，已停止', 'error');
-                            return $.Deferred().reject();
-                        }
-                        return BAPI.TreasureBox.getCaptcha(ts_ms()).then((response) => {
-                            MYDEBUG('TreasureBox.captcha.calc: getCaptcha', response);
-                            if (response.code === 0) {
-                                MY_API.TreasureBox.captcha.cnt++;
-                                const p = $.Deferred();
-                                MY_API.TreasureBox.promise.calc = $.Deferred();
-                                MY_API.TreasureBox.promise.calc.then((captcha) => {
-                                    MY_API.TreasureBox.captcha.cnt = 0;
-                                    p.resolve(captcha);
-                                }, () => {
-                                    MY_API.TreasureBox.captcha.calc().then((captcha) => {
-                                        p.resolve(captcha);
-                                    }, () => {
-                                        p.reject();
-                                    });
-                                });
-                                MY_API.TreasureBox.DOM.image.attr('src', response.data.img);
-                                return p;
-                            } else {
-                                window.toast(`[自动领取瓜子]${response.msg}`, 'caution');
-                                return delayCall(() => MY_API.TreasureBox.captcha.calc());
-                            }
-                        }, () => {
-                            window.toast('[自动领取瓜子]加载验证码失败，请检查网络', 'error');
-                            return delayCall(() => MY_API.TreasureBox.captcha.calc());
-                        });
-                    },
-                    // 对B站验证码进行处理
-                    // 代码来源：https://github.com/zacyu/bilibili-helper/
-                    // 删除了未使用的变量
-                    OCR: {
-                        getGrayscaleMap: (context, rate = 235, width = 120, height = 40) => {
-                            const pixelMap = context.getImageData(0, 0, width, height).data;
-                            const map = [];
-                            for (let y = 0; y < height; y++) { // line y
-                                for (let x = 0; x < width; x++) { // column x
-                                    const index = (y * width + x) * 4;
-                                    const pixel = pixelMap.slice(index, index + 4);
-                                    const gray = pixel ? (77 * pixel[0] + 150 * pixel[1] + 29 * pixel[2] + 128) >> 8 : 0;
-                                    map.push(gray > rate ? gray : 0);
-                                }
-                            }
-                            return map;
-                        },
-                        orderFilter2In3x3: (grayscaleMap, n = 9, width = 120) => {
-                            const gray = (x, y) => (x + y * width >= 0) ? grayscaleMap[x + y * width] : 255;
-                            const map = [];
-                            const length = grayscaleMap.length;
-                            const catchNumber = n - 1;
-                            for (let i = 0; i < length; ++i) {
-                                const [x, y] = [i % width, Math.floor(i / width)];
-                                const matrix = new Array(9);
-                                matrix[0] = gray(x - 1, y - 1);
-                                matrix[1] = gray(x + 0, y - 1);
-                                matrix[2] = gray(x + 1, y - 1);
-                                matrix[3] = gray(x - 1, y + 0);
-                                matrix[4] = gray(x + 0, y + 0);
-                                matrix[5] = gray(x + 1, y + 0);
-                                matrix[6] = gray(x - 1, y + 1);
-                                matrix[7] = gray(x + 0, y + 1);
-                                matrix[8] = gray(x + 1, y + 1);
-                                matrix.sort((a, b) => a - b);
-                                map.push(matrix[catchNumber]);
-                            }
-                            return map;
-                        },
-                    },
-                    eval: (fn) => {
-                        let Fn = Function;
-                        return new Fn(`return ${fn}`)();
-                    },
-                    // 修正OCRAD识别结果
-                    // 代码来源：https://github.com/zacyu/bilibili-helper
-                    // 修改部分：
-                    // 1.将correctStr声明在correctQuestion函数内部，并修改相关引用
-                    // 2.在correctStr中增加'>': 3
-                    correctStr: {
-                        'i': 1, 'I': 1, '|': 1, 'l': 1,
-                        'o': 0, 'O': 0, 'D': 0,
-                        'S': 6, 's': 6, 'b': 6,
-                        'R': 8, 'B': 8,
-                        'z': 2, 'Z': 2,
-                        '.': '-',
-                        '_': 4,
-                        'g': 9,
-                        '>': 3
-                    },
-                    correctQuestion: (question) => {
-                        let q = '';
-                        question = question.trim();
-                        for (let i in question) {
-                            let a = MY_API.TreasureBox.captcha.correctStr[question[i]];
-                            q += (a !== undefined ? a : question[i]);
-                        }
-                        if (q[2] === '4') q[2] = '+'; //若第三位为4则替换为+
-                        for (let c = 0; c <= parseInt(q.length - 2); c++) {//'1 => 7
-                            if (q[c] === '\'' && q[c + 1] === '1') {
-                                q[c] = '7';
-                                q.splice(c + 1, 1)
-                            }
-                        }
-                        return q;
-                    }
-                }
-            }, // Constantly Run, Need Init
             Gift: {
                 run_timer: undefined,
                 ruid: undefined,
@@ -3224,7 +2867,6 @@
                                     count++;
                                 }
                                 if (count >= control) {
-                                    endFunc();
                                     break;
                                 }
                                 else
@@ -3248,7 +2890,7 @@
                     return await BAPI.sendLiveDanmu(danmuContent, roomId).then((response) => {
                         MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmuContent}】，房间号【${roomId}】`, response);
                         if (response.code === 0 && !response.msg)
-                            window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送成功`,'success');
+                            window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送成功`, 'success');
                         else window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）出错 ${response.msg}`, 'caution')
                     }, () => {
                         window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送失败`, 'error')
@@ -3269,22 +2911,59 @@
                     for (let i = 0; i < maxLength; i++) {
                         let danmu_content = MY_API.AUTO_DANMU.setValue('DANMU_CONTENT', i),
                             danmu_roomid = parseInt(MY_API.AUTO_DANMU.setValue('DANMU_ROOMID', i)),
-                            danmu_intervalTime = parseFloat(MY_API.AUTO_DANMU.setValue('DANMU_INTERVAL_TIME', i)),//设置-间隔时间(分钟)
+                            danmu_intervalTime = MY_API.AUTO_DANMU.setValue('DANMU_INTERVAL_TIME', i),//设置-发送时间
                             lastSendTime = undefined,//上次发弹幕的时间戳(毫秒)
                             jsonCache = MY_API.CACHE.AUTO_SEND_DANMU_TS,
-                            objIndex = undefined,
-                            intervalTime = undefined;//据上次发弹幕的时间(毫秒)
-                        const danmu_intervalTime_Ts = danmu_intervalTime * 60000;//设置-间隔时间(毫秒)
+                            objIndex = undefined,//弹幕缓存下标
+                            isTimeData = undefined,//是否是时间数据(eg 9:01)
+                            intervalTime = undefined,//据上次发弹幕的时间(毫秒)
+                            danmu_intervalTime_Ts = undefined,//间隔时间
+                            sleepTime = 0;
+                        if (danmu_intervalTime.indexOf(':') > -1) {//时间
+                            isTimeData = true;
+                            const danmu_time = danmu_intervalTime.split(':');//小时，分钟，秒
+                            const hour = parseInt(danmu_time[0]), minute = parseInt(danmu_time[1]), second = parseInt(danmu_time[2]);
+                            if (!isTime(hour, minute, second)) {
+                                sleepTime = getIntervalTime(hour, minute, second);
+                            }
+                        }
+                        else {
+                            isTimeData = false;
+                            danmu_intervalTime = danmu_intervalTime.toLowerCase();
+                            console.log('danmu_intervalTime',danmu_intervalTime)
+                            if (danmu_intervalTime.indexOf('h') > -1 || danmu_intervalTime.indexOf('m') > -1 || danmu_intervalTime.indexOf('s') > -1) {
+                                const hourArray = danmu_intervalTime.split('h');//1h5m3s
+                                console.log('hourArray', hourArray);
+                                const minuteArray = (hourArray[1] === undefined) ? hourArray[0].split('m') : hourArray[1].split('m');
+                                console.log('minuteArray', minuteArray);
+                                const secondArray = (minuteArray[1] === undefined) ? minuteArray[0].split('s') : minuteArray[1].split('s');
+                                console.log('secondArray', secondArray);
+                                const hour = hourArray[0],
+                                    minute = minuteArray[0],
+                                    second = secondArray[0];
+                                console.log('hour minute second', isNaN(hour) ? 0 : hour || 0, isNaN(minute) ? 0 : minute || 0, isNaN(second) ? 0 : second || 0);
+                                const finalHour = isNaN(hour) ? 0 : hour || 0,
+                                    finalMinute = isNaN(minute) ? 0 : minute || 0,
+                                    finalSecond = isNaN(second) ? 0 : second || 0;
+                                danmu_intervalTime_Ts = finalHour * 3600000 + finalMinute * 60000 + finalSecond * 1000;
+                            } else {//没有h或m或s则默认是分钟
+                                danmu_intervalTime_Ts = danmu_intervalTime * 60000;
+                            }
+                        }
+                        console.log('danmu_intervalTime_Ts',danmu_intervalTime_Ts)
                         MYDEBUG('[自动发弹幕]MY_API.CACHE.AUTO_SEND_DANMU_TS => jsoncache', jsonCache);
                         for (const obj of jsonCache) {
-                            if (obj.roomid === danmu_roomid && obj.content == danmu_content) {
+                            if (obj.roomid == danmu_roomid && obj.content == danmu_content) {
                                 lastSendTime = obj.sendTs
                                 objIndex = jsonCache.indexOf(obj);
                                 break;
                             }
                         }
-                        if (!!lastSendTime) intervalTime = ts_ms() - lastSendTime;
-                        else intervalTime = ts_ms();
+                        if (!isTimeData) {
+                            if (!!lastSendTime) intervalTime = ts_ms() - lastSendTime;
+                            else intervalTime = ts_ms();
+                        }
+                        console.log('intervalTime',intervalTime)
                         const setCache = () => {
                             const newJson = {
                                 roomid: danmu_roomid,
@@ -3299,27 +2978,33 @@
                             MY_API.CACHE.AUTO_SEND_DANMU_TS = jsonCache;
                             MY_API.saveCache(false);
                         };
-                        const sendNextDanmu = () => {
-                            setCache();
-                            setTimeout(async() => {
+                        const sendNextDanmu = (intervalTS, isTime) => {
+                            if (!isTime) setCache();
+                            setTimeout(async () => {
                                 await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
-                                setCache();
-                                sendNextDanmu();
-                            }, danmu_intervalTime_Ts);
+                                if (!isTime) setCache();
+                                sendNextDanmu(intervalTS, isTime);
+                            }, intervalTS);
                         }
-                        if (intervalTime >= danmu_intervalTime_Ts || SEND_DANMU_NOW) {
+                        if (!isTimeData && (intervalTime >= danmu_intervalTime_Ts || SEND_DANMU_NOW)) {
                             SEND_DANMU_NOW = false;
                             await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
-                            MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, `${danmu_intervalTime}分钟`);
-                            sendNextDanmu();
+                            MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, danmu_intervalTime);
+                            sendNextDanmu(danmu_intervalTime_Ts, isTimeData);
+                        } else if ((isTimeData && !sleepTime) || SEND_DANMU_NOW) {
+                            SEND_DANMU_NOW = false;
+                            await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
+                            sleepTime = getIntervalTime(danmu_time[0], danmu_time[1], danmu_time[2]);
+                            MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, '约24小时');
+                            sendNextDanmu(sleepTime, isTimeData);
                         }
                         else {
-                            MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, `${danmu_intervalTime - intervalTime / 60000}分钟`);
-                            setTimeout(async() => {
+                            MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, `${(!isTimeData) ? (danmu_intervalTime_Ts - intervalTime) / 60000 : sleepTime / 60000}分钟`);
+                            setTimeout(async () => {
                                 await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
-                                sendNextDanmu();
-                            }, danmu_intervalTime_Ts - intervalTime);
-                        } 
+                                sendNextDanmu((isTimeData) ? 86400000 : danmu_intervalTime_Ts, isTimeData);
+                            }, (isTimeData) ? sleepTime : danmu_intervalTime_Ts - intervalTime);
+                        }
                         await sleep(1100);
                     }
                 }
@@ -3335,7 +3020,6 @@
                         // 其他脚本正在运行
                         $('.link-toast').remove();
                         $('.igiftMsg').remove();
-                        MY_API.CONFIG.AUTO_TREASUREBOX = false;
                         window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
                         return promiseInit.reject();
                     } else {
@@ -3394,7 +3078,6 @@
             API.DailyReward.run();//每日任务
             API.LiveReward.run();//直播每日任务
             API.Exchange.runS2C();//银瓜子换硬币
-            API.TreasureBox.run();//领宝箱
             API.Gift.run();//送礼物
         }, 6e3);//脚本加载后6秒执行任务
         if (API.CONFIG.LOTTERY) {
@@ -3495,18 +3178,18 @@
      * （23,50） 获取与目标时间在时间轴上的间隔时间,24小时制（毫秒）
      * @param hour 整数 小时
      * @param minute 整数 分钟
+     * @param second 整数 秒（可不填）
      * @returns {number} intervalTime
      */
-    function getIntervalTime(hour, minute) {
+    function getIntervalTime(hour, minute, second) {
         const myDate = new Date();
         const h = myDate.getHours();
         const m = myDate.getMinutes();
         const s = myDate.getSeconds();
-        const TargetTime = hour * 3600 * 1e3 + minute * 60 * 1e3;
+        const TargetTime = hour * 3600 * 1e3 + minute * 60 * 1e3 + ((!second) ? 0 : second * 1e3);
         const nowTime = h * 3600 * 1e3 + m * 60 * 1e3 + s * 1e3;
         const intervalTime = TargetTime - nowTime;
-        const intervalDate = new Date(intervalTime);
-        MYDEBUG("[getIntervalTime]获取间隔时间", `${intervalDate.getHours()}时${intervalDate.getMinutes()}分`);
+        MYDEBUG("[getIntervalTime]获取间隔时间", `${intervalTime}毫秒`);
         if (intervalTime < 0) {
             return 24 * 3600 * 1e3 + intervalTime
         }
@@ -3519,16 +3202,18 @@
      * （23,50） 当前时间是否为23:50
      * @param hour 整数 小时
      * @param minute 整数 分钟
+     * @param second 整数 秒（可不填）
      * @returns {boolean}
      */
-    function isTime(hour, minute) {
+    function isTime(hour, minute, second) {
         let myDate = new Date();
         let h = myDate.getHours();
         let m = myDate.getMinutes();
-        if (h == hour && m == minute) {
+        let s = myDate.getSeconds();
+        if ((h == hour && m == minute && !second) || (h == hour && m == minute && s == second)) {
             return true
         } else {
-            MYDEBUG("isTime 错误时间", `目标时间${hour}时${minute}分，当前时间${h}时${m}分`);
+            MYDEBUG("isTime 错误时间", `目标时间${hour}时${minute}分${second || 0}秒，当前时间${h}时${m}分${s}秒`);
             return false
         }
     }

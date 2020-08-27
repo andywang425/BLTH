@@ -8,7 +8,7 @@
 -------------------------------
 
 ### 点击以下任一链接安装脚本
-### 1.githubusercontent源：[BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) [BLTH_Origin](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)  
+### 1.githubusercontent源：[BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)&nbsp;&nbsp;&nbsp;[BLTH_Origin](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)  
 ### 2.greasyfork源： [BLTH_Origin_greasyfork](https://greasyfork.org/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B/code/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
 ### 3.openuserjs源：[BLTH_Origin_openuserjs](https://openuserjs.org/install/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
 
@@ -22,7 +22,7 @@
 -------------------------------
 
 ### 一些建议
-+ 本脚本加载的库文件较多，初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新页面。  
++ 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新页面。  
 + 部分设置更改后需要刷新页面才能生效。  
 + 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。  
 
@@ -56,8 +56,7 @@
 <li>分享视频</li>  
 <li>银瓜子换硬币</li>  
 <li>直播区签到</li>  
-<li>应援团签到</li>  
-<li>领银瓜子宝箱</li>  
+<li>应援团签到</li>   
 </ul>
 </details>
 <details>
@@ -69,6 +68,8 @@
 <li>屏蔽挂机检测</li>
 </ul>
 </details>
+<li>自动参加被广播的节奏风暴</li>
+<li>自动发弹幕</li>
 <li>自动获取小心心</li>
 <li>自动点亮勋章</li>
 <li>自动送礼</li>
@@ -80,7 +81,7 @@
 ## 说明
 #### 关于脚本代码格式
 本脚本在三个平台上的代码格式有所不同
-+ github: 压缩和原格式都有，默认安装压缩格式
++ github: 压缩和原格式都有
 + openuserjs: 第一次安装为原格式，若用tampermonkey更新则会变为压缩格式
 + greasyfork: 原格式
 
@@ -88,7 +89,7 @@
 原格式的脚本为[B站直播间挂机助手.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)。  
 
 #### 输入数据格式
-+ 浮点数(小数)或整数: 抽奖-抽奖前附加随机延迟，随机跳过礼物；弹幕-间隔时间。  
++ 浮点数(小数)或整数: 抽奖-抽奖前附加随机延迟，随机跳过礼物；弹幕-发送时间（或时间格式）。  
 + 数组(或单个整数): 送礼-优先送礼房间，不送礼房间；小心心-自动点亮勋章房间号；弹幕-房间号，间隔时间(此项可填浮点数)。  
 + 其余只支持整数。  
 
@@ -135,9 +136,27 @@
   _提示：如果想点亮所有勋章，选黑名单然后不填写拥有勋章的房间号即可。_  
 
 #### 弹幕设置
-+ 弹幕内容，房间号，间隔时间可填多个，数据之间用半角逗号`,`隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。  
++ 弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号`,`隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。  
 + 若有多条弹幕需要发送，每条弹幕间会有1.1秒的间隔时间。  
-+ 如果数据没对齐，缺失的数据会自动向前对齐。如填写`弹幕内容 lalala`，`房间号 3,4`，`间隔时间 5,10`，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。  
++ 如果数据没对齐，缺失的数据会自动向前对齐。如填写`弹幕内容 lalala`，`房间号 3,4`，`发送时间 5m,10:30`，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。  
++ 发送时间有两种填写方法
+  1. 【小时】h【分钟】m【秒】s  
+  + 每隔一段时间发送一条弹幕
+  + 例子：`1h2m3s`, `3m`, `30s`, `1h50s`, `2m6s`, `0.5h`  
+  + 可以填小数
+  + 可以只填写其中一项或两项  
+
+  脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写`10`则默认单位是分钟（等同于`10m`）。  
+
+  _注意：必须按顺序填小时，分钟，秒，否则会出错(如`3s5h`就是错误的写法)_  
+
+  2. 【小时】:【分钟】:【秒】  
+  + 在特定时间点发一条弹幕
+  + 例子： `10:30:10`, `0:40`  
+  + 只能填整数
+  + 小时分钟必须填写，秒数可以不填  
+
+  脚本会在该时间点发一条弹幕（如`13:30:10`就是在下午1点30分10秒的时候发弹幕）。  
 
 #### 购买粉丝勋章
 + 调用官方api（`api.vc.bilibili.com/link_group/v1/member/buy_medal`），消耗20硬币购买某位UP的粉丝勋章。  
@@ -150,19 +169,17 @@
 
 #### 运行日志
 脚本默认开启运行日志，打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。若想关闭日志可以在脚本头部加入`console.log = () => {}`。  
-如果使用脚本过程中遇到问题，可以在控制台中寻找相关错误信息。若无法解决可以进行反馈，并给出错误信息和问题描述。  
+如果使用脚本过程中遇到问题，可以在控制台中寻找相关错误信息。
 
 #### 关于反馈
-反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。不符合规范的反馈可能会被关闭。
+反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。
 
 -------------------------------
 
 ## 已知问题
 1. [#12](https://github.com/andywang425/BLTH/issues/12)  
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后，打开`启用Ajax Hook API`。  
-2. 由于B站服务器限制，无法给某些直播间如[共青团中央](https://live.bilibili.com/54)送礼。  
-3. 在有特殊背景的（含有多个嵌套iframe的）直播间启用脚本时，控制台中可能会不停地出现`[B站直播间挂机助手]无配置信息`，但不影响使用。 
-4. 脚本每次更新后第一次运行可能会不工作，刷新一下页面即可。   
+2. 脚本每次更新后第一次运行可能会不工作，刷新一下页面即可。   
 
 -------------------------------
 
@@ -177,13 +194,11 @@
 + [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/BLRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
-+ [ocrad.js](https://github.com/antimatter15/ocrad.js) (GPL-3.0) by [antimatter15](https://github.com/antimatter15)  
 + [layer](https://github.com/sentsin/layer) (MIT) by [sentsin](https://github.com/sentsin)  
 
 本脚本使用的库：  
 + [jquery](https://github.com/jquery/jquery) (MIT)  
 + [BilibiliAPI_Mod.min.js](https://github.com/andywang425/BLTH/blob/master/library_files/BilibiliAPI_Mod.js) (MIT)：B站API及常用函数。  
-+ [OCRAD.min.js](https://github.com/antimatter15/ocrad.js) (GPL-3.0)：识别领银瓜子宝箱验证码。  
 + [libBilibiliToken.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libBilibiliToken/libBilibiliToken.js) (MIT)：获取移动端token。  
 + [libWasmHash.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libWasmHash/libWasmHash.js) (MIT)：WebAssembly实现的Hash，计算心跳请求参数。  
 + [layer.js](https://github.com/sentsin/layer) (MIT)：创建弹窗，信息框等  
@@ -196,7 +211,7 @@
 -------------------------------
 
 ## 更新日志
->### 4.4
->新增自动发弹幕功能；代码细节优化。  
+>### 4.4.1
+>新增自动发定时弹幕功能；调整了弹幕设置-发送时间的填写方法；修复检查小时榜间隔时间无法修改的bug；删除了领银瓜子宝箱的相关代码。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
