@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.4.1
+// @version        4.4.1.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -26,8 +26,11 @@
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/layer.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/libBilibiliToken.js
 // @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/libWasmHash.js
-// @grant        unsafeWindow
-// @grant        GM_xmlhttpRequest
+// @resource      layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@a00d57126c9b2591cc93389cac78dc91db4b66e0/library_files/layer.css
+// @grant         unsafeWindow
+// @grant         GM_xmlhttpRequest
+// @grant         GM_getResourceText
+// @grant         GM_addStyle
 // ==/UserScript==
 (function () {
     const NAME = 'IGIFTMSG',
@@ -150,39 +153,11 @@
                 }
             }// Need Init
         },
-        addStyle = () => {
-            $('head').append(`
-            <style>
-                .igiftMsg_input{
-                    outline: none;
-                    border: 1px solid #e9eaec;
-                    background-color: #fff;
-                    border-radius: 4px;
-                    padding: 1px 0 0;
-                    overflow: hidden;
-                    font-size: 12px;
-                    line-height: 19px;
-                    width: 30px;
-                    z-index: '10001';
-                }
-                .igiftMsg_btn{
-                    background-color: #23ade5;
-                    color: #fff;
-                    border-radius: 4px;
-                    border: none;
-                    padding: 5px;
-                    cursor: pointer;
-                    box-shadow: 0 0 2px #00000075;
-                    line-height: 10px;
-                    z-index: 10001;
-                }
-                .igiftMsg_fs{
-                    border: 2px solid #d4d4d4;
-                    z-index: 10001;
-                }
-            </style>
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css" id="layuicss-layer">
-                `);
+        addStyle = async () => {
+            const layerCss = await GM_getResourceText('layerCss');
+            const myCss = ".igiftMsg_input{outline:none;border:1px solid #e9eaec;background-color:#fff;border-radius:4px;padding:1px 0 0;overflow:hidden;font-size:12px;line-height:19px;width:30px;z-index:'10001';}.igiftMsg_btn{background-color:#23ade5;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;z-index:10001;}.igiftMsg_fs{border:2px solid #d4d4d4;z-index:10001;}";
+            const AllCss = layerCss + myCss;
+            return await GM_addStyle(AllCss);
         };
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide',//UI隐藏开关
         gift_join_try = 0,
@@ -545,12 +520,7 @@
                 }
             },
             creatSetBox: () => {//创建设置框
-                const eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter']//确保必要元素已加载
-                for (const ele of eleList) {
-                    if ($(ele).length === 0) {
-                        return delayCall(() => MY_API.creatSetBox(), 200);
-                    }
-                }
+                //const eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter']必要元素
                 //添加按钮
                 const btnmsg = msgHide == 'hide' ? '显示窗口和提示信息' : '隐藏窗口和提示信息';
                 let btn = $(`<button style="display: inline-block; float: left; margin-right: 7px;background-color: #23ade5;color: #fff;border-radius: 4px;border: none; padding:4px; cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
@@ -577,7 +547,7 @@
                     <div data-toggle="LOTTERY">
                         <label style="margin: 5px auto; color: purple;line-height:30px";>
                             <input style="vertical-align: text-top;" type="checkbox">
-                            参与抽奖
+                            参与礼物抽奖
                         </label>
                     </div>
                         <div data-toggle="RANDOM_DELAY">
@@ -859,8 +829,7 @@
                             target="_blank">v${GM_info.script.version}&nbsp;更多信息见github上的项目说明(点我)</a>
                     </label>
                 </div>
-            </div>
-    `;
+            </div>`;
                 const getScrollPosition = (el = window) => ({
                     x: el.pageXOffset !== undefined ? el.pageXOffset : el.scrollLeft,
                     y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop
@@ -1506,7 +1475,7 @@
                 }
                 if (probability(MY_API.CONFIG.RANDOM_SEND_DANMU)) {//概率发活跃弹幕
                     BAPI.sendLiveDanmu(MY_API.auto_danmu_list[Math.floor(Math.random() * 12)], roomId).then((response) => {
-                        MYDEBUG('弹幕发送返回信息', response);
+                        MYDEBUG('[活跃弹幕]弹幕发送返回信息', response);
                     })
                 }//Math.floor(Math.random() * (max - min + 1) ) + min
                 BAPI.xlive.lottery.check(roomId).then((re) => {
@@ -1650,17 +1619,14 @@
                     'line-height': '30px',
                     'padding': '0 10px',
                     'margin': '10px auto',
+                    'border': '1px solid rgb(203, 195, 255)',
+                    'background': 'rgb(233, 230, 255) none repeat scroll 0% 0%',
                 });
                 msg.css({
                     'word-wrap': 'break-word',
                     'width': '100%',
                     'line-height': '1em',
                     'margin-bottom': '10px',
-                });
-
-                div.css({
-                    'border': '1px solid rgb(203, 195, 255)',
-                    'background': 'rgb(233, 230, 255) none repeat scroll 0% 0%',
                 });
                 if (msgHide == 'show') {//false
                     ct.find('#chat-items').append(div);//向聊天框加入信息
@@ -1872,13 +1838,6 @@
                 run: () => {//执行应援团任务
                     try {
                         if (!MY_API.CONFIG.AUTO_GROUP_SIGN) return $.Deferred().resolve();
-                        /*let alternateTime = GetTomorrowIntervalTime(MY_API.CACHE.AUTO_GROUP_SIGH_TS);
-                        if (alternateTime < 86400 * 1e3) { //间隔小于24小时
-                            setTimeout(MY_API.GroupSign.run, alternateTime);
-                            let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
-                            MYDEBUG("[自动应援团签到]", `将在${runTime}进行应援团签到`);
-                            return $.Deferred().resolve();
-                        }*/
                         if (!checkNewDay(MY_API.CACHE.AUTO_GROUP_SIGH_TS)) {
                             runTomorrow(MY_API.GroupSign.run, 8, 0, '应援团签到');
                             return $.Deferred().resolve();
@@ -1889,11 +1848,7 @@
                         return MY_API.GroupSign.getGroups().then((list) => {
                             return MY_API.GroupSign.signInList(list).then(() => {
                                 MY_API.CACHE.AUTO_GROUP_SIGH_TS = ts_ms();
-                                MY_API.saveCache();/*
-                                alternateTime = GetTomorrowIntervalTime(MY_API.CACHE.AUTO_GROUP_SIGH_TS);
-                                setTimeout(MY_API.GroupSign.run, alternateTime);
-                                let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
-                                MYDEBUG("[自动应援团签到]", `将在${runTime}进行应援团签到`);*/
+                                MY_API.saveCache();
                                 runTomorrow(MY_API.GroupSign.run, 8, 0, '应援团签到');
                                 return $.Deferred().resolve();
                             }, () => delayCall(() => MY_API.GroupSign.run()));
@@ -2843,6 +2798,7 @@
                             return;
                     }
                     MYDEBUG('[小心心]', '开始客户端心跳');
+                    window.toast('[小心心]开始获取小心心', 'success');
                     MY_API.LITTLE_HEART.mobileOnline();
                     let mobileOnlineTimer = setInterval(() => MY_API.LITTLE_HEART.mobileOnline(), 5 * 60 * 1000);
                     const giftNum = await MY_API.LITTLE_HEART.getGiftNum();
@@ -2898,11 +2854,13 @@
                 },
                 getMaxLength: () => {
                     let maxLength = undefined;
-                    if (MY_API.CONFIG.DANMU_CONTENT.length >= MY_API.CONFIG.DANMU_ROOMID.length)
-                        maxLength = MY_API.CONFIG.DANMU_CONTENT.length;
-                    else maxLength = MY_API.CONFIG.DANMU_ROOMID.length;
-                    if (maxLength < MY_API.CONFIG.DANMU_INTERVAL_TIME.length)
-                        maxLength = MY_API.CONFIG.DANMU_INTERVAL_TIME.length;
+                    const contentLength = MY_API.CONFIG.DANMU_CONTENT.length,
+                        roomidLength = MY_API.CONFIG.DANMU_ROOMID.length,
+                        intervalTimeLength = MY_API.CONFIG.DANMU_INTERVAL_TIME.length;
+                    if (contentLength >= roomidLength) maxLength = contentLength;
+                    else maxLength = roomidLength;
+                    if (maxLength < intervalTimeLength)
+                        maxLength = intervalTimeLength;
                     return maxLength
                 },
                 run: async () => {
@@ -2930,18 +2888,13 @@
                         else {
                             isTimeData = false;
                             danmu_intervalTime = danmu_intervalTime.toLowerCase();
-                            console.log('danmu_intervalTime',danmu_intervalTime)
                             if (danmu_intervalTime.indexOf('h') > -1 || danmu_intervalTime.indexOf('m') > -1 || danmu_intervalTime.indexOf('s') > -1) {
                                 const hourArray = danmu_intervalTime.split('h');//1h5m3s
-                                console.log('hourArray', hourArray);
                                 const minuteArray = (hourArray[1] === undefined) ? hourArray[0].split('m') : hourArray[1].split('m');
-                                console.log('minuteArray', minuteArray);
                                 const secondArray = (minuteArray[1] === undefined) ? minuteArray[0].split('s') : minuteArray[1].split('s');
-                                console.log('secondArray', secondArray);
                                 const hour = hourArray[0],
                                     minute = minuteArray[0],
                                     second = secondArray[0];
-                                console.log('hour minute second', isNaN(hour) ? 0 : hour || 0, isNaN(minute) ? 0 : minute || 0, isNaN(second) ? 0 : second || 0);
                                 const finalHour = isNaN(hour) ? 0 : hour || 0,
                                     finalMinute = isNaN(minute) ? 0 : minute || 0,
                                     finalSecond = isNaN(second) ? 0 : second || 0;
@@ -2950,7 +2903,6 @@
                                 danmu_intervalTime_Ts = danmu_intervalTime * 60000;
                             }
                         }
-                        console.log('danmu_intervalTime_Ts',danmu_intervalTime_Ts)
                         MYDEBUG('[自动发弹幕]MY_API.CACHE.AUTO_SEND_DANMU_TS => jsoncache', jsonCache);
                         for (const obj of jsonCache) {
                             if (obj.roomid == danmu_roomid && obj.content == danmu_content) {
@@ -2963,7 +2915,6 @@
                             if (!!lastSendTime) intervalTime = ts_ms() - lastSendTime;
                             else intervalTime = ts_ms();
                         }
-                        console.log('intervalTime',intervalTime)
                         const setCache = () => {
                             const newJson = {
                                 roomid: danmu_roomid,
