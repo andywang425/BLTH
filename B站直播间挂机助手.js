@@ -3,8 +3,8 @@
 // @name           B站直播间挂机助手
 // @name:en        B站直播间挂机助手
 // @author         andywang425
-// @description    自动参与Bilibili直播区抽奖(现在极少)，直播区签到，完成主站每日任务，自动送礼，自动获取小心心，批量点亮勋章，自动参加被广播的节奏风暴(几乎没有)，自动发弹幕，快捷购买粉丝勋章
-// @description:en 自动参与Bilibili直播区抽奖(现在极少)，直播区签到，完成主站每日任务，自动送礼，自动获取小心心，批量点亮勋章，自动参加被广播的节奏风暴(几乎没有)，自动发弹幕，快捷购买粉丝勋章
+// @description    自动获取小心心，直播区签到，完成主站每日任务，批量送礼、点亮勋章，参与Bilibili直播区抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
+// @description:en 自动获取小心心，直播区签到，完成主站每日任务，批量送礼、点亮勋章，参与Bilibili直播区抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
 // @updateURL      https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH/
@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.4.1.1
+// @version        4.4.1.2
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -388,18 +388,16 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.4.1') &&
-                        version == '4.4.1') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '4.4.1.2') &&
+                        version == '4.4.1.2') { //更新公告时需要修改
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
                         };
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `<strong>1.新增自动发定时弹幕功能</strong><br>
-                            ${linkMsg('使用前建议先看下说明(点我前往对应说明处)', 'https://github.com/andywang425/BLTH/blob/master/README.md#弹幕设置')}<br>
-                            2.调整了弹幕设置-发送时间的填写方法。<br>
-                            3.修复检查小时榜间隔时间无法修改的bug。<br>
-                            4.删除了领银瓜子宝箱的功能。<br>
+                            content: `1.修复短号房间弹幕发送异常的问题<br>
+                            2.修复应援团签到bug<br>
+                            3.修复不开启抽奖也会模拟进入房间的bug<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -1469,37 +1467,39 @@
                 } else {
                     MY_API.RoomId_list.push(roomId);
                 }
-                if (!MY_API.EntryRoom_list_history.isIn(roomId)) {
+                if (!MY_API.EntryRoom_list_history.isIn(roomId) && MY_API.CONFIG.LOTTERY) {
                     BAPI.room.room_entry_action(roomId);//直播间进入记录
                     MY_API.EntryRoom_list_history.add(roomId);//加入列表
                 }
                 if (probability(MY_API.CONFIG.RANDOM_SEND_DANMU)) {//概率发活跃弹幕
-                    BAPI.sendLiveDanmu(MY_API.auto_danmu_list[Math.floor(Math.random() * 12)], roomId).then((response) => {
-                        MYDEBUG('[活跃弹幕]弹幕发送返回信息', response);
+                    BAPI.room.get_info(roomId).then((res) => {
+                        MYDEBUG(`API.room.get_info roomId=${roomId} res`, res);
+                        BAPI.sendLiveDanmu(MY_API.auto_danmu_list[Math.floor(Math.random() * 12)], res.data.room_id).then((response) => {
+                            MYDEBUG('[活跃弹幕]弹幕发送返回信息', response);
+                        })
                     })
                 }//Math.floor(Math.random() * (max - min + 1) ) + min
                 BAPI.xlive.lottery.check(roomId).then((re) => {
                     MY_API.RoomId_list.remove(roomId);//移除房间号
                     MYDEBUG('检查房间返回信息', re);
-                    let data = re.data;
+                    const data = re.data;
                     if (re.code === 0) {
-                        let list;
                         if (data.gift) {
-                            list = data.gift;
+                            const list = data.gift;
                             for (let i in list) {
                                 if (!list.hasOwnProperty(i)) continue;
                                 MY_API.creat_join(roomId, list[i], 'gift', area)
                             }
                         }
                         if (data.guard) {
-                            list = data.guard;
+                            const list = data.guard;
                             for (let i in list) {
                                 if (!list.hasOwnProperty(i)) continue;
                                 MY_API.creat_join(roomId, list[i], 'guard', area)
                             }
                         }
                         if (data.pk) {
-                            list = data.pk;
+                            const list = data.pk;
                             for (let i in list) {
                                 if (!list.hasOwnProperty(i)) continue;
                                 MY_API.creat_join(roomId, list[i], 'pk', area)
@@ -1807,7 +1807,7 @@
                     if (i >= list.length) return $.Deferred().resolve();
                     const obj = list[i];
                     //自己不能给自己的应援团应援
-                    if (obj.owner_uid == Live_info.uid) return GroupSign.signInList(list, i + 1);
+                    if (obj.owner_uid == Live_info.uid) return MY_API.GroupSign.signInList(list, i + 1);
                     return BAPI.Group.sign_in(obj.group_id, obj.owner_uid).then((response) => {
                         MYDEBUG('GroupSign.signInList: API.Group.sign_in', response);
                         let p = $.Deferred();
@@ -2000,9 +2000,8 @@
                     });
                 },
                 dynamic: async () => {
-                    let throwCoinNum = undefined;
-                    let coinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
-                    throwCoinNum = await BAPI.getuserinfo().then((re) => {
+                    const coinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
+                    const throwCoinNum = await BAPI.getuserinfo().then((re) => {
                         MYDEBUG('DailyReward.dynamic: API.getuserinfo', re);
                         if (re.data.biliCoin < coinNum) return re.data.biliCoin
                         else return coinNum
@@ -2038,7 +2037,7 @@
                         MYDEBUG('DailyReward.UserSpace: API.dynamic_svr.UserSpace', response);
                         if (response.code === 0) {
                             if (!!response.data.list.vlist) {
-                                let throwCoinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
+                                const throwCoinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
                                 const p1 = MY_API.DailyReward.coin_uid(response.data.list.vlist, Math.max(throwCoinNum, 0), pn, uid);
                                 return p1;
                             } else {
@@ -2061,16 +2060,15 @@
                             runMidnight(MY_API.DailyReward.run, '每日任务');
                             return $.Deferred().resolve();
                         }
-                        return BAPI.DailyReward.exp().then((response) => {
+                        return BAPI.DailyReward.exp().then(async (response) => {
                             MYDEBUG('DailyReward.run: API.DailyReward.exp', response);
                             if (response.code === 0) {
                                 MY_API.DailyReward.coin_exp = response.number;
-                                MY_API.DailyReward.login();
-                                return MY_API.DailyReward.dynamic().then(() => {
-                                    MY_API.CACHE.DailyReward_TS = ts_ms();
-                                    MY_API.saveCache();
-                                    runMidnight(MY_API.DailyReward.run, '每日任务');
-                                });
+                                await MY_API.DailyReward.login();
+                                await MY_API.DailyReward.dynamic();
+                                MY_API.CACHE.DailyReward_TS = ts_ms();
+                                MY_API.saveCache();
+                                runMidnight(MY_API.DailyReward.run, '每日任务');
                             } else {
                                 window.toast(`[自动每日奖励]${response.message}`, 'caution');
                             }
@@ -2842,15 +2840,18 @@
                     else return MY_API.CONFIG[array][index];
                 },
                 sendDanmu: async (danmuContent, roomId) => {
-                    console.log('sendDanmu', danmuContent, roomId)
-                    return await BAPI.sendLiveDanmu(danmuContent, roomId).then((response) => {
-                        MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmuContent}】，房间号【${roomId}】`, response);
-                        if (response.code === 0 && !response.msg)
-                            window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送成功`, 'success');
-                        else window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）出错 ${response.msg}`, 'caution')
-                    }, () => {
-                        window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送失败`, 'error')
-                    })
+                    //console.log('prepare to sendDanmu', danmuContent, roomId)
+                    return BAPI.room.get_info(roomId).then((res) => {
+                        MYDEBUG(`API.room.get_info roomId=${roomId} res`, res);//可能是短号，要用长号发弹幕
+                        return BAPI.sendLiveDanmu(danmuContent, res.data.room_id).then((response) => {
+                            MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmuContent}】，房间号【${roomId}】`, response);
+                            if (response.code === 0 && !response.msg)
+                                window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送成功`, 'success');
+                            else window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）出错 ${response.msg}`, 'caution')
+                        }, () => {
+                            window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送失败`, 'error')
+                        })
+                    });
                 },
                 getMaxLength: () => {
                     let maxLength = undefined;
@@ -3183,14 +3184,14 @@
         let myDate = new Date();
         let h = myDate.getHours();
         let m = myDate.getMinutes();
-        if (sH < eH) {//如(2,0,8,0)
+        if (sH < eH) {//如(2,8,0,0)
             if (h >= sH && h < eH)
                 return true;
             else if (h == eH && m >= sM && m < eM)
                 return true;
             else return false;
         }
-        else if (sH > eH) {//如(22,0,12,0)
+        else if (sH > eH) {//如(22,12,0,0)
             if (h >= sH || h < eH)
                 return true;
             else if (h == eH && m >= sM && m < eM)

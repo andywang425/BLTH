@@ -8,11 +8,11 @@
 -------------------------------
 
 ### 点击以下任一链接安装脚本
-### 1.githubusercontent源：[BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)&nbsp;&nbsp;&nbsp;[BLTH_Origin](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)  
+### 1.githubusercontent源：[BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)&nbsp;&nbsp;&nbsp;[BLTH_Origin_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)  
 ### 2.greasyfork源： [BLTH_Origin_greasyfork](https://greasyfork.org/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B/code/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
 ### 3.openuserjs源：[BLTH_Origin_openuserjs](https://openuserjs.org/install/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
 
-带有Origin字样的为原格式脚本。建议火狐用户安装原格式脚本。  
+带有Origin字样的为原格式脚本，其余为压缩脚本。建议安装压缩脚本。  
 
 -------------------------------
 
@@ -100,7 +100,7 @@
 + 送礼设置优先级:  
   不送礼房间 > 优先送礼房间 > 优先高/低等级粉丝牌。  
 + 送礼设置逻辑规则:  
-  无论【优先高等级粉丝牌】如何设置，会根据【无视礼物类型和到期时间限制】（勾选则无视是否到期补满亲密度，否则只送到期的）条件去按优先送礼房间先后顺序送礼。  
+  无论【优先高/低等级粉丝牌】如何设置，会根据【无视礼物类型和到期时间限制】（勾选则无视是否到期补满亲密度，否则只送到期的）条件去按优先送礼房间先后顺序送礼。  
   之后根据【优先高/低等级粉丝牌】决定先送高级还是低级。  
 + 若不勾选【无视礼物类型和到期时间限制】，不会送出永久礼物。  
 + 【剩余礼物】指送满了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。  
@@ -201,17 +201,17 @@
 + [BilibiliAPI_Mod.min.js](https://github.com/andywang425/BLTH/blob/master/library_files/BilibiliAPI_Mod.js) (MIT)：B站API及常用函数。  
 + [libBilibiliToken.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libBilibiliToken/libBilibiliToken.js) (MIT)：获取移动端token。  
 + [libWasmHash.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libWasmHash/libWasmHash.js) (MIT)：WebAssembly实现的Hash，计算心跳请求参数。  
-+ [layer.js](https://github.com/sentsin/layer) (MIT)：创建弹窗，信息框等  
++ [layer.js](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：创建弹窗，信息框等  
 
 本脚本引用的外部资源：  
-+ [layer.css](https://cdn.jsdelivr.net/gh/sentsin/layer@v3.1.1/dist/theme/default/layer.css)：layer.js的内置样式  
++ [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式  
 
 感谢以上这些项目的作者~  
 
 -------------------------------
 
 ## 更新日志
->### 4.4.1.1
->尝试解决加载不出控制面板的问题；改变了layer.css的加载方式。  
+>### 4.4.1.2
+>修复弹幕发送异常的问题（如果是短号要先转成长号）；修复应援团签到bug；修复不开启抽奖也会模拟进入房间的bug。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
