@@ -3,19 +3,19 @@
 // @name           B站直播间挂机助手
 // @name:en        B站直播间挂机助手
 // @author         andywang425
-// @description    自动获取小心心，直播区签到，完成主站每日任务，批量送礼、点亮勋章，参与Bilibili直播区抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
-// @description:en 自动获取小心心，直播区签到，完成主站每日任务，批量送礼、点亮勋章，参与Bilibili直播区抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
+// @description    自动获取小心心，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼、点亮勋章，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
+// @description:en 自动获取小心心，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼、点亮勋章，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
 // @updateURL      https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH/
 // @supportURL     https://github.com/andywang425/BLTH/issues
-// @icon           https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
+// @icon           data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAACMCAMAAACZHrEMAAAC/VBMVEUAAABSAABSAABSAABSAABSAABSAABSAABSAABSAABSAABSAABSAABSAABSAABSAAD+nmbbgGprNkLWvLpSAAD0OT/hRxO9U1XMVUHDQzzIPwvUa1b8mWGQGx7zlGDwcz3bfWf3iFFAGR/XdWDoXShdCQbYeGJVBwj5jlbAVlbQYEtiIyrKZV7VcFtoEw2TaG/XeGbNWETTd019KBpyHhPPtLNyPkrPXUnzfUfqYi3EXFrOWkZaEhf1g0zZfWnObGDWc13TaFNyOUJfHCLlUh3jTBibGwbaemXQb2P6k13BWVmoTzOdRS1oDAiyHQLScmT6mGPSZVDxeEJnLzrubTfWuLXWqKHWemjpilnUbVjZZUxlLDbEPA3Jq6vCo6Suio1/T1npfFbegFPRYk7IbUa+Y0BpMz6TOyZHHSTmVyN4Eg61kpWGWGC9PzhaBAPUr627m5zakYHUdWXPVETwODzsaDKvNjHcYy1dGB3QPxNLCgzXrafZl4jai3n2kFzHYVx4R1HUXUjHST9nMz+zVjplKTLaWyajOyDSURzZnpKheX7bhnHEbm/xhk+QSU3aZUx6P0aYNj/sOjXgaTONOS2ZKibbOyLLRRFYDhFQAwTUtLPXsavWn5XIfX6acXfVhHa4aV7sglnfcFDqekSANkHoOj97NzjpNzRZKjTMRDBPJCxDFRqEGBnPSxa4PRS2MgvQoqHUlIrKiIingYaMYGjVdWTibV+uYlrmYVrkdlShV1SHSEzvR0jjaELyPULOOEDlcTvQLi+IMSCsLB1GERXLPw6tKgu+NwqhIQhkCQfRqKb0jFWUUVLIVE7tgErKTkHDQji8KCzkOyvcLyvURSWpIiSVICCLIh6+JxvYPxS5JgrOm5rYmo/Vi37TfG/Mc2zNd2XAYGK/bmDvh1zLX1LpWFKsTVCwOEG4OEDhMzndWDW4OzCmSi6gLimaOyerPBzdShqEKRl9GRepMxSKIAzFb2DrVE/RcUfdZkeiR0HOZj3FYjy0NCiaNyJqIB5MOxb9AAAAEHRSTlMAEO+/n2BAMIDP3yCvj3BQjfSzKQAADzJJREFUeNrsmVmsC1EYxzutttpy79Q9d7RMOiaKIiTU0tpJa8klQRoEsd80V4IH+4stthdil4jYl0gsERJBxBZbCILEEl6QkNi32EJ8Z5k5M8Yo7aUe/BMxIbf9zbf8v++c6/iv//o3FfAEHEWX4Cmp6XIhLGdNR/Hkddd2OZFRNRxFkVDiMlK0iZ+qOAV/ux1FkFeLSMt4RWXriBgbqIhia4RcjiLIjzmy81uLWHKiSpIkeGiDkKMIgsQMEalkJS2BovAYLxZMnLF0BhQsBZ77IuRx/H1xGIkpBs8VxYFxopZaZFKEJYWfxyFUDKuBvhY1JZIAMxA/tS4+DEgFFlCkOL1dG6HWolXFgan5A5i/bTQBj4e2SwlC8y0of9NoSmv4EcjvhWcPQk+VqGIi+WtGAyT6fPbj2YTQW+ihhJGkWo1GsF2PvIykUbyiog0dzQiNB5ipIld1Go1Qw2YfEdw+SpIdJ4KGQGjocCIDiasajaYmfffaNkHBJEynIDTEaMB6k5yj+ozG48df2LfR9ykvpRtUvDKCx7OqxujbuwhMJKbK1W80gVoI1DcizkfIZ0TxI8JIlgU1ScYhNRPvHzOaEpyI+BD2WSUOTW6yyUFQsKbyRaESagvDjDNzyFXRgo3G68NvP04vQKfAJzOKa2+vShwm0gg5veB6FWYYiFyfwoxGqM0yxJRlNcx3FiaF7lCdmbWRnzKxJPD/EqMpqHD7DVd5O0ANB/Q9t5FIxDeFKpF2N1HclCQMqxRgNAIu3InnJUk1eCjvBzCeMaJJMZmNoEbjbz6bNlk0SJFAmfyNphQX7viZEobhaqkH2s0yYdXoMJFoEF3K8zWagAuHZR/bX7k+U4cFCYjtllbNIzD94clU4NE8jaaEhOU2fEI6ajT1genxenvXYnmyaiiBeWDOEsDkaTTYQt5jSzWpT1SShuP2zpGnWQRms6GaqjBMvkYDLKyfTWGRQG+1IhQQ6yerJmOYLab3SCRTyTw3GpfVziEsRDP19q7BbNaqwxhmKH0ufKNxW6ozkZaoEvCBtWi/IZT9MUx/DDNXtKoyr952mbdYmcxB1p96eztRI0syZTXGSvgKHOEURa6GjcYLBTGEF2BK0tSHvJ5LO5FUwjdKVWZ7S8riZmo0VUaTYu7syu/oc4q/rqLRKGx6uxlxHBL4HQxZqq4ATATDxKpjoxGc5hpOEJyUzILt1+5hIHyZmLHlJOLZWwDmmCpnMqJZLZEzr3HwfXt3jtKxDIoz5+Obgtlsk2IEYG6Y1s6LJxYurlevX553aS7LN6nae45hzhcA4B/BRInVfJD1NF+evrYeaO+irzioeSjgtPV7Mcu6opbFj1RWWaP13pa3LsQgwxet6lGnTp1O0Ip5npjb2MAMYc4HecpaYTLYahiMTlKHqvnv3cAKkB+XFz/5qNlYNTX6FD6T4KIL/UWTpKiqTUtxCc3OCyDRhX6nhL1k6XeWGswmlvhuMkjSy4kIlfrwPH1yTFF/BLx5wuk9pE6yPTgJzZP7d65wW7ZE9CdqEyORU5JoWWjfIKKb4fAu7IQWXV54vuc5SM+OOt9pAUyT36jaNpFYFpEKFfx4FirSdzAZCXQB78fTwqCXcEtmlnwCgnK25xtIj1VNEBJ+rV58hEWaWkGP1h4E4ydNYWTd28j83ofQ7glhrBvUfrijTCc1+4Wkx6oZEPVfZ8FfplZSGujdVwxGkZJGGPXVszDV1ZQ5P6RSICg2GvaLeapFXFcld6WERsBT4VM0SQdUTCvggUqms/ggrGk0z89WUrS8UvLPUw1Iyhh2Vk2I48BLfAKfChbN1WCG6qWyFgflOc9P/nlyI2q5aXaNPIbQuGxX3QgG4QeBWSvXmvJTUJ68wFJJXIQowWi8fHxbTwFMhwFlOrE3np+C8iQ4tRCk2Q07o7GfCv3nMZgrFIWXSqF5qqUfj2N0x1QxDdifH/1wKgyE0G2hLBNOn6tn8LfC8+RGhoVW7qxMjSZIXbQh1zATZllgUmmZhubq6Z49zw7nVVt4ngSbyiA0u8Phycx6+VJHfjsxmqD0PH9yOf+mwvNUk+8CFprVpEZpafPlLZrEYE96gm5NKd/2qxxHL+XOkw9vszZlSs6H8yJ0vzUdPZYs3gcoO8vLt/8SyLIjm4LB/XNy5onvj1Ypu9iZDArbOIZmYeO/c70c9Dg3SY9L94NY90bmzBNY2xZbGGkXTVQV3eKYsN2euVZOlLNklkJMqDaWtcuVpxJYTfiIsWySu0ii2K7NMgRhWTOlnKrHz9PzsT0jqQ9/yjbkyBO5Ugjb0MgSpZlLhhb9p5WAMhOKher4T9PzrmOoGWVpHGoYDK4bwfNk73mv7WgS0WhnbP2bMxLd6pbswWEp1/XIHuVI3a5jQ6GxFKY7pppUNipXnkoRp7EbRPP6wy9jVRaWFZzFtrGXzg91b9qheyhUn8K0D4V6BQeVHaB5yrH89pvwc5q5eKnRwsK13SYoXVuFQq1m1+0yINSNsPQKYaz1ZW3pXl6ak+YYmdh2NHA1ZqoW+5JZdmhwcEAI9LBu72C3BgSmBYG5W1Z2kJ2fctJ86+bMfmSIojBu35fcuuiKMkllmqZbd3Q/jE66MT2E6UzCRIaedCwziUQwYmwhDEYIwYjlwb6GFxkS+5JYEokgxINYEsSWIPgDPHlw7lJ1q9wq7Rq0+J5GxMzP/c75zrlVzWN6I/ShWUeb6BltIqGdHiisRECRqijiMjNGzERnMa7j96fCNJ8tGFnHvt4GFp4t/iVz1QqVTBpqNxpGLq3GGI8UPhWi8YMZtPz0hDu8cv1LZgckrRnhJRuLhOKBahfMEYAZUdgnoOlOLkPXh3my3AeLTsNQ/F4fJYPMJNSGLeaTEMA0cJ8KX1YWLPPsqeN77C6SSkZ0EGIsegzZKq9yw+y3fer6UzTbrUsJv7iOJl3ERpGssSJX3iCiiK5D1NqqDcRdME22T73bKdBMGTCe3/TnbnIGnXdjj/3QjECso0NIKFVeYSChHPNptnhuVJiGXaDYvvvs+aTpA1c4y0WeBdsCgUAtaSGdCDlUHtaTSOggln0qTDN6MB/SGyeBRLl4NfbVDwFQOZmGCWBJI+T0qWIWshRDm7HtU7efe6O+YNd2UbqE5ZGMIRp77GUUJTBViB9NBDnVnEVcwbQeXISZTzXibXChi26/XdvpRZGUrmDxLpmrbyrhr0+0mMe+4YLJNvMvDOCMAQzzCYZlz5+mWUJplg+cPmmSGEZyY489akYiiB1NlFmRgGYyTRtmTBiJ0jaOYO7TOPIEV4EGUpcsuoJFLplttdDLCaiMMKEZw+YzADlPp5mFcILCICx86tVOgWbNJhIvoqXlkjnKBiJpGlbCXKF0yOFTlFUMg5nq8Kn9T7896Pf09vQfs1wz2c6kB4kZVgnLSiHHEtHEfJKWz0KPSCbevTPwByxX+CGwxC23SlhWlIdwhYABn6aRYalCM2G3/7E8CLMSMZMAw4+m2ROm2rJvMsDkMPOJDUslmqV+LO/NeDjFaJARQtbR1CK3TJP7xGkMSD3mk+LD+z7wBPyJN8qNS/CdgQY5VWWXsGBJJKlPgtGCaWDDUuX1wbySh54WQfdSmijJ3IzVNXIJG2ydqM5CbbE/A1swVRkbliowp0pKbnpYhEwjb9Hk9YjzaKrdJ1PBfhegEwlEtQgzXaA+9VSxqYTQyBaZCZ2fTdbQK+xA8ShhM8RhQmxctnCbcJ1CCLNnSOBTydNPkkX0Z3Ca8qC7amo9++nVolWbN+eaDmBbM2gId1R4OUiNeupsqS8mcipyMezY5BaTAQVwsg5hSfUqIQzqzWieLHUGXdAFk7xYJWjyKaDRE5NlntcyzHkIYenGUuAp6JASoLHKBVhCepJZxGMMaMbYv6gGmAdko6n83qd7EsxMxeaGvY/RPBTpAvMuERSrmw40EH58RwjC0YR1EFSrW+ewpLUkhHsovjidaNEQFmhlUEykGqzf8ZR1n82QqqH32gI+8RDeq9Dc1j2TNfiVFpZjLppQEByJk/BL06GcIj4JGD0dmZwnnpU3SjAN0Nxsciu11Dyg+dR/270WBsNphICG7eIGaagwYPHsqdSpIKNfyTBl/LGRijpzmp3a4QMt3CaZpprSzELkaN4RKrFQkRVj1VQsq54XjTrNnDnrtYVTV6PKSNqLJpslNBGaNamIHnTApEOLmrCXtqhNBLGEjiotnaOtLQMaUGUwmDcM5KaJ88iHo4mlERegxDiKrIVQNCRp1GlOlpa2ahcw0PioOm5PqKgY25lsDgtJRbPhFz7gA3Gzr7S09IRWh/EqXxoWNyT4rBisjYYDW383THtOM23kTD8asxLFCcPisL1jZcEx0Bk/l0bSDO7zSx/vWQlls76+zJsmlEgjoBkTDRDBerwYDoXK52jKDmu//LmRrpxGGwHfKGfmg2IkWI+IQkBjAaTgC1svsKy6kYAyexxbytVp+lGaVlI2+KAOE8p07Zcs6KIBWVWyTzPnayBAESWjHje3oIhJ2eCz7udTpg6iu3dKYjm0X3JoBEEZPlT6zL46TQ0pG5xzPkbkscyWPbfenpFQthCHNuwlKJ2kxFPatU5CEV/AhGaW42QyPPXRkYBb5+RiWQsoNRSlo/TsSj38WrXzGEQGlaBJAEwetUzd6kTZ2ii1cz1BGUVQundp+7/q2keyj5SNO4xDdFTn8D2HQy/kumUtBOrhszqoh1/NyDKJxpylR8id6JDt0PeFO2OEjdKBJF3baXpAg0PZzMeUxhV/mRjZExqrWA81+rdQh24F7gRq4deqHcZUq4z05AziYreic6RYzsgtxFDkFmo7zQmtAVO9JAuLYbJHvExbpVPBKt2sHjdz1tPs4/GnJwxxicae3cxROiq0kAKNBtlHdTBJcPKrp/qiqHazevidgJHJlCM0MX6N9gkWtW5WD78ayD6mxgo92eSNohAsbQo/WNBnYqb9R3IFUBS7WT38WjXIPn/N+BsoIvymafP9UZxrwh9EEXGzXjvsi6KYcW2nGaVpDf8ACo+b4RrJPn+Ujn8BRdDMhlumLwrE7d9TL2rU/H8BhV2mxmnaiH8ABdQFfmqNpm3hEVcsFDGlhmqEpqyuvogoIonBKA1ISNoWDUXcMzdoRDUQ/EVFAfUBgGngzyiK0qloKGKd2NuPoRT9vyaCsqHqAZO5+GoPLdWhU992/5W+AfX4GH89u3Y6AAAAAElFTkSuQmCC
 // @copyright      2020, andywang425 (https://github.com/andywang425)
 // @license        MIT
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.4.1.2
+// @version        4.4.2
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -158,7 +158,8 @@
             const myCss = ".igiftMsg_input{outline:none;border:1px solid #e9eaec;background-color:#fff;border-radius:4px;padding:1px 0 0;overflow:hidden;font-size:12px;line-height:19px;width:30px;z-index:'10001';}.igiftMsg_btn{background-color:#23ade5;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;z-index:10001;}.igiftMsg_fs{border:2px solid #d4d4d4;z-index:10001;}";
             const AllCss = layerCss + myCss;
             return await GM_addStyle(AllCss);
-        };
+        },
+        ct = $('#chat-history-list');
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide',//UI隐藏开关
         gift_join_try = 0,
         guard_join_try = 0,
@@ -388,16 +389,16 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.4.1.2') &&
-                        version == '4.4.1.2') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '4.4.2') &&
+                        version == '4.4.2') { //更新公告时需要修改
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
                         };
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `1.修复短号房间弹幕发送异常的问题<br>
-                            2.修复应援团签到bug<br>
-                            3.修复不开启抽奖也会模拟进入房间的bug<br>
+                            content: `1.修复送礼失败的问题<br>
+                            2.优化了自动投币的检测机制<br>
+                            3.优化了隐藏/显示脚本提示时聊天栏信息的滚动<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -523,7 +524,7 @@
                 const btnmsg = msgHide == 'hide' ? '显示窗口和提示信息' : '隐藏窗口和提示信息';
                 let btn = $(`<button style="display: inline-block; float: left; margin-right: 7px;background-color: #23ade5;color: #fff;border-radius: 4px;border: none; padding:4px; cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
                 const div = '#allsettings';
-                const ct = $('.chat-history-list');
+                const lockBtn = 'span[title=\"弹幕滚动锁定\"]';
                 let mainIndex;
                 const settingTableHeight = $('.live-player-mounter').height();
                 const settingTableoffset = $('.live-player-mounter').offset();
@@ -1108,10 +1109,18 @@
                                 MY_API.chatLog('已重置统计数据');
                             });
                             $(div).find('button[data-action="sendGiftNow"]').click(() => {//立刻开始送礼
+                                if (!MY_API.CONFIG.AUTO_GIFT) {
+                                    window.toast('[立刻开始送礼]请先勾选【自动送礼】再点击此按钮', 'info');
+                                    return
+                                }
                                 SEND_GIFT_NOW = true;
                                 MY_API.Gift.run();
                             });
                             $(div).find('button[data-action="lightMedalNow"]').click(() => {//立刻点亮勋章
+                                if (!MY_API.CONFIG.AUTO_GIFT) {
+                                    window.toast('[立刻点亮勋章]请先勾选【自动送礼】再点击此按钮', 'info');
+                                    return
+                                }
                                 LIGHT_MEDAL_NOW = true;
                                 MY_API.Gift.run();
                             });
@@ -1226,8 +1235,11 @@
                             localStorage.setItem(`${NAME}_msgHide`, msgHide);
                             $('.igiftMsg').hide();
                             $('.link-toast').hide();
-                            ct.animate({ scrollTop: 0 }, 0);
-                            setTimeout(() => { ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10) }, 100);
+                            if ($(lockBtn).attr('class') === 'icon-item icon-font icon-lock-1 active')
+                                $(lockBtn).trigger('click');
+                            else $(lockBtn).trigger('click').trigger('click');
+                            //ct.animate({ scrollTop: 0 }, 0);
+                            //setTimeout(() => { ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10) }, 100);
                             document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
                         }
                     });
@@ -1242,8 +1254,11 @@
                             $('.igiftMsg').hide();
                             $('.link-toast').hide();
                             layer.close(mainIndex);
-                            ct.animate({ scrollTop: 0 }, 0);
-                            setTimeout(() => { ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10) }, 100);
+                            //ct.animate({ scrollTop: 0 }, 0);
+                            //setTimeout(() => { ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10) }, 100);
+                            if ($(lockBtn).attr('class') === 'icon-item icon-font icon-lock-1 active')
+                                $(lockBtn).trigger('click');
+                            else $(lockBtn).trigger('click').trigger('click');
                             document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
                         }
                         else {
@@ -1252,7 +1267,10 @@
                             $('.igiftMsg').show();
                             $('.link-toast').show();
                             openMainWindow();
-                            ct.animate({ scrollTop: ct.prop("scrollHeight") }, 0);
+                            //ct.animate({ scrollTop: ct.prop("scrollHeight") }, 0);
+                            if ($(lockBtn).attr('class') === 'icon-item icon-font icon-lock-1 active')
+                                $(lockBtn).trigger('click');
+                            else $(lockBtn).trigger('click').trigger('click');
                             document.getElementById('hiderbtn').innerHTML = "隐藏窗口和提示信息";
                         }
                     }
@@ -1271,7 +1289,6 @@
             chatLog: function (text, type = 'info') {//自定义提示
                 let div = $("<div class='igiftMsg'>");
                 let msg = $("<div>");
-                let ct = $('#chat-history-list');
                 let myDate = new Date();
                 msg.text(text);
                 div.text(myDate.toLocaleString());
@@ -1602,7 +1619,6 @@
                 let div = $("<div class='igiftMsg'>");
                 let msg = $("<div>");
                 let aa = $("<div>");
-                let ct = $('#chat-history-list');
                 let myDate = new Date();
                 msg.text(`[${area}]` + data.thank_text.split('<%')[1].split('%>')[0] + data.thank_text.split('%>')[1]);
                 div.text(myDate.toLocaleString());
@@ -1899,12 +1915,13 @@
                     const obj = JSON.parse(cards[i].card);
                     let num = Math.min(2, n);
                     if (one) num = 1;
-                    BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
+                    return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
                         if (re.data.multiply === 2) {
                             MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
                             return MY_API.DailyReward.coin(vlist, n, i + 1);
                         }
                         else {
+                            if (re.data.multiply === 1) num = 1;
                             return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
                                 MYDEBUG('DailyReward.coin: API.DailyReward.coin', response);
                                 if (response.code === 0) {
@@ -1948,12 +1965,13 @@
                     }
                     let num = Math.min(2, n);
                     if (one) num = 1;
-                    BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
+                    return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
                         if (re.data.multiply === 2) {
                             MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
                             return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uid, i + 1);
                         }
                         else {
+                            if (re.data.multiply === 1) num = 1;
                             return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
                                 MYDEBUG('DailyReward.coin_uid: API.DailyReward.coin_uid', response);
                                 if (response.code === 0) {
@@ -2054,18 +2072,18 @@
                 },
                 run: () => {
                     try {
-                        //if (!MY_API.CONFIG.DailyReward) return $.Deferred().resolve();
+                        if (!MY_API.CONFIG.LOGIN && !MY_API.CONFIG.COIN && !MY_API.CONFIG.WATCH) return $.Deferred().resolve();
                         if (!checkNewDay(MY_API.CACHE.DailyReward_TS)) {
                             // 同一天，不执行每日任务
                             runMidnight(MY_API.DailyReward.run, '每日任务');
                             return $.Deferred().resolve();
                         }
-                        return BAPI.DailyReward.exp().then(async (response) => {
+                        return BAPI.DailyReward.exp().then((response) => {
                             MYDEBUG('DailyReward.run: API.DailyReward.exp', response);
                             if (response.code === 0) {
                                 MY_API.DailyReward.coin_exp = response.number;
-                                await MY_API.DailyReward.login();
-                                await MY_API.DailyReward.dynamic();
+                                MY_API.DailyReward.login();
+                                MY_API.DailyReward.dynamic();
                                 MY_API.CACHE.DailyReward_TS = ts_ms();
                                 MY_API.saveCache();
                                 runMidnight(MY_API.DailyReward.run, '每日任务');
@@ -2821,6 +2839,7 @@
                                     count++;
                                 }
                                 if (count >= control) {
+                                    endFunc();
                                     break;
                                 }
                                 else
@@ -2998,6 +3017,7 @@
                         MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
                         return
                     };
+                    localStorage.setItem(`${NAME}_CONFIG`, JSON.stringify(MY_API.CONFIG));//修复一下因版本差异造成的变量类型错误
                     MY_API.newMessage(GM_info.script.version);//新版本提示信息
                     MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
                     StartPlunder(MY_API);
