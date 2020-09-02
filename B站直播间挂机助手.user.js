@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.4.2.2
+// @version        4.4.2.3
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -511,8 +511,8 @@ else{MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间
 await sleep(1100);}}}};MY_API.init().then(()=>{try{const promiseInit=$.Deferred();const uniqueCheck=()=>{const t=ts_ms();if(t-MY_API.CACHE.UNIQUE_CHECK>=0&&t-MY_API.CACHE.UNIQUE_CHECK<=15e3){$('.link-toast').remove();$('.igiftMsg').remove();window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行','caution');return promiseInit.reject();}else{return promiseInit.resolve();}};uniqueCheck().then(()=>{let timer_unique;const uniqueMark=()=>{timer_unique=setTimeout(uniqueMark,10e3);MY_API.CACHE.UNIQUE_CHECK=Date.now();MY_API.saveCache(false);};window.addEventListener('unload',()=>{if(timer_unique){clearTimeout(timer_unique);MY_API.CACHE.UNIQUE_CHECK=0;MY_API.saveCache();}});uniqueMark();if(parseInt(Live_info.uid)===0||isNaN(parseInt(Live_info.uid))){MY_API.chatLog('未登录，请先登录再使用脚本','warning');return};MY_API.newMessage(GM_info.script.version);MYDEBUG('MY_API.CONFIG',MY_API.CONFIG);StartPlunder(MY_API);})}
 catch(e){console.error('重复运行检测错误',e);}});}
 function StartPlunder(API){'use strict';let clearStat=()=>{API.GIFT_COUNT.COUNT=0;API.GIFT_COUNT.CLEAR_TS=dateNow();API.saveGiftCount();MYDEBUG('已清空辣条数量')}
-if(checkNewDay(API.GIFT_COUNT.CLEAR_TS))clearStat();runExactMidnight(clearStat,'重置统计');API.creatSetBox();API.removeUnnecessary();const fixList=['AUTO_GIFT_ROOMID','LIGHT_MEDALS','EXCLUDE_ROOMID'];let fixCount=0;for(const i of fixList){if(!$.isArray(API.CONFIG[i])){API.CONFIG[i]=API.CONFIG[i].split(",");fixCount++;}
-if(fixCount===fixList.length-1){API.chatLog('变量类型错误修复完成','success');API.saveConfig();break;}}
+if(checkNewDay(API.GIFT_COUNT.CLEAR_TS))clearStat();runExactMidnight(clearStat,'重置统计');API.creatSetBox();API.removeUnnecessary();const fixList=['AUTO_GIFT_ROOMID','LIGHT_MEDALS','EXCLUDE_ROOMID'];for(const i of fixList){if(!$.isArray(API.CONFIG[i])){API.CONFIG[i]=API.CONFIG[i].split(",");}
+if(i===fixList[fixList.length-1]){API.chatLog('变量类型错误修复完成','success');API.saveConfig();break;}}
 setTimeout(()=>{API.AUTO_DANMU.run();API.LITTLE_HEART.run();API.GroupSign.run();API.DailyReward.run();API.LiveReward.run();API.Exchange.runS2C();API.Gift.run();},6e3);if(API.CONFIG.LOTTERY){BAPI.room.getList().then((response)=>{MYDEBUG('直播间列表',response);for(const obj of response.data){BAPI.room.getRoomList(obj.id,0,0,1,1).then((response)=>{MYDEBUG('直播间号列表',response);for(let j=0;j<response.data.length;++j){API.listen(response.data[j].roomid,Live_info.uid,`${obj.name}区`);}});}});if(API.CONFIG.CHECK_HOUR_ROOM){let check_top_room=()=>{if(API.GIFT_COUNT.COUNT>=API.CONFIG.MAX_GIFT){MYDEBUG('超过今日辣条限制，不参与抽奖');API.max_blocked=true;}
 if(API.blocked||API.max_blocked){if(API.blocked){API.chatLog('进入小黑屋检查小时榜已停止运行');clearInterval(check_timer);return}
 else{API.chatLog('辣条已达到最大值检查小时榜已停止运行');return}}

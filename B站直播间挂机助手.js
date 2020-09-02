@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.4.2.2
+// @version        4.4.2.3
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -3044,13 +3044,11 @@
         API.removeUnnecessary();//移除页面元素
         //修复一下因版本差异造成的变量类型错误
         const fixList = ['AUTO_GIFT_ROOMID', 'LIGHT_MEDALS', 'EXCLUDE_ROOMID'];
-        let fixCount = 0;
         for (const i of fixList) {
             if (!$.isArray(API.CONFIG[i])) {
                 API.CONFIG[i] = API.CONFIG[i].split(",");
-                fixCount++;
             }
-            if (fixCount === fixList.length - 1) {
+            if (i === fixList[fixList.length - 1]) {
                 API.chatLog('变量类型错误修复完成', 'success');
                 API.saveConfig();
                 break;
