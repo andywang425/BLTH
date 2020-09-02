@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.4.2.1
+// @version        4.4.2.2
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -421,170 +421,6 @@
                     MYDEBUG('API保存出错', e);
                     return false
                 }
-            },
-            saveAction: () => {
-                //TIME_AREA_DISABLE（控制输入的两个小时两个分钟）
-                let val = undefined;
-                let valArray = undefined;
-                let val1 = parseInt($(div).find('div[data-toggle="TIME_AREA_DISABLE"] .startHour').val());
-                let val2 = parseInt($(div).find('div[data-toggle="TIME_AREA_DISABLE"] .endHour').val());
-                let val3 = parseInt($(div).find('div[data-toggle="TIME_AREA_DISABLE"] .startMinute').val());
-                let val4 = parseInt($(div).find('div[data-toggle="TIME_AREA_DISABLE"] .endMinute').val());
-
-                if (val1 >= 24 || val2 >= 24 || val3 >= 60 || val4 >= 60 || val1 < 0 || val2 < 0 || val3 < 0 || val4 < 0) {
-                    MY_API.chatLog("[定时休眠]时间错误", 'warning');
-                    return
-                }
-                MY_API.CONFIG.TIME_AREA_START_H0UR = val1;
-                MY_API.CONFIG.TIME_AREA_END_H0UR = val2;
-                MY_API.CONFIG.TIME_AREA_START_MINUTE = val3;
-                MY_API.CONFIG.TIME_AREA_END_MINUTE = val4;
-                //RANDOM_SKIP save
-                val = parseFloat($(div).find('div[data-toggle="RANDOM_SKIP"] .per').val());
-                if (val < 0 || val > 100) {
-                    MY_API.chatLog('[随机跳过礼物]数据小于0或大于100', 'warning');
-                    return
-                }
-                MY_API.CONFIG.RANDOM_SKIP = val;
-                //RANDOM_SEND_DANMU save
-                val = parseFloat($(div).find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val());
-                if (val > 5) {
-                    MY_API.chatLog("[活跃弹幕]为维护直播间弹幕氛围,弹幕发送概率不得大于5%", 'warning');
-                    return
-                }
-                else if (val < 0) {
-                    MY_API.chatLog("[活跃弹幕]数据小于0", 'warning');
-                    return
-                }
-                MY_API.CONFIG.RANDOM_SEND_DANMU = val;
-                //MAX_GIFT save
-                val = parseInt($(div).find('div[data-toggle="MAX_GIFT"] .num').val());
-                MY_API.CONFIG.MAX_GIFT = val;
-                //TIME_RELOAD save
-                val = parseInt($(div).find('div[data-toggle="TIME_RELOAD"] .delay-seconds').val());
-                if (val <= 0 || val > 10000) {
-                    MY_API.chatLog('[直播间重载时间]数据小于等于0或大于10000', 'warning');
-                    return
-                }
-                MY_API.CONFIG.TIME_RELOAD_MINUTE = val;
-                //RANDOM_DELAY
-                val = parseFloat($(div).find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val());
-                val2 = parseFloat($(div).find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val());
-
-                if (val < 0 || val2 > 100) {
-                    MY_API.chatLog('[抽奖延时]数据小于0或大于100', 'warning');
-                    return
-                }
-                else if (val2 <= val) {
-                    MY_API.chatLog('[抽奖延时]数据大小关系不正确', 'warning');
-                    return
-                }
-                MY_API.CONFIG.RND_DELAY_START = val;
-                MY_API.CONFIG.RND_DELAY_END = val2;
-                //COIN
-                val = parseInt($(div).find('div[data-toggle="COIN"] .coin_number').val());
-                if (val < 0 || val > 5) {
-                    MY_API.chatLog("[自动投币]数据小于0或大于5", 'warning');
-                    return
-                }
-                MY_API.CONFIG.COIN_NUMBER = val;
-                //CHECK_HOUR_ROOM_INTERVAL
-                val = parseInt($(div).find('div[data-toggle="CHECK_HOUR_ROOM"] .num').val());
-                if (val <= 0) {
-                    MY_API.chatLog("[检查小时榜间隔]数据小于等于0", 'warning');
-                    return
-                }
-                MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL = val;
-                //AUTO_GIFT_ROOMID
-                val = $(div).find('div[data-toggle="AUTO_GIFT_ROOMID"] .num').val();
-                valArray = val.split(",");
-                for (let i = 0; i < valArray.length; i++) {
-                    if (valArray[i] === '') {
-                        valArray[i] = 22474988;
-                    }
-                };
-                MY_API.CONFIG.AUTO_GIFT_ROOMID = valArray;
-                //EXCLUDE_ROOMID
-                val = $(div).find('div[data-toggle="EXCLUDE_ROOMID"] .num').val();
-                valArray = val.split(",");
-                for (let i = 0; i < valArray.length; i++) {
-                    if (valArray[i] === '') {
-                        valArray[i] = 0;
-                    }
-                };
-                MY_API.CONFIG.EXCLUDE_ROOMID = valArray;
-                //GIFT_LIMIT
-                val = parseInt($(div).find('div[data-toggle="GIFT_LIMIT"] .num').val());
-                MY_API.CONFIG.GIFT_LIMIT = val;
-                //GIFT_SEND_TIME
-                val1 = parseInt($(div).find('div[data-toggle="GIFT_SEND_TIME"] .Hour').val());
-                val2 = parseInt($(div).find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val());
-                if (val1 < 0 || val2 < 0) {
-                    MY_API.chatLog("[送礼时间]数据小于0", 'warning');
-                    return
-                }
-                else if (val1 >= 24 || val2 >= 60) {
-                    MY_API.chatLog("[送礼时间]时间错误", 'warning');
-                    return
-                }
-                MY_API.CONFIG.GIFT_SEND_HOUR = val1;
-                MY_API.CONFIG.GIFT_SEND_MINUTE = val2;
-                //SPARE_GIFT_ROOM
-                val = $(div).find('div[data-toggle="SPARE_GIFT_ROOM"] .num').val();
-                MY_API.CONFIG.SPARE_GIFT_ROOM = val;
-                //STORM_QUEUE_SIZE
-                val = parseInt($(div).find('div[data-toggle="STORM_QUEUE_SIZE"] .num').val());
-                MY_API.CONFIG.STORM_QUEUE_SIZE = val;
-                //STORM_MAX_COUNT
-                val = parseInt($(div).find('div[data-toggle="STORM_MAX_COUNT"] .num').val());
-                MY_API.CONFIG.STORM_MAX_COUNT = val;
-                //STORM_ONE_LIMIT
-                val = parseInt($(div).find('div[data-toggle="STORM_ONE_LIMIT"] .num').val());
-                MY_API.CONFIG.STORM_ONE_LIMIT = val;
-                //COIN_UID
-                val = parseInt($(div).find('div[data-toggle="COIN_UID"] .num').val());
-                MY_API.CONFIG.COIN_UID = val;
-                //LIGHT_MEDALS
-                val = $(div).find('div[data-toggle="LIGHT_MEDALS"] .num').val();
-                valArray = val.split(",");
-                for (let i = 0; i < valArray.length; i++) {
-                    if (valArray[i] === '') {
-                        valArray[i] = 0;
-                    }
-                };
-                MY_API.CONFIG.LIGHT_MEDALS = valArray;
-                //MAX_TAB
-                val = parseInt($(div).find('div[data-toggle="MAX_TAB"] .num').val());
-                MY_API.CONFIG.MAX_TAB = val;
-                //AUTO_DANMU
-                val1 = $(div).find('div[data-toggle="AUTO_DANMU"] .Danmu').val();
-                valArray = val1.split(",");
-                for (let i = 0; i < valArray.length; i++) {
-                    if (valArray[i] === '') {
-                        valArray[i] = '这是一条弹幕';
-                    }
-                };
-                val1 = valArray;
-                val2 = $(div).find('div[data-toggle="AUTO_DANMU"] .Roomid').val();
-                valArray = val2.split(",");
-                for (let i = 0; i < valArray.length; i++) {
-                    if (valArray[i] === '') {
-                        valArray[i] = '22474988';
-                    }
-                };
-                val2 = valArray;
-                val3 = $(div).find('div[data-toggle="AUTO_DANMU"] .Time').val();
-                valArray = val3.split(",");
-                for (let i = 0; i < valArray.length; i++) {
-                    if (valArray[i] === '') {
-                        valArray[i] = '10m';
-                    }
-                };
-                val3 = valArray;
-                MY_API.CONFIG.DANMU_CONTENT = val1;
-                MY_API.CONFIG.DANMU_ROOMID = val2;
-                MY_API.CONFIG.DANMU_INTERVAL_TIME = val3;
-                MY_API.saveConfig();
             },
             saveCache: (logswitch = true) => {//保存配置函数
                 try {
@@ -1079,9 +915,172 @@
                             $(div).find('div[data-toggle="GIFT_SEND_TIME"] .Hour').val(MY_API.CONFIG.GIFT_SEND_HOUR.toString());
                             $(div).find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val(MY_API.CONFIG.GIFT_SEND_MINUTE.toString());
                             $(div).find('div[data-toggle="GIFT_LIMIT"] .num').val(parseInt(MY_API.CONFIG.GIFT_LIMIT).toString());
+                            const saveAction = () => {
+                                //TIME_AREA_DISABLE（控制输入的两个小时两个分钟）
+                                let val = undefined;
+                                let valArray = undefined;
+                                let val1 = parseInt($(div).find('div[data-toggle="TIME_AREA_DISABLE"] .startHour').val());
+                                let val2 = parseInt($(div).find('div[data-toggle="TIME_AREA_DISABLE"] .endHour').val());
+                                let val3 = parseInt($(div).find('div[data-toggle="TIME_AREA_DISABLE"] .startMinute').val());
+                                let val4 = parseInt($(div).find('div[data-toggle="TIME_AREA_DISABLE"] .endMinute').val());
 
+                                if (val1 >= 24 || val2 >= 24 || val3 >= 60 || val4 >= 60 || val1 < 0 || val2 < 0 || val3 < 0 || val4 < 0) {
+                                    MY_API.chatLog("[定时休眠]时间错误", 'warning');
+                                    return
+                                }
+                                MY_API.CONFIG.TIME_AREA_START_H0UR = val1;
+                                MY_API.CONFIG.TIME_AREA_END_H0UR = val2;
+                                MY_API.CONFIG.TIME_AREA_START_MINUTE = val3;
+                                MY_API.CONFIG.TIME_AREA_END_MINUTE = val4;
+                                //RANDOM_SKIP save
+                                val = parseFloat($(div).find('div[data-toggle="RANDOM_SKIP"] .per').val());
+                                if (val < 0 || val > 100) {
+                                    MY_API.chatLog('[随机跳过礼物]数据小于0或大于100', 'warning');
+                                    return
+                                }
+                                MY_API.CONFIG.RANDOM_SKIP = val;
+                                //RANDOM_SEND_DANMU save
+                                val = parseFloat($(div).find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val());
+                                if (val > 5) {
+                                    MY_API.chatLog("[活跃弹幕]为维护直播间弹幕氛围,弹幕发送概率不得大于5%", 'warning');
+                                    return
+                                }
+                                else if (val < 0) {
+                                    MY_API.chatLog("[活跃弹幕]数据小于0", 'warning');
+                                    return
+                                }
+                                MY_API.CONFIG.RANDOM_SEND_DANMU = val;
+                                //MAX_GIFT save
+                                val = parseInt($(div).find('div[data-toggle="MAX_GIFT"] .num').val());
+                                MY_API.CONFIG.MAX_GIFT = val;
+                                //TIME_RELOAD save
+                                val = parseInt($(div).find('div[data-toggle="TIME_RELOAD"] .delay-seconds').val());
+                                if (val <= 0 || val > 10000) {
+                                    MY_API.chatLog('[直播间重载时间]数据小于等于0或大于10000', 'warning');
+                                    return
+                                }
+                                MY_API.CONFIG.TIME_RELOAD_MINUTE = val;
+                                //RANDOM_DELAY
+                                val = parseFloat($(div).find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val());
+                                val2 = parseFloat($(div).find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val());
+
+                                if (val < 0 || val2 > 100) {
+                                    MY_API.chatLog('[抽奖延时]数据小于0或大于100', 'warning');
+                                    return
+                                }
+                                else if (val2 <= val) {
+                                    MY_API.chatLog('[抽奖延时]数据大小关系不正确', 'warning');
+                                    return
+                                }
+                                MY_API.CONFIG.RND_DELAY_START = val;
+                                MY_API.CONFIG.RND_DELAY_END = val2;
+                                //COIN
+                                val = parseInt($(div).find('div[data-toggle="COIN"] .coin_number').val());
+                                if (val < 0 || val > 5) {
+                                    MY_API.chatLog("[自动投币]数据小于0或大于5", 'warning');
+                                    return
+                                }
+                                MY_API.CONFIG.COIN_NUMBER = val;
+                                //CHECK_HOUR_ROOM_INTERVAL
+                                val = parseInt($(div).find('div[data-toggle="CHECK_HOUR_ROOM"] .num').val());
+                                if (val <= 0) {
+                                    MY_API.chatLog("[检查小时榜间隔]数据小于等于0", 'warning');
+                                    return
+                                }
+                                MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL = val;
+                                //AUTO_GIFT_ROOMID
+                                val = $(div).find('div[data-toggle="AUTO_GIFT_ROOMID"] .num').val();
+                                valArray = val.split(",");
+                                for (let i = 0; i < valArray.length; i++) {
+                                    if (valArray[i] === '') {
+                                        valArray[i] = 22474988;
+                                    }
+                                };
+                                MY_API.CONFIG.AUTO_GIFT_ROOMID = valArray;
+                                //EXCLUDE_ROOMID
+                                val = $(div).find('div[data-toggle="EXCLUDE_ROOMID"] .num').val();
+                                valArray = val.split(",");
+                                for (let i = 0; i < valArray.length; i++) {
+                                    if (valArray[i] === '') {
+                                        valArray[i] = 0;
+                                    }
+                                };
+                                MY_API.CONFIG.EXCLUDE_ROOMID = valArray;
+                                //GIFT_LIMIT
+                                val = parseInt($(div).find('div[data-toggle="GIFT_LIMIT"] .num').val());
+                                MY_API.CONFIG.GIFT_LIMIT = val;
+                                //GIFT_SEND_TIME
+                                val1 = parseInt($(div).find('div[data-toggle="GIFT_SEND_TIME"] .Hour').val());
+                                val2 = parseInt($(div).find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val());
+                                if (val1 < 0 || val2 < 0) {
+                                    MY_API.chatLog("[送礼时间]数据小于0", 'warning');
+                                    return
+                                }
+                                else if (val1 >= 24 || val2 >= 60) {
+                                    MY_API.chatLog("[送礼时间]时间错误", 'warning');
+                                    return
+                                }
+                                MY_API.CONFIG.GIFT_SEND_HOUR = val1;
+                                MY_API.CONFIG.GIFT_SEND_MINUTE = val2;
+                                //SPARE_GIFT_ROOM
+                                val = $(div).find('div[data-toggle="SPARE_GIFT_ROOM"] .num').val();
+                                MY_API.CONFIG.SPARE_GIFT_ROOM = val;
+                                //STORM_QUEUE_SIZE
+                                val = parseInt($(div).find('div[data-toggle="STORM_QUEUE_SIZE"] .num').val());
+                                MY_API.CONFIG.STORM_QUEUE_SIZE = val;
+                                //STORM_MAX_COUNT
+                                val = parseInt($(div).find('div[data-toggle="STORM_MAX_COUNT"] .num').val());
+                                MY_API.CONFIG.STORM_MAX_COUNT = val;
+                                //STORM_ONE_LIMIT
+                                val = parseInt($(div).find('div[data-toggle="STORM_ONE_LIMIT"] .num').val());
+                                MY_API.CONFIG.STORM_ONE_LIMIT = val;
+                                //COIN_UID
+                                val = parseInt($(div).find('div[data-toggle="COIN_UID"] .num').val());
+                                MY_API.CONFIG.COIN_UID = val;
+                                //LIGHT_MEDALS
+                                val = $(div).find('div[data-toggle="LIGHT_MEDALS"] .num').val();
+                                valArray = val.split(",");
+                                for (let i = 0; i < valArray.length; i++) {
+                                    if (valArray[i] === '') {
+                                        valArray[i] = 0;
+                                    }
+                                };
+                                MY_API.CONFIG.LIGHT_MEDALS = valArray;
+                                //MAX_TAB
+                                val = parseInt($(div).find('div[data-toggle="MAX_TAB"] .num').val());
+                                MY_API.CONFIG.MAX_TAB = val;
+                                //AUTO_DANMU
+                                val1 = $(div).find('div[data-toggle="AUTO_DANMU"] .Danmu').val();
+                                valArray = val1.split(",");
+                                for (let i = 0; i < valArray.length; i++) {
+                                    if (valArray[i] === '') {
+                                        valArray[i] = '这是一条弹幕';
+                                    }
+                                };
+                                val1 = valArray;
+                                val2 = $(div).find('div[data-toggle="AUTO_DANMU"] .Roomid').val();
+                                valArray = val2.split(",");
+                                for (let i = 0; i < valArray.length; i++) {
+                                    if (valArray[i] === '') {
+                                        valArray[i] = '22474988';
+                                    }
+                                };
+                                val2 = valArray;
+                                val3 = $(div).find('div[data-toggle="AUTO_DANMU"] .Time').val();
+                                valArray = val3.split(",");
+                                for (let i = 0; i < valArray.length; i++) {
+                                    if (valArray[i] === '') {
+                                        valArray[i] = '10m';
+                                    }
+                                };
+                                val3 = valArray;
+                                MY_API.CONFIG.DANMU_CONTENT = val1;
+                                MY_API.CONFIG.DANMU_ROOMID = val2;
+                                MY_API.CONFIG.DANMU_INTERVAL_TIME = val3;
+                                MY_API.saveConfig();
+                            };
                             $(div).find('div[id="giftCount"] [data-action="save"]').click(() => {//保存按钮
-                                MY_API.saveAction();
+                                saveAction();
                             });
                             $(div).find('div[data-toggle="BUY_MEDAL"] [data-action="buy_medal"]').click(function () {//购买勋章
                                 const room_id = parseInt($(div).find('div[data-toggle="BUY_MEDAL"] .num').val());
@@ -1164,12 +1163,12 @@
                                 if (MY_API.CONFIG[i]) input.attr('checked', '');
                                 input.change(function () {
                                     MY_API.CONFIG[i] = $(this).prop('checked');
-                                    MY_API.saveConfig();
+                                    saveAction();
                                 });
                             };
                             $('input:text').bind('keydown', function (event) {//绑定回车保存
                                 if (event.keyCode == "13") {
-                                    MY_API.saveAction();
+                                    saveAction();
                                 }
                             });
                             if (MY_API.CONFIG.COIN_TYPE == 'COIN_DYN') {
@@ -2396,7 +2395,7 @@
                         //送之前查一次有没有可送的
                         let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(r.gift_id) && r.gift_num > 0 &&
                             r.corner_mark.substring(0, r.corner_mark.indexOf("天")) <= MY_API.CONFIG.GIFT_LIMIT);
-                        MYDEBUG("pass", pass)
+                        MYDEBUG("[自动送礼]pass的礼物", pass)
                         if (pass.length == 0) {
                             MY_API.Gift.over = true;
                             return;
@@ -2792,12 +2791,16 @@
                         player_type: '0',
                         client_ts: '{client_ts}'
                     };
-                    const endFunc = () => {
-                        window.toast('[小心心]今日小心心已全部获取', 'success');
-                        clearInterval(mobileOnlineTimer);
-                        MY_API.CACHE.LittleHeart_TS = ts_ms();
-                        MY_API.saveCache();
-                        runMidnight(MY_API.LITTLE_HEART.run, '获取小心心');
+                    const endFunc = async (check = true) => {
+                        if (!check || await MY_API.LITTLE_HEART.getGiftNum() >= 24) {
+                            window.toast('[小心心]今日小心心已全部获取', 'success');
+                            clearInterval(mobileOnlineTimer);
+                            MY_API.CACHE.LittleHeart_TS = ts_ms();
+                            MY_API.saveCache();
+                            return runMidnight(MY_API.LITTLE_HEART.run, '获取小心心');
+                        } else {//出于某些原因心跳次数到到了但小心心个数没到，再次运行
+                            return MY_API.LITTLE_HEART.run()
+                        }
                     }
                     if (tokenData.access_token === undefined && await setToken() === undefined)
                         return;
@@ -2825,7 +2828,7 @@
                             for (let i = 0; i < loopNum; i++) {
                                 for (const funsMedalData of fansMedal) {
                                     if (count >= control)
-                                        break;
+                                        return endFunc();
                                     const postData = Object.assign({}, mobileHeartBeatJSON, {
                                         room_id: funsMedalData.room_id.toString(),
                                         timestamp: (BilibiliToken.TS - 300).toString(),
@@ -2837,17 +2840,16 @@
                                     count++;
                                 }
                                 if (count >= control) {
-                                    endFunc();
-                                    break;
+                                    return endFunc();
                                 }
-                                else
+                                else {
                                     await sleep(300 * 1000);
+                                }
                             }
                         }
                     } else {
-                        endFunc();
+                        return endFunc(false);
                     }
-                    return $.Deferred().resolve();
                 }
             },
             AUTO_DANMU: {
