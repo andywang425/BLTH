@@ -164,7 +164,7 @@
 
 #### 其它设置说明
 + 重置所有为默认：指将设置和任务执行时间缓存重置为默认。  
-+ 再次执行每日任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。  
++ 再次执行所有任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。  
 + 支持输入框回车保存。  
 
 #### 运行日志
@@ -180,6 +180,7 @@
 1. [#12](https://github.com/andywang425/BLTH/issues/12)  
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后，打开`启用Ajax Hook API`。  
 2. 脚本每次更新后第一次运行可能会不工作，刷新一下页面即可。   
+3. 在有多层嵌套iframe的直播间运行时，可能会看不到提示信息，但不影响使用。  
 
 -------------------------------
 
@@ -190,7 +191,7 @@
 
 ## 其它信息  
 这个项目的部分代码来源于以下几个项目:  
-+ [b站直播心心助手](https://greasyfork.org/zh-CN/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E5%BF%83%E5%BF%83%E5%8A%A9%E6%89%8B) (MIT) by [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)
++ [B站直播心心助手](https://greasyfork.org/zh-CN/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E5%BF%83%E5%BF%83%E5%8A%A9%E6%89%8B) (MIT) by [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)
 + [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/BLRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
@@ -211,7 +212,7 @@
 -------------------------------
 
 ## 更新日志
->### 4.4.2.1 - 4.4.2.3
->修复版本更新导致的变量类型错误。  
+>### 4.4.2.4
+>小心心模块，直播签到优化。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  

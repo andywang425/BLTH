@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.4.2.3
+// @version        4.4.2.4
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -2103,11 +2103,14 @@
                     return BAPI.xlive.dosign().then((response) => {
                         MYDEBUG('LiveReward.dailySignIn: API.xlive.dosign', response);
                         if (response.code === 0) {
-                            window.toast('[自动直播签到]完成', 'success')
+                            window.toast('[自动直播签到]完成', 'success');
+                            $('.hinter').remove();//移除签到按钮和小红点
+                            $('.checkin-btn').remove();
                         } else if (response.code === 1011040) {
                             window.toast('[自动直播签到]今日直播签到已完成', 'info')
                         } else {
-                            window.toast(`[自动直播签到]${response.message}`, 'caution')
+                            window.toast(`[自动直播签到]${response.message}，尝试点击签到按钮`, 'caution');
+                            $('.checkin-btn').click();
                         }
                     }, () => {
                         window.toast('[自动直播签到]直播签到失败，请检查网络', 'error');
@@ -2792,6 +2795,7 @@
                         client_ts: '{client_ts}'
                     };
                     const endFunc = async (check = true) => {
+                        if (check) await sleep(5000);//小心心获取有延时等待5秒
                         if (!check || await MY_API.LITTLE_HEART.getGiftNum() >= 24) {
                             window.toast('[小心心]今日小心心已全部获取', 'success');
                             clearInterval(mobileOnlineTimer);
@@ -2799,7 +2803,8 @@
                             MY_API.saveCache();
                             return runMidnight(MY_API.LITTLE_HEART.run, '获取小心心');
                         } else {//出于某些原因心跳次数到到了但小心心个数没到，再次运行
-                            return MY_API.LITTLE_HEART.run()
+                            window.toast('[小心心]小心心未全部获取，295秒后将再次运行', 'info');
+                            return setTimeout(MY_API.LITTLE_HEART.run, 295 * 1000)
                         }
                     }
                     if (tokenData.access_token === undefined && await setToken() === undefined)
@@ -2813,7 +2818,7 @@
                             return;
                         else if (userInfo.body.data.mid !== Live_info.uid && await setToken() === undefined)
                             return;
-                    }
+                    };
                     MYDEBUG('[小心心]', '开始客户端心跳');
                     window.toast('[小心心]开始获取小心心', 'success');
                     MY_API.LITTLE_HEART.mobileOnline();
@@ -3044,15 +3049,14 @@
         API.removeUnnecessary();//移除页面元素
         //修复一下因版本差异造成的变量类型错误
         const fixList = ['AUTO_GIFT_ROOMID', 'LIGHT_MEDALS', 'EXCLUDE_ROOMID'];
-        for (const i of fixList) {
-            if (!$.isArray(API.CONFIG[i])) {
-                API.CONFIG[i] = API.CONFIG[i].split(",");
+        if (!fixList.every(i => $.isArray(API.CONFIG[i]))) {
+            for (const i of fixList) {
+                if (!$.isArray(API.CONFIG[i])) {
+                    API.CONFIG[i] = API.CONFIG[i].split(",");
+                }
             }
-            if (i === fixList[fixList.length - 1]) {
-                API.chatLog('变量类型错误修复完成', 'success');
-                API.saveConfig();
-                break;
-            }
+            API.chatLog('变量类型错误修复完成', 'success');
+            API.saveConfig();
         }
         setTimeout(() => {
             API.AUTO_DANMU.run();//自动发弹幕
@@ -3135,21 +3139,19 @@
             let resetTimer = setTimeout(() => {//重置直播间
                 if (API.raffleId_list.length > 0 || API.guardId_list.length > 0 || API.pkId_list.length > 0) {
                     MYDEBUG('[刷新直播间]', '还有礼物没抽，延迟15s后刷新直播间');
-                    reset(15000);
-                    return
+                    return reset(15000);
                 }
                 if (checkNewDay(API.CACHE.LittleHeart_TS)) {
                     MYDEBUG('[刷新直播间]', '正在获取小心心，10分钟后再次检查');
                     clearTimeout(resetTimer);
-                    reset(600e3);
-                    return
+                    return reset(600e3);
+
                 }
                 if (inTimeArea(API.CONFIG.TIME_AREA_START_H0UR, API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE)
                     && API.CONFIG.IN_TIME_RELOAD_DISABLE) {//在不抽奖时段且不抽奖时段不刷新开启
                     let resetTime = getIntervalTime(API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE) + 60e3;
-                    reset(resetTime);
                     MYDEBUG('[刷新直播间]', `处于休眠时间段，将在${resetTime}毫秒后刷新直播间`);
-                    return;
+                    return reset(resetTime);
                 }
                 window.location.reload();
             }, delay);
@@ -3158,7 +3160,7 @@
     }
 
     /**
-     * （23,50） 获取与目标时间在时间轴上的间隔时间,24小时制（毫秒）
+     * （23,50） 获取与目标时间在一天内的间隔时间,24小时制（毫秒）
      * @param hour 整数 小时
      * @param minute 整数 分钟
      * @param second 整数 秒（可不填）
