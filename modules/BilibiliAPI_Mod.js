@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BilibiliAPI_mod
 // @namespace    https://github.com/SeaLoong
-// @version      1.5
+// @version      1.6
 // @description  BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author       SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -655,7 +655,7 @@ var BilibiliAPI = {
             getStatus: (aid, times = '') => {
                 // 获取活动信息/状态
                 return BilibiliAPI.ajax({
-                    url: 'lottery/v1/box/getStatus',
+                    url: 'lottery/v2/box/getStatus',
                     data: {
                         aid: aid,
                         times: times
@@ -665,7 +665,7 @@ var BilibiliAPI = {
             draw: (aid, number = 1) => {
                 // 参加实物抽奖
                 return BilibiliAPI.ajax({
-                    url: 'lottery/v1/box/draw',
+                    url: '/xlive/lottery-interface/v2/Box/draw',
                     data: {
                         aid: aid,
                         number: number
@@ -675,7 +675,7 @@ var BilibiliAPI = {
             getWinnerGroupInfo: (aid, number = 1) => {
                 // 获取中奖名单
                 return BilibiliAPI.ajax({
-                    url: 'lottery/v1/box/getWinnerGroupInfo',
+                    url: 'lottery/v2/box/getWinnerGroupInfo',
                     data: {
                         aid: aid,
                         number: number
