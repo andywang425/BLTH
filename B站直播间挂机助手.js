@@ -15,18 +15,18 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.4.2.4
+// @version        4.5
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
-// @run-at        document-start
+// @run-at        document-end
 // @connect       passport.bilibili.com
 // @connect       api.live.bilibili.com
 // @connect       live-trace.bilibili.com
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/BilibiliAPI_Mod.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/layer.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/libBilibiliToken.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@ae50298c8b1ce34108d737606ae254f448b0a22e/library_files/libWasmHash.js
-// @resource      layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@a00d57126c9b2591cc93389cac78dc91db4b66e0/library_files/layer.css
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@4716930900e64769f19dd7aa00b0824a4961cdd0/modules/BilibiliAPI_Mod.min.js
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@4716930900e64769f19dd7aa00b0824a4961cdd0/modules/layer.js
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@4716930900e64769f19dd7aa00b0824a4961cdd0/modules/libBilibiliToken.js
+// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@4716930900e64769f19dd7aa00b0824a4961cdd0/modules/libWasmHash.js
+// @resource      layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@d86732c07164300f64a2e543f264ce4f6099fbfc/modules/layer.css
 // @grant         unsafeWindow
 // @grant         GM_xmlhttpRequest
 // @grant         GM_getResourceText
@@ -159,7 +159,13 @@
             const AllCss = layerCss + myCss;
             return await GM_addStyle(AllCss);
         },
-        ct = $('#chat-history-list');
+        ct = $('#chat-history-list'),
+        lockBtn = 'span[title=\"弹幕滚动锁定\"]',
+        getScrollPosition = (el = window) => ({
+            x: el.pageXOffset !== undefined ? el.pageXOffset : el.scrollLeft,
+            y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop
+        });
+    //eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter'];
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide',//UI隐藏开关
         gift_join_try = 0,
         guard_join_try = 0,
@@ -184,7 +190,7 @@
         tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || {};
     newWindow.init();
 
-    $(() => {//DOM完毕，等待弹幕加载完成
+    window.onload = () => {//所有元素加载完毕，等待弹幕加载完成
         const loadInfo = (delay) => {
             setTimeout(async () => {
                 const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
@@ -233,7 +239,7 @@
         };
         loadInfo(1000);
         addStyle();//加载style
-    });
+    };
     /**
      * 删除一维数组元素
      * @param val 数组中一个元素的值
@@ -277,6 +283,9 @@
                 LIGHT_MEDALS: ["0"],//点亮勋章
                 LIGHT_METHOD: "LIGHT_WHITE",
                 MAX_GIFT: 99999,//辣条上限
+                MATERIAL_LOTTERY: true,//实物抽奖
+                MATERIAL_LOTTERY_CHECK_INTERVAL: 10,//实物抽奖检查间隔
+                MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: true,//实物抽奖忽略存疑抽奖
                 NOSLEEP: true,//屏蔽挂机检测
                 RANDOM_DELAY: true,//抽奖随机延迟
                 RANDOM_SEND_DANMU: 0,//随机弹幕发送概率
@@ -312,7 +321,9 @@
                 Silver2Coin_TS: 0,//银瓜子换硬币
                 Gift_TS: 0,//自动送礼（定时）
                 GiftInterval_TS: 0,//自动送礼（间隔）
-                LittleHeart_TS: 0//小心心
+                LittleHeart_TS: 0,//小心心
+                materialobject_ts: 0,//金宝箱抽奖
+                last_aid: 632,//实物抽奖最后一个有效aid
             },
             CONFIG: {},
             CACHE: {},
@@ -321,7 +332,73 @@
                 SILVER_COUNT: 0,
                 CLEAR_TS: 0,
             },
-            init: () => {
+            init: async () => {
+                const tabList = $('.tab-list.dp-flex'),
+                    ContributionList = $(tabList.children('li')[0]),
+                    GreatNavigation = $(tabList.children('li')[1]),
+                    tabContent = $('.tab-content'),
+                    tabOffSet = tabContent.offset(),
+                    tabHeight = tabContent.height(),
+                    ctWidth = ct.outerWidth(true),
+                    ctHeight = ct.height(),
+                    //asideAreaVmHeight = $('#aside-area-vm').height();
+                    top = tabOffSet.top,
+                    left = tabOffSet.left,
+                    pic = $('.pic.pointer'),
+                    menuDiv = $(`<li data-v-2fdbecb2="" data-v-d2be050a="" class="item dp-i-block live-skin-separate-border border-box t-center pointer live-skin-normal-text" id = "menuDiv">脚本日志</li>`),
+                    eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter'];
+                if (eleList.some(i => i.length === 0) || tabList.length === 0 || tabContent.length === 0) {
+                    window.toast('必要页面元素缺失，强制运行（可能会看不到控制面板，提示信息）', 'error');
+                }
+                tabList.append(menuDiv);
+                function hidePic(hide = true) {
+                    if (hide) pic.children('img').hide()
+                    else pic.children('img').show()
+                };
+                let menuIndex = await layer.open({
+                    type: 1,
+                    title: false,
+                    offset: [String(top - getScrollPosition().y) + 'px', left + 'px'],
+                    closeBtn: 0,
+                    shade: 0,
+                    zIndex: 9999,
+                    fixed: false,
+                    area: [ctWidth + 'px', String(ctHeight + tabHeight) + 'px'], //宽高
+                    anim: -1,
+                    isOutAnim: false,
+                    content: '<div id = "menuWindow"></div>'
+                });
+                layer.style(menuIndex, {
+                    'box-shadow': 'none',
+                    'display': 'none'
+                });
+                menuDiv.click(() => {//日志
+                    menuDiv.addClass('active');
+                    ContributionList.removeClass('active');
+                    GreatNavigation.removeClass('active');
+                    layer.style(menuIndex, {
+                        'display': 'block'
+                    });
+                    hidePic();
+                });
+                ContributionList.click(() => {//贡献榜
+                    ContributionList.addClass('active')
+                    menuDiv.removeClass('active');
+                    GreatNavigation.removeClass('active');
+                    layer.style(menuIndex, {
+                        'display': 'none'
+                    });
+                    hidePic(false);
+                });
+                GreatNavigation.click(() => {//大航海
+                    GreatNavigation.addClass('active')
+                    menuDiv.removeClass('active');
+                    ContributionList.removeClass('active');
+                    layer.style(menuIndex, {
+                        'display': 'none'
+                    });
+                    hidePic(false);
+                });
                 try {
                     BAPI.setCommonArgs(Live_info.bili_jct);// 设置token
                 } catch (err) {
@@ -389,16 +466,16 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.4.2') &&
-                        version == '4.4.2') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '4.5') &&
+                        version == '4.5') { //更新公告时需要修改
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
                         };
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `1.修复送礼失败的问题<br>
-                            2.优化了自动投币的检测机制<br>
-                            3.优化了隐藏/显示脚本提示时聊天栏信息的滚动<br>
+                            content: `<strong>1.界面优化，点击聊天区上方，大航海右侧的【脚本日志】按钮查看部分日志（原来是在聊天区显示）。<br>
+                            2.新增实物抽奖功能<br></strong>
+                            ps：B站最近在更新实物抽奖的API，我在编写代码的过程中就已经更新过了一次。如果实物抽奖功能失效了我会再更新。<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -414,7 +491,7 @@
             saveConfig: () => {//保存配置函数
                 try {
                     localStorage.setItem(`${NAME}_CONFIG`, JSON.stringify(MY_API.CONFIG));
-                    MY_API.chatLog('配置已保存');
+                    window.toast('配置已保存，部分设置需刷新后才能生效', 'info');
                     MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
                     return true
                 } catch (e) {
@@ -455,6 +532,7 @@
                     MY_API.Gift.run();//送礼物
                     MY_API.LITTLE_HEART.run();//小心心
                     MY_API.AUTO_DANMU.run();//发弹幕
+                    MY_API.MaterialObject.run();//实物抽奖
                 }, 3000);
             },
             loadGiftCount: () => {//读取礼物数量
@@ -565,7 +643,6 @@
                 const btnmsg = msgHide == 'hide' ? '显示窗口和提示信息' : '隐藏窗口和提示信息';
                 let btn = $(`<button style="display: inline-block; float: left; margin-right: 7px;background-color: #23ade5;color: #fff;border-radius: 4px;border: none; padding:4px; cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
                 const div = '#allsettings';
-                const lockBtn = 'span[title=\"弹幕滚动锁定\"]';
                 let mainIndex;
                 const settingTableHeight = $('.live-player-mounter').height();
                 const settingTableoffset = $('.live-player-mounter').offset();
@@ -591,7 +668,7 @@
                         </label>
                     </div>
                         <div data-toggle="RANDOM_DELAY">
-                            <label style="margin: 5px auto; color: darkgreen">
+                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
                                 <input style="vertical-align: text-top;" type="checkbox">
                                 抽奖附加随机延迟
                                 <input class="RND_DELAY_START igiftMsg_input" style="width: 30px;vertical-align: top;" type="text">~
@@ -599,7 +676,7 @@
                             </label>
                         </div>
                         <div data-toggle="TIME_AREA_DISABLE">
-                            <label style="margin: 5px auto; color: darkgreen">
+                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
                                 <input style="vertical-align: text-top;" type="checkbox">
                                 启用
                                 <input class="startHour igiftMsg_input" style="width: 20px;" type="text">点
@@ -609,31 +686,50 @@
                             </label>
                         </div>
                         <div data-toggle="RANDOM_SKIP">
-                            <label style="margin: 5px auto; color: darkgreen">
+                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
                                 随机跳过礼物(0到100,为0则不跳过)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
                             </label>
                         </div>
                         <div data-toggle="MAX_GIFT">
-                            <label style="margin: 5px auto; color: darkgreen">
+                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
                                 当天最多抢辣条数量<input class="num igiftMsg_input" style="width: 100px;" type="text">
                             </label>
                         </div>
                         <div data-toggle="RANDOM_SEND_DANMU">
-                            <label style="margin: 5px auto; color: darkgreen">
+                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
                                 抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
                             </label>
                         </div>
                         <div data-toggle="CHECK_HOUR_ROOM">
-                            <label style="margin: 5px auto; color: darkgreen">
+                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
                                 <input style="vertical-align: text-top;" type="checkbox">
                                 检查小时榜（间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒）
                             </label>
                         </div>
                         <div data-toggle="FORCE_LOTTERY" style="line-height: 20px">
-                        <label style="margin: 5px auto; color: red;">
+                        <label style="margin: 5px auto; color: red;">&nbsp;&nbsp;&nbsp;&nbsp;
                             <input style="vertical-align: text-top;" type="checkbox">
                             访问被拒绝后强制重复抽奖(最多5次)
                         </label>
+                        <div data-toggle="MATERIAL_LOTTERY">
+                        <label style="margin: 5px auto; color: purple;">
+                            <input style="vertical-align: text-top;" type="checkbox">
+                            参与金宝箱抽奖
+                        </label>
+                    </div>
+                    <div data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL">
+                        <label style="margin: 5px auto; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;
+                            检查间隔
+                            <input class="num igiftMsg_input" style="width: 30px;" type="text">
+                            分钟
+                        </label>
+                    </div>
+                    <div data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY">
+                    <label style="margin: 5px auto; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input style="vertical-align: text-top;" type="checkbox">
+                        忽略存疑的抽奖
+                    </label>
+                </div>
                     </div>
                     </fieldset>
             
@@ -870,10 +966,6 @@
                     </label>
                 </div>
             </div>`;
-                const getScrollPosition = (el = window) => ({
-                    x: el.pageXOffset !== undefined ? el.pageXOffset : el.scrollLeft,
-                    y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop
-                });
                 const openMainWindow = () => {
                     return mainIndex = layer.open({
                         type: 1,
@@ -887,6 +979,7 @@
                         content: html,
                         success: () => {
                             //显示对应配置状态
+                            $(div).find('div[data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL).toString());
                             $(div).find('div[data-toggle="AUTO_DANMU"] .Time').val(MY_API.CONFIG.DANMU_INTERVAL_TIME.toString());
                             $(div).find('div[data-toggle="AUTO_DANMU"] .Roomid').val(MY_API.CONFIG.DANMU_ROOMID.toString());
                             $(div).find('div[data-toggle="AUTO_DANMU"] .Danmu').val(MY_API.CONFIG.DANMU_CONTENT.toString());
@@ -1077,7 +1170,10 @@
                                 MY_API.CONFIG.DANMU_CONTENT = val1;
                                 MY_API.CONFIG.DANMU_ROOMID = val2;
                                 MY_API.CONFIG.DANMU_INTERVAL_TIME = val3;
-                                MY_API.saveConfig();
+                                //MATERIAL_LOTTERY_CHECK_INTERVAL
+                                val = $(div).find('div[data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"] .num').val();
+                                MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL = parseInt(val);
+                                return MY_API.saveConfig();
                             };
                             $(div).find('div[id="giftCount"] [data-action="save"]').click(() => {//保存按钮
                                 saveAction();
@@ -1156,7 +1252,9 @@
                                 "FORCE_LIGHT",
                                 "LOTTERY",
                                 "CHECK_HOUR_ROOM",
-                                "NOSLEEP"
+                                "NOSLEEP",
+                                'MATERIAL_LOTTERY',
+                                'MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY'
                             ];
                             for (const i of checkList) {//绑定所有checkbox事件
                                 let input = $(div).find(`div[data-toggle="${i}"] input:checkbox`);
@@ -1199,7 +1297,7 @@
                                 else {
                                     MY_API.CONFIG.COIN_TYPE = 'COIN_UID';
                                 }
-                                MY_API.saveConfig();
+                                saveAction();
                             });
                             $("input:radio[name='LIGHT_TYPE']").change(function () { //点亮勋章模式变化
                                 if ($("div[data-toggle='LIGHT_WHITE'] input:radio").is(':checked')) {
@@ -1208,7 +1306,7 @@
                                 else {
                                     MY_API.CONFIG.LIGHT_METHOD = 'LIGHT_BLACK';
                                 }
-                                MY_API.saveConfig();
+                                saveAction();
                             });
                             $("input:radio[name='GIFT_TYPE']").change(function () { //送礼模式变化
                                 if ($("div[data-toggle='GIFT_INTERVAL'] input:radio").is(':checked')) {
@@ -1217,7 +1315,7 @@
                                 else {
                                     MY_API.CONFIG.GIFT_METHOD = 'GIFT_SEND_TIME';
                                 }
-                                MY_API.saveConfig();
+                                saveAction();
                             });
                             $("input:radio[name='GIFT_SORT']").change(function () { //送礼模式变化
                                 if ($("div[data-toggle='GIFT_SORT_HIGH'] input:radio").is(':checked')) {
@@ -1226,13 +1324,12 @@
                                 else {
                                     MY_API.CONFIG.GIFT_SORT = 'low';
                                 }
-                                MY_API.saveConfig();
+                                saveAction();
                             });
                         },
                         end: () => {
                             msgHide = 'hide';
                             localStorage.setItem(`${NAME}_msgHide`, msgHide);
-                            $('.igiftMsg').hide();
                             $('.link-toast').hide();
                             if ($(lockBtn).attr('class') === 'icon-item icon-font icon-lock-1 active')
                                 $(lockBtn).trigger('click');
@@ -1248,26 +1345,18 @@
                         if (msgHide == 'show') {//显示=>隐藏
                             msgHide = 'hide';
                             localStorage.setItem(`${NAME}_msgHide`, msgHide);
-                            $('.igiftMsg').hide();
                             $('.link-toast').hide();
                             layer.close(mainIndex);
                             //ct.animate({ scrollTop: 0 }, 0);
                             //setTimeout(() => { ct.animate({ scrollTop: ct.prop("scrollHeight") }, 10) }, 100);
-                            if ($(lockBtn).attr('class') === 'icon-item icon-font icon-lock-1 active')
-                                $(lockBtn).trigger('click');
-                            else $(lockBtn).trigger('click').trigger('click');
                             document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
                         }
                         else {
                             msgHide = 'show';
                             localStorage.setItem(`${NAME}_msgHide`, msgHide);
-                            $('.igiftMsg').show();
                             $('.link-toast').show();
                             openMainWindow();
                             //ct.animate({ scrollTop: ct.prop("scrollHeight") }, 0);
-                            if ($(lockBtn).attr('class') === 'icon-item icon-font icon-lock-1 active')
-                                $(lockBtn).trigger('click');
-                            else $(lockBtn).trigger('click').trigger('click');
                             document.getElementById('hiderbtn').innerHTML = "隐藏窗口和提示信息";
                         }
                     }
@@ -1276,7 +1365,10 @@
                 if (!MY_API.CACHE.DailyReward_TS) {
                     layer.tips('点我隐藏/显示控制面板', '#hiderbtn', {
                         tips: 1
-                    })
+                    });
+                    setTimeout(() => layer.tips('点我查看日志', '#menuDiv', {
+                        tips: 1
+                    }), 6000);  
                 }
                 if (msgHide == 'show') {
                     openMainWindow()
@@ -1284,6 +1376,7 @@
             },
 
             chatLog: function (text, type = 'info') {//自定义提示
+                const menuWindow = document.querySelector("#layui-layer1 > div");
                 let div = $("<div class='igiftMsg'>");
                 let msg = $("<div>");
                 let myDate = new Date();
@@ -1333,13 +1426,10 @@
                             'border': '1px solid rgb(203, 195, 255)',
                             'background': 'rgb(233, 230, 255) none repeat scroll 0% 0%',
                         });
-                }
-                if (msgHide == 'show') {//false
-                    ct.find('#chat-items').append(div);//向聊天框加入信息  
-                } else {
-                    ct.find('#chat-items').append(div.hide());//向聊天框加入信息
-                }
-                ct.scrollTop(ct.prop("scrollHeight"));//滚动到底部
+                };
+                $('#menuWindow').append(div);
+                menuWindow.scrollTo(0, menuWindow.scrollHeight);
+                //menuWindow.scrollTop(menuWindow.prop("scrollHeight"));//滚动到底部
             },
             blocked: false,
             max_blocked: false,
@@ -1617,6 +1707,7 @@
                 let msg = $("<div>");
                 let aa = $("<div>");
                 let myDate = new Date();
+                const menuWindow = document.querySelector("#layui-layer1 > div");
                 msg.text(`[${area}]` + data.thank_text.split('<%')[1].split('%>')[0] + data.thank_text.split('%>')[1]);
                 div.text(myDate.toLocaleString());
                 div.append(msg);
@@ -1641,12 +1732,8 @@
                     'line-height': '1em',
                     'margin-bottom': '10px',
                 });
-                if (msgHide == 'show') {//false
-                    ct.find('#chat-items').append(div);//向聊天框加入信息
-                } else {
-                    ct.find('#chat-items').append(div.hide());//向聊天框加入信息                 
-                }
-                ct.scrollTop(ct.prop("scrollHeight"));//滚动到底部
+                $('#menuWindow').append(div);//向聊天框加入信息
+                menuWindow.scrollTo(0, menuWindow.scrollHeight);
                 let timer = setInterval(() => {
                     aa.text(`等待抽奖倒计时${delay}秒`);
                     if (delay <= 0) {
@@ -2984,6 +3071,172 @@
                         await sleep(1100);
                     }
                 }
+            },
+            MaterialObject: {//金宝箱
+                list: [],
+                ignore_keyword: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼'],
+                run: () => {
+                    try {
+                        if (!MY_API.CONFIG.MATERIAL_LOTTERY) return $.Deferred().resolve();
+                        if (MY_API.CACHE.materialobject_ts) {
+                            const diff = ts_ms() - MY_API.CACHE.materialobject_ts;
+                            const interval = MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL * 60e3 || 600e3;
+                            if (diff < interval) {
+                                MYDEBUG('[实物抽奖]', `${interval - diff}毫秒后再次运行`);
+                                setTimeout(MY_API.MaterialObject.run, interval - diff);
+                                return $.Deferred().resolve();
+                            }
+                        };
+                        MY_API.chatLog('[实物抽奖]\n开始寻找可参加的抽奖');
+                        return MY_API.MaterialObject.check().then((aid) => {
+                            if (aid) { // aid有效
+                                MY_API.CACHE.last_aid = aid;
+                                MY_API.CACHE.materialobject_ts = ts_ms();
+                                MY_API.saveCache();
+                            }
+                            MYDEBUG('[实物抽奖]', `将在${MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL}分钟后再次运行实物抽奖`);
+                            setTimeout(MY_API.MaterialObject.run, MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL * 60e3 || 600e3);
+                        }, () => delayCall(() => MY_API.MaterialObject.run()));
+                    } catch (err) {
+                        MY_API.chatLog('[实物抽奖]运行时出现异常', 'error');
+                        console.error(`[${NAME}]`, err);
+                        return $.Deferred().reject();
+                    }
+                },
+                check: (aid, valid = 632, rem = 9) => { // TODO valid起始aid rem + 1检查次数
+                    aid = parseInt(aid || (MY_API.CACHE.last_aid), 10);
+                    if (isNaN(aid)) aid = valid;
+                    MYDEBUG('API.MaterialObject.check: aid=', aid);
+                    return BAPI.Lottery.MaterialObject.getStatus(aid).then((response) => {
+                        MYDEBUG('API.MaterialObject.check: API.MY_API.MaterialObject.getStatus', response);
+                        if (response.code === 0 && response.data) {
+                            if (MY_API.CONFIG.MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY && MY_API.MaterialObject.ignore_keyword.some(v => response.data.title.toLowerCase().indexOf(v) > -1)) {
+                                MY_API.chatLog(`[实物抽奖]\n忽略抽奖(aid=${aid})`, 'info');
+                                return MY_API.MaterialObject.check(aid + 1, aid);
+                            } else {
+                                return MY_API.MaterialObject.join(aid, response.data.title, response.data.typeB).then(() => MY_API.MaterialObject.check(aid + 1, aid));
+                            }
+                        } else if (response.code === -400 || response.data == null) { // 活动不存在
+                            if (rem) return MY_API.MaterialObject.check(aid + 1, valid, rem - 1);
+                            return $.Deferred().resolve(valid);
+                        } else {
+                            MY_API.chatLog(`[实物抽奖]\n${response.msg}`, 'warning');
+                        }
+                    }, () => {
+                        MY_API.chatLog(`[实物抽奖]\n检查抽奖(aid=${aid})失败，请检查网络`, 'error');
+                        return delayCall(() => MY_API.MaterialObject.check(aid, valid));
+                    });
+                },
+                join: (aid, title, typeB, i = 0) => {
+                    if (i >= typeB.length) return $.Deferred().resolve();
+                    if (MY_API.MaterialObject.list.some(v => v.aid === aid && v.number === i + 1))
+                        return MY_API.MaterialObject.join(aid, title, typeB, i + 1);
+                    const number = i + 1;
+                    const obj = {
+                        title: title,
+                        aid: aid,
+                        number: number,
+                        status: typeB[i].status,
+                        join_start_time: typeB[i].join_start_time,
+                        join_end_time: typeB[i].join_end_time
+                    };
+                    switch (obj.status) {
+                        case -1: // 未开始
+                            {
+                                MY_API.chatLog(`[实物抽奖] 将在${new Date(ts_ms() + obj.join_start_time + 1000).toLocaleString()}参加抽奖"${obj.title}"aid=${obj.aid}`, 'success');
+                                MY_API.MaterialObject.list.push(obj);
+                                const p = $.Deferred();
+                                p.then(() => {
+                                    return MY_API.MaterialObject.draw(obj);
+                                });
+                                setTimeout(() => {
+                                    p.resolve();
+                                }, (obj.join_start_time - ts_s() + 1) * 1e3);
+                            }
+                            break;
+                        case 0: // 可参加
+                            //MY_API.chatLog(`[实物抽奖]\n即将参加抽奖"${obj.title}"aid=${obj.aid}`, 'success');
+                            return MY_API.MaterialObject.draw(obj).then(() => {
+                                return MY_API.MaterialObject.join(aid, title, typeB, i + 1);
+                            });
+                        case 1: // 已参加
+                            {
+                                MY_API.chatLog(`[实物抽奖] 已参加抽奖"${obj.title}"aid=${obj.aid}`);
+                                MY_API.MaterialObject.list.push(obj);
+                                const p = $.Deferred();
+                                p.then(() => {
+                                    return MY_API.MaterialObject.notice(obj);
+                                });
+                                setTimeout(() => {
+                                    p.resolve();
+                                }, (obj.join_end_time - ts_s() + 1) * 1e3);
+                            }
+                            break;
+                    }
+                    return MY_API.MaterialObject.join(aid, title, typeB, i + 1);
+                },
+                draw: (obj) => {
+                    return BAPI.Lottery.MaterialObject.draw(obj.aid, obj.number).then((response) => {
+                        MYDEBUG('API.MaterialObject.check: API.MY_API.MaterialObject.draw',
+                            response);
+                        if (response.code === 0) {
+                            $.each(MY_API.MaterialObject.list, (i, v) => {
+                                if (v.aid === obj.aid && v.number === obj.number) {
+                                    v.status = 1;
+                                    MY_API.MaterialObject.list[i] = v;
+                                    return false;
+                                }
+                            });
+                            const p = $.Deferred();
+                            p.then(() => {
+                                return MY_API.MaterialObject.notice(obj);
+                            });
+                            setTimeout(() => {
+                                p.resolve();
+                            }, (obj.join_end_time - ts_s() + 1) * 1e3);
+                        } else {
+                            MY_API.chatLog(
+                                `[实物抽奖] "${obj.title}"(aid=${obj.aid},number=${obj.number})${response.msg}`,
+                                'warning');
+                        }
+                    }, () => {
+                        MY_API.chatLog(
+                            `[实物抽奖] 参加"${obj.title}"(aid=${obj.aid},number=${obj.number})失败，请检查网络`,
+                            'error');
+                        return delayCall(() => MY_API.MaterialObject.draw(obj));
+                    });
+                },
+                notice: (obj) => {
+                    return BAPI.Lottery.MaterialObject.getWinnerGroupInfo(obj.aid, obj.number).then((response) => {
+                        MYDEBUG('API.MaterialObject.check: API.MY_API.MaterialObject.getWinnerGroupInfo', response);
+                        if (response.code === 0) {
+                            $.each(MY_API.MaterialObject.list, (i, v) => {
+                                if (v.aid === obj.aid && v.number === obj.number) {
+                                    v.status = 3;
+                                    MY_API.MaterialObject.list[i] = v;
+                                    return false;
+                                }
+                            });
+                            $.each(response.data.winnerList, (i, v) => {
+                                if (v.uid === Info.uid) {
+                                    MY_API.chatLog(
+                                        `[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid},number=${obj.number})获得奖励"${v.giftTitle}"`,
+                                        'success');
+                                    return false;
+                                }
+                            });
+                        } else {
+                            MY_API.chatLog(
+                                `[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid},number=${obj.number})${response.msg}`,
+                                'warning');
+                        }
+                    }, () => {
+                        MY_API.chatLog(
+                            `[实物抽奖] 获取抽奖"${obj.title}"(aid=${obj.aid},number=${obj.number})中奖名单失败，请检查网络`,
+                            'error');
+                        return delayCall(() => MY_API.MaterialObject.notice(obj));
+                    });
+                }
             }
         };
 
@@ -3066,6 +3319,7 @@
             API.LiveReward.run();//直播每日任务
             API.Exchange.runS2C();//银瓜子换硬币
             API.Gift.run();//送礼物
+            API.MaterialObject.run();//实物抽奖
         }, 6e3);//脚本加载后6秒执行任务
         if (API.CONFIG.LOTTERY) {
             BAPI.room.getList().then((response) => {//获取各分区的房间号
