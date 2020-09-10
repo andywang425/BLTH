@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.5.1
+// @version        4.5.2
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-end
 // @connect       passport.bilibili.com
@@ -160,7 +160,6 @@
             return await GM_addStyle(AllCss);
         },
         ct = $('#chat-history-list'),
-        lockBtn = 'span[title=\"弹幕滚动锁定\"]',
         getScrollPosition = (el = window) => ({
             x: el.pageXOffset !== undefined ? el.pageXOffset : el.scrollLeft,
             y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop
@@ -178,21 +177,46 @@
             room_id: undefined,
             uid: undefined,
             ruid: undefined,
-            tid: undefined,
-            mobile_verify: undefined,
             gift_list: undefined,
             rnd: undefined,
             visit_id: undefined,
-            identification: undefined,
-            bili_jct: undefined
+            bili_jct: undefined,
+            tid: undefined,
+            //mobile_verify: undefined,
+            //identification: undefined,
         },
         userToken = undefined,
         tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || {},
         mainIndex = undefined,
         menuIndex = undefined;
     newWindow.init();
-
     window.onload = () => {//所有元素加载完毕，等待弹幕加载完成
+        try {//唯一运行检测
+            let UNIQUE_CHECK_CACHE = localStorage.getItem(`${NAME}_UNIQUE_CHECK_CACHE`) || 0;
+            const t = ts_ms();
+            if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 15e3) {
+                // 其他脚本正在运行
+                window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
+                return $.Deferred().resolve();
+            }
+            let timer_unique;
+            const uniqueMark = () => {
+                timer_unique = setTimeout(uniqueMark, 10e3);
+                UNIQUE_CHECK_CACHE = ts_ms();
+                localStorage.setItem(`${NAME}_UNIQUE_CHECK_CACHE`, UNIQUE_CHECK_CACHE)
+            };
+            window.addEventListener('unload', () => {
+                if (timer_unique) {
+                    clearTimeout(timer_unique);
+                    UNIQUE_CHECK_CACHE = 0;
+                    localStorage.setItem(`${NAME}_UNIQUE_CHECK_CACHE`, UNIQUE_CHECK_CACHE)
+                }
+            });
+            uniqueMark();
+        } catch (e) {
+            MYDEBUG('重复运行检测错误', e);
+            return $.Deferred().reject();
+        }
         const loadInfo = (delay) => {
             setTimeout(async () => {
                 const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
@@ -204,11 +228,12 @@
                     Live_info.room_id = W.BilibiliLive.ROOMID;
                     Live_info.uid = W.BilibiliLive.UID;
                     Live_info.tid = W.BilibiliLive.ANCHOR_UID;
+                    /*
                     await BAPI.live_user.get_info_in_room(Live_info.room_id).then((response) => {
                         MYDEBUG('InitData: API.live_user.get_info_in_room', response);
                         Live_info.mobile_verify = response.data.info.mobile_verify;
                         Live_info.identification = response.data.info.identification;
-                    });
+                    });*/
                     await BAPI.gift.gift_config().then((response) => {
                         MYDEBUG('InitData: API.gift.gift_config', response);
                         if (!!response.data && $.isArray(response.data)) {
@@ -288,14 +313,15 @@
                 MATERIAL_LOTTERY: true,//实物抽奖
                 MATERIAL_LOTTERY_CHECK_INTERVAL: 60,//实物抽奖检查间隔
                 MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: true,//实物抽奖忽略存疑抽奖
-                QUESTIONABLE_LOTTERY: ['test','encrypt','测试','钓鱼','加密','炸鱼'],//存疑实物抽奖
+                QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼'],//存疑实物抽奖
+                MATERIAL_LOTTERY_REM: 9,//每次检查aid数量
                 NOSLEEP: true,//屏蔽挂机检测
                 RANDOM_DELAY: true,//抽奖随机延迟
                 RANDOM_SEND_DANMU: 0,//随机弹幕发送概率
                 RANDOM_SKIP: 0,//随机跳过抽奖概率
                 REMOVE_ELEMENT_2233: false,//移除2233
-                REMOVE_ELEMENT_activity: false,//移除活动入口
-                REMOVE_ELEMENT_rank: true,//移除上榜入口
+                REMOVE_ELEMENT_activity: true,//移除活动入口
+                REMOVE_ELEMENT_rank: true,//移除排行榜入口
                 RND_DELAY_END: 5,//延迟最大值
                 RND_DELAY_START: 2,//延迟最小值
                 SEND_ALL_GIFT: false,//送满全部勋章
@@ -316,7 +342,6 @@
                 WATCH: true,//观看视频
             },
             CACHE_DEFAULT: {
-                UNIQUE_CHECK: 0,//唯一运行检测
                 AUTO_SEND_DANMU_TS: [],//弹幕发送
                 AUTO_GROUP_SIGH_TS: 0,//应援团执行时间，用于判断是否为新的一天
                 DailyReward_TS: 0,//其它每日任务
@@ -353,13 +378,12 @@
                 tabList.append(menuDiv);
                 let tabListItems = [];
                 for (let i = 0; i < tabList.children('li').length; i++) {
-                    console.log(tabList.children('li')[i]);
+                    //console.log(tabList.children('li')[i]);
                     tabListItems.push(tabList.children('li')[i]);
                 };
                 function hideTab(hide = true) {
                     return hide ? tabContent.hide() : tabContent.show();
                 };
-                //console.log('ctHeight + tabHeight + iconHeight + ctWidth', ctHeight, tabHeight, iconHeight, ctWidth)
                 menuIndex = await layer.open({
                     type: 1,
                     title: false,
@@ -375,7 +399,7 @@
                 });
                 layer.style(menuIndex, {
                     'box-shadow': 'none',
-                    'display': 'none',//#ffffff
+                    'display': 'none',
                     'background-color': '#f2f3f5'
                 });
                 for (const i of tabListItems) {
@@ -462,17 +486,19 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.5.1') &&
-                        version == '4.5.1') { //更新公告时需要修改
+                    if ((cache == undefined || cache == null || cache != '4.5.2') &&
+                        version == '4.5.2') { //更新公告时需要修改
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
                         };
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `<strong>1.金宝箱抽奖新增忽略关键字功能</strong><br>
-                            2.UI细节优化<br>
+                            content: `1.<strong>金宝箱抽奖优化，解决了刷新页面导致等待参加的抽奖被舍弃的问题</strong><br>
+                            2.金宝箱抽奖【忽略关键字】支持${linkMsg('正则表达式', 'https://www.runoob.com/js/js-regexp.html')}<br>
+                            （${linkMsg('点我前往github对应说明处', 'https://github.com/andywang425/BLTH#金宝箱抽奖')}）<br>
                             3.金宝箱抽奖日志优化<br>
-                            ps：B站最近在更新实物抽奖的API，金宝箱抽奖功能可能会失效。发现失效后我会再更新。<br>
+                            4.新增金宝箱抽奖【每次检查抽奖数量】设置<br>
+                            5.重复运行检测优化<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -720,6 +746,12 @@
                             分钟
                         </label>
                     </div>
+                    <div data-toggle="MATERIAL_LOTTERY_REM">
+                    <label style="margin: 5px auto; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;
+                        每次检查抽奖数量
+                        <input class="num igiftMsg_input" style="width: 30px;" type="text">
+                    </label>
+                </div>
                     <div data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY">
                     <label style="margin: 5px auto; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;
                         <input style="vertical-align: text-top;" type="checkbox">
@@ -976,6 +1008,7 @@
                         success: () => {
                             //显示对应配置状态
                             const div = $('#allsettings');
+                            div.find('div[data-toggle="MATERIAL_LOTTERY_REM"] .num').val(parseInt(MY_API.CONFIG.MATERIAL_LOTTERY_REM).toString());
                             div.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] .str').val(MY_API.CONFIG.QUESTIONABLE_LOTTERY.toString());
                             div.find('div[data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL).toString());
                             div.find('div[data-toggle="AUTO_DANMU"] .Time').val(MY_API.CONFIG.DANMU_INTERVAL_TIME.toString());
@@ -1172,7 +1205,7 @@
                                 val = div.find('div[data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"] .num').val();
                                 MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL = parseInt(val);
                                 //QUESTIONABLE_LOTTERY
-                                val =  div.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] .str').val();
+                                val = div.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] .str').val();
                                 valArray = val.split(",");
                                 for (let i = 0; i < valArray.length; i++) {
                                     if (valArray[i] === '') {
@@ -1180,6 +1213,10 @@
                                     }
                                 };
                                 MY_API.CONFIG.QUESTIONABLE_LOTTERY = valArray;
+                                //MATERIAL_LOTTERY_REM
+                                val = div.find('div[data-toggle="MATERIAL_LOTTERY_REM"] .num').val();
+                                if (isNaN(val)) val = 9;
+                                MY_API.CONFIG.MATERIAL_LOTTERY_REM = parseInt(val);
                                 return MY_API.saveConfig();
                             };
                             div.find('div[id="giftCount"] [data-action="save"]').click(() => {//保存按钮
@@ -3089,6 +3126,7 @@
             },
             MaterialObject: {//金宝箱
                 list: [],
+                firstAid: undefined,
                 run: () => {
                     try {
                         if (!MY_API.CONFIG.MATERIAL_LOTTERY) return $.Deferred().resolve();
@@ -3117,22 +3155,36 @@
                         return $.Deferred().reject();
                     }
                 },
-                check: (aid, valid = 632, rem = 9) => { // TODO valid起始aid rem + 1检查次数
+                check: (aid, valid = 632, rem = MY_API.CONFIG.MATERIAL_LOTTERY_REM || 9) => { // TODO valid起始aid rem + 1检查次数
                     aid = parseInt(aid || (MY_API.CACHE.last_aid), 10);
                     if (isNaN(aid)) aid = valid;
                     MYDEBUG('API.MaterialObject.check: aid=', aid);
                     return BAPI.Lottery.MaterialObject.getStatus(aid).then((response) => {
                         MYDEBUG('API.MaterialObject.check: API.MY_API.MaterialObject.getStatus', response);
                         if (response.code === 0 && response.data) {
-                            if (MY_API.CONFIG.MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY && MY_API.CONFIG.QUESTIONABLE_LOTTERY.some(v => response.data.title.toLowerCase().indexOf(v) > -1)) {
-                                MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})`, 'info');
-                                return MY_API.MaterialObject.check(aid + 1, aid);
-                            } else {
-                                return MY_API.MaterialObject.join(aid, response.data.title, response.data.typeB).then(() => MY_API.MaterialObject.check(aid + 1, aid));
+                            if (response.data.typeB[response.data.typeB.length-1].status != 3 && MY_API.MaterialObject.firstAid === undefined)
+                                MY_API.MaterialObject.firstAid = aid;
+                            if (MY_API.CONFIG.MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY) {
+                                for (const str of MY_API.CONFIG.QUESTIONABLE_LOTTERY) {
+                                    if (str.charAt(0) != '/' &&  str.charAt(str.length - 1) != '/') {
+                                        if(response.data.title.toLowerCase().indexOf(str) > -1) {
+                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})<br>含有关键字：${str}`, 'info');
+                                            return MY_API.MaterialObject.check(aid + 1, aid);
+                                        }
+                                    }
+                                    else {
+                                        let reg = eval(str);
+                                        if (reg.test(str)) {
+                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})<br>匹配正则：${str}`, 'info');
+                                            return MY_API.MaterialObject.check(aid + 1, aid);
+                                        }
+                                    }
+                                }
                             }
+                                return MY_API.MaterialObject.join(aid, response.data.title, response.data.typeB).then(() => MY_API.MaterialObject.check(aid + 1, aid));
                         } else if (response.code === -400 || response.data == null) { // 活动不存在
                             if (rem) return MY_API.MaterialObject.check(aid + 1, valid, rem - 1);
-                            return $.Deferred().resolve(valid);
+                            return $.Deferred().resolve(MY_API.MaterialObject.firstAid || valid);
                         } else {
                             MY_API.chatLog(`[实物抽奖] ${response.msg}`, 'warning');
                         }
@@ -3146,19 +3198,23 @@
                     if (MY_API.MaterialObject.list.some(v => v.aid === aid && v.number === i + 1))
                         return MY_API.MaterialObject.join(aid, title, typeB, i + 1);
                     const number = i + 1;
-                    const obj = {
+                    let obj = {
                         title: title,
                         aid: aid,
                         number: number,
                         status: typeB[i].status,
                         join_start_time: typeB[i].join_start_time,//时间戳
                         join_end_time: typeB[i].join_end_time,//时间戳
-                        startTime: typeB[i].startTime//字符串 2020-09-09 20:55:00
+                        list: typeB[i].list,//礼物列表
+                        jpName: ''
                     };
+                    for (const i of obj.list) {
+                        obj.jpName = obj.jpName.concat(' ', i.jp_name);
+                    }
                     switch (obj.status) {
                         case -1: // 未开始
                             {
-                                MY_API.chatLog(`[实物抽奖] 将在${obj.startTime}参加抽奖<br>"${obj.title}" aid=${obj.aid} 第${i+1}轮`, 'info');
+                                MY_API.chatLog(`[实物抽奖] 将在${new Date((obj.join_start_time+1)*1000).toLocaleString()}参加抽奖<br>"${obj.title}" aid=${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
                                 MY_API.MaterialObject.list.push(obj);
                                 const p = $.Deferred();
                                 p.then(() => {
@@ -3170,13 +3226,12 @@
                             }
                             break;
                         case 0: // 可参加
-                            //MY_API.chatLog(`[实物抽奖]\n即将参加抽奖"${obj.title}"aid=${obj.aid}`, 'success');
                             return MY_API.MaterialObject.draw(obj).then(() => {
                                 return MY_API.MaterialObject.join(aid, title, typeB, i + 1);
                             });
                         case 1: // 已参加
                             {
-                                MY_API.chatLog(`[实物抽奖] 已参加抽奖<br>"${obj.title}"aid=${obj.aid}`);
+                                MY_API.chatLog(`[实物抽奖] 已参加抽奖<br>"${obj.title}" aid=${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
                                 MY_API.MaterialObject.list.push(obj);
                                 const p = $.Deferred();
                                 p.then(() => {
@@ -3202,6 +3257,7 @@
                                     return false;
                                 }
                             });
+                            MY_API.chatLog(`[实物抽奖] 成功参加抽奖<nr>"${obj.title}"(aid=${obj.aid},number=${obj.number}) 奖品：${obj.jpName}`, 'success');
                             const p = $.Deferred();
                             p.then(() => {
                                 return MY_API.MaterialObject.notice(obj);
@@ -3225,21 +3281,24 @@
                     return BAPI.Lottery.MaterialObject.getWinnerGroupInfo(obj.aid, obj.number).then((response) => {
                         MYDEBUG('API.MaterialObject.check: API.MY_API.MaterialObject.getWinnerGroupInfo', response);
                         if (response.code === 0) {
-                            $.each(MY_API.MaterialObject.list, (i, v) => {
+                            $.each(MY_API.MaterialObject.list, (i, v) => {//i下表,v元素
                                 if (v.aid === obj.aid && v.number === obj.number) {
                                     v.status = 3;
                                     MY_API.MaterialObject.list[i] = v;
                                     return false;
                                 }
                             });
-                            $.each(response.data.winnerList, (i, v) => {
-                                if (v.uid === Info.uid) {
-                                    MY_API.chatLog(
-                                        `[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid},number=${obj.number})获得奖励<br>"${v.giftTitle}"`,
-                                        'success');
-                                    return false;
+                            for (const i of response.data.groups) {
+                                for (const g of i.list) {
+                                    if (g.uid === Live_info.uid) {
+                                        MY_API.chatLog(
+                                            `[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid},number=${obj.number})获得奖励<br>"${i.giftTitle}"`,
+                                            'success');
+                                            return true;
+                                    }
                                 }
-                            });
+                            }
+                            MY_API.chatLog(`[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid},number=${obj.number})未中奖`, 'info');
                         } else {
                             MY_API.chatLog(
                                 `[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid},number=${obj.number})<br>${response.msg}`,
@@ -3257,43 +3316,14 @@
 
         MY_API.init().then(() => {//主函数
             try {
-                const promiseInit = $.Deferred();
-                const uniqueCheck = () => {
-                    const t = ts_ms();
-                    if (t - MY_API.CACHE.UNIQUE_CHECK >= 0 && t - MY_API.CACHE.UNIQUE_CHECK <= 15e3) {
-                        // 其他脚本正在运行
-                        $('.link-toast').remove();
-                        $('.igiftMsg').remove();
-                        window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
-                        return promiseInit.reject();
-                    } else {
-                        // 没有其他脚本正在运行
-                        return promiseInit.resolve();
-                    }
+
+                if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid))) {//登陆判断
+                    MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
+                    return
                 };
-                uniqueCheck().then(() => {
-                    let timer_unique;
-                    const uniqueMark = () => {
-                        timer_unique = setTimeout(uniqueMark, 10e3);
-                        MY_API.CACHE.UNIQUE_CHECK = Date.now();
-                        MY_API.saveCache(false);
-                    };
-                    window.addEventListener('unload', () => {
-                        if (timer_unique) {
-                            clearTimeout(timer_unique);
-                            MY_API.CACHE.UNIQUE_CHECK = 0;
-                            MY_API.saveCache();
-                        }
-                    });
-                    uniqueMark();
-                    if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid))) {//登陆判断
-                        MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
-                        return
-                    };
-                    MY_API.newMessage(GM_info.script.version);//新版本提示信息
-                    MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
-                    StartPlunder(MY_API);
-                })
+                MY_API.newMessage(GM_info.script.version);//新版本提示信息
+                MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
+                StartPlunder(MY_API);
             }
             catch (e) {
                 console.error('重复运行检测错误', e);
