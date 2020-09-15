@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        4.5.2
+// @version        4.5.2.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-end
 // @connect       passport.bilibili.com
@@ -155,7 +155,7 @@
         },
         addStyle = async () => {
             const layerCss = await GM_getResourceText('layerCss');
-            const myCss = ".igiftMsg_input{outline:none;border:1px solid #e9eaec;background-color:#fff;border-radius:4px;padding:1px 0 0;overflow:hidden;font-size:12px;line-height:19px;width:30px;z-index:'10001';}.igiftMsg_btn{background-color:#23ade5;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;z-index:10001;}.igiftMsg_fs{border:2px solid #d4d4d4;z-index:10001;}";
+            const myCss = ".chatLogDiv{text-align:center;border-radius:4px;min-height:30px;width:256px;color:#9585FF;line-height:30px;padding:0 10px;margin:10px auto;}.chatLogMsg{word-wrap:break-word;width:100%;line-height:1em;margin-bottom:10px;}.chatLogWarning{border:1px solid rgb(236,221,192);color:rgb(218,142,36);background:rgb(245,235,221) none repeat scroll 0% 0%;}.chatLogSuccess{border:1px solid rgba(22,140,0,0.28);color:rgb(69,171,69);background:none 0% 0% repeat scroll rgba(16,255,0,0.18);}.chatLogError{border:1px solid rgba(255,0,39,0.28);color:rgb(116,0,15);background:none 0% 0% repeat scroll rgba(255,0,39,0.18);}.chatLogDefault{border:1px solid rgb(203,195,255);background:rgb(233,230,255) none repeat scroll 0% 0%;}.igiftMsg_input{outline:none;border:1px solid #e9eaec;background-color:#fff;border-radius:4px;padding:1px 0 0;overflow:hidden;font-size:12px;line-height:19px;width:30px;z-index:10001;}.igiftMsg_btn{background-color:#23ade5;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;z-index:10001;}.igiftMsg_fs{border:2px solid #d4d4d4;z-index:10001;}.chatLogDiv{text-align:center;border-radius:4px;min-height:30px;width:256px;line-height:30px;padding:0 10px;margin:10px auto;}.chatLogMsg{word-wrap:break-word;width:100%;line-height:1em;margin-bottom:10px;}.chatLogWarning{border:1px solid rgb(236,221,192);color:rgb(218,142,36);background:rgb(245,235,221) none repeat scroll 0% 0%;}.chatLogSuccess{border:1px solid rgba(22,140,0,0.28);color:rgb(69,171,69);background:none 0% 0% repeat scroll rgba(16,255,0,0.18);}.chatLogError{border:1px solid rgba(255,0,39,0.28);color:rgb(116,0,15);background:none 0% 0% repeat scroll rgba(255,0,39,0.18);}.chatLogDefault{border:1px solid rgb(203,195,255);color:#9585FF;background:rgb(233,230,255) none repeat scroll 0% 0%;}.chatLogLottery{text-align:center;border-radius:4px;min-height:30px;width:256px;color:#9585FF;line-height:30px;padding:0 10px;margin:10px auto;border:1px solid rgb(203,195,255);background:rgb(233,230,255) none repeat scroll 0% 0%;}";
             const AllCss = layerCss + myCss;
             return await GM_addStyle(AllCss);
         },
@@ -188,7 +188,8 @@
         userToken = undefined,
         tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || {},
         mainIndex = undefined,
-        menuIndex = undefined;
+        menuIndex = undefined,
+        layerMenuWindow = undefined;
     newWindow.init();
     window.onload = () => {//所有元素加载完毕，等待弹幕加载完成
         try {//唯一运行检测
@@ -221,19 +222,12 @@
             setTimeout(async () => {
                 const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
                 if ((W.BilibiliLive === undefined || parseInt(W.BilibiliLive.UID) === 0 || isNaN(parseInt(W.BilibiliLive.UID)))) {
-                    //window.toast(`[${GM_info.script.name}]无配置信息`, 'warning');
                     //MYDEBUG(`${GM_info.script.name}`,'无配置信息');
                     return loadInfo(1000);
                 } else {
                     Live_info.room_id = W.BilibiliLive.ROOMID;
                     Live_info.uid = W.BilibiliLive.UID;
                     Live_info.tid = W.BilibiliLive.ANCHOR_UID;
-                    /*
-                    await BAPI.live_user.get_info_in_room(Live_info.room_id).then((response) => {
-                        MYDEBUG('InitData: API.live_user.get_info_in_room', response);
-                        Live_info.mobile_verify = response.data.info.mobile_verify;
-                        Live_info.identification = response.data.info.identification;
-                    });*/
                     await BAPI.gift.gift_config().then((response) => {
                         MYDEBUG('InitData: API.gift.gift_config', response);
                         if (!!response.data && $.isArray(response.data)) {
@@ -314,7 +308,7 @@
                 MATERIAL_LOTTERY_CHECK_INTERVAL: 60,//实物抽奖检查间隔
                 MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: true,//实物抽奖忽略存疑抽奖
                 QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼'],//存疑实物抽奖
-                MATERIAL_LOTTERY_REM: 9,//每次检查aid数量
+                MATERIAL_LOTTERY_REM: 10,//每次检查aid数量
                 NOSLEEP: true,//屏蔽挂机检测
                 RANDOM_DELAY: true,//抽奖随机延迟
                 RANDOM_SEND_DANMU: 0,//随机弹幕发送概率
@@ -351,7 +345,7 @@
                 GiftInterval_TS: 0,//自动送礼（间隔）
                 LittleHeart_TS: 0,//小心心
                 materialobject_ts: 0,//金宝箱抽奖
-                last_aid: 632,//实物抽奖最后一个有效aid
+                last_aid: 639,//实物抽奖最后一个有效aid
             },
             CONFIG: {},
             CACHE: {},
@@ -378,7 +372,6 @@
                 tabList.append(menuDiv);
                 let tabListItems = [];
                 for (let i = 0; i < tabList.children('li').length; i++) {
-                    //console.log(tabList.children('li')[i]);
                     tabListItems.push(tabList.children('li')[i]);
                 };
                 function hideTab(hide = true) {
@@ -395,7 +388,11 @@
                     area: [String(ctWidth) + 'px', String(ctHeight + tabHeight + iconHeight) + 'px'], //宽高
                     anim: -1,
                     isOutAnim: false,
-                    content: '<div id = "menuWindow"></div>'
+                    resize: false,
+                    content: '<div id = "menuWindow"></div>',
+                    success: () => {
+                        layerMenuWindow = document.querySelector("#layui-layer1 > div");
+                    }
                 });
                 layer.style(menuIndex, {
                     'box-shadow': 'none',
@@ -403,7 +400,7 @@
                     'background-color': '#f2f3f5'
                 });
                 for (const i of tabListItems) {
-                    let style = 'none', hide = false;
+                    let style = 'none', hide = false, scroll = false;
                     $(i).click(() => {
                         for (const item of tabListItems) {
                             if (item != i) $(item).removeClass('active');
@@ -412,10 +409,12 @@
                         if ($(i).attr('id') === "menuDiv") {
                             style = 'block';
                             hide = true;
+                            scroll = true;
                         }
                         layer.style(menuIndex, {
                             'display': style
                         });
+                        if (scroll) layerMenuWindow.scrollTo(0, layerMenuWindow.scrollHeight);
                         return hideTab(hide);
                     })
                 };
@@ -451,9 +450,9 @@
             loadConfig: () => {//加载配置函数
                 let p = $.Deferred();
                 try {
-                    let config = JSON.parse(localStorage.getItem(`${NAME}_CONFIG`));
+                    const config = JSON.parse(localStorage.getItem(`${NAME}_CONFIG`));
                     $.extend(true, MY_API.CONFIG, MY_API.CONFIG_DEFAULT);
-                    for (let item in MY_API.CONFIG) {
+                    for (const item in MY_API.CONFIG) {
                         if (!MY_API.CONFIG.hasOwnProperty(item)) continue;
                         if (config[item] !== undefined && config[item] !== null) MY_API.CONFIG[item] = config[item];
                     }
@@ -469,9 +468,9 @@
             loadCache: () => {//加载CACHE
                 let p = $.Deferred();
                 try {
-                    let cache = JSON.parse(localStorage.getItem(`${NAME}_CACHE`));
+                    const cache = JSON.parse(localStorage.getItem(`${NAME}_CACHE`));
                     $.extend(true, MY_API.CACHE, MY_API.CACHE_DEFAULT);
-                    for (let item in MY_API.CACHE) {
+                    for (const item in MY_API.CACHE) {
                         if (!MY_API.CACHE.hasOwnProperty(item)) continue;
                         if (cache[item] !== undefined && cache[item] !== null) MY_API.CACHE[item] = cache[item];
                     }
@@ -486,19 +485,15 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache == undefined || cache == null || cache != '4.5.2') &&
-                        version == '4.5.2') { //更新公告时需要修改
+                    if ((cache === undefined || cache === null || cache != '4.5.2.1') &&
+                        version == '4.5.2.1') { //更新公告时需要修改
                         const linkMsg = (msg, link) => {
                             return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
                         };
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `1.<strong>金宝箱抽奖优化，解决了刷新页面导致等待参加的抽奖被舍弃的问题</strong><br>
-                            2.金宝箱抽奖【忽略关键字】支持${linkMsg('正则表达式', 'https://www.runoob.com/js/js-regexp.html')}<br>
-                            （${linkMsg('点我前往github对应说明处', 'https://github.com/andywang425/BLTH#金宝箱抽奖')}）<br>
-                            3.金宝箱抽奖日志优化<br>
-                            4.新增金宝箱抽奖【每次检查抽奖数量】设置<br>
-                            5.重复运行检测优化<br>
+                            content: `1.代码优化，提高运行效率<br>
+                            2.修复了控制面板和日志窗口可以被拉伸的bug<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -560,8 +555,8 @@
             },
             loadGiftCount: () => {//读取礼物数量
                 try {
-                    let config = JSON.parse(localStorage.getItem(`${NAME}_GIFT_COUNT`));
-                    for (let item in MY_API.GIFT_COUNT) {
+                    const config = JSON.parse(localStorage.getItem(`${NAME}_GIFT_COUNT`));
+                    for (const item in MY_API.GIFT_COUNT) {
                         if (!MY_API.GIFT_COUNT.hasOwnProperty(item)) continue;
                         if (config[item] !== undefined && config[item] !== null) MY_API.GIFT_COUNT[item] = config[item];
                     }
@@ -604,8 +599,9 @@
                 const removeUntiSucceed = (list_id) => {
                     if (MY_API.CONFIG[settingNameList[list_id]]) {
                         setInterval(() => {
-                            if ($(unnecessaryList[list_id]).length > 0) {
-                                $(unnecessaryList[list_id]).remove();
+                            const unnecessaryItem = $(unnecessaryList[list_id]);
+                            if (unnecessaryItem.length > 0) {
+                                unnecessaryItem.remove();
                             } else {
                                 return
                             }
@@ -664,7 +660,7 @@
                 //添加按钮
                 const btnmsg = msgHide == 'hide' ? '显示窗口和提示信息' : '隐藏窗口和提示信息';
                 const btn = $(`<button style="display: inline-block; float: left; margin-right: 7px;background-color: #23ade5;color: #fff;border-radius: 4px;border: none; padding:4px; cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
-                const fullSreenBtn = $('button[data-title="网页全屏"]'),
+                const webFullScreenBtn = $('button[data-title="网页全屏"]'),
                     settingTableHeight = $('.live-player-mounter').height(),
                     settingTableoffset = $('.live-player-mounter').offset();
                 let fieldsetStyle = '\"float:left\"';
@@ -748,8 +744,9 @@
                     </div>
                     <div data-toggle="MATERIAL_LOTTERY_REM">
                     <label style="margin: 5px auto; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;
-                        每次检查抽奖数量
+                        检测到
                         <input class="num igiftMsg_input" style="width: 30px;" type="text">
+                        个不存在活动的aid后停止检测
                     </label>
                 </div>
                     <div data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY">
@@ -1004,6 +1001,7 @@
                         zIndex: 9998,
                         fixed: false,
                         area: [, String(settingTableHeight) + 'px'], //宽高
+                        resize: false,
                         content: html,
                         success: () => {
                             //显示对应配置状态
@@ -1313,7 +1311,7 @@
                                 });
                             };
                             $('input:text').bind('keydown', function (event) {//绑定回车保存
-                                if (event.keyCode == "13") {
+                                if (event.keyCode == 13) {
                                     saveAction();
                                 }
                             });
@@ -1339,7 +1337,7 @@
                             }
 
                             $("input:radio[name='COIN_TYPE']").change(function () { //投币模式变化
-                                if ($("div[data-toggle='COIN_DYN'] input:radio").is(':checked')) {
+                                if ($(this).is(':checked')) {
                                     MY_API.CONFIG.COIN_TYPE = 'COIN_DYN';
                                 }
                                 else {
@@ -1348,7 +1346,7 @@
                                 saveAction();
                             });
                             $("input:radio[name='LIGHT_TYPE']").change(function () { //点亮勋章模式变化
-                                if ($("div[data-toggle='LIGHT_WHITE'] input:radio").is(':checked')) {
+                                if ($(this).is(':checked')) {
                                     MY_API.CONFIG.LIGHT_METHOD = 'LIGHT_WHITE';
                                 }
                                 else {
@@ -1357,7 +1355,7 @@
                                 saveAction();
                             });
                             $("input:radio[name='GIFT_TYPE']").change(function () { //送礼模式变化
-                                if ($("div[data-toggle='GIFT_INTERVAL'] input:radio").is(':checked')) {
+                                if ($(this).is(':checked')) {
                                     MY_API.CONFIG.GIFT_METHOD = 'GIFT_INTERVAL';
                                 }
                                 else {
@@ -1366,7 +1364,7 @@
                                 saveAction();
                             });
                             $("input:radio[name='GIFT_SORT']").change(function () { //送礼模式变化
-                                if ($("div[data-toggle='GIFT_SORT_HIGH'] input:radio").is(':checked')) {
+                                if ($(this).is(':checked')) {
                                     MY_API.CONFIG.GIFT_SORT = 'high';
                                 }
                                 else {
@@ -1404,7 +1402,7 @@
                         }
                     }
                 });
-                fullSreenBtn.click(() => {
+                webFullScreenBtn.click(() => {
                     layer.close(mainIndex);
                     document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
                     layer.style(menuIndex, {
@@ -1428,66 +1426,32 @@
             },
 
             chatLog: function (text, type = 'info') {//自定义提示
-                const menuWindow = document.querySelector("#layui-layer1 > div");
-                let div = $("<div class='igiftMsg'>"),
-                    msg = $("<div>"),
+                let div = $("<div class='chatLogDiv'>"),
+                    msg = $("<div class='chatLogMsg'>"),
                     myDate = new Date();
                 msg.html(text);
                 div.text(myDate.toLocaleString());
                 div.append(msg);
-                div.css({
-                    'text-align': 'center',
-                    'border-radius': '4px',
-                    'min-height': '30px',
-                    'width': '256px',
-                    'color': '#9585FF',
-                    'line-height': '30px',
-                    'padding': '0 10px',
-                    'margin': '10px auto',
-                });
-                msg.css({
-                    'word-wrap': 'break-word',
-                    'width': '100%',
-                    'line-height': '1em',
-                    'margin-bottom': '10px',
-                });
                 switch (type) {
                     case 'warning':
-                        div.css({
-                            'border': '1px solid rgb(236, 221, 192)',
-                            'color': 'rgb(218, 142, 36)',
-                            'background': 'rgb(245, 235, 221) none repeat scroll 0% 0%',
-                        });
+                        div.addClass('chatLogWarning')
                         break;
                     case 'success':
-                        div.css({
-                            'border': '1px solid rgba(22, 140, 0, 0.28)',
-                            'color': 'rgb(69, 171, 69)',
-                            'background': 'none 0% 0% repeat scroll rgba(16, 255, 0, 0.18)',
-                        });
+                        div.addClass('chatLogSuccess')
                         break;
                     case 'error':
-                        div.css({
-                            'border': '1px solid rgb(255, 46, 0)',
-                            'color': 'white',
-                            'background': 'none 0% 0% repeat scroll #ff4c4c',
-                        });
+                        div.addClass('chatLogError')
                         break;
                     default:
-                        div.css({
-                            'border': '1px solid rgb(203, 195, 255)',
-                            'background': 'rgb(233, 230, 255) none repeat scroll 0% 0%',
-                        });
+                        div.addClass('chatLogDefault')
                 };
                 $('#menuWindow').append(div);
-                menuWindow.scrollTo(0, menuWindow.scrollHeight);
-                //menuWindow.scrollTop(menuWindow.prop("scrollHeight"));//滚动到底部
+                layerMenuWindow.scrollTo(0, layerMenuWindow.scrollHeight);
             },
             blocked: false,
             max_blocked: false,
             listen: (roomId, uid, area = '本直播间') => {
                 BAPI.room.getConf(roomId).then((response) => {
-                    //DanMuServerHost = response.data.host;
                     MYDEBUG(`获取弹幕服务器信息 ${area}`, response);
                     let wst = new BAPI.DanmuWebSocket(uid, roomId, response.data.host_server_list, response.data.token);
                     wst.bind((newWst) => {
@@ -1579,14 +1543,13 @@
                 add: function (EntryRoom) {
                     let EntryRoom_list = [];
                     try {
-                        let config = JSON.parse(localStorage.getItem(`${NAME}_EntryRoom_list`));
-                        EntryRoom_list = [].concat(config.list);
+                        const config = JSON.parse(localStorage.getItem(`${NAME}_EntryRoom_list`));
+                        EntryRoom_list = [...config.list];
                         EntryRoom_list.push(EntryRoom);
                         if (EntryRoom_list.length > 100) {
                             EntryRoom_list.splice(0, 50);//删除前50条数据
                         }
                         localStorage.setItem(`${NAME}_EntryRoom_list`, JSON.stringify({ list: EntryRoom_list }));
-                        //MYDEBUG(`${NAME}_EntryRoom_list_add`, EntryRoom_list);
                     } catch (e) {
                         EntryRoom_list.push(EntryRoom);
                         localStorage.setItem(`${NAME}_EntryRoom_list`, JSON.stringify({ list: EntryRoom_list }));
@@ -1595,13 +1558,12 @@
                 isIn: function (EntryRoom) {
                     let EntryRoom_list = [];
                     try {
-                        let config = JSON.parse(localStorage.getItem(`${NAME}_EntryRoom_list`));
+                        const config = JSON.parse(localStorage.getItem(`${NAME}_EntryRoom_list`));
                         if (config === null) {
                             EntryRoom_list = [];
                         } else {
-                            EntryRoom_list = [].concat(config.list);
+                            EntryRoom_list = [...config.list];
                         }
-                        //MYDEBUG(`${NAME}_EntryRoom_list_read`, config);
                         return EntryRoom_list.indexOf(EntryRoom) > -1
                     } catch (e) {
                         localStorage.setItem(`${NAME}_EntryRoom_list`, JSON.stringify({ list: EntryRoom_list }));
@@ -1613,7 +1575,7 @@
             RoomId_list: [],
             err_roomId: [],
             auto_danmu_list: ["(=・ω・=)", "（￣▽￣）", "nice", "666", "kksk", "(⌒▽⌒)", "(｀・ω・´)", "╮(￣▽￣)╭", "(￣3￣)", "Σ( ￣□￣||)",
-                "(^・ω・^ )", "_(:3」∠)_"],//共11个
+                "(^・ω・^ )", "_(:3」∠)_"],//共12个
             checkRoom: function (roomId, area = '本直播间') {
                 if (MY_API.blocked || MY_API.max_blocked) {
                     return
@@ -1630,7 +1592,7 @@
                 if (probability(MY_API.CONFIG.RANDOM_SEND_DANMU)) {//概率发活跃弹幕
                     BAPI.room.get_info(roomId).then((res) => {
                         MYDEBUG(`API.room.get_info roomId=${roomId} res`, res);
-                        BAPI.sendLiveDanmu(MY_API.auto_danmu_list[Math.floor(Math.random() * 12)], res.data.room_id).then((response) => {
+                        BAPI.sendLiveDanmu(MY_API.auto_danmu_list[Math.floor(Math.random() * MY_API.auto_danmu_list.length)], res.data.room_id).then((response) => {
                             MYDEBUG('[活跃弹幕]弹幕发送返回信息', response);
                         })
                     })
@@ -1678,10 +1640,10 @@
             },
             Id_list_history: {//礼物历史记录缓存
                 add: function (id, type) {
-                    let id_list = [];
+                    const id_list = [];
                     try {
                         let config = JSON.parse(localStorage.getItem(`${NAME}_${type}Id_list`));
-                        id_list = [].concat(config.list);
+                        id_list = [...config.list];
                         id_list.push(id);
                         if (id_list.length > 200) {
                             id_list.splice(0, 50);//删除前50条数据
@@ -1696,11 +1658,11 @@
                 isIn: function (id, type) {
                     let id_list = [];
                     try {
-                        let config = JSON.parse(localStorage.getItem(`${NAME}_${type}Id_list`));
+                        const config = JSON.parse(localStorage.getItem(`${NAME}_${type}Id_list`));
                         if (config === null) {
                             id_list = [];
                         } else {
-                            id_list = [].concat(config.list);
+                            id_list = [...config.list];
                         }
                         MYDEBUG(`${NAME}_${type}Id_list_read`, config);
                         return id_list.indexOf(id) > -1
@@ -1755,37 +1717,18 @@
                 if (MY_API.CONFIG.RANDOM_DELAY)
                     delay += Math.floor(Math.random() * (MY_API.CONFIG.RND_DELAY_END - MY_API.CONFIG.RND_DELAY_START + 1)) + MY_API.CONFIG.RND_DELAY_START;
                 //随机延迟 return Math.floor(Math.random() * (max - min + 1) ) + min; min，max都包括
-                let div = $("<div class='igiftMsg'>"),
-                    msg = $("<div>"),
+                let div = $("<div class='chatLogLottery'>"),
+                    msg = $("<div class='chatLogMsg'>"),
                     aa = $("<div>"),
                     myDate = new Date();
-                const menuWindow = document.querySelector("#layui-layer1 > div");
                 msg.text(`[${area}]` + data.thank_text.split('<%')[1].split('%>')[0] + data.thank_text.split('%>')[1]);
                 div.text(myDate.toLocaleString());
                 div.append(msg);
                 aa.css('color', 'red');
                 aa.text('等待抽奖');
                 msg.append(aa);
-                div.css({
-                    'text-align': 'center',
-                    'border-radius': '4px',
-                    'min-height': '30px',
-                    'width': '256px',
-                    'color': '#9585FF',
-                    'line-height': '30px',
-                    'padding': '0 10px',
-                    'margin': '10px auto',
-                    'border': '1px solid rgb(203, 195, 255)',
-                    'background': 'rgb(233, 230, 255) none repeat scroll 0% 0%',
-                });
-                msg.css({
-                    'word-wrap': 'break-word',
-                    'width': '100%',
-                    'line-height': '1em',
-                    'margin-bottom': '10px',
-                });
                 $('#menuWindow').append(div);//向聊天框加入信息
-                menuWindow.scrollTo(0, menuWindow.scrollHeight);
+                layerMenuWindow.scrollTo(0, layerMenuWindow.scrollHeight);
                 let timer = setInterval(() => {
                     aa.text(`等待抽奖倒计时${delay}秒`);
                     if (delay <= 0) {
@@ -2646,8 +2589,8 @@
                 add: function (id) {
                     let storm_id_list = [];
                     try {
-                        let config = JSON.parse(localStorage.getItem(`${NAME}stormIdSet`));
-                        storm_id_list = [].concat(config.list);
+                        const config = JSON.parse(localStorage.getItem(`${NAME}stormIdSet`));
+                        storm_id_list = [...config.list];
                         storm_id_list.push(id);
                         if (storm_id_list.length > 50) {
                             storm_id_list.splice(0, 10);//删除前10条数据
@@ -2662,11 +2605,11 @@
                 isIn: function (id) {
                     let storm_id_list = [];
                     try {
-                        let config = JSON.parse(localStorage.getItem(`${NAME}stormIdSet`));
+                        const config = JSON.parse(localStorage.getItem(`${NAME}stormIdSet`));
                         if (config === null) {
                             storm_id_list = [];
                         } else {
-                            storm_id_list = [].concat(config.list);
+                            storm_id_list = [...config.list];
                         }
                         MYDEBUG(`${NAME}storm_Id_list_read`, config);
                         return storm_id_list.indexOf(id) > -1
@@ -3091,14 +3034,14 @@
                                 jsonCache[objIndex].sendTs = ts_ms();
                             }
                             MY_API.CACHE.AUTO_SEND_DANMU_TS = jsonCache;
-                            MY_API.saveCache(false);
+                            return MY_API.saveCache(false);
                         };
                         const sendNextDanmu = (intervalTS, isTime) => {
                             if (!isTime) setCache();
-                            setTimeout(async () => {
+                            return setTimeout(async () => {
                                 await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
                                 if (!isTime) setCache();
-                                sendNextDanmu(intervalTS, isTime);
+                                return sendNextDanmu(intervalTS, isTime);
                             }, intervalTS);
                         }
                         if (!isTimeData && (intervalTime >= danmu_intervalTime_Ts || SEND_DANMU_NOW)) {
@@ -3155,19 +3098,19 @@
                         return $.Deferred().reject();
                     }
                 },
-                check: (aid, valid = 632, rem = MY_API.CONFIG.MATERIAL_LOTTERY_REM || 9) => { // TODO valid起始aid rem + 1检查次数
+                check: (aid, valid = 639, rem = MY_API.CONFIG.MATERIAL_LOTTERY_REM || 9) => { // TODO valid起始aid rem + 1检查次数
                     aid = parseInt(aid || (MY_API.CACHE.last_aid), 10);
                     if (isNaN(aid)) aid = valid;
                     MYDEBUG('API.MaterialObject.check: aid=', aid);
                     return BAPI.Lottery.MaterialObject.getStatus(aid).then((response) => {
                         MYDEBUG('API.MaterialObject.check: API.MY_API.MaterialObject.getStatus', response);
                         if (response.code === 0 && response.data) {
-                            if (response.data.typeB[response.data.typeB.length-1].status != 3 && MY_API.MaterialObject.firstAid === undefined)
+                            if (response.data.typeB[response.data.typeB.length - 1].status != 3 && MY_API.MaterialObject.firstAid === undefined)
                                 MY_API.MaterialObject.firstAid = aid;
                             if (MY_API.CONFIG.MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY) {
                                 for (const str of MY_API.CONFIG.QUESTIONABLE_LOTTERY) {
-                                    if (str.charAt(0) != '/' &&  str.charAt(str.length - 1) != '/') {
-                                        if(response.data.title.toLowerCase().indexOf(str) > -1) {
+                                    if (str.charAt(0) != '/' && str.charAt(str.length - 1) != '/') {
+                                        if (response.data.title.toLowerCase().indexOf(str) > -1) {
                                             MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})<br>含有关键字：${str}`, 'info');
                                             return MY_API.MaterialObject.check(aid + 1, aid);
                                         }
@@ -3181,7 +3124,7 @@
                                     }
                                 }
                             }
-                                return MY_API.MaterialObject.join(aid, response.data.title, response.data.typeB).then(() => MY_API.MaterialObject.check(aid + 1, aid));
+                            return MY_API.MaterialObject.join(aid, response.data.title, response.data.typeB).then(() => MY_API.MaterialObject.check(aid + 1, aid));
                         } else if (response.code === -400 || response.data == null) { // 活动不存在
                             if (rem) return MY_API.MaterialObject.check(aid + 1, valid, rem - 1);
                             return $.Deferred().resolve(MY_API.MaterialObject.firstAid || valid);
@@ -3214,7 +3157,7 @@
                     switch (obj.status) {
                         case -1: // 未开始
                             {
-                                MY_API.chatLog(`[实物抽奖] 将在${new Date((obj.join_start_time+1)*1000).toLocaleString()}参加抽奖<br>"${obj.title}" aid=${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
+                                MY_API.chatLog(`[实物抽奖] 将在${new Date((obj.join_start_time + 1) * 1000).toLocaleString()}参加抽奖<br>"${obj.title}" aid=${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
                                 MY_API.MaterialObject.list.push(obj);
                                 const p = $.Deferred();
                                 p.then(() => {
@@ -3294,7 +3237,7 @@
                                         MY_API.chatLog(
                                             `[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid},number=${obj.number})获得奖励<br>"${i.giftTitle}"`,
                                             'success');
-                                            return true;
+                                        return true;
                                     }
                                 }
                             }
@@ -3313,10 +3256,8 @@
                 }
             }
         };
-
         MY_API.init().then(() => {//主函数
             try {
-
                 if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid))) {//登陆判断
                     MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
                     return
@@ -3326,7 +3267,7 @@
                 StartPlunder(MY_API);
             }
             catch (e) {
-                console.error('重复运行检测错误', e);
+                console.error('初始化错误', e);
             }
         });
     }
@@ -3344,7 +3285,7 @@
         runExactMidnight(clearStat, '重置统计');
         API.creatSetBox();//创建设置框
         API.removeUnnecessary();//移除页面元素
-        //修复一下因版本差异造成的变量类型错误
+        //修复因版本差异造成的变量类型错误
         const fixList = ['AUTO_GIFT_ROOMID', 'LIGHT_MEDALS', 'EXCLUDE_ROOMID'];
         if (!fixList.every(i => $.isArray(API.CONFIG[i]))) {
             for (const i of fixList) {
@@ -3512,9 +3453,9 @@
         if (sH > 23 || eH > 24 || sH < 0 || eH < 1 || sM > 59 || sM < 0 || eM > 59 || eM < 0) {
             return false
         }
-        let myDate = new Date();
-        let h = myDate.getHours();
-        let m = myDate.getMinutes();
+        const myDate = new Date();
+        const h = myDate.getHours();
+        const m = myDate.getMinutes();
         if (sH < eH) {//如(2,8,0,0)
             if (h >= sH && h < eH)
                 return true;
