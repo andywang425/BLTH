@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BilibiliAPI_mod
 // @namespace    https://github.com/SeaLoong
-// @version      1.6
+// @version      1.7
 // @description  BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author       SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -79,7 +79,7 @@ var BilibiliAPI = {
         share: (aid) => BilibiliAPI.x.share_add(aid)
     },
     // ajax调用B站API
-    runUntilSucceed: (callback, delay = 0, period = 50) => {
+    runUntilSucceed: (callback, delay = 0, period = 2) => {
         setTimeout(() => {
             if (!callback()) BilibiliAPI.runUntilSucceed(callback, period, period);
         }, delay);
@@ -729,7 +729,7 @@ var BilibiliAPI = {
                     }
                 });
             },
-            join_ex: (id, roomid ,access_token, appKey, headers, captcha_token = "", captcha_phrase = "", color = 16777215) => {
+            join_ex: (id, roomid ,access_token, appKey, headers/*, captcha_token = "", captcha_phrase = "", color = 16777215*/) => {
                 // 参加节奏风暴
                 let param = TokenUtil.signQuery(KeySign.sort({
                     id:id,
@@ -867,6 +867,76 @@ var BilibiliAPI = {
             return BilibiliAPI.ajax({
                 url: 'relation/v1/Feed/IsUserFollow?follow=' + follow
             });
+        },
+        getFollowings: (vmid, pn=1, ps=20, order='desc', jsonp='jsonp',callback='') => {//获取关注列表
+            return BilibiliAPI.ajax({
+                url: '//api.bilibili.com/x/relation/followings',
+                data: {
+                    vmid: vmid,//uid
+                    pn: pn,
+                    ps: ps,
+                    order: order,
+                    jsonp: jsonp,
+                    callback: callback//__jp5
+                }
+            })
+        },
+        getTags: () => {//获取关注分组
+            return BilibiliAPI.ajax({
+                url: '//api.bilibili.com/x/relation/tags',
+                data: {
+                    jsonp: 'jsonp',
+                    callback: ''//__jp3
+                }
+            });
+        },
+        getTagInfo: (mid, tagid, pn = 1, ps = 20, jsonp = 'jsonp', callback = '') => {//获取一个关注分组中的UP
+            return BilibiliAPI.ajax({
+                url: '//api.bilibili.com/x/relation/tag',
+                data: {
+                    mid: mid,//自己的uid
+                    tagid: tagid,//通过getTags获取
+                    pn: pn,//页数
+                    ps: ps,//每页数量
+                    jsonp: jsonp,
+                    callback: callback//__jp11
+                }
+            });
+        },
+        modify: (fid, act, re_src = 11) => {
+            return BilibiliAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '//api.bilibili.com/x/relation/modify',
+                data: {
+                    fid: fid,//目标uid
+                    act: act,//1关注 2取消关注
+                    re_src: re_src,
+                    jsonp: 'jsonp',
+                    callback: ''//__jp3
+                }
+            });
+        },
+        addUsers: (fid, tagids) => {
+            return BilibiliAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '//api.bilibili.com/x/relation/tags/addUsers?cross_domain=true',
+                data: {
+                    fid: fid,//目标uid
+                    tagids: tagids//通过getTags获取。可以为数组，用逗号,隔开，需要编码(即用 %2C 隔开)
+                }
+            });
+        },
+        moveUsers: (beforeTagids, afterTagids, fids, jsonp = 'jsonp') => {
+            return BilibiliAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '//api.bilibili.com/x/relation/tags/moveUsers',
+                data: {
+                    beforeTagids: beforeTagids,
+                    afterTagids: afterTagids,
+                    fids: fids,//目标uid。可以为数组，用逗号,隔开，需要编码(即用 %2C 隔开)
+                    jsonp: jsonp
+                }
+            });
         }
     },
     room: {
@@ -929,17 +999,18 @@ var BilibiliAPI = {
                 url: 'room/v1/Area/getList'
             });
         },
-        getRoomList: (parent_area_id = 1, cate_id = 0, area_id = 0, page = 1, page_size = 30, sort_type = 'online', platform = 'web') => {
+        getRoomList: (parent_area_id = 1, cate_id = 0, area_id = 0, page = 1, page_size = 30, sort_type = 'online', platform = 'web', tag_version = 1) => {
             return BilibiliAPI.ajax({
-                url: 'room/v1/area/getRoomList',
+                url: 'room/v3/area/getRoomList',
                 data: {
                     platform: platform,
-                    parent_area_id: parent_area_id,
+                    parent_area_id: parent_area_id,//要检查的分区
                     cate_id: cate_id,
                     area_id: area_id,
                     sort_type: sort_type,
                     page: page,
-                    page_size: page_size
+                    page_size: page_size,
+                    tag_version: tag_version
                 }
             });
         }
@@ -1142,6 +1213,28 @@ var BilibiliAPI = {
             return BilibiliAPI.ajax({
                 url: 'xlive/web-ucenter/v1/sign/DoSign'
             });
+        },
+        anchor: {
+            check: (roomid) => {
+                return BilibiliAPI.ajax({
+                    url: 'xlive/lottery-interface/v1/Anchor/Check?roomid=' + roomid
+                })
+            },
+            join: (id, gift_id, gift_num, platform = 'pc') => {
+                var data = {
+                    id: id,//通过anchor.check获取
+                    platform: platform
+                };
+                if (gift_id !== undefined || gift_num !== undefined) {
+                    data.gift_id = gift_id;
+                    data.gift_num = gift_num;
+                };
+                return BilibiliAPI.ajaxWithCommonArgs({
+                    method: 'POST',
+                    url: 'xlive/lottery-interface/v1/Anchor/Join',
+                    data: data
+                })
+            }
         }
     
     },
