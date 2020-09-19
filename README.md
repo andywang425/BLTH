@@ -243,7 +243,7 @@ githubusercontent源的原格式脚本需自行复制到Tampermonkey中新建脚
 -------------------------------
 
 ## 更新日志
->### 4.5.2.1
->代码优化；修复了控制面板和日志窗口可以被拉伸的bug。  
+>### 5.0
+>新增自动参加天选时刻的功能。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
