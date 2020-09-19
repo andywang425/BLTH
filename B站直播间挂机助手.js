@@ -3,8 +3,8 @@
 // @name           B站直播间挂机助手
 // @name:en        B站直播间挂机助手
 // @author         andywang425
-// @description    自动获取小心心，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼、点亮勋章，参与实物抽奖，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
-// @description:en 自动获取小心心，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼、点亮勋章，参与实物抽奖，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
+// @description    自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼、点亮勋章，参与实物抽奖，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
+// @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼、点亮勋章，参与实物抽奖，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
 // @updateURL      https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/Bilibili-SGTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH/
