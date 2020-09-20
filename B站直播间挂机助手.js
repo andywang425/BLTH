@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.0
+// @version        5.0.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-end
 // @connect       passport.bilibili.com
@@ -45,7 +45,7 @@
                 if (!callback()) runUntilSucceed(callback, period, period);
             }, delay);
         },
-        delayCall = (callback, delay = 10e3) => {
+        delayCall = (callback, delay = 120e3) => {
             const p = $.Deferred();
             setTimeout(() => {
                 const t = callback();
@@ -162,7 +162,11 @@
         getScrollPosition = (el = window) => ({
             x: el.pageXOffset !== undefined ? el.pageXOffset : el.scrollLeft,
             y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop
-        });
+        }),
+        linkMsg = (msg, link) => {
+            return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
+        },
+        liveRoomUrl = 'https://live.bilibili.com/';
     //eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter'];
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide',//UI隐藏开关
         gift_join_try = 0,
@@ -172,6 +176,8 @@
         SEND_DANMU_NOW = false,//立刻发弹幕
         LIGHT_MEDAL_NOW = false,//立刻点亮勋章
         hideBtnClickable = true,
+        getFollowBtnClickable = true,
+        unFollowBtnClickable = true,
         Live_info = {
             room_id: undefined,
             uid: undefined,
@@ -181,8 +187,6 @@
             visit_id: undefined,
             bili_jct: undefined,
             tid: undefined,
-            //mobile_verify: undefined,
-            //identification: undefined,
         },
         userToken = undefined,
         tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || {},
@@ -494,13 +498,10 @@
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
                     if ((cache === undefined || cache === null || cache != '5.0') &&
-                        version == '5.0') { //更新公告时需要修改
-                        const linkMsg = (msg, link) => {
-                            return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
-                        };
+                        version == '5.0.1') { //更新公告时需要修改
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `<strong>1.新增自动参加${linkMsg('天选时刻','https://github.com/andywang425/BLTH#天选时刻')}的功能</strong><br>
+                            content: `<strong>1.新增自动参加${linkMsg('天选时刻', 'https://github.com/andywang425/BLTH#天选时刻')}的功能</strong><br>
                             2.修复一些bug<br>
                             <hr>
                             <em style="color:grey;">
@@ -1329,15 +1330,21 @@
                                 $('#giftCount span:eq(1)').text(MY_API.GIFT_COUNT.SILVER_COUNT);
                                 MY_API.chatLog('已重置统计数据');
                             });
-                            div.find('button[data-action="saveFollowingList"]').click(async () => {//保存当前关注列表为白名单
-                                window.toast('[保存当前关注列表为白名单] 开始获取关注列表');
-                                await MY_API.AnchorLottery.getFollowingList();
-                                window.toast('[保存当前关注列表为白名单] 保存关注列表成功', 'success');
+                            div.find('button[data-action="saveFollowingList"]').click(() => {
+                                if (getFollowBtnClickable) {//保存当前关注列表为白名单
+                                    getFollowBtnClickable = false;
+                                    setTimeout(function () { getFollowBtnClickable = true }, 2000);
+                                    window.toast('[保存当前关注列表为白名单] 开始获取关注列表');
+                                    return MY_API.AnchorLottery.getFollowingList();
+                                }
                             });
-                            div.find('button[data-action="removeAnchorFollowing"]').click(async () => {//取关不在白名单内的UP主
-                                window.toast('[取关不在白名单内的UP主] 开始获取关注列表并取消关注');
-                                await MY_API.AnchorLottery.delAnchorFollowing();
-                                window.toast('[取关不在白名单内的UP主] 取消关注成功', 'success');
+                            div.find('button[data-action="removeAnchorFollowing"]').click(() => {//取关不在白名单内的UP主
+                                if (unFollowBtnClickable) {//保存当前关注列表为白名单
+                                    unFollowBtnClickable = false;
+                                    setTimeout(function () { unFollowBtnClickable = true }, 2000);
+                                    window.toast('[取关不在白名单内的UP主] 开始获取关注列表并取消关注');
+                                    return MY_API.AnchorLottery.delAnchorFollowing();
+                                }
                             });
                             div.find('button[data-action="sendGiftNow"]').click(() => {//立刻开始送礼
                                 if (!MY_API.CONFIG.AUTO_GIFT) {
@@ -3205,14 +3212,14 @@
                                 for (const str of MY_API.CONFIG.QUESTIONABLE_LOTTERY) {
                                     if (str.charAt(0) != '/' && str.charAt(str.length - 1) != '/') {
                                         if (response.data.title.toLowerCase().indexOf(str) > -1) {
-                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})<br>含有关键字：`+str, 'warning');
+                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})<br>含有关键字：` + str, 'warning');
                                             return MY_API.MaterialObject.check(aid + 1, aid);
                                         }
                                     }
                                     else {
                                         let reg = eval(str);
                                         if (reg.test(response.data.title)) {
-                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})<br>匹配正则：`+str, 'warning');
+                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})<br>匹配正则：` + str, 'warning');
                                             return MY_API.MaterialObject.check(aid + 1, aid);
                                         }
                                     }
@@ -3350,7 +3357,6 @@
                 }
             },
             AnchorLottery: {
-                //roomIdList: [],
                 followingList: [],
                 unfollowList: [],
                 add: (id, listName) => {
@@ -3391,39 +3397,59 @@
                     return BAPI.relation.getFollowings(Live_info.uid, pn, ps).then((response) => {
                         MYDEBUG(`getFollowingList API.relation.getFollowings ${pn}, ${ps}`, response);
                         let p = $.Deferred();
-                        const total = response.data.total;
-                        for (const up of response.data.list) {
-                            MY_API.AnchorLottery.followingList.push(up.mid);
+                        if (response.code === 0) {
+                            p.resolve();
+                            const total = response.data.total;
+                            for (const up of response.data.list) {
+                                MY_API.AnchorLottery.followingList.push(up.mid);
+                            }
+                            const remainUp = total - MY_API.AnchorLottery.followingList.length;
+                            if (remainUp > 0)
+                                return $.when(MY_API.AnchorLottery.getFollowingList(pn + 1, ps), p);
+                            else {
+                                window.toast('[保存当前关注列表为白名单] 保存关注列表成功', 'success');
+                                localStorage.setItem(`${NAME}AnchorFollowingList`, JSON.stringify({ list: MY_API.AnchorLottery.followingList }));
+                                return p;
+                            }
+                        } else {
+                            window.toast(`[保存当前关注列表为白名单] 获取关注列表出错 ${response.message}`, 'error');
+                            return p.reject();
                         }
-                        const remainUp = total - MY_API.AnchorLottery.followingList.length;
-                        p.resolve();
-                        if (remainUp > 0)
-                            return $.when(MY_API.AnchorLottery.getFollowingList(pn+1, remainUp), p);
-                        else {
-                            localStorage.setItem(`${NAME}AnchorFollowingList`, JSON.stringify({ list: MY_API.AnchorLottery.followingList }));
-                            return
-                        }
+                    }, () => {
+                        MY_API.chatLog(`[天选时刻] 获取关注列表出错，请检查网络`, 'error');
+                        return delayCall(() => MY_API.AnchorLottery.getFollowingList());
                     })
                 },
                 delAnchorFollowing: async (pn = 1, ps = 50) => {
                     if (pn === 1) MY_API.AnchorLottery.unfollowList = [];
-                    function getFollowingList (PN, PS) {
+                    function getFollowingList(PN, PS) {
                         return BAPI.relation.getFollowings(Live_info.uid, PN, PS).then((response) => {
                             MYDEBUG(`delAnchorFollowing API.relation.getFollowings(${PN}, ${PS})`, response)
                             let p = $.Deferred();
-                            const total = response.data.total;
-                            for (const up of response.data.list) {
-                                MY_API.AnchorLottery.unfollowList.push(up.mid);
+                            if (response.code === 0) {
+                                p.resolve();
+                                const total = response.data.total;
+                                for (const up of response.data.list) {
+                                    MY_API.AnchorLottery.unfollowList.push(up.mid);
+                                }
+                                const remainUp = total - MY_API.AnchorLottery.unfollowList.length;
+                                if (remainUp > 0) {
+                                    return $.when(getFollowingList(PN + 1, PS), p);
+                                }
+                                else {
+                                    return p;
+                                }
+                            } else {
+                                window.toast(`[取关不在白名单内的UP主] 获取关注列表出错 ${response.message}`, 'error');
+                                return p.reject();
                             }
-                            const remainUp = total - MY_API.AnchorLottery.unfollowList.length;
-                            p.resolve();
-                            if (remainUp > 0)
-                                return $.when(getFollowingList(PN+1, 50), p);
-                            else return
+                        }, () => {
+                            MY_API.chatLog(`[天选时刻] 获取关注列表出错，请检查网络`, 'error');
+                            return delayCall(() => MY_API.AnchorLottery.delAnchorFollowing());
                         });
                     }
                     return getFollowingList(pn, ps).then(() => {
-                        const config = JSON.parse(localStorage.getItem(`${NAME}AnchorFollowingList`)) || {"list":[]};
+                        const config = JSON.parse(localStorage.getItem(`${NAME}AnchorFollowingList`)) || { "list": [] };
                         const id_list = [...config.list];
                         let count = 0;
                         for (const uid of MY_API.AnchorLottery.unfollowList) {
@@ -3433,7 +3459,11 @@
                                 count++;
                                 p.then(() => {
                                     BAPI.relation.modify(uid, 2).then((response) => {
-                                        return MYDEBUG(`API.relation.modify ${uid}, ${2}`, response);
+                                        MYDEBUG(`API.relation.modify ${uid}, ${2}`, response);
+                                        if (response.code === 0)
+                                            window.toast(`[取关不在白名单内的UP主] 取关UP(uid = ${uid})成功`, 'success');
+                                        else
+                                            window.toast(`[取关不在白名单内的UP主] 取关UP(uid = ${uid})出错  ${response.message}`, 'error');
                                     })
                                 })
                             }
@@ -3470,6 +3500,9 @@
                                     MY_API.AnchorLottery.add(i.roomid, 'AnchorRoomidList');
                                 }
                             }
+                        }, () => {
+                            MY_API.chatLog(`[天选时刻] 获取小时榜直播间出错，请检查网络`, error);
+                            return delayCall(() => checkHourRank(data));
                         })
                     };
                     const checkRoomList = (areaId) => {
@@ -3482,12 +3515,23 @@
                                     MY_API.AnchorLottery.add(i.roomid, 'AnchorRoomidList');
                                 }
                             }
+                        }, () => {
+                            MY_API.chatLog(`[天选时刻] 获取分区直播间出错，请检查网络`, 'error');
+                            return delayCall(() => checkRoomList(areaId));
                         })
+                    };
+                    let pArray = [];
+                    for (let n = AreaNum - 1; n < AreaIdList.length - 1; n++) {
+                        pArray[n] = $.Deferred();
                     }
                     for (let n = AreaNum; n < AreaIdList.length; n++) {
-                        await checkHourRank(n).then(() => checkRoomList(n).then(async () => await sleep(1000)));
+                        let p = $.Deferred();
+                        setTimeout(() => p.resolve(), (n - 1) * 1000)
+                        p.then(() => {
+                            checkHourRank(n).then(() => checkRoomList(n).then(() => pArray[n - 1].resolve()));
+                        });
                     }
-                    return $.Deferred().resolve();
+                    return $.when(...pArray)
                 },
                 check: (roomid) => {
                     return BAPI.xlive.anchor.check(roomid).then((response) => {
@@ -3497,14 +3541,14 @@
                                 for (const str of MY_API.CONFIG.ANCHOR_BLACKLIST_WORD) {
                                     if (str.charAt(0) != '/' && str.charAt(str.length - 1) != '/') {
                                         if (response.data.award_name.toLowerCase().indexOf(str) > -1 || response.data.danmu.toLowerCase().indexOf(str) > -1) {
-                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选(roomid = ${roomid}, id=${response.data.id})<br>含有关键字：`+str, 'warning');
+                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id=${response.data.id}<br>含有关键字：` + str, 'warning');
                                             return [false]
                                         }
                                     }
                                     else {
                                         let reg = eval(str);
                                         if (reg.test(response.data.award_name) || reg.test(response.data.danmu)) {
-                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选(roomid = ${roomid}, id=${response.data.id})<br>匹配正则：`+str, 'warning');
+                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id=${response.data.id}<br>匹配正则：` + str, 'warning');
                                             return [false]
                                         }
                                     }
@@ -3512,58 +3556,68 @@
                             };
                             const joinPrice = response.data.gift_num * response.data.gift_price;
                             if (joinPrice > MY_API.CONFIG.AHCHOR_NEED_GOLD) {
-                                MY_API.chatLog(`[天选时刻] 忽略付费天选(roomid = ${roomid}, id=${response.data.id})<br>所需金瓜子：${joinPrice}`, 'warning');
+                                MY_API.chatLog(`[天选时刻] 忽略付费天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id=${response.data.id}<br>所需金瓜子：${joinPrice}`, 'warning');
                                 return [false]
                             }
                             if (response.data.require_type === 2 && response.data.require_value > 0) {
-                                MY_API.chatLog(`[天选时刻] 忽略有粉丝勋章要求的天选(roomid = ${roomid}, id=${response.data.id})<br>所需勋章等级：${response.data.require_text}`, 'warning');
+                                MY_API.chatLog(`[天选时刻] 忽略有粉丝勋章要求的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id=${response.data.id}<br>所需勋章等级：${response.data.require_text}`, 'warning');
                                 return [false]
                             }
                             if (response.data.status === 2) {
-                                MY_API.chatLog(`[天选时刻] 忽略已参加天选(roomid = ${roomid}, id=${response.data.id})`, 'info');
+                                MY_API.chatLog(`[天选时刻] 忽略已参加天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id=${response.data.id}`, 'info');
                                 return [false]
                             }
-                            return [response.data.id, joinPrice === 0 ? undefined : response.data.gift_id, joinPrice === 0 ? undefined : response.data.gift_num]
+                            if (response.data.time === 0) {
+                                MY_API.chatLog(`[天选时刻] 忽略过期天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id=${response.data.id}`, 'info');
+                                return [false]
+                            }
+                            return [response.data.id, joinPrice === 0 ? undefined : response.data.gift_id, joinPrice === 0 ? undefined : response.data.gift_num, roomid, response.data.award_name]
                         }
                         else {
                             return [false]
                         }
-                    })
+                    }, () => {
+                        MY_API.chatLog(`[天选时刻] 天选检查出错，请检查网络`, 'error');
+                        return delayCall(() => MY_API.AnchorLottery.check(roomid));
+                    });
                 },
                 join: (data) => {
-                    return BAPI.xlive.anchor.join(data[0],data[1],data[2]).then((response) => {
+                    return BAPI.xlive.anchor.join(data[0], data[1], data[2]).then((response) => {//id, gift_id, gift_num, roomid, award_name
                         MYDEBUG(`API.xlive.anchor.join(${data[0]}) response`, response);
                         if (response.code === 0) {
-                            MY_API.chatLog(`[天选时刻] 天选（id=${data[0]}）参加成功`, 'success');
+                            MY_API.chatLog(`[天选时刻] 成功参加天选<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id=${data[0]}<br>奖品：${data[4]}<br>`, 'success');
                         } else {
-                            MY_API.chatLog(`[天选时刻] 天选（id=${data[0]}）参加失败 ${response.msg}`, 'warning')
+                            MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id=${data[0]}<br>奖品：${data[4]}<br> ${response.msg}`, 'warning')
                         }
+                    }, () => {
+                        MY_API.chatLog(`[天选时刻] 天选参加出错，请检查网络`, 'error');
+                        return delayCall(() => MY_API.AnchorLottery.join(data));
                     })
                 },
-                run: async () => {
+                run: () => {
                     if (!MY_API.CONFIG.ANCHOR_LOTTERY) return $.Deferred().resolve();
                     const settingIntervalTime = MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000;
                     async function getRoomListAndJoin() {
                         await MY_API.AnchorLottery.getRoomList();
-                        MY_API.chatLog(`[天选时刻] 开始检查天选`, 'success');
-                        const config = JSON.parse(localStorage.getItem(`${NAME}AnchorRoomidList`)) || {"list":[]};
+                        const config = JSON.parse(localStorage.getItem(`${NAME}AnchorRoomidList`)) || { "list": [] };
                         const id_list = [...config.list];
+                        MY_API.chatLog(`[天选时刻] 开始检查天选（共${id_list.length}个房间）`, 'success');
                         for (const room of id_list) {//
                             await MY_API.AnchorLottery.check(room).then((re) => {
                                 if (!!re[0]) {
-                                    MY_API.AnchorLottery.join(re)
+                                    return MY_API.AnchorLottery.join(re)
                                 }
                             });
                             await sleep(MY_API.CONFIG.ANCHOR_INTERVAL);
                         };
                         MY_API.CACHE.AnchorLottery_TS = ts_ms();
                         MY_API.saveCache();
-                        MY_API.chatLog(`[天选时刻] 本次轮询结束。${MY_API.CONFIG.ANCHOR_CHECK_INTERVAL}分钟后再次检查天选`, 'success');
+                        MY_API.chatLog(`[天选时刻] 本次轮询结束<br>${MY_API.CONFIG.ANCHOR_CHECK_INTERVAL}分钟后再次检查天选`, 'success');
                         return setTimeout(() => getRoomListAndJoin(), settingIntervalTime);
                     };
                     const intervalTime = ts_ms() - MY_API.CACHE.AnchorLottery_TS;
                     const waitTime = intervalTime >= MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000 ? 0 : intervalTime;
-                    MYDEBUG('[天选时刻]',`将在${waitTime}毫秒后再次检查天选`);
+                    MYDEBUG('[天选时刻]', `将在${waitTime}毫秒后再次检查天选`);
                     return setTimeout(() => getRoomListAndJoin(), waitTime);
                 }
             }
@@ -3587,6 +3641,8 @@
     function StartPlunder(API) {
         'use strict';
         //清空辣条数量
+        //API.chatLog(`<a href="https://bilibili.com" target="_blank">测试</a>`)
+        //API.chatLog(`${linkMsg('测试', 'https://bilibili.com')}`)
         let clearStat = () => {
             API.GIFT_COUNT.COUNT = 0;
             API.GIFT_COUNT.CLEAR_TS = dateNow();
@@ -3734,7 +3790,6 @@
             return intervalTime
         }
     }
-
     /**
      * （23,50） 当前时间是否为23:50
      * @param hour 整数 小时
