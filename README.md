@@ -7,13 +7,11 @@
 
 -------------------------------
 
-### 点击以下任一链接安装脚本
-### 1.githubusercontent源：[BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)&nbsp;&nbsp;&nbsp;[BLTH_Origin_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)  
-### 2.greasyfork源： [BLTH_Origin_greasyfork](https://greasyfork.org/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B/code/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
-### 3.openuserjs源：[BLTH_Origin_openuserjs](https://openuserjs.org/install/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)  
+### 安装方法
+### 1.点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 githubusercontent 安装脚本。    
+### 2.点击 [BLTH_Origin_greasyfork](https://greasyfork.org/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B/code/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 或 [BLTH_Origin_openuserjs](https://openuserjs.org/install/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 前往 greasyfork/openuserjs 安装脚本。  
 
 带有Origin字样的为原格式脚本，其余为压缩脚本。建议安装压缩脚本。  
-githubusercontent源的原格式脚本需自行复制到Tampermonkey中新建脚本进行安装。  
 
 -------------------------------
 
@@ -26,6 +24,14 @@ githubusercontent源的原格式脚本需自行复制到Tampermonkey中新建脚
 + 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新页面。  
 + 部分设置更改后需要刷新页面才能生效。  
 + 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。  
++ 修改浏览器Referer设置
+
+   建议通过修改浏览器设置不发送或缩减Referer。
+   + Chrome  
+   在地址栏输入`chrome://flags/`，搜索`Reduce default 'referer' header granularity`和`Prefetch request properties are updated to be privacy-preserving`，将这两个功能设置为`Enabled`。
+   + FireFox  
+   在地址栏输入`about:config`，搜索`network.http.sendRefererHeader`，把这个设置的值改为`0`。
+
 
 交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天或者提点建议~    
 
@@ -150,6 +156,7 @@ githubusercontent源的原格式脚本需自行复制到Tampermonkey中新建脚
   + 白名单：点亮【自动点亮勋章房间号】所对应的粉丝勋章。
   + 黑名单：点亮所有粉丝勋章中除了【自动点亮勋章房间号】所对应勋章的粉丝勋章。  
   _提示：如果想点亮所有勋章，选黑名单然后不填写拥有勋章的房间号即可。_  
++ B站随时可以通过APP客户端热更新使该功能失效。  
 
 #### 弹幕设置
 + 弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号`,`隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。  
@@ -177,14 +184,22 @@ githubusercontent源的原格式脚本需自行复制到Tampermonkey中新建脚
 
 #### 金宝箱抽奖
 + 【忽略关键字】中每一项之间用半角逗号`,`隔开。  
-+ 【忽略关键字】可以填正则表达式。正则格式为以`/`开头且以`/`结尾，如`/测.*试/`。  
++ 【忽略关键字】可以填正则表达式。正则格式为以`/`开头且以`/`结尾，如`/测.*试/`。
+
+推荐正则教程：[正则表达式30分钟入门教程](https://deerchao.cn/tutorials/regex/regex.htm) by [deerchao](https://deerchao.cn/)  
+
 + 【检测到__个不存在活动的aid后停止检测】如果你不理解此项保持默认配置即可。  
 
 #### 天选时刻
 + 【忽略关键字】中每一项之间用半角逗号`,`隔开。  
 + 【忽略关键字】可以填正则表达式。正则格式为以`/`开头且以`/`结尾，如`/测.*试/`。  
-+ 【请求间隔_毫秒】轮询天选和取关时每次请求间的间隔时间。如果间隔时间过短可能会被风控。  
-  _注：轮询天选时本就存在一个微小的间隔，流程为：发出请求 - 等待回复 - 等待一个间隔时间 - 发出下一个请求。而取消关注时不会等待回复。_  
+
+分享一个来自群友的正则：`/(([^十百千万拾佰仟01234][零0oO]|^[零0oO])[\.点、。][01234一二三四零壹贰叁肆Oo])|[01234一二三四零壹贰叁肆Oo][分]|(图片|照片|写真|相片|排位|车位|一起|代打|好友|专属头衔|素颜照|卸妆照|美照|皮肤|空气)/`
+
++ 【请求间隔_毫秒】轮询天选，取关，获取粉丝勋章信息时每两个请求间的间隔时间。如果间隔时间过短可能会被风控。  
+
+  _注：每两个请求间本就存在一个微小的间隔，流程为：发出请求 - 等待回复 - 等待一个间隔时间 - 发出下一个请求。_  
+  
 + 【保存当前关注列表为白名单】【取关不在白名单内的UP主】参加天选时会关注很多UP。可以在参加天选前点击【保存当前关注列表为白名单】，参与完天选后再点【取关不在白名单内的UP主】来清理关注列表。不建议频繁清理，可能会被风控。  
 + 轮询的房间来源于各分区小时榜和热门房间列表。  
 + 轮询房间占用资源较多，若出现卡顿请尝试降低【检查房间最大数量】。  
@@ -212,7 +227,6 @@ githubusercontent源的原格式脚本需自行复制到Tampermonkey中新建脚
 1. [#12](https://github.com/andywang425/BLTH/issues/12)  
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后，打开`启用Ajax Hook API`。  
 2. 脚本每次更新后第一次运行可能会不工作，刷新一下页面即可。   
-3. 在有多层嵌套iframe的直播间运行时，可能会看不到提示信息，但不影响使用。  
 
 -------------------------------
 
@@ -244,7 +258,7 @@ githubusercontent源的原格式脚本需自行复制到Tampermonkey中新建脚
 -------------------------------
 
 ## 更新日志
->### 5.0.1
->天选时刻模块bug修复和优化。  
+>### 5.0.2
+>修复小心心模块的token获取问题；修复了单选框设置保存无效的bug；天选时刻：现在可以参加拥有符合要求粉丝勋章的天选了；取关时也会等待回复。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
