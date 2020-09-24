@@ -1,17 +1,18 @@
 // ==UserScript==
-// @name         BilibiliAPI_mod
-// @namespace    https://github.com/SeaLoong
-// @version      1.7
-// @description  BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
-// @author       SeaLoong, andywang425
+// @name          BilibiliAPI_mod
+// @namespace     https://github.com/SeaLoong
+// @version       1.7
+// @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
+// @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
-// @grant        none
-// @include       * 
-// @license      MIT
+// @grant         none
+// @include       *
+// @license       MIT
 // ==/UserScript==
 
-let csrf_token, visit_id;
-
+let csrf_token, visit_id,
+    ts_ms = () => Date.now(),//当前毫秒
+    ts_s = () => Math.round(ts_ms() / 1000);//当前秒
 var BilibiliAPI = {
     setCommonArgs: (csrfToken = '', visitId = '') => {
         csrf_token = csrfToken;
@@ -64,7 +65,7 @@ var BilibiliAPI = {
     Storm: {
         check: (roomid) => BilibiliAPI.lottery.Storm.check(roomid),
         join: (id, captcha_token, captcha_phrase, roomid, color) => BilibiliAPI.lottery.Storm.join(id, captcha_token, captcha_phrase, roomid, color),
-        join_ex: (id, roomid ,access_token, appKey, headers, captcha_token = "", captcha_phrase = "", color = 16777215) => BilibiliAPI.lottery.Storm.join_ex(id, roomid ,access_token, appKey, headers, captcha_token = "", captcha_phrase = "", color = 16777215)
+        join_ex: (id, roomid, access_token, appKey, headers, captcha_token = "", captcha_phrase = "", color = 16777215) => BilibiliAPI.lottery.Storm.join_ex(id, roomid, access_token, appKey, headers, captcha_token = "", captcha_phrase = "", color = 16777215)
     },
     HeartBeat: {
         web: () => BilibiliAPI.user.userOnlineHeart(),
@@ -593,7 +594,7 @@ var BilibiliAPI = {
                 url: '//api.vc.bilibili.com/link_group/v1/member/buy_medal',
                 data: {
                     master_uid: master_uid,
-                    coin_type: coin_type,      
+                    coin_type: coin_type,
                     platform: platform,
                 },
             })
@@ -729,24 +730,24 @@ var BilibiliAPI = {
                     }
                 });
             },
-            join_ex: (id, roomid ,access_token, appKey, headers/*, captcha_token = "", captcha_phrase = "", color = 16777215*/) => {
+            join_ex: (id, roomid, access_token, appKey, headers/*, captcha_token = "", captcha_phrase = "", color = 16777215*/) => {
                 // 参加节奏风暴
                 let param = TokenUtil.signQuery(KeySign.sort({
-                    id:id,
-                    access_key:access_token,
-                    appkey:appKey,
-                    actionKey:'appkey',
-                    build:5561000,
-                    channel:'bili',
-                    device:'android',
-                    mobi_app:'android',
-                    platform:'android',
+                    id: id,
+                    access_key: access_token,
+                    appkey: appKey,
+                    actionKey: 'appkey',
+                    build: 5561000,
+                    channel: 'bili',
+                    device: 'android',
+                    mobi_app: 'android',
+                    platform: 'android',
                 }));
                 return BilibiliAPI.ajaxWithCommonArgs({
                     method: 'POST',
                     url: `xlive/lottery-interface/v1/storm/Join?${param}`,
-                    headers:headers,
-                    roomid:roomid
+                    headers: headers,
+                    roomid: roomid
                 });
             }
         },
@@ -834,10 +835,10 @@ var BilibiliAPI = {
             5    电台小时榜
             6    单机小时榜
         */
-        getTopRealTimeHour:(areaId) => {
+        getTopRealTimeHour: (areaId) => {
             return BilibiliAPI.ajax({
                 url: 'rankdb/v1/Rank2018/getTop?type=master_realtime_hour&type_id=areaid_realtime_hour'
-                + `&area_id=${areaId}`
+                    + `&area_id=${areaId}`
             })
         }
     },
@@ -868,7 +869,7 @@ var BilibiliAPI = {
                 url: 'relation/v1/Feed/IsUserFollow?follow=' + follow
             });
         },
-        getFollowings: (vmid, pn=1, ps=20, order='desc', jsonp='jsonp',callback='') => {//获取关注列表
+        getFollowings: (vmid, pn = 1, ps = 20, order = 'desc', jsonp = 'jsonp', callback = '') => {//获取关注列表
             return BilibiliAPI.ajax({
                 url: '//api.bilibili.com/x/relation/followings',
                 data: {
@@ -1062,7 +1063,7 @@ var BilibiliAPI = {
         getUserSpace: (mid, ps, tid, pn, keyword, order, jsonp) => { //查看用户动态
             return BilibiliAPI.ajax({
                 url: '//api.bilibili.com/x/space/arc/search',
-                data:{
+                data: {
                     mid: mid, //uid
                     ps: ps, //30
                     tid: tid, //0
@@ -1217,7 +1218,8 @@ var BilibiliAPI = {
         anchor: {
             check: (roomid) => {
                 return BilibiliAPI.ajax({
-                    url: 'xlive/lottery-interface/v1/Anchor/Check?roomid=' + roomid
+                    url: 'xlive/lottery-interface/v1/Anchor/Check?roomid=' + roomid,
+                    Referer: 'https://live.bilibili.com/' + roomid
                 })
             },
             join: (id, gift_id, gift_num, platform = 'pc') => {
@@ -1236,7 +1238,7 @@ var BilibiliAPI = {
                 })
             }
         }
-    
+
     },
     YearWelfare: {
         checkFirstCharge: () => {
@@ -1490,54 +1492,77 @@ var BilibiliAPI = {
             return this.sendData('[object Object]', 1, 2, 1);
         }
     },
-    /**
-* 发送直播弹幕
-* @param msg
-* @param roomid
-*/
-    sendLiveDanmu: (msg, roomid) => {
-        let ndate = new Date();
+    sendLiveDanmu: (msg, roomid, color = '16777215', fontsize = '25', mode = '1', bubble = '0') => {
         return BilibiliAPI.ajaxWithCommonArgs({
             method: 'POST',
             url: 'msg/send',
             data: {
-                color: '16777215',
-                fontsize: '25',
-                mode: '1',
+                color: color,
+                fontsize: fontsize,
+                mode: mode,
                 msg: msg,
-                rnd: ndate.getTime(),
+                rnd: ts_ms(),
                 roomid: roomid,
-                bubble: '0'
+                bubble: bubble
 
             }
         });
+    },//发私信
+    sendMsg: (msg, build = 0, mobi_app = 'web') => {
+        return BilibiliAPI.ajaxWithCommonArgs({
+            method: 'POST',
+            url: '//api.vc.bilibili.com/web_im/v1/web_im/send_msg ',
+            data: {
+                'msg[sender_uid]': msg['sender_uid'],
+                'msg[receiver_id]': msg['receiver_id'],
+                'msg[receiver_type]': msg['receiver_type'] || 1,
+                'msg[msg_type]': msg['msg_type'] || 1,
+                'msg[msg_status]': msg['msg_status'] || 0,
+                'msg[content]': msg['content'],
+                'msg[timestamp]': ts_s(),
+                'msg[dev_id]': msg['dev_id'],
+                'build': build,
+                'mobi_app': mobi_app
+            }
+        });
     },
+    /*样例
+    var msg = {
+        sender_uid: 358483030,
+        receiver_id: 588780270,
+        receiver_type: 1,
+        msg_type: 1,
+        msg_status: 0,
+        content: `{"content":"测试"}`,
+        dev_id: '372778FD-E359-461D-86A3-EA2BCC6FF52A'
+    }
+    */
     /**
     * 获取cookie
     * @param name
     * @returns {string|boolean}
     */
-    getCookie:(name) => {
+    getCookie: (name) => {
         let cookies = document.cookie.split(';');
         let c;
-        for(var i=0; i<cookies.length ; i++){
-         c = cookies[i].split('=');
-         if (c[0].replace(' ', '') == name) {
-          return decodeURIComponent(c[1]);
-         }
+        for (var i = 0; i < cookies.length; i++) {
+            c = cookies[i].split('=');
+            if (c[0].replace(' ', '') == name) {
+                return decodeURIComponent(c[1]);
+            }
         }
-       },
-       //
+    },
+    //
     /**
     * 合并请求参数
     * @param obj
     * @returns {string}
     */
-    KeySign : {
-        sort:(obj)=>{
+    KeySign: {
+        sort: (obj) => {
             let keys = Object.keys(obj).sort();
-            let p=[];
-            for(let key of keys){
+            let p = [];
+            for (let key of keys) {
                 p.push(`${key}=${obj[key]}`);
             }
             return p.join('&');
