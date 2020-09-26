@@ -8,8 +8,8 @@
 -------------------------------
 
 ### 安装方法
-### 1.点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 githubusercontent 安装脚本    
-### 2.点击 [BLTH_Origin_greasyfork](https://greasyfork.org/zh-CN/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 或 [BLTH_Origin_openuserjs](https://openuserjs.org/scripts/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 greasyfork/openuserjs 安装脚本  
+### 1. 点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 githubusercontent 安装脚本    
+### 2. 点击 [BLTH_Origin_greasyfork](https://greasyfork.org/zh-CN/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 或 [BLTH_Origin_openuserjs](https://openuserjs.org/scripts/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 greasyfork/openuserjs 安装脚本  
 
 带有Origin字样的为原格式脚本，其余为压缩脚本。建议安装压缩脚本。  
 
@@ -33,7 +33,7 @@
    在地址栏输入`about:config`，搜索`network.http.sendRefererHeader`，把这个设置的值改为`0`。
 
 
-交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天或者提点建议~    
+交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)（入群问题答案：B站直播间挂机助手），欢迎进来聊天或者提点建议~    
 
 -------------------------------
 
@@ -55,7 +55,7 @@
 </ul>
 </details>
 <details>
-<summary>自动参加金宝箱（实物）抽奖</summary>
+<summary>自动参加实物（金宝箱）抽奖</summary>
 <ul>
 <li>忽略含特定关键字或匹配特定正则表达式的存疑抽奖</li>
 </ul>
@@ -182,7 +182,7 @@
 
   脚本会在该时间点发一条弹幕（如`13:30:10`就是在下午1点30分10秒的时候发弹幕）。  
 
-#### 金宝箱抽奖
+#### 实物抽奖
 + 【忽略关键字】中每一项之间用半角逗号`,`隔开。  
 + 【忽略关键字】可以填正则表达式。正则格式为以`/`开头且以`/`结尾，如`/测.*试/`。
 
@@ -214,7 +214,7 @@
 + 支持输入框回车保存。  
 
 #### 运行日志
-1. 普通的日志可以点击聊天区上方，大航海右侧的【脚本日志】查看。  
+1. 普通的日志可以点击聊天区上方，大航海右侧的【日志】查看。  
 2. 脚本默认开启控制台日志，打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。若想关闭日志可以在脚本头部加入`console.log = () => {}`。  
 如果使用脚本过程中遇到问题，可以在控制台中寻找相关错误信息。
 
@@ -253,12 +253,16 @@
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式  
 
-感谢以上这些项目的作者~  
+-------------------------------
+
+## 鸣谢
+[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[X-Holmes](https://github.com/X-Holmes)  
+以及所有提出过建议的用户。
 
 -------------------------------
 
 ## 更新日志
->### 5.0.2
->修复小心心模块的token获取问题；修复了单选框设置保存无效的bug；天选时刻：现在可以参加拥有符合要求粉丝勋章的天选了；取关时也会等待回复。  
+>### 5.1
+>新功能：实物/天选中奖后通过方糖推送通知；忽略关键字编辑方式优化；新增按钮点击特效；实物/天选参与抽奖后会追踪获奖情况，若中奖则在日志区域显示金色日志，通过方糖推送通知（如果开启），并在日志右上角显示小红点；修复自动投币的一些bug；各种运行效率上的优化。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
