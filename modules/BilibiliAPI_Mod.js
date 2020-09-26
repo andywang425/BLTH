@@ -99,7 +99,7 @@ var BilibiliAPI = {
         BilibiliAPI.runUntilSucceed(() => {
             if (BilibiliAPI.processing > 8) return false;
             ++BilibiliAPI.processing;
-            return jQuery.ajax(settings).then((arg1, arg2, arg3, ) => {
+            return jQuery.ajax(settings).then((arg1, arg2, arg3,) => {
                 --BilibiliAPI.processing;
                 p.resolve(arg1, arg2, arg3);
                 return true;
@@ -1552,7 +1552,6 @@ var BilibiliAPI = {
             }
         }
     },
-    //
     /**
     * 合并请求参数
     * @param obj
