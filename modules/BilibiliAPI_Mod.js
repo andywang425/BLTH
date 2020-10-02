@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       1.7
+// @version       1.8
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -1215,11 +1215,19 @@ var BilibiliAPI = {
                 url: 'xlive/web-ucenter/v1/sign/DoSign'
             });
         },
+        getDanmuInfo: (id, type = 0) => {
+            return BilibiliAPI.ajax({
+                url: 'xlive/web-room/v1/index/getDanmuInfo',
+                data: {
+                    id: id,//roomid
+                    type: type
+                }
+            });
+        },
         anchor: {
             check: (roomid) => {
                 return BilibiliAPI.ajax({
-                    url: 'xlive/lottery-interface/v1/Anchor/Check?roomid=' + roomid,
-                    Referer: 'https://live.bilibili.com/' + roomid
+                    url: 'xlive/lottery-interface/v1/Anchor/Check?roomid=' + roomid
                 })
             },
             join: (id, gift_id, gift_num, platform = 'pc') => {
@@ -1227,7 +1235,7 @@ var BilibiliAPI = {
                     id: id,//通过anchor.check获取
                     platform: platform
                 };
-                if (gift_id !== undefined || gift_num !== undefined) {
+                if (gift_id !== undefined && gift_num !== undefined) {
                     data.gift_id = gift_id;
                     data.gift_num = gift_num;
                 };
@@ -1570,4 +1578,3 @@ var BilibiliAPI = {
 }
 
 BilibiliAPI.DanmuWebSocket.headerLength = 16;
-
