@@ -21,17 +21,28 @@
 -------------------------------
 
 ### 一些建议
-+ 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新页面。  
++ 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新(`shift+F5`)页面。  
 + 部分设置更改后需要刷新页面才能生效。  
 + 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。  
-+ 修改浏览器Referer设置
++ 建议通过修改浏览器设置缩减或不发送Referer。
+  <details>
+  <summary>点击展开具体方法</summary>
+  <ul>
 
-   建议通过修改浏览器设置不发送或缩减Referer。
    + Chrome  
-   在地址栏输入`chrome://flags/`，搜索`Reduce default 'referer' header granularity`和`Prefetch request properties are updated to be privacy-preserving`，将这两个功能设置为`Enabled`。
-   + FireFox  
+   在地址栏输入`chrome://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
+   + Edge  
+   在地址栏输入`edge://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
+   + FireFox   
    在地址栏输入`about:config`，搜索`network.http.sendRefererHeader`，把这个设置的值改为`0`。
 
+   </ul>
+
+  + 建议这样做的原因：
+  B站直播间api在被调用时，其referer值为`https://live.bilibili.com/当前房间号`。所以若不修改设置，脚本发出的相当一部分api请求所携带的referer值是不合理的。如在直播间`777`使用脚本，参加了直播间`666`的天选时刻，那么发出请求所携带的referer值就是`https://live.bilibili.com/777`。但正常情况下天选时刻只能在对应房间参加，如果B站有相关检测的话很容易发现刚刚那个请求是异常的。  
+  + 请注意：
+  某些网站为了防盗链要求referer必须为本站链接，不发送referer可能导致无法正常访问这些网站。同时不发送referer还可能会影响网站的广告收入。  
+  </details>
 
 交流群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)（入群问题答案：B站直播间挂机助手），欢迎进来聊天或者提点建议~    
 
@@ -67,6 +78,7 @@
 <li>含特定关键字或匹配特定正则表达式的存疑天选</li>  
 <li>保存当前关注列表为白名单</li>  
 <li>取关不在白名单内的UP主</li>   
+<li>上传天选信息至自己的直播间/从特定直播间获取天选信息</li>
 </ul>
 </details>
 <details>
@@ -102,15 +114,15 @@
 ## 说明
 #### 关于脚本代码格式
 本脚本在三个平台上的代码格式有所不同
-+ github: 压缩和原格式都有
-+ openuserjs: 第一次安装为原格式，若用tampermonkey更新则会变为压缩格式
++ github: 压缩和原格式（更新后变为压缩格式）都有
++ openuserjs: 原格式（更新后变为压缩格式）
 + greasyfork: 原格式
 
 注：项目文件中的[B站直播间挂机助手.user.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)是压缩后的脚本。  
 原格式的脚本为[B站直播间挂机助手.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)。  
 
 #### 输入数据格式
-+ 浮点数(小数)或整数: 抽奖-抽奖前附加随机延迟，随机跳过礼物；弹幕-发送时间（或时间格式）。  
++ 浮点数(小数)或整数: 抽奖-抽奖前附加随机延迟，随机跳过礼物；弹幕-发送时间（或时间格式）；天选时刻-获取数据间隔。  
 + 数组(或单个数据): 送礼-优先送礼房间，不送礼房间；小心心-自动点亮勋章房间号；弹幕-房间号，间隔时间(此项可填浮点数)；抽奖-忽略关键字。  
 + 其余只支持整数。  
 
@@ -141,7 +153,6 @@
 
 #### 节奏风暴
 + 仅会参加被广播的节奏风暴。若无法参加请尝试实名后再参加。  
-+ 这个功能目前处于实验阶段，且风险较大。  
 
 #### 内容屏蔽
 + 【屏蔽挂机检测】脚本每十分钟触发一次页面可见性改变事件防检测。  
@@ -161,7 +172,8 @@
 #### 弹幕设置
 + 弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号`,`隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。  
 + 若有多条弹幕需要发送，每条弹幕间会有1.1秒的间隔时间。  
-+ 如果数据没对齐，缺失的数据会自动向前对齐。如填写`弹幕内容 lalala`，`房间号 3,4`，`发送时间 5m,10:30`，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。  
++ 如果数据没对齐，缺失的数据会自动向前对齐。如填写`弹幕内容 lalala`，`房间号 3,4`，`发送时间 5m,10:30`，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。 
++ 房间号的默认值是我的直播间号，可以用来测试。   
 + 发送时间有两种填写方法
 
   1.【小时】h【分钟】m【秒】s  
@@ -180,10 +192,10 @@
   + 只能填整数
   + 小时分钟必须填写，秒数可以不填  
 
-  脚本会在该时间点发一条弹幕（如`13:30:10`就是在下午1点30分10秒的时候发弹幕）。  
+  脚本会在该时间点发一条弹幕（如`13:30:10`就是在下午1点30分10秒的时候发弹幕）。
 
 #### 实物抽奖
-+ 【忽略关键字】中每一项之间用半角逗号`,`隔开。  
++ 【忽略关键字】中每一项之间用半角逗号`,`隔开。若标题中含有忽略关键字则跳过该抽奖。  
 + 【忽略关键字】可以填正则表达式。正则格式为以`/`开头且以`/`结尾，如`/测.*试/`。
 
 推荐正则教程：[正则表达式30分钟入门教程](https://deerchao.cn/tutorials/regex/regex.htm) by [deerchao](https://deerchao.cn/)  
@@ -191,18 +203,22 @@
 + 【检测到__个不存在活动的aid后停止检测】如果你不理解此项保持默认配置即可。  
 
 #### 天选时刻
-+ 【忽略关键字】中每一项之间用半角逗号`,`隔开。  
++ 【忽略关键字】中每一项之间用半角逗号`,`隔开。若奖品名中含有忽略关键字则跳过该天选。  
 + 【忽略关键字】可以填正则表达式。正则格式为以`/`开头且以`/`结尾，如`/测.*试/`。  
 
 分享一个来自群友的正则：`/(([^十百千万拾佰仟01234][零0oO]|^[零0oO])[\.点、。][01234一二三四零壹贰叁肆Oo])|[01234一二三四零壹贰叁肆Oo][分]|(图片|照片|写真|相片|排位|车位|一起|代打|好友|专属头衔|素颜照|卸妆照|美照|皮肤|空气)/`
 
-+ 【请求间隔_毫秒】轮询天选，取关，获取粉丝勋章信息时每两个请求间的间隔时间。如果间隔时间过短可能会被风控。  
++ 【请求间隔_毫秒】轮询天选，取关，获取粉丝勋章信息，获取房间列表时每两个请求间的间隔时间。如果间隔时间过短可能会被风控。  
++ 【发出请求后等待回复】勾选后发出轮询天选，取关的请求后会等待回复，收到回复后等待一个间隔时间再发起下一个请求。  
 
-  _注：每两个请求间本就存在一个微小的间隔，流程为：发出请求 - 等待回复 - 等待一个间隔时间 - 发出下一个请求。_  
+  _流程：发出请求 - 等待回复 - 等待一个间隔时间 - 发出下一个请求_  
   
 + 【保存当前关注列表为白名单】【取关不在白名单内的UP主】参加天选时会关注很多UP。可以在参加天选前点击【保存当前关注列表为白名单】，参与完天选后再点【取关不在白名单内的UP主】来清理关注列表。不建议频繁清理，可能会被风控。  
-+ 轮询的房间来源于各分区小时榜和热门房间列表。  
-+ 轮询房间占用资源较多，若出现卡顿请尝试降低【检查房间最大数量】。  
++ 轮询的房间来源于各分区小时榜和热门房间列表。获取到房间列表后脚本会缓存起来以供后续使用，若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。  
++ 【检查房间最大数量】并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。   
++ 【上传天选数据至直播间个人简介】使用这个功能前你必须先拥有自己的直播间。
++ 【从直播间__的个人简介获取天选时刻数据】默认值写了我的直播间号，但我不会24小时挂着脚本，所以大多数时候从我这个直播间获取的数据都是过期的，所以仅用于测试。这个功能主要是为了减少同时挂多个账号时的请求数量，减少风控的概率。以后（因为我写这个文档的时候脚本还没发布）q群的群在线文档中可能会有一些群友上传的能提供天选数据的直播间号。
++ 上传的直播间号是经过base64编码的数组。数组内容为检测时有正在进行的天选时刻的房间号。如果直接上传原数组可能会被认为有违法内容，原因不明。  
 
 #### 购买粉丝勋章
 + 调用官方api（`api.vc.bilibili.com/link_group/v1/member/buy_medal`），消耗20硬币购买某位UP的粉丝勋章。  
@@ -215,7 +231,7 @@
 
 #### 运行日志
 1. 普通的日志可以点击聊天区上方，大航海右侧的【日志】查看。  
-2. 脚本默认开启控制台日志，打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。若想关闭日志可以在脚本头部加入`console.log = () => {}`。  
+2. 脚本默认开启控制台日志，打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。若想关闭日志可以在脚本中搜索`debugSwitch`，把值改成`0`。  
 如果使用脚本过程中遇到问题，可以在控制台中寻找相关错误信息。
 
 #### 关于反馈
@@ -226,7 +242,7 @@
 ## 已知问题
 1. [#12](https://github.com/andywang425/BLTH/issues/12)  
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后，打开`启用Ajax Hook API`。  
-2. 脚本每次更新后第一次运行可能会不工作，刷新一下页面即可。   
+2. 脚本每次更新后第一次运行可能会不工作，`shift+F5`刷新一下页面即可。   
 
 -------------------------------
 
@@ -242,13 +258,15 @@
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/BLRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
 + [layer](https://github.com/sentsin/layer) (MIT) by [sentsin](https://github.com/sentsin)  
++ [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT) by [wendux](https://github.com/wendux)
 
 本脚本使用的库：  
 + [jquery](https://github.com/jquery/jquery) (MIT)  
 + [BilibiliAPI_Mod.min.js](https://github.com/andywang425/BLTH/blob/master/library_files/BilibiliAPI_Mod.js) (MIT)：B站API及常用函数。  
 + [libBilibiliToken.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libBilibiliToken/libBilibiliToken.js) (MIT)：获取移动端token。  
 + [libWasmHash.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libWasmHash/libWasmHash.js) (MIT)：WebAssembly实现的Hash，计算心跳请求参数。  
-+ [layer.js](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：创建弹窗，信息框等  
++ [layer.js](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web弹层组件。  
++ [Ajax-hook.min.js](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器XMLHttpRequest的库。  
 
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式  
@@ -256,13 +274,13 @@
 -------------------------------
 
 ## 鸣谢
-[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[X-Holmes](https://github.com/X-Holmes)  
+[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://greasyfork.org/zh-CN/users/429735-%E9%A3%8E%E7%BB%AB%E4%B8%A8%E9%92%B0%E8%A2%96)  
 以及所有提出过建议的用户。
 
 -------------------------------
 
 ## 更新日志
->### 5.1
->新功能：实物/天选中奖后通过方糖推送通知；忽略关键字编辑方式优化；新增按钮点击特效；实物/天选参与抽奖后会追踪获奖情况，若中奖则在日志区域显示金色日志，通过方糖推送通知（如果开启），并在日志右上角显示小红点；修复自动投币的一些bug；各种运行效率上的优化。  
+>### 5.2
+>不再使用GM函数GM_addStyle；日志窗口滚动优化：如果日志按钮旁边有🚀图标，点击即可滚动到底部；滚动到底部后会在新日志出现时自动滚动；新功能：检测到未中奖后自动取关发起抽奖的UP，上传天选数据至直播间个人简介，从个人简介获取天选数据，隐身入场。各小时榜/分区检查优化。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
