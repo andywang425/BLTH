@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.2
+// @version        5.2.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -128,7 +128,7 @@
                                 default:
                                     type = 'info';
                             }
-                            const a = $(`<div class="link-toast ${type} fixed" style="z-index:9999"><span class="toast-text">${msg}</span></div>`)[0];
+                            const a = $(`<div class="link-toast ${type} fixed" style="z-index:20000"><span class="toast-text">${msg}</span></div>`)[0];
                             document.body.appendChild(a);
                             a.style.top = (document.body.scrollTop + list.length * 40 + 10) + 'px';
                             a.style.left = (document.body.offsetWidth + document.body.scrollLeft - a.offsetWidth - 5) + 'px';
@@ -317,10 +317,10 @@
                 ANCHOR_LOTTERY: false,//天选时刻
                 ANCHOR_AUTO_DEL_FOLLOW: false,//检测到未中奖自动取关
                 ANCHOR_MAXROOM: 1000,//天选检查房间最大数量
-                ANCHOR_MAXLIVEROOM_SAVE: 120,//天选上传保存房间最大数量
+                ANCHOR_MAXLIVEROOM_SAVE: 100,//天选上传保存房间最大数量
                 ANCHOR_CHECK_INTERVAL: 5,//天选检查间隔（分钟）
                 ANCHOR_IGNORE_BLACKLIST: true,//天选忽略关键字（选项）
-                ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金'],//天选忽略关键字
+                ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋'],//天选忽略关键字
                 ANCHOR_INTERVAL: 150,//天选（检查天选和取关）请求间隔
                 AHCHOR_NEED_GOLD: 0,//忽略所需金瓜子大于_的抽奖
                 ANCHOR_WAIT_REPLY: true,//请求后等待恢复
@@ -398,7 +398,7 @@
                 LittleHeart_TS: 0,//小心心
                 materialobject_ts: 0,//实物抽奖
                 AnchorLottery_TS: 0,
-                last_aid: 654,//实物抽奖最后一个有效aid
+                last_aid: 659,//实物抽奖最后一个有效aid
             },
             CONFIG: {},
             CACHE: {},
@@ -493,11 +493,12 @@
                                 if (layerMenuWindow_ScrollY < layerMenuWindow_ScrollHeight || layerMenuWindow_ScrollY === undefined)
                                     layerMenuWindow.scrollTop(layerMenuWindow.prop("scrollHeight"));
                             }
+                            return hideTab(true)
                         } else {
                             layer.style(menuIndex, {
                                 'display': 'none'
                             });
-                            return hideTab();
+                            return hideTab(false);
                         }
                     })
                 };
@@ -568,12 +569,16 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache === undefined || cache === null || cache != '5.2')) { //更新公告时需要修改
+                    if ((cache === undefined || cache === null || cache != '5.2.1')) { //更新公告时需要修改
                         layer.open({
                             title: `${version}更新提示`,
-                            content: `1.日志窗口滚动优化：如果日志按钮旁边有🚀图标，点击即可滚动到底部；滚动到底部后会在新日志出现时自动滚动；<br>
-                            <strong>2.新功能：检测到未中奖后自动取关发起抽奖的UP，
-                            上传天选数据至直播间个人简介，从个人简介获取天选数据，隐身入场。</strong><br>
+                            content: `
+                            <strong>5.2.1更新内容</strong><br>
+                            1.从个人简介获取天选数据时能显示所获取数据的最后上传时间（上传者必须更新脚本至5.2.1）<br>
+                            2.修复一些bug<br>
+                            <strong>5.2更新内容</strong><br>1.日志窗口滚动优化：如果日志按钮旁边有🚀图标，点击即可滚动到底部；滚动到底部后会在新日志出现时自动滚动；<br>
+                            2.新功能：检测到未中奖后自动取关发起抽奖的UP，
+                            上传天选数据至直播间个人简介，从个人简介获取天选数据，隐身入场。<br>
                             3.各小时榜/分区检查优化，不再遗漏。<br>
                             <hr>
                             <em style="color:grey;">
@@ -3535,12 +3540,11 @@
                 roomidList: [],
                 oldLotteryResponseList: [],
                 lotteryResponseList: [],
-                myLiveRoomid: undefined,
+                myLiveRoomid: 0,
                 followingList: [],
                 unfollowList: [],
                 medal_list: [],
                 waitForRecheckList: [],
-                ANCHOR_UPLOAD_DATA_INTERVAL: 1000,
                 getMedalList: async (page = 1) => {
                     if (page === 1) MY_API.AnchorLottery.medal_list = [];
                     return await BAPI.i.medal(page, 25).then((response) => {
@@ -3697,13 +3701,13 @@
                     return checkHourRank().then(async () => {
                         await checkRoomList();
                         if (MY_API.AnchorLottery.roomidList.length > MY_API.CONFIG.ANCHOR_MAXROOM)
-                            MY_API.AnchorLottery.roomidList.splice(MY_API.CONFIG.ANCHOR_MAXROOM, MY_API.AnchorLottery.roomidList.length - 1);
+                            MY_API.AnchorLottery.roomidList = MY_API.AnchorLottery.roomidList.splice(0, MY_API.CONFIG.ANCHOR_MAXROOM);
                         localStorage.setItem(`${NAME}AnchorRoomidList`, JSON.stringify({ list: MY_API.AnchorLottery.roomidList }));
                         return $.Deferred().resolve();
                     });
                 },
                 uploadRoomList: async () => {
-                    let description = undefined;
+                    let description = undefined, p = $.Deferred();
                     if (MY_API.AnchorLottery.lotteryResponseList.length === 0) {
                         await BAPI.room.getRoomBaseInfo(MY_API.CONFIG.ANCHOR_GETDATA_ROOM).then((response) => {
                             MYDEBUG(`API.room.getRoomBaseInfo(${MY_API.CONFIG.ANCHOR_GETDATA_ROOM})`, response);
@@ -3716,32 +3720,34 @@
                         }, () => {
                             MY_API.chatLog(`[天选时刻] 获取直播间个人简介出错，请检查网络`, 'error');
                         });
-                    }
-                    let lotteryInfoArray;
-                    try {
-                        lotteryInfoArray = await eval(decode64(description));
-                        if (!$.isArray(lotteryInfoArray)) {
+                        let lotteryInfoArray;
+                        try {
+                            lotteryInfoArray = await eval(decode64(description));
+                            if (!$.isArray(lotteryInfoArray) || !$.isArray(lotteryInfoArray[0])) {
+                                lotteryInfoArray = undefined
+                            }
+                        } catch (e) {
                             lotteryInfoArray = undefined
                         }
-                    } catch (e) { }
-                    if (lotteryInfoArray !== undefined) {
-                        for (const i of lotteryInfoArray) {
-                            MY_API.AnchorLottery.lotteryResponseList.push(i);//旧数据用push
+                        if (lotteryInfoArray !== undefined) {
+                            for (const i of lotteryInfoArray[0]) {
+                                MY_API.AnchorLottery.lotteryResponseList.push(i);//旧数据用push
+                            }
                         }
                     }
                     //console.log('测试 length old new', MY_API.AnchorLottery.oldLotteryResponseList, MY_API.AnchorLottery.lotteryResponseList)
                     if (MY_API.AnchorLottery.oldLotteryResponseList.length === MY_API.AnchorLottery.lotteryResponseList.length) {
-                        //console.log('测试 无新增数据，不运行以下部分')
-                        return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), MY_API.AnchorLottery.ANCHOR_UPLOAD_DATA_INTERVAL);
+                        console.log('测试 无新增数据，不运行以下部分')
+                        return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL * 1000);
                     }
-                    if (MY_API.AnchorLottery.myLiveRoomid === undefined) {
+                    if (MY_API.AnchorLottery.myLiveRoomid === 0) {
                         await BAPI.room.getRoomInfoOld(Live_info.uid).then((response) => {
                             MYDEBUG(`API.room.getRoomInfoOld(${Live_info.uid})`, response);
                             if (response.code === 0) {
-                                MY_API.AnchorLottery.myLiveRoomid = response.data.roomid;
+                                MY_API.AnchorLottery.myLiveRoomid = response.data.roomid;//没有则返回0
                             } else {
                                 MY_API.chatLog('[天选时刻] 获取直播间信息出错 ' + response.data.message, 'error');
-                                return $.Deferred().reject();
+                                return p.reject()
                             }
                         }, () => {
                             MY_API.chatLog('[天选时刻] 获取直播间信息出错，请检查网络', 'error');
@@ -3750,47 +3756,50 @@
                     }
                     if (MY_API.AnchorLottery.myLiveRoomid === 0) {
                         MY_API.chatLog('[天选时刻] 请先开通直播间再使用上传数据的功能', 'warning');
-                        return $.Deferred().reject();
+                        return p.reject()
                     }
 
-                    let uploadRawStr = '[';
+                    let uploadRawStr = '[[';
                     if (MY_API.AnchorLottery.lotteryResponseList.length > MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE)//删除超出的旧数据
-                        MY_API.AnchorLottery.lotteryResponseList.splice(MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE, MY_API.AnchorLottery.lotteryResponseList.length - 1)
+                        MY_API.AnchorLottery.lotteryResponseList = MY_API.AnchorLottery.lotteryResponseList.splice(0, MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE)
                     for (const r of MY_API.AnchorLottery.lotteryResponseList) {
                         uploadRawStr = uploadRawStr.concat(r + ',');
                     }
-                    uploadRawStr = uploadRawStr.concat(']');
+                    uploadRawStr = uploadRawStr.concat('],' + String(ts_ms()) + ']');// [[n个直播间], 时间戳]
                     //console.log('测试 uploadRawStr', uploadRawStr);
-                    function updateEncodeData(roomId, str) {
-                        return BAPI.room.update(roomId, str).then((re) => {
+                    async function updateEncodeData(roomId, str) {
+                        return await BAPI.room.update(roomId, str).then((re) => {
                             MYDEBUG(`BAPI.room.update MY_API.AnchorLottery.myLiveRoomid encode64(uploadRawStr)`, re);
                             if (re.code == 0) {
-                                MY_API.chatLog('[天选时刻] 房间列表上传成功', 'success');
+                                MY_API.chatLog(`[天选时刻] 房间列表上传成功（共${MY_API.AnchorLottery.lotteryResponseList.length}个房间）`, 'success');
                                 MY_API.AnchorLottery.oldLotteryResponseList = [...MY_API.AnchorLottery.lotteryResponseList];
-                                return $.Deferred().resolve();
+                                return p.resolve()
                             } else if (re.code === 1) {
                                 if (re.message === '出错啦，再试试吧') {
-                                    MY_API.chatLog('[天选时刻] 上传失败，5秒后再次尝试', 'warning');
-                                    return delayCall(() => updateEncodeData(roomId, str), 5e3);
+                                    MY_API.chatLog(`[天选时刻] 上传失败，${MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL}秒后再次尝试`, 'warning');
+                                    return p.resolve()
                                 } else if (re.message === '简介内容过长') {
                                     MY_API.chatLog('[天选时刻] 上传失败，内容过长，清空数据', 'warning');
                                     MY_API.AnchorLottery.lotteryResponseList = [];
-                                    return $.Deferred().resolve();
+                                    return p.resolve()
                                 } else {
                                     MY_API.chatLog('[天选时刻] 上传失败 ' + re.message, 'warning');
-                                    return $.Deferred().reject();
+                                    return p.reject()
                                 }
                             }
                             else {
                                 MY_API.chatLog('[天选时刻] 房间列表上传失败 ' + re.message, 'error');
-                                return $.Deferred().reject();
+                                return p.reject()
                             }
                         }, () => {
                             MY_API.chatLog('[天选时刻] 房间列表上传出错，请检查网络', 'error');
                             return delayCall(() => MY_API.AnchorLottery.uploadRoomList());
                         })
                     }
-                    return updateEncodeData(MY_API.AnchorLottery.myLiveRoomid, encode64(uploadRawStr)).then(() => setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), MY_API.AnchorLottery.ANCHOR_UPLOAD_DATA_INTERVAL));
+                    const encodeData = await encode64(uploadRawStr);
+                    return await updateEncodeData(MY_API.AnchorLottery.myLiveRoomid, encodeData).then(() => {
+                        return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL * 1000)
+                    });
                 },
                 getLotteryInfoFromRoom: async () => {
                     let description = undefined;
@@ -3809,14 +3818,15 @@
                     try {
                         if (description === undefined) throw "undefined"
                         lotteryInfoArray = await eval(decode64(description));
-                        if (!$.isArray(lotteryInfoArray)) {
+                        if (!$.isArray(lotteryInfoArray) || !$.isArray(lotteryInfoArray[0])) {
                             throw "Not a Array"
                         }
                     } catch (e) {
                         MY_API.chatLog(`[天选时刻] 直播间${MY_API.CONFIG.ANCHOR_GETDATA_ROOM}个人简介的数据格式不符合要求 ` + e, 'error');
                         return setTimeout(() => MY_API.AnchorLottery.getLotteryInfoFromRoom(), MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000);
                     }
-                    for (const room of lotteryInfoArray) {
+                    MY_API.chatLog(`[天选时刻] 开始检查天选（共${lotteryInfoArray[0].length}个房间）<br>数据来源：直播间${MY_API.CONFIG.ANCHOR_GETDATA_ROOM}的个人简介<br>该数据最后上传时间：${new Date(lotteryInfoArray[1]).toLocaleString()}`, 'success')
+                    for (const room of lotteryInfoArray[0]) {
                         if (MY_API.CONFIG.ANCHOR_WAIT_REPLY) {
                             await MY_API.AnchorLottery.check(room, false).then((re) => {
                                 if (!!re[0]) {
@@ -3978,7 +3988,6 @@
                 },
                 run: async () => {
                     if (!MY_API.CONFIG.ANCHOR_LOTTERY) return $.Deferred().resolve();
-                    MY_API.AnchorLottery.ANCHOR_UPLOAD_DATA_INTERVAL = MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL * 1000;
                     const settingIntervalTime = MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000;
                     MY_API.chatLog(`[天选时刻] 开始获取粉丝勋章信息`);
                     await MY_API.AnchorLottery.getMedalList();
@@ -3990,15 +3999,21 @@
                         await sleep(MY_API.CONFIG.ANCHOR_INTERVAL)
                     };
                     //console.log('测试 MY_API.CONFIG.ANCHOR_TYPE', MY_API.CONFIG.ANCHOR_TYPE)
+                    function waitForNextRun(Fn) {
+                        const intervalTime = ts_ms() - MY_API.CACHE.AnchorLottery_TS;
+                        const waitTime = intervalTime >= MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000 ? 0 : intervalTime;
+                        MYDEBUG('[天选时刻]', `将在${waitTime}毫秒后再次检查天选`);
+                        return setTimeout(() => Fn(), waitTime);
+                    }
                     if (MY_API.CONFIG.ANCHOR_TYPE == 'POLLING') {
+                        if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) {
+                            await MY_API.AnchorLottery.uploadRoomList();
+                        }
                         async function getRoomListAndJoin() {
                             await MY_API.AnchorLottery.getRoomList();
                             const config = JSON.parse(localStorage.getItem(`${NAME}AnchorRoomidList`)) || { "list": [] };
                             const id_list = [...config.list];
                             MY_API.chatLog(`[天选时刻] 开始检查天选（共${id_list.length}个房间）`, 'success');
-                            if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) {
-                                await MY_API.AnchorLottery.uploadRoomList();
-                            }
                             for (const room of id_list) {
                                 if (MY_API.CONFIG.ANCHOR_WAIT_REPLY) {
                                     await MY_API.AnchorLottery.check(room).then((re) => {
@@ -4020,16 +4035,9 @@
                             MY_API.chatLog(`[天选时刻] 本次轮询结束<br>${MY_API.CONFIG.ANCHOR_CHECK_INTERVAL}分钟后再次检查天选`, 'success');
                             return setTimeout(() => getRoomListAndJoin(), settingIntervalTime);
                         };
-                        const intervalTime = ts_ms() - MY_API.CACHE.AnchorLottery_TS;
-                        const waitTime = intervalTime >= MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000 ? 0 : intervalTime;
-                        MYDEBUG('[天选时刻]', `将在${waitTime}毫秒后再次检查天选`);
-                        return setTimeout(() => getRoomListAndJoin(), waitTime);
+                        return waitForNextRun(getRoomListAndJoin);
                     } else {
-                        const intervalTime = ts_ms() - MY_API.CACHE.AnchorLottery_TS;
-                        const waitTime = intervalTime >= MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000 ? 0 : intervalTime;
-                        MYDEBUG('[天选时刻]', `将在${waitTime}毫秒后再次检查天选`);
-                        return setTimeout(async () => MY_API.AnchorLottery.getLotteryInfoFromRoom(), waitTime);
-
+                        return waitForNextRun(MY_API.AnchorLottery.getLotteryInfoFromRoom);
                     }
                 }
             }
