@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.2.2
+// @version        5.2.3
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -208,22 +208,25 @@
         awardScrollCount = 0;
     newWindow.init();
     $(document).ready(() => {
-        ah.proxy({
-            onRequest: (XHRconfig, handler) => {
-                if (XHRconfig.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
-                    MYDEBUG('getInfoByUser request', XHRconfig);
-                    XHRconfig.url = '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser?room_id=114514114514';
+        const config = localStorage.getItem(`${NAME}_INVISIBLE_ENTER`);
+        if (config === "true") {
+            ah.proxy({
+                onRequest: (XHRconfig, handler) => {
+                    if (XHRconfig.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
+                        MYDEBUG('getInfoByUser request', XHRconfig);
+                        XHRconfig.url = '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser?room_id=114514114514';
+                    }
+                    handler.next(XHRconfig);
+                },
+                onResponse: (response, handler) => {
+                    if (response.config.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
+                        MYDEBUG('getInfoByUser response', response);
+                        response.response = response.response.replace('"is_room_admin":false', '"is_room_admin":true');
+                    }
+                    handler.next(response);
                 }
-                handler.next(XHRconfig);
-            },
-            onResponse: (response, handler) => {
-                if (response.config.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
-                    MYDEBUG('getInfoByUser response', response);
-                    response.response = response.response.replace('"is_room_admin":false', '"is_room_admin":true');
-                }
-                handler.next(response);
-            }
-        })
+            })
+        }
     });
     window.onload = () => {//所有元素和媒体资源加载完毕
         try {//唯一运行检测
@@ -243,8 +246,7 @@
             window.addEventListener('unload', () => {
                 if (timer_unique) {
                     clearTimeout(timer_unique);
-                    UNIQUE_CHECK_CACHE = 0;
-                    localStorage.setItem(`${NAME}_UNIQUE_CHECK_CACHE`, UNIQUE_CHECK_CACHE)
+                    localStorage.setItem(`${NAME}_UNIQUE_CHECK_CACHE`, 0)
                 }
             });
             uniqueMark();
@@ -320,7 +322,7 @@
                 ANCHOR_MAXLIVEROOM_SAVE: 100,//天选上传保存房间最大数量
                 ANCHOR_CHECK_INTERVAL: 5,//天选检查间隔（分钟）
                 ANCHOR_IGNORE_BLACKLIST: true,//天选忽略关键字（选项）
-                ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋'],//天选忽略关键字
+                ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车'],//天选忽略关键字
                 ANCHOR_INTERVAL: 150,//天选（检查天选和取关）请求间隔
                 AHCHOR_NEED_GOLD: 0,//忽略所需金瓜子大于_的抽奖
                 ANCHOR_WAIT_REPLY: true,//请求后等待恢复
@@ -328,6 +330,8 @@
                 ANCHOR_UPLOAD_DATA_INTERVAL: 10,//上传数据间隔
                 ANCHOR_TYPE: "POLLING",//天选模式
                 ANCHOR_GETDATA_ROOM: 22474988,//获取天选数据的直播间
+                ANCHOR_PRIVATE_LETTER: false,//中奖后给UP发一条私信
+                ANCHOR_LETTER_CONTENT: 'UP我中天选了，请问怎么领奖[doge]',//私信内容
                 CHECK_HOUR_ROOM: false,//检查小时榜
                 CHECK_HOUR_ROOM_INTERVAL: 600,//小时间检查间隔时间(秒)
                 COIN: false,//投币
@@ -569,13 +573,14 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache === undefined || cache === null || cache != '5.2.2')) { //更新公告时需要修改
+                    if ((cache === undefined || cache === null || cache != '5.2.3')) { //更新公告时需要修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            1.【检测到未中奖后自动取关发起抽奖的UP】不会取关在白名单中的UP。<br>
-                            2.一些细节上的优化。<br>
-                            <strong>3.【从直播间__的个人简介获取天选时刻数据】默认值为我的直播间号。我已在云上部署了脚本持续上传数据，可以尝试一下这个功能。</strong>
+                            1.新功能：检测到天选中奖后给发起抽奖的UP发一条私信<br>
+                            2.点击【取关不在白名单内的UP主】后会有确认窗口<br>
+                            3.修复【检测到未中奖后自动取关发起抽奖的UP】不生效的bug<br>
+                            4.添加【隐身入场】的设置，可自行决定是否开启。<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -1079,12 +1084,19 @@
                         发出请求后等待回复
                     </label>
                 </div>
-                <div data-toggle="ANCHOR_AUTO_DEL_FOLLOW" style="line-height: 25px">
-                <label style="margin: 5px auto; color: purple">
+                <div data-toggle="ANCHOR_AUTO_DEL_FOLLOW" style="line-height: 20px">
+                <label style="margin: 5px auto; color: black">
                     <input style="vertical-align: text-top;" type="checkbox">
-                    检测到未中奖后自动取关发起抽奖的UP
+                    检测到<strong style = "color: purple">未中奖</strong>后自动取关发起抽奖的UP
                 </label>
             </div>
+            <div data-toggle="ANCHOR_PRIVATE_LETTER" style="line-height: 25px">
+            <label style="margin: 5px auto; color: black">
+                <input style="vertical-align: text-top;" type="checkbox">
+                检测到<strong style = "color: purple">中奖</strong>后给发起抽奖的UP发一条私信
+                &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="edit_ANCHOR_LETTER_CONTENT">编辑私信内容</button>
+            </label>
+        </div>
 
             </div>
                         &nbsp;<button data-action="saveFollowingList" class="igiftMsg_btn">保存当前关注列表为白名单</button>
@@ -1116,6 +1128,12 @@
                             屏蔽挂机检测
                         </label>
                     </div>
+                    <div data-toggle="INVISIBLE_ENTER">
+                    <label style="margin: 5px auto; color: black">
+                        <input style="vertical-align: text-top;" type="checkbox">
+                        隐身入场
+                    </label>
+                </div>
                     </fieldset>
                     <fieldset class="igiftMsg_fs" style="line-height: 25px">
                         <legend style="color: black">弹幕设置</legend>
@@ -1158,14 +1176,10 @@
                         <div id="resetArea">
                             &nbsp;<button data-action="reset" style="color: red;" class="igiftMsg_btn">重置所有为默认</button>
                             &nbsp;<button data-action="redo_dailyTasks" style="color: red;" class="igiftMsg_btn">再次执行所有任务</button>
-                            &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="countReset">重置统计</button>
+                            &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="about">关于</button>
                         </div>
             
                     </fieldset>
-                    <label style="color: darkblue; font-size:large;">
-                         <a href="https://github.com/andywang425/BLTH"
-                            target="_blank">v${GM_info.script.version}&nbsp;更多信息见github上的项目说明(点我)</a>
-                    </label>
                 </div>
             </div>`;
                 const openMainWindow = async () => {
@@ -1415,16 +1429,17 @@
                             div.find('button[data-action="redo_dailyTasks"]').click(() => {//重置每日任务状态
                                 MY_API.ReDoDailyTasks();
                             });
-                            div.find('#resetArea [data-action="countReset"]').click(() => {//清空统计数据按钮
-                                MY_API.GIFT_COUNT = {
-                                    COUNT: 0,
-                                    SILVER_COUNT: 0,
-                                    CLEAR_TS: 0,
-                                };
-                                MY_API.saveGiftCount();
-                                $('#giftCount span:eq(0)').text(MY_API.GIFT_COUNT.COUNT);
-                                $('#giftCount span:eq(1)').text(MY_API.GIFT_COUNT.SILVER_COUNT);
-                                MY_API.chatLog('已重置统计数据');
+                            div.find('button[data-action="about"]').click(() => {//关于
+                                layer.open({
+                                    title: `版本v${GM_info.script.version}`,
+                                    content: `
+                                    <h3 style = "text-align:center">B站直播间挂机助手</h3>
+                                    作者：${linkMsg("andywang425", "https://github.com/andywang425/")}<br>
+                                    许可证：${linkMsg("MIT", "https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE")}<br>
+                                    github项目地址：${linkMsg("BLTH", "https://github.com/andywang425/BLTH")}<br>
+                                    反馈：${linkMsg("BLTH/issues", "https://github.com/andywang425/BLTH/issues")}<br>
+                                    交流qq群：${linkMsg('1106094437', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}<br>`
+                                });
                             });
                             div.find('button[data-action="edit_QUESTIONABLE_LOTTERY"]').click(() => {//编辑实物忽略关键字
                                 layer.prompt({
@@ -1472,6 +1487,24 @@
                                         layer.close(index);
                                     });
                             });
+                            div.find('button[data-action="edit_ANCHOR_LETTER_CONTENT"]').click(() => {//编辑天选私信
+                                layer.prompt({
+                                    formType: 2,
+                                    value: MY_API.CONFIG.ANCHOR_LETTER_CONTENT,
+                                    title: '请输入天选时刻中奖后发送私信内容',
+                                },
+                                    function (value, index) {
+                                        let val = value;
+                                        if (!val) val = 'UP我中天选了，怎么领奖'
+                                        MY_API.CONFIG.ANCHOR_LETTER_CONTENT = val;
+                                        MY_API.saveConfig(false);
+                                        layer.msg('天选时刻私信内容保存成功', {
+                                            time: 2500,
+                                            icon: 1
+                                        });
+                                        layer.close(index);
+                                    });
+                            });
                             div.find('button[data-action="saveFollowingList"]').click(() => {
                                 if (getFollowBtnClickable) {//保存当前关注列表为白名单
                                     getFollowBtnClickable = false;
@@ -1480,10 +1513,21 @@
                                 }
                             });
                             div.find('button[data-action="removeAnchorFollowing"]').click(() => {//取关不在白名单内的UP主
-                                if (unFollowBtnClickable) {//保存当前关注列表为白名单
-                                    unFollowBtnClickable = false;
-                                    window.toast('[取关不在白名单内的UP主] 开始获取关注列表并取消关注');
-                                    return MY_API.AnchorLottery.delAnchorFollowing();
+                                if (unFollowBtnClickable) {
+                                    layer.confirm(`[天选时刻]是否取关不在白名单内的UP主？`, {
+                                        title: '取关不在白名单内的UP主',
+                                        btn: ['是', '否'] //按钮
+                                    }, function () {
+                                        unFollowBtnClickable = false;
+                                        layer.msg('开始取关', {
+                                            time: 2000,
+                                        });
+                                        return MY_API.AnchorLottery.delAnchorFollowing();
+                                    }, function () {
+                                        layer.msg('已取消', {
+                                            time: 2000
+                                        });
+                                    })
                                 }
                             });
                             div.find('button[data-action="sendGiftNow"]').click(() => {//立刻开始送礼
@@ -1547,7 +1591,8 @@
                                 'FT_NOTICE',
                                 'ANCHOR_WAIT_REPLY',
                                 'ANCHOR_AUTO_DEL_FOLLOW',
-                                'ANCHOR_UPLOAD_DATA'
+                                'ANCHOR_UPLOAD_DATA',
+                                'ANCHOR_PRIVATE_LETTER',
                             ];
                             for (const i of checkList) {//绑定所有checkbox事件
                                 const input = div.find(`div[data-toggle="${i}"] input:checkbox`);
@@ -1557,6 +1602,13 @@
                                     saveAction();
                                 });
                             };
+                            const invisibleInput = div.find(`div[data-toggle="INVISIBLE_ENTER"] input:checkbox`),
+                                invisibleSetting = localStorage.getItem(`${NAME}_INVISIBLE_ENTER`);
+                            if (invisibleSetting === 'true') invisibleInput.attr('checked', '');
+                            invisibleInput.change(function () {
+                                localStorage.setItem(`${NAME}_INVISIBLE_ENTER`, $(this).prop('checked'));
+                                window.toast('[隐身入场] 配置已保存', 'info');
+                            })
                             $('input:text').bind('keydown', function (event) {//绑定回车保存
                                 if (event.keyCode == 13) {
                                     saveAction();
@@ -3915,6 +3967,14 @@
                     return BAPI.xlive.anchor.check(data[3]).then((response) => {
                         MYDEBUG(`API.xlive.anchor.reCheck(${data[3]}) response`, response);
                         if (response.code === 0 && !!response.data && response.data.hasOwnProperty('award_users') && !!response.data.award_users) {
+                            let anchorUid, p = $.Deferred();
+                            BAPI.live_user.get_anchor_in_room(data[3]).then((res) => {
+                                MYDEBUG(`API.live_user.get_anchor_in_room(${data[3]})`, res);
+                                if (!!res.data) {
+                                    anchorUid = res.data.info.uid;
+                                    p.resolve();
+                                } else p.reject()
+                            });
                             for (const i of response.data.award_users) {
                                 if (i.uid === Live_info.uid) {
                                     MY_API.chatLog(`[天选时刻] 天选时刻<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id=${data[0]}中奖<br>奖品：${data[4]}<br>`, 'prize');
@@ -3922,48 +3982,62 @@
                                     winPrizeTotalCount++;
                                     JQlogRedPoint.text(winPrizeNum);
                                     if (JQlogRedPoint.is(":hidden")) JQlogRedPoint.show();
-                                    let p1 = $.Deferred().resolve(), p2 = $.Deferred().resolve();
-                                    if (MY_API.CONFIG.ANCHOR_AUTO_DEL_FOLLOW) {
-                                        p1 = $.Deferred();
-                                        const config = JSON.parse(localStorage.getItem(`${NAME}AnchorFollowingList`)) || { list: [] };
-                                        const id_list = [...config.list];
-                                        BAPI.live_user.get_anchor_in_room(data[3]).then((res) => {
-                                            MYDEBUG(`API.live_user.get_anchor_in_room(${data[3]})`, res);
-                                            if (id_list.indexOf(res.data.info.uid) === -1) {
-                                                return BAPI.relation.modify(res.data.info.uid, 2).then((response) => {
-                                                    MYDEBUG(`API.relation.modify response.info.uid, ${2}`, response);
+                                    return p.then(() => {
+                                        if (MY_API.CONFIG.ANCHOR_PRIVATE_LETTER) {
+                                            const msg = {
+                                                sender_uid: Live_info.uid,
+                                                receiver_id: anchorUid,
+                                                receiver_type: 1,
+                                                msg_type: 1,
+                                                msg_status: 0,
+                                                content: `{"content":"` + MY_API.CONFIG.ANCHOR_LETTER_CONTENT + `"}`,
+                                                dev_id: getMsgDevId()
+                                            }
+                                            setTimeout(() => {
+                                                BAPI.sendMsg(msg).then((response) => {
                                                     if (response.code === 0) {
-                                                        window.toast(`[天选自动取关] 取关UP(uid = ${response.info.uid})成功`, 'success');
-                                                        return p1.resolve();
-                                                    }
-                                                    else {
-                                                        window.toast(`[天选自动取关] 取关UP(uid = ${response.info.uid})出错  ${response.message}`, 'error');
-                                                        return p1.reject();
+                                                        window.toast(`[天选自动私信] 私信UP(uid = ${anchorUid})成功`, 'success');
+                                                    } else {
+                                                        window.toast(`[天选自动私信] 私信UP(uid = ${anchorUid})失败 ${response.message}`, 'error');
                                                     }
                                                 })
-                                            } else return p1.resolve();
-                                        });
-                                    }
-                                    if (MY_API.CONFIG.FT_NOTICE) {
-                                        p2 = $.Deferred();
-                                        FT_sendMsg(MY_API.CONFIG.FT_SCKEY,
-                                            `【${GM_info.script.name}】天选时刻中奖通知 roomid = ${data[3]}，奖品:${data[4]}`,
-                                            `###天选时刻中奖\n###roomid = ${data[3]}\n###id = ${data[0]}\n###获得奖品：\n###${data[4]}\n###请及时私信主播发放奖励`
-                                        ).then((re) => {
-                                            MYDEBUG('FT_sendMsg response', re);
-                                            if (re.body.errno == 0) {
-                                                window.toast('[天选时刻] 方糖中奖提示发送成功', 'success');
-                                                return p2.resolve();
-                                            } else {
-                                                window.toast(`[天选时刻] 方糖中奖提示发送失败 ${re.errmsg}`, 'error')
-                                                return p2.reject();
+                                            }, 7000);//之前3秒+7秒
+
+                                        }
+                                        if (MY_API.CONFIG.FT_NOTICE) {
+                                            FT_sendMsg(MY_API.CONFIG.FT_SCKEY,
+                                                `${GM_info.script.name} 天选时刻中奖通知 ${new Date().toLocaleString()}`,
+                                                `###天选时刻中奖\n###房间号roomid = ${data[3]}\n###主播uid = ${anchorUid}\n###抽奖id = ${data[0]}\n###获得奖品：\n###${data[4]}\n###请及时私信主播发放奖励`
+                                            ).then((re) => {
+                                                MYDEBUG('FT_sendMsg response', re);
+                                                if (re.body.errno == 0) {
+                                                    window.toast('[天选时刻] 方糖中奖提示发送成功', 'success');
+                                                } else {
+                                                    window.toast(`[天选时刻] 方糖中奖提示发送失败 ${re.errmsg}`, 'error')
+                                                }
+                                            }, () => {
+                                                MY_API.chatLog(`[天选时刻] 方糖中奖提示发送出错，请检查网络`, 'error');
+                                                return delayCall(() => MY_API.AnchorLottery.reCheck(data));
+                                            });
+                                        }
+                                    })
+                                }
+                            }
+                            if (MY_API.CONFIG.ANCHOR_AUTO_DEL_FOLLOW) {
+                                const config = JSON.parse(localStorage.getItem(`${NAME}AnchorFollowingList`)) || { list: [] };
+                                const id_list = [...config.list];
+                                if (id_list.indexOf(anchorUid) === -1) {
+                                    return p.then(() => {
+                                        BAPI.relation.modify(anchorUid, 2).then((response) => {
+                                            MYDEBUG(`API.relation.modify response.info.uid, ${2}`, response);
+                                            if (response.code === 0) {
+                                                window.toast(`[天选自动取关] 取关UP(uid = ${anchorUid})成功`, 'success');
                                             }
-                                        }), () => {
-                                            MY_API.chatLog(`[天选时刻] 方糖中奖提示发送出错，请检查网络`, 'error');
-                                            return delayCall(() => MY_API.AnchorLottery.reCheck(data));
-                                        };
-                                    }
-                                    return $.when(p1, p2);
+                                            else {
+                                                window.toast(`[天选自动取关] 取关UP(uid = ${anchorUid})出错  ${response.message}`, 'error');
+                                            }
+                                        })
+                                    });
                                 }
                             }
                         }
@@ -4253,7 +4327,7 @@
     /**
      * 暂停
      * @param millisecond
-     * @returns {new Promise}
+     * @returns {Promise} resolve
      */
     function sleep(millisecond) {
         return new Promise(resolve => {
@@ -4292,7 +4366,7 @@
      * @param SCKEY
      * @param text
      * @param desp
-     * @returns { response: res, body: res.response }
+     * @returns {object}  {response: res, body: res.response}
      */
     function FT_sendMsg(SCKEY, text, desp) {
         return XHR({
@@ -4305,9 +4379,33 @@
         })
     }
     /**
+     * 获取msg[dev_id]
+     * @param name 
+     * @returns {String} dev_id
+     */
+    function getMsgDevId(name = NAME) {
+        let deviceid = window.localStorage.getItem("im_deviceid_".concat(name));
+        if (!name || !deviceid) {
+            let str = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (function (name) {
+                let randomInt = 16 * Math.random() | 0;
+                return ("x" === name ? randomInt : 3 & randomInt | 8).toString(16).toUpperCase()
+            }
+            ));
+            return function (name, randomInt) {
+                Object.keys(localStorage).forEach((function (name) {
+                    name.match(/^im_deviceid_/) && window.localStorage.removeItem(name)
+                }
+                )),
+                    window.localStorage.setItem("im_deviceid_".concat(randomInt), name)
+            }(str, name),
+                str
+        }
+        return deviceid
+    };
+    /**
      * 发起xmlhttpRequest请求（GM函数和浏览器原生）
      * @param XHROptions
-     * @returns { response: res, body: res.response }
+     * @returns {object}  {response: res, body: res.response}
      */
     function XHR(XHROptions) {
         return new Promise(resolve => {
