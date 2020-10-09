@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.2.3
+// @version        5.2.3.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -34,7 +34,7 @@
 // @grant         GM_xmlhttpRequest
 // @grant         GM_getResourceText
 // ==/UserScript==
-; (function () {
+(function () {
     const NAME = 'IGIFTMSG',
         debugSwitch = true, //日志控制开关 
         BAPI = BilibiliAPI,
@@ -195,7 +195,7 @@
             tid: undefined,
         },
         userToken = undefined,
-        tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || {},
+        tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || { time: 0 },
         mainIndex = undefined,
         menuIndex = undefined,
         layerMenuWindow = undefined,
@@ -573,14 +573,11 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache === undefined || cache === null || cache != '5.2.3')) { //更新公告时需要修改
+                    if ((cache === undefined || cache === null || cache != '5.2.3.1')) { //更新公告时需要修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            1.新功能：检测到天选中奖后给发起抽奖的UP发一条私信<br>
-                            2.点击【取关不在白名单内的UP主】后会有确认窗口<br>
-                            3.修复【检测到未中奖后自动取关发起抽奖的UP】不生效的bug<br>
-                            4.添加【隐身入场】的设置，可自行决定是否开启。<br>
+                            1.自动发弹幕功能优化<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -1167,7 +1164,7 @@
                         <div data-toggle="FT_NOTICE" style="line-height: 20px">
                         <label style="margin: 5px auto; color: darkgreen">
                             <input style="vertical-align: text-top;" type="checkbox">
-                            实物/天选中奖后通过${linkMsg('方糖', 'http://sc.ftqq.com/')}推送通知<br>
+                            实物/天选中奖后通过${linkMsg('方糖', 'https://sc.ftqq.com/')}推送通知<br>
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             SCKEY
                             <input class="str igiftMsg_input" type="text" style="width: 350px;">
@@ -1431,7 +1428,7 @@
                             });
                             div.find('button[data-action="about"]').click(() => {//关于
                                 layer.open({
-                                    title: `版本v${GM_info.script.version}`,
+                                    title: `版本${GM_info.script.version}`,
                                     content: `
                                     <h3 style = "text-align:center">B站直播间挂机助手</h3>
                                     作者：${linkMsg("andywang425", "https://github.com/andywang425/")}<br>
@@ -3205,8 +3202,7 @@
                         else if (userInfo.body.data.mid !== Live_info.uid && await setToken() === undefined)
                             return;
                     };
-                    MYDEBUG('[小心心] tokenData', tokenData.access_token)
-                    MYDEBUG('[小心心]', '开始客户端心跳');
+                    MYDEBUG('[小心心] 开始客户端心跳 tokenData', tokenData.access_token)
                     window.toast('[小心心]开始获取小心心', 'success');
                     const giftNum = await MY_API.LITTLE_HEART.getGiftNum();
                     if (giftNum < 24) {
@@ -3253,9 +3249,11 @@
                         MYDEBUG(`API.room.get_info roomId=${roomId} res`, res);//可能是短号，要用长号发弹幕
                         return BAPI.sendLiveDanmu(danmuContent, res.data.room_id).then((response) => {
                             MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmuContent}】，房间号【${roomId}】`, response);
-                            if (response.code === 0 && !response.msg)
+                            if (response.code === 0 && !response.msg) {
                                 window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送成功`, 'success');
-                            else window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）出错 ${response.msg}`, 'caution')
+                            } else {
+                                window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）出错 ${response.msg}`, 'caution');
+                            }
                         }, () => {
                             window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送失败`, 'error');
                             return $.Deferred().reject();
@@ -3278,98 +3276,109 @@
                 },
                 run: async () => {
                     if (!MY_API.CONFIG.AUTO_DANMU) return $.Deferred().resolve();
-                    let maxLength = MY_API.AUTO_DANMU.getMaxLength();
-                    for (let i = 0; i < maxLength; i++) {
-                        let danmu_content = MY_API.AUTO_DANMU.setValue('DANMU_CONTENT', i),
-                            danmu_roomid = parseInt(MY_API.AUTO_DANMU.setValue('DANMU_ROOMID', i)),
-                            danmu_intervalTime = MY_API.AUTO_DANMU.setValue('DANMU_INTERVAL_TIME', i),//设置-发送时间
-                            lastSendTime = undefined,//上次发弹幕的时间戳(毫秒)
-                            jsonCache = MY_API.CACHE.AUTO_SEND_DANMU_TS,
-                            objIndex = undefined,//弹幕缓存下标
-                            isTimeData = undefined,//是否是时间数据(eg 9:01)
-                            intervalTime = undefined,//据上次发弹幕的时间(毫秒)
-                            danmu_intervalTime_Ts = undefined,//间隔时间
-                            sleepTime = 0;
-                        if (danmu_intervalTime.indexOf(':') > -1) {//时间
-                            isTimeData = true;
-                            const danmu_time = danmu_intervalTime.split(':');//小时，分钟，秒
-                            const hour = parseInt(danmu_time[0]), minute = parseInt(danmu_time[1]), second = parseInt(danmu_time[2]);
-                            if (!isTime(hour, minute, second)) {
-                                sleepTime = getIntervalTime(hour, minute, second);
+                    if (SEND_DANMU_NOW) {
+                        console.log('MY_API.CONFIG.DANMU_CONTENT.length', MY_API.CONFIG.DANMU_CONTENT.length, MY_API.CONFIG.DANMU_CONTENT)
+                        for (let i = 0; i < MY_API.CONFIG.DANMU_CONTENT.length; i++) {
+                            console.log('i', i);
+                            let danmu_content = MY_API.AUTO_DANMU.setValue('DANMU_CONTENT', i),
+                                danmu_roomid = parseInt(MY_API.AUTO_DANMU.setValue('DANMU_ROOMID', i));
+                            await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
+                            console.log('senddanmu', danmu_content, danmu_roomid);
+                            await sleep(1000);
+                        }
+                        SEND_DANMU_NOW = false;
+                    } else {
+                        let maxLength = MY_API.AUTO_DANMU.getMaxLength();
+                        for (let i = 0; i < maxLength; i++) {
+                            let danmu_content = MY_API.AUTO_DANMU.setValue('DANMU_CONTENT', i),
+                                danmu_roomid = parseInt(MY_API.AUTO_DANMU.setValue('DANMU_ROOMID', i)),
+                                danmu_intervalTime = MY_API.AUTO_DANMU.setValue('DANMU_INTERVAL_TIME', i),//设置-发送时间
+                                lastSendTime = undefined,//上次发弹幕的时间戳(毫秒)
+                                jsonCache = MY_API.CACHE.AUTO_SEND_DANMU_TS,
+                                objIndex = undefined,//弹幕缓存下标
+                                isTimeData = undefined,//是否是时间数据(eg 9:01)
+                                intervalTime = undefined,//据上次发弹幕的时间(毫秒)
+                                danmu_intervalTime_Ts = undefined,//间隔时间
+                                sleepTime = 0;
+                            if (danmu_intervalTime.indexOf(':') > -1) {//时间
+                                isTimeData = true;
+                                const danmu_time = danmu_intervalTime.split(':');//小时，分钟，秒
+                                const hour = parseInt(danmu_time[0]), minute = parseInt(danmu_time[1]), second = parseInt(danmu_time[2]);
+                                if (!isTime(hour, minute, second)) {
+                                    sleepTime = getIntervalTime(hour, minute, second);
+                                }
                             }
-                        }
-                        else {
-                            isTimeData = false;
-                            danmu_intervalTime = danmu_intervalTime.toLowerCase();
-                            if (danmu_intervalTime.indexOf('h') > -1 || danmu_intervalTime.indexOf('m') > -1 || danmu_intervalTime.indexOf('s') > -1) {
-                                const hourArray = danmu_intervalTime.split('h');//1h5m3s
-                                const minuteArray = (hourArray[1] === undefined) ? hourArray[0].split('m') : hourArray[1].split('m');
-                                const secondArray = (minuteArray[1] === undefined) ? minuteArray[0].split('s') : minuteArray[1].split('s');
-                                const hour = hourArray[0],
-                                    minute = minuteArray[0],
-                                    second = secondArray[0];
-                                const finalHour = isNaN(hour) ? 0 : hour || 0,
-                                    finalMinute = isNaN(minute) ? 0 : minute || 0,
-                                    finalSecond = isNaN(second) ? 0 : second || 0;
-                                danmu_intervalTime_Ts = finalHour * 3600000 + finalMinute * 60000 + finalSecond * 1000;
-                            } else {//没有h或m或s则默认是分钟
-                                danmu_intervalTime_Ts = danmu_intervalTime * 60000;
+                            else {
+                                isTimeData = false;
+                                danmu_intervalTime = danmu_intervalTime.toLowerCase();
+                                if (danmu_intervalTime.indexOf('h') > -1 || danmu_intervalTime.indexOf('m') > -1 || danmu_intervalTime.indexOf('s') > -1) {
+                                    const hourArray = danmu_intervalTime.split('h');//1h5m3s
+                                    const minuteArray = (hourArray[1] === undefined) ? hourArray[0].split('m') : hourArray[1].split('m');
+                                    const secondArray = (minuteArray[1] === undefined) ? minuteArray[0].split('s') : minuteArray[1].split('s');
+                                    const hour = hourArray[0],
+                                        minute = minuteArray[0],
+                                        second = secondArray[0];
+                                    const finalHour = isNaN(hour) ? 0 : hour || 0,
+                                        finalMinute = isNaN(minute) ? 0 : minute || 0,
+                                        finalSecond = isNaN(second) ? 0 : second || 0;
+                                    danmu_intervalTime_Ts = finalHour * 3600000 + finalMinute * 60000 + finalSecond * 1000;
+                                } else {//没有h或m或s则默认是分钟
+                                    danmu_intervalTime_Ts = danmu_intervalTime * 60000;
+                                }
                             }
-                        }
-                        MYDEBUG('[自动发弹幕]MY_API.CACHE.AUTO_SEND_DANMU_TS => jsoncache', jsonCache);
-                        for (const obj of jsonCache) {
-                            if (obj.roomid == danmu_roomid && obj.content == danmu_content) {
-                                lastSendTime = obj.sendTs
-                                objIndex = jsonCache.indexOf(obj);
-                                break;
+                            MYDEBUG('[自动发弹幕]MY_API.CACHE.AUTO_SEND_DANMU_TS => jsoncache', jsonCache);
+                            for (const obj of jsonCache) {
+                                if (obj.roomid == danmu_roomid && obj.content == danmu_content) {
+                                    lastSendTime = obj.sendTs
+                                    objIndex = jsonCache.indexOf(obj);
+                                    break;
+                                }
                             }
-                        }
-                        if (!isTimeData) {
-                            if (!!lastSendTime) intervalTime = ts_ms() - lastSendTime;
-                            else intervalTime = ts_ms();
-                        }
-                        const setCache = () => {
-                            const newJson = {
-                                roomid: danmu_roomid,
-                                content: danmu_content,
-                                sendTs: ts_ms()
+                            if (!isTimeData) {
+                                if (!!lastSendTime) intervalTime = ts_ms() - lastSendTime;
+                                else intervalTime = ts_ms();
+                            }
+                            const setCache = () => {
+                                const newJson = {
+                                    roomid: danmu_roomid,
+                                    content: danmu_content,
+                                    sendTs: ts_ms()
+                                };
+                                if (!lastSendTime) {
+                                    jsonCache.push(newJson);
+                                } else {
+                                    jsonCache[objIndex].sendTs = ts_ms();
+                                }
+                                MY_API.CACHE.AUTO_SEND_DANMU_TS = jsonCache;
+                                return MY_API.saveCache(false);
                             };
-                            if (!lastSendTime) {
-                                jsonCache.push(newJson);
-                            } else {
-                                jsonCache[objIndex].sendTs = ts_ms();
-                            }
-                            MY_API.CACHE.AUTO_SEND_DANMU_TS = jsonCache;
-                            return MY_API.saveCache(false);
-                        };
-                        const sendNextDanmu = (intervalTS, isTime) => {
-                            if (!isTime) setCache();
-                            return setTimeout(async () => {
-                                await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
+                            const sendNextDanmu = (intervalTS, isTime) => {
                                 if (!isTime) setCache();
-                                return sendNextDanmu(intervalTS, isTime);
-                            }, intervalTS);
-                        }
-                        if (!isTimeData && (intervalTime >= danmu_intervalTime_Ts || SEND_DANMU_NOW)) {
-                            SEND_DANMU_NOW = false;
-                            await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
-                            MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, danmu_intervalTime);
-                            sendNextDanmu(danmu_intervalTime_Ts, isTimeData);
-                        } else if ((isTimeData && !sleepTime) || SEND_DANMU_NOW) {
-                            SEND_DANMU_NOW = false;
-                            await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
-                            sleepTime = getIntervalTime(danmu_time[0], danmu_time[1], danmu_time[2]);
-                            MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, '约24小时');
-                            sendNextDanmu(sleepTime, isTimeData);
-                        }
-                        else {
-                            MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, `${(!isTimeData) ? (danmu_intervalTime_Ts - intervalTime) / 60000 : sleepTime / 60000}分钟`);
-                            setTimeout(async () => {
+                                return setTimeout(async () => {
+                                    await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
+                                    if (!isTime) setCache();
+                                    return sendNextDanmu(intervalTS, isTime);
+                                }, intervalTS);
+                            }
+                            if (!isTimeData && intervalTime >= danmu_intervalTime_Ts) {
                                 await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
-                                sendNextDanmu((isTimeData) ? 86400000 : danmu_intervalTime_Ts, isTimeData);
-                            }, (isTimeData) ? sleepTime : danmu_intervalTime_Ts - intervalTime);
+                                MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, danmu_intervalTime);
+                                sendNextDanmu(danmu_intervalTime_Ts, isTimeData);
+                            } else if (isTimeData && !sleepTime) {
+                                await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
+                                sleepTime = getIntervalTime(danmu_time[0], danmu_time[1], danmu_time[2]);
+                                MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, '约24小时');
+                                sendNextDanmu(sleepTime, isTimeData);
+                            }
+                            else {
+                                MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmu_content}】，房间号【${danmu_roomid}】，距下次发送还有`, `${(!isTimeData) ? (danmu_intervalTime_Ts - intervalTime) / 60000 : sleepTime / 60000}分钟`);
+                                setTimeout(async () => {
+                                    await MY_API.AUTO_DANMU.sendDanmu(danmu_content, danmu_roomid);
+                                    sendNextDanmu((isTimeData) ? 86400000 : danmu_intervalTime_Ts, isTimeData);
+                                }, (isTimeData) ? sleepTime : danmu_intervalTime_Ts - intervalTime);
+                            }
+                            await sleep(1100);
                         }
-                        await sleep(1100);
                     }
                 }
             },
@@ -3417,14 +3426,14 @@
                                 for (const str of MY_API.CONFIG.QUESTIONABLE_LOTTERY) {
                                     if (str.charAt(0) != '/' && str.charAt(str.length - 1) != '/') {
                                         if (response.data.title.toLowerCase().indexOf(str) > -1) {
-                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})<br>含有关键字：` + str, 'warning');
+                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid = ${aid})<br>含有关键字：` + str, 'warning');
                                             return MY_API.MaterialObject.check(aid + 1, aid);
                                         }
                                     }
                                     else {
                                         let reg = eval(str);
                                         if (reg.test(response.data.title)) {
-                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid=${aid})<br>匹配正则：` + str, 'warning');
+                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid = ${aid})<br>匹配正则：` + str, 'warning');
                                             return MY_API.MaterialObject.check(aid + 1, aid);
                                         }
                                     }
@@ -3438,7 +3447,7 @@
                             MY_API.chatLog(`[实物抽奖] ${response.msg}`, 'warning');
                         }
                     }, () => {
-                        MY_API.chatLog(`[实物抽奖] 检查抽奖(aid=${aid})失败，请检查网络`, 'error');
+                        MY_API.chatLog(`[实物抽奖] 检查抽奖(aid = ${aid})失败，请检查网络`, 'error');
                         return delayCall(() => MY_API.MaterialObject.check(aid, valid));
                     });
                 },
@@ -3463,7 +3472,7 @@
                     switch (obj.status) {
                         case -1: // 未开始
                             {
-                                MY_API.chatLog(`[实物抽奖] 将在${new Date((obj.join_start_time + 1) * 1000).toLocaleString()}参加抽奖<br>"${obj.title}" aid=${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
+                                MY_API.chatLog(`[实物抽奖] 将在${new Date((obj.join_start_time + 1) * 1000).toLocaleString()}参加抽奖<br>"${obj.title}" aid = ${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
                                 MY_API.MaterialObject.list.push(obj);
                                 const p = $.Deferred();
                                 p.then(() => {
@@ -3480,7 +3489,7 @@
                             });
                         case 1: // 已参加
                             {
-                                MY_API.chatLog(`[实物抽奖] 已参加抽奖<br>"${obj.title}" aid=${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
+                                MY_API.chatLog(`[实物抽奖] 已参加抽奖<br>"${obj.title}" aid = ${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
                                 MY_API.MaterialObject.list.push(obj);
                                 const p = $.Deferred();
                                 p.then(() => {
@@ -3506,7 +3515,7 @@
                                     return false;
                                 }
                             });
-                            MY_API.chatLog(`[实物抽奖] 成功参加抽奖<nr>"${obj.title}"(aid=${obj.aid}，第${obj.number}轮) 奖品：${obj.jpName}`, 'success');
+                            MY_API.chatLog(`[实物抽奖] 成功参加抽奖<nr>"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮) 奖品：${obj.jpName}`, 'success');
                             const p = $.Deferred();
                             p.then(() => {
                                 return MY_API.MaterialObject.notice(obj);
@@ -3516,12 +3525,12 @@
                             }, (obj.join_end_time - ts_s() + 1) * 1e3);
                         } else {
                             MY_API.chatLog(
-                                `[实物抽奖] "${obj.title}"(aid=${obj.aid}，第${obj.number}轮)<br>${response.msg}`,
+                                `[实物抽奖] "${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)<br>${response.msg}`,
                                 'warning');
                         }
                     }, () => {
                         MY_API.chatLog(
-                            `[实物抽奖] 参加"${obj.title}"(aid=${obj.aid}，第${obj.number}轮)<br>失败，请检查网络`,
+                            `[实物抽奖] 参加"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)<br>失败，请检查网络`,
                             'error');
                         return delayCall(() => MY_API.MaterialObject.draw(obj));
                     });
@@ -3541,7 +3550,7 @@
                                 for (const g of i.list) {
                                     if (g.uid === Live_info.uid) {
                                         MY_API.chatLog(
-                                            `[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid}，第${obj.number}轮)获得奖励<br>"${i.giftTitle}"`,
+                                            `[实物抽奖] 抽奖"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)获得奖励<br>"${i.giftTitle}"`,
                                             'prize');
                                         winPrizeNum++;
                                         winPrizeTotalCount++;
@@ -3551,7 +3560,7 @@
                                             function FT_notice() {
                                                 return FT_sendMsg(MY_API.CONFIG.FT_SCKEY,
                                                     `【${GM_info.script.name}】实物抽奖中奖通知 ${obj.title}，第${obj.number}轮`,
-                                                    `###实物抽奖中奖\n###${obj.title}\n###aid=${obj.aid}\n###第${obj.number}轮\n###获得奖励：\n###${i.giftTitle}\n###请及时填写领奖信息`
+                                                    `###实物抽奖中奖\n###${obj.title}\n###aid = ${obj.aid}\n###第${obj.number}轮\n###获得奖励：\n###${i.giftTitle}\n###请及时填写领奖信息`
                                                 ).then((re) => {
                                                     MYDEBUG('FT_sendMsg response', re);
                                                     if (re.body.errno == 0) {
@@ -3570,15 +3579,15 @@
                                     }
                                 }
                             }
-                            MY_API.chatLog(`[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid}，第${obj.number}轮)未中奖`, 'info');
+                            MY_API.chatLog(`[实物抽奖] 抽奖"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)未中奖`, 'info');
                         } else {
                             MY_API.chatLog(
-                                `[实物抽奖] 抽奖"${obj.title}"(aid=${obj.aid}，第${obj.number}轮)<br>${response.msg}`,
+                                `[实物抽奖] 抽奖"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)<br>${response.msg}`,
                                 'warning');
                         }
                     }, () => {
                         MY_API.chatLog(
-                            `[实物抽奖] 获取抽奖"${obj.title}"(aid=${obj.aid}，第${obj.number}轮)<br>获取中奖名单失败，请检查网络`,
+                            `[实物抽奖] 获取抽奖"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)<br>获取中奖名单失败，请检查网络`,
                             'error');
                         return delayCall(() => MY_API.MaterialObject.notice(obj));
                     });
@@ -3977,7 +3986,7 @@
                             });
                             for (const i of response.data.award_users) {
                                 if (i.uid === Live_info.uid) {
-                                    MY_API.chatLog(`[天选时刻] 天选时刻<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id=${data[0]}中奖<br>奖品：${data[4]}<br>`, 'prize');
+                                    MY_API.chatLog(`[天选时刻] 天选时刻<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id = ${data[0]}中奖<br>奖品：${data[4]}<br>`, 'prize');
                                     winPrizeNum++;
                                     winPrizeTotalCount++;
                                     JQlogRedPoint.text(winPrizeNum);
@@ -4050,15 +4059,15 @@
                     return BAPI.xlive.anchor.join(data[0], data[1], data[2]).then((response) => {//id, gift_id, gift_num, roomid, award_name, time
                         MYDEBUG(`API.xlive.anchor.join(${data[0]}) response`, response);
                         if (response.code === 0) {
-                            MY_API.chatLog(`[天选时刻] 成功参加天选<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id=${data[0]}<br>奖品：${data[4]}<br>`, 'success');
+                            MY_API.chatLog(`[天选时刻] 成功参加天选<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id = ${data[0]}<br>奖品：${data[4]}<br>`, 'success');
                             MY_API.AnchorLottery.waitForRecheckList.push(data[3]);
                             return setTimeout(() => MY_API.AnchorLottery.reCheck(data), (data[5] + 3) * 1000);
                         } else if (response.code === 500) {
-                            MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id=${data[0]}<br>奖品：${data[4]}<br>${response.msg}<br>3秒后再次尝试参加`, 'warning');
+                            MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id = ${data[0]}<br>奖品：${data[4]}<br>${response.msg}<br>3秒后再次尝试参加`, 'warning');
                             return setTimeout(() => MY_API.AnchorLottery.join(data), 3000);
                         }
                         else {
-                            return MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id=${data[0]}<br>奖品：${data[4]}<br>${response.msg}`, 'warning')
+                            return MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id = ${data[0]}<br>奖品：${data[4]}<br>${response.msg}`, 'warning')
                         }
                     }, () => {
                         MY_API.chatLog(`[天选时刻] 天选参加出错，请检查网络`, 'error');
@@ -4372,7 +4381,7 @@
         return XHR({
             GM: true,
             anonymous: true,
-            method: 'POST',
+            method: 'GET',
             url: `https://sc.ftqq.com/${SCKEY}.send`,
             responseType: 'json',
             data: encodeURI(`text=${text}&desp=${desp}`)

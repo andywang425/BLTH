@@ -8,10 +8,9 @@
 -------------------------------
 
 ### 安装方法
-### 1. 点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 githubusercontent 安装脚本    
-### 2. 点击 [BLTH_Origin_greasyfork](https://greasyfork.org/zh-CN/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 或 [BLTH_Origin_openuserjs](https://openuserjs.org/scripts/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 greasyfork/openuserjs 安装脚本  
-
-带有Origin字样的为原格式脚本，其余为压缩脚本。建议安装压缩脚本。  
+### 1. 点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 githubusercontent 安装压缩过的脚本    
+### 2. 点击 [BLTH_Origin_greasyfork](https://greasyfork.org/zh-CN/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 greasyfork 安装原格式脚本  
+### 3. 点击 [BLTH_Origin_openuserjs](https://openuserjs.org/scripts/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 openuserjs 安装原格式脚本  
 
 -------------------------------
 
@@ -175,7 +174,7 @@
 
 #### 弹幕设置
 + 弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号`,`隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。  
-+ 若有多条弹幕需要发送，每条弹幕间会有1.1秒的间隔时间。  
++ 由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.1秒间隔时间（对在特定时间点发送的弹幕无效）。
 + 如果数据没对齐，缺失的数据会自动向前对齐。如填写`弹幕内容 lalala`，`房间号 3,4`，`发送时间 5m,10:30`，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。 
 + 房间号的默认值是我的直播间号，可以用来测试。   
 + 发送时间有两种填写方法
@@ -226,6 +225,7 @@
 + 【检查房间最大数量】并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。   
 + 【从直播间__的个人简介获取天选时刻数据】默认值写了我的直播间号，**目前我把脚本挂在云上运行，所以该直播间的个人简介可以持续提供天选数据**（除非被风控或遇到一些突发情况）。这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。  
   [q群](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)的群在线文档中有一些群友上传的能提供天选数据的直播间号。
++ 【检测到中奖后给发起抽奖的UP发一条私信】若中奖，会在开奖后10秒发送私信。
 
 #### 购买粉丝勋章
 + 调用官方api（`api.vc.bilibili.com/link_group/v1/member/buy_medal`），消耗20硬币购买某位UP的粉丝勋章。  
@@ -281,13 +281,13 @@
 -------------------------------
 
 ## 鸣谢
-[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://greasyfork.org/zh-CN/users/429735-%E9%A3%8E%E7%BB%AB%E4%B8%A8%E9%92%B0%E8%A2%96)  
+[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://greasyfork.org/zh-CN/users/429735-%E9%A3%8E%E7%BB%AB%E4%B8%A8%E9%92%B0%E8%A2%96)，[Server酱](https://sc.ftqq.com/)  
 以及所有提出过建议的用户。
 
 -------------------------------
 
 ## 更新日志
->### 5.2.3
->新功能：检测到中奖后给发起抽奖的UP发一条私信；点击【取关不在白名单内的UP主】后会有确认窗口；修复【检测到未中奖后自动取关发起抽奖的UP】不生效的bug；添加【隐身入场】的设置；添加【关于】按钮，移除底部链接。  
+>### 5.2.4
+>自动发弹幕功能优化。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
