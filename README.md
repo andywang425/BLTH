@@ -8,9 +8,9 @@
 -------------------------------
 
 ### 安装方法
-### 1. 点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 githubusercontent 安装压缩过的脚本    
-### 2. 点击 [BLTH_Origin_greasyfork](https://greasyfork.org/zh-CN/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 greasyfork 安装原格式脚本  
-### 3. 点击 [BLTH_Origin_openuserjs](https://openuserjs.org/scripts/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 openuserjs 安装原格式脚本  
+### 1. 点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 githubusercontent 安装脚本    
+### 2. 点击 [BLTH_Origin_greasyfork](https://greasyfork.org/zh-CN/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 greasyfork 安装脚本  
+### 3. 点击 [BLTH_Origin_openuserjs](https://openuserjs.org/scripts/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 openuserjs 安装脚本  
 
 -------------------------------
 
@@ -26,21 +26,18 @@
 + 建议通过修改浏览器设置缩减或不发送Referer。
   <details>
   <summary>点击展开具体方法</summary>
-  <ul>
 
-   + Chrome  
-   在地址栏输入`chrome://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
-   + Edge  
-   在地址栏输入`edge://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
-   + FireFox   
-   在地址栏输入`about:config`，搜索`network.http.sendRefererHeader`，把这个设置的值改为`0`。
-
-   </ul>
-
+  + Chrome  
+  在地址栏输入`chrome://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
+  + Edge  
+  在地址栏输入`edge://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
+  + FireFox   
+  在地址栏输入`about:config`，搜索`network.http.sendRefererHeader`，把这个设置的值改为`0`。
   + 建议这样做的原因：
   B站直播间api在被调用时，其referer值为`https://live.bilibili.com/当前房间号`。所以若不修改设置，脚本发出的相当一部分api请求所携带的referer值是不合理的。如在直播间`777`使用脚本，参加了直播间`666`的天选时刻，那么发出请求所携带的referer值就是`https://live.bilibili.com/777`。但正常情况下天选时刻只能在对应房间参加，如果B站有相关检测的话很容易发现刚刚那个请求是异常的。  
   + 请注意：
-  某些网站为了防盗链要求referer必须为本站链接，不发送referer可能导致无法正常访问这些网站。同时不发送referer还可能会影响网站的广告收入。  
+  某些网站为了防盗链要求referer必须为本站链接，不发送referer可能导致无法正常访问这些网站。同时不发送referer还可能会影响网站的广告收入。
+  
   </details>
 
 交流qq群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)（入群问题答案：B站直播间挂机助手），欢迎进来聊天或者提点建议~    
@@ -114,8 +111,8 @@
 ## 说明
 #### 关于脚本代码格式
 本脚本在三个平台上的代码格式有所不同
-+ github: 压缩和原格式（更新后变为压缩格式）都有
-+ openuserjs: 原格式（更新后变为压缩格式）
++ github: 压缩和原格式都有
++ openuserjs: 原格式
 + greasyfork: 原格式
 
 注：项目文件中的[B站直播间挂机助手.user.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)是压缩后的脚本。  
@@ -211,7 +208,7 @@
 
 分享一个来自群友的正则：`/(([^十百千万拾佰仟01234][零0oO]|^[零0oO])[\.点、。][01234一二三四零壹贰叁肆Oo])|[01234一二三四零壹贰叁肆Oo][分]|(图片|照片|写真|相片|排位|车位|一起|代打|好友|专属头衔|素颜照|卸妆照|美照|皮肤|空气)/`
 
-+ 【请求间隔_毫秒】轮询天选，取关，获取粉丝勋章信息，获取房间列表时每两个请求间的间隔时间。如果间隔时间过短可能会被风控。  
++ 【请求间隔_毫秒】轮询天选，取关，获取房间列表时每两个请求间的间隔时间。如果间隔时间过短可能会被风控。  
 + 【发出请求后等待回复】勾选后发出轮询天选，取关的请求后会等待回复，收到回复后等待一个间隔时间再发起下一个请求。  
 
   _流程：发出请求 - 等待回复 - 等待一个间隔时间 - 发出下一个请求_  
@@ -223,9 +220,9 @@
   上传数据格式：经base64编码的数组。数组格式：`[[一些直播间号], 时间戳]`。  
   【间隔__秒】：这个设置项若填`10`秒，并不一定是每`10`秒上传一次数据，而是只有在检测到了新的天选数据时才会上传。  
 + 【检查房间最大数量】并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。   
-+ 【从直播间__的个人简介获取天选时刻数据】默认值写了我的直播间号，**目前我把脚本挂在云上运行，所以该直播间的个人简介可以持续提供天选数据**（除非被风控或遇到一些突发情况）。这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。  
++ 【从直播间__的个人简介获取天选时刻数据】默认值写了我的直播间号，**目前我在云上部署了脚本，所以该直播间的个人简介可以持续提供天选数据**（除非被风控或遇到一些突发情况）。这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。  
   [q群](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)的群在线文档中有一些群友上传的能提供天选数据的直播间号。
-+ 【检测到中奖后给发起抽奖的UP发一条私信】若中奖，会在开奖后10秒发送私信。
++ 【检测到中奖后给发起抽奖的UP发一条私信】若中奖，会在开奖后10秒发送私信。建议改一下私信内容，不要和默认值完全一样。
 
 #### 购买粉丝勋章
 + 调用官方api（`api.vc.bilibili.com/link_group/v1/member/buy_medal`），消耗20硬币购买某位UP的粉丝勋章。  
@@ -287,7 +284,7 @@
 -------------------------------
 
 ## 更新日志
->### 5.2.4
->自动发弹幕功能优化。  
+>### 5.2.3.2
+>修复自动投币循环检查UP前30个的视频的bug；修复自动送礼【优先送礼房间】的顺序会在送礼后颠倒的bug；优化天选时刻获取粉丝勋章信息的方法，提高效率。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  

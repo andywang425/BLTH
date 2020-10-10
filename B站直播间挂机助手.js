@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.2.3.1
+// @version        5.2.3.2
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -573,11 +573,13 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache === undefined || cache === null || cache != '5.2.3.1')) { //更新公告时需要修改
+                    if ((cache === undefined || cache === null || cache != '5.2.3.2')) { //更新公告时需要修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            1.自动发弹幕功能优化<br>
+                            1.修复自动投币循环检查UP前30个的视频的bug。<br>
+                            2.修复自动送礼【优先送礼房间】的顺序会在送礼后颠倒的bug。<br>
+                            3.优化天选时刻获取粉丝勋章信息的方法，提高效率。<br> 
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -2348,7 +2350,7 @@
                         return $.Deferred().resolve();
                     }
                     if (i >= vlist.length) {
-                        return MY_API.DailyReward.UserSpace(MY_API.CONFIG.COIN_UID, 30, 0, pagenum++, '', 'pubdate', 'jsonp');
+                        return MY_API.DailyReward.UserSpace(MY_API.CONFIG.COIN_UID, 30, 0, pagenum + 1, '', 'pubdate', 'jsonp');
                     }
                     const obj = vlist[i];
                     if (obj.hasOwnProperty('is_union_video') && obj.is_union_video === 1 && obj.mid != uid) {
@@ -2627,7 +2629,7 @@
                         });
                     }
                     if (MY_API.CONFIG.AUTO_GIFT_ROOMID && MY_API.CONFIG.AUTO_GIFT_ROOMID.length > 0) {
-                        let sortRooms = MY_API.CONFIG.AUTO_GIFT_ROOMID;
+                        let sortRooms = [...MY_API.CONFIG.AUTO_GIFT_ROOMID];
                         sortRooms.reverse();
                         for (let froom of sortRooms) {
                             let rindex = medals.findIndex(r => r.roomid == froom);
@@ -3946,22 +3948,30 @@
                             switch (response.data.require_type) {
                                 //case 1: break;关注
                                 case 2: {
-                                    for (const m of MY_API.AnchorLottery.medal_list) {
-                                        if (m.long_roomid === response.data.room_id || m.roomid === response.data.room_id) {
-                                            if (m.level < response.data.require_value) {
-                                                MY_API.chatLog(`[天选时刻] 忽略粉丝勋章等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>所需勋章等级：${response.data.require_value} 你的勋章等级：${m.level}`, 'warning');
-                                                return [false]
-                                            } else {
-                                                return [response.data.id, joinPrice === 0 ? undefined : response.data.gift_id, joinPrice === 0 ? undefined : response.data.gift_num, roomid, response.data.award_name, response.data.time]
+                                    return BAPI.live_user.get_anchor_in_room(roomid).then((res) => {
+                                        MYDEBUG(`API.live_user.get_anchor_in_room(${roomid})`, res);
+                                        if (!!res.data) {
+                                            let ownerUid = res.data.info.uid;
+                                            for (const m of MY_API.AnchorLottery.medal_list) {
+                                                if (m.uid === ownerUid) {
+                                                    if (m.level < response.data.require_value) {
+                                                        MY_API.chatLog(`[天选时刻] 忽略粉丝勋章等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>所需勋章等级：${response.data.require_value} 你的勋章等级：${m.level}`, 'warning');
+                                                        return [false]
+                                                    } else {
+                                                        return [response.data.id, joinPrice === 0 ? undefined : response.data.gift_id, joinPrice === 0 ? undefined : response.data.gift_num, roomid, response.data.award_name, response.data.time]
+                                                    }
+                                                }
                                             }
+                                            MY_API.chatLog(`[天选时刻] 忽略有粉丝勋章要求的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>所需勋章等级：${response.data.require_value}`, 'warning');
+                                            return [false]
+                                        } else {
+                                            return [false]
                                         }
-                                    }
-                                    MY_API.chatLog(`[天选时刻] 忽略有粉丝勋章要求的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>所需勋章等级：${response.data.require_value}`, 'warning');
-                                    return [false]
+                                    });
                                 }
+                                //case 3:上舰
                                 default: break;
                             }
-                            //case 3:上舰
                             return [response.data.id, joinPrice === 0 ? undefined : response.data.gift_id, joinPrice === 0 ? undefined : response.data.gift_num, roomid, response.data.award_name, response.data.time]
                         }
                         else {
@@ -4079,13 +4089,6 @@
                     const settingIntervalTime = MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000;
                     MY_API.chatLog(`[天选时刻] 开始获取粉丝勋章信息`);
                     await MY_API.AnchorLottery.getMedalList();
-                    for (let m = 0; m < MY_API.AnchorLottery.medal_list.length; m++) {
-                        await BAPI.room.get_info(MY_API.AnchorLottery.medal_list[m].roomid).then((res) => {//res.data.room_id长号
-                            MYDEBUG(`API.room.get_info roomId=${MY_API.AnchorLottery.medal_list[m].roomid} res`, res);
-                            MY_API.AnchorLottery.medal_list[m].long_roomid = res.data.room_id;
-                        });
-                        await sleep(MY_API.CONFIG.ANCHOR_INTERVAL)
-                    };
                     //console.log('测试 MY_API.CONFIG.ANCHOR_TYPE', MY_API.CONFIG.ANCHOR_TYPE)
                     function waitForNextRun(Fn) {
                         const intervalTime = ts_ms() - MY_API.CACHE.AnchorLottery_TS;
