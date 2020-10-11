@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.2.3.2
+// @version        5.2.3.3
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -573,13 +573,11 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache === undefined || cache === null || cache != '5.2.3.2')) { //更新公告时需要修改
+                    if ((cache === undefined || cache === null || cache != '5.2.3.3')) { //更新公告时需要修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            1.修复自动投币循环检查UP前30个的视频的bug。<br>
-                            2.修复自动送礼【优先送礼房间】的顺序会在送礼后颠倒的bug。<br>
-                            3.优化天选时刻获取粉丝勋章信息的方法，提高效率。<br> 
+                            1.修复方糖推送失败的问题<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -4012,19 +4010,20 @@
                                                 content: `{"content":"` + MY_API.CONFIG.ANCHOR_LETTER_CONTENT + `"}`,
                                                 dev_id: getMsgDevId()
                                             }
-                                            setTimeout(() => {
-                                                BAPI.sendMsg(msg).then((response) => {
-                                                    if (response.code === 0) {
+                                            return setTimeout(() => {
+                                                BAPI.sendMsg(msg).then((res) => {
+                                                    MYDEBUG(`API.sendMsg ${msg}`, res);
+                                                    if (res.code === 0) {
                                                         window.toast(`[天选自动私信] 私信UP(uid = ${anchorUid})成功`, 'success');
                                                     } else {
-                                                        window.toast(`[天选自动私信] 私信UP(uid = ${anchorUid})失败 ${response.message}`, 'error');
+                                                        window.toast(`[天选自动私信] 私信UP(uid = ${anchorUid})失败 ${res.message}`, 'error');
                                                     }
                                                 })
                                             }, 7000);//之前3秒+7秒
 
                                         }
                                         if (MY_API.CONFIG.FT_NOTICE) {
-                                            FT_sendMsg(MY_API.CONFIG.FT_SCKEY,
+                                            return FT_sendMsg(MY_API.CONFIG.FT_SCKEY,
                                                 `${GM_info.script.name} 天选时刻中奖通知 ${new Date().toLocaleString()}`,
                                                 `###天选时刻中奖\n###房间号roomid = ${data[3]}\n###主播uid = ${anchorUid}\n###抽奖id = ${data[0]}\n###获得奖品：\n###${data[4]}\n###请及时私信主播发放奖励`
                                             ).then((re) => {
@@ -4385,9 +4384,8 @@
             GM: true,
             anonymous: true,
             method: 'GET',
-            url: `https://sc.ftqq.com/${SCKEY}.send`,
-            responseType: 'json',
-            data: encodeURI(`text=${text}&desp=${desp}`)
+            url: `https://sc.ftqq.com/${SCKEY}.send?` + encodeURI(`text=${text}&desp=${desp}`),
+            responseType: 'json'
         })
     }
     /**
