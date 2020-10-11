@@ -7,7 +7,7 @@
 // @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼、点亮勋章，参与实物抽奖，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
 // @updateURL      https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
-// @homepageURL    https://github.com/andywang425/BLTH/
+// @homepageURL    https://github.com/andywang425/BLTH
 // @supportURL     https://github.com/andywang425/BLTH/issues
 // @icon           https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png
 // @copyright      2020, andywang425 (https://github.com/andywang425)
@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.2.3.3
+// @version        5.2.3.4
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -573,11 +573,11 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if ((cache === undefined || cache === null || cache != '5.2.3.3')) { //更新公告时需要修改
+                    if ((cache === undefined || cache === null || cache != '5.2.3.4')) { //更新公告时需要修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            1.修复方糖推送失败的问题<br>
+                            1.修复方糖推送没有正文的问题<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -4148,7 +4148,7 @@
 
     async function StartPlunder(API) {
         'use strict';
-        //清空辣条数量        
+        //清空辣条数量
         let clearStat = () => {
             API.GIFT_COUNT.COUNT = 0;
             API.GIFT_COUNT.CLEAR_TS = dateNow();
@@ -4383,8 +4383,9 @@
         return XHR({
             GM: true,
             anonymous: true,
-            method: 'GET',
-            url: `https://sc.ftqq.com/${SCKEY}.send?` + encodeURI(`text=${text}&desp=${desp}`),
+            method: 'POST',
+            url: `https://sc.ftqq.com/${SCKEY}.send`,
+            data: `text=${text}&desp=${desp}`,
             responseType: 'json'
         })
     }
