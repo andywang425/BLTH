@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.2.4
+// @version        5.2.4.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -110,8 +110,7 @@
         },
         newWindow = {
             init: () => {
-                return newWindow.Toast.init().then(() => {
-                });
+                return newWindow.Toast.init();
             },
             Toast: { //设置右上角弹窗
                 init: () => {
@@ -326,7 +325,7 @@
                 ANCHOR_CHECK_INTERVAL: 5,//天选检查间隔（分钟）
                 ANCHOR_IGNORE_BLACKLIST: true,//天选忽略关键字（选项）
                 ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车'],//天选忽略关键字
-                ANCHOR_INTERVAL: 150,//天选（检查天选和取关）请求间隔
+                ANCHOR_INTERVAL: 200,//天选（检查天选和取关）请求间隔
                 AHCHOR_NEED_GOLD: 0,//忽略所需金瓜子大于_的抽奖
                 ANCHOR_WAIT_REPLY: true,//请求后等待恢复
                 ANCHOR_UPLOAD_DATA: false,//天选上传数据
@@ -577,14 +576,13 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if (cache === undefined || cache === null || cache != version) {
+                    if (cache === undefined || cache === null || cache !== "5.2.4.1") { //更新时需修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            1.自动投币支持多UID<br>
-                            2.天选/实物中奖后浏览器提示<br>
-                            3.白名单编辑<br>
-                            4.新增【再次执行主站任务】按钮<br>
+                            1.修改天选时刻上传数据格式，防止出现<em style = "color: orange">
+                            您所填写的简介可能涉及不符合相关法律法规和政策的内容，请修改</em>
+                            的情况。<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -3857,7 +3855,7 @@
                         });
                         let lotteryInfoArray;
                         try {
-                            lotteryInfoArray = await eval(decode64(description));
+                            lotteryInfoArray = await eval(decode64(description.replaceAll("-", "")));
                             if (!$.isArray(lotteryInfoArray) || !$.isArray(lotteryInfoArray[0])) {
                                 lotteryInfoArray = undefined
                             }
@@ -3937,7 +3935,12 @@
                         })
                     }
                     const encodeData = await encode64(uploadRawStr);
-                    return updateEncodeData(MY_API.AnchorLottery.myLiveRoomid, encodeData).then(() => {
+                    let finalStr = "";
+                    for (const c of encodeData) {
+                        finalStr = finalStr + c + (c === encodeData.charAt(encodeData.length-1) ? "" : "-");
+                    }
+                    //console.log('测试 finalStr', finalStr);
+                    return updateEncodeData(MY_API.AnchorLottery.myLiveRoomid, finalStr).then(() => {
                         return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL * 1000)
                     });
                 },
@@ -3957,7 +3960,7 @@
                     let lotteryInfoArray;
                     try {
                         if (description === undefined) throw "undefined"
-                        lotteryInfoArray = await eval(decode64(description));
+                        lotteryInfoArray = await eval(decode64(description.replaceAll("-", "")));
                         if (!$.isArray(lotteryInfoArray) || !$.isArray(lotteryInfoArray[0])) {
                             throw "Not a Array"
                         }
@@ -4131,7 +4134,7 @@
                                 const id_list = [...config.list];
                                 if (id_list.indexOf(anchorUid) === -1) {
                                     return p.then(() => {
-                                        BAPI.relation.modify(anchorUid, 2).then((response) => {
+                                        return BAPI.relation.modify(anchorUid, 2).then((response) => {
                                             MYDEBUG(`API.relation.modify response.info.uid, ${2}`, response);
                                             if (response.code === 0) {
                                                 window.toast(`[天选自动取关] 取关UP(uid = ${anchorUid})成功`, 'success');
