@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.3
+// @version        5.3.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -589,7 +589,7 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if (cache === undefined || cache === null || cache !== "5.3") { //更新时需修改
+                    if (cache === undefined || cache === null || cache !== "5.3.1") { //更新时需修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
@@ -4391,6 +4391,14 @@
             }
             API.chatLog('变量类型错误修复完成', 'success');
             API.saveConfig(false);
+        }
+        const config = JSON.parse(localStorage.getItem(`${NAME}AnchorFollowingList`)) || { list: [] };
+        let idlist = [...config.list];
+        if (idlist.length !== 0 && typeof(idlist[0]) === 'number') {
+            for (let i = 0; i < idlist.length; i++) {
+                idlist[i] = String(idlist[i])
+            }
+            localStorage.setItem(`${NAME}AnchorFollowingList`, JSON.stringify({ list: idlist }));
         }
         setTimeout(() => {
             API.AUTO_DANMU.run();//自动发弹幕
