@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       1.9
+// @version       2.0
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -891,7 +891,7 @@ var BilibiliAPI = {
                 }
             });
         },
-        getTagInfo: (mid, tagid, pn = 1, ps = 20, jsonp = 'jsonp', callback = '') => {//获取一个关注分组中的UP
+        getUpInTag: (mid, tagid, pn = 1, ps = 20, jsonp = 'jsonp', callback = '') => {//获取一个关注分组中的UP
             return BilibiliAPI.ajax({
                 url: '//api.bilibili.com/x/relation/tag',
                 data: {
@@ -903,6 +903,34 @@ var BilibiliAPI = {
                     callback: callback//__jp11
                 }
             });
+        },
+        createTag: (tag, jsonp = 'jsonp') => {
+            return BilibiliAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '//api.bilibili.com/x/relation/tag/create',
+                data: {
+                    tag: tag,//tag名称
+                    jsonp: jsonp
+                }
+            })
+        },
+        getTagIDByName: (tag_name) => {
+            return BilibiliAPI.ajax({
+                url: '//api.bilibili.com/x/tag/info',
+                data: {
+                    tag_name: tag_name
+                }
+            })
+        },
+        delTag: (tagid, jsonp = 'jsonp') => {
+            return BilibiliAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '//api.bilibili.com/x/relation/tag/del',
+                data: {
+                    tagid: tagid,
+                    jsonp: jsonp
+                }
+            })
         },
         modify: (fid, act, re_src = 11) => {
             return BilibiliAPI.ajaxWithCommonArgs({
@@ -1025,7 +1053,7 @@ var BilibiliAPI = {
                 }
             })
         },
-        getRoomInfoOld:(mid) => {
+        getRoomInfoOld: (mid) => {
             return BilibiliAPI.ajax({
                 url: 'room/v1/Room/getRoomInfoOld',
                 data: {
