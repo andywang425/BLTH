@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.0
+// @version       2.0.1
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -1278,6 +1278,18 @@ var BilibiliAPI = {
                     type: type
                 }
             });
+        },
+        getInfoByUser: (room_id) => {
+            /**
+             * 返回json中 data.privilege.privilege_type的值为上船种类
+             * 0：未上船，1：总督，2：提督，3：舰长
+             */
+            return BilibiliAPI.ajax({
+                url: '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser',
+                data: {
+                    room_id: room_id
+                }
+            })
         },
         anchor: {
             check: (roomid) => {
