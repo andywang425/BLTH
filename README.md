@@ -280,13 +280,13 @@
 -------------------------------
 
 ## 鸣谢
-[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://greasyfork.org/zh-CN/users/429735-%E9%A3%8E%E7%BB%AB%E4%B8%A8%E9%92%B0%E8%A2%96)，[Server酱](https://sc.ftqq.com/)  
+[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com/)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)  
 以及所有提出过建议的用户。
 
 -------------------------------
 
 ## 更新日志
->### 5.3.1
->新增【把参与天选时关注的UP移到新分组】【取关该分组内的UP主】，中奖后【把发起抽奖的UP加入白名单】；修复取关时若等待回复会取关得非常慢的问题；修复取关不在白名单内UP时把所有关注的UP全取关的bug；方糖推送显示获奖账号。  
+>### 5.4
+>【屏蔽挂机检测】优化，改为函数劫持方式；方糖SCKEY编辑方式优化；新功能：忽略金额小于__元的天选；支持参加有粉丝勋章和大航海要求的天选；修复天选时刻中奖后不添加白名单，自动取关白名单内UP的bug；不再自动取关，移动一开始在默认分组内的UP；新增内置帮助信息（目前只完成了一条）。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
