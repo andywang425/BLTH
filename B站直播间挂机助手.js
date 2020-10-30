@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.4
+// @version        5.4.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -599,7 +599,7 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if (cache === undefined || cache === null || cache !== "5.4") { //更新时需修改
+                    if (cache === undefined || cache === null || cache !== "5.4.1") { //更新时需修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
@@ -4254,7 +4254,7 @@
                             };
                             const moneyCheckReturnArray = MY_API.AnchorLottery.moneyCheck(response.data.award_name);
                             if (moneyCheckReturnArray[0] && moneyCheckReturnArray[1] < MY_API.CONFIG.ANCHOR_IGNORE_MONEY) {
-                                MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>识别到的金额：${moneyCheckReturnArray[1]}元`, 'warning');
+                                MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>原标题：${response.data.award_name}<br>识别到的金额：${moneyCheckReturnArray[1]}元`, 'warning');
                                 return [false]
                             }
                             const joinPrice = response.data.gift_num * response.data.gift_price;
