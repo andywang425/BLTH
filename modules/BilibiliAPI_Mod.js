@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.0.1
+// @version       2.0.2
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -1140,7 +1140,12 @@ var BilibiliAPI = {
                 }
             })
         },
-        coin_add: (aid, multiply = 1) => {
+        getTodayExp: () => { //获取今日投币获得的经验
+            return BilibiliAPI.ajax({
+                url: '//api.bilibili.com/x/web-interface/coin/today/exp'
+            })
+        },
+        coin_add: (aid, select_like = 0, multiply = 1) => {
             // 投币
             return BilibiliAPI.ajaxWithCommonArgs({
                 method: 'POST',
@@ -1148,6 +1153,7 @@ var BilibiliAPI = {
                 data: {
                     aid: aid,
                     multiply: multiply,
+                    select_like: select_like,
                     cross_domain: true
                 }
             });
