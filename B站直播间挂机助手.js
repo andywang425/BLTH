@@ -3,8 +3,8 @@
 // @name           B站直播间挂机助手
 // @name:en        B站直播间挂机助手
 // @author         andywang425
-// @description    自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼、点亮勋章，参与实物抽奖，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
-// @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼、点亮勋章，参与实物抽奖，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
+// @description    自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
+// @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖(现在极少)，参加被广播的节奏风暴(几乎没有)，定时发弹幕，快捷购买粉丝勋章
 // @updateURL      https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH
@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.5
+// @version        5.5.1
 // @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at        document-start
 // @connect       passport.bilibili.com
@@ -393,7 +393,7 @@
                 MATERIAL_LOTTERY_CHECK_INTERVAL: 60,//实物抽奖检查间隔
                 MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: true,//实物抽奖忽略存疑抽奖
                 MEDAL_DANMU: false,//粉丝勋章打卡弹幕
-                MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "(￣3￣)", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(｡･ω･｡)", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄"],//粉丝勋章打卡弹幕内容
+                MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "(￣3￣)", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄"],//粉丝勋章打卡弹幕内容
                 QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼'],//存疑实物抽奖
                 MATERIAL_LOTTERY_REM: 10,//每次检查aid数量
                 RANDOM_DELAY: true,//抽奖随机延迟
@@ -606,16 +606,12 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if (cache === undefined || cache === null || cache !== "5.5") { //更新时需修改
+                    if (cache === undefined || cache === null || cache !== "5.5.1") { //更新时需修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            1.【屏蔽挂机检测】优化，每隔一段时间模拟一次鼠标移动。<br>
-                            2.【天选时刻】【忽略金额小于__元的天选】优化，支持识别汉字数字，提高识别率。<br>
-                            3.修复方糖SCKEY在保存设置后消失的bug。<br>
-                            4.当浏览器窗口有横向滚动条时脚本控制面板和日志窗口不再错位。<br>
-                            5.<strong>新功能：粉丝勋章打卡弹幕。</strong><br>
-                            6.今日统计改为统计天选和实物抽奖参与次数。<br>
+                            1.【天选时刻】【忽略金额小于__元的天选】重构升级，能够识别更多种类的奖品名。<br>
+                            2.修复忽略关键字数量，参与抽奖次数显示不正确的bug。<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -787,8 +783,8 @@
                 <fieldset class="igiftMsg_fs">
                     <legend style="color: black">今日统计</legend>
                     <div id="giftCount" style="font-size: large; font-weight: bold; color: blueviolet;">
-                        参与天选时刻&nbsp;<span>${MY_API.GIFT_COUNT.ANCHOR_COUNT}</span>&nbsp;次
-                        参与实物抽奖&nbsp;<span>${MY_API.GIFT_COUNT.MATERIAL_COUNT}</span>&nbsp;次
+                        参与天选时刻&nbsp;<span>0</span>&nbsp;次
+                        参与实物抽奖&nbsp;<span>0</span>&nbsp;次
                         &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="save">保存所有设置</button>
                     </div>
                 </fieldset>
@@ -865,7 +861,7 @@
                     <label style="margin: 5px auto; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;
                         <input style="vertical-align: text-top;" type="checkbox">
                         忽略关键字
-                        <label class = 'str' style = 'font-weight:bold'>${MY_API.CONFIG.QUESTIONABLE_LOTTERY.length}个</label>
+                        <label class = 'str' style = 'font-weight:bold'>0个</label>
                         &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="edit_QUESTIONABLE_LOTTERY">编辑</button>
                     </label>
                 </div>
@@ -1078,7 +1074,7 @@
                             <label style="margin: 5px auto; color: black">
                                 <input style="vertical-align: text-top;" type="checkbox">
                                 忽略关键字
-                                <label class = 'str' style = 'font-weight:bold'>${MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length}个</label>
+                                <label class = 'str' style = 'font-weight:bold'>0个</label>
                                 &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="edit_ANCHOR_BLACKLIST_WORD">编辑</button>
                             </label>
                         </div>
@@ -1472,13 +1468,16 @@
                     },
                 ];
                 const helpText = {
-                    ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<h3>注意：</h3><li>支持识别阿拉伯数字和汉字数字，汉字数字的识别率相对较低</li><li>识别的单位有限</li><li>不支持识别外币</li><li>由于一些天选时刻的奖品名比较奇怪，可能会出现误判</li>',
+                    ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<h3>注意：</h3><li>支持识别阿拉伯数字和汉字数字</li><li>识别的单位有限</li><li>不支持识别外币</li><li>由于一些天选时刻的奖品名比较特殊，可能会出现误判</li>',
                     LOTTERY: '现在B站已经没有礼物抽奖了，这个功能暂时没用。但考虑到以后可能还会有礼物抽奖就保留了。',
                     MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<h3>注意：</h3><li>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送</li><li>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行</li>',
-                    AUTO_DANMU: '发送直播间弹幕。<h3>注意：</h3><ul><li>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</li><li><p>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</p></li><li><p>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.1秒间隔时间（对在特定时间点发送的弹幕无效）。</p></li><li><p>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</p></li><li><p>房间号的默认值是我的直播间号，可以用来测试。</p></li><li><p>发送时间有两种填写方法</p><p>1.【小时】h【分钟】m【秒】s</p><ul><li>每隔一段时间发送一条弹幕</li><li>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></li><li>可以填小数</li><li>可以只填写其中一项或两项</li></ul><p>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</p><p><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></p><p>2.【小时】:【分钟】:【秒】</p><ul><li>在特定时间点发一条弹幕</li><li>例子： <code>10:30:10</code>, <code>0:40</code></li><li>只能填整数</li><li>小时分钟必须填写，秒数可以不填</li></ul><p>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</p></li></ul>',
+                    AUTO_DANMU: '发送直播间弹幕。<h3>注意：</h3><ul><li>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</li><li><p>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</p></li><li><p>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.1秒间隔时间（对在特定时间点发送的弹幕无效）。</p></li><li><p>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</p></li><li><p>可以用默认值所填的房间号来测试本功能。</p></li><li><p>发送时间有两种填写方法</p><p>1.【小时】h【分钟】m【秒】s</p><ul><li>每隔一段时间发送一条弹幕</li><li>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></li><li>可以填小数</li><li>可以只填写其中一项或两项</li></ul><p>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</p><p><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></p><p>2.【小时】:【分钟】:【秒】</p><ul><li>在特定时间点发一条弹幕</li><li>例子： <code>10:30:10</code>, <code>0:40</code></li><li>只能填整数</li><li>小时分钟必须填写，秒数可以不填</li></ul><p>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</p></li></ul>',
                     NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<h3>原理：</h3><li>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每10分钟触发一次鼠标移动事件规避鼠标移动检测</li>',
                     INVISIBLE_ENTER: '开启后进任意直播间时都不会出现提示【xxx进入直播间】。所有人都不会发现你进入了直播间。<h3>缺点：</h3>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管点击后会提示接口返回错误），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。',
-                    MATERIAL_LOTTERY: '实物抽奖，即金宝箱抽奖。某些特殊的直播间会有金宝箱抽奖。<h3>注意：</h3><li>【忽略关键字】中每一项之间用半角逗号<code>,</code>隔开。若标题中含有忽略关键字则跳过该抽奖。</li><li>【忽略关键字】可以填正则表达式。正则格式为以<code>/</code>开头且以<code>/</code>结尾，如<code>/测.*试/</code>。</li><li>【检测到__个不存在活动的aid后停止检测】aid是活动的编号。如果你不理解此项保持默认配置即可。</li>'
+                    MATERIAL_LOTTERY: '实物抽奖，即金宝箱抽奖。某些特殊的直播间会有金宝箱抽奖。<h3>注意：</h3><li>【忽略关键字】中每一项之间用半角逗号<code>,</code>隔开。若标题中含有忽略关键字则跳过该抽奖。</li><li>【忽略关键字】可以填正则表达式。正则格式为以<code>/</code>开头且以<code>/</code>结尾，如<code>/测.*试/</code>。</li><li>【检测到__个不存在活动的aid后停止检测】aid是活动的编号。如果你不理解此项保持默认配置即可。</li>',
+                    ANCHOR_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑天选。<h3>注意：</h3><li>若要填写多个，每一项之间用半角逗号<code>,</code>隔开</li><li>关键字对大小写不敏感，而正则会区分大小写</li>",
+                    MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<h3>注意：</h3><li>若要填写多个，每一项之间用半角逗号<code>,</code>隔开</li><li>关键字对大小写不敏感，而正则会区分大小写</li>",
+                    FT_NOTICE: "<a href = 'https://sc.ftqq.com/' target = '_blank'>方糖（点我注册）</a>，即「Server酱」，英文名「ServerChan」，是一款「程序员」和「服务器」之间的通信软件。说人话？就是从服务器推报警和日志到手机的工具。<br>使用前请先前往方糖官网完成注册，然后回到脚本界面填写SCKEY。<hr><li>检测到实物/天选中奖后会发一条包含中奖具体信息的微信推送提醒你中奖了</li>"
                 }
                 const openMainWindow = async () => {
                     const settingTableoffset = $('.live-player-mounter').offset(),
@@ -1503,7 +1502,12 @@
                                 if (data_toggle !== undefined && helpText.hasOwnProperty(data_toggle)) {
                                     JQdom.append(`<span id = '${data_toggle}_help' class = "clickableText">?</span>`)
                                 }
-                            })
+                            });
+                            $('#giftCount span:eq(0)').text(MY_API.GIFT_COUNT.ANCHOR_COUNT);
+                            $('#giftCount span:eq(1)').text(MY_API.GIFT_COUNT.MATERIAL_COUNT);
+                            div.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] label:eq(0) label:eq(0)').text(String(MY_API.CONFIG.QUESTIONABLE_LOTTERY.length) + '个');
+                            div.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label:eq(0) label:eq(0)').text(String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length) + '个');
+
                             div.find('div[data-toggle="ANCHOR_IGNORE_MONEY"] .num').val(parseFloat(MY_API.CONFIG.ANCHOR_IGNORE_MONEY).toString());
                             div.find('div[data-toggle="ANCHOR_MAXLIVEROOM_SAVE"] .roomNum').val(parseInt(MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE).toString());
                             div.find('div[data-toggle="ANCHOR_UPLOAD_DATA"] .num').val(MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL.toString());
@@ -3590,7 +3594,7 @@
                             if (MY_API.CONFIG.MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY) {
                                 for (const str of MY_API.CONFIG.QUESTIONABLE_LOTTERY) {
                                     if (str.charAt(0) != '/' && str.charAt(str.length - 1) != '/') {
-                                        if (response.data.title.toLowerCase().indexOf(str) > -1) {
+                                        if (response.data.title.toLowerCase().indexOf(str.toLowerCase()) > -1) {
                                             MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid = ${aid})<br>含有关键字：` + str, 'warning');
                                             return MY_API.MaterialObject.check(aid + 1, aid);
                                         }
@@ -4164,93 +4168,83 @@
                 moneyCheck: (award_name) => {
                     const name = award_name.replaceAll(' ', '').toLowerCase();//去空格+转小写
                     const numberArray = name.match(/\d+(\.\d+)?/g);//提取阿拉伯数字
-                    if (numberArray === null) { //没提取出阿拉伯数字
-                        const chineseNumber = name.match(/[一二三四五六七八九十]?千?[一二三四五六七八九十]?百?[零一二三四五六七八九十]?十?[一二三四五六七八九十]?/)[0];
-                        //console.log('chineseNumber', chineseNumber);
-                        if (chineseNumber.length === 0) return [false]; //汉字数字也匹配失败则返回
-                        const chnNumChar = {
-                            零: 0,
-                            一: 1,
-                            二: 2,
-                            三: 3,
-                            四: 4,
-                            五: 5,
-                            六: 6,
-                            七: 7,
-                            八: 8,
-                            九: 9
-                        },
-                            chnNameValue = {
-                                十: { value: 10, secUnit: false },
-                                百: { value: 100, secUnit: false },
-                                千: { value: 1000, secUnit: false },
-                                万: { value: 10000, secUnit: true },
-                                亿: { value: 100000000, secUnit: true }
-                            };
-                        function ChineseToNumber(chnStr) {
-                            let rtn = 0;
-                            let section = 0;
-                            let number = 0;
-                            let secUnit = false;
-                            let str = chnStr.split('');
-
-                            for (let i = 0; i < str.length; i++) {
-                                let num = chnNumChar[str[i]];
-                                if (typeof num !== 'undefined') {
-                                    number = num;
-                                    if (i === str.length - 1) {
-                                        section += number;
-                                    }
-                                } else {
-                                    if (!chnNameValue.hasOwnProperty(str[i]))
-                                        return undefined;
-                                    let unit = chnNameValue[str[i]].value;
-                                    secUnit = chnNameValue[str[i]].secUnit;
-                                    if (secUnit) {
-                                        section = (section + number) * unit;
-                                        rtn += section;
-                                        section = 0;
+                    const chineseNumberArray = name.match(/([一二两三四五六七八九十]千零?[一二两三四五六七八九十]?百?[一二三四五六七八九十]?十?[一二三四五六七八九十]?)|([一二两三四五六七八九十]百[一二三四五六七八九十]?十?[一二三四五六七八九十]?)|([一二三四五六七八九十]?十[一二三四五六七八九十])|[一二三四五六七八九十]/g);//提取汉字数字
+                    const chnNumChar = { "零": 0, "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9 },
+                        chnNameValue = { "十": { value: 10, secUnit: false }, "百": { value: 100, secUnit: false }, "千": { value: 1e3, secUnit: false }, "万": { value: 1e4, secUnit: true }, "亿": { value: 1e8, secUnit: true } };
+                    if (chineseNumberArray !== null && numberArray === null) { //只提取出汉字数字
+                        return chineseFunc();
+                    } else if (chineseNumberArray === null && numberArray !== null) { //只提取出阿拉伯数字
+                        return arabicNumberFunc();
+                    } else if (chineseNumberArray !== null && numberArray !== null) { //都提取出来了
+                        let arr =  arabicNumberFunc();
+                        if (arr[0]) return arr;
+                        else return chineseFunc()
+                    } else { //都没提取出来
+                        return [false]
+                    }
+                    function chineseFunc() {
+                        if (chineseNumberArray.length === 0) return [false]; //汉字数字也匹配失败则返回
+                        let chineseNumIndexList = [];
+                        for (const n of chineseNumberArray) {
+                            chineseNumIndexList.push(getIndex(name, n, chineseNumIndexList));
+                        }
+                        //console.log('chineseNumIndexList', chineseNumIndexList)
+                        for (let n = 0; n < chineseNumberArray.length; n++) {
+                            const chineseNum = chineseNumberArray[n];//中文数字
+                            if (chineseNum !== undefined) {
+                                const num = ChineseToNumber(chineseNum);//阿拉伯数字
+                                const ChineseNumberIndex = chineseNumIndexList[n],//中文数字下表
+                                    ChineseNumLength = chineseNum.length,//中文数字长度
+                                    nextChineseNumIndex = chineseNumIndexList[n + 1];//下一个数字下标
+                                const unitIndex = ChineseNumberIndex + ChineseNumLength;//数字后一个中文数字的下标 可能为undefined
+                                //console.log('中文数字下表', ChineseNumberIndex)
+                                //console.log('中文数字长度', ChineseNumLength)
+                                //console.log('下一个数字下标', nextChineseNumIndex)
+                                //console.log('数字后一个中文数字的下标', unitIndex)
+                                let strAfterNum = '';//数字后面的字符串
+                                for (let i = unitIndex; i < name.length; i++) {
+                                    if (nextChineseNumIndex !== undefined) {
+                                        if (i < nextChineseNumIndex)//不能把下一个数字取进去
+                                            strAfterNum = strAfterNum + name[i];
                                     } else {
-                                        section += (number * unit);
+                                        strAfterNum = strAfterNum + name[i];
                                     }
-                                    number = 0;
                                 }
+                                //console.log('strAfterNum', strAfterNum)
+                                let finalMoney = checkPrice(num, strAfterNum);
+                                if (finalMoney === undefined) {
+                                    if (n === chineseNumberArray.length - 1) return [false];
+                                    else continue;
+                                }
+                                else return [true, finalMoney];
                             }
-                            return rtn + section;
-                        };
-                        const number = ChineseToNumber(chineseNumber);
-                        //console.log('number', number)
-                        if (number !== undefined) {
-                            const chineseIndex = name.indexOf(chineseNumber);
-                            let strAfterNum = name.substring(chineseIndex + chineseNumber.length);
-                            let finalMoney = checkPrice(number, strAfterNum);
-                            if (finalMoney === undefined) return [false];
-                            else return [true, finalMoney];
                         }
                     }
-                    let numIndexList = [];
-                    for (const n of numberArray) { //每个数字在name中的下标
-                        numIndexList.push(name.indexOf(n));
-                    } for (let n = 0; n < numberArray.length; n++) {
-                        const num = numberArray[n];//数字
-                        const numberIndex = name.indexOf(num),//数字下表
-                            numLength = num.length,//数字长度
-                            nextNumIndex = numIndexList[n + 1];//下一个数字下标
-                        const unitIndex = numberIndex + numLength;//数字后一个字符的下标 可能为undefined
-                        let strAfterNum = '';//数字后面的字符串
-                        for (let i = unitIndex; i < name.length; i++) {
-                            if (nextNumIndex !== undefined) {
-                                if (i < nextNumIndex)//不能把下一个数字取进去
+                    function arabicNumberFunc() {
+                        let numIndexList = [];
+                        for (const n of numberArray) { //每个数字在name中的下标
+                            numIndexList.push(getIndex(name, n, numIndexList));
+                        } for (let n = 0; n < numberArray.length; n++) {
+                            const num = numberArray[n];//数字
+                            const numberIndex = name.indexOf(num),//数字下表
+                                numLength = num.length,//数字长度
+                                nextNumIndex = numIndexList[n + 1];//下一个数字下标
+                            const unitIndex = numberIndex + numLength;//数字后一个字符的下标 可能为undefined
+                            let strAfterNum = '';//数字后面的字符串
+                            for (let i = unitIndex; i < name.length; i++) {
+                                if (nextNumIndex !== undefined) {
+                                    if (i < nextNumIndex)//不能把下一个数字取进去
+                                        strAfterNum = strAfterNum + name[i];
+                                } else {
                                     strAfterNum = strAfterNum + name[i];
-                            } else {
-                                strAfterNum = strAfterNum + name[i];
+                                }
                             }
+                            let finalMoney = checkPrice(num, strAfterNum);
+                            if (finalMoney === undefined) {//识别失败
+                                if (n === numberArray.length - 1) return [false];
+                                else continue;
+                            } else return [true, finalMoney]
                         }
-                        let finalMoney = checkPrice(num, strAfterNum);
-                        if (finalMoney === undefined) {//识别失败
-                            if (n === numberArray.length - 1) return [false];
-                            else continue;
-                        } else return [true, finalMoney]
                     }
                     function checkPrice(num, strAfterNum) {
                         const yuan = ['元', 'r', '块'],//1
@@ -4276,6 +4270,54 @@
                         }
                         return finalMoney;
                     }
+                    function ChineseToNumber(chnStr) {
+                        let rtn = 0;
+                        let section = 0;
+                        let number = 0;
+                        let secUnit = false;
+                        let str = chnStr.split('');
+
+                        for (let i = 0; i < str.length; i++) {
+                            let num = chnNumChar[str[i]];
+                            if (typeof num !== 'undefined') {
+                                number = num;
+                                if (i === str.length - 1) {
+                                    section += number;
+                                }
+                            } else {
+                                if (!chnNameValue.hasOwnProperty(str[i]))
+                                    return undefined;
+                                let unit = chnNameValue[str[i]].value;
+                                secUnit = chnNameValue[str[i]].secUnit;
+                                if (secUnit) {
+                                    section = (section + number) * unit;
+                                    rtn += section;
+                                    section = 0;
+                                } else {
+                                    section += (number * unit);
+                                }
+                                number = 0;
+                            }
+                        }
+                        return rtn + section;
+                    };
+                    /**
+                    * 获取下标，可处理部分特殊情况，如
+                    * 100金瓜子1个
+                    * 1份100金瓜子1个
+                    * @param str 字符串
+                    * @param num 被搜索的数字
+                    * @param array 储存已搜索到的数字的下标的数组
+                    * @param start 搜索数字的开始下标，初始为0，为了防止重复搜索字符串中的一个子串
+                    * @param arrStart 搜索数组的开始下标，初始为0，为了防止重复搜索数组中的某一项
+                    * @returns {number} index
+                    */
+                    function getIndex(str, num, array, start = 0, arrStart = 0) {
+                        let index = str.indexOf(num, start),
+                            arrayIndex = array.indexOf(index, arrStart);
+                        if (arrayIndex > -1) return getIndex(str, num, array, index + 1, arrayIndex + 1);
+                        else return index
+                    }
                 },
                 check: (roomid, add = true) => {
                     return BAPI.xlive.anchor.check(roomid).then((response) => {
@@ -4292,7 +4334,7 @@
                             if (MY_API.CONFIG.ANCHOR_IGNORE_BLACKLIST) {
                                 for (const str of MY_API.CONFIG.ANCHOR_BLACKLIST_WORD) {
                                     if (str.charAt(0) != '/' && str.charAt(str.length - 1) != '/') {
-                                        if (response.data.award_name.toLowerCase().indexOf(str) > -1) {
+                                        if (response.data.award_name.toLowerCase().indexOf(str.toLowerCase()) > -1) {
                                             MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>含有关键字：` + str, 'warning');
                                             return [false]
                                         }
