@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.0.2
+// @version       2.0.3
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -1291,7 +1291,7 @@ var BilibiliAPI = {
              * 0：未上船，1：总督，2：提督，3：舰长
              */
             return BilibiliAPI.ajax({
-                url: '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser',
+                url: 'xlive/web-room/v1/index/getInfoByUser',
                 data: {
                     room_id: room_id
                 }
@@ -1316,6 +1316,11 @@ var BilibiliAPI = {
                     method: 'POST',
                     url: 'xlive/lottery-interface/v1/Anchor/Join',
                     data: data
+                })
+            },
+            randTime: (id) => {
+                return BilibiliAPI.ajax({
+                    url: 'xlive/lottery-interface/v1/Anchor/RandTime?id=' + id
                 })
             }
         }
