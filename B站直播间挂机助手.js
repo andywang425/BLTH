@@ -1,8 +1,10 @@
 // ==UserScript==
 // @namespace      https://github.com/andywang425
 // @name           B站直播间挂机助手
+// @name:en        B站直播间挂机助手
 // @author         andywang425
 // @description    自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章
+// @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章
 // @updateURL      https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH
@@ -4039,7 +4041,6 @@
                                         MY_API.AnchorLottery.anchorPrizeTagid = tag.tagid;
                                 }
                             } //没创建过分组则创建一个新的
-                            console.log(MY_API.AnchorLottery.anchorFollowTagid, MY_API.AnchorLottery.anchorPrizeTagid)
                             if (MY_API.AnchorLottery.anchorFollowTagid === undefined)
                                 MY_API.AnchorLottery.creatTag(anchorFollowTagName).then(() => p1.resolve());
                             else p1.resolve();
@@ -4280,7 +4281,6 @@
                             lotteryInfoJson = JSON.parse(Base64.decode64(description.replaceAll('-', '')));
                             if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
                                 lotteryInfoJson = undefined;
-                            console.log('lotteryInfoArray', lotteryInfoJson)
                         } catch (e) {
                             lotteryInfoJson = undefined
                         }
@@ -4354,12 +4354,10 @@
                         })
                     }
                     const encodeData = Base64.encode64(JSON.stringify(uploadRawJson));
-                    console.log('encodeData', encodeData)
                     let finalStr = '';
                     for (let i = 0; i < encodeData.length; i++) {
                         finalStr += (encodeData[i] + (i === encodeData.length - 1 ? '' : '-'));
                     }
-                    console.log('finalStr', finalStr)
                     return updateEncodeData(MY_API.AnchorLottery.myLiveRoomid, finalStr).then(() => {
                         return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL * 1000)
                     });
@@ -4382,7 +4380,6 @@
                         lotteryInfoJson = JSON.parse(Base64.decode64(description.replaceAll('-', '')));
                         if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
                             throw 'Not a JSON'
-                        console.log('lotteryInfoArray', lotteryInfoJson)
                     } catch (e) {
                         MY_API.chatLog(`[天选时刻] 直播间${MY_API.CONFIG.ANCHOR_GETDATA_ROOM}个人简介的数据格式不符合要求 ` + e, 'error');
                         return setTimeout(() => MY_API.AnchorLottery.getLotteryInfoFromRoom(), MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000);
