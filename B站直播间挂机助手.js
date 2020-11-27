@@ -630,7 +630,7 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if (cache === undefined || cache === null || cache !== "5.6") { //更新时需修改
+                    if (cache === undefined || cache === null || cache !== "5.6.1") { //更新时需修改
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
