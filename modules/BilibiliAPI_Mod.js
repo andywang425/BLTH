@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.0.3
+// @version       2.0.4
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -945,12 +945,12 @@ var BilibiliAPI = {
                 }
             });
         },
-        addUsers: (fid, tagids) => {
+        addUsers: (fids, tagids) => { //可以直接设置分组，无需知道被移动用户之前在什么分组
             return BilibiliAPI.ajaxWithCommonArgs({
                 method: 'POST',
                 url: '//api.bilibili.com/x/relation/tags/addUsers?cross_domain=true',
                 data: {
-                    fid: fid,//目标uid
+                    fids: fids,//目标uid
                     tagids: tagids//通过getTags获取。可以为数组，用逗号,隔开，需要编码(即用 %2C 隔开)
                 }
             });
