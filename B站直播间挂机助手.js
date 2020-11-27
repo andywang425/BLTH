@@ -15,26 +15,26 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6
-// @include       /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
-// @run-at        document-start
-// @connect       passport.bilibili.com
-// @connect       api.live.bilibili.com
-// @connect       live-trace.bilibili.com
-// @connect       sc.ftqq.com
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@73731f83347fe39300f222f61785f6354939e3a9/modules/HackTimer.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/Ajax-hook.min.js
-// @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@73731f83347fe39300f222f61785f6354939e3a9/modules/BilibiliAPI_Mod.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@4716930900e64769f19dd7aa00b0824a4961cdd0/modules/layer.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libBilibiliToken.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libWasmHash.min.js
-// @require       https://cdn.jsdelivr.net/gh/andywang425/BLTH@97bf818a906154a418f72ecbb644de9cf19c80b1/modules/base64.min.js
-// @resource      layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@d86732c07164300f64a2e543f264ce4f6099fbfc/modules/layer.css
-// @grant         unsafeWindow
-// @grant         GM_xmlhttpRequest
-// @grant         GM_getResourceText
-// @grant         GM_notification
+// @version        5.6.1
+// @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
+// @run-at         document-start
+// @connect        passport.bilibili.com
+// @connect        api.live.bilibili.com
+// @connect        live-trace.bilibili.com
+// @connect        sc.ftqq.com
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@73731f83347fe39300f222f61785f6354939e3a9/modules/HackTimer.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/Ajax-hook.min.js
+// @require        https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@9831688d191ce645deba014a542608c0b1eb9f4e/modules/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4716930900e64769f19dd7aa00b0824a4961cdd0/modules/layer.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libBilibiliToken.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libWasmHash.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@97bf818a906154a418f72ecbb644de9cf19c80b1/modules/base64.min.js
+// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@d86732c07164300f64a2e543f264ce4f6099fbfc/modules/layer.css
+// @grant          unsafeWindow
+// @grant          GM_xmlhttpRequest
+// @grant          GM_getResourceText
+// @grant          GM_notification
 // ==/UserScript==
 (function () {
     const NAME = 'IGIFTMSG',
