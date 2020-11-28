@@ -53,11 +53,9 @@
 <summary>自动参加礼物抽奖</summary>
 <ul>
 <li>抽奖前随机延迟</li>
-<li>特定时段不参与抽奖</li>
 <li>随机跳过抽奖</li>
 <li>抽奖前模拟进入目标房间</li>
 <li>抽奖前发送活跃弹幕（防检测）</li>
-<li>被风控后强制重复抽奖直到成功，最多尝试5次</li>
 </ul>
 </details>
 <details>
@@ -72,10 +70,11 @@
 <li>忽略所需金瓜子大于设置值的天选</li>  
 <li>忽略含特定关键字或匹配特定正则表达式的存疑天选</li>
 <li>尝试识别天选中的金额并忽略金额低于设置值的天选</li>
-<li>保存当前关注列表为白名单</li>  
-<li>取关不在白名单内的UP主</li>   
+<li>保存当前关注列表为白名单/取关不在白名单内的UP主</li>  
 <li>上传天选信息至自己的直播间/从特定直播间获取天选信息</li>
 <li>把参与天选时关注的UP移动到新关注分组/取关该分组内的UP主</li>
+<li>未中奖自动取关</li>
+<li>中奖后自动发私信/弹幕</li>
 </ul>
 </details>
 <details>
@@ -120,11 +119,12 @@
 原格式的脚本为[B站直播间挂机助手.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)。  
 
 #### 脚本内置说明
-运行脚本后点击控制面板上带下划线的小问号（<span style = "font-size: 12px;color: #0080c6;cursor: pointer;text-decoration: underline;">?</span>）查看各项功能的具体说明。  
+运行脚本后点击控制面板上带下划线的小问号查看各项功能的具体说明。  
 
 #### 运行日志
 + 普通的日志可以点击聊天区上方，大航海右侧的【日志】查看。
-+ 脚本默认关闭控制台日志，打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。若想关闭开启可以在脚本代码中搜索`debugSwitch`，把值改成`true`。
++ 脚本默认关闭控制台日志。若想开启可以在脚本代码中搜索`debugSwitch`，把值改成`true`。  
+  打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。
 
 #### 关于反馈
 + 如果使用脚本过程中遇到问题，可以先按上述步骤开启控制台日志，然后再次运行脚本并在控制台中寻找相关错误信息。若能找到请在反馈bug时附上这些控制台日志。
@@ -167,13 +167,13 @@
 -------------------------------
 
 ## 鸣谢
-[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com/)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)  
+[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com/)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)
 以及所有提出过建议的用户。
 
 -------------------------------
 
 ## 更新日志
->### 5.6 - 5.6.1
->补充内置说明；解决了浏览器标签页后台时计时器变慢的问题；新增天选时刻开奖倒计时和【立刻参加】按钮；修复了隐身入场无效的bug；新增打卡弹幕黑白名单功能；新增导入和导出脚本配置的功能；新增定时休眠功能（仅对天选和检查小时榜生效）；新增天选时刻中奖弹幕功能；默认关闭控制台日志；【天选时刻】上传至直播间简介的数据格式调整；【天选时刻】中奖后把发起抽奖的UP移到新分组；bug fix。
+>### 5.6.2
+>修复获取小心心功能。修复重复参加pk大乱斗的bug。移除HackTimer库。  
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
