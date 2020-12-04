@@ -2,7 +2,6 @@
 <p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg" alt="TamperMonkey 4.10"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77">&nbsp;<img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">&nbsp;<img src="https://img.shields.io/github/stars/andywang425/Bilibili-SGTH?style=social" alt=""></p>
 <h1 align="center">Bilibili Live Tasks Helper</h1>
 
--------------------------------
 
 ### 安装方法
 ### 1. 点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 github 安装脚本    
