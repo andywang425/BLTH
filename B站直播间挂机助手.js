@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.2
+// @version        5.6.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -24,7 +24,7 @@
 // @connect        sc.ftqq.com
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/Ajax-hook.min.js
 // @require        https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@9831688d191ce645deba014a542608c0b1eb9f4e/modules/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@0f7a397839262357127a10cc8dfd2cbb5c706994/modules/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4716930900e64769f19dd7aa00b0824a4961cdd0/modules/layer.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libWasmHash.min.js
@@ -37,7 +37,6 @@
 // ==/UserScript==
 (function () {
     const NAME = 'IGIFTMSG',
-        debugSwitch = false, //日志控制开关 
         BAPI = BilibiliAPI,
         UA = navigator.userAgent,
         tz_offset = new Date().getTimezoneOffset() + 480,
@@ -47,11 +46,6 @@
         ts_s = () => Math.round(ts_ms() / 1000),//当前秒
         anchorFollowTagName = 'BLTH天选关注UP',
         anchorPrizeTagName = 'BLTH天选中奖UP',
-        runUntilSucceed = (callback, delay = 0, period = 100) => {
-            setTimeout(() => {
-                if (!callback()) runUntilSucceed(callback, period, period);
-            }, delay);
-        },
         delayCall = (callback, delay = 120e3) => {
             const p = $.Deferred();
             setTimeout(() => {
@@ -171,9 +165,7 @@
             x: el.pageXOffset !== undefined ? el.pageXOffset : el.scrollLeft,
             y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop
         }),
-        linkMsg = (msg, link) => {
-            return '<a href=\"' + link + '\"target=\"_blank\">' + msg + '</a>';
-        },
+        linkMsg = (msg, link) => '<a href="' + link + '"target="_blank" style="color:">' + msg + '</a>',
         liveRoomUrl = 'https://live.bilibili.com/';
 
     let msgHide = localStorage.getItem(`${NAME}_msgHide`) || 'hide',//UI隐藏开关
@@ -187,6 +179,7 @@
         mainSiteTasksBtnClickable = true,
         danmuTaskRunning = false,
         medalDanmuRunning = false,
+        debugSwitch = localStorage.getItem(`${NAME}_debugSwitch`) === 'true' ? true : false,
         Live_info = {
             room_id: undefined,
             uid: undefined,
@@ -197,7 +190,8 @@
             bili_jct: undefined,
             tid: undefined,
             uname: undefined,
-            user_level: undefined
+            user_level: undefined, //直播等级
+            level: undefined  //主站等级
         },
         userToken = undefined,
         tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || { time: 0 },
@@ -325,7 +319,13 @@
                             Live_info.uname = re.data.uname;
                             Live_info.user_level = re.data.user_level;
                         }
-                        else window.toast('获取用户信息失败', 'error');
+                        else window.toast(`API.getuserinfo 获取用户信息失败 ${re.message}`, 'error');
+                    });
+                    await BAPI.x.getAccInfo(Live_info.uid).then((re) => {
+                        MYDEBUG('InitData: API.x.getAccInfo', re);
+                        if (re.code === 0) {
+                            Live_info.level = re.data.level;
+                        } else window.toast(`API.x.getAccInfo 获取用户信息失败 ${re.message}`, 'error')
                     });
                     Live_info.bili_jct = BAPI.getCookie('bili_jct');
                     Live_info.ruid = W.BilibiliLive.ANCHOR_UID;
@@ -355,10 +355,11 @@
                 AUTO_GROUP_SIGN: true,//应援团签到开关
                 ANCHOR_LOTTERY: false,//天选时刻
                 ANCHOR_AUTO_DEL_FOLLOW: false,//检测到未中奖自动取关
-                ANCHOR_MAXROOM: 1000,//天选检查房间最大数量
+                ANCHOR_MAXROOM: 600,//天选检查房间最大数量
                 ANCHOR_MAXLIVEROOM_SAVE: 100,//天选上传保存房间最大数量
                 ANCHOR_CHECK_INTERVAL: 5,//天选检查间隔（分钟）
                 ANCHOR_IGNORE_BLACKLIST: true,//天选忽略关键字（选项）
+                ANCHOR_IGNORE_PWDROOM: true,//不参加有密码的直播间的天选
                 ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车', '上反船'],//天选忽略关键字
                 ANCHOR_INTERVAL: 250,//天选（检查天选和取关）请求间隔
                 AHCHOR_NEED_GOLD: 0,//忽略所需金瓜子大于_的抽奖
@@ -633,10 +634,13 @@
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            <strong>1.修复获取小心心的功能。</strong><br>
-                            再次感谢${linkMsg('lzghzr', 'https://github.com/lzghzr')}这位大佬，本项目的小心心模块是基于ta的项目${linkMsg('TampermonkeyJS', 'https://github.com/lzghzr/TampermonkeyJS')}修改而来。有能力的可以去支持一下~<br>
-                            2.修复重复参加pk大乱斗的bug。<br>
-                            3.移除HackTimer库<br>
+                            1.新增两种能识别的天选时刻种类<br>
+                            2.直播画面全屏后自动关闭面板<br>
+                            3.修复移动分组等网络请求被风控使脚本停止运行的问题<br>
+                            4.新增<code>控制台日志</code>选项<br>
+                            5.若启用需创建分组的功能则不创建<br>
+                            6.<strong>新选项：不参与加密直播间的天选</strong><br>
+                            7.优化了请求失败后再次尝试发起请求的逻辑<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -802,7 +806,7 @@
                 //添加按钮
                 const btnmsg = msgHide == 'hide' ? '显示窗口和提示信息' : '隐藏窗口和提示信息';
                 const btn = $(`<button class="igiftMsg_btn" style="display: inline-block; float: left; margin-right: 7px;cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
-                const webFullScreenBtn = $('button[data-title="网页全屏"]');
+                const livePlayer = $('.bilibili-live-player.relative');
                 let fieldsetStyle = '\"float:left\"';
                 if (UA.toLowerCase().indexOf("firefox") > -1) fieldsetStyle = '\"\"';
                 const html = `<div id='allsettings' class="igiftMsg_main">
@@ -1126,6 +1130,12 @@
                                 发出请求后等待回复
                             </label>
                         </div>
+                        <div data-toggle="ANCHOR_IGNORE_PWDROOM" style="line-height: 20px">
+                        <label style="margin: 5px auto; color: black">
+                            <input style="vertical-align: text-top;" type="checkbox">
+                                不参与加密直播间的天选
+                        </label>
+                        </div>
                         <div data-toggle="ANCHOR_MOVETO_FOLLOW_TAG" style="line-height: 20px">
                             <label style="margin: 5px auto; color: black">
                                 <input style="vertical-align: text-top;" type="checkbox">
@@ -1256,6 +1266,12 @@
                             <label style="margin: 5px auto">
                                 <input style="vertical-align: text-top;" type="checkbox">
                                 不抽奖时段不刷新直播间
+                            </label>
+                        </div>
+                        <div data-toggle = "debugSwitch">
+                        <label style="margin: 5px auto">
+                            <input style="vertical-align: text-top;" type="checkbox">
+                            控制台日志
                             </label>
                         </div>
                         <div data-toggle="GM_NOTICE">
@@ -1477,16 +1493,15 @@
                     'LIVE_SIGN',
                     'IN_TIME_RELOAD_DISABLE',
                     'TIME_RELOAD',
-                    'IN_TIME_RELOAD_DISABLE',
-                    "AUTO_GIFT",
-                    "SEND_ALL_GIFT",
+                    'AUTO_GIFT',
+                    'SEND_ALL_GIFT',
                     'STORM',
                     'LITTLE_HEART',
                     'REMOVE_ELEMENT_2233',
                     'REMOVE_ELEMENT_activity',
                     'REMOVE_ELEMENT_rank',
-                    "LOTTERY",
-                    "CHECK_HOUR_ROOM",
+                    'LOTTERY',
+                    'CHECK_HOUR_ROOM',
                     'MATERIAL_LOTTERY',
                     'MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY',
                     'ANCHOR_IGNORE_BLACKLIST',
@@ -1501,7 +1516,8 @@
                     'ANCHOR_MOVETO_FOLLOW_TAG',
                     'MEDAL_DANMU',
                     'ANCHOR_DANMU',
-                    'ANCHOR_MOVETO_PRIZE_TAG'
+                    'ANCHOR_MOVETO_PRIZE_TAG',
+                    'ANCHOR_IGNORE_PWDROOM'
                 ];
                 const radioList = [
                     {
@@ -1572,7 +1588,8 @@
                     MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<li>白名单：仅给房间列表内的直播间发弹幕。</li><li>黑名单：给房间列表以外的直播间发弹幕。</li><li>若要填写多个直播间，每两个直播间号之间用半角逗号<code>隔开</code>。</li>",
                     ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<h3>注意：</h3><li>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</li>",
                     topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<li>统计信息实时更新，每天0点时重置。</li><li>支持输入框回车保存。</li><li>单选框和多选框设置发生变化时会自动保存设置。</li>",
-                    ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<li><strong>请勿修改该分组名称。</strong></li>`
+                    ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<li><strong>请勿修改该分组名称。</strong></li>`,
+                    debugSwitch: "开启或关闭控制日志。<li>平时建议关闭，减少资源占用。</li><li>该设置只会影响普通日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</li>"
                 }
                 const openMainWindow = async () => {
                     const settingTableoffset = $('.live-player-mounter').offset(),
@@ -1975,6 +1992,14 @@
                                 localStorage.setItem(`${NAME}_NOSLEEP`, $(this).prop('checked'));
                                 window.toast('[屏蔽挂机检测] 配置已保存', 'info');
                             });
+                            const debugSwitchInput = div.find(`div[data-toggle="debugSwitch"] input:checkbox`),
+                                debugSwitchSetting = localStorage.getItem(`${NAME}_debugSwitch`);
+                            if (debugSwitchSetting === 'true') debugSwitchInput.attr('checked', '');
+                            debugSwitchInput.change(function () {
+                                debugSwitch = $(this).prop('checked');
+                                localStorage.setItem(`${NAME}_debugSwitch`, debugSwitch);
+                                window.toast('[控制台日志] 配置已保存', 'info');
+                            })
                             $('input:text').bind('keydown', function (event) {//绑定回车保存
                                 if (event.keyCode == 13) {
                                     saveAction(div);
@@ -2040,15 +2065,18 @@
                         }
                     }
                 });
-                webFullScreenBtn.click(() => {
-                    layer.close(mainIndex);
-                    document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
-                    layer.style(menuIndex, {
-                        'display': 'none'
-                    });
-                    $('#menuDiv').removeClass('active');
-                    $('.tab-list.dp-flex').children('li')[0].click();
-                });
+                livePlayer.on("DOMNodeInserted", function () {
+                    let state = $(this).attr('data-player-state');
+                    if (state === 'web-fullscreen' || state === 'fullscreen') {
+                        layer.close(mainIndex);
+                        document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
+                        layer.style(menuIndex, {
+                            'display': 'none'
+                        });
+                        $('#menuDiv').removeClass('active');
+                        $('.tab-list.dp-flex').children('li')[0].click();
+                    }
+                })
                 $('.attention-btn-ctnr').append(btn);
                 if (!MY_API.CACHE.DailyReward_TS) {
                     layer.tips('点我隐藏/显示控制面板', '#hiderbtn', {
@@ -3991,10 +4019,10 @@
                                         MY_API.AnchorLottery.anchorPrizeTagid = tag.tagid;
                                 }
                             } //没创建过分组则创建一个新的
-                            if (MY_API.AnchorLottery.anchorFollowTagid === undefined)
+                            if (MY_API.AnchorLottery.anchorFollowTagid === undefined && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG)
                                 MY_API.AnchorLottery.creatTag(anchorFollowTagName).then(() => p1.resolve());
                             else p1.resolve();
-                            if (MY_API.AnchorLottery.anchorPrizeTagid === undefined)
+                            if (MY_API.AnchorLottery.anchorPrizeTagid === undefined && MY_API.CONFIG.ANCHOR_MOVETO_PRIZE_TAG)
                                 p1.then(() => MY_API.AnchorLottery.creatTag(anchorPrizeTagName).then(() => p2.resolve()));
                             else p2.resolve();
                             return $.when(p1, p2);
@@ -4336,19 +4364,23 @@
                     }
                     MY_API.chatLog(`[天选时刻] 开始检查天选（共${lotteryInfoJson.roomList.length}个房间）<br>数据来源：直播间${linkMsg(MY_API.CONFIG.ANCHOR_GETDATA_ROOM, liveRoomUrl + MY_API.CONFIG.ANCHOR_GETDATA_ROOM)}的个人简介<br>该数据最后上传时间：${new Date(lotteryInfoJson.ts).toLocaleString()}`, 'success')
                     for (const room of lotteryInfoJson.roomList) {
-                        if (MY_API.CONFIG.ANCHOR_WAIT_REPLY) {
-                            await MY_API.AnchorLottery.check(room, false).then((re) => {
-                                if (!!re[0]) {
-                                    return MY_API.AnchorLottery.join(re)
-                                }
-                            });
-                        } else {
-                            MY_API.AnchorLottery.check(room, false).then((re) => {
-                                if (!!re[0]) {
-                                    return MY_API.AnchorLottery.join(re)
-                                }
-                            });
-                        }
+                        let p = $.Deferred();
+                        if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
+                        MY_API.AnchorLottery.check(room).then((re) => {
+                            if (re[0]) {
+                                //可以参加
+                                return MY_API.AnchorLottery.pwdCheck(room).then((res) => {
+                                    if (res) {
+                                        //加密
+                                        MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(res[3], liveRoomUrl + res[3])}, id = ${res[0]}<br>${res[8] === 0 ? '' : ('所需金瓜子：' + res[8] + '<br>')}奖品：${res[4]}<br>${MY_API.AnchorLottery.countDown(res[5])}`, 'warning');
+                                        p.resolve();
+                                    } else {
+                                        return MY_API.AnchorLottery.join(re).then(() => p.resolve());
+                                    }
+                                })
+                            } else p.resolve();
+                        });
+                        await p;
                         await sleep(MY_API.CONFIG.ANCHOR_INTERVAL);
                     }
                     MY_API.chatLog(`[天选时刻] 本次检查结束<br>${MY_API.CONFIG.ANCHOR_CHECK_INTERVAL}分钟后再次检查天选`, 'success');
@@ -4585,7 +4617,7 @@
                                 return [false]
                             }
                             switch (response.data.require_type) {
-                                case 1: break; //关注
+                                case 1: return defaultJoinData //关注
                                 case 2: { // 粉丝勋章
                                     return BAPI.live_user.get_anchor_in_room(roomid).then((res) => {
                                         MYDEBUG(`API.live_user.get_anchor_in_room(${roomid})`, res);
@@ -4616,7 +4648,7 @@
                                             const privilege_type = re.data.privilege.privilege_type;
                                             if (privilege_type !== 0 && privilege_type <= response.data.require_value) {
                                                 //0：未上船，1：总督，2：提督，3：舰长。若满足要求则返回数据
-                                                return [response.data.id, joinPrice === 0 ? undefined : response.data.gift_id, joinPrice === 0 ? undefined : response.data.gift_num, roomid, response.data.award_name, response.data.time, response.data.require_type];
+                                                return defaultJoinData;
                                             } else {
                                                 function getPrivilegeText(typeNum) {
                                                     switch (typeNum) {
@@ -4637,12 +4669,20 @@
                                         }
                                     })
                                 }
+                                case 4: { //直播等级
+                                    if (Live_info.user_level >= response.data.require_value) return defaultJoinData;
+                                    else MY_API.chatLog(`[天选时刻] 忽略直播等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需直播等级：${response.data.require_value}<br>你的直播等级：UL.${Live_info.user_level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
+                                }
+                                case 5: { //主站等级
+                                    if (Live_info.level >= response.data.require_value) return defaultJoinData;
+                                    else MY_API.chatLog(`[天选时刻] 忽略主站等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需直播等级：${response.data.require_value}<br>你的主站等级：Lv${Live_info.level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
+                                }
                                 default: {
                                     MYDEBUG(`[天选时刻] 未被收录的类型 require_value = ${response.data.require_value}`, response);
                                     break;
                                 }
                             }
-                            return defaultJoinData
+
                         }
                         else {
                             return [false]
@@ -4655,7 +4695,7 @@
                 reCheck: (data) => {
                     return BAPI.xlive.anchor.check(data[3]).then((response) => {
                         MYDEBUG(`API.xlive.anchor.reCheck(${data[3]}) response`, response);
-                        if (response.code === 0 && !!response.data && response.data.hasOwnProperty('award_users') && !!response.data.award_users) {
+                        if (response.code === 0 && !!response.data && response.data.hasOwnProperty('award_users') && response.data.award_users) {
                             let anchorUid = data[7], award = false;
                             for (const i of response.data.award_users) {
                                 if (i.uid === Live_info.uid) {
@@ -4676,6 +4716,8 @@
                                             else {
                                                 window.toast(`[天选自动取关] 取关UP(uid = ${anchorUid})出错  ${response.message}`, 'error');
                                             }
+                                        }, () => {
+                                            MY_API.chatLog(`[天选自动取关] 取关UP(uid = ${anchorUid})出错，请检查网络`);
                                         })
                                     }
                                 }
@@ -4703,15 +4745,18 @@
                                             } else {
                                                 window.toast(`[天选自动私信] 私信UP(uid = ${anchorUid})失败 ${res.message}`, 'error');
                                             }
+                                        }, () => {
+                                            MY_API.chatLog(`[天选自动私信] 私信UP(uid = ${anchorUid})出错，请检查网络`);
                                         })
                                     }, 8000);//之前2秒+8秒
-
                                 }
                                 if (MY_API.CONFIG.ANCHOR_MOVETO_PRIZE_TAG) {
-                                    BAPI.relation.addUsers(res.data.info.uid, MY_API.AnchorLottery.anchorPrizeTagid).then((re) => {
-                                        MYDEBUG(`API.relation.addUsers ${res.data.info.uid} ${MY_API.AnchorLottery.anchorPrizeTagid}`, re);
-                                        if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）至分组【${anchorPrizeTagName}】成功`, 'success');
-                                        else window.toast(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）至分组【${anchorPrizeTagName}】失败 ${re.message}`, 'warning');
+                                    BAPI.relation.addUsers(anchorUid, MY_API.AnchorLottery.anchorPrizeTagid).then((re) => {
+                                        MYDEBUG(`API.relation.addUsers ${anchorUid} ${MY_API.AnchorLottery.anchorPrizeTagid}`, re);
+                                        if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${anchorUid}）至分组【${anchorPrizeTagName}】成功`, 'success');
+                                        else window.toast(`[天选时刻] 移动UP（uid = ${anchorUid}）至分组【${anchorPrizeTagName}】失败 ${re.message}`, 'warning');
+                                    }, () => {
+                                        MY_API.chatLog(`[天选时刻] 移动UP（uid = ${anchorUid}）到分组【${anchorPrizeTagName}】出错，请检查网络`);
                                     });
                                 }
                                 if (MY_API.CONFIG.FT_NOTICE) {
@@ -4782,6 +4827,16 @@
                         return `<span id="time" style="color:${color};">距开奖还有<span class = 'num'>${time}</span>秒</span>`;
                     else return '';
                 },
+                pwdCheck: (room_id, pwd = '') => {
+                    return BAPI.room.verify_room_pwd(room_id, pwd).then((response) => {
+                        MYDEBUG(`API.room.verify_room_pwd(${room_id}, ${pwd})`, response);
+                        if (response.code === -1) return true;//message: ╮(￣▽￣)╭请输入密码 / 你确定不是掏错卡了？("▔□▔)/请重新输入密码
+                        else if (response.code === 0) return false; //message: room_not_encrypted
+                        else return true;
+                    }, () => {
+                        MY_API.chatLog('[天选时刻] 直播间加密检查出错，请检查网络', 'error');
+                    });
+                },
                 /**
                  * 参加天选
                  * @param data 数组，各项内容如下
@@ -4808,6 +4863,8 @@
                                                 MYDEBUG(`API.relation.addUsers ${res.data.info.uid} ${MY_API.AnchorLottery.anchorFollowTagid}`, re);
                                                 if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）至分组【${anchorFollowTagName}】成功`, 'success');
                                                 else window.toast(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）至分组【${anchorFollowTagName}】失败 ${re.message}`, 'warning');
+                                            }, () => {
+                                                MY_API.chatLog(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`);
                                             });
                                         }, 4000);
                                     }
@@ -4833,7 +4890,8 @@
                     MY_API.chatLog(`[天选时刻] 开始获取粉丝勋章信息`);
                     await MY_API.AnchorLottery.getMedalList();
                     MY_API.chatLog(`[天选时刻] 开始获取关注分组信息`);
-                    await MY_API.AnchorLottery.getTag([anchorFollowTagName, anchorPrizeTagName]);
+                    if (MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG || MY_API.CONFIG.ANCHOR_MOVETO_PRIZE_TAG)
+                        await MY_API.AnchorLottery.getTag([anchorFollowTagName, anchorPrizeTagName]);
                     await MY_API.AnchorLottery.getUpInOriginTag(Live_info.uid);
                     function waitForNextRun(Fn) {
                         if (MY_API.CONFIG.TIME_AREA_DISABLE && inTimeArea(MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)) {//判断时间段
@@ -4858,19 +4916,23 @@
                             const id_list = [...config.list];
                             MY_API.chatLog(`[天选时刻] 开始检查天选（共${id_list.length}个房间）`, 'success');
                             for (const room of id_list) {
-                                if (MY_API.CONFIG.ANCHOR_WAIT_REPLY) {
-                                    await MY_API.AnchorLottery.check(room).then((re) => {
-                                        if (!!re[0]) {
-                                            return MY_API.AnchorLottery.join(re)
-                                        }
-                                    });
-                                } else {
-                                    MY_API.AnchorLottery.check(room).then((re) => {
-                                        if (!!re[0]) {
-                                            return MY_API.AnchorLottery.join(re)
-                                        }
-                                    });
-                                }
+                                let p = $.Deferred();
+                                if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
+                                MY_API.AnchorLottery.check(room).then((re) => {
+                                    if (re[0]) {
+                                        //可以参加
+                                        return MY_API.AnchorLottery.pwdCheck(room).then((res) => {
+                                            if (res) {
+                                                //加密
+                                                MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(res[3], liveRoomUrl + res[3])}, id = ${res[0]}<br>${res[8] === 0 ? '' : ('所需金瓜子：' + res[8] + '<br>')}奖品：${res[4]}<br>${MY_API.AnchorLottery.countDown(res[5])}`, 'warning');
+                                                p.resolve();
+                                            } else {
+                                                return MY_API.AnchorLottery.join(re).then(() => p.resolve());
+                                            }
+                                        })
+                                    } else p.resolve();
+                                });
+                                await p;
                                 await sleep(MY_API.CONFIG.ANCHOR_INTERVAL);
                             };
                             MY_API.CACHE.AnchorLottery_TS = ts_ms();

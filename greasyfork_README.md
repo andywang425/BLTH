@@ -4,18 +4,12 @@
 <h2 align="center">Bilibili Live Tasks Helper</h2>
 
 -------------------------------
-
-### 安装方法
-### 1. 点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 github 安装脚本    
-### 2. 点击 [BLTH_Origin_greasyfork](https://greasyfork.org/zh-CN/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 greasyfork 安装脚本  
-### 3. 点击 [BLTH_Origin_openuserjs](https://openuserjs.org/scripts/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 openuserjs 安装脚本  
-
--------------------------------
+### github项目地址
+[github.com/andywang425/BLTH](https://github.com/andywang425/BLTH)
 
 ### 使用方法 
 在[Tampermonkey](https://www.tampermonkey.net/)中启用脚本，登陆bilibili后打开任意b站直播间。 
-+ 在 [Tampermonkey](https://www.tampermonkey.net/) 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
-+ 不保证能通过其它油猴插件(Greasemonkey/Violentmonkey等)运行。  
+
 -------------------------------
 
 ### 一些建议
@@ -139,7 +133,7 @@
 
 -------------------------------
 
-## 许可证
+## 许可证  
 <a href = "https://github.com/andywang425/BLTH/blob/master/LICENSE" style="font-size: 1.1em;">MIT License</a>
 
 -------------------------------
@@ -173,7 +167,4 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.3
->新增两种能识别的天选时刻种类；直播画面全屏后自动关闭面板；修复移动分组等网络请求被风控使脚本停止运行的问题；新增控制台日志选项；若启用需创分组的功能则不创建；新选项：不参与加密直播间的天选；优化了请求失败后再次尝试发起请求的逻辑。
-
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
