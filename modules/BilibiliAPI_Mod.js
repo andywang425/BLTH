@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.0.4
+// @version       2.0.5
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -10,13 +10,13 @@
 // @license       MIT
 // ==/UserScript==
 
-let csrf_token, visit_id,
-    ts_ms = () => Date.now(),//当前毫秒
-    ts_s = () => Math.round(ts_ms() / 1000);//当前秒
+let BilibiliAPI_csrf_token, BilibiliAPI_visit_id,
+    BilibiliAPI_ts_ms = () => Date.now(),//当前毫秒
+    BilibiliAPI_ts_s = () => Math.round(BilibiliAPI_ts_ms() / 1000);//当前秒
 var BilibiliAPI = {
     setCommonArgs: (csrfToken = '', visitId = '') => {
-        csrf_token = csrfToken;
-        visit_id = visitId;
+        BilibiliAPI_csrf_token = csrfToken;
+        BilibiliAPI_visit_id = visitId;
     },
     // 整合常用API
     TreasureBox: {
@@ -80,10 +80,12 @@ var BilibiliAPI = {
         share: (aid) => BilibiliAPI.x.share_add(aid)
     },
     // ajax调用B站API
-    runUntilSucceed: (callback, delay = 0, period = 2) => {
-        setTimeout(() => {
-            if (!callback()) BilibiliAPI.runUntilSucceed(callback, period, period);
-        }, delay);
+    runUntilSucceed: (callback, delay = 0, maxTry = 2) => {
+        if (maxTry > 0) {
+            setTimeout(() => {
+                if (!callback()) BilibiliAPI.runUntilSucceed(callback, 500, --maxTry);
+            }, delay);
+        }
     },
     processing: 0,
     ajax: (settings) => {
@@ -113,9 +115,9 @@ var BilibiliAPI = {
     },
     ajaxWithCommonArgs: (settings) => {
         if (!settings.data) settings.data = {};
-        settings.data.csrf = csrf_token;
-        settings.data.csrf_token = csrf_token;
-        settings.data.visit_id = visit_id;
+        settings.data.csrf = BilibiliAPI_csrf_token;
+        settings.data.csrf_token = BilibiliAPI_csrf_token;
+        settings.data.visit_id = BilibiliAPI_visit_id;
         return BilibiliAPI.ajax(settings);
     },
     // 以下按照URL分类
@@ -1069,6 +1071,15 @@ var BilibiliAPI = {
                     req_biz: req_biz
                 }
             });
+        },
+        verify_room_pwd: (room_id, pwd = '') => {
+            return BilibiliAPI.ajax({
+                url: 'room/v1/Room/verify_room_pwd',
+                data: {
+                    room_id: room_id,
+                    pwd: pwd
+                }
+            })
         }
     },
     sign: {
@@ -1126,14 +1137,23 @@ var BilibiliAPI = {
                     keyword: keyword, //''
                     order: order, //pubdate
                     jsonp: jsonp //jsonp
-                }//BilibiliAPI.x.getUserSpace(375504219, 30, 0, 1, '', 'pubdate', 'jsonp').then((re) => {console.log(re)})
+                }
             });
+        },
+        getAccInfo: (mid, jsonp = 'jsonp') => {
+            return BilibiliAPI.ajax({
+                url: '//api.bilibili.com/x/space/acc/info',
+                data: {
+                    mid: mid,  //uid
+                    jsonp: jsonp
+                }
+            })
         },
         getCoinInfo: (callback, jsonp, aid, _) => { //获取视频投币状态
             return BilibiliAPI.ajax({
                 url: '//api.bilibili.com/x/web-interface/archive/coins',
                 data: {
-                    callback: callback, //jqueryCallback_bili_1465130006244295 数字含义未知 此项可以为空''
+                    callback: callback, //jqueryCallback_bili_1465130006244295 此项可以为空''
                     jsonp: jsonp, //jsonp
                     aid: aid,
                     _: _ //当前时间戳
@@ -1145,7 +1165,7 @@ var BilibiliAPI = {
                 url: '//api.bilibili.com/x/web-interface/coin/today/exp'
             })
         },
-        coin_add: (aid, select_like = 0, multiply = 1) => {
+        coin_add: (aid, multiply = 1, select_like = 0) => {
             // 投币
             return BilibiliAPI.ajaxWithCommonArgs({
                 method: 'POST',
@@ -1587,7 +1607,7 @@ var BilibiliAPI = {
                 fontsize: fontsize,
                 mode: mode,
                 msg: msg,
-                rnd: ts_ms(),
+                rnd: BilibiliAPI_ts_ms(),
                 roomid: roomid,
                 bubble: bubble
 
@@ -1605,7 +1625,7 @@ var BilibiliAPI = {
                 'msg[msg_type]': msg['msg_type'] || 1,
                 'msg[msg_status]': msg['msg_status'] || 0,
                 'msg[content]': msg['content'],
-                'msg[timestamp]': ts_s(),
+                'msg[timestamp]': BilibiliAPI_ts_s(),
                 'msg[dev_id]': msg['dev_id'],
                 'build': build,
                 'mobi_app': mobi_app
