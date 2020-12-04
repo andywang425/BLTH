@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.3
+// @version        5.6.3.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -638,7 +638,7 @@
                             2.直播画面全屏后自动关闭面板<br>
                             3.修复移动分组等网络请求被风控使脚本停止运行的问题<br>
                             4.新增<code>控制台日志</code>选项<br>
-                            5.若启用需创建分组的功能则不创建<br>
+                            5.若未启用需创建关注分组的功能则不创建<br>
                             6.<strong>新选项：不参与加密直播间的天选</strong><br>
                             7.优化了请求失败后再次尝试发起请求的逻辑<br>
                             <hr>
