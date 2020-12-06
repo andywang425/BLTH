@@ -1,18 +1,17 @@
 <p align ="center"><img src="https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"></p>
-<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg" alt="TamperMonkey 4.10"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77">&nbsp;<img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">&nbsp;<img src="https://img.shields.io/github/stars/andywang425/Bilibili-SGTH?style=social" alt=""></p>
-<h1 align="center">Bilibili Live Tasks Helper</h1>
-
+<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg" alt="TamperMonkey 4.10"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH"><img src="https://img.shields.io/github/stars/andywang425/Bilibili-SGTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437-brightgreen" alt="QQ Group"></a></p>
+<h1 align="center">B站直播间挂机助手</h1>
 
 ### 安装方法
-### 1. 点击 [BLTH_raw](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 github 安装脚本    
-### 2. 点击 [BLTH_Origin_greasyfork](https://greasyfork.org/zh-CN/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 greasyfork 安装脚本  
-### 3. 点击 [BLTH_Origin_openuserjs](https://openuserjs.org/scripts/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 openuserjs 安装脚本  
+### 1. 点击 [BLTH_github](https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js) 从 github 安装脚本    
+### 2. 点击 [BLTH_greasyfork](https://greasyfork.org/zh-CN/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 [greasyfork](https://greasyfork.org) 安装脚本  
+### 3. 点击 [BLTH_openuserjs](https://openuserjs.org/scripts/andywang425/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B) 前往 [openuserjs](https://openuserjs.org) 安装脚本  
 
 -------------------------------
 
 ### 使用方法 
 在[Tampermonkey](https://www.tampermonkey.net/)中启用脚本，登陆bilibili后打开任意b站直播间。 
-+ 在 [Tampermonkey](https://www.tampermonkey.net/) 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
++ 在 Tampermonkey 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
 + 不保证能通过其它油猴插件(Greasemonkey/Violentmonkey等)运行。  
 -------------------------------
 
@@ -20,7 +19,7 @@
 + 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新(`shift+F5`)页面。  
 + 部分设置更改后需要刷新页面才能生效。  
 + 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。  
-+ 建议通过修改浏览器设置缩减或不发送Referer。
++ 修改浏览器设置缩减或不发送Referer。
   <details>
   <summary>点击展开具体方法</summary>
 
@@ -36,8 +35,6 @@
   某些网站为了防盗链要求referer必须为本站链接，不发送referer可能导致无法正常访问这些网站。同时不发送referer还可能会影响网站的广告收入。
   
   </details>
-
-交流qq群:[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)（入群问题答案：B站直播间挂机助手），欢迎进来聊天或者提点建议~    
 
 -------------------------------
 
@@ -108,9 +105,28 @@
 ## 说明
 #### 脚本代码格式
 本脚本在三个平台上的代码格式有所不同
-+ github: 压缩和原格式都有
-+ openuserjs: 原格式
-+ greasyfork: 原格式
+<table>
+    <tr>
+        <td align ="center">平台 / 格式</td>
+        <td align ="center">原格式</td>
+        <td align ="center">压缩</td>
+    </tr>
+    <tr>
+        <td align ="center">github</td>
+        <td align ="center">✔</td>
+        <td align ="center">✔</td>
+    </tr>
+    <tr>
+        <td align ="center">greasyfork</td>
+        <td align ="center">✔</td>
+        <td align ="center">/</td>
+    </tr>
+    <tr>
+        <td align ="center">openuserjs</td>
+        <td align ="center">✔</td>
+        <td align ="center">/</td>
+    </tr>
+</table>
 
 注：项目文件中的[B站直播间挂机助手.user.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)是压缩后的脚本。  
 原格式的脚本为[B站直播间挂机助手.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)。  
@@ -127,6 +143,7 @@
 + 如果使用脚本过程中遇到问题，可以先按上述步骤开启控制台日志，然后再次运行脚本并在控制台中寻找相关错误信息。  
   若能找到请在反馈bug时附上这些控制台日志。
 + 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。
++ 交流qq群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天或者提点建议~    
 
 -------------------------------
 
@@ -138,7 +155,9 @@
 -------------------------------
 
 ## 许可证
-<a href = "https://github.com/andywang425/BLTH/blob/master/LICENSE" style="font-size: 1.1em;">MIT License</a>
+本项目以`MIT`许可证开源。  
+
+<a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/andywang425/BLTH?style=for-the-badge"></a>
 
 -------------------------------
 
@@ -171,7 +190,7 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.3
+>### 5.6.3.1
 >新增两种能识别的天选时刻种类；直播画面全屏后自动关闭面板；修复移动分组等网络请求被风控使脚本停止运行的问题；新增控制台日志选项；若启用需创分组的功能则不创建；新选项：不参与加密直播间的天选；优化了请求失败后再次尝试发起请求的逻辑。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
