@@ -1613,7 +1613,22 @@ var BilibiliAPI = {
 
             }
         });
-    },//发私信
+    },
+    /**
+     * 发私信
+     * @param
+        { 
+            {
+                sender_uid: number,
+                receiver_id: number,
+                receiver_type: number,
+                msg_type: number,
+                msg_status: number,
+                content: object,
+                dev_id: string
+            }
+        } msg
+    */
     sendMsg: (msg, build = 0, mobi_app = 'web') => {
         return BilibiliAPI.ajaxWithCommonArgs({
             method: 'POST',
@@ -1632,17 +1647,6 @@ var BilibiliAPI = {
             }
         });
     },
-    /*样例
-    var msg = {
-        sender_uid: 358483030,
-        receiver_id: 588780270,
-        receiver_type: 1,
-        msg_type: 1,
-        msg_status: 0,
-        content: `{"content":"测试"}`,
-        dev_id: '372778FD-E359-461D-86A3-EA2BCC6FF52A'
-    }
-    */
     /**
     * 获取cookie
     * @param name

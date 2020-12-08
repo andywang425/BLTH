@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.3.1
+// @version        5.6.3.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -315,7 +315,7 @@
                     });
                     await BAPI.getuserinfo().then((re) => {
                         MYDEBUG('InitData: API.getuserinfo', re);
-                        if (!!re.data) {
+                        if (re.data) {
                             Live_info.uname = re.data.uname;
                             Live_info.user_level = re.data.user_level;
                         }
@@ -406,7 +406,7 @@
                 MATERIAL_LOTTERY_CHECK_INTERVAL: 60,//实物抽奖检查间隔
                 MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: true,//实物抽奖忽略存疑抽奖
                 MEDAL_DANMU: false,//粉丝勋章打卡弹幕
-                MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "(￣3￣)", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄"],//粉丝勋章打卡弹幕内容
+                MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "(￣3￣)", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄", "←◡←"],//粉丝勋章打卡弹幕内容
                 QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼'],//存疑实物抽奖
                 MATERIAL_LOTTERY_REM: 10,//每次检查aid数量
                 RANDOM_DELAY: true,//抽奖随机延迟
@@ -634,13 +634,9 @@
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            1.新增两种能识别的天选时刻种类<br>
-                            2.直播画面全屏后自动关闭面板<br>
-                            3.修复移动分组等网络请求被风控使脚本停止运行的问题<br>
-                            4.新增<code>控制台日志</code>选项<br>
-                            5.若未启用需创建关注分组的功能则不创建<br>
-                            6.<strong>新选项：不参与加密直播间的天选</strong><br>
-                            7.优化了请求失败后再次尝试发起请求的逻辑<br>
+                            1.【粉丝勋章打卡弹幕】弹幕选取逻辑调整。<br>
+                            2. 增大了弹幕发送间隔。<br>
+                            3. bug fix<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -1549,8 +1545,8 @@
                 const helpText = {
                     ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<h3>注意：</h3><li>支持识别阿拉伯数字和汉字数字。</li><li>识别的单位有限。</li><li>不支持识别外币。</li><li>由于一些天选时刻的奖品名比较特殊，可能会出现误判。</li>',
                     LOTTERY: '参与大乱斗抽奖。',
-                    MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<h3>注意：</h3><li>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</li><li>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</li>',
-                    AUTO_DANMU: '发送直播间弹幕。<h3>注意：</h3><ul><li>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</li><li><p>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</p></li><li><p>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.1秒间隔时间（对在特定时间点发送的弹幕无效）。</p></li><li><p>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</p></li><li><p>可以用默认值所填的房间号来测试本功能。</p></li><li><p>发送时间有两种填写方法</p><p>1.【小时】h【分钟】m【秒】s</p><ul><li>每隔一段时间发送一条弹幕</li><li>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></li><li>可以填小数</li><li>可以只填写其中一项或两项</li></ul><p>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</p><p><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></p><p>2.【小时】:【分钟】:【秒】</p><ul><li>在特定时间点发一条弹幕</li><li>例子： <code>10:30:10</code>, <code>0:40</code></li><li>只能填整数</li><li>小时分钟必须填写，秒数可以不填</li></ul><p>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</p></li></ul>',
+                    MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<h3>注意：</h3><li>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则从第一条开始再次按顺序选取）。</li><li>由于B站服务器限制，脚本发送完一条弹幕后会等待1.5秒再发下一条。</li><li>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</li>',
+                    AUTO_DANMU: '发送直播间弹幕。<h3>注意：</h3><ul><li>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</li><li><p>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</p></li><li><p>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</p></li><li><p>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</p></li><li><p>可以用默认值所填的房间号来测试本功能。</p></li><li><p>发送时间有两种填写方法</p><p>1.【小时】h【分钟】m【秒】s</p><ul><li>每隔一段时间发送一条弹幕</li><li>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></li><li>可以填小数</li><li>可以只填写其中一项或两项</li></ul><p>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</p><p><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></p><p>2.【小时】:【分钟】:【秒】</p><ul><li>在特定时间点发一条弹幕</li><li>例子： <code>10:30:10</code>, <code>0:40</code></li><li>只能填整数</li><li>小时分钟必须填写，秒数可以不填</li></ul><p>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</p></li></ul>',
                     NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<h3>原理：</h3><li>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。</li>',
                     INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<h3>缺点：</h3>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管点击后会提示接口返回错误），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。',
                     MATERIAL_LOTTERY: '实物抽奖，即金宝箱抽奖。某些特殊的直播间会有金宝箱抽奖。<h3>注意：</h3><li>【忽略关键字】中每一项之间用半角逗号<code>,</code>隔开。</li>',
@@ -1585,7 +1581,7 @@
                     RANDOM_SKIP: "随机忽略一部分抽奖。<li>可以填小数。</li>",
                     ANCHOR_CHECK_INTERVAL: "检查完一轮天选后等待的时间。<li>可以填小数。</li>",
                     TIME_AREA_DISABLE: "处于这个时段内时，脚本会暂停检查小时榜和天选时刻。<br><li>24小时制，只能填整数。</li>",
-                    MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<li>白名单：仅给房间列表内的直播间发弹幕。</li><li>黑名单：给房间列表以外的直播间发弹幕。</li><li>若要填写多个直播间，每两个直播间号之间用半角逗号<code>隔开</code>。</li>",
+                    MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<li>白名单：仅给房间列表内的直播间发弹幕。</li><li>黑名单：给房间列表以外的直播间发弹幕。</li><li>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</li>",
                     ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<h3>注意：</h3><li>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</li>",
                     topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<li>统计信息实时更新，每天0点时重置。</li><li>支持输入框回车保存。</li><li>单选框和多选框设置发生变化时会自动保存设置。</li>",
                     ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<li><strong>请勿修改该分组名称。</strong></li>`,
@@ -3661,7 +3657,7 @@
                                     sendNextDanmu((isTimeData) ? 86400000 : danmu_intervalTime_Ts, isTimeData);
                                 }, (isTimeData) ? sleepTime : danmu_intervalTime_Ts - intervalTime);
                             }
-                            await sleep(1100);
+                            await sleep(1500);
                         }
                     }
                     danmuTaskRunning = false;
@@ -3722,12 +3718,16 @@
                         lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) === -1);
                     }
                     MYDEBUG('[粉丝牌打卡] 过滤后的粉丝勋章房间列表', lightMedalList);
+                    let danmuContentIndex = 0;
+                    const configDanmuLength = MY_API.CONFIG.MEDAL_DANMU_CONTENT.length;
                     for (const up of lightMedalList) {
+                        if (danmuContentIndex >= configDanmuLength) danmuContentIndex = 0;
                         const medal_name = up.medal_name,
                             roomid = up.roomid,
-                            danmuContent = MY_API.CONFIG.MEDAL_DANMU_CONTENT[Math.floor(Math.random() * MY_API.CONFIG.MEDAL_DANMU_CONTENT.length)];
+                            danmuContent = MY_API.CONFIG.MEDAL_DANMU_CONTENT[danmuContentIndex];
                         await MY_API.MEDAL_DANMU.sendDanmu(danmuContent, roomid, medal_name);
-                        await sleep(1100);
+                        danmuContentIndex++;
+                        await sleep(1500);
                     }
                     medalDanmuRunning = false;
                     window.toast('[粉丝牌打卡弹幕] 今日已完成', 'success');
@@ -3785,7 +3785,7 @@
                                         }
                                     }
                                     else {
-                                        let reg = eval(str);
+                                        const reg = eval(str);
                                         if (reg.test(response.data.title)) {
                                             MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid = ${aid})<br>匹配正则：` + str, 'warning');
                                             return MY_API.MaterialObject.check(aid + 1, aid);
@@ -4367,17 +4367,24 @@
                         let p = $.Deferred();
                         if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
                         MY_API.AnchorLottery.check(room).then((re) => {
-                            if (re[0]) {
-                                //可以参加
-                                return MY_API.AnchorLottery.pwdCheck(room).then((res) => {
-                                    if (res) {
-                                        //加密
-                                        MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(res[3], liveRoomUrl + res[3])}, id = ${res[0]}<br>${res[8] === 0 ? '' : ('所需金瓜子：' + res[8] + '<br>')}奖品：${res[4]}<br>${MY_API.AnchorLottery.countDown(res[5])}`, 'warning');
-                                        p.resolve();
-                                    } else {
-                                        return MY_API.AnchorLottery.join(re).then(() => p.resolve());
-                                    }
-                                })
+                            if ($.isArray(re) && re[0]) {
+                                //数据格式正确，可以参加
+                                if (MY_API.CONFIG.ANCHOR_IGNORE_PWDROOM) {
+                                    return MY_API.AnchorLottery.pwdCheck(room).then((res) => {
+                                        if (res) {
+                                            //加密
+                                            MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(res[3], liveRoomUrl + res[3])}, id = ${res[0]}<br>${res[8] === 0 ? '' : ('所需金瓜子：' + res[8] + '<br>')}奖品：${res[4]}<br>${MY_API.AnchorLottery.countDown(res[5])}`, 'warning');
+                                            p.resolve();
+                                        } else {
+                                            //不加密
+                                            MY_API.AnchorLottery.join(re).then(() => p.resolve());
+                                        }
+                                    }, () => {
+                                        MY_API.chatLog('[天选时刻] 直播间加密检查出错，请检查网络', 'error')
+                                    })
+                                } else {
+                                    MY_API.AnchorLottery.join(re).then(() => p.resolve());
+                                }
                             } else p.resolve();
                         });
                         await p;
@@ -4563,7 +4570,17 @@
                             const joinPrice = response.data.gift_num * response.data.gift_price,
                                 joinTextTitle = `${NAME}_ANCHOR_${response.data.id}`,
                                 ts = ts_ms();
-                            let defaultJoinData = [response.data.id, joinPrice === 0 ? undefined : response.data.gift_id, joinPrice === 0 ? undefined : response.data.gift_num, roomid, response.data.award_name, response.data.time, response.data.require_type, undefined, joinPrice];
+                            let defaultJoinData = {
+                                id: response.data.id,
+                                gift_id: joinPrice === 0 ? undefined : response.data.gift_id,
+                                gift_num: joinPrice === 0 ? undefined : response.data.gift_num,
+                                roomid: roomid,
+                                award_name: response.data.award_name,
+                                time: response.data.time,
+                                require_type: response.data.require_type,
+                                joinPrice: joinPrice,
+                                uid: undefined
+                            };
                             let joinText = `<div class = "clickableText" title = "${joinTextTitle}" ts = "${ts}">点击参加</div>`;
                             function joinAnchorListener() {
                                 let jqText = $('div' + '[title=\"' + joinTextTitle + '\"]' + '[ts=\"' + ts + '\"]');
@@ -4572,8 +4589,8 @@
                                     //已经过了一段时间，需再次获取剩余时间
                                     BAPI.xlive.anchor.randTime(response.data.id).then((re) => {
                                         MYDEBUG(`API.xlive.anchor.randTime ${response.data.id}`, re);
-                                        if (response.code === 0) defaultJoinData[5] = re.data.time;
-                                        else defaultJoinData[5] = undefined;
+                                        if (response.code === 0) defaultJoinData.time = re.data.time;
+                                        else defaultJoinData.time = undefined;
                                         MY_API.AnchorLottery.join(defaultJoinData);
                                         let allSameJqText = $('div' + '[title=\"' + joinTextTitle + '\"]');
                                         allSameJqText.unbind('click');
@@ -4592,7 +4609,7 @@
                                         }
                                     }
                                     else {
-                                        let reg = eval(str);
+                                        const reg = eval(str);
                                         if (reg.test(response.data.award_name)) {
                                             MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>匹配正则：${str}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
                                             joinAnchorListener();
@@ -4601,11 +4618,13 @@
                                     }
                                 }
                             };
-                            const moneyCheckReturnArray = MY_API.AnchorLottery.moneyCheck(response.data.award_name);
-                            if (moneyCheckReturnArray[0] && moneyCheckReturnArray[1] < MY_API.CONFIG.ANCHOR_IGNORE_MONEY) {
-                                MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>识别到的金额：${moneyCheckReturnArray[1]}元<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
-                                joinAnchorListener();
-                                return [false]
+                            if (MY_API.CONFIG.ANCHOR_IGNORE_MONEY > 0) {
+                                const moneyCheckReturnArray = MY_API.AnchorLottery.moneyCheck(response.data.award_name);
+                                if (moneyCheckReturnArray[0] && moneyCheckReturnArray[1] < MY_API.CONFIG.ANCHOR_IGNORE_MONEY) {
+                                    MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>识别到的金额：${moneyCheckReturnArray[1]}元<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
+                                    joinAnchorListener();
+                                    return [false]
+                                }
                             }
                             if (response.data.status === 2) {
                                 MY_API.chatLog(`[天选时刻] 忽略已参加天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>`, 'info');
@@ -4617,6 +4636,7 @@
                                 return [false]
                             }
                             switch (response.data.require_type) {
+                                case 0: //无要求
                                 case 1: return defaultJoinData //关注
                                 case 2: { // 粉丝勋章
                                     return BAPI.live_user.get_anchor_in_room(roomid).then((res) => {
@@ -4672,14 +4692,16 @@
                                 case 4: { //直播等级
                                     if (Live_info.user_level >= response.data.require_value) return defaultJoinData;
                                     else MY_API.chatLog(`[天选时刻] 忽略直播等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需直播等级：${response.data.require_value}<br>你的直播等级：UL.${Live_info.user_level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
+                                    return [false]
                                 }
                                 case 5: { //主站等级
                                     if (Live_info.level >= response.data.require_value) return defaultJoinData;
                                     else MY_API.chatLog(`[天选时刻] 忽略主站等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需直播等级：${response.data.require_value}<br>你的主站等级：Lv${Live_info.level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
+                                    return [false]
                                 }
                                 default: {
                                     MYDEBUG(`[天选时刻] 未被收录的类型 require_value = ${response.data.require_value}`, response);
-                                    break;
+                                    return [false]
                                 }
                             }
 
@@ -4693,10 +4715,10 @@
                     });
                 },
                 reCheck: (data) => {
-                    return BAPI.xlive.anchor.check(data[3]).then((response) => {
-                        MYDEBUG(`API.xlive.anchor.reCheck(${data[3]}) response`, response);
+                    return BAPI.xlive.anchor.check(data.roomid).then((response) => {
+                        MYDEBUG(`API.xlive.anchor.reCheck(${data.roomid}) response`, response);
                         if (response.code === 0 && !!response.data && response.data.hasOwnProperty('award_users') && response.data.award_users) {
-                            let anchorUid = data[7], award = false;
+                            let anchorUid = data.uid, award = false;
                             for (const i of response.data.award_users) {
                                 if (i.uid === Live_info.uid) {
                                     award = true;
@@ -4722,7 +4744,7 @@
                                     }
                                 }
                             } else { //中奖的代码
-                                MY_API.chatLog(`[天选时刻] 天选时刻<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id = ${data[0]}中奖<br>奖品：${data[4]}<br>`, 'prize');
+                                MY_API.chatLog(`[天选时刻] 天选时刻<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}中奖<br>奖品：${data.award_name}<br>`, 'prize');
                                 winPrizeNum++;
                                 winPrizeTotalCount++;
                                 JQlogRedPoint.text(winPrizeNum);
@@ -4763,7 +4785,7 @@
                                     function FT_notice() {
                                         return FT_sendMsg(MY_API.CONFIG.FT_SCKEY,
                                             `${GM_info.script.name} 天选时刻中奖通知 ${new Date().toLocaleString()}`,
-                                            `###天选时刻中奖\n###中奖账号id：${Live_info.uname}\n###房间号roomid = ${data[3]}\n###主播uid = ${anchorUid}\n###抽奖id = ${data[0]}\n###获得奖品：\n###${data[4]}\n###请及时私信主播发放奖励`
+                                            `###天选时刻中奖\n###中奖账号id：${Live_info.uname}\n###房间号roomid = ${data.roomid}\n###主播uid = ${anchorUid}\n###抽奖id = ${data.id}\n###获得奖品：\n###${data.award_name}\n###请及时私信主播发放奖励`
                                         ).then((re) => {
                                             MYDEBUG('FT_sendMsg response', re);
                                             if (re.body.errno == 0) {
@@ -4779,11 +4801,11 @@
                                     FT_notice();
                                 }
                                 if (MY_API.CONFIG.GM_NOTICE) {
-                                    GM_notice("天选时刻中奖", `房间号：${data[3]}，奖品：${data[4]}`)
+                                    GM_notice("天选时刻中奖", `房间号：${data.roomid}，奖品：${data.award_name}`)
                                 }
                                 if (MY_API.CONFIG.ANCHOR_DANMU) {
                                     const danmuContent = MY_API.CONFIG.ANCHOR_DANMU_CONTENT[Math.floor(Math.random() * MY_API.CONFIG.MEDAL_DANMU_CONTENT.length)];
-                                    MY_API.AnchorLottery.sendDanmu(danmuContent, data[3])
+                                    MY_API.AnchorLottery.sendDanmu(danmuContent, data.roomid)
                                 }
                                 if (MY_API.CONFIG.ANCHOR_ADD_TO_WHITELIST) {
                                     const config = JSON.parse(localStorage.getItem(`${NAME}AnchorFollowingList`)) || { list: [] };
@@ -4838,26 +4860,26 @@
                     });
                 },
                 /**
-                 * 参加天选
-                 * @param data 数组，各项内容如下
-                 *  id, gift_id, gift_num, roomid, award_name, time, require_type, uid(此项为之后添加的，初始为undefined) joinPrice(计算得出)
-                 *  0,     1,       2,        3,      4,        5,        6,                         7,                        8
+                 * 参与天选
+                 * @param {
+                       { id: number, gift_id?: number, gift_num?: number, roomid: number, award_name: string, time: number, require_type: number, joinPrice: number, uid: undefined}
+                    } data
                  */
                 join: (data) => {
-                    //console.table('[天选时刻] 参加天选 join(data)\n', { id: data[0], gift_id: data[1], gift_num: data[2], roomid: data[3], award_name: data[4], time: data[5], require_type: data[6], joinPrice: data[8], time:data[9] });
-                    return BAPI.xlive.anchor.join(data[0], data[1], data[2]).then((response) => {
-                        MYDEBUG(`API.xlive.anchor.join(${data[0]}) response`, response);
+                    //console.table('[天选时刻] 参加天选 join(data)\n', { id: data.id, gift_id: data.gift_id, gift_num: data.gift_num, roomid: data.roomid, award_name: data.award_name, time: data.time, require_type: data.require_type, joinPrice: data.joinPrice});
+                    return BAPI.xlive.anchor.join(data.id, data.gift_id, data.gift_num).then((response) => {
+                        MYDEBUG(`API.xlive.anchor.join(${data.id}) response`, response);
                         if (response.code === 0) {
-                            MY_API.chatLog(`[天选时刻] 成功参加天选<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id = ${data[0]}<br>${data[8] === 0 ? '' : ('花费金瓜子：' + data[8] + '<br>')}奖品：${data[4]}<br>${MY_API.AnchorLottery.countDown(data[5])}`, 'success');
-                            MY_API.AnchorLottery.waitForRecheckList.push(data[3]);
-                            return BAPI.live_user.get_anchor_in_room(data[3]).then((res) => { //获取uid
-                                MYDEBUG(`API.live_user.get_anchor_in_room(${data[3]})`, res);
+                            MY_API.chatLog(`[天选时刻] 成功参加天选<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>${data.joinPrice === 0 ? '' : ('花费金瓜子：' + data.joinPrice + '<br>')}奖品：${data.award_name}<br>${MY_API.AnchorLottery.countDown(data.time)}`, 'success');
+                            MY_API.AnchorLottery.waitForRecheckList.push(data.roomid);
+                            return BAPI.live_user.get_anchor_in_room(data.roomid).then((res) => { //获取uid
+                                MYDEBUG(`API.live_user.get_anchor_in_room(${data.roomid})`, res);
                                 if (res.code === 0) {
                                     MY_API.addAnchor();
-                                    data[7] = res.data.info.uid;
+                                    data.uid = res.data.info.uid;
                                     MYDEBUG('天选时刻join data', data);
-                                    if (data[6] === 1 && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG) { //有关注要求
-                                        if (MY_API.AnchorLottery.uidInOriginTag.indexOf(String(data[7])) > -1) return;//之前在默认分组，不移动
+                                    if (data.require_type === 1 && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG) { //有关注要求
+                                        if (MY_API.AnchorLottery.uidInOriginTag.indexOf(String(data.uid)) > -1) return;//之前在默认分组，不移动
                                         setTimeout(() => {
                                             BAPI.relation.addUsers(res.data.info.uid, MY_API.AnchorLottery.anchorFollowTagid).then((re) => {
                                                 MYDEBUG(`API.relation.addUsers ${res.data.info.uid} ${MY_API.AnchorLottery.anchorFollowTagid}`, re);
@@ -4868,16 +4890,16 @@
                                             });
                                         }, 4000);
                                     }
-                                    return setTimeout(() => MY_API.AnchorLottery.reCheck(data), data[5] * 1000 + 1500);
+                                    setTimeout(() => MY_API.AnchorLottery.reCheck(data), data.time * 1000 + 1500);
                                 }
                             });
 
                         } else if (response.code === 500) {
-                            MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id = ${data[0]}<br>奖品：${data[4]}<br>${response.msg}<br>3秒后再次尝试参加`, 'warning');
+                            MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>奖品：${data.award_name}<br>${response.msg}<br>3秒后再次尝试参加`, 'warning');
                             return setTimeout(() => MY_API.AnchorLottery.join(data), 3000);
                         }
                         else {
-                            return MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data[3], liveRoomUrl + data[3])}, id = ${data[0]}<br>奖品：${data[4]}<br>${response.msg}`, 'warning')
+                            return MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>奖品：${data.award_name}<br>${response.msg}`, 'warning')
                         }
                     }, () => {
                         MY_API.chatLog(`[天选时刻] 天选参加出错，请检查网络`, 'error');
@@ -4919,17 +4941,24 @@
                                 let p = $.Deferred();
                                 if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
                                 MY_API.AnchorLottery.check(room).then((re) => {
-                                    if (re[0]) {
-                                        //可以参加
-                                        return MY_API.AnchorLottery.pwdCheck(room).then((res) => {
-                                            if (res) {
-                                                //加密
-                                                MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(res[3], liveRoomUrl + res[3])}, id = ${res[0]}<br>${res[8] === 0 ? '' : ('所需金瓜子：' + res[8] + '<br>')}奖品：${res[4]}<br>${MY_API.AnchorLottery.countDown(res[5])}`, 'warning');
-                                                p.resolve();
-                                            } else {
-                                                return MY_API.AnchorLottery.join(re).then(() => p.resolve());
-                                            }
-                                        })
+                                    if ($.isArray(re) && re[0]) {
+                                        //数据格式正确，可以参加
+                                        if (MY_API.CONFIG.ANCHOR_IGNORE_PWDROOM) {
+                                            return MY_API.AnchorLottery.pwdCheck(room).then((res) => {
+                                                if (res) {
+                                                    //加密
+                                                    MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(res[3], liveRoomUrl + res[3])}, id = ${res[0]}<br>${res[8] === 0 ? '' : ('所需金瓜子：' + res[8] + '<br>')}奖品：${res[4]}<br>${MY_API.AnchorLottery.countDown(res[5])}`, 'warning');
+                                                    p.resolve();
+                                                } else {
+                                                    //不加密
+                                                    MY_API.AnchorLottery.join(re).then(() => p.resolve());
+                                                }
+                                            }, () => {
+                                                MY_API.chatLog('[天选时刻] 直播间加密检查出错，请检查网络', 'error')
+                                            })
+                                        } else {
+                                            MY_API.AnchorLottery.join(re).then(() => p.resolve());
+                                        }
                                     } else p.resolve();
                                 });
                                 await p;
