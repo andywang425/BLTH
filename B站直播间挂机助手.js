@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.3.2
+// @version        5.6.3.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -634,9 +634,8 @@
                         layer.open({
                             title: `${version}更新提示`,
                             content: `
-                            1.【粉丝勋章打卡弹幕】弹幕选取逻辑调整。<br>
-                            2. 增大了弹幕发送间隔。<br>
-                            3. bug fix<br>
+                            1.修复无法参加天选的bug。<br>
+                            2.修复配置导入无效的bug。<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -1669,7 +1668,7 @@
                                 readConfigArray[1].then(() => {
                                     let json = readConfigArray[0];
                                     MYDEBUG('readConfigArray 文件读取结果：', readConfigArray[0]);
-                                    $.extend(true, MY_API.CONFIG, json.MY_API.CONFIG);
+                                    $.extend(true, MY_API.CONFIG, json.MY_API_CONFIG);
                                     MY_API.saveConfig(false);
                                     localStorage.setItem(`${NAME}_NOSLEEP`, json.nosleepConfig);
                                     localStorage.setItem(`${NAME}_INVISIBLE_ENTER`, json.INVISIBLE_ENTER_config);
@@ -4203,7 +4202,7 @@
                                     MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间出错<br>${data.message}`, 'warning');
                                 }
                             }, () => {
-                                MY_API.chatLog(`[天选时刻] 获取小时榜直播间出错，请检查网络`, error);
+                                MY_API.chatLog(`[天选时刻] 获取小时榜直播间出错，请检查网络`, 'error');
                                 return delayCall(() => checkHourRank());
                             });
                             await sleep(MY_API.CONFIG.ANCHOR_INTERVAL)
@@ -4367,7 +4366,7 @@
                         let p = $.Deferred();
                         if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
                         MY_API.AnchorLottery.check(room).then((re) => {
-                            if ($.isArray(re) && re[0]) {
+                            if (re) {
                                 //数据格式正确，可以参加
                                 if (MY_API.CONFIG.ANCHOR_IGNORE_PWDROOM) {
                                     return MY_API.AnchorLottery.pwdCheck(room).then((res) => {
@@ -4561,7 +4560,7 @@
                         if (response.code === 0 && !!response.data) {
                             if (response.data.time === 0) {
                                 MY_API.chatLog(`[天选时刻] 忽略过期天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}`, 'info');
-                                return [false]
+                                return false
                             }
                             if (add) {
                                 if (MY_API.AnchorLottery.lotteryResponseList.indexOf(response.data.room_id) === -1)
@@ -4605,7 +4604,7 @@
                                         if (response.data.award_name.toLowerCase().indexOf(str.toLowerCase()) > -1) {
                                             MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>含有关键字：${str}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
                                             joinAnchorListener();
-                                            return [false]
+                                            return false
                                         }
                                     }
                                     else {
@@ -4613,7 +4612,7 @@
                                         if (reg.test(response.data.award_name)) {
                                             MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>匹配正则：${str}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
                                             joinAnchorListener();
-                                            return [false]
+                                            return false
                                         }
                                     }
                                 }
@@ -4623,17 +4622,17 @@
                                 if (moneyCheckReturnArray[0] && moneyCheckReturnArray[1] < MY_API.CONFIG.ANCHOR_IGNORE_MONEY) {
                                     MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>识别到的金额：${moneyCheckReturnArray[1]}元<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
                                     joinAnchorListener();
-                                    return [false]
+                                    return false
                                 }
                             }
                             if (response.data.status === 2) {
                                 MY_API.chatLog(`[天选时刻] 忽略已参加天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>`, 'info');
-                                return [false]
+                                return false
                             }
                             if (joinPrice > MY_API.CONFIG.AHCHOR_NEED_GOLD) {
                                 MY_API.chatLog(`[天选时刻] 忽略付费天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
                                 joinAnchorListener();
-                                return [false]
+                                return false
                             }
                             switch (response.data.require_type) {
                                 case 0: //无要求
@@ -4648,16 +4647,16 @@
                                                     //这里m.target_id是勋章对应UP的uid，m.uid是自己的uid
                                                     if (m.level < response.data.require_value) {
                                                         MY_API.chatLog(`[天选时刻] 忽略粉丝勋章等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需勋章等级：${response.data.require_value}<br>你的勋章等级：${m.level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
-                                                        return [false]
+                                                        return false
                                                     } else {
                                                         return defaultJoinData
                                                     }
                                                 }
                                             }
                                             MY_API.chatLog(`[天选时刻] 忽略有粉丝勋章要求的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需勋章等级：${response.data.require_value}<br>你没有该勋章<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
-                                            return [false]
+                                            return false
                                         } else {
-                                            return [false]
+                                            return false
                                         }
                                     });
                                 }
@@ -4682,32 +4681,32 @@
                                                 const requireText = getPrivilegeText(response.data.require_value),
                                                     myText = getPrivilegeText(privilege_type);
                                                 MY_API.chatLog(`[天选时刻] 忽略大航海等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需大航海等级：${requireText}<br>你的大航海等级：${myText}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
-                                                return [false]
+                                                return false
                                             }
                                         } else {
-                                            return [false]
+                                            return false
                                         }
                                     })
                                 }
                                 case 4: { //直播等级
                                     if (Live_info.user_level >= response.data.require_value) return defaultJoinData;
                                     else MY_API.chatLog(`[天选时刻] 忽略直播等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需直播等级：${response.data.require_value}<br>你的直播等级：UL.${Live_info.user_level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
-                                    return [false]
+                                    return false
                                 }
                                 case 5: { //主站等级
                                     if (Live_info.level >= response.data.require_value) return defaultJoinData;
                                     else MY_API.chatLog(`[天选时刻] 忽略主站等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需直播等级：${response.data.require_value}<br>你的主站等级：Lv${Live_info.level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
-                                    return [false]
+                                    return false
                                 }
                                 default: {
                                     MYDEBUG(`[天选时刻] 未被收录的类型 require_value = ${response.data.require_value}`, response);
-                                    return [false]
+                                    return false
                                 }
                             }
 
                         }
                         else {
-                            return [false]
+                            return false
                         }
                     }, () => {
                         MY_API.chatLog(`[天选时刻] 天选检查出错，请检查网络`, 'error');
@@ -4861,7 +4860,7 @@
                 },
                 /**
                  * 参与天选
-                 * @param {
+                   @param {
                        { id: number, gift_id?: number, gift_num?: number, roomid: number, award_name: string, time: number, require_type: number, joinPrice: number, uid: undefined}
                     } data
                  */
@@ -4941,7 +4940,7 @@
                                 let p = $.Deferred();
                                 if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
                                 MY_API.AnchorLottery.check(room).then((re) => {
-                                    if ($.isArray(re) && re[0]) {
+                                    if (re) {
                                         //数据格式正确，可以参加
                                         if (MY_API.CONFIG.ANCHOR_IGNORE_PWDROOM) {
                                             return MY_API.AnchorLottery.pwdCheck(room).then((res) => {
@@ -5151,13 +5150,13 @@
     }
     /**
      * 导出配置文件
-     * @param MY_API MY_API
+     * @param MY_API_CONFIG MY_API.CONFIG
      * @param nosleepConfig noSleep
      * @param INVISIBLE_ENTER_config invisibleEnter
      */
-    function exportConfig(MY_API, nosleepConfig, INVISIBLE_ENTER_config) {
+    function exportConfig(MY_API_CONFIG, nosleepConfig, INVISIBLE_ENTER_config) {
         const exportJson = {
-            MY_API: MY_API,
+            MY_API_CONFIG: MY_API_CONFIG,
             nosleepConfig: nosleepConfig,
             INVISIBLE_ENTER_config: INVISIBLE_ENTER_config
         };
@@ -5175,7 +5174,7 @@
             try {
                 readConfigArray[0] = JSON.parse(this.result);
                 if (typeof readConfigArray[0] == 'object' && readConfigArray[0]) {
-                    const list = ["MY_API", "nosleepConfig", "INVISIBLE_ENTER_config"];
+                    const list = ["MY_API_CONFIG", "nosleepConfig", "INVISIBLE_ENTER_config"];
                     for (const i of list) {
                         if (!readConfigArray[0].hasOwnProperty(i)) return wrongFile();
                     }

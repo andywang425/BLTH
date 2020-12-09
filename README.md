@@ -190,7 +190,7 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.3.2
->【粉丝勋章打卡弹幕】弹幕选取逻辑调整；bug fix。
+>### 5.6.3.3
+>修复无法参加天选的bug；修复配置导入无效的bug。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
