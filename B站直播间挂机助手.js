@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.3.3
+// @version        5.6.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -4252,7 +4252,18 @@
                                 joinPrice: joinPrice,
                                 uid: undefined
                             };
-                            const joinText = (text) => `<div class = "clickableText" title = "${joinTextTitle}" ts = "${ts}">${text}</div>`;
+                            let joinText = null, joinDisplay = "block";
+                            switch (response.data.require_type) {
+                                case 1: joinText = "点击参加"; break;
+                                case 2: {
+                                    if (response.data.require_value === 1) joinText = "点击购买粉丝勋章参加";
+                                    else joinText = "点击购买粉丝勋章";
+                                    break;
+                                }
+                                case 3: joinDisplay = "none"; break;
+                                default: joinDisplay = "none";
+                            }
+                            const joinHtml = (text = joinText, display = joinDisplay) => `<div class = "clickableText" title = "${joinTextTitle}" ts = "${ts}" style = "display:${display};">${text}</div>`;
                             function joinAnchorListener() {
                                 let jqText = $('div' + '[title=\"' + joinTextTitle + '\"]' + '[ts=\"' + ts + '\"]');
                                 let timer = setTimeout(() => jqText.remove(), response.data.time * 1000);
@@ -4260,52 +4271,61 @@
                                     let p = $.Deferred();
                                     switch (response.data.require_type) {
                                         case 2: //粉丝勋章
-                                                BAPI.live_user.get_anchor_in_room(roomid).then(function (response) {
-                                                    MYDEBUG('API.live_user.get_anchor_in_room response', response)
-                                                    if (response.code === 0 && !!response.data.info) {
-                                                        const uid = response.data.info.uid;
-                                                        BAPI.link_group.buy_medal(uid).then((re) => {
-                                                            MYDEBUG('API.link_group.buy_medal re', re);
-                                                            if (re.code === 0) {
-                                                                if (response.data.require_value === 1) {
-                                                                    layer.msg('粉丝勋章购买成功，约1秒后参加天选', {
-                                                                        time: 2000,
-                                                                        icon: 1
-                                                                    });
-                                                                    setTimeout(() => p.resolve(), 1000);
-                                                                } else {
-                                                                    layer.msg('粉丝勋章购买成功', {
-                                                                        time: 2000,
-                                                                        icon: 1
-                                                                    });
-                                                                    p.reject();
-                                                                }
-                                                                const medalJson = {
-                                                                    anchorInfo: {
-                                                                        uid: uid,
-                                                                        uname: response.data.info.uname,
-                                                                        face: response.data.info.face
-                                                                    },
-                                                                    medal_level: 1,
-                                                                    target_id: uid
-                                                                }
-                                                                MY_API.AnchorLottery.medal_list.push(medalJson);
-                                                            } else {
-                                                                layer.msg(`粉丝勋章购买失败 ${re.message}`, {
-                                                                    time: 3500,
-                                                                    icon: 2
-                                                                });
-                                                                p.reject()
-                                                            }
-                                                        }, () => {
-                                                            MY_API.chatLog('[天选时刻] 购买粉丝勋章出错，请检查网络', 'error');
-                                                            p.reject()
-                                                        });
+                                            let getUid = $.Deferred();
+                                            if (!defaultJoinData.uid) {
+                                                BAPI.live_user.get_anchor_in_room(roomid).then((res) => {
+                                                    MYDEBUG(`API.live_user.get_anchor_in_room(${roomid})`, res);
+                                                    if (res.data) {
+                                                        defaultJoinData.uid = res.data.info.uid;
+                                                        getUid.resolve();
+                                                    } else {
+                                                        MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${roomid}<br>${res.msg}`, 'error');
+                                                        getUid.reject();
                                                     }
                                                 }, () => {
-                                                    MY_API.chatLog('[天选时刻] 获取房间信息出错，请检查网络', 'error');
-                                                    p.reject()
+                                                    MY_API.chatLog(`[天选时刻] 获取uid出错，请检查网络`, 'error');
+                                                    getUid.reject();
                                                 })
+                                            } else getUid.resolve();
+                                            getUid.then(() => {
+                                                BAPI.link_group.buy_medal(defaultJoinData.uid).then((re) => {
+                                                    MYDEBUG('API.link_group.buy_medal re', re);
+                                                    if (re.code === 0) {
+                                                        if (response.data.require_value === 1) {
+                                                            layer.msg('粉丝勋章购买成功，约1秒后参加天选', {
+                                                                time: 2000,
+                                                                icon: 1
+                                                            });
+                                                            setTimeout(() => p.resolve(), 1000);
+                                                        } else {
+                                                            layer.msg('粉丝勋章购买成功', {
+                                                                time: 2000,
+                                                                icon: 1
+                                                            });
+                                                            p.reject();
+                                                        }
+                                                        const medalJson = {
+                                                            anchorInfo: {
+                                                                uid: defaultJoinData.uid,
+                                                                uname: res.data.info.uname,
+                                                                face: res.data.info.face
+                                                            },
+                                                            medal_level: 1,
+                                                            target_id: defaultJoinData.uid
+                                                        }
+                                                        MY_API.AnchorLottery.medal_list.push(medalJson);
+                                                    } else {
+                                                        layer.msg(`粉丝勋章购买失败 ${re.message}`, {
+                                                            time: 3500,
+                                                            icon: 2
+                                                        });
+                                                        p.reject()
+                                                    }
+                                                }, () => {
+                                                    MY_API.chatLog('[天选时刻] 购买粉丝勋章出错，请检查网络', 'error');
+                                                    p.reject()
+                                                });
+                                            });
                                             break;
                                         default: p.resolve()
                                     }
@@ -4330,7 +4350,7 @@
                                 for (const str of MY_API.CONFIG.ANCHOR_BLACKLIST_WORD) {
                                     if (str.charAt(0) != '/' && str.charAt(str.length - 1) != '/') {
                                         if (response.data.award_name.toLowerCase().indexOf(str.toLowerCase()) > -1) {
-                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>含有关键字：${str}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText('点击参加')}`, 'warning');
+                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>含有关键字：${str}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
                                             joinAnchorListener();
                                             return false
                                         }
@@ -4338,7 +4358,7 @@
                                     else {
                                         const reg = eval(str);
                                         if (reg.test(response.data.award_name)) {
-                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>匹配正则：${str}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText('点击参加')}`, 'warning');
+                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>匹配正则：${str}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
                                             joinAnchorListener();
                                             return false
                                         }
@@ -4348,7 +4368,7 @@
                             if (MY_API.CONFIG.ANCHOR_IGNORE_MONEY > 0) {
                                 const moneyCheckReturnArray = MY_API.AnchorLottery.moneyCheck(response.data.award_name);
                                 if (moneyCheckReturnArray[0] && moneyCheckReturnArray[1] < MY_API.CONFIG.ANCHOR_IGNORE_MONEY) {
-                                    MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>识别到的金额：${moneyCheckReturnArray[1]}元<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText('点击参加')}`, 'warning');
+                                    MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}识别到的金额：${moneyCheckReturnArray[1]}元<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
                                     joinAnchorListener();
                                     return false
                                 }
@@ -4358,7 +4378,7 @@
                                 return false
                             }
                             if (joinPrice > MY_API.CONFIG.AHCHOR_NEED_GOLD) {
-                                MY_API.chatLog(`[天选时刻] 忽略付费天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText('点击参加')}`, 'warning');
+                                MY_API.chatLog(`[天选时刻] 忽略付费天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
                                 joinAnchorListener();
                                 return false
                             }
@@ -4368,10 +4388,10 @@
                                 case 2: { // 粉丝勋章
                                     return BAPI.live_user.get_anchor_in_room(roomid).then((res) => {
                                         MYDEBUG(`API.live_user.get_anchor_in_room(${roomid})`, res);
-                                        if (!!res.data) {
-                                            let ownerUid = res.data.info.uid;
+                                        if (res.data) {
+                                            defaultJoinData.uid = res.data.info.uid;
                                             for (const m of MY_API.AnchorLottery.medal_list) {
-                                                if (m.target_id === ownerUid) {
+                                                if (m.target_id === defaultJoinData.uid) {
                                                     //这里m.target_id是勋章对应UP的uid，m.uid是自己的uid
                                                     if (m.medal_level < response.data.require_value) {
                                                         MY_API.chatLog(`[天选时刻] 忽略粉丝勋章等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需勋章等级：${response.data.require_value}<br>你的勋章等级：${m.level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
@@ -4381,12 +4401,16 @@
                                                     }
                                                 }
                                             }
-                                            MY_API.chatLog(`[天选时刻] 忽略有粉丝勋章要求的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需勋章等级：${response.data.require_value}<br>你没有该勋章<br>${MY_API.AnchorLottery.countDown(response.data.time)}${response.data.require_value === 1 ? joinText('点击购买勋章并参加') : joinText('点击购买勋章')}`, 'warning');
-                                            joinAnchorListener()
+                                            MY_API.chatLog(`[天选时刻] 忽略有粉丝勋章要求的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需勋章等级：${response.data.require_value}<br>你没有该勋章<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
+                                            joinAnchorListener();
                                             return false
                                         } else {
+                                            MY_API.chatLog(`[天选时刻] 获取uid出错<br>${res.msg}`, 'error');
                                             return false
                                         }
+                                    }, () => {
+                                        MY_API.chatLog(`[天选时刻] 获取uid出错，请检查网络`, 'error');
+                                        return false
                                     });
                                 }
                                 case 3: { //大航海
@@ -4602,28 +4626,39 @@
                         if (response.code === 0) {
                             MY_API.chatLog(`[天选时刻] 成功参加天选<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>${data.joinPrice === 0 ? '' : ('花费金瓜子：' + data.joinPrice + '<br>')}奖品：${data.award_name}<br>${MY_API.AnchorLottery.countDown(data.time)}`, 'success');
                             MY_API.AnchorLottery.waitForRecheckList.push(data.roomid);
-                            return BAPI.live_user.get_anchor_in_room(data.roomid).then((res) => { //获取uid
-                                MYDEBUG(`API.live_user.get_anchor_in_room(${data.roomid})`, res);
-                                if (res.code === 0) {
-                                    MY_API.addAnchor();
-                                    data.uid = res.data.info.uid;
-                                    MYDEBUG('天选时刻join data', data);
-                                    if (data.require_type === 1 && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG) { //有关注要求
-                                        if (MY_API.AnchorLottery.uidInOriginTag.indexOf(String(data.uid)) > -1) return;//之前在默认分组，不移动
-                                        setTimeout(() => {
-                                            BAPI.relation.addUsers(res.data.info.uid, MY_API.AnchorLottery.anchorFollowTagid).then((re) => {
-                                                MYDEBUG(`API.relation.addUsers ${res.data.info.uid} ${MY_API.AnchorLottery.anchorFollowTagid}`, re);
-                                                if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）至分组【${anchorFollowTagName}】成功`, 'success');
-                                                else window.toast(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）至分组【${anchorFollowTagName}】失败 ${re.message}`, 'warning');
-                                            }, () => {
-                                                MY_API.chatLog(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`);
-                                            });
-                                        }, 4000);
+                            let p = $.Deferred();
+                            if (!data.uid) {
+                                BAPI.live_user.get_anchor_in_room(data.roomid).then((res) => { //获取uid
+                                    MYDEBUG(`API.live_user.get_anchor_in_room(${data.roomid})`, res);
+                                    if (res.code === 0) {
+                                        data.uid = res.data.info.uid;
+                                        p.resolve();
+                                    } else {
+                                        MY_API.chatLog(`[天选时刻] 获取uid出错，中断后续操作<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>${res.msg}`, 'error');
+                                        p.reject();
                                     }
-                                    setTimeout(() => MY_API.AnchorLottery.reCheck(data), data.time * 1000 + 1500);
+                                }, () => {
+                                    MY_API.chatLog(`[天选时刻] 获取uid出错，中断后续操作<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>请检查网络`, 'error');
+                                    p.reject();
+                                });
+                            } else p.resolve();
+                            p.then(() => {
+                                MY_API.addAnchor();
+                                MYDEBUG('天选时刻join data', data);
+                                if (data.require_type === 1 && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG) { //有关注要求
+                                    if (MY_API.AnchorLottery.uidInOriginTag.indexOf(String(data.uid)) > -1) return;//之前在默认分组，不移动
+                                    setTimeout(() => {
+                                        BAPI.relation.addUsers(data.uid, MY_API.AnchorLottery.anchorFollowTagid).then((re) => {
+                                            MYDEBUG(`API.relation.addUsers ${data.uid} ${MY_API.AnchorLottery.anchorFollowTagid}`, re);
+                                            if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】成功`, 'success');
+                                            else window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】失败 ${re.message}`, 'warning');
+                                        }, () => {
+                                            MY_API.chatLog(`[天选时刻] 移动UP（uid = ${data.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`);
+                                        });
+                                    }, 4000);
                                 }
-                            });
-
+                                setTimeout(() => MY_API.AnchorLottery.reCheck(data), data.time * 1000 + 1500);
+                            })
                         } else if (response.code === 500) {
                             MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>奖品：${data.award_name}<br>${response.msg}<br>3秒后再次尝试参加`, 'warning');
                             return setTimeout(() => MY_API.AnchorLottery.join(data), 3000);
