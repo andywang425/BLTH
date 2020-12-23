@@ -1196,8 +1196,8 @@
                                 myDiv = $('#allsettings');
                             }
                             //显示顶部统计数据
-                            $('#giftCount .anchor .num').text(MY_API.GIFT_COUNT.ANCHOR_COUNT);
-                            $('#giftCount .material .num').text(MY_API.GIFT_COUNT.MATERIAL_COUNT);
+                            $('#giftCount .anchor .num').text(MY_API.GIFT_COUNT.ANCHOR_COUNT); //天选
+                            $('#giftCount .material .num').text(MY_API.GIFT_COUNT.MATERIAL_COUNT); //实物
                             //显示忽略关键字等统计数量
                             myDiv.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] label.str').text(String(MY_API.CONFIG.QUESTIONABLE_LOTTERY.length) + '个');
                             myDiv.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label.str').text(String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length) + '个');
@@ -1646,28 +1646,35 @@
                                 });
                             };
                             //绑定特殊设置（不在MY_API.CONFIG中）
-                            const invisibleInput = myDiv.find(`div[data-toggle="INVISIBLE_ENTER"] input:checkbox`),
-                                invisibleSetting = localStorage.getItem(`${NAME}_INVISIBLE_ENTER`);
-                            if (invisibleSetting === 'true') invisibleInput.attr('checked', '');
-                            invisibleInput.change(function () {
-                                localStorage.setItem(`${NAME}_INVISIBLE_ENTER`, $(this).prop('checked'));
-                                window.toast('[隐身入场] 配置已保存', 'info');
-                            });
-                            const NOSLEEP = myDiv.find('div[data-toggle="NOSLEEP"] input:checkbox'),
-                                NOSLEEPsetting = localStorage.getItem(`${NAME}_NOSLEEP`);
-                            if (NOSLEEPsetting === 'true') NOSLEEP.attr('checked', '');
-                            NOSLEEP.change(function () {
-                                localStorage.setItem(`${NAME}_NOSLEEP`, $(this).prop('checked'));
-                                window.toast('[屏蔽挂机检测] 配置已保存', 'info');
-                            });
-                            const debugSwitchInput = myDiv.find(`div[data-toggle="debugSwitch"] input:checkbox`),
-                                debugSwitchSetting = localStorage.getItem(`${NAME}_debugSwitch`);
-                            if (debugSwitchSetting === 'true') debugSwitchInput.attr('checked', '');
-                            debugSwitchInput.change(function () {
-                                debugSwitch = $(this).prop('checked');
-                                localStorage.setItem(`${NAME}_debugSwitch`, debugSwitch);
-                                window.toast('[控制台日志] 配置已保存', 'info');
-                            })
+                            const specialSetting = [
+                                {
+                                    jqPath: `div[data-toggle="INVISIBLE_ENTER"] input:checkbox`,
+                                    lsItem: `${NAME}_INVISIBLE_ENTER`,
+                                    toastMsg: ["[隐身入场] 配置已保存", "info"],
+                                },
+                                {
+                                    jqPath: `div[data-toggle="NOSLEEP"] input:checkbox`,
+                                    lsItem: `${NAME}_NOSLEEP`,
+                                    toastMsg: ["[屏蔽挂机检测] 配置已保存', 'info"],
+                                },
+                                {
+                                    jqPath: `div[data-toggle="debugSwitch"] input:checkbox`,
+                                    lsItem: `${NAME}_debugSwitch`,
+                                    toastMsg: ["[控制台日志] 配置已保存', 'info"],
+                                    changeFn: function (self) { debugSwitch = $(self).prop('checked'); }
+                                },
+                            ];
+                            for (const i of specialSetting) {
+                                const input = myDiv.find(i.jqPath),
+                                    setting = localStorage.getItem(i.lsItem);
+                                if (setting === 'true') input.attr('checked', '');
+                                input.change(function () {
+                                    let self = this;
+                                    if (i.hasOwnProperty('changeFn')) i.changeFn(self);
+                                    localStorage.setItem(i.lsItem, $(self).prop('checked'));
+                                    window.toast(i.toastMsg[0], i.toastMsg[1]);
+                                })
+                            }
                             //绑定回车保存
                             $('input:text').bind('keydown', function (event) {
                                 if (event.keyCode == 13) {
@@ -4101,6 +4108,7 @@
                         return [false]
                     }
                     function chineseFunc() {
+                        //把匹配到的数字由长到段重新排列
                         let chineseNumIndexList = [];
                         chineseNumberArray.sort(function (a, b) {
                             return b.length - a.length;
@@ -4142,6 +4150,7 @@
                         }
                     }
                     function arabicNumberFunc() {
+                        //把匹配到的数字由长到段重新排列
                         let numIndexList = [];
                         numberArray.sort(function (a, b) {
                             return b.length - a.length;
@@ -4729,6 +4738,11 @@
                         return delayCall(() => MY_API.AnchorLottery.join(data));
                     })
                 },
+                /**
+                 * 检测是否在休眠时间休眠时间
+                 * @returns {boolean} false （不在休眠时间段）
+                 * @returns {number} 距休眠结束的毫秒数 （在休眠时间段）
+                 */
                 sleepCheck: () => {
                     if (!MY_API.CONFIG.TIME_AREA_DISABLE) return false;
                     if (inTimeArea(MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)) {//判断时间段
