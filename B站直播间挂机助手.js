@@ -214,8 +214,17 @@
         INVISIBLE_ENTER_config = undefined,
         readConfigArray = [undefined];
 
-    newWindow.init();
+    /**
+     * 替换字符串中所有的匹配项
+     * @param oldSubStr 搜索的字符串
+     * @param newSubStr 替换内容
+     */
+    String.prototype.replaceAll = function (oldSubStr, newSubStr) {
+        return this.replace(new RegExp(oldSubStr, 'gm'), newSubStr)
+    }
+
     $(document).ready(() => {
+        newWindow.init();
         nosleepConfig = localStorage.getItem(`${NAME}_NOSLEEP`);
         if (nosleepConfig === 'true') {
             const width = screen.availWidth, height = screen.availHeight;
@@ -341,14 +350,6 @@
         };
         return loadInfo(0);
     });
-    /**
-     * 替换字符串中所有的匹配项
-     * @param oldSubStr 搜索的字符串
-     * @param newSubStr 替换内容
-     */
-    String.prototype.replaceAll = function (oldSubStr, newSubStr) {
-        return this.replace(new RegExp(oldSubStr, 'gm'), newSubStr)
-    }
     function init() {//API初始化
         const MY_API = {
             CONFIG_DEFAULT: {
@@ -469,7 +470,7 @@
                 CLEAR_TS: 0,//重置统计
             },
             init: async () => {
-                await addStyle();
+                addStyle();
                 const tabList = $('.tab-list.dp-flex'),
                     tabContent = $('.tab-content'),
                     ct = $('#chat-history-list'),
@@ -1150,11 +1151,12 @@
                     ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</mli></mul>",
                     topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，每天0点时重置。</mli><mli>支持输入框回车保存。</mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
                     ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
-                    debugSwitch: "开启或关闭控制日志。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响普通日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
+                    debugSwitch: "开启或关闭控制日志。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
                     UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
                     ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
                     MEDAL_DANMU_INTERVAL: "每两条弹幕间所等待的时间。<mh3>注意：</mh3><mul><mli>由于B站服务器限制，间隔时间必须大于等于1秒，否则弹幕发送会出错。</mli></mul>",
-                    ANCHOR_IGNORE_ROOM: "不检查和参加这些直播间的天选。<mul><mli>如果要填写多个直播间，每两个直播间号之间请用半角逗号<code>,</code>隔开。</mli></mul>"
+                    ANCHOR_IGNORE_ROOM: "不检查和参加这些直播间的天选。<mul><mli>如果要填写多个直播间，每两个直播间号之间请用半角逗号<code>,</code>隔开。</mli></mul>",
+                    ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli></mul>"
                 };
                 let newHtml = undefined;
                 const openMainWindow = async () => {
