@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.3.3
+// @version        5.6.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -29,7 +29,10 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libWasmHash.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@97bf818a906154a418f72ecbb644de9cf19c80b1/modules/base64.min.js
-// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@d86732c07164300f64a2e543f264ce4f6099fbfc/modules/layer.css
+// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@e5661a11516ac85ad185e267dca600fc142a0bcd/css/layer.css
+// @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@512a0bd5d39ffcbe79186aac9977d5073974b4ea/css/myCss-min.css
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@00d05501c9e88d2879b1f735f0bcca68a164dcb4/html/main-min.html
+// @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@512a0bd5d39ffcbe79186aac9977d5073974b4ea/html/eula-min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
@@ -62,7 +65,8 @@
             if (data.length === 1) { console.log(d, `${sign}:`, data[0]); return }
             console.log(d, `${sign}:`, data);
         },
-        runMidnight = (callback, msg) => {//明天凌晨0点1分再次运行（因为12点时任务可能没刷新）
+        runMidnight = (callback, msg) => {
+            //明天凌晨0点1分再次运行
             const t = new Date();
             let name = msg || ' ';
             t.setMinutes(t.getMinutes() + tz_offset);
@@ -72,7 +76,8 @@
             setTimeout(callback, t - ts_ms());
             MYDEBUG('runMidnight', name + " " + t.toString());
         },
-        runExactMidnight = (callback, msg) => {//明天凌晨0点再次运行（清空统计）
+        runExactMidnight = (callback, msg) => {
+            //明天凌晨0点再次运行
             const t = new Date();
             let name = msg || ' ';
             t.setMinutes(t.getMinutes() + tz_offset);
@@ -82,7 +87,8 @@
             setTimeout(callback, t - ts_ms());
             MYDEBUG('runExactMidnight', name + " " + t.toString());
         },
-        runTomorrow = (callback, hour, minute, msg) => {//明天运行，可自定义时间
+        runTomorrow = (callback, hour, minute, msg) => {
+            //明天运行，可自定义时间
             const t = new Date();
             let name = msg || ' ';
             t.setMinutes(t.getMinutes() + tz_offset);
@@ -110,7 +116,8 @@
             init: () => {
                 return newWindow.Toast.init();
             },
-            Toast: { //设置右上角弹窗
+            Toast: {
+                //设置右上角浮动提示框 Need Init
                 init: () => {
                     try {
                         const list = [];
@@ -118,9 +125,7 @@
                             switch (type) {
                                 case 'success':
                                 case 'info':
-                                    break;
                                 case 'caution':
-                                    break;
                                 case 'error':
                                     break;
                                 default:
@@ -151,12 +156,13 @@
                         return $.Deferred().reject();
                     }
                 }
-            }// Need Init
+            }
         },
-        addStyle = async () => {
-            const layerCss = await GM_getResourceText('layerCss');
-            const myCss = ".chatLogDiv{text-align:center;border-radius:4px;min-height:30px;width:256px;color:#9585ff;line-height:30px;padding:0 10px;margin:10px auto}.chatLogMsg{word-wrap:break-word;width:100%;line-height:1em;margin-bottom:10px}.chatLogWarning{border:1px solid rgb(236,221,192);color:rgb(218,142,36);background:rgb(245,235,221) none repeat scroll 0% 0%}.chatLogSuccess{border:1px solid rgba(22,140,0,.28);color:rgb(69,171,69);background:none 0% 0% repeat scroll rgba(16,255,0,.18)}.chatLogError{border:1px solid rgba(255,0,39,.28);color:rgb(116,0,15);background:none 0% 0% repeat scroll rgba(255,0,39,.18)}.chatLogDefault{border:1px solid rgb(203,195,255);background:rgb(233,230,255) none repeat scroll 0% 0%}.igiftMsg_input{outline:none;border:1px solid #e9eaec;background-color:#fff;border-radius:4px;padding:1px 0 0;overflow:hidden;font-size:12px;line-height:19px;width:30px;z-index:9999}.igiftMsg_btn{background-color:#23ade5;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;z-index:9999}.igiftMsg_btn:active{background-color:#0e8bbd;position:relative;top:1px}.igiftMsg_fs{border:2px solid #d4d4d4;z-index:9999}.chatLogDiv{text-align:center;border-radius:4px;min-height:30px;width:256px;line-height:30px;padding:0 10px;margin:10px auto}.chatLogMsg{word-wrap:break-word;width:100%;line-height:1em;margin-bottom:10px}.chatLogWarning{border:1px solid rgb(209,194,164);color:rgb(190,125,33);background:rgb(255,223,175) none repeat scroll 0% 0%}.chatLogSuccess{border:1px solid rgba(22,140,0,.28);color:rgb(69,171,69);background:none 0% 0% repeat scroll rgba(16,255,0,.18)}.chatLogError{border:1px solid rgba(255,0,39,.28);color:rgb(116,0,15);background:none 0% 0% repeat scroll rgba(255,0,39,.18)}.chatLogDefault{border:1px solid rgb(203,195,255);color:#9585ff;background:rgb(233,230,255) none repeat scroll 0% 0%}.chatLogLottery{text-align:center;border-radius:4px;min-height:30px;width:256px;color:#9585ff;line-height:30px;padding:0 10px;margin:10px auto;border:1px solid rgb(203,195,255);background:rgb(233,230,255) none repeat scroll 0% 0%}.chatLogWinPrize{border:1px solid rgb(223,187,0);color:rgb(145,123,0);background:none 0% 0% repeat scroll rgb(255,215,0,30%)}.igiftMsg_num{min-width:12px;height:16px;padding:0 3px;border-radius:8px;line-height:16px;font-size:12px;text-align:center;color:#fff;position:absolute;top:6px;right:11px;z-index:10000;background-color:#fa5a57}.clickableText{font-size:12px;color:#0080c6;cursor:pointer;text-decoration:underline}code{padding:.2em .4em;margin:0;font-size:85%;background-color:rgb(27 31 35 / 5%);border-radius:6px}blockquote{padding:0 1em;color:#6a737d;border-left:.25em solid #dfe2e5}";
-            const AllCss = layerCss + myCss;
+        addStyle = () => {
+            const layerCss = GM_getResourceText('layerCss');
+            const myCss = GM_getResourceText('myCss');
+            const uaCss = UA.indexOf('Firefox') > -1 ? ".layui-layer .fieldset{}" : ".layui-layer .fieldset{float:left}";
+            const AllCss = layerCss + myCss + uaCss;
             const style = document.createElement('style');
             style.innerHTML = AllCss;
             return document.getElementsByTagName('head')[0].appendChild(style);
@@ -210,8 +216,17 @@
         INVISIBLE_ENTER_config = undefined,
         readConfigArray = [undefined];
 
-    newWindow.init();
+    /**
+     * 替换字符串中所有的匹配项
+     * @param oldSubStr 搜索的字符串
+     * @param newSubStr 替换内容
+     */
+    String.prototype.replaceAll = function (oldSubStr, newSubStr) {
+        return this.replace(new RegExp(oldSubStr, 'gm'), newSubStr)
+    }
+
     $(document).ready(() => {
+        newWindow.init();
         nosleepConfig = localStorage.getItem(`${NAME}_NOSLEEP`);
         if (nosleepConfig === 'true') {
             const width = screen.availWidth, height = screen.availHeight;
@@ -256,9 +271,8 @@
                 })
             } catch (e) { MYDEBUG('ah.proxy Ajax-hook代理运行出错', e) }
         }
-    });
-    window.onload = () => {//所有元素和媒体资源加载完毕
-        try {//唯一运行检测
+        try {
+            //唯一运行检测
             let UNIQUE_CHECK_CACHE = localStorage.getItem(`${NAME}_UNIQUE_CHECK_CACHE`) || 0;
             const t = ts_ms();
             if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 15e3) {
@@ -337,15 +351,7 @@
             }, delay);
         };
         return loadInfo(0);
-    };
-    /**
-     * 替换字符串中所有的匹配项
-     * @param oldSubStr 搜索的字符串
-     * @param newSubStr 替换内容
-     */
-    String.prototype.replaceAll = function (oldSubStr, newSubStr) {
-        return this.replace(new RegExp(oldSubStr, 'gm'), newSubStr)
-    }
+    });
     function init() {//API初始化
         const MY_API = {
             CONFIG_DEFAULT: {
@@ -360,14 +366,19 @@
                 ANCHOR_CHECK_INTERVAL: 5,//天选检查间隔（分钟）
                 ANCHOR_IGNORE_BLACKLIST: true,//天选忽略关键字（选项）
                 ANCHOR_IGNORE_PWDROOM: true,//不参加有密码的直播间的天选
-                ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车', '上反船'],//天选忽略关键字
+                ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车', '上反船', '照片', '素颜', '自拍', 'cos', '写真', '皂片', '开舰', '上舰', '自画像', '封面照', '封面', '取关', '美照', '随机照', '随机照片', '好友'],//天选忽略关键字
                 ANCHOR_INTERVAL: 250,//天选（检查天选和取关）请求间隔
                 AHCHOR_NEED_GOLD: 0,//忽略所需金瓜子大于_的抽奖
                 ANCHOR_WAIT_REPLY: true,//请求后等待回复
                 ANCHOR_UPLOAD_DATA: false,//天选上传数据
                 ANCHOR_UPLOAD_DATA_INTERVAL: 10,//上传数据间隔
+                ANCHOR_UPLOAD_MSG: false,//天选上传时的附加信息开关
+                ANCHOR_UPLOAD_MSG_CONTENT: "",//附加信息
+                ANCHOR_IGNORE_UPLOAD_MSG: true,//天选忽略附加信息
                 ANCHOR_TYPE: "ANCHOR_POLLING",//天选模式
                 ANCHOR_GETDATA_ROOM: 22474988,//获取天选数据的直播间
+                ANCHOR_IGNORE_ROOM: true,//天选忽略直播间
+                ANCHOR_IGNORE_ROOMLIST: ["22647871"],//天选忽略直播间房间列表
                 ANCHOR_PRIVATE_LETTER: false,//中奖后给UP发一条私信
                 ANCHOR_LETTER_CONTENT: 'UP我中天选了，请问怎么领奖[doge]',//私信内容
                 ANCHOR_ADD_TO_WHITELIST: false,//天选中奖后把发起抽奖的UP加入白名单
@@ -375,9 +386,10 @@
                 ANCHOR_MOVETO_PRIZE_TAG: true,//把中奖的UP移到新分组
                 ANCHOR_DANMU: false,//天选中奖后弹幕
                 ANCHOR_DANMU_CONTENT: ["我中啦！", "芜湖"],//天选中奖后弹幕内容
+                ANCHOR_IGNORE_MONEY: 0,//忽略金额小于_的天选
+                ANCHOR_MONEY_ONLY: false,//仅参加现金抽奖
                 CHECK_HOUR_ROOM: false,//检查小时榜
                 CHECK_HOUR_ROOM_INTERVAL: 600,//小时间检查间隔时间(秒)
-                ANCHOR_IGNORE_MONEY: 0,//忽略金额小于_的天选
                 COIN: false,//投币
                 COIN_NUMBER: 0,//投币数量
                 COIN_TYPE: "COIN_DYN",//投币方法 动态/UID
@@ -402,19 +414,22 @@
                 LITTLE_HEART: true,//获取小心心
                 MEDAL_DANMU_ROOM: ["0"],//打卡弹幕房间列表
                 MEDAL_DANMU_METHOD: "MEDAL_DANMU_BLACK",//打卡弹幕发送方式
+                MEDAL_DANMU_INTERVAL: 2,//打卡弹幕发送间隔（秒）
                 MATERIAL_LOTTERY: true,//实物抽奖
                 MATERIAL_LOTTERY_CHECK_INTERVAL: 60,//实物抽奖检查间隔
                 MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: true,//实物抽奖忽略存疑抽奖
                 MEDAL_DANMU: false,//粉丝勋章打卡弹幕
+                MATERIAL_LOTTERY_REM: 10,//每次检查aid数量
                 MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "(￣3￣)", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄", "←◡←"],//粉丝勋章打卡弹幕内容
                 QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼'],//存疑实物抽奖
-                MATERIAL_LOTTERY_REM: 10,//每次检查aid数量
                 RANDOM_DELAY: true,//抽奖随机延迟
                 RANDOM_SEND_DANMU: 0,//随机弹幕发送概率
                 RANDOM_SKIP: 0,//随机跳过抽奖概率
                 REMOVE_ELEMENT_2233: false,//移除2233
                 REMOVE_ELEMENT_activity: true,//移除活动入口
                 REMOVE_ELEMENT_rank: true,//移除排行榜入口
+                REMOVE_ELEMENT_followSideBar: false,//移除右侧关注按钮及弹窗
+                REMOVE_ELEMENT_flipView: true,//移除移除礼物栏下方广告
                 RND_DELAY_END: 5,//延迟最大值
                 RND_DELAY_START: 2,//延迟最小值
                 SEND_ALL_GIFT: false,//送满全部勋章
@@ -432,6 +447,7 @@
                 TIME_AREA_START_MINUTE: 0,//不抽奖开始分钟
                 TIME_RELOAD: false,//定时刷新直播间
                 TIME_RELOAD_MINUTE: 120,//直播间重载时间
+                UPDATE_TIP: true, //更新提示
                 WATCH: true,//观看视频
             },
             CACHE_DEFAULT: {
@@ -457,17 +473,15 @@
                 CLEAR_TS: 0,//重置统计
             },
             init: async () => {
-                await addStyle();
+                addStyle();
                 const tabList = $('.tab-list.dp-flex'),
                     tabContent = $('.tab-content'),
-                    tabOffSet = tabContent.offset(),
                     ct = $('#chat-history-list'),
                     ctWidth = ct.outerWidth(true),
                     aside_area_vmHeight = $('#aside-area-vm').height(),
                     chat_control_panel_vmHeight = $('#chat-control-panel-vm').height(),
-                    top = tabOffSet.top,
-                    left = tabOffSet.left,
                     eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter'];
+                let tabOffSet = tabContent.offset(), top = tabOffSet.top, left = tabOffSet.left;
                 menuDiv = $(`<li data-v-2fdbecb2="" data-v-d2be050a="" class="item dp-i-block live-skin-separate-border border-box t-center pointer live-skin-normal-text" style = 'font-weight:bold;color: #999;' id = "menuDiv"><span id="menuDivText">日志</span><div class="igiftMsg_num" style="display: none;" id = 'logRedPoint'>0</div></li>`);
                 if (eleList.some(i => i.length === 0) || tabList.length === 0 || tabContent.length === 0) {
                     window.toast('必要页面元素缺失，强制运行（可能会看不到控制面板，提示信息）', 'error');
@@ -478,10 +492,7 @@
                 for (let i = 0; i < tabList.children('li').length; i++) {
                     tabListItems.push(tabList.children('li')[i]);
                 };
-                function hideTab(hide = true) {
-                    return hide ? tabContent.hide() : tabContent.show();
-                };
-                menuIndex = await layer.open({
+                menuIndex = layer.open({
                     type: 1,
                     title: false,
                     offset: [String(top - getScrollPosition().y) + 'px', String(left - getScrollPosition().x) + 'px'],
@@ -495,6 +506,16 @@
                     resize: false,
                     content: '<div id = "menuWindow"></div>',
                     success: () => {
+                        //窗口大小改变时改变位置
+                        $(window).resize(function () {
+                            tabOffSet = $('.tab-content').offset();
+                            top = tabOffSet.top;
+                            left = tabOffSet.left;
+                            layer.style(menuIndex, {
+                                'top': String(top) + 'px',
+                                'left': String(left) + 'px'
+                            })
+                        })
                         layerMenuWindow = $('#layui-layer1 .layui-layer-content');
                         JQmenuWindow = $('#menuWindow');
                         let menuDivText = $('#menuDivText');
@@ -502,7 +523,7 @@
                             layerMenuWindow_Height = $(this).height();
                             layerMenuWindow_ScrollHeight = $(this)[0].scrollHeight;
                             if (layerMenuWindow_ScrollHeight > layerMenuWindow_Height) {
-                                if (winPrizeNum === 0) menuDivText.text('日志🚀');
+                                layerMenuWindow.scrollTop(layerMenuWindow.prop("scrollHeight"));
                                 $(this).off("DOMNodeInserted");
                             }
                         })
@@ -553,12 +574,10 @@
                                 JQlogRedPoint.text(--winPrizeNum);
                                 if (winPrizeNum === 0) JQlogRedPoint.hide();
                             }
-                            return hideTab(true)
                         } else {
                             layer.style(menuIndex, {
                                 'display': 'none'
                             });
-                            return hideTab(false);
                         }
                     })
                 };
@@ -633,9 +652,25 @@
                     if (cache === undefined || cache === null || cache !== version) { //更新时需修改
                         layer.open({
                             title: `${version}更新提示`,
+                            area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
                             content: `
-                            1.修复无法参加天选的bug。<br>
-                            2.修复配置导入无效的bug。<br>
+                            1.扩充天选时刻默认忽略关键字。<br>
+                            2.天选时刻金额识别优化。<br>
+                            3.天选时刻新增忽略直播间功能。<br>
+                            4.修复天选时刻休眠无效的bug。<br>
+                            5.内容屏蔽新增两项。<br>
+                            6.右侧关注和弹窗，下方广告。<br>
+                            7.新增更新提示开关。<br>
+                            8.新增打卡弹幕发送间隔设置。<br>
+                            9.新增天选时刻附加信息。<br>
+                            10.窗口大小改变时脚本窗口位置会随之改变，并保持相对位置不变。<br>
+                            11.天选时刻数据推送新增额外信息。<br>
+                            12.天选时刻检查到缺少粉丝牌的天选时可快捷购买并参加。<br>
+                            13.样式上的一些小改进。<br>
+                            14.新增eula。<br>
+                            15.部分重构，减少不必要的请求，完善错误处理，运行效率和代码格式优化。<br>
+                            16.新增忽略非现金抽奖的天选。<br>
+                            17.改为通过GM函数获取所需资源。<br>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
@@ -719,38 +754,56 @@
             },
             addAnchor: (count = 1) => {
                 MY_API.GIFT_COUNT.ANCHOR_COUNT += count;
-                $('#giftCount span:eq(0)').text(MY_API.GIFT_COUNT.ANCHOR_COUNT);
+                $('#giftCount .anchor .num').text(MY_API.GIFT_COUNT.ANCHOR_COUNT);
                 MY_API.saveGiftCount(false);
             },
             addMaterial: (count = 1) => {
                 MY_API.GIFT_COUNT.MATERIAL_COUNT += count;
-                $('#giftCount span:eq(1)').text(MY_API.GIFT_COUNT.MATERIAL_COUNT);
+                $('#giftCount .material .num').text(MY_API.GIFT_COUNT.MATERIAL_COUNT);
                 MY_API.saveGiftCount(false);
             },
             removeUnnecessary: () => {//移除不必要的页面元素
-                const unnecessaryList = [
-                    '#my-dear-haruna-vm',//2233
-                    '.activity-entry',//活动入口
-                    '.activity-rank'//排行榜
-                ];
-                const settingNameList = [
-                    'REMOVE_ELEMENT_2233',
-                    'REMOVE_ELEMENT_activity',
-                    'REMOVE_ELEMENT_rank'
-                ];
-                const removeUntiSucceed = (list_id) => {
-                    if (MY_API.CONFIG[settingNameList[list_id]]) {
-                        setInterval(() => {
-                            const unnecessaryItem = $(unnecessaryList[list_id]);
-                            if (unnecessaryItem.length > 0) {
-                                unnecessaryItem.remove();
-                            } else {
-                                return
-                            }
-                        }, 200);
+                const unnecessaryObj = [
+                    {
+                        //2233
+                        settingName: 'REMOVE_ELEMENT_2233',
+                        rmJQpath: ['#my-dear-haruna-vm']
+                    },
+                    {
+                        //活动入口
+                        settingName: 'REMOVE_ELEMENT_activity',
+                        rmJQpath: ['.activity-entry']
+                    },
+                    {
+                        //排行榜
+                        settingName: 'REMOVE_ELEMENT_rank',
+                        rmJQpath: ['.activity-rank']
+                    },
+                    {
+                        //关注按钮及弹窗
+                        settingName: 'REMOVE_ELEMENT_followSideBar',
+                        rmJQpath: ['div[data-upgrade-intro="Follow"]', '.side-bar-popup-cntr.ts-dot-4']
+                    },
+                    {
+                        //礼物栏下方广告
+                        settingName: 'REMOVE_ELEMENT_flipView',
+                        rmJQpath: ['.flip-view']
+                    }
+                ]
+                const removeUntiSucceed = (obj) => {
+                    if (MY_API.CONFIG[obj.settingName]) {
+                        for (const path of obj.rmJQpath) {
+                            let timer = setInterval(() => {
+                                const unnecessaryItem = $(path);
+                                if (unnecessaryItem.length > 0) {
+                                    unnecessaryItem.remove();
+                                    clearInterval(timer)
+                                }
+                            }, 200);
+                        }
                     }
                 };
-                for (let i = 0; i < unnecessaryList.length; i++) {
+                for (const i of unnecessaryObj) {
                     removeUntiSucceed(i);
                 };
             },
@@ -761,10 +814,10 @@
                         const uid = String(response.data.info.uid),
                             uname = response.data.info.uname;
                         layer.confirm(`<div style = "text-align:center">是否消耗20硬币购买UP主<br>${linkMsg(uname, "https://space.bilibili.com/" + uid)}<br>的粉丝勋章？</div>`, {
-                            title: '购买勋章',
-                            btn: ['是', '否'] //按钮
+                            title: `购买勋章 房间号：${room_id}`,
+                            btn: ['是', '否']
                         }, function () {
-                            return BAPI.link_group.buy_medal(response.data.info.uid).then((re) => {
+                            BAPI.link_group.buy_medal(response.data.info.uid).then((re) => {
                                 MYDEBUG('API.link_group.buy_medal re', re);
                                 if (re.code === 0) {
                                     layer.msg('购买成功', {
@@ -777,6 +830,8 @@
                                         icon: 2
                                     });
                                 }
+                            }, () => {
+                                MY_API.chatLog('购买粉丝勋章出错，请检查网络', 'error');
                             });
                         }, function () {
                             layer.msg('已取消购买', {
@@ -802,502 +857,7 @@
                 const btnmsg = msgHide == 'hide' ? '显示窗口和提示信息' : '隐藏窗口和提示信息';
                 const btn = $(`<button class="igiftMsg_btn" style="display: inline-block; float: left; margin-right: 7px;cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
                 const livePlayer = $('.bilibili-live-player.relative');
-                let fieldsetStyle = '\"float:left\"';
-                if (UA.toLowerCase().indexOf("firefox") > -1) fieldsetStyle = '\"\"';
-                const html = `<div id='allsettings' class="igiftMsg_main">
-                <fieldset class="igiftMsg_fs">
-                    <legend style="color: black">今日统计</legend>
-                <span data-toggle="topArea">
-                    <span id="giftCount" style="font-size: large; font-weight: bold; color: blueviolet;">
-                        参与天选时刻&nbsp;<span>0</span>&nbsp;次
-                        参与实物抽奖&nbsp;<span>0</span>&nbsp;次
-                        &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="save">保存所有设置</button>
-                    </span>
-                </span>
-                </fieldset>
-                <div id="left_fieldset" style=${fieldsetStyle}>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">抽奖设置</legend>
-                        <div data-toggle="LOTTERY">
-                            <label style="margin: 5px auto; color: purple;line-height:30px" ;>
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                参与礼物抽奖
-                            </label>
-                        </div>
-                        <div data-toggle="RANDOM_DELAY">
-                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                抽奖附加随机延迟
-                                <input class="RND_DELAY_START igiftMsg_input" style="width: 30px;vertical-align: top;" type="text">~
-                                <input class="RND_DELAY_END igiftMsg_input" style="width: 30px;vertical-align: top;" type="text">s
-                            </label>
-                        </div>
-                        <div data-toggle="RANDOM_SKIP">
-                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
-                                随机跳过抽奖<input class="per igiftMsg_input" style="width: 30px;" type="text">%
-                            </label>
-                        </div>
-                        <div data-toggle="RANDOM_SEND_DANMU">
-                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
-                                抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width: 30px;" type="text">%
-                            </label>
-                        </div>
-                        <div data-toggle="CHECK_HOUR_ROOM">
-                            <label style="margin: 5px auto; color: darkgreen">&nbsp;&nbsp;&nbsp;&nbsp;
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                检查小时榜（间隔时间<input class="num igiftMsg_input" style="width: 25px;" type="text">秒）
-                            </label>
-                        </div>
-                        <div data-toggle="MATERIAL_LOTTERY" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: purple;">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                参与实物抽奖
-                            </label>
-                        </div>
-                        <div data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL">
-                            <label style="margin: 5px auto; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;
-                                检查间隔
-                                <input class="num igiftMsg_input" style="width: 30px;" type="text">
-                                分钟
-                            </label>
-                        </div>
-                        <div data-toggle="MATERIAL_LOTTERY_REM">
-                            <label style="margin: 5px auto; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;
-                                检测到
-                                <input class="num igiftMsg_input" style="width: 30px;" type="text">
-                                个不存在活动的aid后停止检测
-                            </label>
-                        </div>
-                        <div data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY">
-                            <label style="margin: 5px auto; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                忽略关键字
-                                <label class='str' style='font-weight:bold'>0个</label>
-                                &nbsp;<button style="font-size: small" class="igiftMsg_btn"
-                                    data-action="edit_QUESTIONABLE_LOTTERY">编辑</button>
-                            </label>
-                        </div>
-                    </fieldset>
-            
-                    <fieldset class="igiftMsg_fs" style="line-height:16px;">
-                        <legend style="color: black">每日任务设置</legend>
-                        <div data-toggle="LOGIN" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            登陆
-                        </div>
-                        <div data-toggle="WATCH" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            观看视频
-                        </div>
-                        <div data-toggle="COIN" style=" color: black">
-                            <label style="cursor: pointer">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                自动投币<input class="coin_number igiftMsg_input" style="width: 40px;" type="text">个(0-5)
-                            </label>
-                        </div>
-                        <div data-toggle="COIN_TYPE" style=" color: black">
-                            <div data-toggle="COIN_UID">
-                                <input style="vertical-align: text-top;" type="radio" name="COIN_TYPE">
-                                给用户(UID:<input class="num igiftMsg_input" style="width: 150px;" type="text">)
-                                的视频投币
-                            </div>
-                            <div data-toggle="COIN_DYN">
-                                <input style="vertical-align: text-top;" type="radio" name="COIN_TYPE">
-                                给动态中的的视频投币
-                            </div>
-                        </div>
-                        <div data-toggle="SHARE" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            分享视频
-                        </div>
-                        <div data-toggle="SILVER2COIN" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            银瓜子换硬币
-                        </div>
-                        <div data-toggle="LIVE_SIGN" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            直播区签到
-                        </div>
-                        <div data-toggle="AUTO_GROUP_SIGN" style=" color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            应援团签到
-                        </div>
-                        <div data-toggle="MEDAL_DANMU" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            粉丝勋章打卡弹幕
-                            &nbsp;<button style="font-size: small" class="igiftMsg_btn"
-                                data-action="edit_medalDanmu">编辑弹幕内容</button>
-                        </div>
-                        <div data-toggle="MEDAL_DANMU_METHOD" style="line-height: 15px; color: black; display:inline">
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                        打卡弹幕模式：
-                        <div data-toggle="MEDAL_DANMU_WHITE" style="color: black; display:inline">
-                            <input style="vertical-align: text-top;" type="radio" name="MEDAL_DANMU_METHOD">
-                            白名单
-                        </div>
-                        <div data-toggle="MEDAL_DANMU_BLACK" style="color: black; display:inline">
-                            <input style="vertical-align: text-top;" type="radio" name="MEDAL_DANMU_METHOD">
-                            黑名单
-                        </div>
-                        &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="edit_lightMedalList">编辑房间列表</button>
-                    </div>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">自动送礼设置</legend>
-                        <div data-toggle="AUTO_GIFT" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            自动送礼
-                        </div>
-            
-                        <div data-toggle="AUTO_GIFT_ROOMID" style=" color: purple">
-                            优先送礼房间
-                            <input class="num igiftMsg_input" style="width: 150px;" type="text">
-                        </div>
-            
-                        <div data-toggle="EXCLUDE_ROOMID" style=" color: purple">
-                            不送礼房间
-                            <input class="num igiftMsg_input" style="width: 150px;" type="text">
-                        </div>
-                        <div data-toggle="GIFT_INTERVAL" style=" color: black">
-                            <input style="vertical-align: text-top;" type="radio" name="GIFT_METHOD">
-                            间隔
-                            <input class="num igiftMsg_input" style="width: 30px;" type="text">
-                            分钟送礼
-                        </div>
-                        <div data-toggle="GIFT_SEND_TIME" style=" color: purple">
-                            <input style="vertical-align: text-top;" type="radio" name="GIFT_METHOD">
-                            定时送礼<br>&nbsp;&nbsp;&nbsp;&nbsp;
-                            送礼时间
-                            <input class="Hour igiftMsg_input" style="width: 20px;" type="text">点
-                            <input class="Minute igiftMsg_input" style="width: 20px;" type="text">分
-                            &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="sendGiftNow">立刻开始送礼</button>
-                        </div>
-            
-                        <div data-toggle="GIFT_LIMIT" style=" color: purple">
-                            礼物到期时间
-                            <input class="num igiftMsg_input" style="width: 20px;" type="text">
-                            天
-                        </div>
-                        <div data-toggle="GIFT_SORT_HIGH" style=" color: black;line-height: 20px;">
-                            粉丝牌送礼优先级<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<input style="vertical-align: text-top;" type="radio" name="GIFT_SORT">
-                            优先<strong style="color: purple">高</strong>等级粉丝牌
-                        </div>
-                        <div data-toggle="GIFT_SORT_LOW" style=" color: black">
-                            &nbsp;&nbsp;&nbsp;&nbsp;<input style="vertical-align: text-top;" type="radio" name="GIFT_SORT">
-                            优先<strong style="color: purple">低</strong>等级粉丝牌
-                        </div>
-                        <div data-toggle="SEND_ALL_GIFT" style="color: #ff5200;line-height:20px;">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            无视礼物类型和到期时间限制
-                        </div>
-                        <div data-toggle="SPARE_GIFT_ROOM" style="color: black;line-height:20px;">
-                            剩余礼物送礼直播间：
-                            <input class="num igiftMsg_input" type="text" style="width: 100px;">
-                        </div>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">节奏风暴设置</legend>
-                        <div data-toggle="STORM" style="line-height: 15px">
-                            <label style="margin: 5px auto; color: #ff5200">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                参与节奏风暴
-                            </label>
-                        </div>
-                        <div data-toggle="STORM_QUEUE_SIZE" style="color: black">
-                            允许同时参与的节奏风暴次数：
-                            <input class="num igiftMsg_input" type="text" style="width: 30px;">
-                        </div>
-                        <div data-toggle="STORM_MAX_COUNT" style="color: black">
-                            单个风暴最大尝试次数：
-                            <input class="num igiftMsg_input" type="text" style="width: 30px;">
-                        </div>
-                        <div data-toggle="STORM_ONE_LIMIT" style="color: black">
-                            单个风暴参与次数间隔：
-                            <input class="num igiftMsg_input" type="text" style="width: 30px;">
-                            毫秒
-                        </div>
-                    </fieldset>
-                </div>
-            
-            
-            
-                <div id="right_fieldset" style=${fieldsetStyle}>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">购买粉丝勋章</legend>
-                        <div data-toggle="BUY_MEDAL" style="color: black; line-height: 15px">
-                            输入粉丝勋章对应房间号：<input class="num igiftMsg_input" type="text" value=${Live_info.room_id} onclick="select();"
-                                style="width: 70px">
-                            &nbsp;<button class="igiftMsg_btn" data-action="buy_medal">点击购买勋章</button>
-                        </div>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">小心心</legend>
-                        <div data-toggle="LITTLE_HEART" style="line-height: 15px">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox"> 自动获取小心心
-                            </label>
-                        </div>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">天选时刻</legend>
-                        <div data-toggle="ANCHOR_LOTTERY" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: purple">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                参加天选时刻抽奖
-                            </label>
-                        </div>
-            
-                        <div data-toggle="ANCHOR_POLLING" style="line-height: 20px">
-                            <input style="vertical-align: text-top;" type="radio" name="ANCHOR_TYPE">
-                            轮询直播间获取天选时刻数据
-                        </div>
-                        <div data-toggle="ANCHOR_MAXROOM" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                检查房间最大数量
-                                <input class="roomNum igiftMsg_input" style="width: 50px;" type="text">
-                            </label>
-                        </div>
-                        <div data-toggle="ANCHOR_UPLOAD_DATA" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: purple">
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                上传天选数据至直播间个人简介(间隔
-                                <input class="num igiftMsg_input" style="width: 30px;" type="text">
-                                秒)
-                            </label>
-                        </div>
-                        <div data-toggle="ANCHOR_MAXLIVEROOM_SAVE" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                个人简介储存房间最大数量
-                                <input class="roomNum igiftMsg_input" style="width: 50px;" type="text">
-                            </label>
-                        </div>
-                        <div data-toggle="ANCHOR_LIVEROOM" style="line-height: 20px">
-                            <input style="vertical-align: text-top;" type="radio" name="ANCHOR_TYPE">
-                            从直播间
-                            <input class="num igiftMsg_input" style="width: 100px;" type="text">
-                            的个人简介获取天选时刻数据
-                        </div>
-            
-                        <div data-toggle="ANCHOR_CHECK_INTERVAL" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                天选获取数据间隔
-                                <input class="num igiftMsg_input" style="width: 25px;" type="text">
-                                分钟
-                            </label>
-                        </div>
-                        <div data-toggle="AHCHOR_NEED_GOLD" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                忽略所需金瓜子大于
-                                <input class="num igiftMsg_input" style="width: 50px;" type="text">
-                                的天选
-                            </label>
-                        </div>
-                        <div data-toggle="ANCHOR_IGNORE_BLACKLIST" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                忽略关键字
-                                <label class='str' style='font-weight:bold'>0个</label>
-                                &nbsp;<button style="font-size: small" class="igiftMsg_btn"
-                                    data-action="edit_ANCHOR_BLACKLIST_WORD">编辑</button>
-                            </label>
-                        </div>
-                        <div data-toggle="ANCHOR_IGNORE_MONEY" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                忽略金额小于
-                                <input class="num igiftMsg_input" style="width: 30px;" type="text">
-                                元的天选
-                            </label>
-                        </div>
-                        <div data-toggle="ANCHOR_INTERVAL" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                请求间隔
-                                <input class="num igiftMsg_input" style="width: 30px;" type="text">
-                                毫秒
-                            </label>
-                        </div>
-                        <div data-toggle="ANCHOR_WAIT_REPLY" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                发出请求后等待回复
-                            </label>
-                        </div>
-                        <div data-toggle="ANCHOR_IGNORE_PWDROOM" style="line-height: 20px">
-                        <label style="margin: 5px auto; color: black">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                                不参与加密直播间的天选
-                        </label>
-                        </div>
-                        <div data-toggle="ANCHOR_MOVETO_FOLLOW_TAG" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                把参与天选时关注的UP移到新分组
-                                &nbsp;<button style="font-size: small;color: red;" class="igiftMsg_btn"
-                                data-action="removeAnchorFollowingInTag">取关该分组内的UP主</button>
-                            </label>
-                        </div>
-                        检测到<strong style="color: purple">未中奖</strong>后<br>
-                        <div data-toggle="ANCHOR_AUTO_DEL_FOLLOW" style="line-height: 20px">
-                            <label style="margin: 5px auto; color: black">
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                自动取关发起抽奖的UP
-                            </label>
-                        </div>
-                        检测到<strong style="color: purple">中奖</strong>后<br>
-                        <div data-toggle="ANCHOR_PRIVATE_LETTER" style="line-height: 25px">
-                            <label style="margin: 5px auto; color: black">
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                给发起抽奖的UP发一条私信
-                                &nbsp;<button style="font-size: small" class="igiftMsg_btn"
-                                    data-action="edit_ANCHOR_LETTER_CONTENT">编辑私信内容</button>
-                            </label>
-                        </div>
-                        <div data-toggle="ANCHOR_DANMU" style="line-height: 25px">
-                        <label style="margin: 5px auto; color: black">
-                            &nbsp;&nbsp;&nbsp;&nbsp;
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            在对应直播间发一条弹幕
-                            &nbsp;<button style="font-size: small" class="igiftMsg_btn"
-                            data-action="edit_ANCHOR_DANMU_CONTENT">编辑弹幕内容</button>
-                        </label>
-                        </div>
-                        <div data-toggle="ANCHOR_MOVETO_PRIZE_TAG" style="line-height: 20px">
-                        <label style="margin: 5px auto; color: black">
-                            &nbsp;&nbsp;&nbsp;&nbsp;
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            把发起抽奖的UP移到新分组
-                            &nbsp;<button style="font-size: small;color: red;" class="igiftMsg_btn"
-                            data-action="removeAnchorPrizeInTag">取关该分组内的UP主</button>
-                        </label>
-                    </div>
-                        <div data-toggle="ANCHOR_ADD_TO_WHITELIST" style="line-height: 25px">
-                            <label style="margin: 5px auto; color: black">
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                把发起抽奖的UP加入白名单
-                            </label>
-                        </div>
-                        <div data-toggle="anchorBtnArea" style="line-height:25px;">
-                            &nbsp;<button data-action="saveFollowingList" class="igiftMsg_btn">保存当前关注列表为白名单</button>
-                            &nbsp;<button data-action="removeAnchorFollowing" class="igiftMsg_btn"
-                                style="color: red;">取关不在白名单内的UP主</button>
-                            &nbsp;<button data-action="editWhiteList" class="igiftMsg_btn">编辑白名单</button>
-                        </div>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs">
-                        <legend style="color: black">内容屏蔽</legend>
-                        <div data-toggle="REMOVE_ELEMENT_2233" style="line-height: 15px">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                移除2233模型
-                            </label>
-                        </div>
-                        <div data-toggle="REMOVE_ELEMENT_activity" style="line-height: 15px">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                移除活动入口
-                            </label>
-                        </div>
-                        <div data-toggle="REMOVE_ELEMENT_rank" style="line-height: 15px">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                移除排行榜
-                            </label>
-                        </div>
-                        <div data-toggle="NOSLEEP">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                屏蔽挂机检测
-                            </label>
-                        </div>
-                        <div data-toggle="INVISIBLE_ENTER">
-                            <label style="margin: 5px auto; color: black">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                隐身入场
-                            </label>
-                        </div>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs" style="line-height: 25px">
-                        <legend style="color: black">弹幕设置</legend>
-                        <div data-toggle="AUTO_DANMU">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            自动发弹幕
-                        </div>
-                        <div data-toggle="AUTO_DANMU_SETTINGS">
-                            弹幕内容
-                            <input class="Danmu igiftMsg_input" style="width: 330px;" type="text"><br>
-                            房间号
-                            <input class="Roomid igiftMsg_input" style="width: 330px;" type="text"><br>
-                            发送时间
-                            <input class="Time igiftMsg_input" style="width: 330px;" type="text">
-                        </div>
-                        &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="sendDanmuNow">立刻发送弹幕</button>
-                        &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="clearDanmuCache">清除弹幕缓存</button>
-                    </fieldset>
-                    <fieldset class="igiftMsg_fs" style="line-height: 25px">
-                        <legend style="color: black">其他设置</legend>
-                        <div data-toggle="TIME_AREA_DISABLE">
-                        <label style="margin: 5px auto; color: darkgreen">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            休眠时段：
-                            <input class="startHour igiftMsg_input" style="width: 20px;" type="text">点
-                            <input class="startMinute igiftMsg_input" style="width: 20px;" type="text">分至
-                            <input class="endHour igiftMsg_input" style="width: 20px;" type="text">点
-                            <input class="endMinute igiftMsg_input" style="width: 20px;" type="text">分
-                        </label>
-                    </div>
-                        <div data-toggle="TIME_RELOAD">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            每
-                            <input class="delay-seconds igiftMsg_input" type="text" style="width: 30px;">
-                            分钟刷新一次页面
-                        </div>
-                        <div data-toggle="IN_TIME_RELOAD_DISABLE">
-                            <label style="margin: 5px auto">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                不抽奖时段不刷新直播间
-                            </label>
-                        </div>
-                        <div data-toggle = "debugSwitch">
-                        <label style="margin: 5px auto">
-                            <input style="vertical-align: text-top;" type="checkbox">
-                            控制台日志
-                            </label>
-                        </div>
-                        <div data-toggle="GM_NOTICE">
-                            <label style="margin: 5px auto;">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                实物/天选中奖后系统通知
-                            </label>
-                        </div>
-                        <div data-toggle="FT_NOTICE">
-                            <label style="margin: 5px auto; color: darkgreen">
-                                <input style="vertical-align: text-top;" type="checkbox">
-                                实物/天选中奖后通过${linkMsg('方糖', 'https://sc.ftqq.com/')}推送通知
-                                &nbsp;<button style="font-size: small" class="igiftMsg_btn"
-                                    data-action="edit_SCKEY">编辑SCKEY</button>
-                            </label>
-                        </div>
-                        <div data-toggle="btnArea">
-                            &nbsp;<button data-action="reset" style="color: red;" class="igiftMsg_btn">重置所有为默认</button>
-                            &nbsp;<button data-action="redoAllTasks" style="color: red;" class="igiftMsg_btn">再次执行所有任务</button>
-                            &nbsp;<button data-action="mainSiteTasks" class="igiftMsg_btn">再次执行主站任务</button><br>
-                            &nbsp;<button data-action="exportConfig" class="igiftMsg_btn">导出配置</button>
-                            &nbsp;<button data-action="importConfig" class="igiftMsg_btn">导入配置</button>
-                            <input type="file" id="BLTH_config_file" style="display:none">
-                            &nbsp;<button style="font-size: small" class="igiftMsg_btn" data-action="about">关于</button>
-                        </div>
-                    </fieldset>
-                </div>
-            </div>          
-                </div>
-            </div>
-            </div>`;
+                const html = GM_getResourceText('main');
                 function layerOpenAbout() {
                     return layer.open({
                         title: `版本${GM_info.script.version}`,
@@ -1314,7 +874,7 @@
                     let val4 = parseInt(div.find('div[data-toggle="TIME_AREA_DISABLE"] .endMinute').val());
 
                     if (val1 >= 24 || val2 >= 24 || val3 >= 60 || val4 >= 60 || val1 < 0 || val2 < 0 || val3 < 0 || val4 < 0)
-                        return MY_API.chatLog("[定时休眠]时间错误", 'warning');
+                        return window.toast("[定时休眠]时间错误", 'caution');
                     MY_API.CONFIG.TIME_AREA_START_H0UR = val1;
                     MY_API.CONFIG.TIME_AREA_END_H0UR = val2;
                     MY_API.CONFIG.TIME_AREA_START_MINUTE = val3;
@@ -1322,39 +882,39 @@
                     //RANDOM_SKIP save
                     val = parseFloat(div.find('div[data-toggle="RANDOM_SKIP"] .per').val());
                     if (val < 0 || val > 100)
-                        return MY_API.chatLog('[随机跳过礼物]数据小于0或大于100', 'warning');
+                        return window.toast('[随机跳过礼物]数据小于0或大于100', 'caution');
                     MY_API.CONFIG.RANDOM_SKIP = val;
                     //RANDOM_SEND_DANMU save
                     val = parseFloat(div.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val());
                     if (val > 5)
-                        return MY_API.chatLog("[活跃弹幕]为维护直播间弹幕氛围,弹幕发送概率不得大于5%", 'warning');
+                        return window.toast("[活跃弹幕]为维护直播间弹幕氛围,弹幕发送概率不得大于5%", 'caution');
                     else if (val < 0)
-                        return Y_API.chatLog("[活跃弹幕]数据小于0", 'warning');
+                        return Y_API.chatLog("[活跃弹幕]数据小于0", 'caution');
                     MY_API.CONFIG.RANDOM_SEND_DANMU = val;
                     //TIME_RELOAD save
                     val = parseInt(div.find('div[data-toggle="TIME_RELOAD"] .delay-seconds').val());
                     if (val <= 0 || val > 10000)
-                        return MY_API.chatLog('[直播间重载时间]数据小于等于0或大于10000', 'warning');
+                        return window.toast('[直播间重载时间]数据小于等于0或大于10000', 'caution');
                     MY_API.CONFIG.TIME_RELOAD_MINUTE = val;
                     //RANDOM_DELAY
                     val = parseFloat(div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val());
                     val2 = parseFloat(div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val());
 
                     if (val < 0 || val2 > 100)
-                        return MY_API.chatLog('[抽奖延时]数据小于0或大于100', 'warning');
+                        return window.toast('[抽奖延时]数据小于0或大于100', 'caution');
                     else if (val2 <= val)
-                        return MY_API.chatLog('[抽奖延时]数据大小关系不正确', 'warning');
+                        return window.toast('[抽奖延时]数据大小关系不正确', 'caution');
                     MY_API.CONFIG.RND_DELAY_START = val;
                     MY_API.CONFIG.RND_DELAY_END = val2;
                     //COIN
                     val = parseInt(div.find('div[data-toggle="COIN"] .coin_number').val());
                     if (val < 0 || val > 5)
-                        return MY_API.chatLog("[自动投币]数据小于0或大于5", 'warning');
+                        return window.toast("[自动投币]数据小于0或大于5", 'caution');
                     MY_API.CONFIG.COIN_NUMBER = val;
                     //CHECK_HOUR_ROOM_INTERVAL
                     val = parseInt(div.find('div[data-toggle="CHECK_HOUR_ROOM"] .num').val());
                     if (val <= 0)
-                        return MY_API.chatLog("[检查小时榜间隔]数据小于等于0", 'warning');
+                        return window.toast("[检查小时榜间隔]数据小于等于0", 'caution');
                     MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL = val;
                     //AUTO_GIFT_ROOMID
                     val = div.find('div[data-toggle="AUTO_GIFT_ROOMID"] .num').val();
@@ -1384,7 +944,7 @@
                     val1 = parseInt(div.find('div[data-toggle="GIFT_SEND_TIME"] .Hour').val());
                     val2 = parseInt(div.find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val());
                     if (val1 < 0 || val2 < 0 || val1 >= 24 || val2 >= 60)
-                        return MY_API.chatLog("[送礼时间]时间错误", 'warning');
+                        return window.toast("[送礼时间]时间错误", 'caution');
                     MY_API.CONFIG.GIFT_SEND_HOUR = val1;
                     MY_API.CONFIG.GIFT_SEND_MINUTE = val2;
                     //SPARE_GIFT_ROOM
@@ -1440,39 +1000,50 @@
                     MY_API.CONFIG.DANMU_ROOMID = val2;
                     MY_API.CONFIG.DANMU_INTERVAL_TIME = val3;
                     //MATERIAL_LOTTERY_CHECK_INTERVAL
-                    val = div.find('div[data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"] .num').val();
-                    MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL = parseInt(val);
+                    val = parseInt(div.find('div[data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"] .num').val());
+                    MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL = val;
                     //MATERIAL_LOTTERY_REM
-                    val = div.find('div[data-toggle="MATERIAL_LOTTERY_REM"] .num').val();
+                    val = parseInt(div.find('div[data-toggle="MATERIAL_LOTTERY_REM"] .num').val());
                     if (isNaN(val)) val = 9;
-                    MY_API.CONFIG.MATERIAL_LOTTERY_REM = parseInt(val);
+                    MY_API.CONFIG.MATERIAL_LOTTERY_REM = val;
                     //ANCHOR_CHECK_INTERVAL
                     val = parseFloat(div.find('div[data-toggle="ANCHOR_CHECK_INTERVAL"] .num').val());
                     MY_API.CONFIG.ANCHOR_CHECK_INTERVAL = val;
                     //ANCHOR_MAXROOM
                     val = div.find('div[data-toggle="ANCHOR_MAXROOM"] .roomNum').val();
-                    if (val <= 0) return MY_API.chatLog("[检查房间最大数量]数据小于等于0", 'warning');
+                    if (val <= 0) return window.toast("[检查房间最大数量] 数据小于等于0", 'caution');
                     MY_API.CONFIG.ANCHOR_MAXROOM = val;
                     //AHCHOR_NEED_GOLD
-                    val = div.find('div[data-toggle="AHCHOR_NEED_GOLD"] .num').val();
-                    MY_API.CONFIG.AHCHOR_NEED_GOLD = parseInt(val);
+                    val = parseInt(div.find('div[data-toggle="AHCHOR_NEED_GOLD"] .num').val());
+                    MY_API.CONFIG.AHCHOR_NEED_GOLD = val;
                     //ANCHOR_INTERVAL
-                    val = div.find('div[data-toggle="ANCHOR_INTERVAL"] .num').val();
-                    if (val < 0)
-                        return MY_API.chatLog("[请求间隔]数据小于0", 'warning');
-                    MY_API.CONFIG.ANCHOR_INTERVAL = parseInt(val);
+                    val = parseInt(div.find('div[data-toggle="ANCHOR_INTERVAL"] .num').val());
+                    if (isNaN(val) || val < 0)
+                        return window.toast("[请求间隔] 错误输入", 'caution');
+                    MY_API.CONFIG.ANCHOR_INTERVAL = val;
                     //ANCHOR_GETDATA_ROOM
                     val = div.find('div[data-toggle="ANCHOR_LIVEROOM"] .num').val();
+                    if (isNaN(val) || val < 0) return window.toast('[从直播间获取天选数据] 直播间号格式错误', 'caution');
                     MY_API.CONFIG.ANCHOR_GETDATA_ROOM = val;
                     //ANCHOR_UPLOAD_DATA_INTERVAL
                     val = parseInt(div.find('[data-toggle="ANCHOR_UPLOAD_DATA"] .num').val());
+                    if (isNaN(val) || val < 0) return window.toast('[上传天选数据至直播间个人简介间隔] 错误输入', 'caution');
                     MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL = val;
                     //ANCHOR_MAXLIVEROOM_SAVE
                     val = div.find('[data-toggle="ANCHOR_MAXLIVEROOM_SAVE"] .roomNum').val();
+                    if (isNaN(val) || val < 0) return window.toast('[个人简介储存房间最大数量] 错误输入', 'caution');
                     MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE = val;
                     //ANCHOR_IGNORE_MONEY
                     val = parseFloat(div.find('[data-toggle="ANCHOR_IGNORE_MONEY"] .num').val());
+                    if (isNaN(val) || val < 0) return window.toast('[忽略小于指定金额天选] 错误输入', 'caution');
                     MY_API.CONFIG.ANCHOR_IGNORE_MONEY = val;
+                    //MEDAL_DANMU_INTERVAL
+                    val = parseFloat(div.find('[data-toggle="MEDAL_DANMU_INTERVAL"] .num').val())
+                    if (isNaN(val) || val < 0) return window.toast('[打卡弹幕发送间隔] 错误输入', 'caution');
+                    MY_API.CONFIG.MEDAL_DANMU_INTERVAL = val;
+                    //ANCHOR_UPLOAD_MSG
+                    val = div.find('[data-toggle="ANCHOR_UPLOAD_MSG"] .str').val();
+                    MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT = val;
                     return MY_API.saveConfig();
                 };
                 const checkList = [
@@ -1512,12 +1083,25 @@
                     'MEDAL_DANMU',
                     'ANCHOR_DANMU',
                     'ANCHOR_MOVETO_PRIZE_TAG',
-                    'ANCHOR_IGNORE_PWDROOM'
+                    'ANCHOR_IGNORE_PWDROOM',
+                    'UPDATE_TIP',
+                    'REMOVE_ELEMENT_followSideBar',
+                    'REMOVE_ELEMENT_flipView',
+                    'ANCHOR_UPLOAD_MSG',
+                    'ANCHOR_IGNORE_UPLOAD_MSG',
+                    'ANCHOR_IGNORE_ROOM',
+                    'ANCHOR_MONEY_ONLY'
                 ];
                 const radioList = [
+                    /**
+                     *  {
+                     *     name: 包含所有多选框的div的data-toggle，多选框的name，MY_API.CONFIG中的对象名
+                     *     toggle<num>: 每个多选框的div的data-toggle，MY_API.CONFIG中对应设置的值
+                     *  }
+                     */
                     {
-                        name: 'COIN_TYPE', //包含所有多选框的div的data-toggle，多选框的name，MY_API.CONFIG中的名称
-                        toggle1: 'COIN_DYN',//每个多选框的div的data-toggle，MY_API.CONFIG中对应设置的值
+                        name: 'COIN_TYPE',
+                        toggle1: 'COIN_DYN',
                         toggle2: 'COIN_UID'
                     },
                     {
@@ -1542,54 +1126,63 @@
                     }
                 ];
                 const helpText = {
-                    ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<h3>注意：</h3><li>支持识别阿拉伯数字和汉字数字。</li><li>识别的单位有限。</li><li>不支持识别外币。</li><li>由于一些天选时刻的奖品名比较特殊，可能会出现误判。</li>',
+                    ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<mh3>注意：</mh3><mul><mli>支持识别阿拉伯数字和汉字数字。</mli><mli>识别的单位有限。</mli><mli>不支持识别外币。</mli><mli>由于一些天选时刻的奖品名比较特殊，可能会出现遗漏或误判。</mli></mul>',
                     LOTTERY: '参与大乱斗抽奖。',
-                    MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<h3>注意：</h3><li>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则从第一条开始再次按顺序选取）。</li><li>由于B站服务器限制，脚本发送完一条弹幕后会等待1.5秒再发下一条。</li><li>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</li>',
-                    AUTO_DANMU: '发送直播间弹幕。<h3>注意：</h3><ul><li>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</li><li><p>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</p></li><li><p>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</p></li><li><p>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</p></li><li><p>可以用默认值所填的房间号来测试本功能。</p></li><li><p>发送时间有两种填写方法</p><p>1.【小时】h【分钟】m【秒】s</p><ul><li>每隔一段时间发送一条弹幕</li><li>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></li><li>可以填小数</li><li>可以只填写其中一项或两项</li></ul><p>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</p><p><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></p><p>2.【小时】:【分钟】:【秒】</p><ul><li>在特定时间点发一条弹幕</li><li>例子： <code>10:30:10</code>, <code>0:40</code></li><li>只能填整数</li><li>小时分钟必须填写，秒数可以不填</li></ul><p>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</p></li></ul>',
-                    NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<h3>原理：</h3><li>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。</li>',
-                    INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<h3>缺点：</h3>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管点击后会提示接口返回错误），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。',
-                    MATERIAL_LOTTERY: '实物抽奖，即金宝箱抽奖。某些特殊的直播间会有金宝箱抽奖。<h3>注意：</h3><li>【忽略关键字】中每一项之间用半角逗号<code>,</code>隔开。</li>',
+                    MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则从第一条开始再次按顺序选取）。</mli><mli>由于B站服务器限制，脚本发送完一条弹幕后会等待1.5秒再发下一条。</mli><mli>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</mli></mul>',
+                    AUTO_DANMU: '发送直播间弹幕。<mh3>注意：</mh3><mul><mli>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</mli><mli><mp>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</mp></mli><mli><mp>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</mp></mli><mli><mp>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</mp></mli><mli><mp>可以用默认值所填的房间号来测试本功能。</mp></mli><mli><mp>发送时间有两种填写方法</mp><mp>1.【小时】h【分钟】m【秒】s</mp><mul><mli>每隔一段时间发送一条弹幕</mli><mli>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></mli><mli>可以填小数</mli><mli>可以只填写其中一项或两项</mli></mul><mp>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</mp><mp><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></mp><mp>2.【小时】:【分钟】:【秒】</mp><mul><mli>在特定时间点发一条弹幕</mli><mli>例子： <code>10:30:10</code>, <code>0:40</code></mli><mli>只能填整数</mli><mli>小时分钟必须填写，秒数可以不填</mli></mul><mp>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</mp></mli></mul>',
+                    NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<mh3>原理：</mh3><mul><mli>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。</mli><mul>',
+                    INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<mh3>缺点：</mh3>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管点击后会提示接口返回错误），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。',
+                    MATERIAL_LOTTERY: '实物抽奖，即金宝箱抽奖。某些特殊的直播间会有金宝箱抽奖。<mh3>注意：</mh3><mul><mli>【忽略关键字】中每一项之间用半角逗号<code>,</code>隔开。</mli></mul>',
                     MATERIAL_LOTTERY_REM: "aid是活动的编号。如果你不理解此项保持默认配置即可。",
-                    ANCHOR_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑天选。<h3>注意：</h3><li>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</li><li>可以填正则表达式。正则格式为以<code>/</code>开头且以<code>/</code>结尾，如<code>/测.*试/</code>。</li><li>关键字对大小写不敏感，而正则会区分大小写。</li>",
-                    MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<h3>注意：</h3><li>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</li><li>可以填正则表达式。正则格式为以<code>/</code>开头且以<code>/</code>结尾，如<code>/测.*试/</code>。</li><li>关键字对大小写不敏感，而正则会区分大小写。</li>",
-                    FT_NOTICE: "<a href = 'https://sc.ftqq.com/' target = '_blank'>方糖（点我注册）</a>，即「Server酱」，英文名「ServerChan」，是一款「程序员」和「服务器」之间的通信软件。说人话？就是从服务器推报警和日志到手机的工具。<br>使用前请先前往方糖官网完成注册，然后回到脚本界面填写SCKEY。<hr><li>检测到实物/天选中奖后会发一条包含中奖具体信息的微信推送提醒你中奖了。</li>",
-                    BUY_MEDAL: "调用官方api，消耗20硬币购买某位UP的粉丝勋章。<li>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</li>",
-                    btnArea: "<li>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</li><li>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</li><li>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</li><li>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</li>",
-                    LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<li>检测到包裹内有24个7天的小心心后会停止。</li><li>在获取完所有小心心之前直播间不刷新。</li><li>B站随时可以通过热更新使该功能失效。</li>",
+                    ANCHOR_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑天选。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填正则表达式。正则格式为以<code>/</code>开头且以<code>/</code>结尾，如<code>/测.*试/</code>。</mli><mli>关键字对大小写不敏感，而正则会区分大小写。</mli></mul>",
+                    MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填正则表达式。正则格式为以<code>/</code>开头且以<code>/</code>结尾，如<code>/测.*试/</code>。</mli><mli>关键字对大小写不敏感，而正则会区分大小写。</mli></mul>",
+                    FT_NOTICE: "<a href = 'https://sc.ftqq.com/' target = '_blank'>方糖（点我注册）</a>，即「Server酱」，英文名「ServerChan」，是一款「程序员」和「服务器」之间的通信软件。说人话？就是从服务器推报警和日志到手机的工具。<br>使用前请先前往方糖官网完成注册，然后回到脚本界面填写SCKEY。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信推送提醒你中奖了。</mli></mul>",
+                    BUY_MEDAL: "调用官方api，消耗20硬币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
+                    btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
+                    LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
                     STORM: "仅会参加被广播的节奏风暴。若无法参加请尝试实名后再参加。",
                     SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出到期时间内的辣条，亿圆和小心心。",
-                    AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<li>如果要填写多个房间，每个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</li>",
-                    EXCLUDE_ROOMID: "不给这些房间送礼。<li>如果要填写多个房间，每个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</li>",
-                    GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<h3>注意：</h3><li>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</li>",
-                    AUTO_GIFT: "自动给有粉丝勋章的直播间送出包裹内的礼物。<h3>说明：</h3><li>送礼设置优先级：<br>不送礼房间 > 优先送礼房间 > 优先高/低等级粉丝牌。</li><li>送礼设置逻辑规则：<br>无论【优先高/低等级粉丝牌】如何设置，会根据【无视礼物类型和到期时间限制】（勾选则无视是否到期补满亲密度，否则只送到期的）条件去按优先送礼房间先后顺序送礼。之后根据【优先高/低等级粉丝牌】决定先送高级还是低级。</li>",
-                    SPARE_GIFT_ROOM: "【剩余礼物】指送满了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。<li>该项填<code>0</code>则不送剩余礼物。</li>",
-                    COIN: "自动给视频投币，每天最多投5个。<li>脚本会根据今日你已获得的投币经验值判断你已经投了多少个币，然后自动投剩余没投的币。<blockquote>如今日已获得投币经验20，脚本投币数量设置为4，则会投2个币。</blockquote></li>",
-                    COIN_UID: "该项若填<code>0</code>则给动态中的视频依次投币(不存在UID为0的用户)。<li>可以填写多个uid，每两个uid间用半角逗号<code>,</code>隔开。</li><li>如果填了多个uid，则会依次检查这些UP是否有可投币的视频。</li>",
-                    ANCHOR_INTERVAL: "轮询天选，取关，获取房间列表时每两个请求间的间隔时间。<h3>注意：</h3><li>如果间隔时间过短可能会被风控。</li>",
-                    ANCHOR_WAIT_REPLY: "发起检查直播间天选信息，取关的请求后会等待回复，收到回复后等待一个间隔时间再发起下一个请求。<h3>任务流程：</h3><li>发起请求 - 等待回复 - 等待一个间隔时间 - 发起下一个请求</li>",
+                    AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
+                    EXCLUDE_ROOMID: "不给这些房间送礼。<mul><mli>如果要填写多个房间，每个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
+                    GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
+                    AUTO_GIFT: "自动给有粉丝勋章的直播间送出包裹内的礼物。<mh3>说明：</mh3><mul><mli>送礼设置优先级：<br>不送礼房间 > 优先送礼房间 > 优先高/低等级粉丝牌。</mli><mli>送礼设置逻辑规则：<br>无论【优先高/低等级粉丝牌】如何设置，会根据【无视礼物类型和到期时间限制】（勾选则无视是否到期补满亲密度，否则只送到期的）条件去按优先送礼房间先后顺序送礼。之后根据【优先高/低等级粉丝牌】决定先送高级还是低级。</mli></mul>",
+                    SPARE_GIFT_ROOM: "【剩余礼物】指送满了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。<mul><mli>该项填<code>0</code>则不送剩余礼物。</mli></mul>",
+                    COIN: "自动给视频投币，每天最多投5个。<mul><mli>脚本会根据今日你已获得的投币经验值判断你已经投了多少个币，然后自动投剩余没投的币。<blockquote>如今日已获得投币经验20，脚本投币数量设置为4，则会投2个币。</blockquote></mli></mul>",
+                    COIN_UID: "该项若填<code>0</code>则给动态中的视频依次投币(不存在UID为0的用户)。<mul><mli>可以填写多个uid，每两个uid间用半角逗号<code>,</code>隔开。</mli><mli>如果填了多个uid，则会依次检查这些UP是否有可投币的视频。</mli></mul>",
+                    ANCHOR_INTERVAL: "轮询天选，取关，获取房间列表时每两个请求间的间隔时间。<mh3>注意：</mh3><mul><mli>如果间隔时间过短可能会被风控。</mli></mul>",
+                    ANCHOR_WAIT_REPLY: "发起检查直播间天选信息，取关的请求后会等待回复，收到回复后等待一个间隔时间再发起下一个请求。<mh3>任务流程：</mh3><mul><mli>发起请求 - 等待回复 - 等待一个间隔时间 - 发起下一个请求</mli></mul>",
                     ANCHOR_AUTO_DEL_FOLLOW: "如果该UP在白名单内或一开始就在默认分组则不会被取关。",
-                    anchorBtnArea: "参加天选时会关注很多UP。可以在参加天选前点击【保存当前关注列表为白名单】，参与完天选后再点【取关不在白名单内的UP主】来清理关注列表。<li>不建议频繁清理，可能会被风控。</li><li>【编辑白名单】每两个uid之间用半角逗号<code>,</code>隔开。</li><li>推荐大家使用【取关分组内的UP主】的功能来清理关注列表，【取关不在白名单内的UP主】可以作为一个备选方案。</li>",
+                    anchorBtnArea: "参加天选时会关注很多UP。可以在参加天选前点击【保存当前关注列表为白名单】，参与完天选后再点【取关不在白名单内的UP主】来清理关注列表。<mul><mli>不建议频繁清理，可能会被风控。</mli><mli>【编辑白名单】每两个uid之间用半角逗号<code>,</code>隔开。</mli><mli>推荐大家使用【取关分组内的UP主】的功能来清理关注列表，【取关不在白名单内的UP主】可以作为一个备选方案。</mli></mul>",
                     ANCHOR_POLLING: "轮询的房间来源于各分区小时榜和热门房间列表。获取到房间列表后脚本会缓存起来以供后续使用。",
-                    ANCHOR_UPLOAD_DATA: "使用这个功能前你必须先拥有自己的直播间。  <li>上传数据格式：经<a href = 'https://baike.baidu.com/item/base64/8545775' target = '_blank'>Base64</a>编码的JSON字符串，编码后每两个字符间插入一个<code>-</code>。JSON格式：<code>{ roomList: [直播间1, 直播间2, ...], ts: 时间戳 }</code>。</li><li>【间隔__秒】：这个设置项若填<code>10</code>秒，则每<code>10</code>秒检查一次是否收集到了新的数据，若有才上传。</li>",
+                    ANCHOR_UPLOAD_DATA: "使用这个功能前你必须先拥有自己的直播间。  <mul><mli>上传数据格式：经<a href = 'https://baike.baidu.com/item/base64/8545775' target = '_blank'>Base64</a>编码的JSON字符串，编码后每两个字符间插入一个<code>-</code>。JSON格式：<code>{ roomList: [直播间1, 直播间2, ...], ts: 时间戳, msg?: 附加信息 }</code>。</mli><mli>【间隔__秒】：这个设置项若填<code>10</code>秒，则每<code>10</code>秒检查一次是否收集到了新的数据，若有才上传。</mli></mul>",
+                    ANCHOR_UPLOAD_MSG: "在上传天选数据的同时可以上传一段附加信息。<mul><mli>可以填写html<br>如：<code>&lt;span style=\"color:red;\"&gt;测试&lt;/span&gt;</code> 效果：<span style=\"color:red;\">测试</span></mli><mli>如果想把附加信息设为空，请点击编辑界面上的<code>留空</code>按钮。</mli></mul>",
                     ANCHOR_MAXLIVEROOM_SAVE: "个人简介有长度限制（约为一万个字符），若【个人简介储存房间最大数量】太大会无法上传。",
-                    ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<h3>注意：</h3><li>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</li>",
-                    ANCHOR_LIVEROOM: "因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://live.bilibili.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<li>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</li><li>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</li><li><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</li>",
-                    ANCHOR_PRIVATE_LETTER: "若中奖，会在开奖后10秒发送私信。<li>建议改一下私信内容，不要和默认值完全一样。</li>",
-                    ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<li><strong>请勿修改该分组名称。</strong></li>`,
-                    RANDOM_DELAY: "抽奖前额外等待一段时间。<li>可以填小数。</li>",
-                    RANDOM_SKIP: "随机忽略一部分抽奖。<li>可以填小数。</li>",
-                    ANCHOR_CHECK_INTERVAL: "检查完一轮天选后等待的时间。<li>可以填小数。</li>",
-                    TIME_AREA_DISABLE: "处于这个时段内时，脚本会暂停检查小时榜和天选时刻。<br><li>24小时制，只能填整数。</li>",
-                    MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<li>白名单：仅给房间列表内的直播间发弹幕。</li><li>黑名单：给房间列表以外的直播间发弹幕。</li><li>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</li>",
-                    ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<h3>注意：</h3><li>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</li>",
-                    topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<li>统计信息实时更新，每天0点时重置。</li><li>支持输入框回车保存。</li><li>单选框和多选框设置发生变化时会自动保存设置。</li>",
-                    ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<li><strong>请勿修改该分组名称。</strong></li>`,
-                    debugSwitch: "开启或关闭控制日志。<li>平时建议关闭，减少资源占用。</li><li>该设置只会影响普通日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</li>"
-                }
+                    ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<mh3>注意：</mh3><mul><mli>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</mli></mul>",
+                    ANCHOR_LIVEROOM: "因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://mlive.bimlibimli.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<mul><mli>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</mli><mli>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</mli><mli><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</mli></mul>",
+                    ANCHOR_PRIVATE_LETTER: "若中奖，会在开奖后10秒发送私信。<mul><mli>建议改一下私信内容，不要和默认值完全一样。</mli></mul>",
+                    ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+                    RANDOM_DELAY: "抽奖前额外等待一段时间。<mul><mli>可以填小数。</mli></mul>",
+                    RANDOM_SKIP: "随机忽略一部分抽奖。<mul><mli>可以填小数。</mli></mul>",
+                    ANCHOR_CHECK_INTERVAL: "检查完一轮天选后等待的时间。<mul><mli>可以填小数。</mli></mul>",
+                    TIME_AREA_DISABLE: "处于这个时段内时，脚本会暂停检查小时榜和天选时刻。<br><mul><mli>24小时制，只能填整数。</mli></mul>",
+                    MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间发弹幕。</mli><mli>黑名单：给房间列表以外的直播间发弹幕。</mli><mli>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</mli></mul>",
+                    ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</mli></mul>",
+                    topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，每天0点时重置。</mli><mli>支持输入框回车保存。</mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
+                    ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+                    debugSwitch: "开启或关闭控制日志。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
+                    UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
+                    ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
+                    MEDAL_DANMU_INTERVAL: "每两条弹幕间所等待的时间。<mh3>注意：</mh3><mul><mli>由于B站服务器限制，间隔时间必须大于等于1秒，否则弹幕发送会出错。</mli></mul>",
+                    ANCHOR_IGNORE_ROOM: "不检查和参加这些直播间的天选。<mul><mli>如果要填写多个直播间，每两个直播间号之间请用半角逗号<code>,</code>隔开。</mli></mul>",
+                    ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。</mli></mul>",
+                    SHARE: "并不会真的分享视频，通过调用特定api直接完成任务。",
+                    ANCHOR_MONEY_ONLY: "仅参加能识别到金额的天选。<mul><mli>由于部分天选的奖品名较特殊，可能会遗漏或误判一些天选。</mli></mul>"
+                };
+                let newHtml = undefined;
                 const openMainWindow = async () => {
-                    const settingTableoffset = $('.live-player-mounter').offset(),
+                    let settingTableoffset = $('.live-player-mounter').offset(),
                         settingTableHeight = $('.live-player-mounter').height();
-                    mainIndex = await layer.open({
+                    mainIndex = layer.open({
                         type: 1,
                         title: false,
                         offset: [String(settingTableoffset.top - getScrollPosition().y) + 'px', String(settingTableoffset.left - getScrollPosition().x) + 'px'],
@@ -1599,70 +1192,99 @@
                         fixed: false,
                         area: [, String(settingTableHeight) + 'px'], //宽高
                         resize: false,
-                        content: html,
+                        content: newHtml === undefined ? html : newHtml,
                         success: () => {
-                            //显示对应配置状态
-                            const div = $('#allsettings');
-                            $('#allsettings *').each(function (i, dom) {//下标，dom
-                                let JQdom = $(dom);
-                                const data_toggle = JQdom.attr('data-toggle');
-                                if (data_toggle !== undefined && helpText.hasOwnProperty(data_toggle)) {
-                                    JQdom.append(`<span id = '${data_toggle}_help' class = "clickableText">?</span>`)
-                                }
+                            //窗口大小改变时改变位置
+                            $(window).resize(function () {
+                                settingTableoffset = $('.live-player-mounter').offset(),
+                                    settingTableHeight = $('.live-player-mounter').height();
+                                layer.style(mainIndex, {
+                                    'top': String(settingTableoffset.top) + 'px',
+                                    'left': String(settingTableoffset.left) + 'px'
+                                })
                             });
-                            $('#giftCount span:eq(0)').text(MY_API.GIFT_COUNT.ANCHOR_COUNT);
-                            $('#giftCount span:eq(1)').text(MY_API.GIFT_COUNT.MATERIAL_COUNT);
-                            div.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] label:eq(0) label:eq(0)').text(String(MY_API.CONFIG.QUESTIONABLE_LOTTERY.length) + '个');
-                            div.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label:eq(0) label:eq(0)').text(String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length) + '个');
-
-                            div.find('div[data-toggle="ANCHOR_IGNORE_MONEY"] .num').val(parseFloat(MY_API.CONFIG.ANCHOR_IGNORE_MONEY).toString());
-                            div.find('div[data-toggle="ANCHOR_MAXLIVEROOM_SAVE"] .roomNum').val(parseInt(MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE).toString());
-                            div.find('div[data-toggle="ANCHOR_UPLOAD_DATA"] .num').val(MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL.toString());
-                            div.find('div[data-toggle="ANCHOR_LIVEROOM"] .num').val(MY_API.CONFIG.ANCHOR_GETDATA_ROOM.toString());
-                            div.find('div[data-toggle="ANCHOR_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.ANCHOR_INTERVAL).toString());
-                            div.find('div[data-toggle="AHCHOR_NEED_GOLD"] .num').val(parseInt(MY_API.CONFIG.AHCHOR_NEED_GOLD).toString());
-                            div.find('div[data-toggle="ANCHOR_MAXROOM"] .roomNum').val(parseInt(MY_API.CONFIG.ANCHOR_MAXROOM).toString());
-                            div.find('div[data-toggle="ANCHOR_CHECK_INTERVAL"] .num').val(parseFloat(MY_API.CONFIG.ANCHOR_CHECK_INTERVAL).toString());
-                            div.find('div[data-toggle="MATERIAL_LOTTERY_REM"] .num').val(parseInt(MY_API.CONFIG.MATERIAL_LOTTERY_REM).toString());
-                            div.find('div[data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL).toString());
-                            div.find('div[data-toggle="AUTO_DANMU_SETTINGS"] .Time').val(MY_API.CONFIG.DANMU_INTERVAL_TIME.toString());
-                            div.find('div[data-toggle="AUTO_DANMU_SETTINGS"] .Roomid').val(MY_API.CONFIG.DANMU_ROOMID.toString());
-                            div.find('div[data-toggle="AUTO_DANMU_SETTINGS"] .Danmu').val(MY_API.CONFIG.DANMU_CONTENT.toString());
-                            div.find('div[data-toggle="MAX_TAB"] .num').val(parseInt(MY_API.CONFIG.MAX_TAB).toString());
-                            div.find('div[data-toggle="GIFT_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.GIFT_INTERVAL).toString());
-                            div.find('div[data-toggle="STORM_MAX_COUNT"] .num').val(parseInt(MY_API.CONFIG.STORM_MAX_COUNT).toString());
-                            div.find('div[data-toggle="STORM_ONE_LIMIT"] .num').val(parseInt(MY_API.CONFIG.STORM_ONE_LIMIT).toString());
-                            div.find('div[data-toggle="STORM_QUEUE_SIZE"] .num').val(parseInt(MY_API.CONFIG.STORM_QUEUE_SIZE).toString());
-                            div.find('div[data-toggle="SPARE_GIFT_ROOM"] .num').val(MY_API.CONFIG.SPARE_GIFT_ROOM.toString());
-                            div.find('div[data-toggle="TIME_RELOAD"] .delay-seconds').val(parseInt(MY_API.CONFIG.TIME_RELOAD_MINUTE).toString());
-                            div.find('div[data-toggle="RANDOM_SKIP"] .per').val((parseFloat(MY_API.CONFIG.RANDOM_SKIP)).toString());
-                            div.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val((parseFloat(MY_API.CONFIG.RANDOM_SEND_DANMU)).toString());
-                            div.find('div[data-toggle="COIN"] .coin_number').val(parseInt(MY_API.CONFIG.COIN_NUMBER).toString());
-                            div.find('div[data-toggle="COIN_UID"] .num').val(MY_API.CONFIG.COIN_UID.toString());
-                            div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val(parseFloat(MY_API.CONFIG.RND_DELAY_START).toString());
-                            div.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val(parseFloat(MY_API.CONFIG.RND_DELAY_END).toString());
-                            div.find('div[data-toggle="TIME_AREA_DISABLE"] .startHour').val(parseInt(MY_API.CONFIG.TIME_AREA_START_H0UR).toString());
-                            div.find('div[data-toggle="TIME_AREA_DISABLE"] .endHour').val(parseInt(MY_API.CONFIG.TIME_AREA_END_H0UR).toString());
-                            div.find('div[data-toggle="TIME_AREA_DISABLE"] .startMinute').val(parseInt(MY_API.CONFIG.TIME_AREA_START_MINUTE).toString());
-                            div.find('div[data-toggle="TIME_AREA_DISABLE"] .endMinute').val(parseInt(MY_API.CONFIG.TIME_AREA_END_MINUTE).toString());
-                            div.find('div[data-toggle="CHECK_HOUR_ROOM"] .num').val(parseInt(MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL).toString());
-                            div.find('div[data-toggle="AUTO_GIFT_ROOMID"] .num').val((MY_API.CONFIG.AUTO_GIFT_ROOMID).toString());
-                            div.find('div[data-toggle="EXCLUDE_ROOMID"] .num').val((MY_API.CONFIG.EXCLUDE_ROOMID).toString());
-                            div.find('div[data-toggle="GIFT_SEND_TIME"] .Hour').val(MY_API.CONFIG.GIFT_SEND_HOUR.toString());
-                            div.find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val(MY_API.CONFIG.GIFT_SEND_MINUTE.toString());
-                            div.find('div[data-toggle="GIFT_LIMIT"] .num').val(parseInt(MY_API.CONFIG.GIFT_LIMIT).toString());
-                            let inputConfig = document.getElementById("BLTH_config_file");
-                            inputConfig.addEventListener("change", importConfig, false);
-                            div.find('button[data-action="save"]').click(() => {//保存按钮
-                                saveAction(div);
+                            let myDiv = $('#allsettings');
+                            //若首次运行，显示帮助按钮
+                            if (newHtml === undefined) {
+                                $('#allsettings *').each(function (i, dom) {//下标，dom
+                                    let JQdom = $(dom);
+                                    const data_toggle = JQdom.attr('data-toggle');
+                                    if (data_toggle !== undefined && helpText.hasOwnProperty(data_toggle)) {
+                                        JQdom.append(`<span helpData = '${data_toggle}' class = "clickableText helpText">?</span>`)
+                                    }
+                                });
+                                //储存新html和jquery对象div
+                                newHtml = $('#allsettings')[0].outerHTML;
+                                myDiv = $('#allsettings');
+                            }
+                            //显示顶部统计数据
+                            $('#giftCount .anchor .num').text(MY_API.GIFT_COUNT.ANCHOR_COUNT); //天选
+                            $('#giftCount .material .num').text(MY_API.GIFT_COUNT.MATERIAL_COUNT); //实物
+                            //显示忽略关键字等统计数量
+                            myDiv.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] label.str').text(String(MY_API.CONFIG.QUESTIONABLE_LOTTERY.length) + '个');
+                            myDiv.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label.str').text(String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length) + '个');
+                            myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').text(String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length) + '个');
+                            //显示输入框的值
+                            myDiv.find('div[data-toggle="ANCHOR_UPLOAD_MSG"] .str').val(MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT.toString());
+                            myDiv.find('div[data-toggle="MEDAL_DANMU_INTERVAL"] .num').val(parseFloat(MY_API.CONFIG.MEDAL_DANMU_INTERVAL).toString());
+                            myDiv.find('div[data-toggle="ANCHOR_IGNORE_MONEY"] .num').val(parseFloat(MY_API.CONFIG.ANCHOR_IGNORE_MONEY).toString());
+                            myDiv.find('div[data-toggle="ANCHOR_MAXLIVEROOM_SAVE"] .roomNum').val(parseInt(MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE).toString());
+                            myDiv.find('div[data-toggle="ANCHOR_UPLOAD_DATA"] .num').val(MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL.toString());
+                            myDiv.find('div[data-toggle="ANCHOR_LIVEROOM"] .num').val(MY_API.CONFIG.ANCHOR_GETDATA_ROOM.toString());
+                            myDiv.find('div[data-toggle="ANCHOR_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.ANCHOR_INTERVAL).toString());
+                            myDiv.find('div[data-toggle="AHCHOR_NEED_GOLD"] .num').val(parseInt(MY_API.CONFIG.AHCHOR_NEED_GOLD).toString());
+                            myDiv.find('div[data-toggle="ANCHOR_MAXROOM"] .roomNum').val(parseInt(MY_API.CONFIG.ANCHOR_MAXROOM).toString());
+                            myDiv.find('div[data-toggle="ANCHOR_CHECK_INTERVAL"] .num').val(parseFloat(MY_API.CONFIG.ANCHOR_CHECK_INTERVAL).toString());
+                            myDiv.find('div[data-toggle="MATERIAL_LOTTERY_REM"] .num').val(parseInt(MY_API.CONFIG.MATERIAL_LOTTERY_REM).toString());
+                            myDiv.find('div[data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.MATERIAL_LOTTERY_CHECK_INTERVAL).toString());
+                            myDiv.find('div[data-toggle="AUTO_DANMU_SETTINGS"] .Time').val(MY_API.CONFIG.DANMU_INTERVAL_TIME.toString());
+                            myDiv.find('div[data-toggle="AUTO_DANMU_SETTINGS"] .Roomid').val(MY_API.CONFIG.DANMU_ROOMID.toString());
+                            myDiv.find('div[data-toggle="AUTO_DANMU_SETTINGS"] .Danmu').val(MY_API.CONFIG.DANMU_CONTENT.toString());
+                            myDiv.find('div[data-toggle="MAX_TAB"] .num').val(parseInt(MY_API.CONFIG.MAX_TAB).toString());
+                            myDiv.find('div[data-toggle="GIFT_INTERVAL"] .num').val(parseInt(MY_API.CONFIG.GIFT_INTERVAL).toString());
+                            myDiv.find('div[data-toggle="STORM_MAX_COUNT"] .num').val(parseInt(MY_API.CONFIG.STORM_MAX_COUNT).toString());
+                            myDiv.find('div[data-toggle="STORM_ONE_LIMIT"] .num').val(parseInt(MY_API.CONFIG.STORM_ONE_LIMIT).toString());
+                            myDiv.find('div[data-toggle="STORM_QUEUE_SIZE"] .num').val(parseInt(MY_API.CONFIG.STORM_QUEUE_SIZE).toString());
+                            myDiv.find('div[data-toggle="SPARE_GIFT_ROOM"] .num').val(MY_API.CONFIG.SPARE_GIFT_ROOM.toString());
+                            myDiv.find('div[data-toggle="TIME_RELOAD"] .delay-seconds').val(parseInt(MY_API.CONFIG.TIME_RELOAD_MINUTE).toString());
+                            myDiv.find('div[data-toggle="RANDOM_SKIP"] .per').val((parseFloat(MY_API.CONFIG.RANDOM_SKIP)).toString());
+                            myDiv.find('div[data-toggle="RANDOM_SEND_DANMU"] .per').val((parseFloat(MY_API.CONFIG.RANDOM_SEND_DANMU)).toString());
+                            myDiv.find('div[data-toggle="COIN"] .coin_number').val(parseInt(MY_API.CONFIG.COIN_NUMBER).toString());
+                            myDiv.find('div[data-toggle="COIN_UID"] .num').val(MY_API.CONFIG.COIN_UID.toString());
+                            myDiv.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_START').val(parseFloat(MY_API.CONFIG.RND_DELAY_START).toString());
+                            myDiv.find('div[data-toggle="RANDOM_DELAY"] .RND_DELAY_END').val(parseFloat(MY_API.CONFIG.RND_DELAY_END).toString());
+                            myDiv.find('div[data-toggle="TIME_AREA_DISABLE"] .startHour').val(parseInt(MY_API.CONFIG.TIME_AREA_START_H0UR).toString());
+                            myDiv.find('div[data-toggle="TIME_AREA_DISABLE"] .endHour').val(parseInt(MY_API.CONFIG.TIME_AREA_END_H0UR).toString());
+                            myDiv.find('div[data-toggle="TIME_AREA_DISABLE"] .startMinute').val(parseInt(MY_API.CONFIG.TIME_AREA_START_MINUTE).toString());
+                            myDiv.find('div[data-toggle="TIME_AREA_DISABLE"] .endMinute').val(parseInt(MY_API.CONFIG.TIME_AREA_END_MINUTE).toString());
+                            myDiv.find('div[data-toggle="CHECK_HOUR_ROOM"] .num').val(parseInt(MY_API.CONFIG.CHECK_HOUR_ROOM_INTERVAL).toString());
+                            myDiv.find('div[data-toggle="AUTO_GIFT_ROOMID"] .num').val((MY_API.CONFIG.AUTO_GIFT_ROOMID).toString());
+                            myDiv.find('div[data-toggle="EXCLUDE_ROOMID"] .num').val((MY_API.CONFIG.EXCLUDE_ROOMID).toString());
+                            myDiv.find('div[data-toggle="GIFT_SEND_TIME"] .Hour').val(MY_API.CONFIG.GIFT_SEND_HOUR.toString());
+                            myDiv.find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val(MY_API.CONFIG.GIFT_SEND_MINUTE.toString());
+                            myDiv.find('div[data-toggle="GIFT_LIMIT"] .num').val(parseInt(MY_API.CONFIG.GIFT_LIMIT).toString());
+                            myDiv.find('div[data-toggle="BUY_MEDAL"] .num').val(Live_info.room_id);
+                            //监听导入文件按钮
+                            const inputConfig = $("#BLTH_config_file");
+                            inputConfig.on("change", importConfig);
+                            //禁止选中
+                            myDiv[0].onselectstart = function () {
+                                return false;
+                            }
+                            //绑定按钮
+                            myDiv.find('button[data-action="save"]').click(() => {
+                                //保存按钮
+                                saveAction(myDiv);
                             });
-                            div.find('button[data-action="exportConfig"]').click(() => {//导出配置按钮
+                            myDiv.find('button[data-action="exportConfig"]').click(() => {
+                                //导出配置按钮
                                 exportConfig(MY_API.CONFIG, nosleepConfig, INVISIBLE_ENTER_config)
                                 layer.msg('配置已导出', {
                                     time: 2500,
                                 });
                             });
-                            div.find('button[data-action="importConfig"]').click(() => {//导入配置按钮
+                            myDiv.find('button[data-action="importConfig"]').click(() => {
+                                //导入配置按钮
                                 readConfigArray[1] = $.Deferred();
                                 inputConfig.click();
                                 readConfigArray[1].then(() => {
@@ -1681,24 +1303,81 @@
                                     }, 3000);
                                 })
                             });
-                            div.find('div[data-toggle="BUY_MEDAL"] [data-action="buy_medal"]').click(function () {//购买勋章
-                                const room_id = parseInt(div.find('div[data-toggle="BUY_MEDAL"] .num').val());
+                            myDiv.find('div[data-toggle="BUY_MEDAL"] [data-action="buy_medal"]').click(function () {
+                                //购买勋章
+                                const room_id = parseInt(myDiv.find('div[data-toggle="BUY_MEDAL"] .num').val());
                                 MY_API.buyFanMedal(room_id);
                             });
 
-                            div.find('button[data-action="reset"]').click(() => {//重置按钮
+                            myDiv.find('button[data-action="reset"]').click(() => {
+                                //重置按钮
                                 MY_API.setDefaults();
                             });
-                            div.find('button[data-action="checkUpdate"]').click(() => {//检查更新按钮
+                            myDiv.find('button[data-action="checkUpdate"]').click(() => {
+                                //检查更新按钮
                                 MY_API.checkUpdate();
                             });
-                            div.find('button[data-action="redoAllTasks"]').click(() => {//重置每日任务状态
+                            myDiv.find('button[data-action="redoAllTasks"]').click(() => {
+                                //重置每日任务状态
                                 MY_API.ReDoAllTasks();
                             });
-                            div.find('button[data-action="about"]').click(() => {//关于
+                            myDiv.find('button[data-action="about"]').click(() => {
+                                //关于
                                 layerOpenAbout();
-                            });//
-                            div.find('button[data-action="edit_lightMedalList"]').click(() => {//编辑打卡弹幕房间列表
+                            });
+                            myDiv.find('button[data-action="edit_ANCHOR_UPLOAD_MSG"]').click(() => {
+                                //编辑天选附加信息
+                                layer.prompt({
+                                    formType: 2,
+                                    value: String(MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT),
+                                    title: '请输入上传天选信息时的附加信息',
+                                    btn: ['保存', '留空', '取消'],
+                                    btn2: function () {
+                                        MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT = "";
+                                        MY_API.saveConfig(false);
+                                        layer.msg('附加信息已被设为空字符串', {
+                                            time: 2500,
+                                            icon: 1
+                                        });
+                                    }
+                                },
+                                    function (value, index) {
+                                        MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT = value;
+                                        MY_API.saveConfig(false);
+                                        layer.msg('附加信息保存成功', {
+                                            time: 2500,
+                                            icon: 1
+                                        });
+                                        layer.close(index);
+                                    });
+                            });
+                            myDiv.find('button[data-action="edit_ANCHOR_IGNORE_ROOMLIST"]').click(() => {
+                                //编辑忽略直播间
+                                layer.prompt({
+                                    formType: 2,
+                                    value: String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST),
+                                    title: '请输入天选时刻忽略直播间',
+                                    btn: ['保存', '取消']
+                                },
+                                    function (value, index) {
+                                        let valArray = value.split(",");
+                                        for (let i = 0; i < valArray.length; i++) {
+                                            if (valArray[i] === '') {
+                                                valArray[i] = '0';
+                                            }
+                                        };
+                                        MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST = valArray;
+                                        MY_API.saveConfig(false);
+                                        layer.msg('天选时刻忽略直播间保存成功', {
+                                            time: 2500,
+                                            icon: 1
+                                        });
+                                        myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').html(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length + '个')
+                                        layer.close(index);
+                                    });
+                            });
+                            myDiv.find('button[data-action="edit_lightMedalList"]').click(() => {
+                                //编辑打卡弹幕房间列表
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.MEDAL_DANMU_ROOM),
@@ -1720,8 +1399,9 @@
                                         });
                                         layer.close(index);
                                     });
-                            });//
-                            div.find('button[data-action="edit_ANCHOR_DANMU_CONTENT"]').click(() => {//编辑天选弹幕内容
+                            });
+                            myDiv.find('button[data-action="edit_ANCHOR_DANMU_CONTENT"]').click(() => {
+                                //编辑天选弹幕内容
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.ANCHOR_DANMU_CONTENT),
@@ -1744,7 +1424,8 @@
                                         layer.close(index);
                                     });
                             });
-                            div.find('button[data-action="edit_medalDanmu"]').click(() => {//编辑打卡弹幕内容
+                            myDiv.find('button[data-action="edit_medalDanmu"]').click(() => {
+                                //编辑打卡弹幕内容
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.MEDAL_DANMU_CONTENT),
@@ -1767,7 +1448,8 @@
                                         layer.close(index);
                                     });
                             });
-                            div.find('button[data-action="edit_QUESTIONABLE_LOTTERY"]').click(() => {//编辑实物忽略关键字
+                            myDiv.find('button[data-action="edit_QUESTIONABLE_LOTTERY"]').click(() => {
+                                //编辑实物忽略关键字
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.QUESTIONABLE_LOTTERY),
@@ -1787,11 +1469,12 @@
                                             time: 2500,
                                             icon: 1
                                         });
-                                        div.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] label.str').html(MY_API.CONFIG.QUESTIONABLE_LOTTERY.length + '个')
+                                        myDiv.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] label.str').html(MY_API.CONFIG.QUESTIONABLE_LOTTERY.length + '个')
                                         layer.close(index);
                                     });
                             });
-                            div.find('button[data-action="edit_ANCHOR_BLACKLIST_WORD"]').click(() => {//编辑天选忽略关键字
+                            myDiv.find('button[data-action="edit_ANCHOR_BLACKLIST_WORD"]').click(() => {
+                                //编辑天选忽略关键字
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD),
@@ -1811,11 +1494,12 @@
                                             time: 2500,
                                             icon: 1
                                         });
-                                        div.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length + '个')
+                                        myDiv.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length + '个')
                                         layer.close(index);
                                     });
                             });
-                            div.find('button[data-action="edit_ANCHOR_LETTER_CONTENT"]').click(() => {//编辑天选私信
+                            myDiv.find('button[data-action="edit_ANCHOR_LETTER_CONTENT"]').click(() => {
+                                //编辑天选私信
                                 layer.prompt({
                                     formType: 2,
                                     value: MY_API.CONFIG.ANCHOR_LETTER_CONTENT,
@@ -1834,14 +1518,15 @@
                                         layer.close(index);
                                     });
                             });
-                            div.find('button[data-action="mainSiteTasks"]').click(() => {
+                            myDiv.find('button[data-action="mainSiteTasks"]').click(() => {
                                 if (mainSiteTasksBtnClickable) {
                                     mainSiteTasksBtnClickable = false;
                                     setTimeout(() => mainSiteTasksBtnClickable = true, 2000);
                                     MY_API.DailyReward.run(true);
                                 }
                             });
-                            div.find('button[data-action="edit_SCKEY"]').click(() => {//编辑SCKEY
+                            myDiv.find('button[data-action="edit_SCKEY"]').click(() => {
+                                //编辑SCKEY
                                 layer.prompt({
                                     formType: 0,
                                     value: MY_API.CONFIG.FT_SCKEY,
@@ -1859,7 +1544,8 @@
                                     }
                                 )
                             })
-                            div.find('button[data-action="editWhiteList"]').click(() => {//编辑白名单
+                            myDiv.find('button[data-action="editWhiteList"]').click(() => {
+                                //编辑白名单
                                 const config = JSON.parse(localStorage.getItem(`${NAME}AnchorFollowingList`)) || { list: [] };
                                 const list = [...config.list];
                                 layer.prompt({
@@ -1884,18 +1570,20 @@
                                         layer.close(index);
                                     });
                             });
-                            div.find('button[data-action="saveFollowingList"]').click(() => {
-                                if (getFollowBtnClickable) {//保存当前关注列表为白名单
+                            myDiv.find('button[data-action="saveFollowingList"]').click(() => {
+                                if (getFollowBtnClickable) {
+                                    //保存当前关注列表为白名单
                                     getFollowBtnClickable = false;
                                     window.toast('[ 保存当前关注列表为白名单 ] 开始获取关注列表');
                                     return MY_API.AnchorLottery.getFollowingList();
                                 }
                             });
-                            div.find('button[data-action="removeAnchorPrizeInTag"]').click(() => {//取关中奖分组内的UP
+                            myDiv.find('button[data-action="removeAnchorPrizeInTag"]').click(() => {
+                                //取关中奖分组内的UP
                                 if (unFollowBtnClickable) {
-                                    layer.confirm(`[ 天选时刻 ] 是否取关在【${anchorPrizeTagName}】分组的UP主？<li>注：不建议取关该分组内UP。</li>`, {
+                                    layer.confirm(`是否取关在【${anchorPrizeTagName}】分组的UP主？<mul><mli>注：不建议取关该分组内UP。</mli></mul>`, {
                                         title: '取关不在分组内的UP主',
-                                        btn: ['是', '否'] //按钮
+                                        btn: ['是', '否']
                                     }, function () {
                                         unFollowBtnClickable = false;
                                         layer.msg('开始取关', {
@@ -1909,11 +1597,12 @@
                                     })
                                 }
                             });
-                            div.find('button[data-action="removeAnchorFollowingInTag"]').click(() => {//取关关注分组内的UP
+                            myDiv.find('button[data-action="removeAnchorFollowingInTag"]').click(() => {
+                                //取关关注分组内的UP
                                 if (unFollowBtnClickable) {
-                                    layer.confirm(`[ 天选时刻 ] 是否取关在【${anchorFollowTagName}】分组的UP主？`, {
+                                    layer.confirm(`是否取关在【${anchorFollowTagName}】分组的UP主？`, {
                                         title: '取关不在分组内的UP主',
-                                        btn: ['是', '否'] //按钮
+                                        btn: ['是', '否']
                                     }, function () {
                                         unFollowBtnClickable = false;
                                         layer.msg('开始取关', {
@@ -1927,11 +1616,12 @@
                                     })
                                 }
                             });
-                            div.find('button[data-action="removeAnchorFollowing"]').click(() => {//取关不在白名单内的UP主
+                            myDiv.find('button[data-action="removeAnchorFollowing"]').click(() => {
+                                //取关不在白名单内的UP主
                                 if (unFollowBtnClickable) {
-                                    layer.confirm(`[ 天选时刻 ] 是否取关不在白名单内的UP主？`, {
+                                    layer.confirm(`是否取关不在白名单内的UP主？`, {
                                         title: '取关不在白名单内的UP主',
-                                        btn: ['是', '否'] //按钮
+                                        btn: ['是', '否']
                                     }, function () {
                                         unFollowBtnClickable = false;
                                         layer.msg('开始取关', {
@@ -1945,7 +1635,8 @@
                                     })
                                 }
                             });
-                            div.find('button[data-action="sendGiftNow"]').click(() => {//立刻开始送礼
+                            myDiv.find('button[data-action="sendGiftNow"]').click(() => {
+                                //立刻开始送礼
                                 if (!MY_API.CONFIG.AUTO_GIFT) {
                                     window.toast('[ 立刻开始送礼 ] 请先勾选【自动送礼】再点击此按钮', 'info');
                                     return
@@ -1953,7 +1644,8 @@
                                 SEND_GIFT_NOW = true;
                                 MY_API.Gift.run();
                             });
-                            div.find('button[data-action="sendDanmuNow"]').click(() => {//立刻发送弹幕
+                            myDiv.find('button[data-action="sendDanmuNow"]').click(() => {
+                                //立刻发送弹幕
                                 if (!MY_API.CONFIG.AUTO_DANMU) {
                                     window.toast('[ 立刻发送弹幕 ] 请先勾选【自动发弹幕】再点击此按钮', 'info');
                                     return
@@ -1961,45 +1653,57 @@
                                 SEND_DANMU_NOW = true;
                                 MY_API.AUTO_DANMU.run();
                             });
-                            div.find('button[data-action="clearDanmuCache"]').click(() => {//清除弹幕缓存
+                            myDiv.find('button[data-action="clearDanmuCache"]').click(() => {
+                                //清除弹幕缓存
                                 MY_API.CACHE.AUTO_SEND_DANMU_TS = [];
                                 if (MY_API.saveCache()) MY_API.chatLog('清除弹幕缓存成功', 'success');
                             });
-                            for (const i of checkList) {//绑定所有checkbox事件
-                                const input = div.find(`div[data-toggle="${i}"] input:checkbox`);
+                            //绑定所有checkbox事件
+                            for (const i of checkList) {
+                                const input = myDiv.find(`div[data-toggle="${i}"] input:checkbox`);
                                 if (MY_API.CONFIG[i]) input.attr('checked', '');
                                 input.change(function () {
                                     MY_API.CONFIG[i] = $(this).prop('checked');
-                                    saveAction(div);
+                                    saveAction(myDiv);
                                 });
                             };
-                            const invisibleInput = div.find(`div[data-toggle="INVISIBLE_ENTER"] input:checkbox`),
-                                invisibleSetting = localStorage.getItem(`${NAME}_INVISIBLE_ENTER`);
-                            if (invisibleSetting === 'true') invisibleInput.attr('checked', '');
-                            invisibleInput.change(function () {
-                                localStorage.setItem(`${NAME}_INVISIBLE_ENTER`, $(this).prop('checked'));
-                                window.toast('[隐身入场] 配置已保存', 'info');
-                            });
-                            const NOSLEEP = div.find('div[data-toggle="NOSLEEP"] input:checkbox'),
-                                NOSLEEPsetting = localStorage.getItem(`${NAME}_NOSLEEP`);
-                            if (NOSLEEPsetting === 'true') NOSLEEP.attr('checked', '');
-                            NOSLEEP.change(function () {
-                                localStorage.setItem(`${NAME}_NOSLEEP`, $(this).prop('checked'));
-                                window.toast('[屏蔽挂机检测] 配置已保存', 'info');
-                            });
-                            const debugSwitchInput = div.find(`div[data-toggle="debugSwitch"] input:checkbox`),
-                                debugSwitchSetting = localStorage.getItem(`${NAME}_debugSwitch`);
-                            if (debugSwitchSetting === 'true') debugSwitchInput.attr('checked', '');
-                            debugSwitchInput.change(function () {
-                                debugSwitch = $(this).prop('checked');
-                                localStorage.setItem(`${NAME}_debugSwitch`, debugSwitch);
-                                window.toast('[控制台日志] 配置已保存', 'info');
-                            })
-                            $('input:text').bind('keydown', function (event) {//绑定回车保存
+                            //绑定特殊设置（不在MY_API.CONFIG中）
+                            const specialSetting = [
+                                {
+                                    jqPath: `div[data-toggle="INVISIBLE_ENTER"] input:checkbox`,
+                                    lsItem: `${NAME}_INVISIBLE_ENTER`,
+                                    toastMsg: ["[隐身入场] 配置已保存", "info"],
+                                },
+                                {
+                                    jqPath: `div[data-toggle="NOSLEEP"] input:checkbox`,
+                                    lsItem: `${NAME}_NOSLEEP`,
+                                    toastMsg: ["[屏蔽挂机检测] 配置已保存', 'info"],
+                                },
+                                {
+                                    jqPath: `div[data-toggle="debugSwitch"] input:checkbox`,
+                                    lsItem: `${NAME}_debugSwitch`,
+                                    toastMsg: ["[控制台日志] 配置已保存', 'info"],
+                                    changeFn: function (self) { debugSwitch = $(self).prop('checked'); }
+                                },
+                            ];
+                            for (const i of specialSetting) {
+                                const input = myDiv.find(i.jqPath),
+                                    setting = localStorage.getItem(i.lsItem);
+                                if (setting === 'true') input.attr('checked', '');
+                                input.change(function () {
+                                    let self = this;
+                                    if (i.hasOwnProperty('changeFn')) i.changeFn(self);
+                                    localStorage.setItem(i.lsItem, $(self).prop('checked'));
+                                    window.toast(i.toastMsg[0], i.toastMsg[1]);
+                                })
+                            }
+                            //绑定回车保存
+                            $('input:text').bind('keydown', function (event) {
                                 if (event.keyCode == 13) {
-                                    saveAction(div);
+                                    saveAction(myDiv);
                                 }
                             });
+                            //绑定多选框事件
                             for (const i of radioList) {
                                 if (MY_API.CONFIG[i.name] === i.toggle1)
                                     $("div[data-toggle='" + i.toggle1 + "'] input:radio").attr('checked', '');
@@ -2014,19 +1718,19 @@
                                         MY_API.CONFIG[i.name] = i.toggle2;
                                     else
                                         MY_API.CONFIG[i.name] = i.toggle1;
-                                    saveAction(div)
+                                    saveAction(myDiv)
                                 })
                             }
-                            $('.clickableText').click(function () {//帮助
-                                const id = $(this).attr('id');
+                            //绑定帮助文字 (?)
+                            $('.helpText').click(function () {
+                                const id = $(this).attr('helpData');
                                 if (id !== undefined) {
-                                    const idName = id.split('_help')[0];
-                                    if (helpText.hasOwnProperty(idName)) {
+                                    if (helpText.hasOwnProperty(id)) {
                                         return layer.open({
-                                            title: `帮助信息 ${idName}`,
+                                            title: `帮助信息 ${id}`,
                                             anim: 5,
                                             area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
-                                            content: helpText[idName]
+                                            content: helpText[id]
                                         });
                                     }
                                 }
@@ -3726,7 +3430,7 @@
                             danmuContent = MY_API.CONFIG.MEDAL_DANMU_CONTENT[danmuContentIndex];
                         await MY_API.MEDAL_DANMU.sendDanmu(danmuContent, roomid, medal_name);
                         danmuContentIndex++;
-                        await sleep(1500);
+                        await sleep(MY_API.CONFIG.MEDAL_DANMU_INTERVAL * 1000);
                     }
                     medalDanmuRunning = false;
                     window.toast('[粉丝牌打卡弹幕] 今日已完成', 'success');
@@ -3779,14 +3483,14 @@
                                 for (const str of MY_API.CONFIG.QUESTIONABLE_LOTTERY) {
                                     if (str.charAt(0) != '/' && str.charAt(str.length - 1) != '/') {
                                         if (response.data.title.toLowerCase().indexOf(str.toLowerCase()) > -1) {
-                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid = ${aid})<br>含有关键字：` + str, 'warning');
+                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖<br>${response.data.title} (aid = ${aid})<br>含有关键字：` + str, 'warning');
                                             return MY_API.MaterialObject.check(aid + 1, aid);
                                         }
                                     }
                                     else {
                                         const reg = eval(str);
                                         if (reg.test(response.data.title)) {
-                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖(aid = ${aid})<br>匹配正则：` + str, 'warning');
+                                            MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖<br>${response.data.title} (aid = ${aid})<br>匹配正则：` + str, 'warning');
                                             return MY_API.MaterialObject.check(aid + 1, aid);
                                         }
                                     }
@@ -3814,9 +3518,9 @@
                         aid: aid,
                         number: number,
                         status: typeB[i].status,
-                        join_start_time: typeB[i].join_start_time,//时间戳
-                        join_end_time: typeB[i].join_end_time,//时间戳
-                        list: typeB[i].list,//礼物列表
+                        join_start_time: typeB[i].join_start_time, //开始时间戳
+                        join_end_time: typeB[i].join_end_time, //结束时间戳
+                        list: typeB[i].list, //礼物列表
                         jpName: ''
                     };
                     for (const i of obj.list) {
@@ -3825,7 +3529,7 @@
                     switch (obj.status) {
                         case -1: // 未开始
                             {
-                                MY_API.chatLog(`[实物抽奖] 将在${new Date((obj.join_start_time + 1) * 1000).toLocaleString()}参加抽奖<br>"${obj.title}" aid = ${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
+                                MY_API.chatLog(`[实物抽奖] 将在<br>${new Date((obj.join_start_time + 1) * 1000).toLocaleString()}参加抽奖<br>"${obj.title}"<br>aid = ${obj.aid}，第${i + 1}轮<br>奖品：${obj.jpName}`, 'info');
                                 MY_API.MaterialObject.list.push(obj);
                                 const p = $.Deferred();
                                 p.then(() => {
@@ -3842,7 +3546,7 @@
                             });
                         case 1: // 已参加
                             {
-                                MY_API.chatLog(`[实物抽奖] 已参加抽奖<br>"${obj.title}" aid = ${obj.aid} 第${i + 1}轮 奖品：${obj.jpName}`, 'info');
+                                MY_API.chatLog(`[实物抽奖] 已参加抽奖<br>"${obj.title}"<br>aid = ${obj.aid} 第${i + 1}轮<br>奖品：${obj.jpName}`, 'info');
                                 MY_API.MaterialObject.list.push(obj);
                                 const p = $.Deferred();
                                 p.then(() => {
@@ -3868,7 +3572,7 @@
                                     return false;
                                 }
                             });
-                            MY_API.chatLog(`[实物抽奖] 成功参加抽奖<nr>"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮) 奖品：${obj.jpName}`, 'success');
+                            MY_API.chatLog(`[实物抽奖] 成功参加抽奖<br>${obj.title}<br>aid = ${obj.aid}，第${obj.number}轮<br>奖品：${obj.jpName}`, 'success');
                             MY_API.addMaterial();
                             const p = $.Deferred();
                             p.then(() => {
@@ -3904,7 +3608,7 @@
                                 for (const g of i.list) {
                                     if (g.uid === Live_info.uid) {
                                         MY_API.chatLog(
-                                            `[实物抽奖] 抽奖"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)获得奖励<br>"${i.giftTitle}"`,
+                                            `[实物抽奖] 抽奖"${obj.title}"<br>aid = ${obj.aid}，第${obj.number}轮<br>获得奖励："${i.giftTitle}"`,
                                             'prize');
                                         winPrizeNum++;
                                         winPrizeTotalCount++;
@@ -4290,11 +3994,14 @@
                     }
 
                     if (MY_API.AnchorLottery.lotteryResponseList.length > MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE)//删除超出的旧数据
-                        MY_API.AnchorLottery.lotteryResponseList = MY_API.AnchorLottery.lotteryResponseList.splice(0, MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE)
+                        MY_API.AnchorLottery.lotteryResponseList = MY_API.AnchorLottery.lotteryResponseList.splice(0, MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE);
                     let uploadRawJson = {
                         roomList: MY_API.AnchorLottery.lotteryResponseList,
                         ts: ts_ms()
                     };
+                    if (MY_API.CONFIG.ANCHOR_UPLOAD_MSG.length > 0) {
+                        uploadRawJson.msg = MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT;
+                    }
                     function updateEncodeData(roomId, str) {
                         return BAPI.room.update(roomId, str).then((re) => {
                             MYDEBUG(`BAPI.room.update MY_API.AnchorLottery.myLiveRoomid encode64(uploadRawStr)`, re);
@@ -4353,15 +4060,19 @@
                     });
                     let lotteryInfoJson;
                     try {
-                        if (description === undefined) throw "undefined"
+                        if (description === undefined) throw "undefined";
                         lotteryInfoJson = JSON.parse(Base64.decode64(description.replaceAll('-', '')));
                         if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
-                            throw 'Not a JSON'
+                            throw 'Not a JSON';
+                        if (!lotteryInfoJson.hasOwnProperty('roomList'))
+                            throw 'Missing property roomList';
+                        if (!lotteryInfoJson.hasOwnProperty('ts'))
+                            throw 'Missing property ts';
                     } catch (e) {
                         MY_API.chatLog(`[天选时刻] 直播间${MY_API.CONFIG.ANCHOR_GETDATA_ROOM}个人简介的数据格式不符合要求 ` + e, 'error');
                         return setTimeout(() => MY_API.AnchorLottery.getLotteryInfoFromRoom(), MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000);
                     }
-                    MY_API.chatLog(`[天选时刻] 开始检查天选（共${lotteryInfoJson.roomList.length}个房间）<br>数据来源：直播间${linkMsg(MY_API.CONFIG.ANCHOR_GETDATA_ROOM, liveRoomUrl + MY_API.CONFIG.ANCHOR_GETDATA_ROOM)}的个人简介<br>该数据最后上传时间：${new Date(lotteryInfoJson.ts).toLocaleString()}`, 'success')
+                    MY_API.chatLog(`[天选时刻] 开始检查天选（共${lotteryInfoJson.roomList.length}个房间）<br>数据来源：直播间${linkMsg(MY_API.CONFIG.ANCHOR_GETDATA_ROOM, liveRoomUrl + MY_API.CONFIG.ANCHOR_GETDATA_ROOM)}的个人简介${(!MY_API.CONFIG.ANCHOR_IGNORE_UPLOAD_MSG && lotteryInfoJson.hasOwnProperty('msg') && lotteryInfoJson.msg.length > 0) ? '<br>附加信息：' + lotteryInfoJson.msg : ''}<br>该数据最后上传时间：${new Date(lotteryInfoJson.ts).toLocaleString()}`, 'success')
                     for (const room of lotteryInfoJson.roomList) {
                         let p = $.Deferred();
                         if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
@@ -4389,15 +4100,22 @@
                         await p;
                         await sleep(MY_API.CONFIG.ANCHOR_INTERVAL);
                     }
-                    MY_API.chatLog(`[天选时刻] 本次检查结束<br>${MY_API.CONFIG.ANCHOR_CHECK_INTERVAL}分钟后再次检查天选`, 'success');
                     MY_API.CACHE.AnchorLottery_TS = ts_ms();
                     MY_API.saveCache();
-                    return setTimeout(() => MY_API.AnchorLottery.getLotteryInfoFromRoom(), MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000);
+                    const sleepTime = MY_API.AnchorLottery.sleepCheck();
+                    if (sleepTime) {
+                        MYDEBUG('[天选时刻]', `处于休眠时段，${sleepTime}毫秒后再次检查天选`);
+                        MY_API.chatLog(`[天选时刻] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并继续检查天选`, 'warning');
+                        return setTimeout(() => getRoomListAndJoin(), sleepTime);
+                    } else {
+                        MY_API.chatLog(`[天选时刻] 本次检查结束<br>${MY_API.CONFIG.ANCHOR_CHECK_INTERVAL}分钟后再次检查天选`, 'success');
+                        return setTimeout(() => MY_API.AnchorLottery.getLotteryInfoFromRoom(), MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000);
+                    }
                 },
                 moneyCheck: (award_name) => {
                     const name = award_name.replaceAll(' ', '').toLowerCase();//去空格+转小写
-                    const numberArray = name.match(/\d+(\.\d+)?/g);//提取阿拉伯数字
-                    const chineseNumberArray = name.match(/([一二两三四五六七八九十]千零?[一二两三四五六七八九十]?百?[一二三四五六七八九十]?十?[一二三四五六七八九十]?)|([一二两三四五六七八九十]百[一二三四五六七八九十]?十?[一二三四五六七八九十]?)|([一二三四五六七八九十]?十[一二三四五六七八九十])|[一二三四五六七八九十]/g);//提取汉字数字
+                    let numberArray = name.match(/\d+(\.\d+)?/g);//提取阿拉伯数字
+                    let chineseNumberArray = name.match(/([一二两三四五六七八九十]千零?[一二两三四五六七八九十]?百?[一二三四五六七八九十]?十?[一二三四五六七八九十]?)|([一二两三四五六七八九十]百[一二三四五六七八九十]?十?[一二三四五六七八九十]?)|([一二三四五六七八九十]?十[一二三四五六七八九十]?)|[一二三四五六七八九十]/g);//提取汉字数字
                     const chnNumChar = { "零": 0, "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9 },
                         chnNameValue = { "十": { value: 10, secUnit: false }, "百": { value: 100, secUnit: false }, "千": { value: 1e3, secUnit: false }, "万": { value: 1e4, secUnit: true }, "亿": { value: 1e8, secUnit: true } };
                     if (chineseNumberArray !== null && numberArray === null) { //只提取出汉字数字
@@ -4412,7 +4130,11 @@
                         return [false]
                     }
                     function chineseFunc() {
+                        //把匹配到的数字由长到段重新排列
                         let chineseNumIndexList = [];
+                        chineseNumberArray.sort(function (a, b) {
+                            return b.length - a.length;
+                        });
                         for (const n of chineseNumberArray) {
                             chineseNumIndexList.push(getIndex(name, n, chineseNumIndexList));
                         }
@@ -4425,13 +4147,20 @@
                                     nextChineseNumIndex = chineseNumIndexList[n + 1];//下一个数字下标
                                 const unitIndex = ChineseNumberIndex + ChineseNumLength;//数字后一个中文数字的下标 可能为undefined
                                 let strAfterNum = '';//数字后面的字符串
-                                for (let i = unitIndex; i < name.length; i++) {
-                                    if (nextChineseNumIndex !== undefined) {
-                                        if (i < nextChineseNumIndex)//不能把下一个数字取进去
+                                if (unitIndex < nextChineseNumIndex) {
+                                    //如果下一个数字的起始位置不在当前数字所占范围内
+                                    for (let i = unitIndex; i < name.length; i++) {
+                                        if (nextChineseNumIndex !== undefined) {
+                                            if (i < nextChineseNumIndex)//不能把下一个数字取进去
+                                                strAfterNum = strAfterNum + name[i];
+                                            else
+                                                break;
+                                        } else {
                                             strAfterNum = strAfterNum + name[i];
-                                    } else {
-                                        strAfterNum = strAfterNum + name[i];
+                                        }
                                     }
+                                } else {
+                                    strAfterNum = name.slice(unitIndex, name.length);
                                 }
                                 let finalMoney = getPrice(num, strAfterNum);
                                 if (finalMoney === undefined) {
@@ -4443,23 +4172,35 @@
                         }
                     }
                     function arabicNumberFunc() {
+                        //把匹配到的数字由长到段重新排列
                         let numIndexList = [];
+                        numberArray.sort(function (a, b) {
+                            return b.length - a.length;
+                        });
                         for (const n of numberArray) { //每个数字在name中的下标
                             numIndexList.push(getIndex(name, n, numIndexList));
-                        } for (let n = 0; n < numberArray.length; n++) {
+                        }
+                        for (let n = 0; n < numberArray.length; n++) {
                             const num = numberArray[n];//数字
                             const numberIndex = name.indexOf(num),//数字下表
                                 numLength = num.length,//数字长度
                                 nextNumIndex = numIndexList[n + 1];//下一个数字下标
                             const unitIndex = numberIndex + numLength;//数字后一个字符的下标 可能为undefined
                             let strAfterNum = '';//数字后面的字符串
-                            for (let i = unitIndex; i < name.length; i++) {
-                                if (nextNumIndex !== undefined) {
-                                    if (i < nextNumIndex)//不能把下一个数字取进去
+                            if (unitIndex < nextNumIndex) {
+                                //如果下一个数字的起始位置不在当前数字所占范围内
+                                for (let i = unitIndex; i < name.length; i++) {
+                                    if (nextNumIndex !== undefined) {
+                                        if (i < nextNumIndex)//不能把下一个数字取进去
+                                            strAfterNum = strAfterNum + name[i];
+                                        else
+                                            break;
+                                    } else {
                                         strAfterNum = strAfterNum + name[i];
-                                } else {
-                                    strAfterNum = strAfterNum + name[i];
+                                    }
                                 }
+                            } else {
+                                strAfterNum = name.slice(unitIndex, name.length);
                             }
                             let finalMoney = getPrice(num, strAfterNum);
                             if (finalMoney === undefined) {//识别失败
@@ -4470,7 +4211,7 @@
                     }
                     function getPrice(num, strAfterNum) {
                         const yuan = ['元', 'r', '块'],//1
-                            yuanWords = ['rmb', 'cny', '人民币', '软妹币', '微信红包', '红包', 'qq红包'],//1
+                            yuanWords = ['rmb', 'cny', '人民币', '软妹币', '微信红包', '红包', 'qq红包', '现金'],//1
                             dime = ['毛', '角'],//0.1
                             penny = ['分'],//0.01
                             milliWords = ['金瓜子'];//0.001
@@ -4555,11 +4296,19 @@
                     }
                 },
                 check: (roomid, add = true) => {
+                    if (MY_API.CONFIG.ANCHOR_IGNORE_ROOM && MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.indexOf(String(roomid)) > -1) {
+                        MY_API.chatLog(`[天选时刻] 忽略直播间<br>不参加直播间${linkMsg(roomid, liveRoomUrl + roomid)}的天选`, 'warning');
+                        return $.Deferred().resolve();
+                    }
                     return BAPI.xlive.anchor.check(roomid).then((response) => {
                         MYDEBUG(`API.xlive.anchor.check(${roomid}) response`, response);
                         if (response.code === 0 && !!response.data) {
                             if (response.data.time === 0) {
                                 MY_API.chatLog(`[天选时刻] 忽略过期天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}`, 'info');
+                                return false
+                            }
+                            if (response.data.status === 2) {
+                                MY_API.chatLog(`[天选时刻] 忽略已参加天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>`, 'info');
                                 return false
                             }
                             if (add) {
@@ -4580,57 +4329,142 @@
                                 joinPrice: joinPrice,
                                 uid: undefined
                             };
-                            let joinText = `<div class = "clickableText" title = "${joinTextTitle}" ts = "${ts}">点击参加</div>`;
+                            let medalJson = undefined;
+                            let joinText = null, joinDisplay = "block";
+                            switch (response.data.require_type) {
+                                case 0: /* 无 */
+                                case 1: /* 关注 */ joinText = "点击参加"; break;
+                                case 2: /* 粉丝勋章 */
+                                    if (response.data.require_value === 1) joinText = "点击购买粉丝勋章参加";
+                                    else joinText = "点击购买粉丝勋章"; break;
+                                /* case 3: 大航海 */
+                                default: joinDisplay = "none";
+                            }
+                            const joinHtml = (text = joinText, display = joinDisplay) => `<div class = "clickableText" title = "${joinTextTitle}" ts = "${ts}" style = "display:${display};">${text}</div>`;
                             function joinAnchorListener() {
                                 let jqText = $('div' + '[title=\"' + joinTextTitle + '\"]' + '[ts=\"' + ts + '\"]');
                                 let timer = setTimeout(() => jqText.remove(), response.data.time * 1000);
                                 jqText.click(() => {
-                                    //已经过了一段时间，需再次获取剩余时间
-                                    BAPI.xlive.anchor.randTime(response.data.id).then((re) => {
-                                        MYDEBUG(`API.xlive.anchor.randTime ${response.data.id}`, re);
-                                        if (response.code === 0) defaultJoinData.time = re.data.time;
-                                        else defaultJoinData.time = undefined;
-                                        MY_API.AnchorLottery.join(defaultJoinData);
-                                        let allSameJqText = $('div' + '[title=\"' + joinTextTitle + '\"]');
-                                        allSameJqText.unbind('click');
-                                        allSameJqText.remove();
-                                        clearTimeout(timer);
+                                    let p = $.Deferred();
+                                    switch (response.data.require_type) {
+                                        case 2: //粉丝勋章
+                                            let getUid = $.Deferred();
+                                            if (!defaultJoinData.uid) {
+                                                BAPI.live_user.get_anchor_in_room(roomid).then((res) => {
+                                                    MYDEBUG(`API.live_user.get_anchor_in_room(${roomid})`, res);
+                                                    if (res.data) {
+                                                        defaultJoinData.uid = res.data.info.uid;
+                                                        medalJson = {
+                                                            anchorInfo: {
+                                                                uid: res.data.info.uid,
+                                                                uname: res.data.info.uname,
+                                                                face: res.data.info.face
+                                                            },
+                                                            medal_level: 1,
+                                                            target_id: res.data.info.uid
+                                                        };
+                                                        getUid.resolve();
+                                                    } else {
+                                                        MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${roomid}<br>${res.msg}`, 'error');
+                                                        getUid.reject();
+                                                    }
+                                                }, () => {
+                                                    MY_API.chatLog(`[天选时刻] 获取uid出错，请检查网络`, 'error');
+                                                    getUid.reject();
+                                                })
+                                            } else getUid.resolve();
+                                            getUid.then(() => {
+                                                BAPI.link_group.buy_medal(defaultJoinData.uid).then((re) => {
+                                                    MYDEBUG('API.link_group.buy_medal re', re);
+                                                    if (re.code === 0) {
+                                                        if (response.data.require_value === 1) {
+                                                            layer.msg('粉丝勋章购买成功，约1秒后参加天选', {
+                                                                time: 2000,
+                                                                icon: 1
+                                                            });
+                                                            setTimeout(() => p.resolve(), 1000);
+                                                        } else {
+                                                            layer.msg('粉丝勋章购买成功', {
+                                                                time: 2000,
+                                                                icon: 1
+                                                            });
+                                                            p.reject();
+                                                        }
+                                                        if (medalJson !== undefined)
+                                                            MY_API.AnchorLottery.medal_list.push(medalJson);
+                                                    } else {
+                                                        layer.msg(`粉丝勋章购买失败 ${re.message}`, {
+                                                            time: 3500,
+                                                            icon: 2
+                                                        });
+                                                        p.reject()
+                                                    }
+                                                }, () => {
+                                                    MY_API.chatLog('[天选时刻] 购买粉丝勋章出错，请检查网络', 'error');
+                                                    p.reject()
+                                                });
+                                            });
+                                            break;
+                                        default: p.resolve()
+                                    }
+                                    p.then(() => {
+                                        //已经过了一段时间，需再次获取剩余时间
+                                        BAPI.xlive.anchor.randTime(response.data.id).then((re) => {
+                                            MYDEBUG(`API.xlive.anchor.randTime ${response.data.id}`, re);
+                                            if (response.code === 0) defaultJoinData.time = re.data.time;
+                                            else defaultJoinData.time = undefined;
+                                            MY_API.AnchorLottery.join(defaultJoinData);
+                                            let allSameJqText = $('div' + '[title=\"' + joinTextTitle + '\"]');
+                                            allSameJqText.unbind('click');
+                                            allSameJqText.remove();
+                                            clearTimeout(timer);
+                                        }, () => {
+                                            MY_API.chatLog(`[天选时刻] 获取天选开奖剩余时间失败，请检查网络`, 'error')
+                                        })
                                     })
                                 });
                             };
                             if (MY_API.CONFIG.ANCHOR_IGNORE_BLACKLIST) {
+                                // 忽略关键字
                                 for (const str of MY_API.CONFIG.ANCHOR_BLACKLIST_WORD) {
-                                    if (str.charAt(0) != '/' && str.charAt(str.length - 1) != '/') {
+                                    if (str.charAt(0) !== '/' && str.charAt(str.length - 1) !== '/') {
                                         if (response.data.award_name.toLowerCase().indexOf(str.toLowerCase()) > -1) {
-                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>含有关键字：${str}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
+                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>含有关键字：${str}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
                                             joinAnchorListener();
                                             return false
                                         }
                                     }
                                     else {
-                                        const reg = eval(str);
-                                        if (reg.test(response.data.award_name)) {
-                                            MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>匹配正则：${str}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
-                                            joinAnchorListener();
-                                            return false
+                                        try {
+                                            const reg = eval(str);
+                                            if (reg.test(response.data.award_name)) {
+                                                MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>匹配正则：${str}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
+                                                joinAnchorListener();
+                                                return false
+                                            }
+                                        } catch (e) {
+                                            MYDEBUG('[天选时刻] 正则eval出错：', str);
                                         }
                                     }
                                 }
                             };
-                            if (MY_API.CONFIG.ANCHOR_IGNORE_MONEY > 0) {
+                            if (MY_API.CONFIG.ANCHOR_IGNORE_MONEY > 0 || MY_API.CONFIG.ANCHOR_MONEY_ONLY) {
+                                //忽略金额或仅参加现金天选
                                 const moneyCheckReturnArray = MY_API.AnchorLottery.moneyCheck(response.data.award_name);
-                                if (moneyCheckReturnArray[0] && moneyCheckReturnArray[1] < MY_API.CONFIG.ANCHOR_IGNORE_MONEY) {
-                                    MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>识别到的金额：${moneyCheckReturnArray[1]}元<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
-                                    joinAnchorListener();
+                                if (moneyCheckReturnArray[0]) {
+                                    //有金额
+                                    if (moneyCheckReturnArray[1] < MY_API.CONFIG.ANCHOR_IGNORE_MONEY) {
+                                        MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}识别到的金额：${moneyCheckReturnArray[1]}元<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
+                                        joinAnchorListener();
+                                        return false
+                                    }
+                                } else if (MY_API.CONFIG.ANCHOR_MONEY_ONLY) {
+                                    MY_API.chatLog(`[天选时刻] 忽略非现金抽奖的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
                                     return false
                                 }
                             }
-                            if (response.data.status === 2) {
-                                MY_API.chatLog(`[天选时刻] 忽略已参加天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>`, 'info');
-                                return false
-                            }
                             if (joinPrice > MY_API.CONFIG.AHCHOR_NEED_GOLD) {
-                                MY_API.chatLog(`[天选时刻] 忽略付费天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinText}`, 'warning');
+                                MY_API.chatLog(`[天选时刻] 忽略付费天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
                                 joinAnchorListener();
                                 return false
                             }
@@ -4640,12 +4474,21 @@
                                 case 2: { // 粉丝勋章
                                     return BAPI.live_user.get_anchor_in_room(roomid).then((res) => {
                                         MYDEBUG(`API.live_user.get_anchor_in_room(${roomid})`, res);
-                                        if (!!res.data) {
-                                            let ownerUid = res.data.info.uid;
+                                        if (res.data) {
+                                            defaultJoinData.uid = res.data.info.uid;
+                                            medalJson = {
+                                                anchorInfo: {
+                                                    uid: res.data.info.uid,
+                                                    uname: res.data.info.uname,
+                                                    face: res.data.info.face
+                                                },
+                                                medal_level: 1,
+                                                target_id: res.data.info.uid
+                                            };
                                             for (const m of MY_API.AnchorLottery.medal_list) {
-                                                if (m.target_id === ownerUid) {
-                                                    //这里m.target_id是勋章对应UP的uid，m.uid是自己的uid
-                                                    if (m.level < response.data.require_value) {
+                                                if (m.target_id === defaultJoinData.uid) {
+                                                    //m.target_id为勋章对应UP的uid，m.uid是自己的uid
+                                                    if (m.medal_level < response.data.require_value) {
                                                         MY_API.chatLog(`[天选时刻] 忽略粉丝勋章等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需勋章等级：${response.data.require_value}<br>你的勋章等级：${m.level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
                                                         return false
                                                     } else {
@@ -4653,11 +4496,16 @@
                                                     }
                                                 }
                                             }
-                                            MY_API.chatLog(`[天选时刻] 忽略有粉丝勋章要求的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需勋章等级：${response.data.require_value}<br>你没有该勋章<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
+                                            MY_API.chatLog(`[天选时刻] 忽略有粉丝勋章要求的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需勋章等级：${response.data.require_value}<br>你没有该勋章<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
+                                            joinAnchorListener();
                                             return false
                                         } else {
+                                            MY_API.chatLog(`[天选时刻] 获取uid出错<br>${res.msg}`, 'error');
                                             return false
                                         }
+                                    }, () => {
+                                        MY_API.chatLog(`[天选时刻] 获取uid出错，请检查网络`, 'error');
+                                        return false
                                     });
                                 }
                                 case 3: { //大航海
@@ -4688,12 +4536,14 @@
                                         }
                                     })
                                 }
-                                case 4: { //直播等级
+                                case 4: {
+                                    //直播等级
                                     if (Live_info.user_level >= response.data.require_value) return defaultJoinData;
                                     else MY_API.chatLog(`[天选时刻] 忽略直播等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需直播等级：${response.data.require_value}<br>你的直播等级：UL.${Live_info.user_level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
                                     return false
                                 }
-                                case 5: { //主站等级
+                                case 5: {
+                                    //主站等级
                                     if (Live_info.level >= response.data.require_value) return defaultJoinData;
                                     else MY_API.chatLog(`[天选时刻] 忽略主站等级不足的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>所需直播等级：${response.data.require_value}<br>你的主站等级：Lv${Live_info.level}<br>${MY_API.AnchorLottery.countDown(response.data.time)}`, 'warning');
                                     return false
@@ -4777,7 +4627,7 @@
                                         if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${anchorUid}）至分组【${anchorPrizeTagName}】成功`, 'success');
                                         else window.toast(`[天选时刻] 移动UP（uid = ${anchorUid}）至分组【${anchorPrizeTagName}】失败 ${re.message}`, 'warning');
                                     }, () => {
-                                        MY_API.chatLog(`[天选时刻] 移动UP（uid = ${anchorUid}）到分组【${anchorPrizeTagName}】出错，请检查网络`);
+                                        MY_API.chatLog(`[天选时刻] 移动UP（uid = ${anchorUid}）到分组【${anchorPrizeTagName}】出错，请检查网络`, 'error');
                                     });
                                 }
                                 if (MY_API.CONFIG.FT_NOTICE) {
@@ -4871,28 +4721,39 @@
                         if (response.code === 0) {
                             MY_API.chatLog(`[天选时刻] 成功参加天选<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>${data.joinPrice === 0 ? '' : ('花费金瓜子：' + data.joinPrice + '<br>')}奖品：${data.award_name}<br>${MY_API.AnchorLottery.countDown(data.time)}`, 'success');
                             MY_API.AnchorLottery.waitForRecheckList.push(data.roomid);
-                            return BAPI.live_user.get_anchor_in_room(data.roomid).then((res) => { //获取uid
-                                MYDEBUG(`API.live_user.get_anchor_in_room(${data.roomid})`, res);
-                                if (res.code === 0) {
-                                    MY_API.addAnchor();
-                                    data.uid = res.data.info.uid;
-                                    MYDEBUG('天选时刻join data', data);
-                                    if (data.require_type === 1 && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG) { //有关注要求
-                                        if (MY_API.AnchorLottery.uidInOriginTag.indexOf(String(data.uid)) > -1) return;//之前在默认分组，不移动
-                                        setTimeout(() => {
-                                            BAPI.relation.addUsers(res.data.info.uid, MY_API.AnchorLottery.anchorFollowTagid).then((re) => {
-                                                MYDEBUG(`API.relation.addUsers ${res.data.info.uid} ${MY_API.AnchorLottery.anchorFollowTagid}`, re);
-                                                if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）至分组【${anchorFollowTagName}】成功`, 'success');
-                                                else window.toast(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）至分组【${anchorFollowTagName}】失败 ${re.message}`, 'warning');
-                                            }, () => {
-                                                MY_API.chatLog(`[天选时刻] 移动UP（uid = ${res.data.info.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`);
-                                            });
-                                        }, 4000);
+                            let p = $.Deferred();
+                            if (!data.uid) {
+                                BAPI.live_user.get_anchor_in_room(data.roomid).then((res) => { //获取uid
+                                    MYDEBUG(`API.live_user.get_anchor_in_room(${data.roomid})`, res);
+                                    if (res.code === 0) {
+                                        data.uid = res.data.info.uid;
+                                        p.resolve();
+                                    } else {
+                                        MY_API.chatLog(`[天选时刻] 获取uid出错，中断后续操作<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>${res.msg}`, 'error');
+                                        p.reject();
                                     }
-                                    setTimeout(() => MY_API.AnchorLottery.reCheck(data), data.time * 1000 + 1500);
+                                }, () => {
+                                    MY_API.chatLog(`[天选时刻] 获取uid出错，中断后续操作<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>请检查网络`, 'error');
+                                    p.reject();
+                                });
+                            } else p.resolve();
+                            p.then(() => {
+                                MY_API.addAnchor();
+                                MYDEBUG('天选时刻join data', data);
+                                if (data.require_type === 1 && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG) { //有关注要求
+                                    if (MY_API.AnchorLottery.uidInOriginTag.indexOf(String(data.uid)) > -1) return;//之前在默认分组，不移动
+                                    setTimeout(() => {
+                                        BAPI.relation.addUsers(data.uid, MY_API.AnchorLottery.anchorFollowTagid).then((re) => {
+                                            MYDEBUG(`API.relation.addUsers ${data.uid} ${MY_API.AnchorLottery.anchorFollowTagid}`, re);
+                                            if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】成功`, 'success');
+                                            else window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】失败 ${re.message}`, 'warning');
+                                        }, () => {
+                                            MY_API.chatLog(`[天选时刻] 移动UP（uid = ${data.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`);
+                                        });
+                                    }, 4000);
                                 }
-                            });
-
+                                setTimeout(() => MY_API.AnchorLottery.reCheck(data), data.time * 1000 + 1500);
+                            })
                         } else if (response.code === 500) {
                             MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}<br>奖品：${data.award_name}<br>${response.msg}<br>3秒后再次尝试参加`, 'warning');
                             return setTimeout(() => MY_API.AnchorLottery.join(data), 3000);
@@ -4905,6 +4766,17 @@
                         return delayCall(() => MY_API.AnchorLottery.join(data));
                     })
                 },
+                /**
+                 * 检测是否在休眠时间休眠时间
+                 * @returns {boolean} false （不在休眠时间段）
+                 * @returns {number} 距休眠结束的毫秒数 （在休眠时间段）
+                 */
+                sleepCheck: () => {
+                    if (!MY_API.CONFIG.TIME_AREA_DISABLE) return false;
+                    if (inTimeArea(MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)) {//判断时间段
+                        return getIntervalTime(MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_END_MINUTE);
+                    }
+                },
                 run: async () => {
                     if (!MY_API.CONFIG.ANCHOR_LOTTERY) return $.Deferred().resolve();
                     const settingIntervalTime = MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000;
@@ -4915,11 +4787,11 @@
                         await MY_API.AnchorLottery.getTag([anchorFollowTagName, anchorPrizeTagName]);
                     await MY_API.AnchorLottery.getUpInOriginTag(Live_info.uid);
                     function waitForNextRun(Fn) {
-                        if (MY_API.CONFIG.TIME_AREA_DISABLE && inTimeArea(MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)) {//判断时间段
-                            const intervalTime = getIntervalTime(MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_END_MINUTE);
-                            MYDEBUG('[天选时刻]', `处于休眠时段，${intervalTime}毫秒后再次检查天选`);
-                            MY_API.chatLog(`[天选时刻] 处于休眠时段，将会在<br>${new Date(ts_ms() + intervalTime).toLocaleString()}<br>结束休眠并继续检查天选`, 'warning');
-                            return setTimeout(() => Fn(), intervalTime);
+                        const sleepTime = MY_API.AnchorLottery.sleepCheck();
+                        if (sleepTime) {
+                            MYDEBUG('[天选时刻]', `处于休眠时段，${sleepTime}毫秒后再次检查天选`);
+                            MY_API.chatLog(`[天选时刻] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并继续检查天选`, 'warning');
+                            return setTimeout(() => Fn(), sleepTime);
                         } else {
                             const intervalTime = ts_ms() - MY_API.CACHE.AnchorLottery_TS;
                             const waitTime = intervalTime >= MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000 ? 0 : intervalTime;
@@ -4965,8 +4837,15 @@
                             };
                             MY_API.CACHE.AnchorLottery_TS = ts_ms();
                             MY_API.saveCache();
-                            MY_API.chatLog(`[天选时刻] 本次轮询结束<br>${MY_API.CONFIG.ANCHOR_CHECK_INTERVAL}分钟后再次检查天选`, 'success');
-                            return setTimeout(() => getRoomListAndJoin(), settingIntervalTime);
+                            const sleepTime = MY_API.AnchorLottery.sleepCheck();
+                            if (sleepTime) {
+                                MYDEBUG('[天选时刻]', `处于休眠时段，${sleepTime}毫秒后再次检查天选`);
+                                MY_API.chatLog(`[天选时刻] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并继续检查天选`, 'warning');
+                                return setTimeout(() => getRoomListAndJoin(), sleepTime);
+                            } else {
+                                MY_API.chatLog(`[天选时刻] 本次轮询结束<br>${MY_API.CONFIG.ANCHOR_CHECK_INTERVAL}分钟后再次检查天选`, 'success');
+                                return setTimeout(() => getRoomListAndJoin(), settingIntervalTime);
+                            }
                         };
                         return waitForNextRun(() => getRoomListAndJoin());
                     } else {
@@ -4975,13 +4854,44 @@
                 }
             }
         };
-        MY_API.init().then(() => {//主函数
+        MY_API.init().then(() => {
             try {
-                if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid)))//登陆判断
-                    return MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
-                MY_API.newMessage(GM_info.script.version);//新版本提示信息
-                MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
-                StartPlunder(MY_API);
+                //登陆判断
+                let runNext = $.Deferred();
+                const showEula = localStorage.getItem(`${NAME}_showEula`);
+                if (showEula !== 'false') {
+                    const eula = GM_getResourceText('eula');
+                    layer.open({
+                        title: `${GM_info.script.name}最终用户许可协议`,
+                        btn: ['同意协议并继续', '不同意'],
+                        closeBtn: 0,
+                        area: [String($(window).width() * 0.618) + 'px', String($(window).height() * 0.8) + 'px'],
+                        content: eula,
+                        yes: function (index) {
+                            localStorage.setItem(`${NAME}_showEula`, false);
+                            layer.close(index);
+                            runNext.resolve();
+                        },
+                        btn2: function () {
+                            layer.msg('脚本已停止运行', {
+                                time: 3000,
+                                icon: 2
+                            });
+                            MY_API.chatLog('由于未同意最终用户许可协议，<br>脚本已停止运行。', 'warning');
+                            localStorage.setItem(`${NAME}_showEula`, true);
+                            runNext.reject();
+                        }
+                    })
+                } else runNext.resolve();
+                runNext.then(() => {
+                    if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid)))
+                        return MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
+                    //新版本提示信息
+                    if (MY_API.CONFIG.UPDATE_TIP)
+                        MY_API.newMessage(GM_info.script.version);
+                    MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
+                    main(MY_API);
+                });
             }
             catch (e) {
                 console.error('初始化错误', e);
@@ -4989,8 +4899,8 @@
         });
     }
 
-    async function StartPlunder(API) {
-        'use strict';
+    async function main(API) {
+        //修复版本更新产生的兼容性问题
         fixVersionDifferences(API);
         //清空辣条数量
         let clearStat = () => {
@@ -4999,8 +4909,8 @@
             }
             API.GIFT_COUNT.CLEAR_TS = ts_ms();
             API.saveGiftCount();
-            $('#giftCount span:eq(0)').text(API.GIFT_COUNT.ANCHOR_COUNT);
-            $('#giftCount span:eq(1)').text(API.GIFT_COUNT.MATERIAL_COUNT);
+            $('#giftCount .anchor .num').text(API.GIFT_COUNT.ANCHOR_COUNT);
+            $('#giftCount .material .num').text(API.GIFT_COUNT.MATERIAL_COUNT);
             MYDEBUG('已重置统计')
         }
         if (checkNewDay(API.GIFT_COUNT.CLEAR_TS)) clearStat();

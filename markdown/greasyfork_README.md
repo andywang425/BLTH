@@ -5,7 +5,7 @@
 -------------------------------
 ### github项目地址
 [github.com/andywang425/BLTH](https://github.com/andywang425/BLTH)
-&nbsp;<a href="https://github.com/andywang425/BLTH"><img src="https://img.shields.io/github/stars/andywang425/Bilibili-SGTH?style=flat" alt="Github stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a>
+&nbsp;<a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Github stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a>
 
 ### 使用方法 
 在[Tampermonkey](https://www.tampermonkey.net/)中启用脚本，登陆bilibili后打开任意b站直播间。 
@@ -60,6 +60,7 @@
 <ul>
 <li>忽略所需金瓜子大于设置值的天选</li>  
 <li>忽略含特定关键字或匹配特定正则表达式的存疑天选</li>
+<li>忽略指定直播间的天选</li>
 <li>尝试识别天选中的金额并忽略金额低于设置值的天选</li>
 <li>保存当前关注列表为白名单/取关不在白名单内的UP主</li>  
 <li>上传天选信息至自己的直播间/从特定直播间获取天选信息</li>
@@ -83,6 +84,8 @@
 <li>移除2233模型</li>
 <li>移除活动入口</li>
 <li>移除排行榜</li>
+<li>移除右侧关注按钮及弹窗</li>
+<li>移除礼物栏下方广告</li>
 <li>屏蔽挂机检测</li>
 </ul>
 </details>
@@ -136,6 +139,12 @@
 + 脚本默认关闭控制台日志。勾选控制面板上的`其他设置 - 控制台日志`即可开启。  
   打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。
 
+#### 风控
++ 若出现`...，请检查网络`的红色日志，有两种可能。一是网络状况不佳，二被B站风控了。
++ 风控过一段时间会自动解除。
++ 因为风控是针对ip地址的，被风控后可通过挂代理等方式更换ip，继续正常使用脚本。
++ 被风控通常是因为api请求过于频繁，可通过修改脚本的相关设置（如果有的话）降低请求频率。
+
 #### 关于反馈
 + 如果使用脚本过程中遇到问题，可以先按上述步骤开启控制台日志，然后再次运行脚本并在控制台中寻找相关错误信息。  
   若能找到请在反馈bug时附上这些控制台日志。
@@ -187,4 +196,4 @@
 -------------------------------
 
 ## 更新日志
-完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/update-log.md)。  
+完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
