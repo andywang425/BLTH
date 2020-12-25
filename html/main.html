@@ -80,7 +80,7 @@
                 <fieldset class="igiftMsg_fs" style="line-height:16px;">
                         <legend style="color:black">每日任务设置</legend>
                         <div data-toggle="LOGIN" style=" color:black">
-                                <input style="vertical-align:text-top;" type="checkbox">登陆
+                                <input style="vertical-align:text-top;" type="checkbox">登录
 
                         </div>
                         <div data-toggle="WATCH" style=" color:black">
@@ -138,6 +138,14 @@
                         </div>
                         <div data-toggle="MEDAL_DANMU_INTERVAL" style="margin-inline-start: 18px;">
                                 弹幕发送间隔 <input class="num igiftMsg_input" style="width:25px;" type="text">秒
+                        </div>
+                </fieldset>
+                <fieldset class="igiftMsg_fs">
+                        <legend style="color:black">小心心</legend>
+                        <div data-toggle="LITTLE_HEART" style="line-height:15px">
+                                <label style="margin:5px auto; color:black">
+                                        <input style="vertical-align:text-top;" type="checkbox">自动获取小心心
+                                </label>
                         </div>
                 </fieldset>
                 <fieldset class="igiftMsg_fs">
@@ -234,14 +242,6 @@
                         </div>
                 </fieldset>
                 <fieldset class="igiftMsg_fs">
-                        <legend style="color:black">小心心</legend>
-                        <div data-toggle="LITTLE_HEART" style="line-height:15px">
-                                <label style="margin:5px auto; color:black">
-                                        <input style="vertical-align:text-top;" type="checkbox">自动获取小心心
-                                </label>
-                        </div>
-                </fieldset>
-                <fieldset class="igiftMsg_fs">
                         <legend style="color:black">天选时刻</legend>
                         <div data-toggle="ANCHOR_LOTTERY" style="line-height:20px">
                                 <label style="margin:5px auto; color:purple">
@@ -295,7 +295,7 @@
                                         忽略所需金瓜子大于 <input class="num igiftMsg_input" style="width:50px;" type="text">的天选
                                 </label>
                         </div>
-                        <div data-toggle="ANCHOR_IGNORE_BLACKLIST" style="line-height:20px">
+                        <div data-toggle="ANCHOR_IGNORE_BLACKLIST" style="line-height:25px">
                                 <label style="margin:5px auto; color:black">
                                         <input style="vertical-align:text-top;" type="checkbox">
                                         忽略关键字
@@ -316,6 +316,11 @@
                         <div data-toggle="ANCHOR_IGNORE_MONEY" style="line-height:20px">
                                 <label style="margin:5px auto; color:black">
                                         忽略金额小于 <input class="num igiftMsg_input" style="width:30px;" type="text">元的天选
+                                </label>
+                        </div>
+                        <div data-toggle="ANCHOR_MONEY_ONLY" style="line-height:20px">
+                                <label style="margin:5px auto; color:black">
+                                        <input style="vertical-align:text-top;" type="checkbox">仅参加现金抽奖
                                 </label>
                         </div>
                         <div data-toggle="ANCHOR_INTERVAL" style="line-height:20px">
