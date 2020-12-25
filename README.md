@@ -1,5 +1,5 @@
 <p align ="center"><img src="https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"></p>
-<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg" alt="TamperMonkey 4.10"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH"><img src="https://img.shields.io/github/stars/andywang425/Bilibili-SGTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437-brightgreen" alt="QQ Group"></a></p>
+<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg" alt="TamperMonkey 4.10"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437-brightgreen" alt="QQ Group"></a></p>
 <h1 align="center">B站直播间挂机助手</h1>
 
 ### 安装方法
@@ -63,6 +63,7 @@
 <ul>
 <li>忽略所需金瓜子大于设置值的天选</li>  
 <li>忽略含特定关键字或匹配特定正则表达式的存疑天选</li>
+<li>忽略指定直播间的天选</li>
 <li>尝试识别天选中的金额并忽略金额低于设置值的天选</li>
 <li>保存当前关注列表为白名单/取关不在白名单内的UP主</li>  
 <li>上传天选信息至自己的直播间/从特定直播间获取天选信息</li>
@@ -86,6 +87,8 @@
 <li>移除2233模型</li>
 <li>移除活动入口</li>
 <li>移除排行榜</li>
+<li>移除右侧关注按钮及弹窗</li>
+<li>移除礼物栏下方广告</li>
 <li>屏蔽挂机检测</li>
 </ul>
 </details>
@@ -140,7 +143,7 @@
   打开控制台在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。
 
 #### 风控
-+ 若出现`...，请检查网络`的红色日志，有两种可能。一是你的网络状况不佳，二是你被B站风控了。
++ 若出现`...，请检查网络`的红色日志，有两种可能。一是网络状况不佳，二是被B站风控了。
 + 风控过一段时间会自动解除。
 + 因为风控是针对ip地址的，被风控后可通过挂代理等方式更换ip，继续正常使用脚本。
 + 被风控通常是因为api请求过于频繁，可通过修改脚本的相关设置（如果有的话）降低请求频率。
@@ -197,6 +200,6 @@
 
 ## 更新日志
 >### 5.6.4
->1.扩充天选时刻默认忽略关键字 2.天选时刻金额识别优化 3.天选时刻新增忽略直播间功能 4.修复天选时刻休眠无效的bug 5.内容屏蔽新增两项 6.右侧关注和弹窗，下方广告 7.新增更新提示开关 8.新增打卡弹幕发送间隔设置 9.新增天选时刻附加信息 10.窗口大小改变时脚本窗口位置会随之改变，并保持相对位置不变 11.天选时刻数据推送新增额外信息 12.天选时刻检查到缺少粉丝牌的天选时可快捷购买并参加 13.样式上的一些小改进 14.新增eula 15.部分重构，减少不必要的请求，完善错误处理，运行效率和代码格式优化 16.新增忽略非现金抽奖的天选。
+>1.扩充天选时刻默认忽略关键字 2.天选时刻金额识别优化 3.天选时刻新增忽略直播间功能 4.修复天选时刻休眠无效的bug 5.内容屏蔽新增两项 6.右侧关注和弹窗，下方广告 7.新增更新提示开关 8.新增打卡弹幕发送间隔设置 9.新增天选时刻附加信息 10.窗口大小改变时脚本窗口位置会随之改变，并保持相对位置不变 11.天选时刻数据推送新增额外信息 12.天选时刻检查到缺少粉丝牌的天选时可快捷购买并参加 13.样式上的一些小改进 14.新增eula 15.部分重构，减少不必要的请求，完善错误处理，运行效率和代码格式优化 16.新增忽略非现金抽奖的天选 17.改为通过GM函数获取所需资源。
 
-完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/md/update-log.md)。  
+完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
