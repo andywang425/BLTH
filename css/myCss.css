@@ -35,7 +35,7 @@
 }
 .igiftMsg_input {
     outline: none;
-    margin: 0;
+    margin-inline: 5px;
     border: 1px solid #e9eaec;
     background-color: #fff;
     border-radius: 4px;
@@ -47,6 +47,8 @@
 }
 .igiftMsg_btn {
     background-color: #23ade5;
+    font-size: small;
+    margin-inline-start: 5px;
     color: #fff;
     border-radius: 4px;
     border: none;
@@ -62,6 +64,7 @@
 }
 .igiftMsg_fs {
     border: 2px solid #d4d4d4;
+    line-height: 25px;
 }
 .chatLogDiv {
     text-align: center;
@@ -136,14 +139,23 @@
     text-decoration: underline;
 }
 .helpText {
-    padding-inline-start: 3px;
+    padding-inline-start: 5px;
+    display: inline;
+}
+.lineStartSpace {
+    margin-inline-start: 18px;
+}
+.statNum {
+    margin-inline: 5px;
 }
 .layui-layer [type="checkbox"],
 [type="radio"] {
     margin-inline-end: 5px;
+    vertical-align:text-top;
 }
 .layui-layer [type="button"] {
     font-size: small;
+    margin-inline-start: 5px;
 }
 .layui-layer .insideText {
     margin-inline-start: 18px;
@@ -159,10 +171,6 @@
     padding: 0 1em;
     color: #6a737d;
     border-left: 0.25em solid #dfe2e5;
-}
-.layui-layer fieldset {
-    padding: 0.35em 0.75em 0.625em;
-    margin: 0.1em;
 }
 .layui-layer legend {
     margin: auto;
