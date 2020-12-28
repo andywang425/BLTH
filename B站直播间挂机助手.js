@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.5
+// @version        5.6.4.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -660,23 +660,10 @@
                             title: `${version}更新提示`,
                             area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
                             content: `
-                            1.扩充天选时刻默认忽略关键字。<br>
-                            2.天选时刻金额识别优化。<br>
-                            3.天选时刻新增忽略直播间功能。<br>
-                            4.修复天选时刻休眠无效的bug。<br>
-                            5.内容屏蔽新增两项。<br>
-                            6.右侧关注和弹窗，下方广告。<br>
-                            7.新增更新提示开关。<br>
-                            8.新增打卡弹幕发送间隔设置。<br>
-                            9.新增天选时刻附加信息。<br>
-                            10.窗口大小改变时脚本窗口位置会随之改变，并保持相对位置不变。<br>
-                            11.天选时刻数据推送新增额外信息。<br>
-                            12.天选时刻检查到缺少粉丝牌的天选时可快捷购买并参加。<br>
-                            13.样式上的一些小改进。<br>
-                            14.新增eula。<br>
-                            15.部分重构，减少不必要的请求，完善错误处理，运行效率和代码格式优化。<br>
-                            16.新增忽略非现金抽奖的天选。<br>
-                            17.改为通过GM函数获取所需资源。<br>
+                            <mol>
+                            <mli>优化脚本控制面板的样式。</mli>
+                            <mli>修复部分情况下脚本无法加载的bug。</mli>
+                            </mol>
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
