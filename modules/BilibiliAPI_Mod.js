@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.0.5
+// @version       2.0.6
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -814,6 +814,16 @@ var BilibiliAPI = {
                     platform: platform
                 }
             });
+        },
+        myWallet: (need_bp = 1, need_metal = 1, platform = 'pc') => {
+            return BilibiliAPI.ajax({
+                url: 'pay/v2/Pay/myWallet',
+                data: {
+                    need_bp: need_bp,
+                    need_metal: need_metal,
+                    platform: platform
+                }
+            })
         }
     },
     rankdb: {
