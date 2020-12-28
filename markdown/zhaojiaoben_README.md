@@ -194,5 +194,4 @@
 -------------------------------
 
 ## 更新日志
-
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  

@@ -199,7 +199,7 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.5
+>### 5.6.4.1
 >1.优化脚本控制面板的样式 2.修复部分情况下脚本无法加载的bug
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
