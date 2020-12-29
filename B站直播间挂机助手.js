@@ -1,7 +1,7 @@
 // ==UserScript==
-// @namespace      https://github.com/andywang425
 // @name           B站直播间挂机助手
 // @name:en        B站直播间挂机助手
+// @namespace      https://github.com/andywang425
 // @author         andywang425
 // @description    自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章
 // @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章
@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.4.1
+// @version        5.6.4.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -656,10 +656,11 @@
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
                     if (cache === undefined || cache === null || cache !== version) { //更新时需修改
-                        layer.open({
-                            title: `${version}更新提示`,
-                            area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
-                            content: `
+                        if (version !== '5.6.4.2') {
+                            layer.open({
+                                title: `${version}更新提示`,
+                                area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
+                                content: `
                             <mol>
                             <mli>优化脚本控制面板的样式。</mli>
                             <mli>修复部分情况下脚本无法加载的bug。</mli>
@@ -667,9 +668,10 @@
                             <hr>
                             <em style="color:grey;">
                             如果使用过程中遇到问题，欢迎去${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}
-                            （或者进qq群${linkMsg('1106094437', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}）反馈。
+                            反馈。也可以进q群讨论：${linkMsg('1106094437（已满）', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}，${linkMsg('907502444', 'https://jq.qq.com/?_wv=1027&k=Bf951teI')}
                             </em>`
-                        });
+                            });
+                        }
                         localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
                     }
                 } catch (e) {
@@ -854,7 +856,7 @@
                 function layerOpenAbout() {
                     return layer.open({
                         title: `版本${GM_info.script.version}`,
-                        content: `<h3 style="text-align:center">B站直播间挂机助手</h3>作者：${linkMsg("andywang425", "https://github.com/andywang425/")}<br>许可证：${linkMsg("MIT", "https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE")}<br>github项目地址：${linkMsg("BLTH", "https://github.com/andywang425/BLTH")}<br>反馈：${linkMsg("BLTH/issues", "https://github.com/andywang425/BLTH/issues")}<br>交流qq群：${linkMsg('1106094437', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}<br>`
+                        content: `<h3 style="text-align:center">B站直播间挂机助手</h3>作者：${linkMsg("andywang425", "https://github.com/andywang425/")}<br>许可证：${linkMsg("MIT", "https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE")}<br>github项目地址：${linkMsg("BLTH", "https://github.com/andywang425/BLTH")}<br>反馈：${linkMsg("BLTH/issues", "https://github.com/andywang425/BLTH/issues")}<br>交流qq群：${linkMsg('1106094437（已满）', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}，${linkMsg('907502444', 'https://jq.qq.com/?_wv=1027&k=Bf951teI')}<br>`
                     });
                 };
                 const saveAction = (div) => {

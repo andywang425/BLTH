@@ -1,5 +1,6 @@
 <p align ="center"><img src="https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"></p>
-<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg" alt="TamperMonkey 4.10"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437-brightgreen" alt="QQ Group"></a></p>
+<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg" alt="TamperMonkey 4.10"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a></p>
+<p align="center"><a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437(已满)-yellow" alt="QQ Group"></a> <a href="https://jq.qq.com/?_wv=1027&k=Bf951teI"><img src="https://img.shields.io/badge/QQ%20Group-907502444-brightgreen" alt="QQ Group"></a></p>
 <h1 align="center">B站直播间挂机助手</h1>
 
 ### 安装方法
@@ -152,7 +153,7 @@
 + 如果使用脚本过程中遇到问题，可以先按上述步骤开启控制台日志，然后再次运行脚本并在控制台中寻找相关错误信息。  
   若能找到请在反馈bug时附上这些控制台日志。
 + 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。
-+ 交流qq群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，欢迎进来聊天或者提点建议~    
++ 交流qq群：①群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
 
 -------------------------------
 
@@ -199,7 +200,7 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.4.1
->1.优化脚本控制面板的样式 2.修复部分情况下脚本无法加载的bug
+>### 5.6.4.2
+>1.更新一个新q群 2.调整脚本头部元数据位置
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
