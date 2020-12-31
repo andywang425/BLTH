@@ -153,7 +153,7 @@
 + 如果使用脚本过程中遇到问题，可以先按上述步骤开启控制台日志，然后再次运行脚本并在控制台中寻找相关错误信息。  
   若能找到请在反馈bug时附上这些控制台日志。
 + 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。
-+ 交流qq群：①群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
++ 交流qq群：①群：[1106094437(已满)](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
 
 -------------------------------
 
@@ -200,7 +200,7 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.4.2
->1.更新一个新q群 2.调整脚本头部元数据位置
+>### 5.6.4.3
+>1.修复在`从直播间获取天选数据`模式下休眠后无法唤醒的bug。2.修复点击保存后无法保存且关闭面板再打开不显示数据的bug。3.修复自动发弹幕的bug。4.一些细微调整，如脚本加载时间改为在DOM树加载完成时。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
