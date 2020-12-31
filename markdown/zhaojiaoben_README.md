@@ -148,7 +148,7 @@
 + 如果使用脚本过程中遇到问题，可以先按上述步骤开启控制台日志，然后再次运行脚本并在控制台中寻找相关错误信息。  
   若能找到请在反馈bug时附上这些控制台日志。
 + 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。
-+ 交流qq群：①群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
++ 交流qq群：①群：[1106094437(已满)](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
 
 -------------------------------
 
