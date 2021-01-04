@@ -15,9 +15,9 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.4.3
+// @version        5.6.4.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
-// @run-at         document-start
+// @run-at         document-end
 // @connect        passport.bilibili.com
 // @connect        api.live.bilibili.com
 // @connect        live-trace.bilibili.com
@@ -138,7 +138,7 @@
                                 default:
                                     type = 'info';
                             }
-                            const a = $(`<div class="link-toast ${type} fixed" style="z-index:20000"><span class="toast-text">${msg}</span></div>`)[0];
+                            const a = $(`<div class="link-toast ${type} fixed" style="z-index:100000"><span class="toast-text">${msg}</span></div>`)[0];
                             document.body.appendChild(a);
                             a.style.top = (document.body.scrollTop + list.length * 40 + 10) + 'px';
                             a.style.left = (document.body.offsetWidth + document.body.scrollLeft - a.offsetWidth - 5) + 'px';
@@ -213,6 +213,7 @@
         menuIndex = undefined,
         layerMenuWindow = undefined,
         menuDiv = undefined,
+        tabContent = undefined,
         JQlogRedPoint = undefined,
         JQmenuWindow = undefined,
         layerMenuWindow_Height = undefined,
@@ -486,14 +487,14 @@
             init: async () => {
                 addStyle();
                 const tabList = $('.tab-list.dp-flex'),
-                    tabContent = $('.tab-content'),
                     ct = $('#chat-history-list'),
                     ctWidth = ct.outerWidth(true),
                     aside_area_vmHeight = $('#aside-area-vm').height(),
                     chat_control_panel_vmHeight = $('#chat-control-panel-vm').height(),
                     eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter'];
-                let tabOffSet = tabContent.offset(), top = tabOffSet.top, left = tabOffSet.left;
+                tabContent = $('.tab-content');
                 menuDiv = $(`<li data-v-2fdbecb2="" data-v-d2be050a="" class="item dp-i-block live-skin-separate-border border-box t-center pointer live-skin-normal-text" style = 'font-weight:bold;color: #999;' id = "menuDiv"><span id="menuDivText">日志</span><div class="igiftMsg_num" style="display: none;" id = 'logRedPoint'>0</div></li>`);
+                let tabOffSet = tabContent.offset(), top = tabOffSet.top, left = tabOffSet.left;
                 if (eleList.some(i => i.length === 0) || tabList.length === 0 || tabContent.length === 0) {
                     window.toast('必要页面元素缺失，强制运行（可能会看不到控制面板，提示信息）', 'error');
                 }
@@ -506,10 +507,10 @@
                 menuIndex = layer.open({
                     type: 1,
                     title: false,
-                    offset: [String(top - getScrollPosition().y) + 'px', String(left - getScrollPosition().x) + 'px'],
+                    offset: [String(top) + 'px', String(left) + 'px'],
                     closeBtn: 0,
                     shade: 0,
-                    zIndex: 9999,
+                    zIndex: 99999,
                     fixed: false,
                     area: [String(ctWidth) + 'px', String(aside_area_vmHeight - chat_control_panel_vmHeight) + 'px'], //宽高
                     anim: -1,
@@ -551,7 +552,6 @@
                 layer.style(menuIndex, {
                     'box-shadow': 'none',
                     'display': 'none',
-                    'z-index': 990,
                     'background-color': '#f2f3f5'
                 });
                 for (const i of tabListItems) {
@@ -662,12 +662,11 @@
             newMessage: (version) => {
                 try {
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-                    if (cache === undefined || cache === null || cache !== version) { //更新时需修改
+                    if (cache === undefined || cache === null || cache !== version) {
                         const mliList = [
-                            "修复在<code>从直播间获取天选数据</code>模式下休眠后无法唤醒的bug。",
-                            "修复点击保存后无法保存且关闭面板再打开不显示数据的bug。",
-                            "修复自动发弹幕的bug。",
-                            "脚本加载时间改为在DOM树加载完成时"
+                            "修复播放器进入全屏/退出全屏时产生的一些小问题。",
+                            "修复点击【取关该分组内的UP主】后出错的bug。",
+                            "修复定时休眠的bug。"
                         ];
                         let mliHtml = "";
                         for (const mli of mliList) {
@@ -1592,7 +1591,7 @@
                                         layer.msg('开始取关', {
                                             time: 2000,
                                         });
-                                        return MY_API.AnchorLottery.getTag(anchorPrizeTagName).then(() => MY_API.AnchorLottery.delAnchorFollowing(3));
+                                        return MY_API.AnchorLottery.getTag(anchorPrizeTagName, true).then(() => MY_API.AnchorLottery.delAnchorFollowing(3));
                                     }, function () {
                                         layer.msg('已取消', {
                                             time: 2000
@@ -1611,7 +1610,7 @@
                                         layer.msg('开始取关', {
                                             time: 2000,
                                         });
-                                        return MY_API.AnchorLottery.getTag(anchorFollowTagName).then(() => MY_API.AnchorLottery.delAnchorFollowing(2));
+                                        return MY_API.AnchorLottery.getTag(anchorFollowTagName, true).then(() => MY_API.AnchorLottery.delAnchorFollowing(2));
                                     }, function () {
                                         layer.msg('已取消', {
                                             time: 2000
@@ -1747,6 +1746,7 @@
                         }
                     });
                 };
+                //监听隐藏/显示窗口按钮
                 btn.click(() => {
                     if (hideBtnClickable) {
                         hideBtnClickable = false;
@@ -1767,19 +1767,32 @@
                         }
                     }
                 });
-                livePlayer.on("DOMNodeInserted", function () {
-                    let state = $(this).attr('data-player-state');
+                //监听播放器全屏变化
+                function livePlayerPropertyChange() {
+                    let state = livePlayer.attr('data-player-state'),
+                        tabOffSet = tabContent.offset(), top = 0, left = 0;
                     if (state === 'web-fullscreen' || state === 'fullscreen') {
                         layer.close(mainIndex);
                         document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
+                        top = tabOffSet.top, left = tabOffSet.left;
                         layer.style(menuIndex, {
-                            'display': 'none'
+                            'top': String(top) + 'px',
+                            'left': String(left) + 'px'
                         });
-                        $('#menuDiv').removeClass('active');
-                        $('.tab-list.dp-flex').children('li')[0].click();
+                    } else {
+                        top = tabOffSet.top, left = tabOffSet.left;
+                        layer.style(menuIndex, {
+                            'top': String(top) + 'px',
+                            'left': String(left) + 'px'
+                        });
                     }
-                })
+                }
+                let mutationObserver = new MutationObserver(livePlayerPropertyChange);
+                const options = { 'attributes': true };
+                mutationObserver.observe(livePlayer[0], options);
+                //添加隐藏/显示窗口按钮
                 $('.attention-btn-ctnr').append(btn);
+                //初次运行时tips
                 if (!MY_API.CACHE.DailyReward_TS) {
                     layer.tips('点我隐藏/显示控制面板', '#hiderbtn', {
                         tips: 1
@@ -3713,12 +3726,12 @@
                         return delayCall(() => MY_API.AnchorLottery.getFollowingList());
                     })
                 },
-                getTag: async (tagName) => {
-                    if (typeof (tagName) === 'string') tagName = [tagName];
+                getTag: async (tagName, click = false) => {
+                    if (MY_API.AnchorLottery.anchorFollowTagid && MY_API.AnchorLottery.anchorPrizeTagid) return $.Deferred().resolve();
+                    if (typeof tagName === 'string') tagName = [tagName];
                     return BAPI.relation.getTags().then((response) => {
                         MYDEBUG('API.relation.getTags', response);
                         if (response.code === 0) {
-                            let p1 = $.Deferred(), p2 = $.Deferred();
                             for (const tag of response.data) {
                                 if (tag.name === anchorFollowTagName) {
                                     if (tagName.indexOf(anchorFollowTagName) > -1)
@@ -3727,14 +3740,25 @@
                                     if (tagName.indexOf(anchorPrizeTagName) > -1)
                                         MY_API.AnchorLottery.anchorPrizeTagid = tag.tagid;
                                 }
-                            } //没创建过分组则创建一个新的
-                            if (MY_API.AnchorLottery.anchorFollowTagid === undefined && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG)
-                                MY_API.AnchorLottery.creatTag(anchorFollowTagName).then(() => p1.resolve());
-                            else p1.resolve();
-                            if (MY_API.AnchorLottery.anchorPrizeTagid === undefined && MY_API.CONFIG.ANCHOR_MOVETO_PRIZE_TAG)
-                                p1.then(() => MY_API.AnchorLottery.creatTag(anchorPrizeTagName).then(() => p2.resolve()));
-                            else p2.resolve();
-                            return $.when(p1, p2);
+                            }
+                            if (!click) {
+                                //没创建过分组则创建一个新的
+                                let p1 = $.Deferred(), p2 = $.Deferred();
+                                if (MY_API.AnchorLottery.anchorFollowTagid === undefined && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG)
+                                    MY_API.AnchorLottery.creatTag(anchorFollowTagName).then(() => p1.resolve());
+                                else p1.resolve();
+                                if (MY_API.AnchorLottery.anchorPrizeTagid === undefined && MY_API.CONFIG.ANCHOR_MOVETO_PRIZE_TAG)
+                                    p1.then(() => MY_API.AnchorLottery.creatTag(anchorPrizeTagName).then(() => p2.resolve()));
+                                else p2.resolve();
+                                return $.when(p1, p2);
+                            } else {
+                                if (tagName.indexOf(anchorFollowTagName) > -1 && MY_API.AnchorLottery.anchorFollowTagid === undefined)
+                                    MY_API.chatLog(`[天选时刻] 分组【${anchorFollowTagName}】不存在，请先勾选【把参与天选时关注的UP移到新分组】和【参加天选时刻抽奖】，再次运行脚本。`, 'warning');
+                                if (tagName.indexOf(anchorPrizeTagName) > -1 && MY_API.AnchorLottery.anchorPrizeTagid === undefined)
+                                    MY_API.chatLog(`[天选时刻] 分组【${anchorPrizeTagName}】不存在，请先勾选【把发起抽奖的UP移到新分组】和【参加天选时刻抽奖】，再次运行脚本。`, 'warning');
+                                return $.Deferred().resolve();
+                            }
+
                         } else {
                             MY_API.chatLog(`[天选时刻] 获取关注分组出错 ${response.message}`, 'error');
                             return p.reject();
@@ -3967,9 +3991,14 @@
                             if (description === undefined) throw "undefined"
                             lotteryInfoJson = JSON.parse(Base64.decode64(description.replaceAll('-', '')));
                             if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
-                                lotteryInfoJson = undefined;
+                                throw 'Not a JSON';
+                            if (!lotteryInfoJson.hasOwnProperty('roomList'))
+                                throw 'Missing property roomList';
+                            if (!lotteryInfoJson.hasOwnProperty('ts'))
+                                throw 'Missing property ts';
                         } catch (e) {
-                            lotteryInfoJson = undefined
+                            MYDEBUG('MY_API.AnchorLottery.uploadRoomList', `获取到的直播间简介格式有误 ${e}，上传初始值设为undefined`);
+                            lotteryInfoJson = undefined;
                         }
                         if (lotteryInfoJson !== undefined) {
                             for (const i of lotteryInfoJson.roomList) {
@@ -4075,7 +4104,7 @@
                         if (!lotteryInfoJson.hasOwnProperty('ts'))
                             throw 'Missing property ts';
                     } catch (e) {
-                        MY_API.chatLog(`[天选时刻] 直播间${MY_API.CONFIG.ANCHOR_GETDATA_ROOM}个人简介的数据格式不符合要求 ` + e, 'error');
+                        MY_API.chatLog(`[天选时刻] 直播间${MY_API.CONFIG.ANCHOR_GETDATA_ROOM}个人简介的数据格式不符合要求<br>` + e, 'error');
                         return setTimeout(() => MY_API.AnchorLottery.getLotteryInfoFromRoom(), MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000);
                     }
                     MY_API.chatLog(`[天选时刻] 开始检查天选（共${lotteryInfoJson.roomList.length}个房间）<br>数据来源：直播间${linkMsg(MY_API.CONFIG.ANCHOR_GETDATA_ROOM, liveRoomUrl + MY_API.CONFIG.ANCHOR_GETDATA_ROOM)}的个人简介${(!MY_API.CONFIG.ANCHOR_IGNORE_UPLOAD_MSG && lotteryInfoJson.hasOwnProperty('msg') && lotteryInfoJson.msg.length > 0) ? '<br>附加信息：' + lotteryInfoJson.msg : ''}<br>该数据最后上传时间：${new Date(lotteryInfoJson.ts).toLocaleString()}`, 'success')
@@ -4779,8 +4808,12 @@
                  */
                 sleepCheck: () => {
                     if (!MY_API.CONFIG.TIME_AREA_DISABLE) return false;
+                    console.log('四个时间', MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)
                     if (inTimeArea(MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)) {//判断时间段
+                        console.log('inTIme')
                         return getIntervalTime(MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_END_MINUTE);
+                    } else {
+                        return false
                     }
                 },
                 run: async () => {
@@ -5117,7 +5150,7 @@
      * @param second 整数 秒（可不填）
      * @returns {number} intervalTime
      */
-    function getIntervalTime(hour, minute, second = 0) {
+    function getIntervalTime(hour, minute, second) {
         const myDate = new Date();
         const h = myDate.getHours();
         const m = myDate.getMinutes();
@@ -5164,27 +5197,20 @@
         if (sH > 23 || eH > 24 || sH < 0 || eH < 1 || sM > 59 || sM < 0 || eM > 59 || eM < 0) {
             return false
         }
-        const myDate = new Date();
-        const h = myDate.getHours();
-        const m = myDate.getMinutes();
-        if (sH < eH) {//如(2,8,0,0)
-            if (h >= sH && h < eH)
-                return true;
-            else if (h == eH && m >= sM && m < eM)
-                return true;
-            else return false;
-        }
-        else if (sH > eH) {//如(22,12,0,0)
-            if (h >= sH || h < eH)
-                return true;
-            else if (h == eH && m >= sM && m < eM)
+        const hourMs = 3600000, minMs = 60000,
+            myDate = new Date(),
+            nowHour = myDate.getHours(),
+            nowMin = myDate.getMinutes(),
+            nowTimeTs = nowHour * hourMs + nowMin * minMs,
+            targetStartTs = sH * hourMs + sM * minMs,
+            targetEndTs = eH * hourMs + eM * minMs;
+        if (targetStartTs < targetEndTs) {
+            if (nowTimeTs >= targetStartTs && nowTimeTs <= targetEndTs)
                 return true;
             else return false;
-        }
-        else if (sH == eH) {
-            if (h == sH && sM <= eM && m >= sM && m < eM)
-                return true
-            else if (h == sH && sM > eM && m <= eM && m > sM)
+
+        } else {
+            if (nowTimeTs >= targetStartTs || nowTimeTs <= targetEndTs)
                 return true
             else return false;
         }
