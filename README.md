@@ -201,6 +201,6 @@
 
 ## 更新日志
 >### 5.6.4.5
->1.重新加入用小心心点亮勋章的功能。
+>1.延长点击购买勋章并参加按钮后，购买与参加之间的间隔时间。2.点击购买勋章并参加按钮后增加天选是否已结束的判断。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  

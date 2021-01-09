@@ -4496,11 +4496,11 @@
                                                     MYDEBUG('API.link_group.buy_medal re', re);
                                                     if (re.code === 0) {
                                                         if (response.data.require_value === 1) {
-                                                            layer.msg('粉丝勋章购买成功，约1秒后参加天选', {
+                                                            layer.msg('粉丝勋章购买成功，约2秒后参加天选', {
                                                                 time: 2000,
                                                                 icon: 1
                                                             });
-                                                            setTimeout(() => p.resolve(), 1000);
+                                                            setTimeout(() => p.resolve(), 2000);
                                                         } else {
                                                             layer.msg('粉丝勋章购买成功', {
                                                                 time: 2000,
@@ -4529,13 +4529,18 @@
                                         //已经过了一段时间，需再次获取剩余时间
                                         BAPI.xlive.anchor.randTime(response.data.id).then((re) => {
                                             MYDEBUG(`API.xlive.anchor.randTime ${response.data.id}`, re);
-                                            if (response.code === 0) defaultJoinData.time = re.data.time;
-                                            else defaultJoinData.time = undefined;
-                                            MY_API.AnchorLottery.join(defaultJoinData);
-                                            let allSameJqText = $('div' + '[title=\"' + joinTextTitle + '\"]');
-                                            allSameJqText.unbind('click');
-                                            allSameJqText.remove();
-                                            clearTimeout(timer);
+                                            if (response.code === 0) {
+                                                if (response.data.time > 0) {
+                                                    defaultJoinData.time = re.data.time;
+                                                    MY_API.AnchorLottery.join(defaultJoinData);
+                                                    let allSameJqText = $('div' + '[title=\"' + joinTextTitle + '\"]');
+                                                    allSameJqText.unbind('click');
+                                                    allSameJqText.remove();
+                                                    clearTimeout(timer);
+                                                } else {
+                                                    return MY_API.chatLog(`[天选时刻] 该天选已过期<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}`, 'info')
+                                                }
+                                            }
                                         }, () => {
                                             MY_API.chatLog(`[天选时刻] 获取天选开奖剩余时间失败，请检查网络`, 'error')
                                         })
