@@ -119,7 +119,7 @@
     background: none 0% 0% repeat scroll rgb(255, 215, 0, 30%);
 }
 .igiftMsg_num {
-    min-width: 12px;
+    min-width: 10px;
     height: 16px;
     padding: 0 3px;
     border-radius: 8px;
@@ -128,8 +128,8 @@
     text-align: center;
     color: #fff;
     position: absolute;
-    top: 6px;
-    right: 11px;
+    top: 12px;
+    right: 30px;
     background-color: #fa5a57;
 }
 .clickableText {
@@ -151,7 +151,7 @@
 .layui-layer [type="checkbox"],
 [type="radio"] {
     margin-inline-end: 5px;
-    vertical-align:text-top;
+    vertical-align: text-top;
 }
 .layui-layer [type="button"] {
     font-size: small;
@@ -178,6 +178,11 @@
 }
 .layui-layer a {
     color: blue;
+}
+.layui-layer-content ul {
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    padding-inline-start: 0px;
 }
 mp {
     display: block;
