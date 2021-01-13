@@ -151,7 +151,7 @@
 .layui-layer [type="checkbox"],
 [type="radio"] {
     margin-inline-end: 5px;
-    vertical-align:text-top;
+    vertical-align: text-top;
 }
 .layui-layer [type="button"] {
     font-size: small;
@@ -178,6 +178,13 @@
 }
 .layui-layer a {
     color: blue;
+}
+.layui-layer-content ul {
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    padding-inline-start: 0px;
+    margin: 10px;
+    list-style: none;
 }
 mp {
     display: block;

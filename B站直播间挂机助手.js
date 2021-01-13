@@ -498,7 +498,7 @@
                     eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter'];
                 tabContent = $('.tab-content');
                 menuDiv = $(`<li data-v-2fdbecb2="" data-v-d2be050a="" class="item dp-i-block live-skin-separate-border border-box t-center pointer live-skin-normal-text" style = 'font-weight:bold;color: #999;' id = "menuDiv"><span id="menuDivText">日志</span><div class="igiftMsg_num" style="display: none;" id = 'logRedPoint'>0</div></li>`);
-                let tabOffSet = tabContent.offset(), top = tabOffSet.top, left = tabOffSet.left;
+                let tabOffSet = 0, top = 0, left = 0;
                 if (eleList.some(i => i.length === 0) || tabList.length === 0 || tabContent.length === 0) {
                     window.toast('必要页面元素缺失，强制运行（可能会看不到控制面板，提示信息）', 'error');
                 }
@@ -576,7 +576,12 @@
                             }
                         }
                         if (JQi.attr('id') === "menuDiv") {
+                            tabOffSet = $('.tab-content').offset();
+                            top = tabOffSet.top;
+                            left = tabOffSet.left;
                             layer.style(menuIndex, {
+                                'top': String(top) + 'px',
+                                'left': String(left) + 'px',
                                 'display': 'block'
                             });
                             if (winPrizeNum === 0) {
@@ -1201,7 +1206,7 @@
                     LIGHT_MEDALS: "根据点亮模式的不同，这些直播间的粉丝勋章将会被点亮或排除在外。<mul><mli>如果要填写多个房间，每个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
                     LIGHT_METHOD: "通过给拥有粉丝勋章的直播间送一个小心心来点亮熄灭的勋章。<mul><mli>白名单：只点亮这些房间的粉丝勋章。</mli><mli>黑名单：点亮除了这些房间以外的直播间的粉丝勋章。</mli><mli>如果你不想启用本功能，把【勋章点亮模式】设为白名单，然后在【自动点亮勋章房间号】中填<code>0</code>即可。</mli></mul>"
                 };
-                let newHtml = undefined;
+                let layerUi2 = undefined;
                 const openMainWindow = async () => {
                     let settingTableoffset = $('.live-player-mounter').offset(),
                         settingTableHeight = $('.live-player-mounter').height();
@@ -1215,9 +1220,8 @@
                         fixed: false,
                         area: [, String(settingTableHeight) + 'px'], //宽高
                         resize: false,
-                        content: newHtml === undefined ? html : newHtml,
+                        content: html,
                         success: () => {
-                            let myDiv = $('#allsettings');
                             //窗口大小改变时改变位置
                             $(window).resize(function () {
                                 settingTableoffset = $('.live-player-mounter').offset();
@@ -1226,19 +1230,16 @@
                                     'left': String(settingTableoffset.left) + 'px'
                                 });
                             });
-                            //若首次运行，显示帮助按钮
-                            if (newHtml === undefined) {
-                                $('#allsettings *').each(function (i, dom) {//下标，dom
-                                    let JQdom = $(dom);
-                                    const data_toggle = JQdom.attr('data-toggle');
-                                    if (data_toggle !== undefined && helpText.hasOwnProperty(data_toggle)) {
-                                        JQdom.append(`<span helpData = '${data_toggle}' class = "clickableText helpText">?</span>`)
-                                    }
-                                });
-                                //储存新html和jquery对象div
-                                newHtml = $('#allsettings')[0].outerHTML;
-                                myDiv = $('#allsettings');
-                            }
+                            //显示帮助按钮
+                            $('#allsettings *').each(function (i, dom) {//下标，dom
+                                let JQdom = $(dom);
+                                const data_toggle = JQdom.attr('data-toggle');
+                                if (data_toggle !== undefined && helpText.hasOwnProperty(data_toggle)) {
+                                    JQdom.append(`<span helpData = '${data_toggle}' class = "clickableText helpText">?</span>`)
+                                }
+                            });
+                            layerUi2 = $("#layui-layer2");
+                            let myDiv = $('#allsettings');
                             //显示顶部统计数据
                             $('#giftCount .anchor .statNum').text(MY_API.GIFT_COUNT.ANCHOR_COUNT); //天选
                             $('#giftCount .material .statNum').text(MY_API.GIFT_COUNT.MATERIAL_COUNT); //实物
@@ -1775,26 +1776,54 @@
                     });
                 };
                 //监听隐藏/显示窗口按钮
+                function animChange(jqdom, bool) {
+                    if (bool) {
+                        //show => hide
+                        jqdom.removeClass('layer-anim');
+                        jqdom.removeClass('layer-anim-00');
+                        jqdom.addClass('layer-anim');
+                        jqdom.addClass('layer-anim-close');
+                    } else {
+                        //hide => show
+                        jqdom.removeClass('layer-anim');
+                        jqdom.removeClass('layer-anim-close');
+                        jqdom.addClass('layer-anim');
+                        jqdom.addClass('layer-anim-00');
+                    }
+                }
+                let JQshow = false;
                 btn.click(() => {
                     if (hideBtnClickable) {
                         hideBtnClickable = false;
                         setTimeout(function () { hideBtnClickable = true }, 200);
-                        if (msgHide == 'show') {//显示=>隐藏
+                        if (msgHide === 'show') {//显示=>隐藏
                             msgHide = 'hide';
                             localStorage.setItem(`${NAME}_msgHide`, msgHide);
                             $('.link-toast').hide();
-                            layer.close(mainIndex);
+                            animChange(layerUi2, true);
                             document.getElementById('hiderbtn').innerHTML = "显示窗口和提示信息";
                         }
-                        else {
+                        else { //隐藏=>显示
                             msgHide = 'show';
                             localStorage.setItem(`${NAME}_msgHide`, msgHide);
                             $('.link-toast').show();
-                            openMainWindow();
+                            if (JQshow) {
+                                layerUi2.show();
+                                JQshow = false;
+                            }
+                            else animChange(layerUi2, false)
                             document.getElementById('hiderbtn').innerHTML = "隐藏窗口和提示信息";
                         }
                     }
                 });
+                //添加隐藏/显示窗口按钮
+                $('.attention-btn-ctnr').append(btn);
+                //打开窗口
+                openMainWindow();
+                if (msgHide === 'hide') {
+                    layerUi2.hide();
+                    JQshow = true;
+                }
                 //监听播放器全屏变化
                 function livePlayerPropertyChange() {
                     let state = livePlayer.attr('data-player-state'),
@@ -1828,9 +1857,6 @@
                     setTimeout(() => layer.tips('点我查看日志', '#menuDiv', {
                         tips: 1
                     }), 6000);
-                }
-                if (msgHide == 'show') {
-                    openMainWindow()
                 }
             },
             chatLog: function (text, type = 'info') {//自定义提示
@@ -4896,9 +4922,8 @@
                  */
                 sleepCheck: () => {
                     if (!MY_API.CONFIG.TIME_AREA_DISABLE) return false;
-                    console.log('四个时间', MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)
-                    if (inTimeArea(MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)) {//判断时间段
-                        console.log('inTIme')
+                    if (inTimeArea(MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)) {
+                        //判断时间段
                         return getIntervalTime(MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_END_MINUTE);
                     } else {
                         return false
