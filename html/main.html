@@ -62,7 +62,8 @@
                         <div data-toggle="COIN_TYPE">
                                 <div data-toggle="COIN_UID"><input type="radio" name="COIN_TYPE">给用户(UID:<input
                                                 class="num igiftMsg_input" style="width:150px;" type="text">) 的视频投币
-                                        <span helpdata="COIN_UID" class="clickableText helpText">?</span></div>
+                                        <span helpdata="COIN_UID" class="clickableText helpText">?</span>
+                                </div>
                                 <div data-toggle="COIN_DYN"><input type="radio" name="COIN_TYPE"
                                                 checked="checked">给动态中的的视频投币 </div>
                         </div>
@@ -76,11 +77,11 @@
                                         class="igiftMsg_btn" data-action="edit_medalDanmu">编辑弹幕内容</button><span
                                         helpdata="MEDAL_DANMU" class="clickableText helpText">?</span>
                         </div>
-                        <div data-toggle="MEDAL_DANMU_METHOD" class="lineStartSpace" style="display:inline;">打卡弹幕模式：
-                                <div data-toggle="MEDAL_DANMU_WHITE" style="display:inline"><input type="radio"
+                        <div data-toggle="MEDAL_DANMU_METHOD" class="lineStartSpace inline">打卡弹幕模式：
+                                <div data-toggle="MEDAL_DANMU_WHITE" class="inline"><input type="radio"
                                                 name="MEDAL_DANMU_METHOD">白名单 </div>
-                                <div data-toggle="MEDAL_DANMU_BLACK" style="display:inline"><input type="radio"
-                                                name="MEDAL_DANMU_METHOD" checked="checked">黑名单 </div><button
+                                <div data-toggle="MEDAL_DANMU_BLACK" class="inline"><input type="radio"
+                                                name="MEDAL_DANMU_METHOD" checked="checked" class="smallInterval">黑名单 </div><button
                                         class="igiftMsg_btn" data-action="edit_lightMedalList">编辑房间列表</button><span
                                         helpdata="MEDAL_DANMU_METHOD" class="clickableText helpText">?</span>
                         </div>
@@ -96,12 +97,13 @@
                         <div data-toggle="LIGHT_MEDALS" style="color:purple">自动点亮勋章房间号 <input class="num igiftMsg_input"
                                         style="width:200px;" type="text"><span helpdata="LIGHT_MEDALS"
                                         class="clickableText helpText">?</span></div>
-                        <div data-toggle="LIGHT_METHOD" style="display:inline">勋章点亮模式：&nbsp;&nbsp; <div
-                                        data-toggle="LIGHT_WHITE" style="display:inline"><input type="radio"
-                                                name="LIGHT_METHOD" checked="checked">白名单
+                        <div data-toggle="LIGHT_METHOD" class="inline">勋章点亮模式：
+                                <div data-toggle="LIGHT_WHITE"
+                                        class="inline"><input type="radio" name="LIGHT_METHOD"
+                                                checked="checked">白名单
                                 </div>
-                                <div data-toggle="LIGHT_BLACK" style="display:inline">&nbsp; <input type="radio"
-                                                name="LIGHT_METHOD">黑名单 </div>&nbsp;<button class="igiftMsg_btn"
+                                <div data-toggle="LIGHT_BLACK" class="inline"><input type="radio"
+                                                name="LIGHT_METHOD" class="smallInterval">黑名单 </div><button class="igiftMsg_btn"
                                         data-action="lightMedalNow">立刻点亮勋章</button><span helpdata="LIGHT_METHOD"
                                         class="clickableText helpText">?</span>
                         </div>
@@ -138,7 +140,8 @@
                                         name="GIFT_SORT">优先<strong style="color:purple">低</strong>等级粉丝牌
                         </div>
                         <div data-toggle="SEND_ALL_GIFT" style="color:#ff5200;"><input type="checkbox">无视礼物类型和到期时间限制
-                                <span helpdata="SEND_ALL_GIFT" class="clickableText helpText">?</span></div>
+                                <span helpdata="SEND_ALL_GIFT" class="clickableText helpText">?</span>
+                        </div>
                         <div data-toggle="SPARE_GIFT_ROOM">剩余礼物送礼直播间： <input class="num igiftMsg_input" type="text"
                                         style="width:100px;"><span helpdata="SPARE_GIFT_ROOM"
                                         class="clickableText helpText">?</span></div>
@@ -200,7 +203,8 @@
                                         class="clickableText helpText">?</span></div>
                         <div data-toggle="ANCHOR_LIVEROOM"><input type="radio" name="ANCHOR_TYPE" checked="checked">从直播间
                                 <input class="num igiftMsg_input" style="width:100px;" type="text">的个人简介获取天选时刻数据 <span
-                                        helpdata="ANCHOR_LIVEROOM" class="clickableText helpText">?</span></div>
+                                        helpdata="ANCHOR_LIVEROOM" class="clickableText helpText">?</span>
+                        </div>
                         <div data-toggle="ANCHOR_IGNORE_UPLOAD_MSG"><label class="lineStartSpace"><input type="checkbox"
                                                 checked="checked">忽略附加信息 </label><span
                                         helpdata="ANCHOR_IGNORE_UPLOAD_MSG" class="clickableText helpText">?</span>
@@ -231,7 +235,8 @@
                         <div data-toggle="ANCHOR_WAIT_REPLY"><label><input type="checkbox" checked="checked">发出请求后等待回复
                                 </label><span helpdata="ANCHOR_WAIT_REPLY" class="clickableText helpText">?</span></div>
                         <div data-toggle="ANCHOR_IGNORE_PWDROOM"><label><input type="checkbox"
-                                                checked="checked">不参与加密直播间的天选 </label></div>
+                                                checked="checked">不参与加密直播间的天选 </label><span
+                                        helpdata="ANCHOR_IGNORE_PWDROOM" class="clickableText helpText">?</span></div>
                         <div data-toggle="ANCHOR_MOVETO_FOLLOW_TAG"><label><input type="checkbox"
                                                 checked="checked">把参与天选时关注的UP移到新分组 <button
                                                 style="font-size:small;color:red;" class="igiftMsg_btn"

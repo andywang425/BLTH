@@ -1,6 +1,7 @@
 .gitignore
 .vscode
 node_modules
-note
-unused_modules
+/note
+/unused_modules
+/test
 markdown/开发目标记录.md

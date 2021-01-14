@@ -33,8 +33,8 @@
     border: 1px solid rgb(203, 195, 255);
     background: rgb(233, 230, 255) none repeat scroll 0% 0%;
 }
-.igiftMsg_main{
-    margin: 10px
+.igiftMsg_main {
+    margin: 10px;
 }
 .igiftMsg_input {
     outline: none;
@@ -147,6 +147,12 @@
 }
 .lineStartSpace {
     margin-inline-start: 18px;
+}
+.smallInerval {
+    margin-inline-start: 5px;
+}
+.inline {
+    display: inline;
 }
 .statNum {
     margin-inline: 5px;
