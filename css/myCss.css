@@ -60,10 +60,13 @@
     box-shadow: 0 0 2px #00000075;
     line-height: 10px;
 }
-.igiftMsg_btn:active {
-    background-color: #0e8bbd;
+.igiftMsg_btn:hover:active {
+    background-color: #0e86b6;
     position: relative;
     top: 1px;
+}
+.igiftMsg_btn:hover {
+    background-color:#1097cc;
 }
 .igiftMsg_fs {
     border: 2px solid #d4d4d4;
@@ -136,10 +139,17 @@
     background-color: #fa5a57;
 }
 .clickableText {
-    font-size: 12px;
+    font-size: 1.1em;
     color: #0080c6;
     cursor: pointer;
     text-decoration: underline;
+}
+.clickableText:hover {
+    font-weight: bold;
+}
+.clickableText:hover:active {
+    position: relative;
+    top: 1px;
 }
 .helpText {
     padding-inline-start: 5px;
