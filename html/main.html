@@ -53,40 +53,42 @@
                 </fieldset>
                 <fieldset class="igiftMsg_fs">
                         <legend>每日任务设置</legend>
-                        <div data-toggle="LOGIN"><input type="checkbox">登录 </div>
-                        <div data-toggle="WATCH"><input type="checkbox">观看视频 </div>
+                        <div data-toggle="LOGIN"><label><input type="checkbox">登录 </label></div>
+                        <div data-toggle="WATCH"><label><input type="checkbox">观看视频 </label></div>
                         <div data-toggle="COIN"><label><input type="checkbox">自动投币<input
                                                 class="coin_number igiftMsg_input" style="width:40px;"
                                                 type="text">个(0-5) </label><span helpdata="COIN"
                                         class="clickableText helpText">?</span></div>
                         <div data-toggle="COIN_TYPE">
-                                <div data-toggle="COIN_UID"><input type="radio" name="COIN_TYPE">给用户(UID:<input
-                                                class="num igiftMsg_input" style="width:150px;" type="text">) 的视频投币
+                                <div data-toggle="COIN_UID"><label class="lineStartSpace"><input type="radio"
+                                                        name="COIN_TYPE">给用户(UID:<input class="num igiftMsg_input"
+                                                        style="width:150px;" type="text">) 的视频投币</label>
                                         <span helpdata="COIN_UID" class="clickableText helpText">?</span>
                                 </div>
-                                <div data-toggle="COIN_DYN"><input type="radio" name="COIN_TYPE"
-                                                checked="checked">给动态中的的视频投币 </div>
+                                <div data-toggle="COIN_DYN"><label class="lineStartSpace"><input type="radio"
+                                                        name="COIN_TYPE" checked="checked">给动态中的的视频投币 </label></div>
                         </div>
-                        <div data-toggle="SHARE"><input type="checkbox">分享视频 <span helpdata="SHARE"
+                        <div data-toggle="SHARE"><label><input type="checkbox">分享视频 </label><span helpdata="SHARE"
                                         class="clickableText helpText">?</span></div>
-                        <div data-toggle="SILVER2COIN"><input type="checkbox">银瓜子换硬币 <span
-                                helpdata="SILVER2COIN" class="clickableText helpText">?</span></div>
-                        <div data-toggle="COIN2SILVER"><input type="checkbox">硬币换银瓜子
-                                <input class="coin_number igiftMsg_input" style="width:40px;" type="text">
-                        个(0-50)<span
-                        helpdata="COIN2SILVER" class="clickableText helpText">?</span></div>
-                        <div data-toggle="LIVE_SIGN"><input type="checkbox">直播区签到 </div>
-                        <div data-toggle="AUTO_GROUP_SIGN"><input type="checkbox">应援团签到 </div>
-                        <div data-toggle="MEDAL_DANMU" style="color:purple"><input type="checkbox">粉丝勋章打卡弹幕 <button
-                                        class="igiftMsg_btn" data-action="edit_medalDanmu">编辑弹幕内容</button><span
+                        <div data-toggle="SILVER2COIN"><label><input type="checkbox">银瓜子换硬币 </label><span
+                                        helpdata="SILVER2COIN" class="clickableText helpText">?</span></div>
+                        <div data-toggle="COIN2SILVER"><label><input type="checkbox">硬币换银瓜子
+                                        <input class="coin_number igiftMsg_input" style="width:40px;" type="text">
+                                        个(0-50) </label><span helpdata="COIN2SILVER"
+                                        class="clickableText helpText">?</span></div>
+                        <div data-toggle="LIVE_SIGN"><label><input type="checkbox">直播区签到 </label></div>
+                        <div data-toggle="AUTO_GROUP_SIGN"><label><input type="checkbox">应援团签到 </label></div>
+                        <div data-toggle="MEDAL_DANMU" style="color:purple"><label><input type="checkbox">粉丝勋章打卡弹幕
+                                </label><button class="igiftMsg_btn" data-action="edit_medalDanmu">编辑弹幕内容</button><span
                                         helpdata="MEDAL_DANMU" class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="MEDAL_DANMU_METHOD" class="lineStartSpace inline">打卡弹幕模式：
                                 <div data-toggle="MEDAL_DANMU_WHITE" class="inline"><input type="radio"
                                                 name="MEDAL_DANMU_METHOD">白名单 </div>
                                 <div data-toggle="MEDAL_DANMU_BLACK" class="inline"><input type="radio"
-                                                name="MEDAL_DANMU_METHOD" checked="checked" class="smallInterval">黑名单 </div><button
-                                        class="igiftMsg_btn" data-action="edit_lightMedalList">编辑房间列表</button><span
+                                                name="MEDAL_DANMU_METHOD" checked="checked" class="smallInterval">黑名单
+                                </div><button class="igiftMsg_btn"
+                                        data-action="edit_lightMedalList">编辑房间列表</button><span
                                         helpdata="MEDAL_DANMU_METHOD" class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="MEDAL_DANMU_INTERVAL" class="lineStartSpace">弹幕发送间隔 <input
@@ -102,12 +104,11 @@
                                         style="width:200px;" type="text"><span helpdata="LIGHT_MEDALS"
                                         class="clickableText helpText">?</span></div>
                         <div data-toggle="LIGHT_METHOD" class="inline">勋章点亮模式：
-                                <div data-toggle="LIGHT_WHITE"
-                                        class="inline"><input type="radio" name="LIGHT_METHOD"
+                                <div data-toggle="LIGHT_WHITE" class="inline"><input type="radio" name="LIGHT_METHOD"
                                                 checked="checked">白名单
                                 </div>
-                                <div data-toggle="LIGHT_BLACK" class="inline"><input type="radio"
-                                                name="LIGHT_METHOD" class="smallInterval">黑名单 </div><button class="igiftMsg_btn"
+                                <div data-toggle="LIGHT_BLACK" class="inline"><input type="radio" name="LIGHT_METHOD"
+                                                class="smallInterval">黑名单 </div><button class="igiftMsg_btn"
                                         data-action="lightMedalNow">立刻点亮勋章</button><span helpdata="LIGHT_METHOD"
                                         class="clickableText helpText">?</span>
                         </div>
