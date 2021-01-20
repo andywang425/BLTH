@@ -173,7 +173,7 @@
 
 ## 其它信息  
 这个项目的部分代码来源于以下几个项目:  
-+ [B站直播签到助手](https://greasyfork.org/zh-CN/scripts/381907-b%E7%AB%99%E7%9B%B4%E6%92%AD%E7%AD%BE%E5%88%B0%E5%8A%A9%E6%89%8B) (MIT) by [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)
++ [B站直播签到助手](https://wwa.lanzous.com/iLjOmkfuvxe) (MIT) by [十六夜](https://space.bilibili.com/4317450)
 + [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/BLRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
@@ -200,7 +200,7 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.4.4
->1.修复播放器进入全屏/退出全屏时产生的一些小问题。2.修复点击【取关该分组内的UP主】后出错的bug。3.修复定时休眠的bug。
+>### 5.6.4.5
+>1.延长点击购买勋章并参加按钮后，购买与参加之间的间隔时间。2.点击购买勋章并参加按钮后增加天选是否已结束的判断。3.样式优化。4.运行效率优化。5.控制台日志美化。6.新功能：每日任务 - 硬币换银瓜子。7.修复自动送礼不按时运行的bug。8.修复天选时刻附加信息在点击【保存所有设置】后变为undefined的bug。9.添加隐藏/显示提示信息选项。10.出于性能和其它原因，控制面板和日志窗口不再在浏览器窗口拉伸时保持相对位置不变。11.优化任务加载方式和错误修复机制。12.自动送礼新设置项：允许被送出的礼物类型。可指定想要送出的礼物类型，支持识别礼物名或礼物id。13.方糖推送改用http。原因见官博https://weibo.com/1088413295/JDqyatOic。14.重新加入赠送小心心点亮勋章的功能。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
