@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.4.5
+// @version        5.6.4.6
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -31,7 +31,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@97bf818a906154a418f72ecbb644de9cf19c80b1/modules/base64.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@e5661a11516ac85ad185e267dca600fc142a0bcd/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@fac387eee85da806fd96bb26abaf0c38f1f51fbf/css/myCss-min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@c8591206cee4bb7e3c6ab36dd08e7ddad66d4806/html/main-min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@aac08733c1b4aa1f31fbb8bc7359e4bacb3c29ae/html/main-min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@512a0bd5d39ffcbe79186aac9977d5073974b4ea/html/eula-min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -42,7 +42,6 @@
 (function () {
     const NAME = 'IGIFTMSG',
         BAPI = BilibiliAPI,
-        tz_offset = new Date().getTimezoneOffset() + 480,
         W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow,
         eventListener = window.addEventListener,
         ts_ms = () => Date.now(), //当前毫秒
@@ -75,10 +74,8 @@
             //明天凌晨0点1分再次运行
             const t = new Date();
             let name = msg || ' ';
-            t.setMinutes(t.getMinutes() + tz_offset);
             t.setDate(t.getDate() + 1);
             t.setHours(0, 1, 0, 0);
-            t.setMinutes(t.getMinutes() - tz_offset);
             setTimeout(callback, t - ts_ms());
             MYDEBUG('runMidnight', name + " " + t.toString());
         },
@@ -86,10 +83,8 @@
             //明天凌晨0点再次运行
             const t = new Date();
             let name = msg || ' ';
-            t.setMinutes(t.getMinutes() + tz_offset);
             t.setDate(t.getDate() + 1);
             t.setHours(0, 0, 0, 0);
-            t.setMinutes(t.getMinutes() - tz_offset);
             setTimeout(callback, t - ts_ms());
             MYDEBUG('runExactMidnight', name + " " + t.toString());
         },
@@ -97,10 +92,8 @@
             //明天运行，可自定义时间
             const t = new Date();
             let name = msg || ' ';
-            t.setMinutes(t.getMinutes() + tz_offset);
             t.setDate(t.getDate() + 1);
             t.setHours(hour, minute, 0, 0);
-            t.setMinutes(t.getMinutes() - tz_offset);
             setTimeout(callback, t - ts_ms());
             MYDEBUG('runTomorrow', name + " " + t.toString());
         },
@@ -175,7 +168,8 @@
             y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop
         }),
         linkMsg = (msg, link) => '<a href="' + link + '"target="_blank" style="color:">' + msg + '</a>',
-        liveRoomUrl = 'https://live.bilibili.com/';
+        liveRoomUrl = 'https://live.bilibili.com/',
+        storageLastFixVersion = localStorage.getItem(`${NAME}_lastFixVersion`) || "0";
 
     let mainDisplay = localStorage.getItem(`${NAME}_msgHide`) || 'hide',//UI隐藏开关
         layerTimes = 0, //记录弹出日志窗口后 到 弹出控制面板前 弹出的其它窗口的数量 (如: 更新提示, EULA)
@@ -191,8 +185,7 @@
         danmuTaskRunning = false,
         medalDanmuRunning = false,
         debugSwitch = localStorage.getItem(`${NAME}_debugSwitch`) === 'true' ? true : false,
-        lsWindowToast = localStorage.getItem(`${NAME}_windowToast`), // 暂存 windowToast
-        windowToast = lsWindowToast === null ? true : lsWindowToast === 'true' ? true : false,
+        windowToast = localStorage.getItem(`${NAME}_windowToast`) === 'false' ? false : true,
         Live_info = {
             room_id: undefined,
             uid: undefined,
@@ -422,7 +415,6 @@
                 LITTLE_HEART: true,//获取小心心
                 LIGHT_MEDALS: ["0"],//点亮勋章
                 LIGHT_METHOD: "LIGHT_WHITE",
-                MAX_GIFT: 99999,//辣条上限
                 MEDAL_DANMU_ROOM: ["0"],//打卡弹幕房间列表
                 MEDAL_DANMU_METHOD: "MEDAL_DANMU_BLACK",//打卡弹幕发送方式
                 MEDAL_DANMU_INTERVAL: 2,//打卡弹幕发送间隔（秒）
@@ -652,10 +644,6 @@
                     for (const item in MY_API.CACHE) {
                         if (cache[item] !== undefined && cache[item] !== null) MY_API.CACHE[item] = cache[item];
                     }
-                    const fixList = [['materialobject_ts', 'MaterialObject_TS'], ['medalDanmu_TS', 'MedalDanmu_TS']];
-                    for (const i of fixList) {
-                        if (cache.hasOwnProperty(i[0])) MY_API.CACHE[i[1]] = cache[i[0]];
-                    }
                     p.resolve()
                 } catch (e) {
                     MYDEBUG('CACHE载入配置失败，加载默认配置', e);
@@ -669,20 +657,11 @@
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
                     if (cache === undefined || cache === null || !versionStringCompare(cache, version)) {
                         const mliList = [
-                            "重新加入赠送小心心点亮勋章的功能。",
-                            "延长点击购买勋章并参加按钮后，购买与参加之间的间隔时间。",
-                            "点击购买勋章并参加按钮后增加天选是否已结束的判断。",
-                            "样式优化。",
-                            "运行效率优化。",
-                            "控制台日志美化。",
-                            "新功能：每日任务 - 硬币换银瓜子。",
-                            "修复自动送礼不按时运行的bug。",
-                            "修复天选时刻附加信息在点击【保存所有设置】后变为undefined的bug。",
-                            "添加隐藏/显示提示信息选项",
-                            "出于性能和其它原因，控制面板和日志窗口不再在浏览器窗口拉伸时保持相对位置不变。",
-                            "优化任务加载方式和错误修复机制。",
-                            "自动送礼新设置项：允许被送出的礼物类型。可指定想要送出的礼物类型，支持识别礼物名或礼物id。",
-                            "方糖推送改用http。原因见官博https://weibo.com/1088413295/JDqyatOic。"
+                            "修复多选框设置显示错误的bug。",
+                            "自适应时区，修复非东八区地区任务执行时间不正确的bug",
+                            "完善内置说明。",
+                            "修复隐藏控制面板时提示信息也会隐藏的bug。",
+                            "修复给部分短号直播间(1001-10000)发弹幕无效的bug。"
                         ];
                         let mliHtml = "";
                         for (const mli of mliList) {
@@ -1193,7 +1172,7 @@
                     btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
                     LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
                     STORM: "仅会参加被广播的节奏风暴。若无法参加请尝试实名后再参加。",
-                    SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出到期时间内的辣条，亿圆和小心心。",
+                    SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
                     AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
                     EXCLUDE_ROOMID: "不给这些房间送礼。<mul><mli>如果要填写多个房间，每个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
                     GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
@@ -1221,7 +1200,7 @@
                     ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</mli></mul>",
                     topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，每天0点时重置。</mli><mli><strong>支持输入框回车保存。</strong></mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
                     ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
-                    debugSwitch: "开启或关闭控制日志。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
+                    debugSwitch: "开启或关闭控制台日志(可通过<code>ctrl + shift + i</code>打开控制台)。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
                     UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
                     ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
                     MEDAL_DANMU_INTERVAL: "每两条弹幕间所等待的时间。<mh3>注意：</mh3><mul><mli>由于B站服务器限制，间隔时间必须大于等于1秒，否则弹幕发送会出错。</mli></mul>",
@@ -1235,7 +1214,7 @@
                     COIN2SILVER: "普通用户每天兑换上限<code>25</code>硬币，老爷或大会员每天兑换上限<code>50</code>硬币。<mul><mli><code>1</code>硬币 = <code>450</code>银瓜子（老爷或大会员<code>500</code>银瓜子）。</mli></mul>",
                     SILVER2COIN: "每日直播用户都可以将部分银瓜子转化为硬币，每天仅一次机会。<mul><mli><code>700</code>银瓜子 = <code>1</code>硬币。</mul></mli>",
                     windowToast: `右上角的提示信息。相对来说不是那么重要，所以不放在日志窗口里。<mul style = "line-height:1em;"><div class="link-toast info fixed"><span class="toast-text">普通消息</span></div><br><br><br><div class="link-toast success fixed"><span class="toast-text">成功</span></div><br><br><br><div class="link-toast error fixed"><span class="toast-text">发生错误</span></div></mul>`,
-                    GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。<br>示例：<code>小心心</code>：能够识别。<code>心心</code>：不能识别。</mli><mli>若填写礼物名，脚本会在送礼前将其转换成id（不会修改设置项）。如果直接填写id能提高运行效率。<br>在控制台中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和id的json。将其全部展开，再搜索礼物名即可找到id。</mli></mul>"
+                    GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。</mli><mli>若填写礼物名，脚本会在送礼前将其转换成 id（不会修改设置项）。如果直接填写 id 能提高运行效率。<mli>在控制台(可通过<code>ctrl + shift + i</code>打开)中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和 id 的json。将data下的几项全部展开，再搜索礼物名即可找到 id 。</mli><mli>常用 id ：1: <code>辣条</code> 6: <code>亿圆</code> 30607: <code>小心心</code></mli></mul>"
                 };
                 const openMainWindow = () => {
                     let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1713,7 +1692,7 @@
                                 if (MY_API.CONFIG[i]) input.attr('checked', '');
                                 input.change(function () {
                                     MY_API.CONFIG[i] = $(this).prop('checked');
-                                    saveAction(myDiv);
+                                    MY_API.saveConfig();
                                 });
                             };
                             //绑定特殊设置（不在MY_API.CONFIG中）
@@ -1737,7 +1716,7 @@
                                 {
                                     jqPath: `div[data-toggle="windowToast"] input:checkbox`,
                                     lsItem: `${NAME}_windowToast`,
-                                    toastMsg: ["[提示信息] 配置已保存", "info"],
+                                    //toastMsg: ["[提示信息] 配置已保存", "info"],
                                     changeFn: function (self) {
                                         windowToast = $(self).prop('checked');
                                         if (windowToast) $('.link-toast').show();
@@ -1753,7 +1732,7 @@
                                     let self = this;
                                     if (i.hasOwnProperty('changeFn')) i.changeFn(self);
                                     localStorage.setItem(i.lsItem, $(self).prop('checked'));
-                                    window.toast(i.toastMsg[0], i.toastMsg[1]);
+                                    if (i.hasOwnProperty('toastMsg')) window.toast(i.toastMsg[0], i.toastMsg[1]);
                                 })
                             }
                             //绑定回车保存
@@ -1777,7 +1756,7 @@
                                         MY_API.CONFIG[i.name] = i.toggle2;
                                     else
                                         MY_API.CONFIG[i.name] = i.toggle1;
-                                    saveAction(myDiv)
+                                    MY_API.saveConfig();
                                 })
                             }
                             //绑定帮助文字 (?)
@@ -1798,7 +1777,6 @@
                         end: () => {
                             mainDisplay = 'hide';
                             localStorage.setItem(`${NAME}_msgHide`, mainDisplay);
-                            $('.link-toast').hide();
                             document.getElementById('hiderbtn').innerHTML = "显示控制面板";
                         }
                     });
@@ -1812,14 +1790,12 @@
                         if (mainDisplay === 'show') {//显示=>隐藏
                             mainDisplay = 'hide';
                             localStorage.setItem(`${NAME}_msgHide`, mainDisplay);
-                            $('.link-toast').hide();
                             animChange(layerUiMain, true);
                             document.getElementById('hiderbtn').innerHTML = "显示控制面板";
                         }
                         else { //隐藏=>显示
                             mainDisplay = 'show';
                             localStorage.setItem(`${NAME}_msgHide`, mainDisplay);
-                            $('.link-toast').show();
                             if (JQshow) {
                                 layerUiMain.show();
                                 JQshow = false;
@@ -3398,7 +3374,7 @@
                 },
                 sendDanmu: async (danmuContent, roomId) => {
                     let realRoomId = roomId;
-                    if (Number(roomId) <= 1000) {
+                    if (Number(roomId) <= 10000) {
                         realRoomId = await BAPI.room.get_info(roomId).then((res) => {
                             MYDEBUG(`API.room.get_info roomId=${roomId} res`, res);//可能是短号，要用长号发弹幕
                             return res.data.room_id;
@@ -3560,7 +3536,7 @@
                 },
                 sendDanmu: async (danmuContent, roomId, medal_name) => {
                     let realRoomId = roomId;
-                    if (Number(roomId) <= 1000) {
+                    if (Number(roomId) <= 10000) {
                         realRoomId = await BAPI.room.get_info(roomId).then((res) => {
                             MYDEBUG(`API.room.get_info roomId=${roomId} res`, res);//可能是短号，要用长号发弹幕
                             return res.data.room_id;
@@ -4887,7 +4863,7 @@
                 },
                 sendDanmu: async (danmuContent, roomId) => {
                     let realRoomId = roomId;
-                    if (Number(roomId) <= 1000) {
+                    if (Number(roomId) <= 10000) {
                         realRoomId = await BAPI.room.get_info(roomId).then((res) => {
                             MYDEBUG(`API.room.get_info roomId=${roomId} res`, res);//可能是短号，要用长号发弹幕
                             return res.data.room_id;
@@ -5197,7 +5173,7 @@
                     for (const r of roomList) {
                         await BAPI.rankdb.getTopRealTimeHour(r.id).then((data) => {
                             let list = data.data.list;
-                            API.chatLog(`检查${r.name + '小时榜'}房间的礼物`, 'warning');s
+                            API.chatLog(`检查${r.name + '小时榜'}房间的礼物`, 'warning'); s
                             for (const i of list) {
                                 API.checkRoom(i.roomid, `小时榜-${i.area_v2_parent_name}区`);
                             }
@@ -5283,12 +5259,11 @@
      */
     function fixVersionDifferences(API, version) {
         //修复变量类型错误
-        const storageVersion = localStorage.getItem(`${NAME}_lastFixVersion`) || "0";
         //添加新的修复后需修改版本号
-        if (versionStringCompare(storageVersion, "5.6.4.5")) return;
-        const fixList = ['AUTO_GIFT_ROOMID', 'EXCLUDE_ROOMID', 'COIN_UID'];
-        if (!fixList.every(i => $.isArray(API.CONFIG[i]))) {
-            for (const i of fixList) {
+        if (versionStringCompare(storageLastFixVersion, "5.6.4.5")) return;
+        const configFixList = ['AUTO_GIFT_ROOMID', 'EXCLUDE_ROOMID', 'COIN_UID'];
+        if (!configFixList.every(i => $.isArray(API.CONFIG[i]))) {
+            for (const i of configFixList) {
                 if (!$.isArray(API.CONFIG[i])) {
                     API.CONFIG[i] = String(API.CONFIG[i]).split(",");
                 }
@@ -5299,7 +5274,14 @@
         else if (API.CONFIG.ANCHOR_TYPE == 'LIVEROOM') API.CONFIG.ANCHOR_TYPE = 'ANCHOR_LIVEROOM';
         if (API.CONFIG.GIFT_SORT == 'high') API.CONFIG.GIFT_SORT = 'GIFT_SORT_HIGH';
         else if (API.CONFIG.GIFT_SORT == 'low') API.CONFIG.GIFT_SORT = 'GIFT_SORT_LOW'
+        //修复CACHE
+        const cache = JSON.parse(localStorage.getItem(`${NAME}_CACHE`));
+        const cacheFixList = [['materialobject_ts', 'MaterialObject_TS'], ['medalDanmu_TS', 'MedalDanmu_TS']];
+        for (const i of cacheFixList) {
+            if (cache.hasOwnProperty(i[0])) API.CACHE[i[1]] = cache[i[0]];
+        }
         API.saveConfig(false);
+        API.saveCache();
         localStorage.setItem(`${NAME}_lastFixVersion`, version);
     }
     /**
