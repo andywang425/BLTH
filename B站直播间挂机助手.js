@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.4.6
+// @version        5.6.4.7
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -201,7 +201,6 @@
         },
         userToken = undefined,
         tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || { time: 0 },
-        mainIndex = undefined,
         logIndex = undefined,
         layerUiMain = undefined, //控制面板
         layerLogWindow = undefined, //日志窗口
@@ -1159,7 +1158,7 @@
                     //帮助信息
                     ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<mh3>注意：</mh3><mul><mli>支持识别阿拉伯数字和汉字数字。</mli><mli>识别的单位有限。</mli><mli>不支持识别外币。</mli><mli>由于一些天选时刻的奖品名比较特殊，可能会出现遗漏或误判。</mli></mul>',
                     LOTTERY: '参与大乱斗抽奖。',
-                    MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则从第一条开始再次按顺序选取）。</mli><mli>由于B站服务器限制，脚本发送完一条弹幕后会等待1.5秒再发下一条。</mli><mli>发送打卡弹幕时偶尔会失败，所以脚本会在发送完所有勋章的打卡弹幕后再尝试发送之前发送失败的弹幕。</mli><mli>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</mli></mul>',
+                    MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则循环选取）。</mli><mli>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</mli></mul>',
                     AUTO_DANMU: '发送直播间弹幕。<mh3>注意：</mh3><mul><mli>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</mli><mli><mp>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</mp></mli><mli><mp>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</mp></mli><mli><mp>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</mp></mli><mli><mp>可以用默认值所填的房间号来测试本功能。</mp></mli><mli><mp>发送时间有两种填写方法</mp><mp>1.【小时】h【分钟】m【秒】s</mp><mul><mli>每隔一段时间发送一条弹幕</mli><mli>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></mli><mli>可以填小数</mli><mli>可以只填写其中一项或两项</mli></mul><mp>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</mp><mp><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></mp><mp>2.【小时】:【分钟】:【秒】</mp><mul><mli>在特定时间点发一条弹幕</mli><mli>例子： <code>10:30:10</code>, <code>0:40</code></mli><mli>只能填整数</mli><mli>小时分钟必须填写，秒数可以不填</mli></mul><mp>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</mp></mli></mul>',
                     NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<mh3>原理：</mh3><mul><mli>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。</mli><mul>',
                     INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<mh3>缺点：</mh3>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管点击后会提示接口返回错误），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。',
@@ -1219,7 +1218,7 @@
                 const openMainWindow = () => {
                     let settingTableoffset = $('.live-player-mounter').offset(),
                         settingTableHeight = $('.live-player-mounter').height();
-                    mainIndex = layer.open({
+                    layer.open({
                         type: 1,
                         title: false,
                         offset: [String(settingTableoffset.top - getScrollPosition().y) + 'px', String(settingTableoffset.left - getScrollPosition().x) + 'px'],
@@ -2737,7 +2736,7 @@
                             return a.level - b.level;
                         });
                     }
-                    if (MY_API.CONFIG.AUTO_GIFT_ROOMID && MY_API.CONFIG.AUTO_GIFT_ROOMID.length > 0) {
+                    if (MY_API.CONFIG.AUTO_GIFT_ROOMID) {
                         let sortRooms = [...MY_API.CONFIG.AUTO_GIFT_ROOMID];
                         sortRooms.reverse();
                         for (let froom of sortRooms) {
@@ -2876,7 +2875,7 @@
                             medal_list = medal_list.filter(it => it.day_limit - it.today_feed > 0 && it.level < 20);
                             medal_list = MY_API.Gift.sort_medals(medal_list);
                             //排除直播间
-                            if (MY_API.CONFIG.EXCLUDE_ROOMID && MY_API.CONFIG.EXCLUDE_ROOMID.length > 0) {
+                            if (MY_API.CONFIG.EXCLUDE_ROOMID) {
                                 const ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID;
                                 medal_list = medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
                             };
@@ -3385,7 +3384,7 @@
                     }
                     return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
                         MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmuContent}】，房间号【${roomId}】`, response);
-                        if (response.code === 0 && !response.msg) {
+                        if (response.code === 0) {
                             window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送成功`, 'success');
                         } else {
                             window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）出错 ${response.msg}`, 'caution');
@@ -3522,7 +3521,6 @@
             },
             MEDAL_DANMU: {
                 medal_list: [],
-                retryRoomList: [],
                 getMedalList: async (page = 1) => {
                     if (page === 1) MY_API.MEDAL_DANMU.medal_list = [];
                     return BAPI.i.medal(page, 25).then((response) => {
@@ -3547,11 +3545,10 @@
                     }
                     return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
                         MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，粉丝勋章【${medal_name}】`, response);
-                        if (response.code === 0 && !response.msg) {
+                        if (response.code === 0) {
                             window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】发送成功，房间号【${roomId}】，粉丝勋章【${medal_name}】已点亮，当前亲密度+100`, 'success');
                         } else {
                             window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】，粉丝勋章【${medal_name}】）出错 ${response.msg}，稍后重试`, 'caution');
-                            retryRoomList.push(realRoomId);
                         }
                     }, () => {
                         window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】，粉丝勋章【${medal_name}】）发送失败`, 'error');
@@ -3571,7 +3568,6 @@
                     medalDanmuRunning = true;
                     await MY_API.MEDAL_DANMU.getMedalList();
                     let lightMedalList;
-                    MY_API.MEDAL_DANMU.retryRoomList = [];
                     if (MY_API.CONFIG.MEDAL_DANMU_METHOD === 'MEDAL_DANMU_WHITE')
                         lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1);
                     else {
@@ -3589,18 +3585,6 @@
                         await MY_API.MEDAL_DANMU.sendDanmu(danmuContent, roomid, medal_name);
                         danmuContentIndex++;
                         await sleep(MY_API.CONFIG.MEDAL_DANMU_INTERVAL * 1000);
-                    }
-                    //第二轮，再次尝试发送之前失败的
-                    if (MY_API.MEDAL_DANMU.retryRoomList.length > 0) {
-                        for (const up of MY_API.MEDAL_DANMU.retryRoomList) {
-                            if (danmuContentIndex >= configDanmuLength) danmuContentIndex = 0;
-                            const medal_name = up.medal_name,
-                                roomid = up.roomid,
-                                danmuContent = MY_API.CONFIG.MEDAL_DANMU_CONTENT[danmuContentIndex];
-                            await MY_API.MEDAL_DANMU.sendDanmu(danmuContent, roomid, medal_name);
-                            danmuContentIndex++;
-                            await sleep(MY_API.CONFIG.MEDAL_DANMU_INTERVAL * 1000);
-                        }
                     }
                     medalDanmuRunning = false;
                     window.toast('[粉丝牌打卡弹幕] 今日已完成', 'success');
@@ -4874,7 +4858,7 @@
                     }
                     return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
                         MYDEBUG(`[天选中奖弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】`, response);
-                        if (response.code === 0 && !response.msg) {
+                        if (response.code === 0) {
                             window.toast(`[天选中奖弹幕] 弹幕【${danmuContent}】发送成功（房间号【${roomId}】）`, 'success');
                         } else {
                             window.toast(`[天选中奖弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】）出错 ${response.msg}`, 'caution');
