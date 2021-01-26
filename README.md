@@ -201,6 +201,6 @@
 
 ## 更新日志
 >### 5.6.4.7
->1.修复打卡弹幕出错时卡死的bug。2.修正部分内置说明的文字表述。
+>1.修复打卡弹幕出错时卡死的bug。2.修正部分内置说明的文字表述。3.修复无法上传天选时刻附加信息的bug。若获取到的天选时刻附加信息带有script标签则舍弃。4.修复金额识别无法识别单个“两”的bug。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
