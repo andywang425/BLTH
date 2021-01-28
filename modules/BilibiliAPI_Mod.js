@@ -302,6 +302,15 @@ var BilibiliAPI = {
                     need_top: need_top
                 }
             })
+        },
+        w_live_users: (size = 10) => {
+            // 获取正在直播的用户
+            return BilibiliAPI.ajax({
+                url: '//api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/w_live_users',
+                data: {
+                    size: size
+                }
+            });
         }
     },
     exchange: {

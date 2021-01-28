@@ -27,7 +27,8 @@
   + Chrome  
   在地址栏输入`chrome://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
   + Edge  
-  在地址栏输入`edge://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
+  安装浏览器拓展[Referer Control](https://chrome.google.com/webstore/detail/referer-control/hnkcfpcejkafcihlgbojoidoihckciin)，在设置页面中找到`default referer for all other sites`，选择`Custom` - `target host`或`Block`。  
+  若无法科学上网可进Q群下载群文件中的crx文件，在浏览器地址栏输入`chrome://extensions/`，打开右上角的`开发者模式`，把crx文件拖进去安装。
   + FireFox   
   在地址栏输入`about:config`，搜索`network.http.sendRefererHeader`，把这个设置的值改为`0`。
   + 建议这样做的原因：
@@ -201,6 +202,6 @@
 
 ## 更新日志
 >### 5.6.4.7
->1.修复打卡弹幕出错时卡死的bug。2.修正部分内置说明的文字表述。3.修复无法上传天选时刻附加信息的bug。若获取到的天选时刻附加信息带有script标签则舍弃。4.修复金额识别无法识别单个“两”的bug。
+>1.取关BLTH关注分组内up时不再取关白名单内up。2.修复控制面板隐藏后依然碰不到音量按钮的bug。3.部分重构和代码细节修正。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
