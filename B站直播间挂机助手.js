@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.5
+// @version        5.6.5.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -492,7 +492,7 @@
                 LittleHeart_TS: 0, // 小心心
                 MaterialObject_TS: 0, // 实物抽奖
                 AnchorLottery_TS: 0,
-                last_aid: 665, // 实物抽奖最后一个有效aid
+                last_aid: 710, // 实物抽奖最后一个有效aid
                 MedalDanmu_TS: 0//粉丝勋章打卡
             },
             CONFIG: {},
@@ -682,12 +682,8 @@
                     const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
                     if (cache === undefined || cache === null || !versionStringCompare(cache, version)) {
                         const mliList = [
-                            "取关BLTH关注分组内up时不再取关白名单内up。",
-                            "修复控制面板隐藏后依然碰不到音量按钮的bug。",
-                            "部分重构（主要是天选时刻部分）。",
-                            "修复在带有iframe的直播间运行脚本时重复运行检测出错的bug。",
-                            "如果开启控制台日志，右上角提示信息内容会输出在控制台中。",
-                            "<strong>天选时刻抽奖支持多种数据获取方式并存，并新增一种方式【从已关注且正在直播的直播间获取天选时刻数据 】。</strong>"
+                            "减少了天选时刻某个API的请求频率，降低被风控概率。但为了新老版本的兼容，老用户在更新到该版本后会清空本地的房间号缓存，请谅解。",
+                            "修复了天选时刻房间号记录不正确导致检查天选时有重复的bug。"
                         ];
                         let mliHtml = "";
                         for (const mli of mliList) {
@@ -1228,7 +1224,7 @@
                     ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
                     MEDAL_DANMU_INTERVAL: "每两条弹幕间所等待的时间。<mh3>注意：</mh3><mul><mli>由于B站服务器限制，间隔时间必须大于等于1秒，否则弹幕发送会出错。</mli></mul>",
                     ANCHOR_IGNORE_ROOM: "不检查和参加这些直播间的天选。<mul><mli>如果要填写多个直播间，每两个直播间号之间请用半角逗号<code>,</code>隔开。</mli></mul>",
-                    ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。</mli><mli>收集到的直播间号会缓存在本地以供后续使用。</mli></mul>",
+                    ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。</mli><mli>收集到的直播间号会缓存在本地以供后续使用。所以即使只勾选了【从已关注且正在直播的直播间获取天选时刻数据】，也可能因以前缓存了其它直播间而检查非关注直播间的天选，这点请多加注意。</mli></mul>",
                     SHARE: "并不会真的分享视频，通过调用特定api直接完成任务。",
                     ANCHOR_MONEY_ONLY: "仅参加能识别到金额的天选。<mul><mli>由于部分天选的奖品名较特殊，可能会遗漏或误判一些天选。</mli></mul>",
                     LIGHT_MEDALS: "根据点亮模式的不同，这些直播间的粉丝勋章将会被点亮或排除在外。<mul><mli>如果要填写多个房间，每个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
@@ -3840,13 +3836,14 @@
                 }
             },
             AnchorLottery: {
-                allRoomList: eval("[" + localStorage.getItem(`${NAME}_AnchorRoomidList`) + "]") || [], // 所有房间号的集合列表
+                allRoomList: eval("[" + (localStorage.getItem(`${NAME}_AnchorRoomidList`) || '') + "]") || [], // 所有房间号的集合列表，统一用数字格式储存
                 roomidList: [], // 轮询直播间
                 liveUserList: [], // 正在直播的用户列表
                 liveRoomList: [], // 正在直播的房间号，可能带uid。格式：roomid|uid
                 oldLotteryResponseList: [], // 上传：旧简介直播间
                 lotteryResponseList: [], // 上传：新简介直播间
                 introRoomList: [], // 从简介获取到的直播间
+                roomidAndUid: {}, // 房间哈和uid对应
                 myLiveRoomid: 0, // 我的直播间号
                 followingList: [],
                 unfollowList: [],
@@ -4113,7 +4110,7 @@
                                     MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间`, 'info');
                                     MYDEBUG(`[天选时刻] 获取${r.name + '小时榜'}房间列表`, data);
                                     for (const i of list) {
-                                        MY_API.AnchorLottery.roomidList.addVal(i.roomid);
+                                        MY_API.AnchorLottery.roomidList.addVal(Number(i.roomid));
                                     }
                                 } else {
                                     MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间出错<br>${data.message}`, 'warning');
@@ -4150,7 +4147,7 @@
                     };
                     return checkHourRank().then(async () => {
                         await checkRoomList();
-                        MY_API.chatLog(`[天选时刻] 高热度直播间收集完毕`, 'success');
+                        MY_API.chatLog(`[天选时刻] 高热度直播间收集完毕<br>共${MY_API.AnchorLottery.roomidList.length}个`, 'success');
                         return $.Deferred().resolve();
                     });
                 },
@@ -4288,7 +4285,7 @@
                         return setTimeout(() => MY_API.AnchorLottery.getLotteryInfoFromRoom(), MY_API.CONFIG.ANCHOR_CHECK_INTERVAL * 60000);
                     }
                     MY_API.AnchorLottery.introRoomList = [...lotteryInfoJson.roomList];
-                    return MY_API.chatLog(`[天选时刻] 简介数据获取完毕（共${lotteryInfoJson.roomList.length}个房间）<br>数据来源：直播间${linkMsg(MY_API.CONFIG.ANCHOR_GETDATA_ROOM, liveRoomUrl + MY_API.CONFIG.ANCHOR_GETDATA_ROOM)}的个人简介${(!MY_API.CONFIG.ANCHOR_IGNORE_UPLOAD_MSG && lotteryInfoJson.hasOwnProperty('msg') && lotteryInfoJson.msg.length > 0 && !/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi.test(lotteryInfoJson.msg)) ? '<br>附加信息：' + lotteryInfoJson.msg : ''}<br>该数据最后上传时间：${new Date(lotteryInfoJson.ts).toLocaleString()}`, 'success');
+                    return MY_API.chatLog(`[天选时刻] 简介数据获取完毕（共${MY_API.AnchorLottery.introRoomList.length}个房间）<br>数据来源：直播间${linkMsg(MY_API.CONFIG.ANCHOR_GETDATA_ROOM, liveRoomUrl + MY_API.CONFIG.ANCHOR_GETDATA_ROOM)}的个人简介${(!MY_API.CONFIG.ANCHOR_IGNORE_UPLOAD_MSG && lotteryInfoJson.hasOwnProperty('msg') && lotteryInfoJson.msg.length > 0 && !/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi.test(lotteryInfoJson.msg)) ? '<br>附加信息：' + lotteryInfoJson.msg : ''}<br>该数据最后上传时间：${new Date(lotteryInfoJson.ts).toLocaleString()}`, 'success');
                 },
                 moneyCheck: (award_name) => {
                     const name = award_name.replaceAll(' ', '').toLowerCase(); // 去空格+转小写
@@ -4490,7 +4487,7 @@
                                 return false
                             }
                             // 添加至上传列表
-                            MY_API.AnchorLottery.lotteryResponseList.addVal(response.data.room_id);
+                            MY_API.AnchorLottery.lotteryResponseList.addVal(Number(response.data.room_id));
                             const joinPrice = response.data.gift_num * response.data.gift_price,
                                 joinTextTitle = `${NAME}_ANCHOR_${response.data.id}`,
                                 ts = ts_ms();
@@ -5013,9 +5010,10 @@
                             for (const i of MY_API.AnchorLottery.liveUserList) {
                                 const roomid = i.link.match(/(?<=https?:\/\/live\.bilibili\.com\/)\d+/)[0],
                                     uid = String(i.uid);
-                                MY_API.AnchorLottery.liveRoomList.addVal(roomid + "|" + uid);
+                                MY_API.AnchorLottery.liveRoomList.addVal(Number(roomid));
+                                MY_API.AnchorLottery.roomidAndUid[roomid] = uid;
                             }
-                            MY_API.chatLog('[天选时刻] 已关注的开播直播间获取完毕', 'success');
+                            MY_API.chatLog(`[天选时刻] 已关注的开播直播间获取完毕<br>共${MY_API.AnchorLottery.liveRoomList.length}个`, 'success');
                         }
                         // 整理数据并参加
                         const id_list = [...MY_API.AnchorLottery.liveRoomList, ...MY_API.AnchorLottery.introRoomList, ...MY_API.AnchorLottery.roomidList];
@@ -5026,11 +5024,9 @@
                             MY_API.AnchorLottery.allRoomList = MY_API.AnchorLottery.allRoomList.splice(0, MY_API.CONFIG.ANCHOR_MAXROOM);
                         localStorage.setItem(`${NAME}_AnchorRoomidList`, MY_API.AnchorLottery.allRoomList);
                         MY_API.chatLog(`[天选时刻] 开始检查天选（共${MY_API.AnchorLottery.allRoomList.length}个房间）`, 'success');
-                        for (const i of MY_API.AnchorLottery.allRoomList) {
+                        for (const room of MY_API.AnchorLottery.allRoomList) {
                             let p = $.Deferred();
-                            const roomAnduid = String(i).split('|'),
-                                room = roomAnduid[0],
-                                uid = roomAnduid[1]; // 可能为undefined
+                            const uid = MY_API.AnchorLottery.roomidAndUid.hasOwnProperty(room) ? MY_API.AnchorLottery.roomidAndUid[room] : undefined;
                             if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
                             MY_API.AnchorLottery.check(room, uid).then((re) => {
                                 if (re) {
@@ -5267,7 +5263,7 @@
      */
     function fixVersionDifferences(API, version) {
         // 添加新的修复后需修改版本号
-        if (versionStringCompare(storageLastFixVersion, "5.6.5")) return;
+        if (versionStringCompare(storageLastFixVersion, "5.6.5.1")) return;
         // 修复变量类型错误
         const configFixList = ['AUTO_GIFT_ROOMID', 'EXCLUDE_ROOMID', 'COIN_UID'];
         if (!configFixList.every(i => $.isArray(API.CONFIG[i]))) {
@@ -5297,6 +5293,7 @@
         const follow = localStorage.getItem(`${NAME}AnchorFollowingList`);
         if (follow !== null) localStorage.setItem(`${NAME}_AnchorFollowingList`, follow);
         localStorage.removeItem(`${NAME}AnchorFollowingList`);
+        localStorage.removeItem(`${NAME}_AnchorRoomidList`);
 
         localStorage.setItem(`${NAME}_lastFixVersion`, version);
     }
