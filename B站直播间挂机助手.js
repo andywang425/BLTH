@@ -22,6 +22,8 @@
 // @connect        api.live.bilibili.com
 // @connect        live-trace.bilibili.com
 // @connect        sc.ftqq.com
+// @connect        push.xuthus.cc
+// @connect        sctapi.ftqq.com
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/Ajax-hook.min.js
 // @require        https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@10156de79624566f6c5adeb85019b0a77b307186/modules/BilibiliAPI_Mod.min.js
@@ -226,27 +228,6 @@
     String.prototype.replaceAll = function (oldSubStr, newSubStr) {
         return this.replace(new RegExp(oldSubStr, 'gm'), newSubStr)
     }
-    /**
-     * 删除一维数组元素
-     * @param val 数组中一个元素的值
-     */
-    Array.prototype.rmVal = function (val) {
-        const index = this.indexOf(val);
-        if (index > -1) return this.splice(index, 1);
-    }
-    /**
-     * 给一维数组添加不重复的元素
-     * @param {*} val 数组中一个元素的值
-     * @param {*} Array 数组
-     * @param {*} mode 1: unshift 2: push
-     */
-    Array.prototype.addVal = function (val, mode = 1) {
-        const index = this.indexOf(val);
-        if (index === -1) {
-            if (mode === 1) return this.unshift(val);
-            else return this.push(val);
-        }
-    }
     $(function () {
         // 若window下无BilibiliLive，则说明页面有iframe，此时脚本在在top中运行 或 发生错误
         if (W.BilibiliLive === undefined) return;
@@ -396,7 +377,7 @@
                 ANCHOR_UPLOAD_DATA_INTERVAL: 10, // 上传数据间隔
                 ANCHOR_UPLOAD_MSG: false, // 天选上传时的附加信息开关
                 ANCHOR_UPLOAD_MSG_CONTENT: "", // 附加信息
-                ANCHOR_IGNORE_UPLOAD_MSG: true, // 天选忽略附加信息
+                ANCHOR_IGNORE_UPLOAD_MSG: false, // 天选忽略附加信息
                 ANCHOR_TYPE: "ANCHOR_POLLING", /* 已被弃用，为了继承设置保留几个版本 */
                 ANCHOR_TYPE_POLLING: true, // 天选模式 - 轮询
                 ANCHOR_TYPE_LIVEROOM: false, // 天选模式 - 直播间简介
@@ -419,6 +400,10 @@
                 COIN_NUMBER: 0, // 投币数量
                 COIN_TYPE: "COIN_DYN", // 投币方法 动态/UID
                 COIN_UID: ['0'], // 投币up主
+                COIN2SILVER: false, // 银币换银瓜子
+                COIN2SILVER_NUM: 1, // 银币换银瓜子，硬币数量
+                CP_NOTICE: false, // 酷推
+                CP_Skey: 'Skey', // 酷推Skey
                 DANMU_CONTENT: ["这是一条弹幕"], // 弹幕内容
                 DANMU_ROOMID: ["22474988"], // 发弹幕房间号
                 DANMU_INTERVAL_TIME: ["10m"], // 弹幕发送时间
@@ -463,8 +448,8 @@
                 SEND_ALL_GIFT: false, // 送满全部勋章
                 SHARE: true, // 分享
                 SILVER2COIN: false, // 银瓜子换硬币
-                COIN2SILVER: false, // 银币换银瓜子
-                COIN2SILVER_NUM: 1, // 银币换银瓜子，硬币数量
+                ServerTurbo_NOTICE: false, // Server酱·Turbo版
+                ServerTurbo_SendKey: "SendKey", // Server酱·Turbo版SendKey
                 SPARE_GIFT_ROOM: "0", // 剩余礼物送礼房间
                 STORM: false, // 节奏风暴
                 STORM_MAX_COUNT: 100, // 单个风暴最大尝试次数
@@ -885,7 +870,13 @@
                 const btnmsg = mainDisplay == 'hide' ? '显示控制面板' : '隐藏控制面板';
                 const btn = $(`<button class="igiftMsg_btn" style="display: inline-block; float: left; margin-right: 7px;cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
                 const livePlayer = $('.bilibili-live-player.relative');
-                const html = GM_getResourceText('main');
+                const html = `
+                <div id="allsettings" class="igiftMsg_main"><div id="top_fieldset"><fieldset class="igiftMsg_fs"><legend>今日统计</legend><div data-toggle="topArea"><span id="giftCount" style="font-size:large; font-weight:bold; color:blueviolet;"><span class="anchor">参与天选时刻<span class="statNum">0</span>次 </span><span class="material">参与实物抽奖<span class="statNum">0</span>次 </span><button class="igiftMsg_btn" data-action="save">保存所有设置</button></span><span helpdata="topArea" class="clickableText helpText">?</span></div></fieldset></div><div id="bottom_fieldset" class="fieldset"><fieldset class="igiftMsg_fs"><legend>抽奖设置</legend><div data-toggle="LOTTERY"><label style="color:purple;"><input type="checkbox">参与礼物抽奖 </label><span helpdata="LOTTERY" class="clickableText helpText">?</span></div><div data-toggle="RANDOM_DELAY"><label class="lineStartSpace" style="color:darkgreen;"><input type="checkbox">抽奖附加随机延迟 <input class="RND_DELAY_START igiftMsg_input" style="width:30px;vertical-align:top;" type="text">~ <input class="RND_DELAY_END igiftMsg_input" style="width:30px;vertical-align:top;" type="text">s </label><span helpdata="RANDOM_DELAY" class="clickableText helpText">?</span></div><div data-toggle="RANDOM_SKIP"><label class="lineStartSpace" style="color:darkgreen;">随机跳过抽奖<input class="per igiftMsg_input" style="width:30px;" type="text">% </label><span helpdata="RANDOM_SKIP" class="clickableText helpText">?</span></div><div data-toggle="RANDOM_SEND_DANMU"><label class="lineStartSpace" style="color:darkgreen;">抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input class="per igiftMsg_input" style="width:30px;" type="text">% </label></div><div data-toggle="CHECK_HOUR_ROOM"><label class="lineStartSpace" style="color:darkgreen;"><input type="checkbox">检查小时榜（间隔时间<input class="num igiftMsg_input" style="width:25px;" type="text">秒） </label></div><div data-toggle="MATERIAL_LOTTERY"><label style="color:purple;"><input type="checkbox">参与实物抽奖 </label><span helpdata="MATERIAL_LOTTERY" class="clickableText helpText">?</span></div><div data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"><label class="lineStartSpace">检查间隔 <input class="num igiftMsg_input" style="width:30px;" type="text">分钟 </label></div><div data-toggle="MATERIAL_LOTTERY_REM"><label class="lineStartSpace">检测到 <input class="num igiftMsg_input" style="width:30px;" type="text">个不存在活动的aid后停止检测 </label><span helpdata="MATERIAL_LOTTERY_REM" class="clickableText helpText">?</span></div><div data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"><label class="lineStartSpace"><input type="checkbox">忽略关键字 <label class="str" style="font-weight:bold">6个</label><button class="igiftMsg_btn" data-action="edit_QUESTIONABLE_LOTTERY">编辑关键字</button></label><span helpdata="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY" class="clickableText helpText">?</span></div></fieldset><fieldset class="igiftMsg_fs"><legend>每日任务设置</legend><div data-toggle="LOGIN"><label><input type="checkbox">登录 </label></div><div data-toggle="WATCH"><label><input type="checkbox">观看视频 </label></div><div data-toggle="COIN"><label><input type="checkbox">自动投币<input class="coin_number igiftMsg_input" style="width:40px;" type="text">个(0-5) </label><span helpdata="COIN" class="clickableText helpText">?</span></div><div data-toggle="COIN_TYPE"><div data-toggle="COIN_UID"><label class="lineStartSpace"><input type="radio" name="COIN_TYPE">给用户(UID:<input class="num igiftMsg_input" style="width:150px;" type="text">) 的视频投币</label><span helpdata="COIN_UID" class="clickableText helpText">?</span></div><div data-toggle="COIN_DYN"><label class="lineStartSpace"><input type="radio" name="COIN_TYPE">给动态中的的视频投币 </label></div></div><div data-toggle="SHARE"><label><input type="checkbox">分享视频 </label><span helpdata="SHARE" class="clickableText helpText">?</span></div><div data-toggle="SILVER2COIN"><label><input type="checkbox">银瓜子换硬币 </label><span helpdata="SILVER2COIN" class="clickableText helpText">?</span></div><div data-toggle="COIN2SILVER"><label><input type="checkbox">硬币换银瓜子 <input class="coin_number igiftMsg_input" style="width:40px;" type="text">个(0-50) </label><span helpdata="COIN2SILVER" class="clickableText helpText">?</span></div><div data-toggle="LIVE_SIGN"><label><input type="checkbox">直播区签到 </label></div><div data-toggle="AUTO_GROUP_SIGN"><label><input type="checkbox">应援团签到 </label></div><div data-toggle="MEDAL_DANMU" style="color:purple"><label><input type="checkbox">粉丝勋章打卡弹幕 </label><button class="igiftMsg_btn" data-action="edit_medalDanmu">编辑弹幕内容</button><span helpdata="MEDAL_DANMU" class="clickableText helpText">?</span></div><div data-toggle="MEDAL_DANMU_METHOD" class="lineStartSpace inline">打卡弹幕模式： <div data-toggle="MEDAL_DANMU_WHITE" class="inline"><input type="radio" name="MEDAL_DANMU_METHOD">白名单 </div><div data-toggle="MEDAL_DANMU_BLACK" class="inline"><input type="radio" name="MEDAL_DANMU_METHOD" class="smallInterval">黑名单 </div><button class="igiftMsg_btn" data-action="edit_lightMedalList">编辑房间列表</button><span helpdata="MEDAL_DANMU_METHOD" class="clickableText helpText">?</span></div><div data-toggle="MEDAL_DANMU_INTERVAL" class="lineStartSpace">弹幕发送间隔 <input class="num igiftMsg_input" style="width:25px;" type="text">秒 <span helpdata="MEDAL_DANMU_INTERVAL" class="clickableText helpText">?</span></div></fieldset><fieldset class="igiftMsg_fs"><legend>小心心</legend><div data-toggle="LITTLE_HEART"><label><input type="checkbox">自动获取小心心 </label><span helpdata="LITTLE_HEART" class="clickableText helpText">?</span></div><div data-toggle="LIGHT_MEDALS" style="color:purple">自动点亮勋章房间号 <input class="num igiftMsg_input" style="width:200px;" type="text"><span helpdata="LIGHT_MEDALS" class="clickableText helpText">?</span></div><div data-toggle="LIGHT_METHOD" class="inline">勋章点亮模式： <div data-toggle="LIGHT_WHITE" class="inline"><input type="radio" name="LIGHT_METHOD">白名单 </div><div data-toggle="LIGHT_BLACK" class="inline"><input type="radio" name="LIGHT_METHOD" class="smallInterval">黑名单 </div><button class="igiftMsg_btn" data-action="lightMedalNow">立刻点亮勋章</button><span helpdata="LIGHT_METHOD" class="clickableText helpText">?</span></div><div data-toggle="FORCE_LIGHT"><label><input type="checkbox">点亮勋章时忽略亲密度上限 </label></div></fieldset><fieldset class="igiftMsg_fs"><legend>自动送礼设置</legend><div data-toggle="AUTO_GIFT" style="color:purple"><input type="checkbox">自动送礼 <span helpdata="AUTO_GIFT" class="clickableText helpText">?</span></div><div data-toggle="AUTO_GIFT_ROOMID" style="color:purple">优先送礼房间 <input class="num igiftMsg_input" style="width:150px;" type="text"><span helpdata="AUTO_GIFT_ROOMID" class="clickableText helpText">?</span></div><div data-toggle="EXCLUDE_ROOMID" style="color:purple">不送礼房间 <input class="num igiftMsg_input" style="width:150px;" type="text"><span helpdata="EXCLUDE_ROOMID" class="clickableText helpText">?</span></div><div data-toggle="GIFT_ALLOW_TYPE" style="color:purple">允许被送出的礼物类型 <input class="str igiftMsg_input" style="width:150px;" type="text"><span helpdata="GIFT_ALLOW_TYPE" class="clickableText helpText">?</span></div><div data-toggle="GIFT_INTERVAL"><input type="radio" name="GIFT_METHOD">间隔 <input class="num igiftMsg_input" style="width:30px;" type="text">分钟送礼 </div><div data-toggle="GIFT_SEND_TIME" style="color:purple"><input type="radio" name="GIFT_METHOD">定时送礼 <div class="lineStartSpace">送礼时间 <input class="Hour igiftMsg_input" style="width:20px;" type="text">点 <input class="Minute igiftMsg_input" style="width:20px;" type="text">分 <button class="igiftMsg_btn" data-action="sendGiftNow">立刻开始送礼</button></div></div><div data-toggle="GIFT_LIMIT" style="color:purple">礼物到期时间 <input class="num igiftMsg_input" style="width:20px;" type="text">天 <span helpdata="GIFT_LIMIT" class="clickableText helpText">?</span></div>粉丝牌送礼优先级<br><div data-toggle="GIFT_SORT_HIGH" class="lineStartSpace"><input type="radio" name="GIFT_SORT">优先<strong style="color:purple">高</strong>等级粉丝牌 </div><div data-toggle="GIFT_SORT_LOW" class="lineStartSpace"><input type="radio" name="GIFT_SORT">优先<strong style="color:purple">低</strong>等级粉丝牌 </div><div data-toggle="SEND_ALL_GIFT" style="color:#ff5200;"><input type="checkbox">无视礼物类型和到期时间限制 <span helpdata="SEND_ALL_GIFT" class="clickableText helpText">?</span></div><div data-toggle="SPARE_GIFT_ROOM">剩余礼物送礼直播间： <input class="num igiftMsg_input" type="text" style="width:100px;"><span helpdata="SPARE_GIFT_ROOM" class="clickableText helpText">?</span></div></fieldset><fieldset class="igiftMsg_fs"><legend>节奏风暴设置</legend><div data-toggle="STORM"><label style="color:#ff5200"><input type="checkbox">参与节奏风暴 </label><span helpdata="STORM" class="clickableText helpText">?</span></div><div data-toggle="STORM_QUEUE_SIZE">允许同时参与的节奏风暴次数： <input class="num igiftMsg_input" type="text" style="width:30px;"></div><div data-toggle="STORM_MAX_COUNT">单个风暴最大尝试次数： <input class="num igiftMsg_input" type="text" style="width:30px;"></div><div data-toggle="STORM_ONE_LIMIT">单个风暴参与次数间隔： <input class="num igiftMsg_input" type="text" style="width:30px;">毫秒 </div></fieldset><fieldset class="igiftMsg_fs"><legend>弹幕设置</legend><div data-toggle="AUTO_DANMU"><input type="checkbox">自动发弹幕 <span helpdata="AUTO_DANMU" class="clickableText helpText">?</span></div><div data-toggle="AUTO_DANMU_SETTINGS">弹幕内容 <input class="Danmu igiftMsg_input" style="width:330px;" type="text"><br>房间号 <input class="Roomid igiftMsg_input" style="width:330px;" type="text"><br>发送时间 <input class="Time igiftMsg_input" style="width:330px;" type="text"></div><button class="igiftMsg_btn" data-action="sendDanmuNow">立刻发送弹幕</button><button class="igiftMsg_btn" data-action="clearDanmuCache">清除弹幕缓存</button></fieldset><fieldset class="igiftMsg_fs"><legend>购买粉丝勋章</legend><div data-toggle="BUY_MEDAL">输入粉丝勋章对应房间号：<input class="num igiftMsg_input" type="text" onclick="select();" style="width:70px"><button class="igiftMsg_btn" data-action="buy_medal">点击购买勋章</button><span helpdata="BUY_MEDAL" class="clickableText helpText">?</span></div></fieldset><fieldset class="igiftMsg_fs"><legend>天选时刻</legend><div data-toggle="ANCHOR_LOTTERY"><label style="color:purple"><input type="checkbox">参加天选时刻抽奖 </label><span helpdata="ANCHOR_LOTTERY" class="clickableText helpText">?</span></div>数据获取方式<br><div data-toggle="ANCHOR_TYPE_POLLING" class="lineStartSpace"><input type="checkbox">从高热度直播间获取天选时刻数据 <span helpdata="ANCHOR_TYPE_POLLING" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_TYPE_LIVEROOM" class="lineStartSpace"><input type="checkbox">从直播间 <input class="num igiftMsg_input" style="width:100px;" type="text">的个人简介获取天选时刻数据 <span helpdata="ANCHOR_TYPE_LIVEROOM" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_TYPE_FOLLOWING" class="lineStartSpace"><input type="checkbox">从已关注且正在直播的直播间获取天选时刻数据 <span helpdata="ANCHOR_TYPE_FOLLOWING" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_MAXROOM"><label>检查房间最大数量 <input class="roomNum igiftMsg_input" style="width:50px;" type="text"></label><span helpdata="ANCHOR_MAXROOM" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_UPLOAD_DATA"><label style="color:purple;"><input type="checkbox">上传天选数据至直播间个人简介(间隔 <input class="num igiftMsg_input" style="width:30px;" type="text">秒) </label><span helpdata="ANCHOR_UPLOAD_DATA" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_MAXLIVEROOM_SAVE"><label>个人简介储存房间最大数量 <input class="roomNum igiftMsg_input" style="width:50px;" type="text"></label><span helpdata="ANCHOR_MAXLIVEROOM_SAVE" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_UPLOAD_MSG"><label style="color:purple;"><input type="checkbox">上传附加信息 <button class="igiftMsg_btn" data-action="edit_ANCHOR_UPLOAD_MSG">编辑附加信息</button></label><span helpdata="ANCHOR_UPLOAD_MSG" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_IGNORE_UPLOAD_MSG"><label><input type="checkbox">忽略附加信息 </label><span helpdata="ANCHOR_IGNORE_UPLOAD_MSG" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_CHECK_INTERVAL"><label>天选获取数据间隔 <input class="num igiftMsg_input" style="width:25px;" type="text">分钟 </label><span helpdata="ANCHOR_CHECK_INTERVAL" class="clickableText helpText">?</span></div><div data-toggle="AHCHOR_NEED_GOLD"><label>忽略所需金瓜子大于 <input class="num igiftMsg_input" style="width:50px;" type="text">的天选 </label></div><div data-toggle="ANCHOR_IGNORE_BLACKLIST"><label><input type="checkbox">忽略关键字 <label class="str" style="font-weight:bold">28个</label><button class="igiftMsg_btn" data-action="edit_ANCHOR_BLACKLIST_WORD">编辑关键字</button></label><span helpdata="ANCHOR_IGNORE_BLACKLIST" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_IGNORE_ROOM"><label><input type="checkbox">忽略直播间 <label class="str" style="font-weight:bold">1个</label><button class="igiftMsg_btn" data-action="edit_ANCHOR_IGNORE_ROOMLIST">编辑直播间</button></label><span helpdata="ANCHOR_IGNORE_ROOM" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_IGNORE_MONEY"><label>忽略金额小于 <input class="num igiftMsg_input" style="width:30px;" type="text">元的天选 </label><span helpdata="ANCHOR_IGNORE_MONEY" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_MONEY_ONLY"><label><input type="checkbox">仅参加现金抽奖 </label><span helpdata="ANCHOR_MONEY_ONLY" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_INTERVAL"><label>请求间隔 <input class="num igiftMsg_input" style="width:30px;" type="text">毫秒 </label><span helpdata="ANCHOR_INTERVAL" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_WAIT_REPLY"><label><input type="checkbox">发出请求后等待回复 </label><span helpdata="ANCHOR_WAIT_REPLY" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_IGNORE_PWDROOM"><label><input type="checkbox">不参与加密直播间的天选 </label><span helpdata="ANCHOR_IGNORE_PWDROOM" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_MOVETO_FOLLOW_TAG"><label><input type="checkbox">把参与天选时关注的UP移到新分组 <button style="font-size:small;color:red;" class="igiftMsg_btn" data-action="removeAnchorFollowingInTag">取关该分组内的UP主</button></label><span helpdata="ANCHOR_MOVETO_FOLLOW_TAG" class="clickableText helpText">?</span></div>检测到<strong style="color:purple">未中奖</strong>后<br><div data-toggle="ANCHOR_AUTO_DEL_FOLLOW"><label class="lineStartSpace"><input type="checkbox">自动取关发起抽奖的UP </label><span helpdata="ANCHOR_AUTO_DEL_FOLLOW" class="clickableText helpText">?</span></div>检测到<strong style="color:purple">中奖</strong>后<br><div data-toggle="ANCHOR_PRIVATE_LETTER"><label class="lineStartSpace"><input type="checkbox">给发起抽奖的UP发一条私信 <button class="igiftMsg_btn" data-action="edit_ANCHOR_LETTER_CONTENT">编辑私信内容</button></label><span helpdata="ANCHOR_PRIVATE_LETTER" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_DANMU"><label class="lineStartSpace"><input type="checkbox">在对应直播间发一条弹幕 <button class="igiftMsg_btn" data-action="edit_ANCHOR_DANMU_CONTENT">编辑弹幕内容</button></label><span helpdata="ANCHOR_DANMU" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_MOVETO_PRIZE_TAG"><label class="lineStartSpace"><input type="checkbox">把发起抽奖的UP移到新分组 <button style="font-size:small;color:red;" class="igiftMsg_btn" data-action="removeAnchorPrizeInTag">取关该分组内的UP主</button></label><span helpdata="ANCHOR_MOVETO_PRIZE_TAG" class="clickableText helpText">?</span></div><div data-toggle="ANCHOR_ADD_TO_WHITELIST"><label class="lineStartSpace"><input type="checkbox">把发起抽奖的UP加入白名单 </label></div><div data-toggle="anchorBtnArea"><button data-action="saveFollowingList" class="igiftMsg_btn">保存当前关注列表为白名单</button><button data-action="removeAnchorFollowing" class="igiftMsg_btn" style="color:red;">取关不在白名单内的UP主</button><button data-action="editWhiteList" class="igiftMsg_btn">编辑白名单</button><span helpdata="anchorBtnArea" class="clickableText helpText">?</span></div></fieldset><fieldset class="igiftMsg_fs"><legend>内容屏蔽</legend><div data-toggle="REMOVE_ELEMENT_2233"><label><input type="checkbox">移除2233模型 </label></div><div data-toggle="REMOVE_ELEMENT_activity"><label><input type="checkbox">移除活动入口 </label></div><div data-toggle="REMOVE_ELEMENT_rank"><label><input type="checkbox">移除排行榜 </label></div><div data-toggle="REMOVE_ELEMENT_followSideBar"><label><input type="checkbox">移除右侧关注按钮及弹窗 </label></div><div data-toggle="REMOVE_ELEMENT_flipView"><label><input type="checkbox">移除礼物栏下方广告 </label></div><div data-toggle="NOSLEEP"><label><input type="checkbox">屏蔽挂机检测 </label><span helpdata="NOSLEEP" class="clickableText helpText">?</span></div><div data-toggle="INVISIBLE_ENTER"><label><input type="checkbox">隐身入场 </label><span helpdata="INVISIBLE_ENTER" class="clickableText helpText">?</span></div></fieldset><fieldset class="igiftMsg_fs"><legend>其他设置</legend><div data-toggle="TIME_AREA_DISABLE"><label style="color:darkgreen"><input type="checkbox">休眠时段： <input class="startHour igiftMsg_input" style="width:20px;" type="text">点 <input class="startMinute igiftMsg_input" style="width:20px;" type="text">分至 <input class="endHour igiftMsg_input" style="width:20px;" type="text">点 <input class="endMinute igiftMsg_input" style="width:20px;" type="text">分 </label><span helpdata="TIME_AREA_DISABLE" class="clickableText helpText">?</span></div><div data-toggle="TIME_RELOAD"><input type="checkbox">每 <input class="delay-seconds igiftMsg_input" type="text" style="width:30px;">分钟刷新一次页面 </div><div data-toggle="IN_TIME_RELOAD_DISABLE"><label><input type="checkbox">不抽奖时段不刷新直播间 </label></div><div data-toggle="debugSwitch"><label><input type="checkbox">控制台日志 </label><span helpdata="debugSwitch" class="clickableText helpText">?</span></div><div data-toggle="windowToast"><label><input type="checkbox">提示信息 </label><span helpdata="windowToast" class="clickableText helpText">?</span></div><div data-toggle="UPDATE_TIP"><label><input type="checkbox">更新内容提示 </label><span helpdata="UPDATE_TIP" class="clickableText helpText">?</span></div><div data-toggle="GM_NOTICE"><label><input type="checkbox">实物/天选中奖后系统通知 </label></div>实物/天选中奖后消息推送\n <div data-toggle="FT_NOTICE"><label class="lineStartSpace" style="color:darkgreen"><input type="checkbox">通过<a href="https://sc.ftqq.com" target="_blank">方糖</a>推送通知 <button class="igiftMsg_btn" data-action="edit_FT_SCKEY">编辑方糖SCKEY</button></label><span helpdata="FT_NOTICE" class="clickableText helpText">?</span></div><div data-toggle="CP_NOTICE"><label class="lineStartSpace" style="color:darkgreen"><input type="checkbox">通过<a href="https://cp.xuthus.cc" target="_blank">酷推</a>推送通知 <button class="igiftMsg_btn" data-action="edit_CP_Skey">编辑酷推Skey</button></label><span helpdata="CP_NOTICE" class="clickableText helpText">?</span></div><div data-toggle="ServerTurbo_NOTICE"><label class="lineStartSpace" style="color:darkgreen"><input type="checkbox">通过<a href="https://sct.ftqq.com" target="_blank">Server酱·Turbo版</a>推送通知 <button class="igiftMsg_btn" data-action="edit_ServerTurbo_SendKey">编辑Turbo版Sendkey</button></label><span helpdata="ServerTurbo_NOTICE" class="clickableText helpText">?</span></div><div data-toggle="btnArea"><button data-action="reset" style="color:red;" class="igiftMsg_btn">重置所有为默认</button><button data-action="redoAllTasks" style="color:red;" class="igiftMsg_btn">再次执行所有任务</button><button data-action="mainSiteTasks" class="igiftMsg_btn">再次执行主站任务</button><br><button data-action="exportConfig" class="igiftMsg_btn">导出配置</button><button data-action="importConfig" class="igiftMsg_btn">导入配置</button><input type="file" id="BLTH_config_file" style="display:none"><button class="igiftMsg_btn" data-action="about">关于</button><span helpdata="btnArea" class="clickableText helpText">?</span></div></fieldset></div></div>
+
+                `
+
+
+                //GM_getResourceText('main');
                 function layerOpenAbout() {
                     return layer.open({
                         title: `版本${GM_info.script.version}`,
@@ -1139,7 +1130,8 @@
                     'COIN2SILVER',
                     'ANCHOR_TYPE_POLLING',
                     'ANCHOR_TYPE_LIVEROOM',
-                    'ANCHOR_TYPE_FOLLOWING'
+                    'ANCHOR_TYPE_FOLLOWING',
+                    'CP_NOTICE'
                 ];
                 const radioList = [
                     /**
@@ -1234,7 +1226,8 @@
                     SILVER2COIN: "每日直播用户都可以将部分银瓜子转化为硬币，每天仅一次机会。<mul><mli><code>700</code>银瓜子 = <code>1</code>硬币。</mul></mli>",
                     windowToast: `右上角的提示信息。相对来说不是那么重要，所以不放在日志窗口里。<mul style = "line-height:1em;"><div class="link-toast info fixed"><span class="toast-text">普通消息</span></div><br><br><br><div class="link-toast success fixed"><span class="toast-text">成功</span></div><br><br><br><div class="link-toast error fixed"><span class="toast-text">发生错误</span></div></mul>`,
                     GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。</mli><mli>若填写礼物名，脚本会在送礼前将其转换成 id（不会修改设置项）。如果直接填写 id 能提高运行效率。<mli>在控制台(可通过<code>ctrl + shift + i</code>打开)中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和 id 的json。将data下的几项全部展开，再搜索礼物名即可找到 id 。</mli><mli>常用 id ：1: <code>辣条</code> 6: <code>亿圆</code> 30607: <code>小心心</code></mli></mul>",
-                    ANCHOR_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的天选时刻。"
+                    ANCHOR_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的天选时刻。",
+                    CP_NOTICE: "<a href = 'https://cp.xuthus.cc/' target = '_blank'>酷推（点我注册）</a>，英文名「Cool Push」，QQ消息推送服务。使用前请先前往酷推官网完成注册，然后回到脚本界面填写Skey。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的QQ私聊消息提醒你中奖了。</mli></mu;>"
                 };
                 const openMainWindow = () => {
                     let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1251,18 +1244,18 @@
                         resize: false,
                         content: html,
                         success: () => {
-                            //整个layer窗口
+                            // 整个layer窗口
                             layerUiMain = $("#layui-layer" + String(2 + layerTimes));
-                            //layer窗口中的总div
+                            // layer窗口中的总div
                             let myDiv = $('#allsettings');
-                            //显示顶部统计数据
+                            // 显示顶部统计数据
                             $('#giftCount .anchor .statNum').text(MY_API.GIFT_COUNT.ANCHOR_COUNT); //天选
                             $('#giftCount .material .statNum').text(MY_API.GIFT_COUNT.MATERIAL_COUNT); //实物
-                            //显示忽略关键字等统计数量
+                            // 显示忽略关键字等统计数量
                             myDiv.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] label.str').text(String(MY_API.CONFIG.QUESTIONABLE_LOTTERY.length) + '个');
                             myDiv.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label.str').text(String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length) + '个');
                             myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').text(String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length) + '个');
-                            //显示输入框的值
+                            // 显示输入框的值
                             myDiv.find('div[data-toggle="GIFT_ALLOW_TYPE"] .str').val(MY_API.CONFIG.GIFT_ALLOW_TYPE).toString();
                             myDiv.find('div[data-toggle="COIN2SILVER"] .coin_number').val(parseInt(MY_API.CONFIG.COIN2SILVER_NUM).toString());
                             myDiv.find('div[data-toggle="LIGHT_MEDALS"] .num').val(MY_API.CONFIG.LIGHT_MEDALS.toString());
@@ -1303,27 +1296,27 @@
                             myDiv.find('div[data-toggle="GIFT_SEND_TIME"] .Minute').val(MY_API.CONFIG.GIFT_SEND_MINUTE.toString());
                             myDiv.find('div[data-toggle="GIFT_LIMIT"] .num').val(parseInt(MY_API.CONFIG.GIFT_LIMIT).toString());
                             myDiv.find('div[data-toggle="BUY_MEDAL"] .num').val(Live_info.room_id);
-                            //监听导入文件按钮
+                            // 监听导入文件按钮
                             const inputConfig = $("#BLTH_config_file");
                             inputConfig.on("change", importConfig);
-                            //禁止选中
+                            // 禁止选中
                             myDiv[0].onselectstart = function () {
                                 return false;
                             }
-                            //绑定按钮
+                            // 绑定按钮
                             myDiv.find('button[data-action="save"]').click(() => {
-                                //保存按钮
+                                // 保存按钮
                                 saveAction(myDiv);
                             });
                             myDiv.find('button[data-action="exportConfig"]').click(() => {
-                                //导出配置按钮
+                                // 导出配置按钮
                                 exportConfig(MY_API.CONFIG, nosleepConfig, INVISIBLE_ENTER_config)
                                 layer.msg('配置已导出', {
                                     time: 2500,
                                 });
                             });
                             myDiv.find('button[data-action="importConfig"]').click(() => {
-                                //导入配置按钮
+                                // 导入配置按钮
                                 readConfigArray[1] = $.Deferred();
                                 inputConfig.click();
                                 readConfigArray[1].then(() => {
@@ -1343,13 +1336,13 @@
                                 })
                             });
                             myDiv.find('div[data-toggle="BUY_MEDAL"] [data-action="buy_medal"]').click(function () {
-                                //购买勋章
+                                // 购买勋章
                                 const room_id = parseInt(myDiv.find('div[data-toggle="BUY_MEDAL"] .num').val());
                                 MY_API.buyFanMedal(room_id);
                             });
 
                             myDiv.find('button[data-action="reset"]').click(() => {
-                                //重置按钮
+                                // 重置按钮
                                 MY_API.setDefaults();
                             });
                             myDiv.find('button[data-action="checkUpdate"]').click(() => {
@@ -1357,11 +1350,11 @@
                                 MY_API.checkUpdate();
                             });
                             myDiv.find('button[data-action="redoAllTasks"]').click(() => {
-                                //重置每日任务状态
+                                // 重置每日任务状态
                                 MY_API.ReDoAllTasks();
                             });
                             myDiv.find('button[data-action="about"]').click(() => {
-                                //关于
+                                // 关于
                                 layerOpenAbout();
                             });
                             myDiv.find('button[data-action="lightMedalNow"]').click(() => { // 立刻点亮勋章
@@ -1373,7 +1366,7 @@
                                 MY_API.Gift.run();
                             });
                             myDiv.find('button[data-action="edit_ANCHOR_UPLOAD_MSG"]').click(() => {
-                                //编辑天选附加信息
+                                // 编辑天选附加信息
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT),
@@ -1399,7 +1392,7 @@
                                     });
                             });
                             myDiv.find('button[data-action="edit_ANCHOR_IGNORE_ROOMLIST"]').click(() => {
-                                //编辑忽略直播间
+                                // 编辑忽略直播间
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST),
@@ -1424,7 +1417,7 @@
                                     });
                             });
                             myDiv.find('button[data-action="edit_lightMedalList"]').click(() => {
-                                //编辑打卡弹幕房间列表
+                                // 编辑打卡弹幕房间列表
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.MEDAL_DANMU_ROOM),
@@ -1448,7 +1441,7 @@
                                     });
                             });
                             myDiv.find('button[data-action="edit_ANCHOR_DANMU_CONTENT"]').click(() => {
-                                //编辑天选弹幕内容
+                                // 编辑天选弹幕内容
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.ANCHOR_DANMU_CONTENT),
@@ -1472,7 +1465,7 @@
                                     });
                             });
                             myDiv.find('button[data-action="edit_medalDanmu"]').click(() => {
-                                //编辑打卡弹幕内容
+                                // 编辑打卡弹幕内容
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.MEDAL_DANMU_CONTENT),
@@ -1496,7 +1489,7 @@
                                     });
                             });
                             myDiv.find('button[data-action="edit_QUESTIONABLE_LOTTERY"]').click(() => {
-                                //编辑实物忽略关键字
+                                // 编辑实物忽略关键字
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.QUESTIONABLE_LOTTERY),
@@ -1521,7 +1514,7 @@
                                     });
                             });
                             myDiv.find('button[data-action="edit_ANCHOR_BLACKLIST_WORD"]').click(() => {
-                                //编辑天选忽略关键字
+                                // 编辑天选忽略关键字
                                 layer.prompt({
                                     formType: 2,
                                     value: String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD),
@@ -1546,7 +1539,7 @@
                                     });
                             });
                             myDiv.find('button[data-action="edit_ANCHOR_LETTER_CONTENT"]').click(() => {
-                                //编辑天选私信
+                                // 编辑天选私信
                                 layer.prompt({
                                     formType: 2,
                                     value: MY_API.CONFIG.ANCHOR_LETTER_CONTENT,
@@ -1566,15 +1559,15 @@
                                     });
                             });
                             myDiv.find('button[data-action="mainSiteTasks"]').click(() => {
-                                //再次执行主站任务
+                                // 再次执行主站任务
                                 if (mainSiteTasksBtnClickable) {
                                     mainSiteTasksBtnClickable = false;
                                     setTimeout(() => mainSiteTasksBtnClickable = true, 2000);
                                     MY_API.DailyReward.run(true);
                                 }
                             });
-                            myDiv.find('button[data-action="edit_SCKEY"]').click(() => {
-                                //编辑SCKEY
+                            myDiv.find('button[data-action="edit_FT_SCKEY"]').click(() => {
+                                // 编辑方糖SCKEY
                                 layer.prompt({
                                     formType: 0,
                                     value: MY_API.CONFIG.FT_SCKEY,
@@ -1591,9 +1584,47 @@
                                         layer.close(index);
                                     }
                                 )
-                            })
+                            });
+                            myDiv.find('button[data-action="edit_CP_Skey"]').click(() => {
+                                // 编辑酷推Skey
+                                layer.prompt({
+                                    formType: 0,
+                                    value: MY_API.CONFIG.CP_Skey,
+                                    title: '请输入酷推Skey',
+                                    btn: ['保存', '取消']
+                                },
+                                    function (value, index) {
+                                        MY_API.CONFIG.CP_Skey = value;
+                                        MY_API.saveConfig(false);
+                                        layer.msg('酷推Skey保存成功', {
+                                            time: 2500,
+                                            icon: 1
+                                        });
+                                        layer.close(index);
+                                    }
+                                )
+                            });
+                            myDiv.find('button[data-action="edit_ServerTurbo_SendKey"]').click(() => {
+                                // 编辑Server酱·Turbo版SendKey
+                                layer.prompt({
+                                    formType: 0,
+                                    value: MY_API.CONFIG.ServerTurbo_SendKey,
+                                    title: '请输入Server酱·Turbo版SendKey',
+                                    btn: ['保存', '取消']
+                                },
+                                    function (value, index) {
+                                        MY_API.CONFIG.ServerTurbo_SendKey = value;
+                                        MY_API.saveConfig(false);
+                                        layer.msg('Server酱·Turbo版SendKey保存成功', {
+                                            time: 2500,
+                                            icon: 1
+                                        });
+                                        layer.close(index);
+                                    }
+                                )
+                            });
                             myDiv.find('button[data-action="editWhiteList"]').click(() => {
-                                //编辑白名单
+                                // 编辑白名单
                                 const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
                                 const list = [...config.list];
                                 layer.prompt({
@@ -1620,14 +1651,14 @@
                             });
                             myDiv.find('button[data-action="saveFollowingList"]').click(() => {
                                 if (getFollowBtnClickable) {
-                                    //保存当前关注列表为白名单
+                                    // 保存当前关注列表为白名单
                                     getFollowBtnClickable = false;
                                     window.toast('[ 保存当前关注列表为白名单 ] 开始获取关注列表');
                                     return MY_API.AnchorLottery.getFollowingList();
                                 }
                             });
                             myDiv.find('button[data-action="removeAnchorPrizeInTag"]').click(() => {
-                                //取关中奖分组内的UP
+                                // 取关中奖分组内的UP
                                 if (unFollowBtnClickable) {
                                     layer.confirm(`是否取关在【${anchorPrizeTagName}】分组的UP主？<mul><mli>注：不建议取关该分组内UP。</mli></mul>`, {
                                         title: '取关不在分组内的UP主',
@@ -1646,7 +1677,7 @@
                                 }
                             });
                             myDiv.find('button[data-action="removeAnchorFollowingInTag"]').click(() => {
-                                //取关关注分组内的UP
+                                // 取关关注分组内的UP
                                 if (unFollowBtnClickable) {
                                     layer.confirm(`是否取关在【${anchorFollowTagName}】分组的UP主？`, {
                                         title: '取关不在分组内的UP主',
@@ -1665,7 +1696,7 @@
                                 }
                             });
                             myDiv.find('button[data-action="removeAnchorFollowing"]').click(() => {
-                                //取关不在白名单内的UP主
+                                // 取关不在白名单内的UP主
                                 if (unFollowBtnClickable) {
                                     layer.confirm(`是否取关不在白名单内的UP主？`, {
                                         title: '取关不在白名单内的UP主',
@@ -1684,7 +1715,7 @@
                                 }
                             });
                             myDiv.find('button[data-action="sendGiftNow"]').click(() => {
-                                //立刻开始送礼
+                                // 立刻开始送礼
                                 if (!MY_API.CONFIG.AUTO_GIFT) {
                                     window.toast('[ 立刻开始送礼 ] 请先勾选【自动送礼】再点击此按钮', 'info');
                                     return
@@ -1693,7 +1724,7 @@
                                 MY_API.Gift.run();
                             });
                             myDiv.find('button[data-action="sendDanmuNow"]').click(() => {
-                                //立刻发送弹幕
+                                // 立刻发送弹幕
                                 if (!MY_API.CONFIG.AUTO_DANMU) {
                                     window.toast('[ 立刻发送弹幕 ] 请先勾选【自动发弹幕】再点击此按钮', 'info');
                                     return
@@ -1702,11 +1733,11 @@
                                 MY_API.AUTO_DANMU.run();
                             });
                             myDiv.find('button[data-action="clearDanmuCache"]').click(() => {
-                                //清除弹幕缓存
+                                // 清除弹幕缓存
                                 MY_API.CACHE.AUTO_SEND_DANMU_TS = [];
                                 if (MY_API.saveCache()) MY_API.chatLog('清除弹幕缓存成功', 'success');
                             });
-                            //绑定所有checkbox事件
+                            // 绑定所有checkbox事件
                             for (const i of checkList) {
                                 const input = myDiv.find(`div[data-toggle="${i}"] input:checkbox`);
                                 if (MY_API.CONFIG[i]) input.attr('checked', '');
@@ -1715,7 +1746,7 @@
                                     MY_API.saveConfig();
                                 });
                             };
-                            //绑定特殊设置（不在MY_API.CONFIG中）
+                            // 绑定特殊设置（不在MY_API.CONFIG中）
                             const specialSetting = [
                                 {
                                     jqPath: `div[data-toggle="INVISIBLE_ENTER"] input:checkbox`,
@@ -1755,13 +1786,13 @@
                                     if (i.hasOwnProperty('toastMsg')) window.toast(i.toastMsg[0], i.toastMsg[1]);
                                 })
                             }
-                            //绑定回车保存
+                            // 绑定回车保存
                             $('input:text').bind('keydown', function (event) {
                                 if (event.keyCode == 13) {
                                     saveAction(myDiv);
                                 }
                             });
-                            //绑定多选框事件
+                            // 绑定多选框事件
                             for (const i of radioList) {
                                 for (let count = 1; true; count++) {
                                     const toggleName = "toggle" + String(count);
@@ -1782,7 +1813,7 @@
                                     }
                                 })
                             }
-                            //绑定帮助文字 (?)
+                            // 绑定帮助文字 (?)
                             $('.helpText').click(function () {
                                 const id = $(this).attr('helpData');
                                 if (id !== undefined) {
@@ -1804,7 +1835,7 @@
                         }
                     });
                 };
-                //监听隐藏/显示窗口按钮
+                // 监听隐藏/显示窗口按钮
                 let JQshow = false;
                 btn.click(() => {
                     if (hideBtnClickable) {
@@ -1830,15 +1861,15 @@
                         }
                     }
                 });
-                //添加隐藏/显示窗口按钮
+                // 添加隐藏/显示窗口按钮
                 $('.attention-btn-ctnr').append(btn);
-                //打开窗口
+                // 打开窗口
                 openMainWindow();
                 if (mainDisplay === 'hide') {
                     layerUiMain.hide();
                     JQshow = true;
                 }
-                //监听播放器全屏变化
+                // 监听播放器全屏变化
                 function livePlayerPropertyChange() {
                     let state = livePlayer.attr('data-player-state'),
                         tabOffSet = tabContent.offset(), top = tabOffSet.top, left = tabOffSet.left;
@@ -1855,9 +1886,9 @@
                 let mutationObserver = new MutationObserver(livePlayerPropertyChange);
                 const options = { 'attributes': true };
                 mutationObserver.observe(livePlayer[0], options);
-                //添加隐藏/显示窗口按钮
+                // 添加隐藏/显示窗口按钮
                 $('.attention-btn-ctnr').append(btn);
-                //初次运行时tips
+                // 初次运行时tips
                 if (!MY_API.CACHE.DailyReward_TS) {
                     layer.tips('点我隐藏/显示控制面板', '#hiderbtn', {
                         tips: 1
@@ -2059,7 +2090,7 @@
                     })
                 }
                 BAPI.xlive.lottery.check(roomId).then((re) => {
-                    MY_API.RoomId_list.rmVal(roomId); // 移除房间号
+                    rmVal(MY_API.RoomId_list, roomId)
                     MYDEBUG('检查房间返回信息', re);
                     const data = re.data;
                     if (re.code === 0) {
@@ -2197,19 +2228,19 @@
                                 case 'gift':
                                     MY_API.gift_join(roomId, data.raffleId, data.type).then(function (msg, num) {
                                         aa.text(msg);
-                                        MY_API.raffleId_list.rmVal(data.raffleId); // 移除礼物id列表
+                                        rmVal(MY_API.raffleId_list, data.raffleId); // 移除礼物id列表
                                     });
                                     break;
                                 case 'guard':
                                     MY_API.guard_join(roomId, data.id).then(function (msg, num) {
                                         aa.text(msg);
-                                        MY_API.guardId_list.rmVal(data.id); // 移除礼物id列表
+                                        rmVal(MY_API.guardId_list, data.id); // 移除礼物id列表
                                     });
                                     break;
                                 case 'pk':
                                     MY_API.pk_join(roomId, data.id).then(function (msg, num) {
                                         aa.text(msg);
-                                        MY_API.pkId_list.rmVal(data.id); // 移除礼物id列表
+                                        rmVal(MY_API.pkId_list, data.id); // 移除礼物id列表
                                     });
                                     break;
                             }
@@ -2856,7 +2887,7 @@
                             const listItem = MY_API.Gift.sendGiftList[i];
                             let matchItem;
                             if (isNaN(listItem)) {
-                                //如果填了礼物名，转换为id
+                                // 如果填了礼物名，转换为id
                                 matchItem = Live_info.gift_list.find(item => item.name === listItem);
                                 if (matchItem) MY_API.Gift.sendGiftList[i] = String(matchItem.id);
                             }
@@ -3789,30 +3820,68 @@
                                 for (const g of i.list) {
                                     if (g.uid === Live_info.uid) {
                                         MY_API.chatLog(
-                                            `[实物抽奖] 抽奖"${obj.title}"<br>aid = ${obj.aid}，第${obj.number}轮<br>获得奖励："${i.giftTitle}"`,
+                                            `[实物抽奖] 抽奖"${obj.title}"<br>aid = ${obj.aid}，第${obj.number}轮<br>获得奖品："${i.giftTitle}"`,
                                             'prize');
                                         winPrizeNum++;
                                         winPrizeTotalCount++;
                                         JQlogRedPoint.text(winPrizeNum);
                                         if (JQlogRedPoint.is(":hidden")) JQlogRedPoint.show();
                                         if (MY_API.CONFIG.FT_NOTICE) {
-                                            function FT_notice() {
+                                            (function FT_notice() {
                                                 return FT_sendMsg(MY_API.CONFIG.FT_SCKEY,
                                                     `【${GM_info.script.name}】实物抽奖中奖通知 ${obj.title}，第${obj.number}轮`,
-                                                    `###实物抽奖中奖\n###中奖账号id：${Live_info.uname}\n###${obj.title}\n###aid = ${obj.aid}\n###第${obj.number}轮\n###获得奖励：\n###${i.giftTitle}\n###请及时填写领奖信息`
+                                                    `###实物抽奖中奖\n###中奖账号id：${Live_info.uname}\n###${obj.title}\n###aid = ${obj.aid}\n###第${obj.number}轮\n###获得奖品：\n##${i.giftTitle}\n###请及时填写领奖信息`
                                                 ).then((re) => {
                                                     MYDEBUG('FT_sendMsg response', re);
                                                     if (re.body.errno == 0) {
                                                         window.toast('[实物抽奖] 方糖中奖提示发送成功', 'success');
                                                     } else {
-                                                        window.toast(`[实物抽奖] 方糖中奖提示发送失败 ${re.errmsg}`, 'error')
+                                                        window.toast(`[实物抽奖] 方糖中奖提示发送失败 ${re.body.errmsg}`, 'error')
                                                     }
+                                                    return $.Deferred().resolve();
                                                 }), () => {
                                                     MY_API.chatLog(`[实物抽奖] 方糖中奖提示发送出错，请检查网络`, 'error');
                                                     return delayCall(() => FT_notice());
                                                 };
-                                            }
-                                            FT_notice();
+                                            })();
+                                        }
+                                        if (MY_API.CONFIG.CP_NOTICE) {
+                                            (function CP_notice() {
+                                                return CP_sendMsg(MY_API.CONFIG.CP_Skey,
+                                                    `【${GM_info.script.name}实物抽奖中奖通知\n${obj.title}\n第${obj.number}轮\n中奖账号id：${Live_info.uname}\n${obj.title}\naid = ${obj.aid}\n第${obj.number}轮\n获得奖品：\n${i.giftTitle}\n请及时填写领奖信息`
+                                                ).then((re) => {
+                                                    MYDEBUG('CP_sendMsg response', re);
+                                                    if (re.body.code === 200) {
+                                                        window.toast('[实物抽奖] 酷推中奖提示发送成功', 'success');
+                                                    } else {
+                                                        window.toast(`[实物抽奖] 酷推中奖提示发送失败 ${re.body.message}`, 'error')
+                                                    }
+                                                    return $.Deferred().resolve();
+                                                }), () => {
+                                                    MY_API.chatLog(`[实物抽奖] 酷推中奖提示发送出错，请检查网络`, 'error');
+                                                    return delayCall(() => CP_notice());
+                                                };
+                                            })()
+                                        }
+                                        if (MY_API.CONFIG.ServerTurbo_NOTICE) {
+                                            // Server酱turbo版
+                                            (function ServerTurbo_notice() {
+                                                return ServerTurbo_sendMsg(MY_API.CONFIG.ServerTurbo_SendKey,
+                                                    `【${GM_info.script.name}】实物抽奖中奖通知 ${obj.title}，第${obj.number}轮`,
+                                                    `## 实物抽奖中奖\n\n## 中奖账号id：${Live_info.uname}\n\n## ${obj.title}\n\n## aid = ${obj.aid}\n\n## 第${obj.number}轮\n\n## 获得奖品：\n\n# ${i.giftTitle}\n\n## 请及时填写领奖信息`
+                                                ).then((re) => {
+                                                    MYDEBUG('ServerTurbo_sendMsg response', re);
+                                                    if (re.body.code === 0) {
+                                                        window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
+                                                    } else {
+                                                        window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
+                                                    }
+                                                    return $.Deferred().resolve();
+                                                }), () => {
+                                                    MY_API.chatLog(`[实物抽奖] Server酱Turbo版中奖提示发起推送出错，请检查网络`, 'error');
+                                                    return delayCall(() => ServerTurbo_notice());
+                                                }
+                                            })();
                                         }
                                         if (MY_API.CONFIG.GM_NOTICE) {
                                             GM_notice("实物抽奖中奖", `${obj.title}，奖品：${i.giftTitle}`)
@@ -4110,7 +4179,7 @@
                                     MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间`, 'info');
                                     MYDEBUG(`[天选时刻] 获取${r.name + '小时榜'}房间列表`, data);
                                     for (const i of list) {
-                                        MY_API.AnchorLottery.roomidList.addVal(Number(i.roomid));
+                                        addVal(MY_API.AnchorLottery.roomidList, i.roomid);
                                     }
                                 } else {
                                     MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间出错<br>${data.message}`, 'warning');
@@ -4487,7 +4556,7 @@
                                 return false
                             }
                             // 添加至上传列表
-                            MY_API.AnchorLottery.lotteryResponseList.addVal(Number(response.data.room_id));
+                            addVal(MY_API.AnchorLottery.lotteryResponseList, response.data.room_id);
                             const joinPrice = response.data.gift_num * response.data.gift_price,
                                 joinTextTitle = `${NAME}_ANCHOR_${response.data.id}`,
                                 ts = ts_ms();
@@ -4754,6 +4823,7 @@
                             }
                             if (!award) { // 运行没中奖的代码
                                 if (MY_API.CONFIG.ANCHOR_AUTO_DEL_FOLLOW) {
+                                    // 取关
                                     const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
                                     const id_list = [...config.list];
                                     if (id_list.indexOf(String(anchorUid)) === -1 && MY_API.AnchorLottery.uidInOriginTag.indexOf(String(anchorUid)) === -1) {
@@ -4777,6 +4847,7 @@
                                 JQlogRedPoint.text(winPrizeNum);
                                 if (JQlogRedPoint.is(":hidden")) JQlogRedPoint.show();
                                 if (MY_API.CONFIG.ANCHOR_PRIVATE_LETTER) {
+                                    // 私信
                                     const msg = {
                                         sender_uid: Live_info.uid,
                                         receiver_id: anchorUid,
@@ -4797,9 +4868,10 @@
                                         }, () => {
                                             MY_API.chatLog(`[天选自动私信] 私信UP(uid = ${anchorUid})出错，请检查网络`);
                                         })
-                                    }, 8000); // 之前2秒+8秒
+                                    }, 8000);
                                 }
                                 if (MY_API.CONFIG.ANCHOR_MOVETO_PRIZE_TAG) {
+                                    // 移动分组
                                     BAPI.relation.addUsers(anchorUid, MY_API.AnchorLottery.anchorPrizeTagid).then((re) => {
                                         MYDEBUG(`API.relation.addUsers ${anchorUid} ${MY_API.AnchorLottery.anchorPrizeTagid}`, re);
                                         if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${anchorUid}）至分组【${anchorPrizeTagName}】成功`, 'success');
@@ -4809,32 +4881,75 @@
                                     });
                                 }
                                 if (MY_API.CONFIG.FT_NOTICE) {
-                                    function FT_notice() {
+                                    // 方糖
+                                    (function FT_notice() {
                                         return FT_sendMsg(MY_API.CONFIG.FT_SCKEY,
                                             `${GM_info.script.name} 天选时刻中奖通知 ${new Date().toLocaleString()}`,
-                                            `###天选时刻中奖\n###中奖账号id：${Live_info.uname}\n###房间号roomid = ${data.roomid}\n###主播uid = ${anchorUid}\n###抽奖id = ${data.id}\n###获得奖品：\n###${data.award_name}\n###请及时私信主播发放奖励`
+                                            `###天选时刻中奖\n###中奖账号id：${Live_info.uname}\n###房间号roomid = ${data.roomid}\n###主播uid = ${anchorUid}\n###抽奖id = ${data.id}\n###获得奖品：\n##${data.award_name}\n###请及时私信主播发放奖励`
                                         ).then((re) => {
                                             MYDEBUG('FT_sendMsg response', re);
                                             if (re.body.errno == 0) {
                                                 window.toast('[天选时刻] 方糖中奖提示发送成功', 'success');
                                             } else {
-                                                window.toast(`[天选时刻] 方糖中奖提示发送失败 ${re.errmsg}`, 'error')
+                                                window.toast(`[天选时刻] 方糖中奖提示发送失败 ${re.body.errmsg}`, 'error')
                                             }
+                                            return $.Deferred().resolve();
                                         }, () => {
                                             MY_API.chatLog(`[天选时刻] 方糖中奖提示发送出错，请检查网络`, 'error');
                                             return delayCall(() => FT_notice());
                                         });
-                                    }
-                                    FT_notice();
+                                    })()
+                                }
+                                if (MY_API.CONFIG.CP_NOTICE) {
+                                    // 酷推
+                                    (function CP_notice() {
+                                        return CP_sendMsg(MY_API.CONFIG.CP_Skey,
+                                            `【${GM_info.script.name}】天选时刻中奖通知\n中奖账号id：${Live_info.uname}\n房间号roomid = ${data.roomid}\n主播uid = ${anchorUid}\n抽奖id = ${data.id}\n获得奖品：\n${data.award_name}\n请及时私信主播发放奖励`
+                                        ).then((re) => {
+                                            MYDEBUG('CP_sendMsg response', re);
+                                            if (re.body.code === 200) {
+                                                window.toast('[天选时刻] 酷推中奖提示发送成功', 'success');
+                                            } else {
+                                                window.toast(`[天选时刻] 酷推中奖提示发送失败 ${re.body.message}`, 'error')
+                                            }
+                                            return $.Deferred().resolve();
+                                        }), () => {
+                                            MY_API.chatLog(`[天选时刻] 酷推中奖提示发送出错，请检查网络`, 'error');
+                                            return delayCall(() => CP_notice());
+                                        };
+                                    })();
+                                }
+                                if (MY_API.CONFIG.ServerTurbo_NOTICE) {
+                                    // Server酱turbo版
+                                    (function ServerTurbo_notice() {
+                                        return ServerTurbo_sendMsg(MY_API.CONFIG.ServerTurbo_SendKey,
+                                            `${GM_info.script.name} 天选时刻中奖通知`,
+                                            `## 天选时刻中奖\n\n## 中奖账号id：${Live_info.uname}\n\n## 房间号roomid = ${data.roomid}\n\n## 主播uid = ${anchorUid}\n\n## 抽奖id = ${data.id}\n\n## 获得奖品：\n\n# ${data.award_name}\n\n## 请及时私信主播发放奖励`
+                                            ).then((re) => {
+                                                MYDEBUG('ServerTurbo_sendMsg response', re);
+                                                if (re.body.code === 0) {
+                                                    window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
+                                                } else {
+                                                    window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
+                                                }
+                                                return $.Deferred().resolve();
+                                            }), () => {
+                                                MY_API.chatLog(`[实物抽奖] Server酱Turbo版中奖提示发起推送出错，请检查网络`, 'error');
+                                                return delayCall(() => ServerTurbo_notice());
+                                            }
+                                    })();
                                 }
                                 if (MY_API.CONFIG.GM_NOTICE) {
+                                    // 系统通知
                                     GM_notice("天选时刻中奖", `房间号：${data.roomid}，奖品：${data.award_name}`)
                                 }
                                 if (MY_API.CONFIG.ANCHOR_DANMU) {
+                                    // 弹幕
                                     const danmuContent = MY_API.CONFIG.ANCHOR_DANMU_CONTENT[Math.floor(Math.random() * MY_API.CONFIG.MEDAL_DANMU_CONTENT.length)];
                                     MY_API.AnchorLottery.sendDanmu(danmuContent, data.roomid)
                                 }
                                 if (MY_API.CONFIG.ANCHOR_ADD_TO_WHITELIST) {
+                                    // 添加到白名单
                                     const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
                                     let id_list = [...config.list];
                                     id_list.push(String(anchorUid));
@@ -4998,19 +5113,19 @@
                         }
                     }
                     async function getDataAndJoin() {
-                        if (MY_API.CONFIG.ANCHOR_TYPE_POLLING) { //轮询
+                        if (MY_API.CONFIG.ANCHOR_TYPE_POLLING) { // 轮询热门房间
                             if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) await MY_API.AnchorLottery.uploadRoomList();
                             await MY_API.AnchorLottery.getRoomList();
                         }
-                        if (MY_API.CONFIG.ANCHOR_TYPE_LIVEROOM) { //从直播间简介
+                        if (MY_API.CONFIG.ANCHOR_TYPE_LIVEROOM) { // 从直播间简介
                             await MY_API.AnchorLottery.getLotteryInfoFromRoom();
                         }
-                        if (MY_API.CONFIG.ANCHOR_TYPE_FOLLOWING) { //从关注直播间
+                        if (MY_API.CONFIG.ANCHOR_TYPE_FOLLOWING) { // 从关注直播间
                             await MY_API.AnchorLottery.getLiveUsers();
                             for (const i of MY_API.AnchorLottery.liveUserList) {
                                 const roomid = i.link.match(/(?<=https?:\/\/live\.bilibili\.com\/)\d+/)[0],
-                                    uid = String(i.uid);
-                                MY_API.AnchorLottery.liveRoomList.addVal(Number(roomid));
+                                    uid = i.uid;
+                                addVal(MY_API.AnchorLottery.liveRoomList, roomid);
                                 MY_API.AnchorLottery.roomidAndUid[roomid] = uid;
                             }
                             MY_API.chatLog(`[天选时刻] 已关注的开播直播间获取完毕<br>共${MY_API.AnchorLottery.liveRoomList.length}个`, 'success');
@@ -5018,7 +5133,7 @@
                         // 整理数据并参加
                         const id_list = [...MY_API.AnchorLottery.liveRoomList, ...MY_API.AnchorLottery.introRoomList, ...MY_API.AnchorLottery.roomidList];
                         for (const r of id_list) {
-                            MY_API.AnchorLottery.allRoomList.addVal(r);
+                            addVal(MY_API.AnchorLottery.allRoomList, r);
                         }
                         if (MY_API.AnchorLottery.allRoomList.length > MY_API.CONFIG.ANCHOR_MAXROOM)
                             MY_API.AnchorLottery.allRoomList = MY_API.AnchorLottery.allRoomList.splice(0, MY_API.CONFIG.ANCHOR_MAXROOM);
@@ -5106,9 +5221,9 @@
     }
 
     async function main(API) {
-        //修复版本更新产生的兼容性问题
+        // 修复版本更新产生的兼容性问题
         fixVersionDifferences(API, GM_info.script.version);
-        //清空辣条数量
+        // 清空辣条数量
         let clearStat = () => {
             for (const i in API.GIFT_COUNT) {
                 if (i !== 'CLEAR_TS') API.GIFT_COUNT[i] = 0;
@@ -5216,6 +5331,27 @@
             }, delay);
         };
         if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000); // 单位1分钟，重新加载直播间
+    }
+    /**
+     * 删除一维数组元素
+     * @param val 数组中一个元素的值
+     */
+    function rmVal(arr, val) {
+        const index = arr.findIndex(v => v == val); // 类型不必相同
+        if (index > -1) return arr.splice(index, 1);
+    }
+    /**
+     * 给一维数组添加不重复的元素
+     * @param  val 数组中一个元素的值
+     * @param  Array 数组
+     * @param  mode 1: unshift 2: push
+     */
+    function addVal(arr, val, mode = 1) {
+        const index = arr.findIndex(v => v == val); // 类型不必相同
+        if (index === -1) {
+            if (mode === 1) return arr.unshift(val);
+            else return arr.push(val);
+        }
     }
     /**
      * 比较版本号大小
@@ -5504,6 +5640,39 @@
         })
     }
     /**
+     * 发送酷推消息
+     * @param Skey 
+     * @param content
+     * @returns {object}  resolve({response: res, body: res.response})
+     */
+    function CP_sendMsg(Skey, content) {
+        return XHR({
+            GM: true,
+            anonymous: true,
+            method: 'POST',
+            url: `https://push.xuthus.cc/send/${Skey}`,
+            data: `${content}`,
+            responseType: 'json'
+        })
+    }
+    /**
+     * 发送Server酱Turbo版通知
+     * @param SendKey
+     * @param title
+     * @param desp
+     * @returns {object}  resolve({response: res, body: res.response})
+     */
+    function ServerTurbo_sendMsg(SendKey, title, desp) { /* openid 暂时不需要*/
+        return XHR({
+            GM: true,
+            anonymous: true,
+            method: 'POST',
+            url: `https://sctapi.ftqq.com/${SendKey}.send`,
+            data: `title=${title}&desp=${desp}`,
+            responseType: 'json'
+        })
+    }
+    /**
      * 浏览器提示
      * @param title
      * @param text
@@ -5552,7 +5721,7 @@
     function XHR(XHROptions) {
         return new Promise(resolve => {
             const onerror = (error) => {
-                MYERROR('XHR出错', `参数${XHROptions}`, error);
+                MYERROR('XHR出错', `${XHROptions}`, error);
                 resolve(undefined);
             };
             if (XHROptions.GM) {

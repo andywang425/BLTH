@@ -30,9 +30,9 @@
                                         style="color:darkgreen;">抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input
                                                 class="per igiftMsg_input" style="width:30px;" type="text">% </label>
                         </div>
-                        <div data-toggle="CHECK_HOUR_ROOM"><label class="lineStartSpace"
-                                        style="color:darkgreen;"><input type="checkbox">检查小时榜（间隔时间<input
-                                                class="num igiftMsg_input" style="width:25px;" type="text">秒） </label>
+                        <div data-toggle="CHECK_HOUR_ROOM"><label class="lineStartSpace" style="color:darkgreen;"><input
+                                                type="checkbox">检查小时榜（间隔时间<input class="num igiftMsg_input"
+                                                style="width:25px;" type="text">秒） </label>
                         </div>
                         <div data-toggle="MATERIAL_LOTTERY"><label style="color:purple;"><input type="checkbox">参与实物抽奖
                                 </label><span helpdata="MATERIAL_LOTTERY" class="clickableText helpText">?</span></div>
@@ -190,14 +190,16 @@
                         <div data-toggle="ANCHOR_LOTTERY"><label style="color:purple"><input type="checkbox">参加天选时刻抽奖
                                 </label><span helpdata="ANCHOR_LOTTERY" class="clickableText helpText">?</span></div>
                         数据获取方式<br>
-                        <div data-toggle="ANCHOR_TYPE_POLLING" class="lineStartSpace"><input type="checkbox">从高热度直播间获取天选时刻数据 <span
-                                        helpdata="ANCHOR_TYPE_POLLING" class="clickableText helpText">?</span></div>
+                        <div data-toggle="ANCHOR_TYPE_POLLING" class="lineStartSpace"><input
+                                        type="checkbox">从高热度直播间获取天选时刻数据 <span helpdata="ANCHOR_TYPE_POLLING"
+                                        class="clickableText helpText">?</span></div>
                         <div data-toggle="ANCHOR_TYPE_LIVEROOM" class="lineStartSpace"><input type="checkbox">从直播间
                                 <input class="num igiftMsg_input" style="width:100px;" type="text">的个人简介获取天选时刻数据 <span
                                         helpdata="ANCHOR_TYPE_LIVEROOM" class="clickableText helpText">?</span>
                         </div>
-                        <div data-toggle="ANCHOR_TYPE_FOLLOWING" class="lineStartSpace"><input type="checkbox">从已关注且正在直播的直播间获取天选时刻数据 <span
-                                        helpdata="ANCHOR_TYPE_FOLLOWING" class="clickableText helpText">?</span>
+                        <div data-toggle="ANCHOR_TYPE_FOLLOWING" class="lineStartSpace"><input
+                                        type="checkbox">从已关注且正在直播的直播间获取天选时刻数据 <span helpdata="ANCHOR_TYPE_FOLLOWING"
+                                        class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="ANCHOR_MAXROOM"><label>检查房间最大数量 <input class="roomNum igiftMsg_input"
                                                 style="width:50px;" type="text"></label><span helpdata="ANCHOR_MAXROOM"
@@ -296,9 +298,8 @@
                 </fieldset>
                 <fieldset class="igiftMsg_fs">
                         <legend>其他设置</legend>
-                        <div data-toggle="TIME_AREA_DISABLE"><label style="color:darkgreen"><input
-                                                type="checkbox">休眠时段： <input class="startHour igiftMsg_input"
-                                                style="width:20px;" type="text">点 <input
+                        <div data-toggle="TIME_AREA_DISABLE"><label style="color:darkgreen"><input type="checkbox">休眠时段：
+                                        <input class="startHour igiftMsg_input" style="width:20px;" type="text">点 <input
                                                 class="startMinute igiftMsg_input" style="width:20px;" type="text">分至
                                         <input class="endHour igiftMsg_input" style="width:20px;" type="text">点 <input
                                                 class="endMinute igiftMsg_input" style="width:20px;" type="text">分
@@ -319,11 +320,24 @@
                         </div>
                         <div data-toggle="GM_NOTICE"><label><input type="checkbox">实物/天选中奖后系统通知 </label>
                         </div>
-                        <div data-toggle="FT_NOTICE"><label style="color:darkgreen"><input type="checkbox">实物/天选中奖后通过<a
-                                                href="https://sc.ftqq.com" target="_blank">方糖</a>推送通知 <button
-                                                class="igiftMsg_btn"
-                                                data-action="edit_SCKEY">编辑SCKEY</button></label><span
+                        实物/天选中奖后消息推送\n
+                        <div data-toggle="FT_NOTICE"><label class="lineStartSpace" style="color:darkgreen"><input
+                                                type="checkbox">通过<a href="https://sc.ftqq.com"
+                                                target="_blank">方糖</a>推送通知 <button class="igiftMsg_btn"
+                                                data-action="edit_FT_SCKEY">编辑方糖SCKEY</button></label><span
                                         helpdata="FT_NOTICE" class="clickableText helpText">?</span>
+                        </div>
+                        <div data-toggle="CP_NOTICE"><label class="lineStartSpace" style="color:darkgreen"><input
+                                                type="checkbox">通过<a href="https://cp.xuthus.cc"
+                                                target="_blank">酷推</a>推送通知 <button class="igiftMsg_btn"
+                                                data-action="edit_CP_Skey">编辑酷推Skey</button></label><span
+                                        helpdata="CP_NOTICE" class="clickableText helpText">?</span>
+                        </div>
+                        <div data-toggle="ServerTurbo_NOTICE"><label class="lineStartSpace" style="color:darkgreen"><input
+                                type="checkbox">通过<a href="https://sct.ftqq.com"
+                                target="_blank">Server酱·Turbo版</a>推送通知 <button class="igiftMsg_btn"
+                                data-action="edit_ServerTurbo_SendKey">编辑Turbo版Sendkey</button></label><span
+                        helpdata="ServerTurbo_NOTICE" class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="btnArea"><button data-action="reset" style="color:red;"
                                         class="igiftMsg_btn">重置所有为默认</button><button data-action="redoAllTasks"
