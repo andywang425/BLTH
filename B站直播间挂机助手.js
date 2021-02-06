@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.5.1
+// @version        5.6.5.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -159,7 +159,13 @@
     },
     addStyle = () => {
       const layerCss = GM_getResourceText('layerCss');
-      const myCss = GM_getResourceText('myCss');
+      const myCss = `
+      .chatLogDiv{text-align:center;border-radius:4px;min-height:30px;width:256px;color:#9585ff;line-height:30px;padding:0 10px;margin:10px auto}.chatLogMsg{word-wrap:break-word;width:100%;line-height:1em;margin-bottom:10px}.chatLogWarning{border:1px solid rgb(236,221,192);color:rgb(218,142,36);background:rgb(245,235,221) none repeat scroll 0% 0%}.chatLogSuccess{border:1px solid rgba(22,140,0,.28);color:rgb(69,171,69);background:none 0% 0% repeat scroll rgba(16,255,0,.18)}.chatLogError{border:1px solid rgba(255,0,39,.28);color:rgb(116,0,15);background:none 0% 0% repeat scroll rgba(255,0,39,.18)}.chatLogDefault{border:1px solid rgb(203,195,255);background:rgb(233,230,255) none repeat scroll 0% 0%}.igiftMsg_main{margin:10px}.igiftMsg_input{outline:none;margin-inline:5px;border:1px solid #e9eaec;background-color:#fff;border-radius:4px;padding:1px 0 0;overflow:hidden;font-size:12px;line-height:19px;width:30px}.igiftMsg_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px}.igiftMsg_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.igiftMsg_btn:hover{background-color:#1097cc}.igiftMsg_fs{border:2px solid #d4d4d4;line-height:25px}.chatLogDiv{text-align:center;border-radius:4px;min-height:30px;width:256px;line-height:30px;padding:0 10px;margin:10px auto}.chatLogMsg{word-wrap:break-word;width:100%;line-height:1em;margin-bottom:10px}.chatLogWarning{border:1px solid rgb(209,194,164);color:rgb(190,125,33);background:rgb(255,223,175) none repeat scroll 0% 0%}.chatLogSuccess{border:1px solid rgba(22,140,0,.28);color:rgb(69,171,69);background:none 0% 0% repeat scroll rgba(16,255,0,.18)}.chatLogError{border:1px solid rgba(255,0,39,.28);color:rgb(116,0,15);background:none 0% 0% repeat scroll rgba(255,0,39,.18)}.chatLogDefault{border:1px solid rgb(203,195,255);color:#9585ff;background:rgb(233,230,255) none repeat scroll 0% 0%}.chatLogLottery{text-align:center;border-radius:4px;min-height:30px;width:256px;color:#9585ff;line-height:30px;padding:0 10px;margin:10px auto;border:1px solid rgb(203,195,255);background:rgb(233,230,255) none repeat scroll 0% 0%}.chatLogWinPrize{border:1px solid rgb(223,187,0);color:rgb(145,123,0);background:none 0% 0% repeat scroll rgb(255,215,0,30%)}.igiftMsg_num{min-width:12px;height:16px;padding:0 3px;border-radius:8px;line-height:16px;font-size:12px;text-align:center;color:#fff;position:absolute;top:6px;right:11px;background-color:#fa5a57}.clickableText{font-size:1.1em;color:#0080c6;cursor:pointer;text-decoration:underline}.clickableText:hover{font-weight:bold}.clickableText:hover:active{position:relative;top:1px}.helpText{padding-inline-start:5px;display:inline}.lineStartSpace{margin-inline-start:18px}.smallInerval{margin-inline-start:5px}.inline{display:inline}.statNum{margin-inline-start:5px;margin-inline-end:5px}.layui-layer [type="checkbox"],[type="radio"]{margin-inline-end:5px;vertical-align:text-top}.layui-layer [type="button"]{font-size:small;margin-inline-start:5px}.layui-layer .insideText{margin-inline-start:18px}.layui-layer code{padding:.2em .4em;margin:0;font-size:85%;background-color:rgb(27 31 35 / 5%);border-radius:6px}.layui-layer blockquote{padding:0 1em;color:#6a737d;border-left:.25em solid #dfe2e5}.layui-layer legend{margin:auto;font-size:1.2em}.layui-layer a{color:blue}.layui-layer-content ul{margin-block-start:0;margin-block-end:0;padding-inline-start:0;margin:10px;list-style:none}mp{display:block;margin-block-start:1em;margin-block-end:1em;margin-inline-start:0;margin-inline-end:0}mli{display:list-item;text-align:-webkit-match-parent}mul{display:block;list-style-type:disc;margin-block-start:1em;margin-block-end:1em;margin-inline-start:0;margin-inline-end:0;padding-inline-start:40px}mh3{display:block;font-size:1.17em;margin-block-start:1em;margin-block-end:1em;margin-inline-start:0;margin-inline-end:0;font-weight:bold}mh4{display:block;margin-block-start:1.33em;margin-block-end:1.33em;margin-inline-start:0;margin-inline-end:0;font-weight:bold}mol{display:block;list-style-type:decimal;margin-block-start:1em;margin-block-end:1em;margin-inline-start:0;margin-inline-end:0;padding-inline-start:40px}
+      
+      `
+
+
+      //GM_getResourceText('myCss');
       const AllCss = layerCss + myCss;
       const style = document.createElement('style');
       style.innerHTML = AllCss;
@@ -665,10 +671,13 @@
       newMessage: (version) => {
         try {
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
-          if (cache === undefined || cache === null || !versionStringCompare(cache, version)) {
+          if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "减少了天选时刻某个API的请求频率，降低被风控概率。但为了新老版本的兼容，老用户在更新到该版本后会清空本地的房间号缓存，请谅解。",
-              "修复了天选时刻房间号记录不正确导致检查天选时有重复的bug。"
+              "减少了天选时刻某个API的请求频率，降低被风控概率。",
+              "修复了天选时刻房间号记录不正确导致检查天选时有重复的bug。",
+              "修复在有背景直播间无法观看直播的bug；修复切换清晰度时直播卡死的bug。",
+              "新增中奖消息推送方式：酷推和Server酱Turbo版。",
+              "Css浏览器兼容，不使用margin-inline。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -4199,9 +4208,7 @@
                   MY_API.chatLog(`[天选时刻] 获取${r.name + '分区'}的直播间`, 'info');
                   MYDEBUG(`[天选时刻] 获取${r.name + '分区'}房间列表`, re);
                   for (const i of list) {
-                    if (MY_API.AnchorLottery.roomidList.indexOf(i.roomid) === -1) {
-                      MY_API.AnchorLottery.roomidList.unshift(i.roomid)
-                    }
+                    addVal(MY_API.AnchorLottery.roomidList, i.roomid);
                   }
                 } else {
                   MY_API.chatLog(`[天选时刻] 获取${r.name + '分区'}的直播间出错<br>${re.message}`, 'warning');
@@ -5342,7 +5349,7 @@
   }
   /**
    * 给一维数组添加不重复的元素
-   * @param  val 数组中一个元素的值
+   * @param  val 元素
    * @param  Array 数组
    * @param  mode 1: unshift 2: push
    */

@@ -165,7 +165,8 @@
     display: inline;
 }
 .statNum {
-    margin-inline: 5px;
+    margin-inline-start: 5px;
+    margin-inline-end: 5px;
 }
 .layui-layer [type="checkbox"],
 [type="radio"] {
