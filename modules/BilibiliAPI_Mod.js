@@ -1344,7 +1344,7 @@ var BAPI = {
             },
             join: (id, gift_id, gift_num, platform = 'pc') => {
                 var data = {
-                    id: id,//通过anchor.check获取
+                    id: id, //通过 anchor.check获取
                     platform: platform
                 };
                 if (gift_id !== undefined && gift_num !== undefined) {
