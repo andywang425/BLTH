@@ -5,4 +5,4 @@ node_modules
 /unused_modules
 /test
 /${tmpdir}
-markdown/development_goals.md
+markdown/development_todo.md

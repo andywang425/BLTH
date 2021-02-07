@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.0.7
+// @version       2.0.8
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
@@ -11,8 +11,8 @@
 // ==/UserScript==
 
 let BAPI_csrf_token, BAPI_visit_id,
-    BAPI_ts_ms = () => Date.now(),//当前毫秒
-    BAPI_ts_s = () => Math.round(BAPI_ts_ms() / 1000);//当前秒
+    BAPI_ts_ms = () => Date.now(),// 当前毫秒
+    BAPI_ts_s = () => Math.round(BAPI_ts_ms() / 1000);// 当前秒
 var BAPI = {
     setCommonArgs: (csrfToken = '', visitId = '') => {
         BAPI_csrf_token = csrfToken;
@@ -117,7 +117,7 @@ var BAPI = {
         if (!settings.data) settings.data = {};
         settings.data.csrf = BAPI_csrf_token;
         settings.data.csrf_token = BAPI_csrf_token;
-        settings.data.visit_id = BAPI_visit_id;
+        if (BAPI_visit_id !== undefined) settings.data.visit_id = BAPI_visit_id;
         return BAPI.ajax(settings);
     },
     // 以下按照URL分类
@@ -1344,7 +1344,7 @@ var BAPI = {
             },
             join: (id, gift_id, gift_num, platform = 'pc') => {
                 var data = {
-                    id: id,//通过anchor.check获取
+                    id: id, //通过 anchor.check获取
                     platform: platform
                 };
                 if (gift_id !== undefined && gift_num !== undefined) {
@@ -1626,7 +1626,7 @@ var BAPI = {
                 fontsize: fontsize,
                 mode: mode,
                 msg: msg,
-                rnd: BAPI_ts_ms(),
+                rnd: BAPI_ts_s(),
                 roomid: roomid,
                 bubble: bubble
 
