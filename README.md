@@ -202,6 +202,6 @@
 
 ## 更新日志
 >### 5.6.5.1
->1.减少了天选时刻某个API的请求频率，降低被风控概率。2.修复了天选时刻房间号记录不正确导致检查天选时有重复的bug。3.修复在有背景直播间无法观看直播的bug；修复切换清晰度时直播卡死的bug。4.新增中奖消息推送方式：酷推和Server酱Turbo版。5.Css浏览器兼容，不使用margin-inline。
+>1.减少了天选时刻某个API的请求频率，降低被风控概率。2.修复了天选时刻房间号记录不正确导致检查天选时有重复的bug。3.修复在有背景直播间无法观看直播的bug；修复切换清晰度时直播卡死的bug。4.新增中奖消息推送方式：酷推和Server酱Turbo版。5.Css浏览器兼容，不使用margin-inline。6.天选时刻金额识别支持繁体数字。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  

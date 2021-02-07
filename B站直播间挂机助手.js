@@ -27,7 +27,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/Ajax-hook.min.js
 // @require        https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@10156de79624566f6c5adeb85019b0a77b307186/modules/BilibiliAPI_Mod.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4716930900e64769f19dd7aa00b0824a4961cdd0/modules/layer.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@1aacf031b9f93299e7d4b947cdda66f96064d49a/modules/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libWasmHash.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@97bf818a906154a418f72ecbb644de9cf19c80b1/modules/base64.min.js
@@ -4354,22 +4354,22 @@
         moneyCheck: (award_name) => {
           const name = award_name.replaceAll(' ', '').toLowerCase(); // 去空格+转小写
           let numberArray = name.match(/\d+(\.\d+)?/g); // 提取阿拉伯数字
-          let chineseNumberArray = name.match(/([一二两三四五六七八九十]千零?[一二两三四五六七八九十]?百?[一二三四五六七八九十]?十?[一二三四五六七八九十]?)|([一二两三四五六七八九十]百[一二三四五六七八九十]?十?[一二三四五六七八九十]?)|([一二三四五六七八九十]?十[一二三四五六七八九十]?)|[一二两三四五六七八九十]/g); // 提取汉字数字
-          const chnNumChar = { "零": 0, "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9 },
-            chnNameValue = { "十": { value: 10, secUnit: false }, "百": { value: 100, secUnit: false }, "千": { value: 1e3, secUnit: false }, "万": { value: 1e4, secUnit: true }, "亿": { value: 1e8, secUnit: true } };
-          if (chineseNumberArray !== null && numberArray === null) { //只提取出汉字数字
+          let chineseNumberArray = name.match(/([一壹二贰两三叁四肆五伍六陆七柒八捌九玖][千仟]零?[一壹二贰两三叁四肆五伍六陆七柒八捌九玖]?[百佰]?[一壹二贰三叁四肆五伍六陆七柒八捌九玖]?[十拾]?[一壹二贰三叁四肆五伍六陆七柒八捌九玖]?)|([一壹二贰两三叁四肆五伍六陆七柒八捌九玖][百佰][一壹二贰三叁四肆五伍六陆七柒八捌九玖]?[十拾]?[一壹二贰三叁四肆五伍六陆七柒八捌九玖]?)|([一壹二贰三叁四肆五伍六陆七柒八捌九玖]?[十拾][一壹二贰三叁四肆五伍六陆七柒八捌九玖]?)|[一壹二贰两三叁四肆五伍六陆七柒八捌九玖十拾]/g); // 提取汉字数字
+          const chnNumChar = { "零": 0, "一": 1, "壹": 1, "二": 2, "贰": 2, "两": 2, "三": 3, "叁": 3, "四": 4, "肆": 4, "五": 5, "伍": 5, "六": 6, "陆": 6, "七": 7, "柒": 7, "八": 8, "捌": 8, "九": 9, "玖": 9 },
+            chnNameValue = { "十": { value: 10, secUnit: false }, "拾": { value: 10, secUnit: false }, "百": { value: 100, secUnit: false }, "佰": { value: 100, secUnit: false }, "千": { value: 1e3, secUnit: false }, "仟": { value: 1e3, secUnit: false }, "万": { value: 1e4, secUnit: true }, "亿": { value: 1e8, secUnit: true } };
+          if (chineseNumberArray !== null && numberArray === null) { // 只提取出汉字数字
             return chineseFunc();
-          } else if (chineseNumberArray === null && numberArray !== null) { //只提取出阿拉伯数字
+          } else if (chineseNumberArray === null && numberArray !== null) { // 只提取出阿拉伯数字
             return arabicNumberFunc();
-          } else if (chineseNumberArray !== null && numberArray !== null) { //都提取出来了
+          } else if (chineseNumberArray !== null && numberArray !== null) { // 都提取出来了
             let arr = arabicNumberFunc();
-            if (arr[0]) return arr; //数组第一项为true则识别成功
+            if (arr[0]) return arr; // 数组第一项为true则识别成功
             else return chineseFunc()
-          } else { //都没提取出来
+          } else { // 都没提取出来
             return [false]
           }
           function chineseFunc() {
-            //把匹配到的数字由长到段重新排列
+            // 把匹配到的数字由长到段重新排列
             let chineseNumIndexList = [];
             chineseNumberArray.sort(function (a, b) {
               return b.length - a.length;
@@ -4387,10 +4387,10 @@
                 const unitIndex = ChineseNumberIndex + ChineseNumLength; // 数字后一个中文数字的下标 可能为undefined
                 let strAfterNum = ''; // 数字后面的字符串
                 if (unitIndex < nextChineseNumIndex) {
-                  //如果下一个数字的起始位置不在当前数字所占范围内
+                  // 如果下一个数字的起始位置不在当前数字所占范围内
                   for (let i = unitIndex; i < name.length; i++) {
                     if (nextChineseNumIndex !== undefined) {
-                      if (i < nextChineseNumIndex)//不能把下一个数字取进去
+                      if (i < nextChineseNumIndex)// 不能把下一个数字取进去
                         strAfterNum = strAfterNum + name[i];
                       else
                         break;
@@ -4411,7 +4411,7 @@
             }
           }
           function arabicNumberFunc() {
-            //把匹配到的数字由长到段重新排列
+            // 把匹配到的数字由长到段重新排列
             let numIndexList = [];
             numberArray.sort(function (a, b) {
               return b.length - a.length;
@@ -4427,10 +4427,10 @@
               const unitIndex = numberIndex + numLength; // 数字后一个字符的下标 可能为undefined
               let strAfterNum = ''; // 数字后面的字符串
               if (unitIndex < nextNumIndex) {
-                //如果下一个数字的起始位置不在当前数字所占范围内
+                // 如果下一个数字的起始位置不在当前数字所占范围内
                 for (let i = unitIndex; i < name.length; i++) {
                   if (nextNumIndex !== undefined) {
-                    if (i < nextNumIndex)//不能把下一个数字取进去
+                    if (i < nextNumIndex)// 不能把下一个数字取进去
                       strAfterNum = strAfterNum + name[i];
                     else
                       break;
@@ -4455,7 +4455,7 @@
               penny = ['分'], // 0.01
               milliWords = ['金瓜子']; // 0.001
             const firstChar = strAfterNum[0];
-            let finalMoney = undefined; //单位：元
+            let finalMoney = undefined; // 单位：元
             const number = Number(num);
             for (const w of yuanWords) {
               if (strAfterNum.indexOf(w) > -1) {
@@ -4475,10 +4475,10 @@
               } else if (dime.indexOf(firstChar) > -1) {
                 finalMoney = number * 0.1;
               } else if (penny.indexOf(firstChar) > -1) {
-                //排除特殊奖品名
+                // 排除特殊奖品名
                 const ignoreList = ['分钟'];
                 for (const i of ignoreList) {
-                  if (strAfterNum.indexOf(i) === 0) return undefined
+                  if (strAfterNum.indexOf(i) > -1) return undefined
                 }
                 finalMoney = number * 0.01;
               }
