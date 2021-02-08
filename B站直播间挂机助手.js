@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.5.2
+// @version        5.6.5.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -234,14 +234,30 @@
     if (W.BilibiliLive === undefined) return;
     newWindow.init();
     if (nosleepConfig) {
-      const width = screen.availWidth, height = screen.availHeight;
-      let evObjMove = document.createEvent('MouseEvents');
-      setInterval(() => {
-        let randomWidth = parseInt(Math.random() * width),
-          randomHeight = parseInt(Math.random() * height);
-        evObjMove.initMouseEvent('mousemove', true, true, W, 0, randomWidth, randomHeight, randomWidth, randomHeight, false, false, true, false, 0, null);
-        W.dispatchEvent(evObjMove);
-      }, 5 * 60e3);
+      function mouseMove() {
+        MYDEBUG('屏蔽挂机检测', "触发一次MouseEvent(mousemove)")
+        document.dispatchEvent(new MouseEvent('mousemove', {
+          screenX: Math.floor(Math.random() * screen.availWidth),
+          screenY: Math.floor(Math.random() * screen.availHeight),
+          clientX: Math.floor(Math.random() * W.innerWidth),
+          clientY: Math.floor(Math.random() * W.innerHeight),
+          ctrlKey: Math.random() > 0.8,
+          shiftKey: Math.random() > 0.8,
+          altKey: Math.random() > 0.9,
+          metaKey: false,
+          button: 0,
+          buttons: 0,
+          relatedTarget: null,
+          region: null,
+          detail: 0,
+          view: W,
+          sourceCapabilities: W.InputDeviceCapabilities ? new W.InputDeviceCapabilities({ fireTouchEvents: false }) : null,
+          bubbles: true,
+          cancelable: true,
+          composed: true
+        }));
+      }
+      setInterval(() => mouseMove(), 300e3);
       W.addEventListener = (...arg) => {
         if (arg[0].indexOf('visibilitychange') > -1) return;
         else return eventListener(...arg);

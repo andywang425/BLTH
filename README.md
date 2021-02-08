@@ -27,7 +27,7 @@
   + Chrome  
   在地址栏输入`chrome://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
   + Edge  
-  安装浏览器拓展[Referer Control](https://chrome.google.com/webstore/detail/referer-control/hnkcfpcejkafcihlgbojoidoihckciin)，在设置页面中找到`default referer for all other sites`，选择`Custom` - `target host`或`Block`。  
+  安装浏览器拓展[Referer Control](https://chrome.google.com/webstore/detail/referer-control/hnkcfpcejkafcihlgbojoidoihckciin)，在设置页面中找到`default referer for all other sites`，选择`Custom` - `target host`。  
   若无法科学上网可进Q群下载群文件中的crx文件，在浏览器地址栏输入`chrome://extensions/`，打开右上角的`开发者模式`，把crx文件拖进去安装。
   + FireFox   
   在地址栏输入`about:config`，搜索`network.http.sendRefererHeader`，把这个设置的值改为`0`。
