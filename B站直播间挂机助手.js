@@ -691,15 +691,7 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "减少了天选时刻某个API的请求频率，降低被风控概率。",
-              "修复了天选时刻房间号记录不正确导致检查天选时有重复的bug。",
-              "修复在有背景直播间无法观看直播的bug；修复切换清晰度时直播卡死的bug。",
-              "新增中奖消息推送方式：酷推和Server酱Turbo版。",
-              "Css浏览器兼容，不使用margin-inline。",
-              "天选时刻金额识别支持繁体数字。",
-              "能填写多个数据的设置项在保存时会自动去重（部分特殊设置除外）。",
-              "天选时刻新增数据获取方式：从自定义直播间列表获取天选时刻数据，即用户手动填写要检查的直播间。",
-              "天选时刻新增设置：不使用缓存中的直播间"
+              "修复【通过Server酱·Turbo版推送微信通知】选项无法勾选的bug。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1157,6 +1149,7 @@
           'ANCHOR_TYPE_LIVEROOM',
           'ANCHOR_TYPE_FOLLOWING',
           'CP_NOTICE',
+          'ServerTurbo_NOTICE',
           'ANCHOR_TYPE_CUSTOM',
           'ANCHOR_DONT_USE_CACHE_ROOM'
         ];
