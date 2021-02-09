@@ -691,7 +691,8 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "修复【通过Server酱·Turbo版推送微信通知】选项无法勾选的bug。"
+              "修复【通过Server酱·Turbo版推送微信通知】选项无法勾选的bug。",
+              "尝试修复屏蔽挂机检测无效的问题。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -701,10 +702,10 @@
               title: `${version}更新提示`,
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `<mol>${mliHtml}</mol>
-                            <hr><em style="color:grey;">
-                            如果使用过程中遇到问题，欢迎去 ${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}反馈。
-                            也可以进q群讨论：${linkMsg('1106094437（已满）', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}，${linkMsg('907502444', 'https://jq.qq.com/?_wv=1027&k=Bf951teI')}
-                            </em>`,
+                <hr><em style="color:grey;">
+                如果使用过程中遇到问题，欢迎去 ${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}反馈。
+                也可以进q群讨论：${linkMsg('1106094437（已满）', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}，${linkMsg('907502444', 'https://jq.qq.com/?_wv=1027&k=Bf951teI')}
+                </em>`,
               success: () => { layerTimes++ }
             });
             localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);

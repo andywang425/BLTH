@@ -202,6 +202,6 @@
 
 ## 更新日志
 >### 5.6.5.3
->1.修复【通过Server酱·Turbo版推送微信通知】选项无法勾选的bug。
+>1.修复【通过Server酱·Turbo版推送微信通知】选项无法勾选的bug。2.尝试修复屏蔽挂机检测无效的问题。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
