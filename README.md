@@ -27,7 +27,7 @@
   + Chrome  
   在地址栏输入`chrome://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
   + Edge  
-  安装浏览器拓展[Referer Control](https://chrome.google.com/webstore/detail/referer-control/hnkcfpcejkafcihlgbojoidoihckciin)，在设置页面中找到`default referer for all other sites`，选择`Custom` - `target host`或`Block`。  
+  安装浏览器拓展[Referer Control](https://chrome.google.com/webstore/detail/referer-control/hnkcfpcejkafcihlgbojoidoihckciin)，在设置页面中找到`default referer for all other sites`，选择`Custom` - `target host`。  
   若无法科学上网可进Q群下载群文件中的crx文件，在浏览器地址栏输入`chrome://extensions/`，打开右上角的`开发者模式`，把crx文件拖进去安装。
   + FireFox   
   在地址栏输入`about:config`，搜索`network.http.sendRefererHeader`，把这个设置的值改为`0`。
@@ -201,7 +201,7 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.5.2
->1.减少了天选时刻某个API的请求频率，降低被风控概率。2.修复了天选时刻房间号记录不正确导致检查天选时有重复的bug。3.修复在有背景直播间无法观看直播的bug；修复切换清晰度时直播卡死的bug。4.新增中奖消息推送方式：酷推和Server酱Turbo版。5.Css浏览器兼容，不使用margin-inline。6.天选时刻金额识别支持繁体数字。7.能填写多个数据的设置项在保存时会自动去重（部分特殊设置除外）。8.天选时刻新增数据获取方式：从自定义直播间列表获取天选时刻数据，即用户手动填写要检查的直播间。9.天选时刻新增设置：不使用缓存中的直播间。
+>### 5.6.5.3
+>1.修复【通过Server酱·Turbo版推送微信通知】选项无法勾选的bug。2.尝试修复屏蔽挂机检测无效的问题。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  

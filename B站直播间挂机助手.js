@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.5.2
+// @version        5.6.5.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -234,14 +234,30 @@
     if (W.BilibiliLive === undefined) return;
     newWindow.init();
     if (nosleepConfig) {
-      const width = screen.availWidth, height = screen.availHeight;
-      let evObjMove = document.createEvent('MouseEvents');
-      setInterval(() => {
-        let randomWidth = parseInt(Math.random() * width),
-          randomHeight = parseInt(Math.random() * height);
-        evObjMove.initMouseEvent('mousemove', true, true, W, 0, randomWidth, randomHeight, randomWidth, randomHeight, false, false, true, false, 0, null);
-        W.dispatchEvent(evObjMove);
-      }, 5 * 60e3);
+      function mouseMove() {
+        MYDEBUG('屏蔽挂机检测', "触发一次MouseEvent(mousemove)")
+        document.dispatchEvent(new MouseEvent('mousemove', {
+          screenX: Math.floor(Math.random() * screen.availWidth),
+          screenY: Math.floor(Math.random() * screen.availHeight),
+          clientX: Math.floor(Math.random() * W.innerWidth),
+          clientY: Math.floor(Math.random() * W.innerHeight),
+          ctrlKey: Math.random() > 0.8,
+          shiftKey: Math.random() > 0.8,
+          altKey: Math.random() > 0.9,
+          metaKey: false,
+          button: 0,
+          buttons: 0,
+          relatedTarget: null,
+          region: null,
+          detail: 0,
+          view: W,
+          sourceCapabilities: W.InputDeviceCapabilities ? new W.InputDeviceCapabilities({ fireTouchEvents: false }) : null,
+          bubbles: true,
+          cancelable: true,
+          composed: true
+        }));
+      }
+      setInterval(() => mouseMove(), 300e3);
       W.addEventListener = (...arg) => {
         if (arg[0].indexOf('visibilitychange') > -1) return;
         else return eventListener(...arg);
@@ -675,15 +691,8 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "减少了天选时刻某个API的请求频率，降低被风控概率。",
-              "修复了天选时刻房间号记录不正确导致检查天选时有重复的bug。",
-              "修复在有背景直播间无法观看直播的bug；修复切换清晰度时直播卡死的bug。",
-              "新增中奖消息推送方式：酷推和Server酱Turbo版。",
-              "Css浏览器兼容，不使用margin-inline。",
-              "天选时刻金额识别支持繁体数字。",
-              "能填写多个数据的设置项在保存时会自动去重（部分特殊设置除外）。",
-              "天选时刻新增数据获取方式：从自定义直播间列表获取天选时刻数据，即用户手动填写要检查的直播间。",
-              "天选时刻新增设置：不使用缓存中的直播间"
+              "修复【通过Server酱·Turbo版推送微信通知】选项无法勾选的bug。",
+              "尝试修复屏蔽挂机检测无效的问题。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -693,10 +702,10 @@
               title: `${version}更新提示`,
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `<mol>${mliHtml}</mol>
-                            <hr><em style="color:grey;">
-                            如果使用过程中遇到问题，欢迎去 ${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}反馈。
-                            也可以进q群讨论：${linkMsg('1106094437（已满）', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}，${linkMsg('907502444', 'https://jq.qq.com/?_wv=1027&k=Bf951teI')}
-                            </em>`,
+                <hr><em style="color:grey;">
+                如果使用过程中遇到问题，欢迎去 ${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}反馈。
+                也可以进q群讨论：${linkMsg('1106094437（已满）', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}，${linkMsg('907502444', 'https://jq.qq.com/?_wv=1027&k=Bf951teI')}
+                </em>`,
               success: () => { layerTimes++ }
             });
             localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
@@ -1141,6 +1150,7 @@
           'ANCHOR_TYPE_LIVEROOM',
           'ANCHOR_TYPE_FOLLOWING',
           'CP_NOTICE',
+          'ServerTurbo_NOTICE',
           'ANCHOR_TYPE_CUSTOM',
           'ANCHOR_DONT_USE_CACHE_ROOM'
         ];
