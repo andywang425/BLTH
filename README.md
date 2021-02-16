@@ -58,6 +58,7 @@
 <summary>自动参加实物（金宝箱）抽奖</summary>
 <ul>
 <li>忽略含特定关键字或匹配特定正则表达式的存疑抽奖</li>
+<li>中奖后通过推送平台通知中奖信息</li>
 </ul>
 </details>
 <details>
@@ -72,6 +73,7 @@
 <li>把参与天选时关注的UP移动到新关注分组/取关该分组内的UP主</li>
 <li>未中奖自动取关</li>
 <li>中奖后自动发私信/弹幕</li>
+<li>中奖后通过推送平台通知中奖信息</li>
 </ul>
 </details>
 <details>
@@ -94,8 +96,14 @@
 <li>屏蔽挂机检测</li>
 </ul>
 </details>
-<li>自动获取小心心</li>
+<details>
+<summary>自动点亮粉丝勋章</summary>
+<ul>
 <li>发送粉丝勋章打卡弹幕</li>
+<li>送出小心心</li>
+</ul>
+</details>
+<li>自动获取小心心</li>
 <li>自动送礼</li>
 <li>银瓜子换硬币</li>
 <li>直播区签到</li>
@@ -142,7 +150,7 @@
 #### 运行日志
 + 可以点击聊天区上方，大航海右侧的【日志】查看普通日志。部分日志上会有可点击的蓝色链接文字，方便用户进行某些操作。
 + 脚本默认关闭控制台日志。勾选控制面板上的`其他设置 - 控制台日志`即可开启。  
-  打开控制台(`ctrl + shift + i`)在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。
+  打开控制台(Chrome可用`ctrl + shift + i`，再点击`Console`)在Filter中输入`IGIFTMSG`即可过滤出本脚本的日志。
 
 #### 风控
 + 若出现`...，请检查网络`的红色日志，有两种可能。一是网络状况不佳，二是被B站风控了。
@@ -160,8 +168,8 @@
 
 ## 已知问题
 1. [#12](https://github.com/andywang425/BLTH/issues/12)  
-本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后，打开`启用Ajax Hook API`。  
-2. 脚本每次更新后第一次运行可能会不工作，`shift+F5`刷新一下页面即可。   
+本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后。  
+2. 脚本每次更新后第一次运行可能会不工作，`shift+F5`刷新一下页面即可。  
 
 -------------------------------
 
@@ -201,7 +209,7 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.5.3
->1.修复【通过Server酱·Turbo版推送微信通知】选项无法勾选的bug。2.尝试修复屏蔽挂机检测无效的问题。
+>### 5.6.5.4
+>1.修复在Safari中无法运行的bug，并开始兼容Safari。2.调整了脚本默认设置，增大了天选时刻-请求间隔。3.完善脚本内置说明及项目文档。4.在非东八区地区使用脚本时，会根据国内时间来执行每日任务。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  

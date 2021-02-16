@@ -15,7 +15,8 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @version        5.6.5.3
+// @compatible     safari 13.0.2 or later
+// @version        5.6.5.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -26,7 +27,7 @@
 // @connect        sctapi.ftqq.com
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/Ajax-hook.min.js
 // @require        https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@8d670b3ab9997959f3a7df11a1aa57554b601ac4/modules/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@40fb6ae6e191b18ddd39828a2a52ef5e66b127e4/modules/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@1aacf031b9f93299e7d4b947cdda66f96064d49a/modules/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libWasmHash.min.js
@@ -47,6 +48,7 @@
     eventListener = window.addEventListener,
     ts_ms = () => Date.now(), // 当前毫秒
     ts_s = () => Math.round(ts_ms() / 1000), // 当前秒
+    tz_offset = new Date().getTimezoneOffset() + 480, // 本地时间与东八区差的分钟数
     anchorFollowTagName = 'BLTH天选关注UP',
     anchorPrizeTagName = 'BLTH天选中奖UP',
     delayCall = (callback, delay = 120e3) => {
@@ -75,8 +77,10 @@
       // 明天凌晨0点1分再次运行
       const t = new Date();
       let name = msg || ' ';
+      t.setMinutes(t.getMinutes() + tz_offset);
       t.setDate(t.getDate() + 1);
       t.setHours(0, 1, 0, 0);
+      t.setMinutes(t.getMinutes() - tz_offset);
       setTimeout(callback, t - ts_ms());
       MYDEBUG('runMidnight', name + " " + t.toString());
     },
@@ -84,8 +88,10 @@
       // 明天凌晨0点再次运行
       const t = new Date();
       let name = msg || ' ';
+      t.setMinutes(t.getMinutes() + tz_offset);
       t.setDate(t.getDate() + 1);
       t.setHours(0, 0, 0, 0);
+      t.setMinutes(t.getMinutes() - tz_offset);
       setTimeout(callback, t - ts_ms());
       MYDEBUG('runExactMidnight', name + " " + t.toString());
     },
@@ -93,10 +99,26 @@
       // 明天运行，可自定义时间
       const t = new Date();
       let name = msg || ' ';
+      t.setMinutes(t.getMinutes() + tz_offset);
       t.setDate(t.getDate() + 1);
       t.setHours(hour, minute, 0, 0);
+      t.setMinutes(t.getMinutes() - tz_offset);
       setTimeout(callback, t - ts_ms());
       MYDEBUG('runTomorrow', name + " " + t.toString());
+    },
+    runToday = (callback, hour, minute, msg) => {
+      // 今天运行，可自定义时间
+      const t = new Date();
+      let name = msg || ' ';
+      t.setMinutes(t.getMinutes() + tz_offset);
+      t.setHours(hour, minute, 0, 0);
+      t.setMinutes(t.getMinutes() - tz_offset);
+      setTimeout(callback, t - ts_ms());
+      MYDEBUG('runToday', name + " " + t.toString());
+    },
+    getCHSdate = () => {
+      // 返回东八区 Date
+      return new Date(ts_ms() + tz_offset * 60000);
     },
     appToken = new BilibiliToken(),
     baseQuery = `actionKey=appkey&appkey=${BilibiliToken.appKey}&build=5561000&channel=bili&device=android&mobi_app=android&platform=android&statistics=%7B%22appId%22%3A1%2C%22platform%22%3A3%2C%22version%22%3A%225.57.0%22%2C%22abtest%22%3A%22%22%7D`,
@@ -105,6 +127,7 @@
         userToken = tokenData;
       } else {
         tokenData = await appToken.getToken();
+        if (tokenData === undefined) return MYERROR('appToken', 'tokenData获取失败');
         tokenData.time = ts_s() + tokenData.expires_in;
         localStorage.setItem(`${NAME}_Token`, JSON.stringify(tokenData));
         userToken = tokenData;
@@ -391,7 +414,7 @@
         ANCHOR_IGNORE_BLACKLIST: true, // 天选忽略关键字（选项）
         ANCHOR_IGNORE_PWDROOM: true, // 不参加有密码的直播间的天选
         ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车', '上反船', '照片', '素颜', '自拍', 'cos', '写真', '皂片', '开舰', '上舰', '自画像', '封面照', '封面', '取关', '美照', '随机照', '随机照片', '好友'], // 天选忽略关键字
-        ANCHOR_INTERVAL: 250, // 天选（检查天选和取关）请求间隔
+        ANCHOR_INTERVAL: 300, // 天选（检查天选和取关）请求间隔
         AHCHOR_NEED_GOLD: 0, // 忽略所需金瓜子大于_的抽奖
         ANCHOR_WAIT_REPLY: true, // 请求后等待回复
         ANCHOR_UPLOAD_DATA: false, // 天选上传数据
@@ -691,8 +714,10 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "修复【通过Server酱·Turbo版推送微信通知】选项无法勾选的bug。",
-              "尝试修复屏蔽挂机检测无效的问题。"
+              "修复在Safari中无法运行的bug，并开始兼容Safari。",
+              "调整了脚本默认设置，增大了天选时刻-请求间隔。",
+              "完善脚本内置说明及项目文档。",
+              "在非东八区地区使用脚本时，会根据国内时间来执行每日任务。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1232,7 +1257,7 @@
           ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</mli></mul>",
           topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，每天0点时重置。</mli><mli><strong>支持输入框回车保存。</strong></mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
           ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
-          debugSwitch: "开启或关闭控制台日志(可通过<code>ctrl + shift + i</code>打开控制台)。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
+          debugSwitch: "开启或关闭控制台日志(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
           UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
           ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
           MEDAL_DANMU_INTERVAL: "每两条弹幕间所等待的时间。<mh3>注意：</mh3><mul><mli>由于B站服务器限制，间隔时间必须大于等于1秒，否则弹幕发送会出错。</mli></mul>",
@@ -2448,8 +2473,8 @@
             if (!checkNewDay(MY_API.CACHE.AUTO_GROUP_SIGH_TS)) {
               runTomorrow(MY_API.GroupSign.run, 8, 0, '应援团签到');
               return $.Deferred().resolve();
-            } else if (new Date().getHours() < 8 && MY_API.CACHE.AUTO_GROUP_SIGH_TS != 0) {
-              setTimeout(MY_API.GroupSign.run, getIntervalTime(8, 0));
+            } else if (getCHSdate().getHours() < 8 && MY_API.CACHE.AUTO_GROUP_SIGH_TS !== 0) {
+              runToday(MY_API.GroupSign.run, 8, 0, '应援团签到');
               return $.Deferred().resolve();
             }
             return MY_API.GroupSign.getGroups().then((list) => {
@@ -5098,7 +5123,7 @@
                     }, () => {
                       MY_API.chatLog(`[天选时刻] 移动UP（uid = ${data.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`);
                     });
-                  }, 4000);
+                  }, 8000);
                 }
                 setTimeout(() => MY_API.AnchorLottery.reCheck(data), data.time * 1000 + 1500);
               })
@@ -5181,7 +5206,7 @@
             if (MY_API.CONFIG.ANCHOR_TYPE_FOLLOWING) { // 从关注直播间
               await MY_API.AnchorLottery.getLiveUsers();
               for (const i of MY_API.AnchorLottery.liveUserList) {
-                const roomid = i.link.match(/(?<=https?:\/\/live\.bilibili\.com\/)\d+/)[0],
+                const roomid = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)$/)[1],
                   uid = i.uid;
                 addVal(MY_API.AnchorLottery.liveRoomList, roomid);
                 MY_API.AnchorLottery.roomidAndUid[roomid] = uid;
