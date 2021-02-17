@@ -2826,11 +2826,14 @@
         room_id: undefined,
         medal_list: undefined,
         bag_list: undefined,
-        time: undefined,
+        giftFeed_list: {},
         remain_feed: undefined,
         over: false,
-        //B坷垃,喵娘,爱心便当,蓝白胖次,节奏风暴,如意小香包,软糯白糖粽,飘香大肉粽,端午茗茶
-        sendGiftList: undefined, // 辣条，亿圆, 小心心
+        sendGiftList: undefined,
+        /**
+         * 获取粉丝勋章
+         * @param {Number} page 页数
+         */
         getMedalList: async (page = 1) => {
           if (page === 1) MY_API.Gift.medal_list = [];
           return BAPI.i.medal(page, 25).then((response) => {
@@ -2842,16 +2845,22 @@
             return delayCall(() => MY_API.Gift.getMedalList());
           });
         },
+        /**
+         * 获取礼物包裹
+         */
         getBagList: async () => {
           return BAPI.gift.bag_list().then((response) => {
             MYDEBUG('Gift.getBagList: API.gift.bag_list', response);
             MY_API.Gift.bag_list = response.data.list;
-            MY_API.Gift.time = response.data.time;
           }, () => {
             window.toast('[自动送礼]获取包裹列表失败，请检查网络', 'error');
             return delayCall(() => MY_API.Gift.getBagList());
           });
         },
+        /**
+         * 通过礼物id获取礼物的亲密度
+         * @param {Number} gift_id 礼物id
+         */
         getFeedByGiftID: (gift_id) => {
           if (gift_id === 30607) return 50; // 小心心
           for (let i = Live_info.gift_list.length - 1; i >= 0; --i) {
@@ -2861,6 +2870,10 @@
           }
           return 0;
         },
+        /**
+         * 排序粉丝勋章
+         * @param {Object} medals 
+         */
         sort_medals: (medals) => {
           if (MY_API.CONFIG.GIFT_SORT == 'GIFT_SORT_HIGH') {
             medals.sort((a, b) => {
@@ -2891,9 +2904,13 @@
           }
           return medals;
         },
+        /**
+         * 送小心心点亮勋章
+         * @param {Object} medal_list 
+         */
         auto_light: async (medal_list) => {
           try {
-            const feed = MY_API.Gift.getFeedByGiftID(30607); //小心心
+            const feed = MY_API.Gift.getFeedByGiftID(30607); // 小心心
             let light_roomid = MY_API.CONFIG.LIGHT_MEDALS;
             let unLightedMedals = undefined;
             if (MY_API.CONFIG.LIGHT_METHOD == 'LIGHT_WHITE') {
@@ -2934,7 +2951,10 @@
                   }
                   break;
                 }
+                return true;
               }
+            } else {
+              return false;
             }
           } catch (e) {
             console.error(e);
@@ -2942,10 +2962,16 @@
           }
         },
         run: async () => {
+          /**
+           * 失败时运行的函数
+           */
           const FailFunc = () => {
             window.toast('[自动送礼]送礼失败，请检查网络', 'error');
             return delayCall(() => MY_API.Gift.run());
           };
+          /**
+           * 一轮送礼结束后运行的函数
+           */
           const nextTimeDebug = () => {
             if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME") {
               let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
@@ -2963,8 +2989,11 @@
             }
             return
           };
+          /**
+           * 处理用户输入的【允许被送出的礼物类型】
+           */
           const handleGiftList = () => {
-            MY_API.Gift.sendGiftList = MY_API.CONFIG.GIFT_ALLOW_TYPE;
+            MY_API.Gift.sendGiftList = [...MY_API.CONFIG.GIFT_ALLOW_TYPE];
             MYDEBUG('[自动送礼]', `处理前的礼物列表 ${MY_API.Gift.sendGiftList}`);
             for (let i = 0; i < MY_API.Gift.sendGiftList.length; i++) {
               const listItem = MY_API.Gift.sendGiftList[i];
@@ -2977,6 +3006,59 @@
             }
             MYDEBUG('[自动送礼]', `处理后得到的礼物id列表 ${MY_API.Gift.sendGiftList}`)
           };
+          /**
+           * 获取礼物列表中的每种礼物所对应的亲密度
+           */
+          const getGiftFeed = async () => {
+            for (const i of MY_API.Gift.bag_list) {
+              if (!MY_API.Gift.giftFeed_list.hasOwnProperty(i.gift_id)) {
+                MY_API.Gift.giftFeed_list[i.gift_id] = await MY_API.Gift.getFeedByGiftID(i.gift_id);
+              }
+            }
+          }
+          /**
+           * 处理包裹
+           */
+          const handleBagList = () => {
+            let bag_list;
+            if (!MY_API.CONFIG.SEND_ALL_GIFT) {
+              // 送之前查一次有没有可送的
+              bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
+                r.corner_mark.substring(0, r.corner_mark.indexOf("天")) <= MY_API.CONFIG.GIFT_LIMIT);
+              MYDEBUG("[自动送礼]过滤后的礼物", bag_list)
+              if (bag_list.length == 0) {
+                MY_API.Gift.over = true;
+                return;
+              }
+            } else {
+              bag_list = MY_API.Gift.bag_list.filter(r => r.gift_num > 0 && r.corner_mark != '永久');
+              if (bag_list.length == 0) {
+                MY_API.Gift.over = true;
+                return;
+              }
+            }
+            // 按礼物亲密度由高到低排序
+            for (const i of bag_list) {
+              i.gift_feed = MY_API.Gift.giftFeed_list[i.gift_id];
+            }
+            bag_list.sort(function (a, b) { return b.gift_feed - a.gift_feed });
+            MY_API.Gift.bag_list = [...bag_list];
+            MYDEBUG('Gift.bag_list', MY_API.Gift.bag_list);
+          };
+          /**
+           * 处理粉丝勋章
+           * @param {Object} medal_list 
+           */
+          const handleMedalList = (medal_list) => {
+            medal_list = medal_list.filter(it => it.day_limit - it.today_feed > 0 && it.level < 20);
+            medal_list = MY_API.Gift.sort_medals(medal_list);
+            // 排除直播间
+            if (MY_API.CONFIG.EXCLUDE_ROOMID) {
+              const ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID;
+              medal_list = medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
+            };
+            return medal_list;
+          }
           try {
             if (!MY_API.CONFIG.AUTO_GIFT) return $.Deferred().resolve();
             if (medalDanmuRunning) {
@@ -2985,13 +3067,14 @@
             }
             if (MY_API.Gift.run_timer) clearTimeout(MY_API.Gift.run_timer);
             if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW) {
+              // 定时送礼
               let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
               MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(), alternateTime);
               let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
               MYDEBUG("[自动送礼]", `将在${runTime}进行自动送礼`);
               return $.Deferred().resolve();
-
             } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW) {
+              // 间隔__分钟送礼
               let GiftInterval = MY_API.CONFIG.GIFT_INTERVAL * 60e3;
               if (MY_API.CACHE.GiftInterval_TS) {
                 const interval = ts_ms() - MY_API.CACHE.GiftInterval_TS;
@@ -3009,36 +3092,37 @@
             }
             MY_API.Gift.over = false;
             handleGiftList();
+            await MY_API.Gift.getBagList();
+            await getGiftFeed();
+            handleBagList();
             await MY_API.Gift.getMedalList();
             let medal_list = MY_API.Gift.medal_list;
             MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', medal_list);
             if (medal_list && medal_list.length > 0) {
-              medal_list = medal_list.filter(it => it.day_limit - it.today_feed > 0 && it.level < 20);
-              medal_list = MY_API.Gift.sort_medals(medal_list);
-              //排除直播间
-              if (MY_API.CONFIG.EXCLUDE_ROOMID) {
-                const ArrayEXCLUDE_ROOMID = MY_API.CONFIG.EXCLUDE_ROOMID;
-                medal_list = medal_list.filter(Er => ArrayEXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
-              };
-              await MY_API.Gift.auto_light(medal_list); // 点亮勋章
+              medal_list = handleMedalList(medal_list);
+              let run_light = await MY_API.Gift.auto_light(medal_list); // 点亮勋章
               if (LIGHT_MEDAL_NOW) {
                 LIGHT_MEDAL_NOW = false;
                 return $.Deferred().resolve();
               }
-              for (let v of medal_list) {
+              if (run_light) {
+                // 如果点亮勋章了则重新获取并处理
+                await MY_API.Gift.getBagList();
+                handleBagList();
+                await MY_API.Gift.getMedalList();
+                MY_API.Gift.medal_list = handleMedalList(MY_API.Gift.medal_list);
+              }
+              for (const v of MY_API.Gift.medal_list) {
                 if (MY_API.Gift.over) break;
-                let response = await BAPI.room.room_init(parseInt(v.roomid, 10));
+                const response = await BAPI.room.room_init(parseInt(v.roomid, 10));
                 MY_API.Gift.room_id = parseInt(response.data.room_id, 10);
                 MY_API.Gift.ruid = v.target_id;
                 MY_API.Gift.remain_feed = v.day_limit - v.today_feed;
                 if (MY_API.Gift.remain_feed > 0) {
-                  await MY_API.Gift.getBagList();
-                  if (MY_API.Gift.remain_feed > 0) {
-                    window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度未满[${v.today_feed}/${v.day_limit}]，预计需要[${MY_API.Gift.remain_feed}]送礼开始`, 'info');
-                    await MY_API.Gift.sendGift(v);
-                  } else {
-                    window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度已满`, 'info');
-                  }
+                  window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度未满[${v.today_feed}/${v.day_limit}]，预计需要[${MY_API.Gift.remain_feed}]送礼开始`, 'info');
+                  await MY_API.Gift.sendGift(v);
+                } else {
+                  window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度已满`, 'info');
                 }
               }
             }
@@ -3055,63 +3139,38 @@
 
         },
         sendGift: async (medal) => {
-          await MY_API.Gift.getBagList();
-          let bag_list;
-          if (MY_API.Gift.remain_feed <= 0) {
-            window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`, 'info');
-            return $.Deferred().resolve();
-          }
-          if (MY_API.Gift.time <= 0) MY_API.Gift.time = ts_s();
-
-          if (!MY_API.CONFIG.SEND_ALL_GIFT) {
-            //送之前查一次有没有可送的
-            let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
-              r.corner_mark.substring(0, r.corner_mark.indexOf("天")) <= MY_API.CONFIG.GIFT_LIMIT);
-            MYDEBUG("[自动送礼]pass的礼物", pass)
-            if (pass.length == 0) {
-              MY_API.Gift.over = true;
-              return;
-            } else {
-              bag_list = pass;
+          let hasRemainGift = false;
+          for (const v of MY_API.Gift.bag_list) {
+            if (MY_API.Gift.remain_feed <= 0) {
+              return window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`, 'info');
             }
-          } else {
-            let pass = MY_API.Gift.bag_list.filter(r => r.gift_num > 0 && r.corner_mark != '永久');
-            if (pass.length == 0) {
-              MY_API.Gift.over = true;
-              return;
-            } else {
-              bag_list = pass;
-            }
-          }
-          MYDEBUG('bag_list', bag_list)
-          for (let v of bag_list) {
-            if (medal.day_limit - medal.today_feed <= 0) {
-              window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`, 'info');
-              return;
-            }
-            let feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
+            if (v.gift_num <= 0) continue;
+            hasRemainGift = true;
+            const feed = MY_API.Gift.giftFeed_list[v.gift_id];
             if (feed > 0) {
               let feed_num = Math.floor(MY_API.Gift.remain_feed / feed);
               if (feed_num > v.gift_num) feed_num = v.gift_num;
-              if (feed_num > 0) {
-                MYDEBUG('[自动送礼]送出礼物类型', v.gift_name);
-                await BAPI.gift.bag_send(Live_info.uid, v.gift_id, MY_API.Gift.ruid, feed_num, v.bag_id, MY_API.Gift.room_id, Live_info.rnd).then((response) => {
-                  MYDEBUG('Gift.sendGift: API.gift.bag_send', response);
-                  if (response.code === 0) {
-                    v.gift_num -= feed_num;
-                    medal.today_feed += feed_num * feed;
-                    MY_API.Gift.remain_feed -= feed_num * feed;
-                    window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
-                  } else {
-                    window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常:${response.msg}`, 'caution');
-                  }
-                }, () => {
-                  window.toast('[自动送礼]包裹送礼失败，请检查网络', 'error');
-                  return delayCall(() => MY_API.Gift.sendGift(medal));
-                });
+              MYDEBUG('[自动送礼]送出礼物类型%s，送出礼物数量%d，剩余礼物数量%d', v.gift_name, feed_num, v.gift_num);
+              //await BAPI.gift.bag_send(Live_info.uid, v.gift_id, MY_API.Gift.ruid, feed_num, v.bag_id, MY_API.Gift.room_id, Live_info.rnd).then((response) => {
+              //MYDEBUG('Gift.sendGift: API.gift.bag_send', response);
+              if (/*response.code === 0*/ true) {
+                v.gift_num -= feed_num;
+                medal.today_feed += feed_num * feed;
+                MY_API.Gift.remain_feed -= feed_num * feed;
+                console.log('v.gift_num: %d，medal.today_feed: %d，MY_API.Gift.remain_feed: %d',v.gift_num, medal.today_feed, MY_API.Gift.remain_feed)
+                window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
+              } else {
+                window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常:${response.msg}`, 'caution');
               }
+              //}, () => {
+              //  window.toast('[自动送礼]包裹送礼失败，请检查网络', 'error');
+              //  return delayCall(() => MY_API.Gift.sendGift(medal));
+              //});
+            } else {
+              console.log('feed <= 0', feed, v);
             }
           }
+          if (!hasRemainGift) MY_API.Gift.over = true;
         },
         sendRemainGift: async (ROOM_ID) => {
           if (ROOM_ID == 0) return $.Deferred().resolve();
@@ -3124,31 +3183,13 @@
               return $.Deferred().reject();
             }
           })
-          await MY_API.Gift.getBagList();
-          let bag_list;
-          if (MY_API.Gift.time <= 0) MY_API.Gift.time = ts_s();
-          if (!MY_API.CONFIG.SEND_ALL_GIFT) {
-            //送之前查一次有没有可送的
-            let pass = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
-              r.corner_mark == `1天`);
-            if (pass.length == 0) {
-              MY_API.Gift.over = true;
-              return;
-            } else {
-              bag_list = pass;
-            }
-          } else {
-            let pass = MY_API.Gift.bag_list.filter(r => r.gift_num > 0 && r.corner_mark != '永久');
-            if (pass.length == 0) {
-              MY_API.Gift.over = true;
-              return;
-            } else {
-              bag_list = pass;
-            }
-          }
+          let bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
+            r.corner_mark == `1天`);
+          if (bag_list.length === 0) return;
           MYDEBUG('[自动送礼]【剩余礼物】bag_list', bag_list);
-          for (let v of bag_list) {
-            const feed = MY_API.Gift.getFeedByGiftID(v.gift_id);
+          for (const v of bag_list) {
+            if (v.gift_num <= 0) continue;
+            const feed = MY_API.Gift.giftFeed_list[v.gift_id];
             if (feed > 0) {
               let feed_num = v.gift_num;
               if (feed_num > 0) {
@@ -5335,19 +5376,19 @@
       localStorage.setItem(`${NAME}_AnchorFollowingList`, JSON.stringify({ list: idlist }));
     }
     const taskList = [
-      //每日任务     
+      // 每日任务     
       API.MEDAL_DANMU.run, // 粉丝牌打卡弹幕
       API.GroupSign.run, // 应援团签到
       API.DailyReward.run, // 每日任务
       API.LiveReward.run, // 直播每日任务
       API.Exchange.runS2C, // 银瓜子换硬币
       API.Exchange.runC2S, // 硬币换银瓜子]
-      //其它任务
+      // 其它任务
       API.AUTO_DANMU.run, // 自动发弹幕
       API.LITTLE_HEART.run, // 小心心
       API.Gift.run, // 送礼物
       API.MaterialObject.run, // 实物抽奖
-      API.AnchorLottery.run//天选时刻
+      API.AnchorLottery.run //天选时刻
     ];
     runAllTasks(5000, 200, taskList);
     if (API.CONFIG.LOTTERY) {

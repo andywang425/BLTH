@@ -903,25 +903,25 @@ var BAPI = {
                 }
             })
         },
-        getTags: () => {//获取关注分组
+        getTags: () => { // 获取关注分组
             return BAPI.ajax({
                 url: '//api.bilibili.com/x/relation/tags',
                 data: {
                     jsonp: 'jsonp',
-                    callback: ''//__jp3
+                    callback: '' // __jp3
                 }
             });
         },
-        getUpInTag: (mid, tagid, pn = 1, ps = 20, jsonp = 'jsonp', callback = '') => {//获取一个关注分组中的UP
+        getUpInTag: (mid, tagid, pn = 1, ps = 20, jsonp = 'jsonp', callback = '') => { // 获取一个关注分组中的UP
             return BAPI.ajax({
                 url: '//api.bilibili.com/x/relation/tag',
                 data: {
-                    mid: mid,//自己的uid
-                    tagid: tagid,//通过getTags获取
-                    pn: pn,//页数
-                    ps: ps,//每页数量
+                    mid: mid, // 自己的uid
+                    tagid: tagid, // 通过getTags获取
+                    pn: pn, // 页数
+                    ps: ps, // 每页数量
                     jsonp: jsonp,
-                    callback: callback//__jp11
+                    callback: callback // __jp11
                 }
             });
         },
@@ -958,11 +958,11 @@ var BAPI = {
                 method: 'POST',
                 url: '//api.bilibili.com/x/relation/modify',
                 data: {
-                    fid: fid,//目标uid
-                    act: act,//1关注 2取消关注
+                    fid: fid, // 目标uid
+                    act: act, // 1关注 2取消关注
                     re_src: re_src,
                     jsonp: 'jsonp',
-                    callback: ''//__jp3
+                    callback: '' // __jp3
                 }
             });
         },
@@ -1345,7 +1345,7 @@ var BAPI = {
             },
             join: (id, gift_id, gift_num, platform = 'pc') => {
                 var data = {
-                    id: id, //通过 anchor.check获取
+                    id: id, // 通过 anchor.check获取
                     platform: platform
                 };
                 if (gift_id !== undefined && gift_num !== undefined) {
