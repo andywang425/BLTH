@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.5.4
+// @version        5.6.5.5
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -413,7 +413,7 @@
         ANCHOR_CHECK_INTERVAL: 5, // 天选检查间隔（分钟）
         ANCHOR_IGNORE_BLACKLIST: true, // 天选忽略关键字（选项）
         ANCHOR_IGNORE_PWDROOM: true, // 不参加有密码的直播间的天选
-        ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车', '上反船', '照片', '素颜', '自拍', 'cos', '写真', '皂片', '开舰', '上舰', '自画像', '封面照', '封面', '取关', '美照', '随机照', '随机照片', '好友'], // 天选忽略关键字
+        ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车', '上反船', '照片', '素颜', '自拍', 'cos', '写真', '皂片', '开舰', '上舰', '自画像', '封面照', '封面', '取关', '美照', '随机照', '随机照片', '好友', '给主播', '照骗', '连麦'], // 天选忽略关键字
         ANCHOR_INTERVAL: 300, // 天选（检查天选和取关）请求间隔
         AHCHOR_NEED_GOLD: 0, // 忽略所需金瓜子大于_的抽奖
         ANCHOR_WAIT_REPLY: true, // 请求后等待回复
@@ -2816,17 +2816,17 @@
             return $.Deferred().reject();
           }
         }
-      }, // Once Run every day
+      },
       Gift: {
-        run_timer: undefined,
-        ruid: undefined,
-        room_id: undefined,
-        medal_list: undefined,
-        bag_list: undefined,
-        giftFeed_list: {},
-        remain_feed: undefined,
-        over: false,
-        sendGiftList: undefined,
+        run_timer: undefined, // 可用来取消下次运行的计划 clearTimeout(MY_API.Gift.run_timer)
+        ruid: undefined, // 包裹内礼物的ruid
+        room_id: undefined, // 送礼目标房间号
+        medal_list: undefined, // 勋章列表
+        bag_list: undefined, // 包裹
+        giftFeed_list: {}, // 每种礼物所对应的亲密度
+        remain_feed: undefined, // 该勋章今日剩余亲密度
+        over: false, // 是否结束送礼
+        allowGiftList: undefined, // 允许被送出礼物的id
         /**
          * 获取粉丝勋章
          * @param {Number} page 页数
@@ -2931,7 +2931,8 @@
                   m.today_feed += feed_num * feed;
                   remain_feed -= feed_num * feed;
                   window.toast(`[自动送礼]勋章[${m.medalName}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`, 'success');
-                  MYDEBUG('Gift.auto_light', `勋章[${m.medalName}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`)
+                  MYDEBUG('Gift.auto_light', `勋章[${m.medalName}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`);
+                  break;
                 } else {
                   window.toast(`[自动送礼]勋章[${m.medalName}]点亮失败【${rsp.msg}】`, 'caution');
                 }
@@ -2971,24 +2972,25 @@
             return
           };
           /**
-           * 处理用户输入的【允许被送出的礼物类型】
+           * 处理用户输入的【允许被送出的礼物类型】，将礼物名转换为id
            */
           const handleGiftList = () => {
-            MY_API.Gift.sendGiftList = [...MY_API.CONFIG.GIFT_ALLOW_TYPE];
-            MYDEBUG('[自动送礼]', `处理前的礼物列表 ${MY_API.Gift.sendGiftList}`);
-            for (let i = 0; i < MY_API.Gift.sendGiftList.length; i++) {
-              const listItem = MY_API.Gift.sendGiftList[i];
+            MY_API.Gift.allowGiftList = [...MY_API.CONFIG.GIFT_ALLOW_TYPE];
+            MYDEBUG('[自动送礼]', `处理前的礼物列表 ${MY_API.Gift.allowGiftList}`);
+            for (let i = 0; i < MY_API.Gift.allowGiftList.length; i++) {
+              const listItem = MY_API.Gift.allowGiftList[i];
               let matchItem;
               if (isNaN(listItem)) {
                 // 如果填了礼物名，转换为id
                 matchItem = Live_info.gift_list.find(item => item.name === listItem);
-                if (matchItem) MY_API.Gift.sendGiftList[i] = String(matchItem.id);
+                if (matchItem) MY_API.Gift.allowGiftList[i] = String(matchItem.id);
               }
             }
-            MYDEBUG('[自动送礼]', `处理后得到的礼物id列表 ${MY_API.Gift.sendGiftList}`)
+            MYDEBUG('[自动送礼]', `处理后得到的礼物id列表 ${MY_API.Gift.allowGiftList}`)
           };
           /**
-           * 获取礼物列表中的每种礼物所对应的亲密度
+           * 获取礼物列表中的每种礼物所对应的亲密度，把结果保存至 giftFeed_list。
+           * 格式：{ id1: feed1, id2: feed2, ... }
            */
           const getGiftFeed = async () => {
             for (const i of MY_API.Gift.bag_list) {
@@ -2998,13 +3000,16 @@
             }
           }
           /**
-           * 处理包裹
+           * 处理包裹。
+           * 1. 根据礼物到期时间过滤包裹
+           * 2. 按礼物亲密度由高到低排序
+           * 3. 按过期时间由早到晚排序
            */
           const handleBagList = () => {
             let bag_list;
             if (!MY_API.CONFIG.SEND_ALL_GIFT) {
               // 送之前查一次有没有可送的
-              bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
+              bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
                 r.corner_mark.substring(0, r.corner_mark.indexOf("天")) <= MY_API.CONFIG.GIFT_LIMIT);
               MYDEBUG("[自动送礼]过滤后的礼物", bag_list);
               if (bag_list.length == 0) {
@@ -3029,7 +3034,7 @@
               if (b.gift_feed === a.gift_feed) {
                 return a.expire_at - b.expire_at
               }
-            })
+            });
             MY_API.Gift.bag_list = [...bag_list];
             MYDEBUG('Gift.bag_list', MY_API.Gift.bag_list);
           };
@@ -3086,7 +3091,8 @@
             if (MY_API.Gift.medal_list.length > 0) {
               handleMedalList();
               await MY_API.Gift.auto_light(); // 点亮勋章
-              console.log(MY_API.Gift.medal_list,MY_API.Gift.bag_list)
+              console.log('点亮勋章后：', [...MY_API.Gift.medal_list])
+              console.log('包裹', [...MY_API.Gift.bag_list])
               if (LIGHT_MEDAL_NOW) {
                 LIGHT_MEDAL_NOW = false;
                 return $.Deferred().resolve();
@@ -3162,7 +3168,7 @@
               return $.Deferred().reject();
             }
           })
-          let bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.sendGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
+          let bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
             r.corner_mark == `1天`);
           if (bag_list.length === 0) return;
           MYDEBUG('[自动送礼]【剩余礼物】bag_list', bag_list);
@@ -4689,7 +4695,7 @@
                 jqText.click(() => {
                   let p = $.Deferred();
                   switch (response.data.require_type) {
-                    case 2: //粉丝勋章
+                    case 2: // 粉丝勋章
                       let getUid = $.Deferred();
                       if (!defaultJoinData.uid) {
                         BAPI.live_user.get_anchor_in_room(roomid).then((res) => {
@@ -4750,7 +4756,7 @@
                     default: p.resolve()
                   }
                   p.then(() => {
-                    //已经过了一段时间，需再次获取剩余时间
+                    // 已经过了一段时间，需再次获取剩余时间
                     BAPI.xlive.anchor.randTime(response.data.id).then((re) => {
                       MYDEBUG(`API.xlive.anchor.randTime ${response.data.id}`, re);
                       if (response.code === 0) {
@@ -4796,10 +4802,10 @@
                 }
               };
               if (MY_API.CONFIG.ANCHOR_IGNORE_MONEY > 0 || MY_API.CONFIG.ANCHOR_MONEY_ONLY) {
-                //忽略金额或仅参加现金天选
+                // 忽略金额或仅参加现金天选
                 const moneyCheckReturnArray = MY_API.AnchorLottery.moneyCheck(response.data.award_name);
                 if (moneyCheckReturnArray[0]) {
-                  //有金额
+                  // 有金额
                   if (moneyCheckReturnArray[1] < MY_API.CONFIG.ANCHOR_IGNORE_MONEY) {
                     MY_API.chatLog(`[天选时刻] 忽略金额小于${MY_API.CONFIG.ANCHOR_IGNORE_MONEY}元的天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}识别到的金额：${moneyCheckReturnArray[1]}元<br>${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
                     joinAnchorListener();
@@ -4816,8 +4822,8 @@
                 return false
               }
               switch (response.data.require_type) {
-                case 0: //无要求
-                case 1: return defaultJoinData //关注
+                case 0: // 无要求
+                case 1: return defaultJoinData // 关注
                 case 2: { // 粉丝勋章
                   return BAPI.live_user.get_anchor_in_room(roomid).then((res) => {
                     MYDEBUG(`API.live_user.get_anchor_in_room(${roomid})`, res);
@@ -4940,7 +4946,7 @@
                     })
                   }
                 }
-              } else { //中奖的代码
+              } else { // 中奖的代码
                 MY_API.chatLog(`[天选时刻] 天选时刻<br>roomid = ${linkMsg(data.roomid, liveRoomUrl + data.roomid)}, id = ${data.id}中奖<br>奖品：${data.award_name}<br>`, 'prize');
                 winPrizeNum++;
                 winPrizeTotalCount++;
