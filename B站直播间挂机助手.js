@@ -25,6 +25,7 @@
 // @connect        sc.ftqq.com
 // @connect        push.xuthus.cc
 // @connect        sctapi.ftqq.com
+// @connect        cdn.jsdelivr.net
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/Ajax-hook.min.js
 // @require        https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@40fb6ae6e191b18ddd39828a2a52ef5e66b127e4/modules/BilibiliAPI_Mod.min.js
@@ -40,6 +41,7 @@
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
 // @grant          GM_notification
+// @grant          GM_openInTab
 // ==/UserScript==
 
 (function () {
@@ -714,10 +716,9 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "修复在Safari中无法运行的bug，并开始兼容Safari。",
-              "调整了脚本默认设置，增大了天选时刻-请求间隔。",
-              "完善脚本内置说明及项目文档。",
-              "在非东八区地区使用脚本时，会根据国内时间来执行每日任务。"
+              "自动送礼和点亮勋章重构：优化礼物排序算法，亲密度高的礼物将被优先送出，更容易达到粉丝勋章的每日亲密度上限；在满足前一个条件的基础上优先送出更早过期的礼物；减少相关API调用次数。",
+              "【粉丝勋章打卡弹幕】不再给20级以上的勋章打卡（因为不加亲密度）。",
+              "每天首次运行脚本时会检测是否有新版本。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1213,10 +1214,10 @@
           },
         ];
         const helpText = {
-          //帮助信息
+          // 帮助信息
           ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<mh3>注意：</mh3><mul><mli>支持识别阿拉伯数字和汉字数字。</mli><mli>识别的单位有限。</mli><mli>不支持识别外币。</mli><mli>由于一些天选时刻的奖品名比较特殊，可能会出现遗漏或误判。</mli></mul>',
           LOTTERY: '参与大乱斗抽奖。',
-          MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则循环选取）。</mli><mli>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</mli></mul>',
+          MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>脚本不会给等级大于20的粉丝勋章打卡（因为不加亲密度）。</mli><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则循环选取）。</mli><mli>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</mli></mul>',
           AUTO_DANMU: '发送直播间弹幕。<mh3>注意：</mh3><mul><mli>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</mli><mli><mp>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</mp></mli><mli><mp>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</mp></mli><mli><mp>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</mp></mli><mli><mp>可以用默认值所填的房间号来测试本功能。</mp></mli><mli><mp>发送时间有两种填写方法</mp><mp>1.【小时】h【分钟】m【秒】s</mp><mul><mli>每隔一段时间发送一条弹幕</mli><mli>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></mli><mli>可以填小数</mli><mli>可以只填写其中一项或两项</mli></mul><mp>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</mp><mp><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></mp><mp>2.【小时】:【分钟】:【秒】</mp><mul><mli>在特定时间点发一条弹幕</mli><mli>例子： <code>10:30:10</code>, <code>0:40</code></mli><mli>只能填整数</mli><mli>小时分钟必须填写，秒数可以不填</mli></mul><mp>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</mp></mli></mul>',
           NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<mh3>原理：</mh3><mul><mli>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。</mli><mul>',
           INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<mh3>缺点：</mh3>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管点击后会提示接口返回错误），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。',
@@ -1233,7 +1234,7 @@
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
           EXCLUDE_ROOMID: "不给这些房间送礼。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
           GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
-          AUTO_GIFT: "自动给有粉丝勋章的直播间送出包裹内的礼物。<mh3>说明：</mh3><mul><mli>送礼设置优先级：<br>不送礼房间 > 优先送礼房间 > 优先高/低等级粉丝牌。</mli><mli>送礼设置逻辑规则：<br>无论【优先高/低等级粉丝牌】如何设置，会根据【无视礼物类型和到期时间限制】（勾选则无视是否到期补满亲密度，否则只送到期的）条件去按优先送礼房间先后顺序送礼。之后根据【优先高/低等级粉丝牌】决定先送高级还是低级。</mli></mul>",
+          AUTO_GIFT: "<mh3>说明：</mh3><mul><mli>送礼设置优先级：<br>不送礼房间 >优先送礼房间 >优先高/低等级粉丝牌。</mli><mli>送礼设置逻辑规则：<br>无论【优先高/低等级粉丝牌】如何设置，会根据【无视礼物类型和到期时间限制】（勾选则无视是否到期补满亲密度，否则只送到期的）条件去按优先送礼房间先后顺序送礼。之后根据【优先高/低等级粉丝牌】决定先送高级还是低级。 </mli><mli>送礼顺序：<br>高亲密度的礼物会被优先送出，在满足此条件的情况下先送快要过期的礼物。 </mli><mli>不会送出永久礼物。 </mli></mul>",
           SPARE_GIFT_ROOM: "【剩余礼物】指送满了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。<mul><mli>该项填<code>0</code>则不送剩余礼物。</mli></mul>",
           COIN: "自动给视频投币，每天最多投5个。<mul><mli>脚本会根据今日你已获得的投币经验值判断你已经投了多少个币，然后自动投剩余没投的币。<blockquote>如今日已获得投币经验20，脚本投币数量设置为4，则会投2个币。</blockquote></mli></mul>",
           COIN_UID: "该项若填<code>0</code>则给动态中的视频依次投币(不存在UID为0的用户)。<mul><mli>可以填写多个uid，每两个uid间用半角逗号<code>,</code>隔开。</mli><mli>如果填了多个uid，则会依次检查这些UP是否有可投币的视频。</mli></mul>",
@@ -1271,7 +1272,7 @@
           COIN2SILVER: "普通用户每天兑换上限<code>25</code>硬币，老爷或大会员每天兑换上限<code>50</code>硬币。<mul><mli><code>1</code>硬币 = <code>450</code>银瓜子（老爷或大会员<code>500</code>银瓜子）。</mli></mul>",
           SILVER2COIN: "每日直播用户都可以将部分银瓜子转化为硬币，每天仅一次机会。<mul><mli><code>700</code>银瓜子 = <code>1</code>硬币。</mul></mli>",
           windowToast: `右上角的提示信息。相对来说不是那么重要，所以不放在日志窗口里。<mul style = "line-height:1em;"><div class="link-toast info fixed"><span class="toast-text">普通消息</span></div><br><br><br><div class="link-toast success fixed"><span class="toast-text">成功</span></div><br><br><br><div class="link-toast error fixed"><span class="toast-text">发生错误</span></div></mul>`,
-          GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。</mli><mli>若填写礼物名，脚本会在送礼前将其转换成 id（不会修改设置项）。如果直接填写 id 能提高运行效率。<mli>在控制台(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和 id 的json。将data下的几项全部展开，再搜索礼物名即可找到 id 。</mli><mli>常用 id ：1: <code>辣条</code> 6: <code>亿圆</code> 30607: <code>小心心</code></mli></mul>",
+          GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。</mli><mli>在脚本中打开控制台日志后，在控制台(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和 id 的json。将data下的几项全部展开，再搜索礼物名即可找到 id 。</mli><mli>常用 id ：1: <code>辣条</code> 6: <code>亿圆</code> 30607: <code>小心心</code></mli></mul>",
           ANCHOR_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的天选时刻。",
           CP_NOTICE: "<a href = 'https://cp.xuthus.cc/' target = '_blank'>酷推（点我注册）</a>，英文名「Cool Push」，QQ消息推送服务。使用前请先前往酷推官网完成注册，然后回到脚本界面填写Skey。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的QQ私聊消息提醒你中奖了。</mli></mu;>",
           ServerTurbo_NOTICE: "<a href = 'https://sct.ftqq.com/' target = '_blank'>Server酱Turbo版（点我注册）</a>，是「<a href='http://sc.ftqq.com' target='_blank'>公众号版</a>」分离出来的一个版本，它为捐赠用户提供更多的推送渠道选择，除了方糖服务号（因为举报原因卡片不显示正文），它还包括了到微信官方提供的「<a href='https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login' target='_blank'>测试号</a>」、企业微信群、钉钉群、飞书群的推送。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信推送提醒你中奖了。</mli></mul>",
@@ -1393,10 +1394,6 @@
               myDiv.find('button[data-action="reset"]').click(() => {
                 // 重置按钮
                 MY_API.setDefaults();
-              });
-              myDiv.find('button[data-action="checkUpdate"]').click(() => {
-                //检查更新按钮
-                MY_API.checkUpdate();
               });
               myDiv.find('button[data-action="redoAllTasks"]').click(() => {
                 // 重置每日任务状态
@@ -2921,11 +2918,11 @@
               }
               for (const g of MY_API.Gift.bag_list) {
                 if (g.gift_id !== 30607 || g.gift_num <= 0) continue;
-                //let response = await BAPI.room.room_init(parseInt(medal.roomid, 10));
-                //let send_room_id = parseInt(response.data.room_id, 10);
+                let response = await BAPI.room.room_init(parseInt(medal.roomid, 10));
+                let send_room_id = parseInt(response.data.room_id, 10);
                 const feed_num = 1;
-                //let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, medal.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd)
-                if (/*rsp.code === 0*/true) {
+                let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, medal.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd)
+                if (rsp.code === 0) {
                   m.is_lighted = 1;
                   g.gift_num -= feed_num;
                   m.today_feed += feed_num * feed;
@@ -2955,6 +2952,7 @@
            * 一轮送礼结束后运行的函数
            */
           const nextTimeDebug = () => {
+            window.toast('[自动送礼] 本次送礼结束', 'info');
             if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME") {
               let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
               MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(), alternateTime);
@@ -2969,7 +2967,6 @@
               MY_API.CACHE.GiftInterval_TS = ts_ms();
               MY_API.saveCache();
             }
-            return
           };
           /**
            * 处理用户输入的【允许被送出的礼物类型】，将礼物名转换为id
@@ -3036,7 +3033,7 @@
               }
             });
             MY_API.Gift.bag_list = [...bag_list];
-            MYDEBUG('Gift.bag_list', MY_API.Gift.bag_list);
+            MYDEBUG('Gift.bag_list (sorted)', MY_API.Gift.bag_list);
           };
           /**
            * 处理粉丝勋章
@@ -3050,6 +3047,13 @@
               MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(Er => MY_API.CONFIG.EXCLUDE_ROOMID.findIndex(exp => exp == Er.roomid) == -1);
             };
           }
+          /**
+           * 判断包裹内是否还有礼物
+           * @returns {Boolean} 有礼物 true, 无礼物 false
+           */
+          const checkRemainGift = () => {
+            return MY_API.Gift.bag_list.some(g => g.gift_num > 0) ? true : false;
+          };
           try {
             if (!MY_API.CONFIG.AUTO_GIFT && !LIGHT_MEDAL_NOW) return $.Deferred().resolve();
             if (medalDanmuRunning) {
@@ -3081,24 +3085,24 @@
                 MY_API.saveCache();
               }
             }
-            MY_API.Gift.over = false;
             handleGiftList();
             await MY_API.Gift.getBagList();
             await getGiftFeed();
             handleBagList();
             await MY_API.Gift.getMedalList();
-            MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', MY_API.Gift.medal_list);
+            MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', [...MY_API.Gift.medal_list]);
             if (MY_API.Gift.medal_list.length > 0) {
               handleMedalList();
               await MY_API.Gift.auto_light(); // 点亮勋章
-              console.log('点亮勋章后：', [...MY_API.Gift.medal_list])
-              console.log('包裹', [...MY_API.Gift.bag_list])
               if (LIGHT_MEDAL_NOW) {
                 LIGHT_MEDAL_NOW = false;
                 return $.Deferred().resolve();
               }
               for (const v of MY_API.Gift.medal_list) {
-                if (MY_API.Gift.over) break;
+                if (!checkRemainGift()) {
+                  MY_API.Gift.over = true;
+                  break;
+                }
                 const response = await BAPI.room.room_init(parseInt(v.roomid, 10));
                 MY_API.Gift.room_id = parseInt(response.data.room_id, 10);
                 MY_API.Gift.ruid = v.target_id;
@@ -3111,51 +3115,45 @@
                 }
               }
             }
-            await MY_API.Gift.sendRemainGift(MY_API.CONFIG.SPARE_GIFT_ROOM);
+            if (!MY_API.Gift.over) await MY_API.Gift.sendRemainGift(MY_API.CONFIG.SPARE_GIFT_ROOM);
+            SEND_GIFT_NOW = false;
+            nextTimeDebug();
+            return $.Deferred().resolve();
           } catch (err) {
             FailFunc();
             window.toast('[自动送礼]运行时出现异常，已停止', 'error');
             MYERROR(`自动送礼出错`, err);
             return $.Deferred().reject();
           }
-          SEND_GIFT_NOW = false;
-          nextTimeDebug();
-          return $.Deferred().resolve();
-
         },
         sendGift: async (medal) => {
-          let hasRemainGift = false;
           for (const v of MY_API.Gift.bag_list) {
             if (MY_API.Gift.remain_feed <= 0) {
-              return window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`, 'info');
+              return window.toast(`[自动送礼]勋章[${medal.medalName}]送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`, 'info');
             }
-            if (v.gift_num <= 0) continue;
-            hasRemainGift = true;
+            if (v.gift_num === 0) continue; // 如果这一礼物送完了则跳到下一个礼物
             const feed = MY_API.Gift.giftFeed_list[v.gift_id];
             if (feed > 0) {
               let feed_num = Math.floor(MY_API.Gift.remain_feed / feed);
+              if (feed_num === 0) continue; // 当前礼物亲密度大于勋章今日剩余亲密度
               if (feed_num > v.gift_num) feed_num = v.gift_num;
-              MYDEBUG(`[自动送礼]送出礼物类型${v.gift_name}，送出礼物数量${feed_num}，剩余礼物数量${v.gift_num}`);
-              //await BAPI.gift.bag_send(Live_info.uid, v.gift_id, MY_API.Gift.ruid, feed_num, v.bag_id, MY_API.Gift.room_id, Live_info.rnd).then((response) => {
-              //MYDEBUG('Gift.sendGift: API.gift.bag_send', response);
-              if (/*response.code === 0*/ true) {
-                v.gift_num -= feed_num;
-                medal.today_feed += feed_num * feed;
-                MY_API.Gift.remain_feed -= feed_num * feed;
-                console.log(`v.gift_num: ${v.gift_num}，medal.today_feed: ${medal.today_feed}，MY_API.Gift.remain_feed: ${MY_API.Gift.remain_feed}`);
-                window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
-              } else {
-                window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常:${response.msg}`, 'caution');
-              }
-              //}, () => {
-              //  window.toast('[自动送礼]包裹送礼失败，请检查网络', 'error');
-              //  return delayCall(() => MY_API.Gift.sendGift(medal));
-              //});
-            } else {
-              console.log('feed <= 0', feed, v);
+              MYDEBUG(`[自动送礼]送出礼物类型${v.gift_name}，该项礼物数量${v.gift_num}，送出礼物数量${feed_num}`);
+              await BAPI.gift.bag_send(Live_info.uid, v.gift_id, MY_API.Gift.ruid, feed_num, v.bag_id, MY_API.Gift.room_id, Live_info.rnd).then((response) => {
+                MYDEBUG('Gift.sendGift: API.gift.bag_send', response);
+                if (response.code === 0) {
+                  v.gift_num -= feed_num;
+                  medal.today_feed += feed_num * feed;
+                  MY_API.Gift.remain_feed -= feed_num * feed;
+                  window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
+                } else {
+                  window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常:${response.msg}`, 'caution');
+                }
+              }, () => {
+                window.toast('[自动送礼]包裹送礼失败，请检查网络', 'error');
+                return delayCall(() => MY_API.Gift.sendGift(medal));
+              });
             }
           }
-          if (!hasRemainGift) MY_API.Gift.over = true;
         },
         sendRemainGift: async (ROOM_ID) => {
           if (ROOM_ID == 0) return $.Deferred().resolve();
@@ -3735,14 +3733,14 @@
           await MY_API.MEDAL_DANMU.getMedalList();
           let lightMedalList;
           if (MY_API.CONFIG.MEDAL_DANMU_METHOD === 'MEDAL_DANMU_WHITE')
-            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1);
+            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1 && r.medal_level <= 20);
           else {
-            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) === -1);
+            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) === -1 && r.medal_level <= 20);
           }
           MYDEBUG('[粉丝牌打卡] 过滤后的粉丝勋章房间列表', lightMedalList);
           let danmuContentIndex = 0;
           const configDanmuLength = MY_API.CONFIG.MEDAL_DANMU_CONTENT.length;
-          //第一轮
+          // 第一轮
           for (const up of lightMedalList) {
             if (danmuContentIndex >= configDanmuLength) danmuContentIndex = 0;
             const medal_name = up.medal_name,
@@ -5172,7 +5170,7 @@
         sleepCheck: () => {
           if (!MY_API.CONFIG.TIME_AREA_DISABLE) return false;
           if (inTimeArea(MY_API.CONFIG.TIME_AREA_START_H0UR, MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_START_MINUTE, MY_API.CONFIG.TIME_AREA_END_MINUTE)) {
-            //判断时间段
+            // 判断时间段
             return getIntervalTime(MY_API.CONFIG.TIME_AREA_END_H0UR, MY_API.CONFIG.TIME_AREA_END_MINUTE);
           } else {
             return false
@@ -5311,7 +5309,7 @@
                 time: 3000,
                 icon: 2
               });
-              MY_API.chatLog('由于未同意最终用户许可协议，<br>脚本已停止运行。', 'warning');
+              window.toast('由于未同意最终用户许可协议，<br>脚本已停止运行。', 'caution');
               localStorage.setItem(`${NAME}_showEula`, true);
               runNext.reject();
             },
@@ -5320,7 +5318,7 @@
         } else runNext.resolve();
         runNext.then(() => {
           if (parseInt(Live_info.uid) === 0 || isNaN(parseInt(Live_info.uid)))
-            return MY_API.chatLog('未登录，请先登录再使用脚本', 'warning');
+            return window.toast('未登录，请先登录再使用脚本', 'caution');
           //新版本提示信息
           if (MY_API.CONFIG.UPDATE_TIP) MY_API.newMessage(GM_info.script.version);
           MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
@@ -5334,6 +5332,8 @@
   }
 
   async function main(API) {
+    // 检查更新
+    checkUpdate(GM_info.script.version);
     // 修复版本更新产生的兼容性问题
     fixVersionDifferences(API, GM_info.script.version);
     // 清空辣条数量
@@ -5445,6 +5445,50 @@
       }, delay);
     };
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000); // 单位1分钟，重新加载直播间
+  }
+  function checkUpdate(version) {
+    const lastCheckUpdateTs = localStorage.getItem(`${NAME}_lastCheckUpdateTs`) || 0;
+    if (!checkNewDay(Number(lastCheckUpdateTs))) return;
+    XHR({
+      GM: true,
+      anonymous: true,
+      method: "GET",
+      url: "https://cdn.jsdelivr.net/gh/andywang425/BLTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js"
+    }).then(response => {
+      MYDEBUG("检查更新 checkUpdate", response);
+      if (response.body === undefined) return;
+      const scriptVersion = response.body.match(/@version[ ]*([\d\.]+)/)[1];
+      const githubOpenTabOptions = { active: false, insert: true, setParent: true },
+        greasyforkOpenTabOptions = { active: true, insert: true, setParent: true };
+      if (!versionStringCompare(version, scriptVersion)) { // version < scriptVersion
+        // 需要更新
+        let updateSource, updateURL;
+        if (GM_info.script.updateURL === null) {
+          updateSource = "Greasy Fork"
+          updateURL = "https://greasyfork.org/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B";
+        } else if (GM_info.script.updateURL.includes("githubusercontent")) {
+          updateSource = "Github";
+          updateURL = "https://cdn.jsdelivr.net/gh/andywang425/BLTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js";
+        }
+        let index = layer.confirm(`检测到新版本 <strong>${scriptVersion}</strong>。<br>是否从 ${updateSource} 更新脚本？`, {
+          title: '更新脚本',
+          btn: ['是', '否']
+        }, function () {
+          // 更新
+          if (updateSource = "Greasy Fork") {
+            layer.close(index);
+            GM_openInTab(updateURL, greasyforkOpenTabOptions);
+          }
+          else {
+            GM_openInTab(updateURL, githubOpenTabOptions);
+            layer.msg('正在更新...', { time: 2000 });
+          }
+          localStorage.setItem(`${NAME}_lastCheckUpdateTs`, ts_ms());
+        }, function () {
+          // 不更新
+        });
+      }
+    })
   }
   /**
    * 删除一维数组元素
@@ -5736,7 +5780,7 @@
    * @param ts
    * @returns {boolean}
    */
-  const checkNewDay = (ts) => {
+  function checkNewDay(ts) {
     if (ts === 0) return true;
     let t = new Date(ts);
     let d = new Date();
