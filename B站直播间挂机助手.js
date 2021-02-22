@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.5.5
+// @version        5.6.5.6
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -199,7 +199,6 @@
     storageLastFixVersion = localStorage.getItem(`${NAME}_lastFixVersion`) || "0";
 
   let mainDisplay = localStorage.getItem(`${NAME}_msgHide`) || 'hide', // UI隐藏开关
-    layerTimes = 0, // 记录弹出日志窗口后 到 弹出控制面板前 弹出的其它窗口的数量 (如: 更新提示, EULA)
     winPrizeNum = 0,
     winPrizeTotalCount = 0,
     SEND_GIFT_NOW = false, // 立刻送出礼物
@@ -716,9 +715,9 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "自动送礼和点亮勋章重构：优化礼物排序算法，亲密度高的礼物将被优先送出，更容易达到粉丝勋章的每日亲密度上限；在满足前一个条件的基础上优先送出更早过期的礼物；减少相关API调用次数。",
-              "【粉丝勋章打卡弹幕】不再给20级以上的勋章打卡（因为不加亲密度）。",
-              "每天首次运行脚本时会检测是否有新版本。"
+              "修复在某些情况下控制面板无法正确开关的bug。",
+              "修复天选时刻白名单无法保存的bug。",
+              "修复检查更新相关bug。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -731,8 +730,7 @@
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('github', 'https://github.com/andywang425/BLTH/issues')}反馈。
                 也可以进q群讨论：${linkMsg('1106094437（已满）', "https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O")}，${linkMsg('907502444', 'https://jq.qq.com/?_wv=1027&k=Bf951teI')}
-                </em>`,
-              success: () => { layerTimes++ }
+                </em>`
             });
             localStorage.setItem(`${NAME}_NEWMSG_CACHE`, version);
           }
@@ -1294,10 +1292,10 @@
             resize: false,
             content: html,
             success: () => {
-              // 整个layer窗口
-              layerUiMain = $("#layui-layer" + String(2 + layerTimes));
               // layer窗口中的总div
               let myDiv = $('#allsettings');
+              // 整个layer窗口
+              layerUiMain = myDiv.parent().parent();
               // 显示顶部统计数据
               $('#giftCount .anchor .statNum').text(MY_API.GIFT_COUNT.ANCHOR_COUNT); // 天选
               $('#giftCount .material .statNum').text(MY_API.GIFT_COUNT.MATERIAL_COUNT); // 实物
@@ -1711,8 +1709,8 @@
                     let val = value;
                     if (!val) { val = "" }
                     else {
-                      val = [...new Set(val)];
                       val = val.split(",");
+                      val = [...new Set(val)];
                       for (let i = 0; i < val.length; i++) {
                         if (!val[i]) val.splice(i, 1);
                       }
@@ -5312,8 +5310,7 @@
               window.toast('由于未同意最终用户许可协议，<br>脚本已停止运行。', 'caution');
               localStorage.setItem(`${NAME}_showEula`, true);
               runNext.reject();
-            },
-            success: () => { layerTimes++ }
+            }
           });
         } else runNext.resolve();
         runNext.then(() => {
@@ -5456,6 +5453,7 @@
       url: "https://cdn.jsdelivr.net/gh/andywang425/BLTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js"
     }).then(response => {
       MYDEBUG("检查更新 checkUpdate", response);
+      localStorage.setItem(`${NAME}_lastCheckUpdateTs`, ts_ms());
       if (response.body === undefined) return;
       const scriptVersion = response.body.match(/@version[ ]*([\d\.]+)/)[1];
       const githubOpenTabOptions = { active: false, insert: true, setParent: true },
@@ -5475,7 +5473,7 @@
           btn: ['是', '否']
         }, function () {
           // 更新
-          if (updateSource = "Greasy Fork") {
+          if (updateSource === "Greasy Fork") {
             layer.close(index);
             GM_openInTab(updateURL, greasyforkOpenTabOptions);
           }
@@ -5483,7 +5481,6 @@
             GM_openInTab(updateURL, githubOpenTabOptions);
             layer.msg('正在更新...', { time: 2000 });
           }
-          localStorage.setItem(`${NAME}_lastCheckUpdateTs`, ts_ms());
         }, function () {
           // 不更新
         });
