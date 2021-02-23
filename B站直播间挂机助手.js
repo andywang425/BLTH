@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.5.6
+// @version        5.6.5.7
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -456,6 +456,7 @@
         DANMU_ROOMID: ["22474988"], // 发弹幕房间号
         DANMU_INTERVAL_TIME: ["10m"], // 弹幕发送时间
         EXCLUDE_ROOMID: ["0"], // 送礼排除房间号
+        FORCE_LIGHT: false, // 点亮勋章时忽略亲密度上限
         FT_NOTICE: false, // 方糖通知
         FT_SCKEY: 'SCKEY', // 方糖SCKEY
         GIFT_LIMIT: 1, // 礼物到期时间(天)
@@ -715,9 +716,10 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "修复在某些情况下控制面板无法正确开关的bug。",
-              "修复天选时刻白名单无法保存的bug。",
-              "修复检查更新相关bug。"
+              "修复自动送礼礼物到期时间判断不正确的bug。",
+              "修复点亮勋章出错的bug。",
+              "修复【点亮勋章时忽略亲密度上限】设置无法保存的bug。",
+              "优化了小心心 - 自动点亮勋章，优先送出包裹内快过期的小心心来点亮勋章。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1265,7 +1267,7 @@
           SHARE: "并不会真的分享视频，通过调用特定api直接完成任务。",
           ANCHOR_MONEY_ONLY: "仅参加能识别到金额的天选。<mul><mli>由于部分天选的奖品名较特殊，可能会遗漏或误判一些天选。</mli></mul>",
           LIGHT_MEDALS: "根据点亮模式的不同，这些直播间的粉丝勋章将会被点亮或排除在外。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
-          LIGHT_METHOD: "通过给拥有粉丝勋章的直播间送一个小心心来点亮熄灭的勋章。<mul><mli>白名单：只点亮这些房间的粉丝勋章。</mli><mli>黑名单：点亮除了这些房间以外的直播间的粉丝勋章。</mli><mli>如果你不想启用本功能，把【勋章点亮模式】设为白名单，然后在【自动点亮勋章房间号】中填<code>0</code>即可。</mli><mli>脚本会在运行自动送礼前点亮勋章。如果未启用自动送礼，请点击【立刻点亮勋章】按钮。</mli></mul>",
+          LIGHT_METHOD: "通过给拥有粉丝勋章的直播间送一个小心心来点亮熄灭的勋章。<mul><mli>白名单：只点亮这些房间的粉丝勋章。</mli><mli>黑名单：点亮除了这些房间以外的直播间的粉丝勋章。</mli><mli>如果你不想启用本功能，把【勋章点亮模式】设为白名单，然后在【自动点亮勋章房间号】中填<code>0</code>即可。</mli><mli>脚本会在运行自动送礼前点亮勋章。如果未启用自动送礼，请点击【立刻点亮勋章】按钮。</mli><mli>优先送出快过期的小心心。</mli></mul>",
           ANCHOR_IGNORE_PWDROOM: "部分直播间需输入密码后才能进入。勾选此选项后将忽略这些直播间的天选。",
           COIN2SILVER: "普通用户每天兑换上限<code>25</code>硬币，老爷或大会员每天兑换上限<code>50</code>硬币。<mul><mli><code>1</code>硬币 = <code>450</code>银瓜子（老爷或大会员<code>500</code>银瓜子）。</mli></mul>",
           SILVER2COIN: "每日直播用户都可以将部分银瓜子转化为硬币，每天仅一次机会。<mul><mli><code>700</code>银瓜子 = <code>1</code>硬币。</mul></mli>",
@@ -2905,7 +2907,7 @@
               light_roomid = MY_API.CONFIG.LIGHT_MEDALS; // 点亮勋章房间号
             for (const m of MY_API.Gift.medal_list) {
               let remain_feed = m.day_limit - m.today_feed;
-              if (MY_API.CONFIG.LIGHT_METHOD == 'LIGHT_WHITE') {
+              if (MY_API.CONFIG.LIGHT_METHOD === 'LIGHT_WHITE') {
                 // 白名单
                 if (!(m.is_lighted === 0 && (remain_feed >= feed || MY_API.CONFIG.FORCE_LIGHT) &&
                   light_roomid.findIndex(it => it == m.roomid) > -1)) continue;
@@ -2916,10 +2918,10 @@
               }
               for (const g of MY_API.Gift.bag_list) {
                 if (g.gift_id !== 30607 || g.gift_num <= 0) continue;
-                let response = await BAPI.room.room_init(parseInt(medal.roomid, 10));
+                let response = await BAPI.room.room_init(parseInt(m.roomid, 10));
                 let send_room_id = parseInt(response.data.room_id, 10);
                 const feed_num = 1;
-                let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, medal.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd)
+                let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, m.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd)
                 if (rsp.code === 0) {
                   m.is_lighted = 1;
                   g.gift_num -= feed_num;
@@ -2999,22 +3001,23 @@
            * 1. 根据礼物到期时间过滤包裹
            * 2. 按礼物亲密度由高到低排序
            * 3. 按过期时间由早到晚排序
+           * @param filter 是否按设置过滤礼物
            */
-          const handleBagList = () => {
+          const handleBagList = (filter = true) => {
             let bag_list;
-            if (!MY_API.CONFIG.SEND_ALL_GIFT) {
+            if (!MY_API.CONFIG.SEND_ALL_GIFT && filter) {
               // 送之前查一次有没有可送的
               bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
-                r.corner_mark.substring(0, r.corner_mark.indexOf("天")) <= MY_API.CONFIG.GIFT_LIMIT);
+                Number(r.corner_mark.substring(0, r.corner_mark.indexOf("天"))) <= Number(MY_API.CONFIG.GIFT_LIMIT));
               MYDEBUG("[自动送礼]过滤后的礼物", bag_list);
-              if (bag_list.length == 0) {
+              if (bag_list.length === 0) {
                 MY_API.Gift.over = true;
                 return;
               }
             } else {
               bag_list = MY_API.Gift.bag_list.filter(r => r.gift_num > 0 && r.corner_mark != '永久');
               MYDEBUG("[自动送礼]过滤后的礼物", bag_list);
-              if (bag_list.length == 0) {
+              if (bag_list.length === 0) {
                 MY_API.Gift.over = true;
                 return;
               }
@@ -3086,9 +3089,10 @@
             handleGiftList();
             await MY_API.Gift.getBagList();
             await getGiftFeed();
-            handleBagList();
+            handleBagList(false);
+            if (MY_API.Gift.over) return;
             await MY_API.Gift.getMedalList();
-            MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', [...MY_API.Gift.medal_list]);
+            MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', MY_API.Gift.medal_list);
             if (MY_API.Gift.medal_list.length > 0) {
               handleMedalList();
               await MY_API.Gift.auto_light(); // 点亮勋章
@@ -3096,6 +3100,8 @@
                 LIGHT_MEDAL_NOW = false;
                 return $.Deferred().resolve();
               }
+              handleBagList();
+              if (MY_API.Gift.over) return;
               for (const v of MY_API.Gift.medal_list) {
                 if (!checkRemainGift()) {
                   MY_API.Gift.over = true;
@@ -3165,7 +3171,7 @@
             }
           })
           let bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
-            r.corner_mark == `1天`);
+            r.corner_mark == '1天');
           if (bag_list.length === 0) return;
           MYDEBUG('[自动送礼]【剩余礼物】bag_list', bag_list);
           for (const v of bag_list) {
@@ -5142,7 +5148,7 @@
                       if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】成功`, 'success');
                       else window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】失败 ${re.message}`, 'warning');
                     }, () => {
-                      MY_API.chatLog(`[天选时刻] 移动UP（uid = ${data.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`);
+                      MY_API.chatLog(`[天选时刻] 移动UP（uid = ${data.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`, 'error');
                     });
                   }, 8000);
                 }
