@@ -26,17 +26,17 @@
 // @connect        push.xuthus.cc
 // @connect        sctapi.ftqq.com
 // @connect        cdn.jsdelivr.net
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/Ajax-hook.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/js/Ajax-hook.min.js
 // @require        https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@40fb6ae6e191b18ddd39828a2a52ef5e66b127e4/modules/BilibiliAPI_Mod.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@1aacf031b9f93299e7d4b947cdda66f96064d49a/modules/layer.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libBilibiliToken.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@adad0a90c758fd1cb441784f01e7ea4aa8bed123/modules/libWasmHash.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@97bf818a906154a418f72ecbb644de9cf19c80b1/modules/base64.min.js
-// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@e5661a11516ac85ad185e267dca600fc142a0bcd/css/layer.css
-// @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@0e059abcac5900490a4af84c2a64c49db74c8c6c/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@d8f51749faa21bc0aedef7873fd83adc3dd7b194/html/main.min.html
-// @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@0e059abcac5900490a4af84c2a64c49db74c8c6c/html/eula.min.html
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/js/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/js/layer.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/js/libBilibiliToken.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/js/libWasmHash.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/js/base64.min.js
+// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/css/layer.css
+// @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/css/myCss.min.css
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/html/main.min.html
+// @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@74c0b0817cd289727f4ec32e204eae36f99c68ab/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
@@ -5456,12 +5456,12 @@
       GM: true,
       anonymous: true,
       method: "GET",
-      url: "https://cdn.jsdelivr.net/gh/andywang425/BLTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js"
+      url: "https://cdn.jsdelivr.net/gh/andywang425/BLTH/assets/json/notice.min.json"
     }).then(response => {
       MYDEBUG("检查更新 checkUpdate", response);
       localStorage.setItem(`${NAME}_lastCheckUpdateTs`, ts_ms());
       if (response.body === undefined) return;
-      const scriptVersion = response.body.match(/@version[ ]*([\d\.]+)/)[1];
+      const scriptVersion = response.body.version;
       const githubOpenTabOptions = { active: false, insert: true, setParent: true },
         greasyforkOpenTabOptions = { active: true, insert: true, setParent: true };
       if (!versionStringCompare(version, scriptVersion)) { // version < scriptVersion
@@ -5470,7 +5470,7 @@
         if (GM_info.script.updateURL === null) {
           updateSource = "Greasy Fork"
           updateURL = "https://greasyfork.org/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B";
-        } else if (GM_info.script.updateURL.includes("githubusercontent")) {
+        } else {
           updateSource = "Github";
           updateURL = "https://cdn.jsdelivr.net/gh/andywang425/BLTH/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js";
         }
