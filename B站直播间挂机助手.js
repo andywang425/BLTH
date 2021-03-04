@@ -415,7 +415,7 @@
         ANCHOR_IGNORE_BLACKLIST: true, // 天选忽略关键字（选项）
         ANCHOR_IGNORE_PWDROOM: true, // 不参加有密码的直播间的天选
         ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车', '上反船', '照片', '素颜', '自拍', 'cos', '写真', '皂片', '开舰', '上舰', '自画像', '封面照', '封面', '取关', '美照', '随机照', '随机照片', '好友', '给主播', '照骗', '连麦'], // 天选忽略关键字
-        ANCHOR_INTERVAL: 300, // 天选（检查天选和取关）请求间隔
+        ANCHOR_INTERVAL: 350, // 天选（检查天选和取关）请求间隔
         AHCHOR_NEED_GOLD: 0, // 忽略所需金瓜子大于_的抽奖
         ANCHOR_WAIT_REPLY: true, // 请求后等待回复
         ANCHOR_UPLOAD_DATA: false, // 天选上传数据
@@ -764,12 +764,12 @@
         }
       },
       setDefaults: () => {
-        //重置配置函数
+        // 重置配置函数
         MY_API.CONFIG = MY_API.CONFIG_DEFAULT;
         MY_API.CACHE = MY_API.CACHE_DEFAULT;
         MY_API.saveConfig();
         MY_API.saveCache();
-        MY_API.chatLog('配置和CACHE已重置为默认。3秒后刷新页面');
+        layer.msg('配置和CACHE已重置为默认。3秒后刷新页面', { icon: 1 });
         setTimeout(() => {
           window.location.reload()
         }, 3000);
@@ -1393,7 +1393,15 @@
 
               myDiv.find('button[data-action="reset"]').click(() => {
                 // 重置按钮
-                MY_API.setDefaults();
+                const index = layer.confirm(`<div style = "text-align:center">是否重置所有设置及缓存为默认？</div>`, {
+                  title: '重置所有为默认',
+                  btn: ['是', '否']
+                }, function () {
+                  layer.close(index);
+                  MY_API.setDefaults();
+                }, function () {
+                  layer.msg('已取消', { time: 2000 });
+                })
               });
               myDiv.find('button[data-action="redoAllTasks"]').click(() => {
                 // 重置每日任务状态
@@ -3076,7 +3084,7 @@
                 const interval = ts_ms() - MY_API.CACHE.GiftInterval_TS;
                 if (interval < GiftInterval) {
                   let intervalTime = GiftInterval - interval;
-                  MY_API.Gift.run_timer = setTimeout(MY_API.Gift.run, intervalTime);
+                  MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(), intervalTime);
                   MYDEBUG("[自动送礼]", `将在${intervalTime}毫秒后进行自动送礼`);
                   return $.Deferred().resolve();
                 }
@@ -3196,7 +3204,6 @@
           }
         }
       },
-
       stormQueue: [], // n节奏风暴队列
       stormBlack: false, // n节奏风暴黑屋
       stormIdSet: { // 风暴历史记录缓存
@@ -5456,7 +5463,8 @@
       GM: true,
       anonymous: true,
       method: "GET",
-      url: "https://cdn.jsdelivr.net/gh/andywang425/BLTH/assets/json/notice.min.json"
+      url: "https://cdn.jsdelivr.net/gh/andywang425/BLTH/assets/json/notice.min.json",
+      responseType: "json"
     }).then(response => {
       MYDEBUG("检查更新 checkUpdate", response);
       localStorage.setItem(`${NAME}_lastCheckUpdateTs`, ts_ms());
