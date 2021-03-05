@@ -243,7 +243,8 @@
     awardScrollCount = 0,
     nosleepConfig = localStorage.getItem(`${NAME}_NOSLEEP`) === 'true' ? true : false,
     INVISIBLE_ENTER_config = localStorage.getItem(`${NAME}_INVISIBLE_ENTER`) === 'true' ? true : false,
-    readConfigArray = [undefined];
+    readConfigArray = [undefined],
+    noticeJson = undefined; // 检查更新时获取的json
 
   /**
    * 替换字符串中所有的匹配项
@@ -527,7 +528,7 @@
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0,
         last_aid: 710, // 实物抽奖最后一个有效aid
-        MedalDanmu_TS: 0//粉丝勋章打卡
+        MedalDanmu_TS: 0 //粉丝勋章打卡
       },
       CONFIG: {},
       CACHE: {},
@@ -1447,6 +1448,7 @@
                 layer.prompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST),
+                  maxlength: Number.MAX_SAFE_INTEGER,
                   title: '请输入天选时刻忽略直播间',
                   btn: ['保存', '取消']
                 },
@@ -1473,6 +1475,7 @@
                 layer.prompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.MEDAL_DANMU_ROOM),
+                  maxlength: Number.MAX_SAFE_INTEGER,
                   title: '请输入粉丝勋章打卡弹幕房间列表',
                   btn: ['保存', '取消']
                 },
@@ -1522,6 +1525,7 @@
                 layer.prompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.MEDAL_DANMU_CONTENT),
+                  maxlength: Number.MAX_SAFE_INTEGER,
                   title: '请输入粉丝勋章打卡弹幕',
                   btn: ['保存', '取消']
                 },
@@ -1546,6 +1550,7 @@
                 layer.prompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.QUESTIONABLE_LOTTERY),
+                  maxlength: Number.MAX_SAFE_INTEGER,
                   title: '请输入实物抽奖忽略关键字',
                   btn: ['保存', '取消']
                 },
@@ -1572,6 +1577,7 @@
                 layer.prompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD),
+                  maxlength: Number.MAX_SAFE_INTEGER,
                   title: '请输入天选时刻忽略关键字',
                   btn: ['保存', '取消']
                 },
@@ -1683,6 +1689,7 @@
                 layer.prompt({
                   formType: 2,
                   value: MY_API.CONFIG.ANCHOR_CUSTOM_ROOMLIST,
+                  maxlength: Number.MAX_SAFE_INTEGER,
                   title: '天选时刻自定义直播间列表',
                   btn: ['保存', '取消']
                 },
@@ -5361,14 +5368,6 @@
     runExactMidnight(() => clearStat(), '重置统计');
     API.creatSetBox(); // 创建设置框
     API.removeUnnecessary(); // 移除页面元素
-    const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
-    let idlist = [...config.list];
-    if (idlist.length !== 0 && typeof (idlist[0]) === 'number') {
-      for (let i = 0; i < idlist.length; i++) {
-        idlist[i] = String(idlist[i])
-      }
-      localStorage.setItem(`${NAME}_AnchorFollowingList`, JSON.stringify({ list: idlist }));
-    }
     const taskList = [
       // 每日任务     
       API.MEDAL_DANMU.run, // 粉丝牌打卡弹幕
@@ -5446,7 +5445,7 @@
           return reset(600e3);
         }
         if (API.CONFIG.TIME_AREA_DISABLE && inTimeArea(API.CONFIG.TIME_AREA_START_H0UR, API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE)) { // 在不抽奖时段且不抽奖时段不刷新开启
-          const resetTime = getIntervalTime(API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE);
+          const resetTime = getIntervalTime(API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_END_MINUTE);
           MYDEBUG('[刷新直播间]', `处于休眠时间段，将在${resetTime}毫秒后刷新直播间`);
           clearTimeout(resetTimer);
           return reset(resetTime);
@@ -5469,6 +5468,7 @@
       MYDEBUG("检查更新 checkUpdate", response);
       localStorage.setItem(`${NAME}_lastCheckUpdateTs`, ts_ms());
       if (response.body === undefined) return;
+      noticeJson = response;
       const scriptVersion = response.body.version;
       const githubOpenTabOptions = { active: false, insert: true, setParent: true },
         greasyforkOpenTabOptions = { active: true, insert: true, setParent: true };
@@ -5607,7 +5607,14 @@
     if (follow !== null) localStorage.setItem(`${NAME}_AnchorFollowingList`, follow);
     localStorage.removeItem(`${NAME}AnchorFollowingList`);
     localStorage.removeItem(`${NAME}_AnchorRoomidList`);
-
+    const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
+    let idlist = [...config.list];
+    if (idlist.length !== 0 && typeof (idlist[0]) === 'number') {
+      for (let i = 0; i < idlist.length; i++) {
+        idlist[i] = String(idlist[i])
+      }
+      localStorage.setItem(`${NAME}_AnchorFollowingList`, JSON.stringify({ list: idlist }));
+    }
     localStorage.setItem(`${NAME}_lastFixVersion`, version);
   }
   /**
