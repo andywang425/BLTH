@@ -35,7 +35,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/base64.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@ba83808a9e4c90de1cffd452fac329b52ac6376c/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@241c896b97a790cbc0c3d62a4ab7a3039fa93006/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -415,7 +415,7 @@
         ANCHOR_CHECK_INTERVAL: 5, // 天选检查间隔（分钟）
         ANCHOR_IGNORE_BLACKLIST: true, // 天选忽略关键字（选项）
         ANCHOR_IGNORE_PWDROOM: true, // 不参加有密码的直播间的天选
-        ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '大航海', '上船', '舰长', '返现', '抵用', '代金', '黑屋', '上车', '上反船', '照片', '素颜', '自拍', 'cos', '写真', '皂片', '开舰', '上舰', '自画像', '封面照', '封面', '取关', '美照', '随机照', '随机照片', '好友', '给主播', '照骗', '连麦'], // 天选忽略关键字
+        ANCHOR_BLACKLIST_WORD: ['测试', '钓鱼', '炸鱼', '黑屋', '脚本', '空气'], // 天选忽略关键字
         ANCHOR_INTERVAL: 350, // 天选（检查天选和取关）请求间隔
         ANCHOR_NEED_GOLD: 0, // 忽略所需金瓜子大于_的抽奖
         ANCHOR_GOLD_JOIN_TIMES: 1, // 每个付费天选参加_次
@@ -718,10 +718,14 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "修复自动送礼礼物到期时间判断不正确的bug。",
-              "修复点亮勋章出错的bug。",
-              "修复【点亮勋章时忽略亲密度上限】设置无法保存的bug。",
-              "优化了小心心 - 自动点亮勋章，优先送出包裹内快过期的小心心来点亮勋章。"
+              "修复自动刷新页面在部分情况下失效的bug。",
+              "【重置所有为默认】按钮点击后增加确认页面。",
+              "取消了部分编辑框的最大字数限制。",
+              "支持一键添加天选云端屏蔽词。",
+              "修正了代码里的拼写错误，因此天选时刻【忽略所需金瓜子大于_的天选】需重新填写。",
+              "部分实时性要求不高的API（如天选移动分组）将在随机延时后被调用，降低风控可能。",
+              "支持多次参加付费天选。",
+              "自动送礼新增黑白名单送礼策略，取代【不送礼房间】设置项。房间号需重新填写。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
