@@ -1,9 +1,9 @@
 .gitignore
 .vscode
-node_modules
+/node_modules
 /note
-/unused_modules
-/test
+/assets/unused_libraries
 /${tmpdir}
 /other_scripts
-markdown/development_todo.md
+/assets/markdown/development_todo.md
+/assets/markdown/tasks_before-update.md

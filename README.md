@@ -24,9 +24,7 @@
   <details>
   <summary>点击展开具体方法</summary>
 
-  + Chrome  
-  在地址栏输入`chrome://flags`，搜索`Reduce default 'referer' header granularity`将这个功能设置为`Enabled`。
-  + Edge  
+  + Chrome / Edge   
   安装浏览器拓展[Referer Control](https://chrome.google.com/webstore/detail/referer-control/hnkcfpcejkafcihlgbojoidoihckciin)，在设置页面中找到`default referer for all other sites`，选择`Custom` - `target host`。  
   若无法科学上网可进Q群下载群文件中的crx文件，在浏览器地址栏输入`chrome://extensions/`，打开右上角的`开发者模式`，把crx文件拖进去安装。
   + FireFox   
@@ -103,8 +101,17 @@
 <li>送出小心心</li>
 </ul>
 </details>
+<details>
+<summary>自动送礼</summary>
+<ul>
+<li>白名单/黑名单送礼模式</li>
+<li>优先给某些直播间送礼</li>
+<li>按照粉丝勋章等级顺序送礼</li>
+<li>送出指定种类的礼物</li>
+<li>送出将在指定时间内过期的礼物</li>
+</ul>
+</details>
 <li>自动获取小心心</li>
-<li>自动送礼</li>
 <li>银瓜子换硬币</li>
 <li>直播区签到</li>
 <li>应援团签到</li>
@@ -203,13 +210,13 @@
 -------------------------------
 
 ## 鸣谢
-[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com/)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)  
+[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)，[酷推](https://cp.xuthus.cc)  
 以及所有提出过建议的用户。
 
 -------------------------------
 
 ## 更新日志
->### 5.6.5.7
->1.修复自动送礼礼物到期时间判断不正确的bug。2.修复点亮勋章出错的bug。3.修复【点亮勋章时忽略亲密度上限】设置无法保存的bug。4.优化了小心心 - 自动点亮勋章，优先送出包裹内快过期的小心心来点亮勋章。
+>### 5.6.6
+>1.修复自动刷新页面在部分情况下失效的bug。2.【重置所有为默认】按钮点击后增加确认页面。3.取消了部分编辑框的最大字数限制。4.一键添加天选云端屏蔽词。5.修正了代码里的拼写错误。6.部分实时性要求不高的API（如天选移动分组）将在随机延时后被调用，降低风控可能。7.支持多次参加付费天选。8.自动送礼新增黑白名单送礼策略。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/markdown/update-log.md)。  
