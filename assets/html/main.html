@@ -122,9 +122,15 @@
                         <div data-toggle="AUTO_GIFT_ROOMID" style="color:purple">优先送礼房间 <input
                                         class="num igiftMsg_input" style="width:150px;" type="text"><span
                                         helpdata="AUTO_GIFT_ROOMID" class="clickableText helpText">?</span></div>
-                        <div data-toggle="EXCLUDE_ROOMID" style="color:purple">不送礼房间 <input class="num igiftMsg_input"
-                                        style="width:150px;" type="text"><span helpdata="EXCLUDE_ROOMID"
-                                        class="clickableText helpText">?</span></div>
+                        <div data-toggle="GIFT_SEND_METHOD" class="inline">自动送礼模式：
+                                <div data-toggle="GIFT_SEND_WHITE" class="inline"><input type="radio"
+                                                name="GIFT_SEND_METHOD">白名单
+                                </div>
+                                <div data-toggle="GIFT_SEND_BLACK" class="inline"><input type="radio"
+                                                name="GIFT_SEND_METHOD" class="smallInterval">黑名单 </div><button
+                                        class="igiftMsg_btn" data-action="edit_GIFT_SEND_ROOM">编辑房间列表</button><span
+                                        helpdata="GIFT_SEND_METHOD" class="clickableText helpText">?</span>
+                        </div>
                         <div data-toggle="GIFT_ALLOW_TYPE" style="color:purple">允许被送出的礼物类型 <input
                                         class="str igiftMsg_input" style="width:150px;" type="text"><span
                                         helpdata="GIFT_ALLOW_TYPE" class="clickableText helpText">?</span></div>
@@ -231,8 +237,11 @@
                         <div data-toggle="ANCHOR_CHECK_INTERVAL"><label>天选获取数据间隔 <input class="num igiftMsg_input"
                                                 style="width:25px;" type="text">分钟 </label><span
                                         helpdata="ANCHOR_CHECK_INTERVAL" class="clickableText helpText">?</span></div>
-                        <div data-toggle="AHCHOR_NEED_GOLD"><label>忽略所需金瓜子大于 <input class="num igiftMsg_input"
+                        <div data-toggle="ANCHOR_NEED_GOLD"><label>忽略所需金瓜子大于 <input class="num igiftMsg_input"
                                                 style="width:50px;" type="text">的天选 </label></div>
+                        <div data-toggle="ANCHOR_GOLD_JOIN_TIMES"><label>每个付费天选参加 <input class="num igiftMsg_input"
+                                                style="width:50px;" type="text">次 </label><span
+                                                helpdata="ANCHOR_GOLD_JOIN_TIMES" class="clickableText helpText">?</span></div>
                         <div data-toggle="ANCHOR_IGNORE_BLACKLIST"><label><input type="checkbox">忽略关键字
                                         <label class="str" style="font-weight:bold">1个</label><button
                                                 class="igiftMsg_btn"
