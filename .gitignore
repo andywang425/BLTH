@@ -2,7 +2,8 @@
 .vscode
 /node_modules
 /note
-/assets/unused_modules
+/assets/unused_libraries
 /${tmpdir}
 /other_scripts
 /assets/markdown/development_todo.md
+/assets/markdown/tasks_before-update.md
