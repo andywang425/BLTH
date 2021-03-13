@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.6
+// @version        5.6.6.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -718,14 +718,7 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "修复自动刷新页面在部分情况下失效的bug。",
-              "【重置所有为默认】按钮点击后增加确认页面。",
-              "取消了部分编辑框的最大字数限制。",
-              "支持一键添加天选云端屏蔽词。",
-              "修正了代码里的拼写错误，因此天选时刻【忽略所需金瓜子大于_的天选】需重新填写。",
-              "部分实时性要求不高的API（如天选移动分组）将在随机延时后被调用，降低风控可能。",
-              "支持多次参加付费天选。",
-              "自动送礼新增黑白名单送礼策略，取代【不送礼房间】设置项。房间号需重新填写。"
+              "修复自动送礼送礼模式只能为黑名单的bug。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -2899,7 +2892,7 @@
         bag_list: undefined, // 包裹
         giftFeed_list: {}, // 每种礼物所对应的亲密度
         remain_feed: undefined, // 该勋章今日剩余亲密度
-        over: false, // 是否结束送礼
+        over: undefined, // 是否结束送礼
         allowGiftList: undefined, // 允许被送出礼物的id
         /**
          * 获取粉丝勋章
@@ -3085,7 +3078,7 @@
             if (!MY_API.CONFIG.SEND_ALL_GIFT && filter) {
               // 送之前查一次有没有可送的
               bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
-                Number(r.corner_mark.substring(0, r.corner_mark.indexOf("天"))) <= Number(MY_API.CONFIG.GIFT_LIMIT));
+                Number(r.corner_mark.substring(0, r.corner_mark.indexOf("天"))) <= MY_API.CONFIG.GIFT_LIMIT);
               MYDEBUG("[自动送礼]过滤后的礼物", bag_list);
               if (bag_list.length === 0) {
                 MY_API.Gift.over = true;
@@ -3121,7 +3114,7 @@
             MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(it => it.day_limit - it.today_feed > 0 && it.level < 20);
             MY_API.Gift.medal_list = MY_API.Gift.sort_medals(MY_API.Gift.medal_list);
             // 排除直播间
-            if (MY_API.CONFIG.GIFT_SEND_METHOD = "GIFT_SEND_BLACK") {
+            if (MY_API.CONFIG.GIFT_SEND_METHOD === "GIFT_SEND_BLACK") {
               // 黑名单
               MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(Er => MY_API.CONFIG.GIFT_SEND_ROOM.findIndex(exp => exp == Er.roomid) == -1);
             } else {
@@ -3167,6 +3160,7 @@
                 MY_API.saveCache();
               }
             }
+            MY_API.Gift.over = false; // 开始运行前先把停止运行设为 false
             handleGiftList();
             await MY_API.Gift.getBagList();
             await getGiftFeed();
