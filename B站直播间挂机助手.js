@@ -226,6 +226,7 @@
       level: undefined,  // 主站等级
       danmu_length: undefined // 直播弹幕长度限制
     },
+    medal_info = { status: $.Deferred(), medal_list: [] },
     userToken = undefined,
     tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || { time: 0 },
     mainIndex = undefined,
@@ -395,6 +396,8 @@
           Live_info.rnd = W.BilibiliLive.RND;
           Live_info.visit_id = W.__statisObserver ? W.__statisObserver.__visitId : '';
           MYDEBUG("Live_info", Live_info);
+          await getMedalList();
+          MYDEBUG("medla_info", medal_info);
           init();
         }
       }, delay);
@@ -410,7 +413,7 @@
         AUTO_GROUP_SIGN: true, // 应援团签到开关
         ANCHOR_LOTTERY: false, // 天选时刻
         ANCHOR_AUTO_DEL_FOLLOW: false, // 检测到未中奖自动取关
-        ANCHOR_MAXROOM: 600, // 天选检查房间最大数量
+        ANCHOR_MAXROOM: 500, // 天选检查房间最大数量
         ANCHOR_MAXLIVEROOM_SAVE: 100, // 天选上传保存房间最大数量
         ANCHOR_CHECK_INTERVAL: 5, // 天选检查间隔（分钟）
         ANCHOR_IGNORE_BLACKLIST: true, // 天选忽略关键字（选项）
@@ -444,7 +447,7 @@
         ANCHOR_MONEY_ONLY: false, // 仅参加现金抽奖
         ANCHOR_DONT_USE_CACHE_ROOM: true, // 不使用缓存中的房间
         CHECK_HOUR_ROOM: false, // 检查小时榜
-        CHECK_HOUR_ROOM_INTERVAL: 600, // 小时间检查间隔时间(秒)
+        CHECK_HOUR_ROOM_INTERVAL: 600, // 小时榜检查间隔时间(秒)
         COIN: false, // 投币
         COIN_NUMBER: 0, // 投币数量
         COIN_TYPE: "COIN_DYN", // 投币方法 动态/UID
@@ -2895,21 +2898,6 @@
         over: undefined, // 是否结束送礼
         allowGiftList: undefined, // 允许被送出礼物的id
         /**
-         * 获取粉丝勋章
-         * @param {Number} page 页数
-         */
-        getMedalList: async (page = 1) => {
-          if (page === 1) MY_API.Gift.medal_list = [];
-          return BAPI.i.medal(page, 25).then((response) => {
-            MYDEBUG('Gift.getMedalList: API.i.medal', response);
-            MY_API.Gift.medal_list = MY_API.Gift.medal_list.concat(response.data.fansMedalList);
-            if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) return MY_API.Gift.getMedalList(page + 1);
-          }, () => {
-            window.toast('[自动送礼]获取勋章列表失败，请检查网络', 'error');
-            return delayCall(() => MY_API.Gift.getMedalList());
-          });
-        },
-        /**
          * 获取礼物包裹
          */
         getBagList: async () => {
@@ -3160,14 +3148,18 @@
                 MY_API.saveCache();
               }
             }
+            if (medal_info.status.state() === "resolved") MY_API.Gift.medal_list = [...medal_info.medal_list];
+            else {
+              window.toast('[自动送礼] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+              return medal_info.status.then(() => MY_API.Gift.run());
+            }
+            MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', MY_API.Gift.medal_list);
             MY_API.Gift.over = false; // 开始运行前先把停止运行设为 false
             handleGiftList();
             await MY_API.Gift.getBagList();
             await getGiftFeed();
             handleBagList(false);
             if (MY_API.Gift.over) return;
-            await MY_API.Gift.getMedalList();
-            MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', MY_API.Gift.medal_list);
             if (MY_API.Gift.medal_list.length > 0) {
               handleMedalList();
               await MY_API.Gift.auto_light(); // 点亮勋章
@@ -3671,16 +3663,14 @@
                 lastSendTime = undefined, // 上次发弹幕的时间戳(毫秒)
                 jsonCache = MY_API.CACHE.AUTO_SEND_DANMU_TS,
                 objIndex = undefined, // 弹幕缓存下标
-                isTimeData = undefined, // 是否是时间数据(eg 9:01)
+                isTimeData = undefined, // 是否是时间点数据(eg 9:01)
                 intervalTime = undefined, // 据上次发弹幕的时间(毫秒)
                 danmu_intervalTime_Ts = undefined, // 间隔时间
-                danmuTime = [], // 储存时间点格式的数组，eg:[10:0:5]
                 sleepTime = 0;
               if (danmu_intervalTime.indexOf(':') > -1) { // 时间
                 isTimeData = true;
                 const danmu_time = danmu_intervalTime.split(':'); // 小时，分钟，秒
                 const hour = parseInt(danmu_time[0]), minute = parseInt(danmu_time[1]), second = parseInt(danmu_time[2]);
-                danmuTime = [hour, minute, second];
                 if (!isTime(hour, minute, second)) sleepTime = getIntervalTime(hour, minute, second);
                 else sleepTime = 86400000;
               }
@@ -3763,17 +3753,6 @@
       },
       MEDAL_DANMU: {
         medal_list: [],
-        getMedalList: async (page = 1) => {
-          if (page === 1) MY_API.MEDAL_DANMU.medal_list = [];
-          return BAPI.i.medal(page, 25).then((response) => {
-            MYDEBUG('MEDAL_DANMU.getMedalList: API.i.medal', response);
-            MY_API.MEDAL_DANMU.medal_list = MY_API.MEDAL_DANMU.medal_list.concat(response.data.fansMedalList);
-            if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) return MY_API.MEDAL_DANMU.getMedalList(page + 1);
-          }, () => {
-            MY_API.chatLog('[粉丝牌打卡弹幕]<br>获取勋章列表失败，请检查网络', 'error');
-            return delayCall(() => MY_API.MEDAL_DANMU.getRoomList());
-          });
-        },
         sendDanmu: async (danmuContent, roomId, medal_name) => {
           let realRoomId = roomId;
           if (Number(roomId) <= 10000) {
@@ -3807,8 +3786,12 @@
             window.toast(`[粉丝牌打卡]【自动发弹幕】任务运行中，暂停运行，30秒后再次检查`, 'warning');
             return setTimeout(() => MY_API.MEDAL_DANMU.run(), 30e3);
           }
+          if (medal_info.status.state() === "resolved") MY_API.MEDAL_DANMU.medal_list = [...medal_info.medal_list];
+          else {
+            window.toast('[粉丝牌打卡] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.MEDAL_DANMU.run());
+          }
           medalDanmuRunning = true;
-          await MY_API.MEDAL_DANMU.getMedalList();
           let lightMedalList;
           if (MY_API.CONFIG.MEDAL_DANMU_METHOD === 'MEDAL_DANMU_WHITE')
             lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1 && r.medal_level <= 20);
@@ -4106,17 +4089,6 @@
         medal_list: [],
         anchorFollowTagid: undefined,
         anchorPrizeTagid: undefined,
-        getMedalList: async (page = 1) => {
-          if (page === 1) MY_API.AnchorLottery.medal_list = [];
-          return BAPI.i.medal(page, 25).then((response) => {
-            MYDEBUG('AnchorLottery.getMedalList: API.i.medal', response);
-            MY_API.AnchorLottery.medal_list = MY_API.AnchorLottery.medal_list.concat(response.data.fansMedalList);
-            if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) return MY_API.AnchorLottery.getMedalList(page + 1);
-          }, () => {
-            MY_API.chatLog('[天选时刻]<br>获取勋章列表失败，请检查网络', 'error');
-            return delayCall(() => MY_API.AnchorLottery.getMedalList());
-          });
-        },
         getFollowingList: (pn = 1, ps = 50) => {
           if (pn === 1) MY_API.AnchorLottery.followingList = [];
           return BAPI.relation.getFollowings(Live_info.uid, pn, ps).then((response) => {
@@ -5257,8 +5229,11 @@
         },
         run: async () => {
           if (!MY_API.CONFIG.ANCHOR_LOTTERY) return $.Deferred().resolve();
-          MY_API.chatLog(`[天选时刻] 开始获取粉丝勋章信息`);
-          await MY_API.AnchorLottery.getMedalList();
+          if (medal_info.status.state() === "resolved") MY_API.AnchorLottery.medal_list = [...medal_info.medal_list];
+          else {
+            MY_API.chatLog('[天选时刻] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.AnchorLottery.run());
+          }
           MY_API.chatLog(`[天选时刻] 开始获取关注分组信息`);
           if (MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG || MY_API.CONFIG.ANCHOR_MOVETO_PRIZE_TAG)
             await MY_API.AnchorLottery.getTag([anchorFollowTagName, anchorPrizeTagName]);
@@ -5563,6 +5538,29 @@
     })
   }
   /**
+   * 获取粉丝勋章列表
+   * @param {Number} page 
+   * @returns 
+   */
+  async function getMedalList(page = 1) {
+    if (page === 1) medal_info = { status: $.Deferred(), medal_list: [] };
+    let end = false;
+    while (true) {
+      await BAPI.i.medal(page, 25).then((response) => {
+        MYDEBUG('before init() getMedalList: API.i.medal', response);
+        medal_info.medal_list = medal_info.medal_list.concat(response.data.fansMedalList);
+        if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) page++;
+        else { medal_info.status.resolve(); end = true }
+      }, () => {
+        MY_API.chatLog('获取粉丝勋章列表失败，请检查网络<br>部分功能将无法正常运行', 'error');
+        setTimeout(() => getMedalList(page));
+        end = true;
+      });
+      if (end) break;
+      await sleep(100);
+    }
+  };
+  /**
    * 删除一维数组元素
    * @param val 数组中一个元素的值
    */
@@ -5708,7 +5706,7 @@
     let elementA = document.createElement("a");
     elementA.setAttribute(
       "href",
-      "data:text/plain;charset=utf-8," + JSON.stringify(fileContent)
+      "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(fileContent))
     );
     elementA.setAttribute("download", fileName);
     elementA.style.display = "none";
@@ -5740,7 +5738,7 @@
     reader.onload = function () {
       MYDEBUG("importConfig 文件读取结果：", this.result);
       try {
-        readConfigArray[0] = JSON.parse(this.result);
+        readConfigArray[0] = JSON.parse(decodeURIComponent(this.result));
         if (typeof readConfigArray[0] == 'object' && readConfigArray[0]) {
           const list = ["MY_API_CONFIG", "nosleepConfig", "INVISIBLE_ENTER_config"];
           for (const i of list) {

@@ -187,22 +187,26 @@
 ## 其它信息  
 这个项目的部分代码来源于以下几个项目:  
 + [B站直播签到助手](https://wwa.lanzous.com/iLjOmkfuvxe) (MIT) by [十六夜](https://space.bilibili.com/4317450)
-+ [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)  
++ [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/BLRHH_) by [pjy612](https://github.com/pjy612)
-+ [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)  
-+ [layer](https://github.com/sentsin/layer) (MIT) by [sentsin](https://github.com/sentsin)  
++ [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)
++ [layer](https://github.com/sentsin/layer) (MIT) by [sentsin](https://github.com/sentsin)
 + [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT) by [wendux](https://github.com/wendux)
 
 本脚本使用的库：  
 + [jquery](https://github.com/jquery/jquery) (MIT)  
-+ [BilibiliAPI_Mod.min.js](https://github.com/andywang425/BLTH/blob/master/library_files/BilibiliAPI_Mod.js) (MIT)：B站API及常用函数。  
-+ [libBilibiliToken.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libBilibiliToken/libBilibiliToken.js) (MIT)：获取移动端token。  
-+ [libWasmHash.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libWasmHash/libWasmHash.js) (MIT)：WebAssembly实现的Hash，计算心跳请求参数。  
-+ [layer.js](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web弹层组件。  
-+ [Ajax-hook.min.js](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器XMLHttpRequest的库。  
++ [BilibiliAPI_Mod.js](https://github.com/andywang425/BLTH/blob/master/assets/js/library/BilibiliAPI_Mod.js) (MIT)：B站API及常用函数。
++ [libBilibiliToken.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libBilibiliToken/libBilibiliToken.js) (MIT)：获取移动端token。
++ [libWasmHash.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libWasmHash/libWasmHash.js) (MIT)：WebAssembly实现的Hash，计算心跳请求参数。
++ [layer.js](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web弹层组件。
++ [Ajax-hook.js](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器XMLHttpRequest的库。
++ [base64.js](https://www.iyunv.com/url_files/base64.js)：实现base64加密解密。
 
 本脚本引用的外部资源：  
-+ [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式  
++ [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。
++ [myCss.css](https://github.com/andywang425/BLTH/blob/master/assets/css/myCss.css)：脚本样式。
++ [main.html](https://github.com/andywang425/BLTH/blob/master/assets/html/main.html)：脚本控制面板的html。
++ [eula.html](https://github.com/andywang425/BLTH/blob/master/assets/html/eula.html)：最终用户许可协议。
 
 -------------------------------
 
