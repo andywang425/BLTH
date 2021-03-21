@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.6.1
+// @version        5.6.6.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -32,10 +32,9 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/base64.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@241c896b97a790cbc0c3d62a4ab7a3039fa93006/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@bbb432a7c7344cc8bac72b6554b1e27c929546f5/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -196,7 +195,8 @@
     }),
     linkMsg = (msg, link) => '<a href="' + link + '"target="_blank" style="color:">' + msg + '</a>',
     liveRoomUrl = 'https://live.bilibili.com/',
-    storageLastFixVersion = localStorage.getItem(`${NAME}_lastFixVersion`) || "0";
+    storageLastFixVersion = localStorage.getItem(`${NAME}_lastFixVersion`) || "0",
+    upperNum = { 0: ")", 1: "!", 2: "@", 3: "#", 4: "$", 5: "%", 6: "^", 7: "7", 8: "*", 9: "(" };
 
   let mainDisplay = localStorage.getItem(`${NAME}_msgHide`) || 'hide', // UI隐藏开关
     winPrizeNum = 0,
@@ -226,6 +226,7 @@
       level: undefined,  // 主站等级
       danmu_length: undefined // 直播弹幕长度限制
     },
+    medal_info = { status: $.Deferred(), medal_list: [] },
     userToken = undefined,
     tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || { time: 0 },
     mainIndex = undefined,
@@ -247,12 +248,15 @@
     noticeJson = JSON.parse(localStorage.getItem(`${NAME}_noticeJson`) || "{}"); // 检查更新时获取的json
 
   /**
-   * 替换字符串中所有的匹配项
+   * 替换字符串中所有的匹配项（可处理特殊字符如括号）
    * @param oldSubStr 搜索的字符串
    * @param newSubStr 替换内容
    */
   String.prototype.replaceAll = function (oldSubStr, newSubStr) {
-    return this.replace(new RegExp(oldSubStr, 'gm'), newSubStr)
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& 代表所有被匹配的字符串
+    }
+    return this.replace(new RegExp(escapeRegExp(oldSubStr), 'g'), () => newSubStr);
   }
   $(function () {
     // 若 window 下无 BilibiliLive，则说明页面有 iframe，此时脚本在在 top 中运行 或 发生错误
@@ -395,6 +399,8 @@
           Live_info.rnd = W.BilibiliLive.RND;
           Live_info.visit_id = W.__statisObserver ? W.__statisObserver.__visitId : '';
           MYDEBUG("Live_info", Live_info);
+          await getMedalList();
+          MYDEBUG("medla_info", medal_info);
           init();
         }
       }, delay);
@@ -410,7 +416,7 @@
         AUTO_GROUP_SIGN: true, // 应援团签到开关
         ANCHOR_LOTTERY: false, // 天选时刻
         ANCHOR_AUTO_DEL_FOLLOW: false, // 检测到未中奖自动取关
-        ANCHOR_MAXROOM: 600, // 天选检查房间最大数量
+        ANCHOR_MAXROOM: 500, // 天选检查房间最大数量
         ANCHOR_MAXLIVEROOM_SAVE: 100, // 天选上传保存房间最大数量
         ANCHOR_CHECK_INTERVAL: 5, // 天选检查间隔（分钟）
         ANCHOR_IGNORE_BLACKLIST: true, // 天选忽略关键字（选项）
@@ -423,6 +429,7 @@
         ANCHOR_UPLOAD_DATA: false, // 天选上传数据
         ANCHOR_UPLOAD_DATA_INTERVAL: 10, // 上传数据间隔
         ANCHOR_UPLOAD_MSG: false, // 天选上传时的附加信息开关
+        ANCHOR_PERSONAL_PROFILE: "", // 天选上传的个人简介表层信息
         ANCHOR_UPLOAD_MSG_CONTENT: "", // 附加信息
         ANCHOR_IGNORE_UPLOAD_MSG: false, // 天选忽略附加信息
         ANCHOR_TYPE_POLLING: true, // 天选模式 - 轮询
@@ -444,7 +451,7 @@
         ANCHOR_MONEY_ONLY: false, // 仅参加现金抽奖
         ANCHOR_DONT_USE_CACHE_ROOM: true, // 不使用缓存中的房间
         CHECK_HOUR_ROOM: false, // 检查小时榜
-        CHECK_HOUR_ROOM_INTERVAL: 600, // 小时间检查间隔时间(秒)
+        CHECK_HOUR_ROOM_INTERVAL: 600, // 小时榜检查间隔时间(秒)
         COIN: false, // 投币
         COIN_NUMBER: 0, // 投币数量
         COIN_TYPE: "COIN_DYN", // 投币方法 动态/UID
@@ -718,7 +725,9 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "修复自动送礼送礼模式只能为黑名单的bug。"
+              "优化了获取粉丝勋章列表的方式，不再重复获取。",
+              "修复了当脚本设置中有特殊字符时无法正确导出配置文件的bug。",
+              "优化了【上传天选数据至直播间个人简介】的功能，使上传的数据不可见，支持上传想要被显示的内容。同时优化了天选数据的编码方式，上传和获取数据会更快。上传出错时的错误处理更加合理。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1214,6 +1223,7 @@
         ];
         const helpText = {
           // 帮助信息
+          ANCHOR_PERSONAL_PROFILE: "在个人简介中所展示的信息。<mul><mli>可以填符合b站规则的html。</mli></mul>",
           ANCHOR_GOLD_JOIN_TIMES: "付费天选指需要花费金瓜子才能参加的天选。<mul><mli>多次参加同一个付费天选<strong>可能</strong>可以提高中奖率。</mli><mli><strong>请慎重填写本设置项。</strong></mli></mul>",
           GIFT_SEND_METHOD: "自动送礼策略，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间送礼。</mli><mli>黑名单：给房间列表以外的直播间送礼。</mli><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<mh3>注意：</mh3><mul><mli>支持识别阿拉伯数字和汉字数字。</mli><mli>识别的单位有限。</mli><mli>不支持识别外币。</mli><mli>由于一些天选时刻的奖品名比较特殊，可能会出现遗漏或误判。</mli></mul>',
@@ -1243,7 +1253,7 @@
           ANCHOR_AUTO_DEL_FOLLOW: "如果该UP在白名单内或一开始就在默认分组则不会被取关。",
           anchorBtnArea: "参加天选时会关注很多UP。可以在参加天选前点击【保存当前关注列表为白名单】，参与完天选后再点【取关不在白名单内的UP主】来清理关注列表。<mul><mli>不建议频繁清理，可能会被风控。</mli><mli>【编辑白名单】每两个uid之间用半角逗号<code>,</code>隔开。</mli><mli>推荐大家使用【取关分组内的UP主】的功能来清理关注列表，【取关不在白名单内的UP主】可以作为一个备选方案。</mli></mul>",
           ANCHOR_TYPE_POLLING: "高热度房间来源于各分区小时榜和热门房间列表。",
-          ANCHOR_UPLOAD_DATA: "使用这个功能前你必须先拥有自己的直播间。  <mul><mli>上传数据格式：经<a href = 'https://baike.baidu.com/item/base64/8545775' target = '_blank'>Base64</a>编码的JSON字符串，编码后每两个字符间插入一个<code>-</code>。JSON格式：<code>{ roomList: [直播间1, 直播间2, ...], ts: 时间戳, msg?: 附加信息 }</code>。</mli><mli>【间隔__秒】：这个设置项若填<code>10</code>秒，则每<code>10</code>秒检查一次是否收集到了新的数据，若有才上传。</mli></mul>",
+          ANCHOR_UPLOAD_DATA: "使用这个功能前你必须先拥有自己的直播间。  <mul><mli>上传数据格式：<code>&lt;p style=\"font-size:0px;\"&gt;JSONSTRING&lt;/p&gt;个人简介表层信息</code>。<br>JSONSTRING: 经处理的JSON字符串。处理方法为把数字替换成按Shift时输入的对应字符（除了7）。JSON格式：<code>{ roomList: [直播间1, 直播间2, ...], ts: 时间戳, msg?: 附加信息 }</code>。</mli><mli>【间隔__秒】：这个设置项若填<code>10</code>秒，则每<code>10</code>秒检查一次是否收集到了新的数据，若有才上传。</mli><mli>上传的天选数据将会通过缩小字体到0的方法隐藏起来。如果需要在个人简介中显示内容请编辑脚本设置中的【个人简介表层信息】。</mli></mul>",
           ANCHOR_UPLOAD_MSG: "在上传天选数据的同时可以上传一段附加信息。<mul><mli>可以填写html<br>如：<code>&lt;span style=\"color:red;\"&gt;测试&lt;/span&gt;</code> 效果：<span style=\"color:red;\">测试</span></mli><mli>如果想把附加信息设为空，请点击编辑界面上的<code>留空</code>按钮。</mli></mul>",
           ANCHOR_MAXLIVEROOM_SAVE: "个人简介有长度限制（约为一万个字符），若【个人简介储存房间最大数量】太大会无法上传。",
           ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<mh3>注意：</mh3><mul><mli>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</mli></mul>",
@@ -1415,6 +1425,32 @@
                 // 立刻点亮勋章
                 LIGHT_MEDAL_NOW = true;
                 MY_API.Gift.run();
+              });
+              myDiv.find('button[data-action="edit_ANCHOR_PERSONAL_PROFILE"]').click(() => {
+                // 编辑个人简介表层信息
+                layer.prompt({
+                  formType: 2,
+                  value: String(MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE),
+                  title: '请输入上传的个人简介表层信息',
+                  btn: ['保存', '留空', '取消'],
+                  btn2: function () {
+                    MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE = "";
+                    MY_API.saveConfig(false);
+                    layer.msg('个人简介表层信息已被设为空字符串', {
+                      time: 2500,
+                      icon: 1
+                    });
+                  }
+                },
+                  function (value, index) {
+                    MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE = value;
+                    MY_API.saveConfig(false);
+                    layer.msg('表层信息保存成功', {
+                      time: 2500,
+                      icon: 1
+                    });
+                    layer.close(index);
+                  });
               });
               myDiv.find('button[data-action="edit_ANCHOR_UPLOAD_MSG"]').click(() => {
                 // 编辑天选附加信息
@@ -2895,21 +2931,6 @@
         over: undefined, // 是否结束送礼
         allowGiftList: undefined, // 允许被送出礼物的id
         /**
-         * 获取粉丝勋章
-         * @param {Number} page 页数
-         */
-        getMedalList: async (page = 1) => {
-          if (page === 1) MY_API.Gift.medal_list = [];
-          return BAPI.i.medal(page, 25).then((response) => {
-            MYDEBUG('Gift.getMedalList: API.i.medal', response);
-            MY_API.Gift.medal_list = MY_API.Gift.medal_list.concat(response.data.fansMedalList);
-            if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) return MY_API.Gift.getMedalList(page + 1);
-          }, () => {
-            window.toast('[自动送礼]获取勋章列表失败，请检查网络', 'error');
-            return delayCall(() => MY_API.Gift.getMedalList());
-          });
-        },
-        /**
          * 获取礼物包裹
          */
         getBagList: async () => {
@@ -3160,14 +3181,18 @@
                 MY_API.saveCache();
               }
             }
+            if (medal_info.status.state() === "resolved") MY_API.Gift.medal_list = [...medal_info.medal_list];
+            else {
+              window.toast('[自动送礼] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+              return medal_info.status.then(() => MY_API.Gift.run());
+            }
+            MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', MY_API.Gift.medal_list);
             MY_API.Gift.over = false; // 开始运行前先把停止运行设为 false
             handleGiftList();
             await MY_API.Gift.getBagList();
             await getGiftFeed();
             handleBagList(false);
             if (MY_API.Gift.over) return;
-            await MY_API.Gift.getMedalList();
-            MYDEBUG('Gift.run: Gift.getMedalList().then: Gift.medal_list', MY_API.Gift.medal_list);
             if (MY_API.Gift.medal_list.length > 0) {
               handleMedalList();
               await MY_API.Gift.auto_light(); // 点亮勋章
@@ -3671,16 +3696,14 @@
                 lastSendTime = undefined, // 上次发弹幕的时间戳(毫秒)
                 jsonCache = MY_API.CACHE.AUTO_SEND_DANMU_TS,
                 objIndex = undefined, // 弹幕缓存下标
-                isTimeData = undefined, // 是否是时间数据(eg 9:01)
+                isTimeData = undefined, // 是否是时间点数据(eg 9:01)
                 intervalTime = undefined, // 据上次发弹幕的时间(毫秒)
                 danmu_intervalTime_Ts = undefined, // 间隔时间
-                danmuTime = [], // 储存时间点格式的数组，eg:[10:0:5]
                 sleepTime = 0;
               if (danmu_intervalTime.indexOf(':') > -1) { // 时间
                 isTimeData = true;
                 const danmu_time = danmu_intervalTime.split(':'); // 小时，分钟，秒
                 const hour = parseInt(danmu_time[0]), minute = parseInt(danmu_time[1]), second = parseInt(danmu_time[2]);
-                danmuTime = [hour, minute, second];
                 if (!isTime(hour, minute, second)) sleepTime = getIntervalTime(hour, minute, second);
                 else sleepTime = 86400000;
               }
@@ -3763,17 +3786,6 @@
       },
       MEDAL_DANMU: {
         medal_list: [],
-        getMedalList: async (page = 1) => {
-          if (page === 1) MY_API.MEDAL_DANMU.medal_list = [];
-          return BAPI.i.medal(page, 25).then((response) => {
-            MYDEBUG('MEDAL_DANMU.getMedalList: API.i.medal', response);
-            MY_API.MEDAL_DANMU.medal_list = MY_API.MEDAL_DANMU.medal_list.concat(response.data.fansMedalList);
-            if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) return MY_API.MEDAL_DANMU.getMedalList(page + 1);
-          }, () => {
-            MY_API.chatLog('[粉丝牌打卡弹幕]<br>获取勋章列表失败，请检查网络', 'error');
-            return delayCall(() => MY_API.MEDAL_DANMU.getRoomList());
-          });
-        },
         sendDanmu: async (danmuContent, roomId, medal_name) => {
           let realRoomId = roomId;
           if (Number(roomId) <= 10000) {
@@ -3807,8 +3819,12 @@
             window.toast(`[粉丝牌打卡]【自动发弹幕】任务运行中，暂停运行，30秒后再次检查`, 'warning');
             return setTimeout(() => MY_API.MEDAL_DANMU.run(), 30e3);
           }
+          if (medal_info.status.state() === "resolved") MY_API.MEDAL_DANMU.medal_list = [...medal_info.medal_list];
+          else {
+            window.toast('[粉丝牌打卡] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.MEDAL_DANMU.run());
+          }
           medalDanmuRunning = true;
-          await MY_API.MEDAL_DANMU.getMedalList();
           let lightMedalList;
           if (MY_API.CONFIG.MEDAL_DANMU_METHOD === 'MEDAL_DANMU_WHITE')
             lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1 && r.medal_level <= 20);
@@ -4106,17 +4122,6 @@
         medal_list: [],
         anchorFollowTagid: undefined,
         anchorPrizeTagid: undefined,
-        getMedalList: async (page = 1) => {
-          if (page === 1) MY_API.AnchorLottery.medal_list = [];
-          return BAPI.i.medal(page, 25).then((response) => {
-            MYDEBUG('AnchorLottery.getMedalList: API.i.medal', response);
-            MY_API.AnchorLottery.medal_list = MY_API.AnchorLottery.medal_list.concat(response.data.fansMedalList);
-            if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) return MY_API.AnchorLottery.getMedalList(page + 1);
-          }, () => {
-            MY_API.chatLog('[天选时刻]<br>获取勋章列表失败，请检查网络', 'error');
-            return delayCall(() => MY_API.AnchorLottery.getMedalList());
-          });
-        },
         getFollowingList: (pn = 1, ps = 50) => {
           if (pn === 1) MY_API.AnchorLottery.followingList = [];
           return BAPI.relation.getFollowings(Live_info.uid, pn, ps).then((response) => {
@@ -4418,7 +4423,11 @@
             let lotteryInfoJson;
             try {
               if (description === undefined) throw "undefined"
-              lotteryInfoJson = JSON.parse(Base64.decode64(description.replaceAll('-', '')));
+              lotteryInfoJson = description.match(/<p style="font-size:0px">(.*)<\/p>/)[1];
+              for (const i in upperNum) {
+                lotteryInfoJson = lotteryInfoJson.replaceAll(upperNum[i], i)
+              }
+              lotteryInfoJson = JSON.parse(lotteryInfoJson);
               if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
                 throw 'Not a JSON';
               if (!lotteryInfoJson.hasOwnProperty('roomList'))
@@ -4456,19 +4465,18 @@
             MY_API.chatLog('[天选时刻] 请先开通直播间再使用上传数据的功能', 'warning');
             return p.reject()
           }
-
-          if (MY_API.AnchorLottery.lotteryResponseList.length > MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE)//删除超出的旧数据
+          if (MY_API.AnchorLottery.lotteryResponseList.length > MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE) // 删除超出的旧数据
             MY_API.AnchorLottery.lotteryResponseList = MY_API.AnchorLottery.lotteryResponseList.splice(0, MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE);
           let uploadRawJson = {
             roomList: MY_API.AnchorLottery.lotteryResponseList,
             ts: ts_ms()
           };
-          if (MY_API.CONFIG.ANCHOR_UPLOAD_MSG) //上传附加信息
+          if (MY_API.CONFIG.ANCHOR_UPLOAD_MSG) // 上传附加信息
             uploadRawJson.msg = MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT;
           function updateEncodeData(roomId, str) {
             return BAPI.room.update(roomId, str).then((re) => {
               MYDEBUG(`BAPI.room.update MY_API.AnchorLottery.myLiveRoomid encode64(uploadRawStr)`, re);
-              if (re.code == 0) {
+              if (re.code === 0) {
                 MY_API.chatLog(`[天选时刻] 房间列表上传成功（共${MY_API.AnchorLottery.lotteryResponseList.length}个房间）`, 'success');
                 MY_API.AnchorLottery.oldLotteryResponseList = [...MY_API.AnchorLottery.lotteryResponseList];
                 return p.resolve()
@@ -4490,21 +4498,25 @@
                   MY_API.chatLog('[天选时刻] 上传失败 ' + re.message, 'warning');
                   return p.reject()
                 }
-              }
-              else {
+              } else if (re.code === -1) {
+                MY_API.chatLog(`[天选时刻] 上传失败，${re.message}，上传间隔临时增加5秒`, 'warning');
+                MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL += 5;
+                return p.resolve();
+              } else {
                 MY_API.chatLog('[天选时刻] 房间列表上传失败 ' + re.message, 'error');
-                return p.reject()
+                return p.reject();
               }
             }, () => {
               MY_API.chatLog('[天选时刻] 房间列表上传出错，请检查网络', 'error');
-              return delayCall(() => MY_API.AnchorLottery.uploadRoomList());
+              return p.reject();
             })
           }
-          const encodeData = Base64.encode64(JSON.stringify(uploadRawJson));
-          let finalStr = '';
-          for (let i = 0; i < encodeData.length; i++) {
-            finalStr += (encodeData[i] + (i === encodeData.length - 1 ? '' : '-'));
+          let jsonStr = JSON.stringify(uploadRawJson);
+          for (const i in upperNum) {
+            jsonStr = jsonStr.replaceAll(i, upperNum[i])
           }
+          let finalStr = `<p style=font-size:0px>` + jsonStr + `</p>${MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE}`;
+          console.log("上传信息", finalStr)
           return updateEncodeData(MY_API.AnchorLottery.myLiveRoomid, finalStr).then(() => {
             return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL * 1000)
           });
@@ -4523,8 +4535,14 @@
           });
           let lotteryInfoJson;
           try {
-            if (description === undefined) throw "undefined";
-            lotteryInfoJson = JSON.parse(Base64.decode64(description.replaceAll('-', '')));
+            if (description === undefined) throw "undefined"
+            lotteryInfoJson = description.match(/<p style="font-size:0px">(.*)<\/p>/)[1];
+            console.log('match', lotteryInfoJson)
+            for (const i in upperNum) {
+              lotteryInfoJson = lotteryInfoJson.replaceAll(upperNum[i], i)
+            }
+            console.log('replace', lotteryInfoJson)
+            lotteryInfoJson = JSON.parse(lotteryInfoJson);
             if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
               throw 'Not a JSON';
             if (!lotteryInfoJson.hasOwnProperty('roomList'))
@@ -4548,7 +4566,7 @@
             return chineseFunc();
           } else if (chineseNumberArray === null && numberArray !== null) { // 只提取出阿拉伯数字
             return arabicNumberFunc();
-          } else if (chineseNumberArray !== null && numberArray !== null) { // 都提取出来了
+          } else if (chineseNumberArray !== null && numberArray !== null) { // 都提取出来
             let arr = arabicNumberFunc();
             if (arr[0]) return arr; // 数组第一项为true则识别成功
             else return chineseFunc()
@@ -5257,8 +5275,11 @@
         },
         run: async () => {
           if (!MY_API.CONFIG.ANCHOR_LOTTERY) return $.Deferred().resolve();
-          MY_API.chatLog(`[天选时刻] 开始获取粉丝勋章信息`);
-          await MY_API.AnchorLottery.getMedalList();
+          if (medal_info.status.state() === "resolved") MY_API.AnchorLottery.medal_list = [...medal_info.medal_list];
+          else {
+            MY_API.chatLog('[天选时刻] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.AnchorLottery.run());
+          }
           MY_API.chatLog(`[天选时刻] 开始获取关注分组信息`);
           if (MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG || MY_API.CONFIG.ANCHOR_MOVETO_PRIZE_TAG)
             await MY_API.AnchorLottery.getTag([anchorFollowTagName, anchorPrizeTagName]);
@@ -5563,6 +5584,29 @@
     })
   }
   /**
+   * 获取粉丝勋章列表
+   * @param {Number} page 
+   * @returns 
+   */
+  async function getMedalList(page = 1) {
+    if (page === 1) medal_info = { status: $.Deferred(), medal_list: [] };
+    let end = false;
+    while (true) {
+      await BAPI.i.medal(page, 25).then((response) => {
+        MYDEBUG('before init() getMedalList: API.i.medal', response);
+        medal_info.medal_list = medal_info.medal_list.concat(response.data.fansMedalList);
+        if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) page++;
+        else { medal_info.status.resolve(); end = true }
+      }, () => {
+        MY_API.chatLog('获取粉丝勋章列表失败，请检查网络<br>部分功能将无法正常运行', 'error');
+        setTimeout(() => getMedalList(page));
+        end = true;
+      });
+      if (end) break;
+      await sleep(100);
+    }
+  };
+  /**
    * 删除一维数组元素
    * @param val 数组中一个元素的值
    */
@@ -5708,7 +5752,7 @@
     let elementA = document.createElement("a");
     elementA.setAttribute(
       "href",
-      "data:text/plain;charset=utf-8," + JSON.stringify(fileContent)
+      "data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(fileContent))
     );
     elementA.setAttribute("download", fileName);
     elementA.style.display = "none";
@@ -5740,7 +5784,7 @@
     reader.onload = function () {
       MYDEBUG("importConfig 文件读取结果：", this.result);
       try {
-        readConfigArray[0] = JSON.parse(this.result);
+        readConfigArray[0] = JSON.parse(decodeURIComponent(this.result));
         if (typeof readConfigArray[0] == 'object' && readConfigArray[0]) {
           const list = ["MY_API_CONFIG", "nosleepConfig", "INVISIBLE_ENTER_config"];
           for (const i of list) {
