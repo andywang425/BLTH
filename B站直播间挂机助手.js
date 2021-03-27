@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.6.2
+// @version        5.6.6.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -41,6 +41,8 @@
 // @grant          GM_getResourceText
 // @grant          GM_notification
 // @grant          GM_openInTab
+// @grant          GM_getValue
+// @grant          GM_setValue
 // ==/UserScript==
 
 (function () {
@@ -725,9 +727,9 @@
           const cache = localStorage.getItem(`${NAME}_NEWMSG_CACHE`);
           if (cache === undefined || cache === null || !versionStringCompare(cache, version)) { // cache < version
             const mliList = [
-              "优化了获取粉丝勋章列表的方式，不再重复获取。",
-              "修复了当脚本设置中有特殊字符时无法正确导出配置文件的bug。",
-              "优化了【上传天选数据至直播间个人简介】的功能，使上传的数据不可见，支持上传想要被显示的内容。同时优化了天选数据的编码方式，上传和获取数据会更快。上传出错时的错误处理更加合理。"
+              "优化了天选时刻的直播间号收集机制。",
+              "修复自动送礼在完成一轮送礼后无法进行下一轮送礼的bug。",
+              "自动送礼细节改进。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -2535,10 +2537,10 @@
           });
         },
         signInList: (list, i = 0) => {
-          //应援团签到
+          // 应援团签到
           if (i >= list.length) return $.Deferred().resolve();
           const obj = list[i];
-          //自己不能给自己的应援团应援
+          // 自己不能给自己的应援团应援
           if (obj.owner_uid == Live_info.uid) return MY_API.GroupSign.signInList(list, i + 1);
           return BAPI.Group.sign_in(obj.group_id, obj.owner_uid).then((response) => {
             MYDEBUG('GroupSign.signInList: API.Group.sign_in', response);
@@ -2594,7 +2596,7 @@
         }
       },
       DailyReward: {
-        //每日任务
+        // 每日任务
         coin_exp: 0,
         login: () => {
           return BAPI.DailyReward.login().then(() => {
@@ -2706,7 +2708,7 @@
                   // 塞满啦！先看看库存吧~
                   return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
                 } else if (response.code === -104) {
-                  //硬币余额不足
+                  // 硬币余额不足
                   window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
                   return $.Deferred().reject();
                 }
@@ -3031,7 +3033,7 @@
             window.toast(`[自动送礼]点亮勋章出错:${e}`, 'error');
           }
         },
-        run: async () => {
+        run: async (noTimeCheck = false) => {
           /**
            * 失败时运行的函数
            */
@@ -3046,14 +3048,14 @@
             window.toast('[自动送礼] 本次送礼结束', 'info');
             if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME") {
               let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
-              MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(), alternateTime);
+              MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(true), alternateTime);
               let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
               MYDEBUG("[自动送礼]", `将在${runTime}进行自动送礼`);
               MY_API.CACHE.Gift_TS = ts_ms();
               MY_API.saveCache();
             } else {
               let alternateTime = MY_API.CONFIG.GIFT_INTERVAL * 60 * 1000;
-              MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(), alternateTime);
+              MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(true), alternateTime);
               MYDEBUG("[自动送礼]", `将在${MY_API.CONFIG.GIFT_INTERVAL}分钟后进行自动送礼`);
               MY_API.CACHE.GiftInterval_TS = ts_ms();
               MY_API.saveCache();
@@ -3100,14 +3102,14 @@
               // 送之前查一次有没有可送的
               bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
                 Number(r.corner_mark.substring(0, r.corner_mark.indexOf("天"))) <= MY_API.CONFIG.GIFT_LIMIT);
-              MYDEBUG("[自动送礼]过滤后的礼物", bag_list);
+              MYDEBUG("[自动送礼] if分支 过滤后的礼物", bag_list);
               if (bag_list.length === 0) {
                 MY_API.Gift.over = true;
                 return;
               }
             } else {
               bag_list = MY_API.Gift.bag_list.filter(r => r.gift_num > 0 && r.corner_mark != '永久');
-              MYDEBUG("[自动送礼]过滤后的礼物", bag_list);
+              MYDEBUG("[自动送礼] else分支 过滤后的礼物", bag_list);
               if (bag_list.length === 0) {
                 MY_API.Gift.over = true;
                 return;
@@ -3157,21 +3159,21 @@
               return setTimeout(() => MY_API.Gift.run(), 30e3);
             }
             if (MY_API.Gift.run_timer) clearTimeout(MY_API.Gift.run_timer);
-            if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW) {
+            if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW && !noTimeCheck) {
               // 定时送礼
               let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
-              MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(), alternateTime);
+              MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(true), alternateTime);
               let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
               MYDEBUG("[自动送礼]", `将在${runTime}进行自动送礼`);
               return $.Deferred().resolve();
-            } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW) {
+            } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW && !noTimeCheck) {
               // 间隔__分钟送礼
               let GiftInterval = MY_API.CONFIG.GIFT_INTERVAL * 60e3;
               if (MY_API.CACHE.GiftInterval_TS) {
                 const interval = ts_ms() - MY_API.CACHE.GiftInterval_TS;
                 if (interval < GiftInterval) {
                   let intervalTime = GiftInterval - interval;
-                  MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(), intervalTime);
+                  MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(true), intervalTime);
                   MYDEBUG("[自动送礼]", `将在${intervalTime}毫秒后进行自动送礼`);
                   return $.Deferred().resolve();
                 }
@@ -3192,7 +3194,7 @@
             await MY_API.Gift.getBagList();
             await getGiftFeed();
             handleBagList(false);
-            if (MY_API.Gift.over) return;
+            if (MY_API.Gift.over) return nextTimeDebug();
             if (MY_API.Gift.medal_list.length > 0) {
               handleMedalList();
               await MY_API.Gift.auto_light(); // 点亮勋章
@@ -3201,7 +3203,7 @@
                 return $.Deferred().resolve();
               }
               handleBagList();
-              if (MY_API.Gift.over) return;
+              if (MY_API.Gift.over) return nextTimeDebug();
               for (const v of MY_API.Gift.medal_list) {
                 if (!checkRemainGift()) {
                   MY_API.Gift.over = true;
@@ -4401,6 +4403,7 @@
               await sleep(MY_API.CONFIG.ANCHOR_INTERVAL)
             }
           };
+          MY_API.AnchorLottery.roomidList = [];
           return checkHourRank().then(async () => {
             await checkRoomList();
             MY_API.chatLog(`[天选时刻] 高热度直播间收集完毕<br>共${MY_API.AnchorLottery.roomidList.length}个`, 'success');
@@ -4516,7 +4519,6 @@
             jsonStr = jsonStr.replaceAll(i, upperNum[i])
           }
           let finalStr = `<p style=font-size:0px>` + jsonStr + `</p>${MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE}`;
-          console.log("上传信息", finalStr)
           return updateEncodeData(MY_API.AnchorLottery.myLiveRoomid, finalStr).then(() => {
             return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL * 1000)
           });
@@ -4537,11 +4539,9 @@
           try {
             if (description === undefined) throw "undefined"
             lotteryInfoJson = description.match(/<p style="font-size:0px">(.*)<\/p>/)[1];
-            console.log('match', lotteryInfoJson)
             for (const i in upperNum) {
               lotteryInfoJson = lotteryInfoJson.replaceAll(upperNum[i], i)
             }
-            console.log('replace', lotteryInfoJson)
             lotteryInfoJson = JSON.parse(lotteryInfoJson);
             if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
               throw 'Not a JSON';
@@ -4635,7 +4635,7 @@
                 // 如果下一个数字的起始位置不在当前数字所占范围内
                 for (let i = unitIndex; i < name.length; i++) {
                   if (nextNumIndex !== undefined) {
-                    if (i < nextNumIndex)// 不能把下一个数字取进去
+                    if (i < nextNumIndex) // 不能把下一个数字取进去
                       strAfterNum = strAfterNum + name[i];
                     else
                       break;
@@ -5328,6 +5328,7 @@
             }
             if (MY_API.CONFIG.ANCHOR_TYPE_FOLLOWING) { // 从关注直播间
               await MY_API.AnchorLottery.getLiveUsers();
+              MY_API.AnchorLottery.liveRoomList = [];
               for (const i of MY_API.AnchorLottery.liveUserList) {
                 const roomid = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)$/)[1],
                   uid = i.uid;
@@ -5722,6 +5723,7 @@
     }
     localStorage.removeItem(`${NAME}_lastCheckUpdateTs`);
     localStorage.setItem(`${NAME}_lastFixVersion`, version);
+    // localStorage => GM 
   }
   /**
    * layer动画
