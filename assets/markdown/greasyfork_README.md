@@ -204,7 +204,7 @@
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。
 + [myCss.css](https://github.com/andywang425/BLTH/blob/master/assets/css/myCss.css)：脚本样式。
-+ [main.html](https://github.com/andywang425/BLTH/blob/master/assets/html/main.html)：脚本控制面板的html。
++ [main.html](https://github.com/andywang425/BLTH/blob/master/assets/html/main.html)：控制面板html。
 + [eula.html](https://github.com/andywang425/BLTH/blob/master/assets/html/eula.html)：最终用户许可协议。
 
 -------------------------------
