@@ -35,7 +35,7 @@
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/myCss.min.css
 // @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@e26d2a60cf9c307bfbff77d2f589cb2e51fe0123/assets/html/main.min.html
-// @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/html/eula.min.html
+// @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@fcdcfae7ed1a35c896ab5304e2553f4e7487842b/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
@@ -5727,7 +5727,7 @@
    * @param {string} ver2
    * @returns {boolean} 若 ver1 > ver2 返回 1, ver1 = ver2 返回 0, ver1 < ver2, 返回 -1
    */
-  function versionStringCompare(ver1 = '', ver2 = '') {
+  function versionStringCompare(ver1 = '0', ver2 = '0') {
     function changeVersion2Num(ver) {
       return ver.match(/\d.*/)[0].split('.').reduce((total, value, index) => total + (0.01 ** index) * Number(value), 0);
     }
@@ -5783,11 +5783,8 @@
     API.saveConfig(false);
     API.saveCache();
     // localStorage修复
-    localStorage.removeItem(`${NAME}AnchorRoomidList`);
     const follow = localStorage.getItem(`${NAME}AnchorFollowingList`);
     if (follow !== null) localStorage.setItem(`${NAME}_AnchorFollowingList`, follow);
-    localStorage.removeItem(`${NAME}AnchorFollowingList`);
-    localStorage.removeItem(`${NAME}_AnchorRoomidList`);
     const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
     let idlist = [...config.list];
     if (idlist.length !== 0 && typeof (idlist[0]) === 'number') {
@@ -5796,16 +5793,12 @@
       }
       localStorage.setItem(`${NAME}_AnchorFollowingList`, JSON.stringify({ list: idlist }));
     }
-    localStorage.removeItem(`${NAME}_lastCheckUpdateTs`);
-    localStorage.removeItem(`${NAME}_showEula`);
-    localStorage.removeItem(`${NAME}_msgHide`);
-    localStorage.removeItem(`${NAME}_debugSwitch`);
-    localStorage.removeItem(`${NAME}_windowToast`);
-    localStorage.removeItem(`${NAME}_NOSLEEP`);
-    localStorage.removeItem(`${NAME}_INVISIBLE_ENTER`);
-    localStorage.removeItem(`${NAME}_NEWMSG_CACHE`);
-    localStorage.removeItem(`${NAME}_lastFixVersion`);
-    localStorage.removeItem(`${NAME}_block_live`);
+    const rmList = [`${NAME}AnchorRoomidList`, `${NAME}AnchorFollowingList`, `${NAME}_AnchorRoomidList`, `${NAME}_lastCheckUpdateTs`,
+    `${NAME}_showEula`, `${NAME}_msgHide`, `${NAME}_debugSwitch`, `${NAME}_windowToast`, `${NAME}_NOSLEEP`, `${NAME}_INVISIBLE_ENTER`,
+    `${NAME}_NEWMSG_CACHE`, `${NAME}_lastFixVersion`, `${NAME}_block_live`];
+    for( const i of rmList) {
+      localStorage.removeItem(i);
+    } 
     SP_CONFIG.showEula = localStorage.getItem(`${NAME}_showEula`) === 'false' ? false : true;
     SP_CONFIG.mainDisplay = localStorage.getItem(`${NAME}_msgHide`) === 'hide' ? 'hide' : 'show';
     SP_CONFIG.debugSwitch = localStorage.getItem(`${NAME}_debugSwitch`) === 'true' ? true : false;
