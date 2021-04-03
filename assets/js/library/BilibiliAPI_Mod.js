@@ -972,8 +972,8 @@ var BAPI = {
                 url: '//api.bilibili.com/x/relation/tags/addUsers',
                 data: {
                     cross_domain: cross_domain, // 跨域，默认true
-                    fids: fids,//目标uid
-                    tagids: tagids//通过getTags获取。可以为数组，用逗号,隔开，需要编码(即用 %2C 隔开)
+                    fids: fids, // 目标uid
+                    tagids: tagids // 通过getTags获取。可以为数组，用逗号,隔开，需要编码(即用 %2C 隔开)
                 }
             });
         },
