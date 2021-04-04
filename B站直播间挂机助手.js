@@ -1273,7 +1273,7 @@
           NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<mh3>原理：</mh3><mul><mli>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。</mli><mul>',
           INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<mh3>缺点：</mh3>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管点击后会提示接口返回错误），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。',
           MATERIAL_LOTTERY: '实物抽奖，即金宝箱抽奖。某些特殊的直播间会有金宝箱抽奖。<mh3>注意：</mh3><mul><mli>【忽略关键字】中每一项之间用半角逗号<code>,</code>隔开。</mli></mul>',
-          MATERIAL_LOTTERY_REM: "aid是活动的编号。如果你不理解此项保持默认配置即可。",
+          MATERIAL_LOTTERY_REM: "aid是活动的编号。如你不理解此项保持默认配置即可。",
           ANCHOR_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑天选。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填正则表达式。正则格式为以<code>/</code>开头且以<code>/</code>结尾，如<code>/测.*试/</code>。</mli><mli>关键字对大小写不敏感，而正则会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填正则表达式。正则格式为以<code>/</code>开头且以<code>/</code>结尾，如<code>/测.*试/</code>。</mli><mli>关键字对大小写不敏感，而正则会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           FT_NOTICE: "<a href = 'https://sc.ftqq.com/' target = '_blank'>方糖（点我注册）</a>，即「Server酱」，英文名「ServerChan」，是一款「程序员」和「服务器」之间的通信软件。说人话？就是从服务器推报警和日志到手机的工具。<br>使用前请先前往方糖官网完成注册，然后回到脚本界面填写SCKEY。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信推送提醒你中奖了。</mli></mul>",
@@ -5878,12 +5878,12 @@
       try {
         readConfigArray[0] = JSON.parse(decodeURIComponent(this.result));
         if (typeof readConfigArray[0] == 'object' && readConfigArray[0]) {
-          if (versionStringCompare("5.6.6.3", readConfigArray[0]["VERSION"]) === 1) // 5.6.6.3 > VERSION
-            return wrongFile('该配置文件版本过低')
-          const list = ["MY_API_CONFIG", "SP_CONFIG"];
+          const list = ["VERSION", "MY_API_CONFIG", "SP_CONFIG"];
           for (const i of list) {
             if (!readConfigArray[0].hasOwnProperty(i)) return wrongFile();
           }
+          if (versionStringCompare("5.6.6.3", readConfigArray[0]["VERSION"]) === 1) // 5.6.6.3 > VERSION
+            return wrongFile('该配置文件版本过低')
           return readConfigArray[1].resolve();
         } else {
           return wrongFile();
@@ -5895,7 +5895,7 @@
     };
     function wrongFile(msg = '文件格式错误') {
       return layer.msg(msg, {
-        time: 2000,
+        time: 2500,
         icon: 2
       });
     }
@@ -5962,11 +5962,11 @@
       targetStartTs = sH * hourMs + sM * minMs,
       targetEndTs = eH * hourMs + eM * minMs;
     if (targetStartTs < targetEndTs) {
-      if (nowTimeTs >= targetStartTs && nowTimeTs <= targetEndTs)
+      if (nowTimeTs >= targetStartTs && nowTimeTs < targetEndTs)
         return true;
       else return false;
     } else {
-      if (nowTimeTs >= targetStartTs || nowTimeTs <= targetEndTs)
+      if (nowTimeTs >= targetStartTs || nowTimeTs < targetEndTs)
         return true
       else return false;
     }
