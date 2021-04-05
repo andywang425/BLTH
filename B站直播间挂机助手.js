@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.6.3
+// @version        5.6.6.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -47,7 +47,8 @@
 // ==/UserScript==
 
 (function () {
-  const NAME = 'IGIFTMSG',
+  localstorage2gm();
+  const NAME = 'BLTH',
     W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow,
     eventListener = window.addEventListener,
     ts_ms = () => Date.now(), // 当前毫秒
@@ -133,10 +134,10 @@
         tokenData = await appToken.getToken();
         if (tokenData === undefined) return MYERROR('appToken', 'tokenData获取失败');
         tokenData.time = ts_s() + tokenData.expires_in;
-        localStorage.setItem(`${NAME}_Token`, JSON.stringify(tokenData));
+        GM_setValue(`Token`, tokenData);
         userToken = tokenData;
       };
-      MYDEBUG(`${NAME}_Token`, tokenData);
+      MYDEBUG(`appToken`, tokenData);
       return 'OK';
     },
     newWindow = {
@@ -197,7 +198,7 @@
     linkMsg = (msg, link) => '<a href="' + link + '"target="_blank" style="color:">' + msg + '</a>',
     liveRoomUrl = 'https://live.bilibili.com/',
     upperNum = { 0: ")", 1: "!", 2: "@", 3: "#", 4: "$", 5: "%", 6: "^", 7: "7", 8: "*", 9: "(" };
-  let SP_CONFIG = JSON.parse(localStorage.getItem(`${NAME}_SP_CONFIG`)) || {
+  let SP_CONFIG = GM_getValue("SP_CONFIG") || {
     showEula: true, // 显示EULA
     storageLastFixVersion: "0", // 上次修复设置的版本
     mainDisplay: 'show', // UI隐藏开关
@@ -235,7 +236,7 @@
     },
     medal_info = { status: $.Deferred(), medal_list: [] },
     userToken = undefined,
-    tokenData = JSON.parse(localStorage.getItem(`${NAME}_Token`)) || { time: 0 },
+    tokenData = GM_getValue("Token") || { time: 0 },
     mainIndex = undefined,
     logIndex = undefined,
     layerUiMain = undefined, // 控制面板
@@ -250,7 +251,7 @@
     layerLogWindow_ScrollY = undefined,
     awardScrollCount = 0,
     readConfigArray = [undefined],
-    noticeJson = JSON.parse(localStorage.getItem(`${NAME}_noticeJson`) || "{}"); // 检查更新时获取的json
+    noticeJson = GM_getValue("noticeJson") || "{}"; // 检查更新时获取的json
 
   /**
    * 替换字符串中所有的匹配项（可处理特殊字符如括号）
@@ -337,7 +338,7 @@
     }
     try {
       // 唯一运行检测
-      let UNIQUE_CHECK_CACHE = localStorage.getItem(`${NAME}_UNIQUE_CHECK_CACHE`) || 0;
+      let UNIQUE_CHECK_CACHE = GM_getValue("UNIQUE_CHECK_CACHE") || 0;
       const t = ts_ms();
       if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 15e3) {
         // 其他脚本正在运行
@@ -348,12 +349,12 @@
       const uniqueMark = () => {
         timer_unique = setTimeout(uniqueMark, 10e3);
         UNIQUE_CHECK_CACHE = ts_ms();
-        localStorage.setItem(`${NAME}_UNIQUE_CHECK_CACHE`, UNIQUE_CHECK_CACHE)
+        GM_setValue("UNIQUE_CHECK_CACHE", UNIQUE_CHECK_CACHE)
       };
       window.addEventListener('unload', () => {
         if (timer_unique) {
           clearTimeout(timer_unique);
-          localStorage.setItem(`${NAME}_UNIQUE_CHECK_CACHE`, 0)
+          GM_setValue("UNIQUE_CHECK_CACHE", 0)
         }
       });
       uniqueMark();
@@ -568,7 +569,7 @@
           chat_control_panel_vmHeight = $('#chat-control-panel-vm').height(),
           eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter'];
         tabContent = $('.tab-content');
-        logDiv = $(`<li data-v-2fdbecb2="" data-v-d2be050a="" class="item dp-i-block live-skin-separate-border border-box t-center pointer live-skin-normal-text" style = 'font-weight:bold;color: #999;' id = "logDiv"><span id="logDivText">日志</span><div class="igiftMsg_num" style="display: none;" id = 'logRedPoint'>0</div></li>`);
+        logDiv = $(`<li data-v-2fdbecb2="" data-v-d2be050a="" class="item dp-i-block live-skin-separate-border border-box t-center pointer live-skin-normal-text" style = 'font-weight:bold;color: #999;' id = "logDiv"><span id="logDivText">日志</span><div class="blth_num" style="display: none;" id = 'logRedPoint'>0</div></li>`);
         let tabOffSet = 0, top = 0, left = 0;
         if (eleList.some(i => i.length === 0) || tabList.length === 0 || tabContent.length === 0) {
           window.toast('必要页面元素缺失，强制运行（可能会看不到控制面板，提示信息）', 'error');
@@ -701,7 +702,7 @@
         // 加载配置函数
         let p = $.Deferred();
         try {
-          const config = JSON.parse(localStorage.getItem(`${NAME}_CONFIG`));
+          const config = GM_getValue("CONFIG");
           $.extend(true, MY_API.CONFIG, MY_API.CONFIG_DEFAULT);
           for (const item in MY_API.CONFIG) {
             if (config[item] !== undefined && config[item] !== null) MY_API.CONFIG[item] = config[item];
@@ -720,7 +721,7 @@
         // 加载CACHE
         let p = $.Deferred();
         try {
-          const cache = JSON.parse(localStorage.getItem(`${NAME}_CACHE`));
+          const cache = GM_getValue("CACHE");
           $.extend(true, MY_API.CACHE, MY_API.CACHE_DEFAULT);
           for (const item in MY_API.CACHE) {
             if (cache[item] !== undefined && cache[item] !== null) MY_API.CACHE[item] = cache[item];
@@ -738,16 +739,10 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "优化了天选时刻的直播间号收集机制。",
-              "修复自动送礼在完成一轮送礼后无法进行下一轮送礼的bug。",
-              "自动送礼细节改进。",
-              "不给20或40级粉丝牌的应援团签到。",
-              "优化天选时刻的休眠机制，避免在休眠前额外检查一轮。",
-              "修复了【自动发弹幕】弹幕缓存不正确的bug（建议点击一下清除弹幕缓存）。",
-              "修复EULA中的一个错误链接。",
-              "天选时刻：特别关心分组里的up不再会被取关，同时优化了分组内UP获取方式。",
-              "内容屏蔽新增【屏蔽天选时刻弹窗及图标】，【屏蔽大乱斗弹窗及进度条】，【禁止p2p上传】。",
-              "重写了特殊配置的读取方式和版本号比较方式，提高效率。"
+              "修复休眠结束后可能会再次休眠的bug。",
+              "修复导入旧配置文件时可能会出错的bug。",
+              "改为使用脚本管理器提供的GM函数来储存数据，并转移了所有的旧数据。以下设置项可能无法成功转移：【隐身入场】，【屏蔽挂机检测】，【提示信息】，【控制台日志】，是否显示控制面板和eula。<br><em>为什么要这么做？通过原生的localstorage读写大量数据会阻塞浏览器渲染，并且存储大量内容会消耗内存空间，导致网页卡顿。除此之外localstorge有储存空间上限，而且只能储存字符串。相比之下用GM函数会更好。</em>",
+              "修复了粉丝勋章数据在跨日后不更新的bug。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -772,7 +767,7 @@
       saveConfig: (show = true) => {
         // 保存配置函数
         try {
-          localStorage.setItem(`${NAME}_CONFIG`, JSON.stringify(MY_API.CONFIG));
+          GM_getValue("CONFIG", MY_API.CONFIG);
           if (show) window.toast('配置已保存，部分设置需刷新后才能生效', 'info');
           MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
           return true
@@ -784,7 +779,7 @@
       saveCache: (logswitch = true) => {
         // 保存缓存函数
         try {
-          localStorage.setItem(`${NAME}_CACHE`, JSON.stringify(MY_API.CACHE));
+          GM_setValue("CACHE", MY_API.CACHE);
           if (logswitch) MYDEBUG('CACHE已保存', MY_API.CACHE)
           return true
         } catch (e) {
@@ -823,7 +818,7 @@
       },
       loadGiftCount: () => { // 读取统计数量
         try {
-          const config = JSON.parse(localStorage.getItem(`${NAME}_GIFT_COUNT`));
+          const config = GM_getValue("GIFT_COUNT");
           for (const item in MY_API.GIFT_COUNT) {
             if (!MY_API.GIFT_COUNT.hasOwnProperty(item)) continue;
             if (config[item] !== undefined && config[item] !== null) MY_API.GIFT_COUNT[item] = config[item];
@@ -835,7 +830,7 @@
       },
       saveGiftCount: (show = true) => {
         try {
-          localStorage.setItem(`${NAME}_GIFT_COUNT`, JSON.stringify(MY_API.GIFT_COUNT));
+          GM_setValue(`GIFT_COUNT`, MY_API.GIFT_COUNT);
           if (show) MYDEBUG('统计保存成功', MY_API.GIFT_COUNT);
           return true
         } catch (e) {
@@ -964,7 +959,7 @@
       creatSetBox: async () => {
         //添加按钮
         const btnmsg = SP_CONFIG.mainDisplay === 'hide' ? '显示控制面板' : '隐藏控制面板';
-        const btn = $(`<button class="igiftMsg_btn" style="display: inline-block; float: left; margin-right: 7px;cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
+        const btn = $(`<button class="blth_btn" style="display: inline-block; float: left; margin-right: 7px;cursor: pointer;box-shadow: 1px 1px 2px #00000075;" id="hiderbtn">${btnmsg}<br></button>`);
         const livePlayer = $('.bilibili-live-player.relative');
         const html = GM_getResourceText('main');
         function layerOpenAbout() {
@@ -1264,7 +1259,7 @@
         const helpText = {
           // 帮助信息
           ANCHOR_PERSONAL_PROFILE: "在个人简介中所展示的信息。<mul><mli>可以填符合b站规则的html。</mli></mul>",
-          ANCHOR_GOLD_JOIN_TIMES: "付费天选指需要花费金瓜子才能参加的天选。<mul><mli>多次参加同一个付费天选<strong>可能</strong>可以提高中奖率。</mli><mli><strong>请慎重填写本设置项。</strong></mli></mul>",
+          ANCHOR_GOLD_JOIN_TIMES: "付费天选指需要花费金瓜子才能参加的天选。<mul><mli>多次参加同一个付费天选可以提高中奖率。</mli><mli><strong>请慎重填写本设置项。</strong></mli></mul>",
           GIFT_SEND_METHOD: "自动送礼策略，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间送礼。</mli><mli>黑名单：给房间列表以外的直播间送礼。</mli><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<mh3>注意：</mh3><mul><mli>支持识别阿拉伯数字和汉字数字。</mli><mli>识别的单位有限。</mli><mli>不支持识别外币。</mli><mli>由于一些天选时刻的奖品名比较特殊，可能会出现遗漏或误判。</mli></mul>',
           LOTTERY: '参与大乱斗抽奖。',
@@ -1848,8 +1843,7 @@
               });
               myDiv.find('button[data-action="editWhiteList"]').click(() => {
                 // 编辑白名单
-                const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
-                const list = [...config.list];
+                const list = GM_getValue(`AnchorFollowingList`) || "";
                 layer.prompt({
                   formType: 2,
                   maxlength: Number.MAX_SAFE_INTEGER,
@@ -1867,7 +1861,7 @@
                         if (!val[i]) val.splice(i, 1);
                       }
                     }
-                    localStorage.setItem(`${NAME}_AnchorFollowingList`, JSON.stringify({ list: val }));
+                    GM_setValue(`AnchorFollowingList`, val);
                     layer.msg('天选时刻UID白名单保存成功', {
                       time: 2500,
                       icon: 1
@@ -2268,31 +2262,25 @@
         add: function (EntryRoom) {
           let EntryRoom_list = [];
           try {
-            const config = JSON.parse(localStorage.getItem(`${NAME}_EntryRoom_list`));
-            EntryRoom_list = [...config.list];
+            EntryRoom_list = GM_getValue(`EntryRoom_list`) || [];
             EntryRoom_list.push(EntryRoom);
             if (EntryRoom_list.length > 100) {
               EntryRoom_list.splice(0, 50); // 删除前50条数据
             }
-            localStorage.setItem(`${NAME}_EntryRoom_list`, JSON.stringify({ list: EntryRoom_list }));
+            GM_setValue(`EntryRoom_list`, EntryRoom_list);
           } catch (e) {
             EntryRoom_list.push(EntryRoom);
-            localStorage.setItem(`${NAME}_EntryRoom_list`, JSON.stringify({ list: EntryRoom_list }));
+            GM_setValue(`EntryRoom_list`, EntryRoom_list);
           }
         },
         isIn: function (EntryRoom) {
           let EntryRoom_list = [];
           try {
-            const config = JSON.parse(localStorage.getItem(`${NAME}_EntryRoom_list`));
-            if (config === null) {
-              EntryRoom_list = [];
-            } else {
-              EntryRoom_list = [...config.list];
-            }
+            EntryRoom_list = GM_getValue(`EntryRoom_list`) || [];
             return EntryRoom_list.indexOf(EntryRoom) > -1
           } catch (e) {
-            localStorage.setItem(`${NAME}_EntryRoom_list`, JSON.stringify({ list: EntryRoom_list }));
-            MYDEBUG('读取' + `${NAME}_EntryRoom_list` + '缓存错误已重置');
+            GM_setValue(`EntryRoom_list`, EntryRoom_list);
+            MYDEBUG('读取' + `EntryRoom_list` + '缓存错误已重置');
             return EntryRoom_list.indexOf(EntryRoom) > -1
           }
         }
@@ -2366,35 +2354,29 @@
       },
       Id_list_history: { // 礼物历史记录缓存
         add: function (id, type) {
-          const id_list = [];
+          let id_list = [];
           try {
-            let config = JSON.parse(localStorage.getItem(`${NAME}_${type}Id_list`));
-            id_list = [...config.list];
+            id_list = GM_getValue(`${type}Id_list`) || [];
             id_list.push(id);
             if (id_list.length > 200) {
               id_list.splice(0, 50); // 删除前50条数据
             }
-            localStorage.setItem(`${NAME}_${type}Id_list`, JSON.stringify({ list: id_list }));
-            MYDEBUG(`${NAME}_${type}Id_list_add`, id_list);
+            GM_setValue(`${type}Id_list`, id_list);
+            MYDEBUG(`${type}Id_list_add`, id_list);
           } catch (e) {
             id_list.push(id);
-            localStorage.setItem(`${NAME}_${type}Id_list`, JSON.stringify({ list: id_list }));
+            GM_setValue(`${type}Id_list`, id_list);
           }
         },
         isIn: function (id, type) {
           let id_list = [];
           try {
-            const config = JSON.parse(localStorage.getItem(`${NAME}_${type}Id_list`));
-            if (config === null) {
-              id_list = [];
-            } else {
-              id_list = [...config.list];
-            }
-            MYDEBUG(`${NAME}_${type}Id_list_read`, config);
+            id_list = GM_getValue(`${type}Id_list`) || [];
+            MYDEBUG(`${type}Id_list_read`, config);
             return id_list.indexOf(id) > -1
           } catch (e) {
-            localStorage.setItem(`${NAME}_${type}Id_list`, JSON.stringify({ list: id_list }));
-            MYDEBUG('读取' + `${NAME}_${type}Id_list` + '缓存错误已重置');
+            GM_setValue(`${type}Id_list`, id_list);
+            MYDEBUG('读取' + `${type}Id_list` + '缓存错误已重置');
             return id_list.indexOf(id) > -1
           }
         }
@@ -3355,33 +3337,27 @@
         add: function (id) {
           let storm_id_list = [];
           try {
-            const config = JSON.parse(localStorage.getItem(`${NAME}stormIdSet`));
-            storm_id_list = [...config.list];
+            storm_id_list = GM_getValue(`stormIdSet`) || [];
             storm_id_list.push(id);
             if (storm_id_list.length > 50) {
               storm_id_list.splice(0, 10); // 删除前10条数据
             }
-            localStorage.setItem(`${NAME}stormIdSet`, JSON.stringify({ list: storm_id_list }));
-            MYDEBUG(`${NAME}storm_Id_list_add`, storm_id_list);
+            GM_setValue(`stormIdSet`, storm_id_list);
+            MYDEBUG(`storm_Id_list_add`, storm_id_list);
           } catch (e) {
             storm_id_list.push(id);
-            localStorage.setItem(`${NAME}stormIdSet`, JSON.stringify({ list: storm_id_list }));
+            GM_setValue(`stormIdSet`, storm_id_list);
           }
         },
         isIn: function (id) {
           let storm_id_list = [];
           try {
-            const config = JSON.parse(localStorage.getItem(`${NAME}stormIdSet`));
-            if (config === null) {
-              storm_id_list = [];
-            } else {
-              storm_id_list = [...config.list];
-            }
-            MYDEBUG(`${NAME}storm_Id_list_read`, config);
+            storm_id_list = GM_getValue(`stormIdSet`) || [];
+            MYDEBUG(`storm_Id_list_read`, config);
             return storm_id_list.indexOf(id) > -1
           } catch (e) {
-            localStorage.setItem(`${NAME}stormIdSet`, JSON.stringify({ list: storm_id_list }));
-            MYDEBUG('读取' + `${NAME}stormIdSet` + '缓存错误已重置');
+            GM_setValue(`stormIdSet`, storm_id_list);
+            MYDEBUG('读取' + `stormIdSet` + '缓存错误已重置');
             return storm_id_list.indexOf(id) > -1
           }
         }
@@ -4197,7 +4173,7 @@
                 return $.when(MY_API.AnchorLottery.getFollowingList(pn + 1, ps), p);
               else {
                 window.toast('[保存当前关注列表为白名单] 保存关注列表成功', 'success');
-                localStorage.setItem(`${NAME}_AnchorFollowingList`, JSON.stringify({ list: MY_API.AnchorLottery.followingList }));
+                GM_setValue(`AnchorFollowingList`, MY_API.AnchorLottery.followingList);
                 getFollowBtnClickable = true;
                 return p;
               }
@@ -4381,14 +4357,12 @@
             });
           }
           function delFollowingList(targetList) {
-            let config, id_list;
-            config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
-            if (config.list.length === 0) { // 关注列表为空
+            let id_list;
+            id_list = GM_getValue(`AnchorFollowingList`) || [];
+            if (id_list.length === 0) { // 关注列表为空
               window.toast(`[取关不在白名单内的UP主] 请先点击【保存当前关注列表为白名单】!`, 'info');
               return $.Deferred().resolve();
             }
-            id_list = [...config.list];
-
             let doUnfollowList = [], pList = [];
             for (const uid of targetList) {
               if (findVal(id_list, uid) === -1)
@@ -5101,8 +5075,7 @@
               if (!award) { // 运行没中奖的代码
                 if (MY_API.CONFIG.ANCHOR_AUTO_DEL_FOLLOW) {
                   // 取关
-                  const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
-                  const id_list = [...config.list];
+                  const id_list = GM_getValue(`AnchorFollowingList`) || [];
                   if (findVal(id_list, anchorUid) === -1 && findVal(MY_API.AnchorLottery.uidInOriginTag, anchorUid) === -1 && findVal(MY_API.AnchorLottery.uidInSpecialTag, anchorUid) === -1) {
                     return BAPI.relation.modify(anchorUid, 2).then((response) => {
                       MYDEBUG(`API.relation.modify response.info.uid, ${2}`, response);
@@ -5227,10 +5200,9 @@
                 }
                 if (MY_API.CONFIG.ANCHOR_ADD_TO_WHITELIST) {
                   // 添加到白名单
-                  const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
-                  let id_list = [...config.list];
+                  let id_list = GM_getValue(`AnchorFollowingList`) || [];
                   id_list.push(String(anchorUid));
-                  localStorage.setItem(`${NAME}_AnchorFollowingList`, JSON.stringify({ list: id_list }));
+                  GM_setValue(`AnchorFollowingList`, id_list);
                   window.toast(`[天选时刻] 已将UP（uid = ${anchorUid}）添加至白名单`, 'success');
                 }
               }
@@ -5363,7 +5335,7 @@
           await MY_API.AnchorLottery.getUpInOriginTag(Live_info.uid);
           await MY_API.AnchorLottery.getUpInSpecialTag(Live_info.uid);
           if (!MY_API.CONFIG.ANCHOR_DONT_USE_CACHE_ROOM) // 读取缓存直播间
-            MY_API.AnchorLottery.allRoomList = eval("[" + (localStorage.getItem(`${NAME}_AnchorRoomidList`) || '') + "]") || [];
+            MY_API.AnchorLottery.allRoomList = GM_getValue(`AnchorRoomidList`) || [];
           function waitForNextRun(Fn, firstRun = false, toNext = false) {
             const sleepTime = MY_API.AnchorLottery.sleepCheck();
             if (sleepTime) { // 休眠
@@ -5433,7 +5405,7 @@
               }
               if (MY_API.AnchorLottery.allRoomList.length > MY_API.CONFIG.ANCHOR_MAXROOM)
                 MY_API.AnchorLottery.allRoomList = MY_API.AnchorLottery.allRoomList.splice(0, MY_API.CONFIG.ANCHOR_MAXROOM);
-              localStorage.setItem(`${NAME}_AnchorRoomidList`, MY_API.AnchorLottery.allRoomList);
+              GM_setValue(`AnchorRoomidList`, MY_API.AnchorLottery.allRoomList);
               MY_API.chatLog(`[天选时刻] 开始检查天选（共${MY_API.AnchorLottery.allRoomList.length}个房间）`, 'success');
               for (const room of MY_API.AnchorLottery.allRoomList) {
                 let p = $.Deferred();
@@ -5636,7 +5608,7 @@
       if (response.body === undefined) return;
       noticeJson = response.body;
       noticeJson.lastCheckUpdateTs = ts_ms();
-      localStorage.setItem(`${NAME}_noticeJson`, JSON.stringify(noticeJson));
+      GM_setValue(`noticeJson`, noticeJson);
       const scriptVersion = response.body.version;
       const githubOpenTabOptions = { active: false, insert: true, setParent: true },
         greasyforkOpenTabOptions = { active: true, insert: true, setParent: true };
@@ -5688,7 +5660,10 @@
         setTimeout(() => getMedalList(page));
         end = true;
       });
-      if (end) break;
+      if (end) {
+        runMidnight(getMedalList);
+        break;
+      }
       await sleep(100);
     }
   };
@@ -5757,7 +5732,7 @@
    */
   function fixVersionDifferences(API, version) {
     // 添加新的修复后需修改版本号
-    if (versionStringCompare(SP_CONFIG.storageLastFixVersion, "5.6.6.3") >= 0) return;
+    if (versionStringCompare(SP_CONFIG.storageLastFixVersion, "5.6.6.4") >= 0) return;
     // 修复变量类型错误
     const configFixList = ['AUTO_GIFT_ROOMID', 'COIN_UID'];
     if (!configFixList.every(i => $.isArray(API.CONFIG[i]))) {
@@ -5775,46 +5750,48 @@
     if (API.CONFIG.GIFT_SORT == 'high') API.CONFIG.GIFT_SORT = 'GIFT_SORT_HIGH';
     else if (API.CONFIG.GIFT_SORT == 'low') API.CONFIG.GIFT_SORT = 'GIFT_SORT_LOW'
     // 修复CACHE
-    const cache = JSON.parse(localStorage.getItem(`${NAME}_CACHE`));
+    const cache = GM_getValue(`CACHE`);
     const cacheFixList = [['materialobject_ts', 'MaterialObject_TS'], ['medalDanmu_TS', 'MedalDanmu_TS']];
     for (const i of cacheFixList) {
       if (cache.hasOwnProperty(i[0])) API.CACHE[i[1]] = cache[i[0]];
     }
+    // localStorage fix
+    localStorage.removeItem("im_deviceid_IGIFTMSG");
+    // save settings
+    SP_CONFIG.storageLastFixVersion = version;
     API.saveConfig(false);
     API.saveCache();
-    // localStorage修复
-    const follow = localStorage.getItem(`${NAME}AnchorFollowingList`);
-    if (follow !== null) localStorage.setItem(`${NAME}_AnchorFollowingList`, follow);
-    const config = JSON.parse(localStorage.getItem(`${NAME}_AnchorFollowingList`)) || { list: [] };
-    let idlist = [...config.list];
-    if (idlist.length !== 0 && typeof (idlist[0]) === 'number') {
-      for (let i = 0; i < idlist.length; i++) {
-        idlist[i] = String(idlist[i])
-      }
-      localStorage.setItem(`${NAME}_AnchorFollowingList`, JSON.stringify({ list: idlist }));
-    }
-    const rmList = [`${NAME}AnchorRoomidList`, `${NAME}AnchorFollowingList`, `${NAME}_AnchorRoomidList`, `${NAME}_lastCheckUpdateTs`,
-    `${NAME}_showEula`, `${NAME}_msgHide`, `${NAME}_debugSwitch`, `${NAME}_windowToast`, `${NAME}_NOSLEEP`, `${NAME}_INVISIBLE_ENTER`,
-    `${NAME}_NEWMSG_CACHE`, `${NAME}_lastFixVersion`, `${NAME}_block_live`];
-    for( const i of rmList) {
-      localStorage.removeItem(i);
-    } 
-    SP_CONFIG.showEula = localStorage.getItem(`${NAME}_showEula`) === 'false' ? false : true;
-    SP_CONFIG.mainDisplay = localStorage.getItem(`${NAME}_msgHide`) === 'hide' ? 'hide' : 'show';
-    SP_CONFIG.debugSwitch = localStorage.getItem(`${NAME}_debugSwitch`) === 'true' ? true : false;
-    SP_CONFIG.windowToast = localStorage.getItem(`${NAME}_windowToast`) === 'false' ? false : true;
-    SP_CONFIG.nosleep = localStorage.getItem(`${NAME}_NOSLEEP`) === 'false' ? false : true;
-    SP_CONFIG.invisibleEnter = localStorage.getItem(`${NAME}_INVISIBLE_ENTER`) === 'true' ? true : false;
-    // localStorage => GM 
-    SP_CONFIG.storageLastFixVersion = version;
     saveSpConfig();
+  }
+  /**
+   * 把localstorage中的设置迁移到GM储存
+   * 对版本小于5.6.6.4时保存的设置项进行修复
+   */
+  function localstorage2gm() {
+    if (!localStorage.getItem("IGIFTMSG_CONFIG")) return;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (/IGIFTMSG.*/.test(key)) {
+        let val = localStorage.getItem(key);
+        try {
+          val = JSON.parse(val);
+          let length = 0;
+          for (const i in val) { length++ }
+          if (val.hasOwnProperty("list") && length === 1) val = val.list;
+        } catch (e) { }
+        const jumpList = ["AnchorRoomidList"]
+        if (jumpList.indexOf(key) === -1) GM_setValue(key.replace(/IGIFTMSG_|IGIFTMSG/, ""), val);
+        localStorage.removeItem(key); i--;
+      }
+    }
+    window.location.reload();
   }
   /**
    * 保存特殊设置
    */
   function saveSpConfig() {
     MYDEBUG('SP_CONFIG已保存', SP_CONFIG);
-    return localStorage.setItem(`${NAME}_SP_CONFIG`, JSON.stringify(SP_CONFIG));
+    return GM_setValue(`SP_CONFIG`, SP_CONFIG);
   }
   /**
    * layer动画
@@ -6087,21 +6064,13 @@
    * @returns {String} dev_id
    */
   function getMsgDevId(name = NAME) {
-    let deviceid = window.localStorage.getItem("im_deviceid_".concat(name));
-    if (!name || !deviceid) {
-      let str = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (function (name) {
+    let deviceid = GM_getValue("im_deviceid_".concat(name));
+    if (!deviceid) {
+      deviceid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (function (name) {
         let randomInt = 16 * Math.random() | 0;
         return ("x" === name ? randomInt : 3 & randomInt | 8).toString(16).toUpperCase()
-      }
-      ));
-      return function (name, randomInt) {
-        Object.keys(localStorage).forEach((function (name) {
-          name.match(/^im_deviceid_/) && window.localStorage.removeItem(name)
-        }
-        )),
-          window.localStorage.setItem("im_deviceid_".concat(randomInt), name)
-      }(str, name),
-        str
+      }));
+      GM_setValue("im_deviceid_".concat(name), deviceid);
     }
     return deviceid
   };

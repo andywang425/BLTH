@@ -33,10 +33,10 @@
     border: 1px solid rgb(203, 195, 255);
     background: rgb(233, 230, 255) none repeat scroll 0% 0%;
 }
-.igiftMsg_main {
+.blth_main {
     margin: 10px;
 }
-.igiftMsg_input {
+.blth_input {
     outline: none;
     margin-inline: 5px;
     border: 1px solid #e9eaec;
@@ -48,7 +48,7 @@
     line-height: 19px;
     width: 30px;
 }
-.igiftMsg_btn {
+.blth_btn {
     background-color: #23ade5;
     font-size: small;
     margin-inline-start: 5px;
@@ -60,15 +60,15 @@
     box-shadow: 0 0 2px #00000075;
     line-height: 10px;
 }
-.igiftMsg_btn:hover:active {
+.blth_btn:hover:active {
     background-color: #0e86b6;
     position: relative;
     top: 1px;
 }
-.igiftMsg_btn:hover {
+.blth_btn:hover {
     background-color:#1097cc;
 }
-.igiftMsg_fs {
+.blth_fs {
     border: 2px solid #d4d4d4;
     line-height: 25px;
 }
@@ -124,7 +124,7 @@
     color: rgb(145, 123, 0);
     background: none 0% 0% repeat scroll rgb(255, 215, 0, 30%);
 }
-.igiftMsg_num {
+.blth_num {
     min-width: 12px;
     height: 16px;
     padding: 0 3px;
