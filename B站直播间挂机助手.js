@@ -27,15 +27,15 @@
 // @connect        sctapi.ftqq.com
 // @connect        cdn.jsdelivr.net
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
-// @require        https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://code.jquery.com/jquery-3.6.0.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@129b806f18cc532126ff34eb2e8f76c16f7c8ad6/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/layer.css
-// @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@e26d2a60cf9c307bfbff77d2f589cb2e51fe0123/assets/html/main.min.html
-// @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@fcdcfae7ed1a35c896ab5304e2553f4e7487842b/assets/html/eula.min.html
+// @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/main.min.html
+// @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
@@ -50,7 +50,7 @@
   localstorage2gm();
   const NAME = 'BLTH',
     W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow,
-    eventListener = window.addEventListener,
+    eventListener = W.addEventListener,
     ts_ms = () => Date.now(), // 当前毫秒
     ts_s = () => Math.round(ts_ms() / 1000), // 当前秒
     tz_offset = new Date().getTimezoneOffset() + 480, // 本地时间与东八区差的分钟数
@@ -251,7 +251,7 @@
     layerLogWindow_ScrollY = undefined,
     awardScrollCount = 0,
     readConfigArray = [undefined],
-    noticeJson = GM_getValue("noticeJson") || "{}"; // 检查更新时获取的json
+    noticeJson = GM_getValue("noticeJson") || {}; // 检查更新时获取的json
 
   /**
    * 替换字符串中所有的匹配项（可处理特殊字符如括号）
@@ -549,7 +549,7 @@
         LittleHeart_TS: 0, // 小心心
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0,
-        last_aid: 710, // 实物抽奖最后一个有效aid
+        last_aid: 729, // 实物抽奖最后一个有效aid
         MedalDanmu_TS: 0 //粉丝勋章打卡
       },
       CONFIG: {},
@@ -742,7 +742,9 @@
               "修复休眠结束后可能会再次休眠的bug。",
               "修复导入旧配置文件时可能会出错的bug。",
               "改为使用脚本管理器提供的GM函数来储存数据，并转移了所有的旧数据。以下设置项可能无法成功转移：【隐身入场】，【屏蔽挂机检测】，【提示信息】，【控制台日志】，是否显示控制面板和eula。<br><em>为什么要这么做？通过原生的localstorage读写大量数据会阻塞浏览器渲染，并且存储大量内容会消耗内存空间，导致网页卡顿。除此之外localstorge有储存空间上限，而且只能储存字符串。相比之下用GM函数会更好。</em>",
-              "修复了粉丝勋章数据在跨日后不更新的bug。"
+              "修复了粉丝勋章数据在跨日后不更新的bug。",
+              "天选时刻【保存当前关注列表为白名单】改为获取所有关注的UP而不是仅在默认分组内的UP。",
+              "更换了库文件jQuery的cdn。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -767,7 +769,7 @@
       saveConfig: (show = true) => {
         // 保存配置函数
         try {
-          GM_getValue("CONFIG", MY_API.CONFIG);
+          GM_setValue("CONFIG", MY_API.CONFIG);
           if (show) window.toast('配置已保存，部分设置需刷新后才能生效', 'info');
           MYDEBUG('MY_API.CONFIG', MY_API.CONFIG);
           return true
@@ -1294,7 +1296,7 @@
           ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<mh3>注意：</mh3><mul><mli>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</mli></mul>",
           ANCHOR_TYPE_LIVEROOM: "因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://live.bilibili.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<mul><mli>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</mli><mli>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</mli><mli><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</mli></mul>",
           ANCHOR_PRIVATE_LETTER: "若中奖，会在开奖后10秒发送私信。<mul><mli>建议改一下私信内容，不要和默认值完全一样。</mli></mul>",
-          ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+          ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli>白名单内UP不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           RANDOM_DELAY: "抽奖前额外等待一段时间。<mul><mli>可以填小数。</mli></mul>",
           RANDOM_SKIP: "随机忽略一部分抽奖。<mul><mli>可以填小数。</mli></mul>",
           ANCHOR_CHECK_INTERVAL: "检查完一轮天选后等待的时间。<mul><mli>可以填小数。</mli></mul>",
@@ -1302,7 +1304,7 @@
           MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间发弹幕。</mli><mli>黑名单：给房间列表以外的直播间发弹幕。</mli><mli>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</mli></mul>",
           topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，每天0点时重置。</mli><mli><strong>支持输入框回车保存。</strong></mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
-          ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+          ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli>白名单内UP不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           debugSwitch: "开启或关闭控制台日志(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
           UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
           ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
@@ -1874,7 +1876,7 @@
                   // 保存当前关注列表为白名单
                   getFollowBtnClickable = false;
                   window.toast('[ 保存当前关注列表为白名单 ] 开始获取关注列表');
-                  return MY_API.AnchorLottery.getFollowingList();
+                  return MY_API.AnchorLottery.get_attention_list(Live_info.uid);
                 }
               });
               myDiv.find('button[data-action="removeAnchorPrizeInTag"]').click(() => {
@@ -4061,6 +4063,7 @@
                     JQlogRedPoint.text(winPrizeNum);
                     if (JQlogRedPoint.is(":hidden")) JQlogRedPoint.show();
                     if (MY_API.CONFIG.FT_NOTICE) {
+                      // Server酱
                       (function FT_notice() {
                         return FT_sendMsg(MY_API.CONFIG.FT_SCKEY,
                           `【${GM_info.script.name}】实物抽奖中奖通知 ${obj.title}，第${obj.number}轮`,
@@ -4080,6 +4083,7 @@
                       })();
                     }
                     if (MY_API.CONFIG.CP_NOTICE) {
+                      // 酷推
                       (function CP_notice() {
                         return CP_sendMsg(MY_API.CONFIG.CP_Skey,
                           `【${GM_info.script.name}实物抽奖中奖通知\n${obj.title}\n第${obj.number}轮\n中奖账号id：${Live_info.uname}\n${obj.title}\naid = ${obj.aid}\n第${obj.number}轮\n获得奖品：\n${i.giftTitle}\n请及时填写领奖信息`
@@ -4157,33 +4161,23 @@
         medal_list: [],
         anchorFollowTagid: undefined,
         anchorPrizeTagid: undefined,
-        getFollowingList: (pn = 1, ps = 50) => {
-          if (pn === 1) MY_API.AnchorLottery.followingList = [];
-          return BAPI.relation.getFollowings(Live_info.uid, pn, ps).then((response) => {
-            MYDEBUG(`getFollowingList API.relation.getFollowings ${pn}, ${ps}`, response);
+        get_attention_list: (mid) => {
+          return BAPI.relation.get_attention_list(mid).then((response) => {
+            MYDEBUG(`get_attention_list API.relation.get_attention_list ${mid}`, response);
             let p = $.Deferred();
             if (response.code === 0) {
-              p.resolve();
-              const total = response.data.total;
-              for (const up of response.data.list) {
-                MY_API.AnchorLottery.followingList.push(String(up.mid));
-              }
-              const remainUp = total - MY_API.AnchorLottery.followingList.length;
-              if (remainUp > 0)
-                return $.when(MY_API.AnchorLottery.getFollowingList(pn + 1, ps), p);
-              else {
-                window.toast('[保存当前关注列表为白名单] 保存关注列表成功', 'success');
+                MY_API.AnchorLottery.followingList = [...response.data.list];
                 GM_setValue(`AnchorFollowingList`, MY_API.AnchorLottery.followingList);
                 getFollowBtnClickable = true;
-                return p;
-              }
+                window.toast('[保存当前关注列表为白名单] 保存关注列表成功', 'success');
+                return p.resolve();
             } else {
               window.toast(`[保存当前关注列表为白名单] 获取关注列表出错 ${response.message}`, 'error');
               return p.reject();
             }
           }, () => {
             MY_API.chatLog(`[天选时刻] 获取关注列表出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.getFollowingList());
+            return delayCall(() => MY_API.AnchorLottery.get_attention_list(mid));
           })
         },
         getLiveUsers: () => {
@@ -4241,7 +4235,6 @@
                   MY_API.chatLog(`[天选时刻] 分组【${anchorPrizeTagName}】不存在，请先勾选【把发起抽奖的UP移到新分组】和【参加天选时刻抽奖】，再次运行脚本。`, 'warning');
                 return $.Deferred().resolve();
               }
-
             } else {
               MY_API.chatLog(`[天选时刻] 获取关注分组出错 ${response.message}`, 'error');
               return p.reject();
@@ -4332,28 +4325,20 @@
               return delayCall(() => getUpInTag(myuid, tagid, pn = 1, ps = 50));
             })
           }
-          function getFollowingList(PN, PS) {
-            return BAPI.relation.getFollowings(Live_info.uid, PN, PS).then((response) => {
-              MYDEBUG(`delAnchorFollowing API.relation.getFollowings(${PN}, ${PS})`, response)
+          function get_attention_list(mid) {
+            return BAPI.relation.get_attention_list(mid).then((response) => {
+              MYDEBUG(`get_attention_list API.relation.get_attention_list(${mid})`, response)
               let p = $.Deferred();
               if (response.code === 0) {
-                p.resolve();
-                const total = response.data.total;
-                for (const up of response.data.list) {
-                  MY_API.AnchorLottery.unfollowList.push(String(up.mid));
-                }
-                const remainUp = total - MY_API.AnchorLottery.unfollowList.length;
-                if (remainUp > 0)
-                  return $.when(getFollowingList(PN + 1, PS), p);
-                else
-                  return p;
+                MY_API.AnchorLottery.unfollowList = [...response.data.list];
+                return p.resolve();
               } else {
                 window.toast(`[取关不在白名单内的UP主] 获取关注列表出错 ${response.message}`, 'error');
                 return p.reject();
               }
             }, () => {
               MY_API.chatLog(`[天选时刻] 获取关注列表出错，请检查网络`, 'error');
-              return delayCall(() => getFollowingList(PN, PS));
+              return delayCall(() => get_attention_list(mid));
             });
           }
           function delFollowingList(targetList) {
@@ -4398,7 +4383,7 @@
             return $.when(...pList)
           }
           if (mode === 1) // 白名单
-            return getFollowingList(pn, ps).then(() => delFollowingList(MY_API.AnchorLottery.unfollowList).then(() => { unFollowBtnClickable = true }));
+            return get_attention_list(Live_info.uid).then(() => delFollowingList(MY_API.AnchorLottery.unfollowList).then(() => { unFollowBtnClickable = true }));
           else if (mode === 2) // 关注分组
             return getUpInTag(Live_info.uid, MY_API.AnchorLottery.anchorFollowTagid).then(() => delFollowingList(MY_API.AnchorLottery.uidInTagList).then(() => { unFollowBtnClickable = true }));
           else if (mode === 3) // 中奖分组
