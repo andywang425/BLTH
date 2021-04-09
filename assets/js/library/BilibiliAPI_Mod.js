@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.0.9
+// @version       2.1
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
-// @require       https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js
+// @require       https://code.jquery.com/jquery-3.6.0.min.js
 // @grant         none
 // @include       *
 // @license       MIT
@@ -894,12 +894,20 @@ var BAPI = {
             return BAPI.ajax({
                 url: '//api.bilibili.com/x/relation/followings',
                 data: {
-                    vmid: vmid,//uid
+                    vmid: vmid, // uid
                     pn: pn,
                     ps: ps,
                     order: order,
                     jsonp: jsonp,
                     callback: callback//__jp5
+                }
+            })
+        },
+        get_attention_list: (mid) => {
+            return BAPI.ajax({
+                url: '//api.vc.bilibili.com/feed/v1/feed/get_attention_list',
+                data: {
+                    mid: mid // uid
                 }
             })
         },
@@ -1150,13 +1158,13 @@ var BAPI = {
             return BAPI.ajax({
                 url: '//api.bilibili.com/x/space/arc/search',
                 data: {
-                    mid: mid, //uid
-                    ps: ps, //30
-                    tid: tid, //0
-                    pn: pn, //1 2 3页数
-                    keyword: keyword, //''
-                    order: order, //pubdate
-                    jsonp: jsonp //jsonp
+                    mid: mid, // uid
+                    ps: ps, // 30
+                    tid: tid, // 0
+                    pn: pn, // 1 2 3页数
+                    keyword: keyword, // ''
+                    order: order, // pubdate
+                    jsonp: jsonp // jsonp
                 }
             });
         },
@@ -1173,10 +1181,10 @@ var BAPI = {
             return BAPI.ajax({
                 url: '//api.bilibili.com/x/web-interface/archive/coins',
                 data: {
-                    callback: callback, //jqueryCallback_bili_1465130006244295 此项可以为空''
-                    jsonp: jsonp, //jsonp
+                    callback: callback, // jqueryCallback_bili_1465130006244295 此项可以为空''
+                    jsonp: jsonp, // jsonp
                     aid: aid,
-                    _: _ //当前时间戳
+                    _: _ // 当前时间戳
                 }
             })
         },
@@ -1235,6 +1243,22 @@ var BAPI = {
                     jsonp: 'jsonp'
                 }
             });
+        },
+        card: (mid) => {
+            return BAPI.ajax({
+                url: '//api.bilibili.com/x/web-interface/card',
+                data: {
+                    mid: mid // uid
+                }
+            })
+        },
+        stat: (vmid) => {
+            return BAPI.ajax({
+                url: '//api.bilibili.com/x/relation/stat',
+                data: {
+                    vmid: vmid // uid
+                }
+            })
         }
     },
     xlive: {
