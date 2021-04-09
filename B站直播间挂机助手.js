@@ -36,7 +36,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@560749f86282ecd90f76ffb8d4e9e85bcee3d576/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@00ff597bce82e6b069a7e45cc4c00d2d460729f5/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -340,24 +340,21 @@
     }
     try {
       // 唯一运行检测
-      let UNIQUE_CHECK_CACHE = GM_getValue("UNIQUE_CHECK_CACHE") || 0;
+      let UNIQUE_CHECK_CACHE = localStorage.getItem("UNIQUE_CHECK_CACHE") || 0;
       const t = ts_ms();
-      if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 15e3) {
+      if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 11e3) {
         // 其他脚本正在运行
         window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
         return $.Deferred().resolve();
       }
       let timer_unique;
       const uniqueMark = () => {
-        timer_unique = setTimeout(uniqueMark, 10e3);
+        timer_unique = setTimeout(() => uniqueMark(), 10e3);
         UNIQUE_CHECK_CACHE = ts_ms();
-        GM_setValue("UNIQUE_CHECK_CACHE", UNIQUE_CHECK_CACHE)
+        localStorage.setItem("UNIQUE_CHECK_CACHE", UNIQUE_CHECK_CACHE)
       };
-      window.addEventListener('unload', () => {
-        if (timer_unique) {
-          clearTimeout(timer_unique);
-          GM_setValue("UNIQUE_CHECK_CACHE", 0)
-        }
+      W.addEventListener('unload', () => {
+        localStorage.setItem("UNIQUE_CHECK_CACHE", 0)
       });
       uniqueMark();
     } catch (e) {
