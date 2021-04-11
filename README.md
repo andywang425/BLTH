@@ -176,6 +176,7 @@
 ## 已知问题
 1. [#12](https://github.com/andywang425/BLTH/issues/12)  
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后。  
+开启`简化直播间`功能后聊天栏顶部的日志文字无法正确地被隐藏/显示成黄色，不过不影响使用。
 2. 脚本每次更新后第一次运行可能会不工作，`shift+F5`刷新一下页面即可。  
 
 -------------------------------
@@ -213,13 +214,37 @@
 -------------------------------
 
 ## 鸣谢
-[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)，[酷推](https://cp.xuthus.cc)  
+[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)，[酷推](https://cp.xuthus.cc)，[冰冰羊](https://space.bilibili.com/261593393)  
 以及所有提出过建议的用户。
 
 -------------------------------
 
 ## 更新日志
->### 5.6.6.5
->1.修复天选时刻运行一段时间后卡死的bug。2.修复天选时刻【忽略粉丝数小于__的UP的天选】不能为0的bug。
+>### 5.6.6.6
+>1.使用多种API来获取房间号对应uid，降低被风控的可能性。2.修复获取关注分组信息时卡死的bug。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/assets/markdown/update-log.md)。  
+
+-------------------------------
+
+## 相关推荐
+
+### Bilibili-Evolved
+作者：[the1812](https://github.com/the1812)
++ [Github](https://github.com/the1812/Bilibili-Evolved)  
+
+强大的哔哩哔哩增强脚本: 下载视频, 音乐, 封面, 弹幕 / 简化直播间, 评论区, 首页 / 自定义顶栏, 删除广告, 夜间模式 / 触屏设备支持。
+
+### bilibili直播净化
+作者：[lzghzr](https://github.com/lzghzr)
++ [Github](https://github.com/lzghzr/TampermonkeyJS/raw/master/BiLiveNoVIP/BiLiveNoVIP.user.js)
++ [GreasyFork](https://greasyfork.org/zh-CN/scripts/21416-bilibili%E7%9B%B4%E6%92%AD%E5%87%80%E5%8C%96)  
+
+屏蔽聊天室礼物以及关键字，净化聊天室环境。
+
+### 哔站直播全裸2233娘
+作者：[journey-ad](https://gist.github.com/journey-ad)
++ [Github](https://gist.github.com/journey-ad/5d3021fd40db75de2df827b876ef5b7e)
++ [GreasyFork](https://greasyfork.org/zh-CN/scripts/369477-%E5%93%94%E7%AB%99%E7%9B%B4%E6%92%AD%E5%85%A8%E8%A3%B82233%E5%A8%98)  
+
+哔站直播间的2233娘挂件替换为全裸版本。

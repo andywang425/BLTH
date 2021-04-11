@@ -1095,7 +1095,7 @@ var BAPI = {
             return BAPI.ajax({
                 url: 'xlive/web-room/v1/index/getRoomBaseInfo',
                 data: {
-                    room_ids: room_ids,//roomid
+                    room_ids: room_ids, // roomid
                     req_biz: req_biz
                 }
             });

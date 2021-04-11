@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.6.5
+// @version        5.6.6.6
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -740,8 +740,8 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "修复天选时刻运行一段时间后卡死的bug。",
-              "修复天选时刻【忽略粉丝数小于__的UP的天选】不能为0的bug。"
+              "使用多种API来获取房间号对应uid，降低被风控的可能性。",
+              "修复获取关注分组信息时卡死的bug。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -3303,9 +3303,9 @@
         sendRemainGift: async (ROOM_ID) => {
           if (ROOM_ID == 0) return $.Deferred().resolve();
           let UID = undefined;
-          await BAPI.live_user.get_anchor_in_room(ROOM_ID).then((response) => {
-            MYDEBUG('API.live_user.get_anchor_in_room', response);
-            if (response.data.info.uid) UID = response.data.info.uid;
+          await BAPI.room.room_init(ROOM_ID).then((response) => {
+            MYDEBUG('API.room.room_init', response);
+            if (response.code === 0) UID = response.data.uid;
             else {
               window.toast('[自动送礼]【剩余礼物】检查房间出错');
               return $.Deferred().reject();
@@ -4324,7 +4324,7 @@
                 MY_API.AnchorLottery.uidInSpecialTag.push(String(up.mid));
               }
               if (response.data.length < ps) return p.resolve();
-              return delayCall(MY_API.AnchorLottery.getUpInSpecialTag(myuid, tagid, pn + 1, ps), 100);
+              return delayCall(() => MY_API.AnchorLottery.getUpInSpecialTag(myuid, tagid, pn + 1, ps), 100);
             } else {
               window.toast(`获取特别关注关注列表出错 ${response.message}`, 'error');
               return p.reject();
@@ -4563,7 +4563,7 @@
             uploadRawJson.msg = MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT;
           function updateEncodeData(roomId, str) {
             return BAPI.room.update(roomId, str).then((re) => {
-              MYDEBUG(`BAPI.room.update MY_API.AnchorLottery.myLiveRoomid encode64(uploadRawStr)`, re);
+              MYDEBUG(`API.room.update MY_API.AnchorLottery.myLiveRoomid`, re);
               if (re.code === 0) {
                 MY_API.chatLog(`[天选时刻] 房间列表上传成功（共${MY_API.AnchorLottery.lotteryResponseList.length}个房间）`, 'success');
                 MY_API.AnchorLottery.oldLotteryResponseList = [...MY_API.AnchorLottery.lotteryResponseList];
@@ -5372,17 +5372,18 @@
          */
         getAnchorUid: (roomid) => {
           if (MY_API.AnchorLottery.roomidAndUid.hasOwnProperty(roomid)) return $.Deferred().resolve(MY_API.AnchorLottery.roomidAndUid[roomid]);
-          return BAPI.live_user.get_anchor_in_room(roomid).then((response) => {
-            MYDEBUG(`API.live_user.get_anchor_in_room(${roomid}) getAnchorUid`, response);
+          return BAPI.room.getRoomBaseInfo(roomid).then((response) => { // mark
+            MYDEBUG(`API.room.getRoomBaseInfo(${roomid}) getAnchorUid`, response);
             if (response.code === 0) {
-              MY_API.AnchorLottery.roomidAndUid[roomid] = response.data.info.uid;
-              return response.data.info.uid;
+              const uid = response.data.by_room_ids[roomid].uid;
+              MY_API.AnchorLottery.roomidAndUid[roomid] = uid;
+              return uid;
             } else {
-              MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}<br>${response.msg}`, 'error');
+              MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}<br>${response.message}`, 'error');
               return -1
             }
           }, () => {
-            MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}，${response.msg}<br>请检查网络`, 'error');
+            MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}，${response.message}<br>请检查网络`, 'error');
             return -1
           })
         },
