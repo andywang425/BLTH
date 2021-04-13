@@ -3176,7 +3176,7 @@
            * @param {Object} MY_API.Gift.medal_list 
            */
           const handleMedalList = () => {
-            MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(it => it.day_limit - it.today_feed > 0 && it.level < 20);
+            MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(it => it.day_limit - it.today_feed > 0 && it.level < 20 && r.roomid);
             MY_API.Gift.medal_list = MY_API.Gift.sort_medals(MY_API.Gift.medal_list);
             // 排除直播间
             if (MY_API.CONFIG.GIFT_SEND_METHOD === "GIFT_SEND_BLACK") {
@@ -3540,7 +3540,7 @@
           if (funsMedals !== undefined && funsMedals.response.status === 200)
             if (funsMedals.body.code === 0)
               if (funsMedals.body.data.length > 0)
-                return funsMedals.body.data;
+                return funsMedals.body.data.filter(m => m.room_id !== 0);
         },
         getGiftNum: async () => {
           let todayHeart = 0;
@@ -3867,9 +3867,9 @@
           medalDanmuRunning = true;
           let lightMedalList;
           if (MY_API.CONFIG.MEDAL_DANMU_METHOD === 'MEDAL_DANMU_WHITE')
-            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1 && r.medal_level <= 20);
+            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1 && r.medal_level <= 20 && r.roomid);
           else {
-            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) === -1 && r.medal_level <= 20);
+            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) === -1 && r.medal_level <= 20 && r.roomid);
           }
           MYDEBUG('[粉丝牌打卡] 过滤后的粉丝勋章房间列表', lightMedalList);
           let danmuContentIndex = 0;
@@ -4825,7 +4825,7 @@
         },
         check: (roomid, uid) => {
           if (MY_API.CONFIG.ANCHOR_IGNORE_ROOM && findVal(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST, roomid) > -1) {
-            MY_API.chatLog(`[天选时刻] 忽略直播间<br>不参加直播间${linkMsg(roomid, liveRoomUrl + roomid)}的天选`, 'warning');
+            MY_API.chatLog(`[天选时刻] 忽略直播间<br>不参加直播间${linkMsg(roomid, liveRoomUrl + roomid)}的天选<br>id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>`, 'warning');
             return $.Deferred().resolve();
           }
           return BAPI.xlive.anchor.check(roomid).then((response) => {
