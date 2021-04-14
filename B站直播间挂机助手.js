@@ -201,18 +201,20 @@
     linkMsg = (msg, link) => '<a href="' + link + '"target="_blank" style="color:">' + msg + '</a>',
     liveRoomUrl = 'https://live.bilibili.com/',
     upperNum = { 0: ")", 1: "!", 2: "@", 3: "#", 4: "$", 5: "%", 6: "^", 7: "7", 8: "*", 9: "(" },
-    isRegexp = /^\/.+\/[i|g|m]?$/;
-  let SP_CONFIG = GM_getValue("SP_CONFIG") || {
-    showEula: true, // 显示EULA
-    storageLastFixVersion: "0", // 上次修复设置的版本
-    mainDisplay: 'show', // UI隐藏开关
-    debugSwitch: false, // 控制台日志开关
-    windowToast: true, // 右上提示信息
-    nosleep: true, // 屏蔽挂机检测
-    invisibleEnter: false, // 隐身入场
-    banP2p: false, // 禁止p2p上传
-    lastShowUpdateMsgVersion: "0" // 上次显示更新信息的版本
-  },
+    isRegexp = /^\/.+\/[i|g|m]?$/,
+    SP_CONFIG_DEFAULT = {
+      showEula: true, // 显示EULA
+      storageLastFixVersion: "0", // 上次修复设置的版本
+      mainDisplay: 'show', // UI隐藏开关
+      debugSwitch: false, // 控制台日志开关
+      windowToast: true, // 右上提示信息
+      nosleep: true, // 屏蔽挂机检测
+      invisibleEnter: false, // 隐身入场
+      banP2p: false, // 禁止p2p上传
+      lastShowUpdateMsgVersion: "0", // 上次显示更新信息的版本
+      DANMU_MODIFY: false // 修改弹幕
+    };
+  let SP_CONFIG = GM_getValue("SP_CONFIG") || {},
     winPrizeNum = 0,
     winPrizeTotalCount = 0,
     SEND_GIFT_NOW = false, // 立刻送出礼物
@@ -271,7 +273,11 @@
   $(function () {
     // 若 window 下无 BilibiliLive，则说明页面有 iframe，此时脚本在在 top 中运行 或 发生错误
     if (W.BilibiliLive === undefined) return;
+    // 初始化右上角提示信息弹窗
     newWindow.init();
+    // 初始化特殊设置
+    let spConfig = SP_CONFIG_DEFAULT;
+    SP_CONFIG = $.extend(true, spConfig, SP_CONFIG);
     if (SP_CONFIG.nosleep) {
       function mouseMove() {
         MYDEBUG('屏蔽挂机检测', "触发一次MouseEvent(mousemove)")
@@ -479,7 +485,6 @@
         DANMU_CONTENT: ["这是一条弹幕"], // 弹幕内容
         DANMU_ROOMID: ["22474988"], // 发弹幕房间号
         DANMU_INTERVAL_TIME: ["10m"], // 弹幕发送时间
-        DANMU_MODIFY: false, // 修改弹幕
         DANMU_MODIFY_REGEX: "/^【/",// 匹配弹幕 正则字符串
         DANMU_MODIFY_UID: 0, // 匹配弹幕 UID
         DANMU_MODIFY_POOL: 4, // 修改弹幕 弹幕池
@@ -562,14 +567,15 @@
         last_aid: 729, // 实物抽奖最后一个有效aid
         MedalDanmu_TS: 0 //粉丝勋章打卡
       },
-      CONFIG: {},
-      CACHE: {},
-      GIFT_COUNT: {
-        COUNT: 0, //辣条（目前没用）
+      GIFT_COUNT_DEFAULT: {
+        COUNT: 0, // 辣条（目前没用）
         ANCHOR_COUNT: 0, // 天选
         MATERIAL_COUNT: 0, // 实物
         CLEAR_TS: 0, // 重置统计
       },
+      CONFIG: {},
+      CACHE: {},
+      GIFT_COUNT: {},
       init: () => {
         addStyle();
         const tabList = $('.tab-list.dp-flex'),
@@ -712,11 +718,8 @@
         // 加载配置函数
         let p = $.Deferred();
         try {
-          const config = GM_getValue("CONFIG");
-          $.extend(true, MY_API.CONFIG, MY_API.CONFIG_DEFAULT);
-          for (const item in MY_API.CONFIG) {
-            if (config[item] !== undefined && config[item] !== null) MY_API.CONFIG[item] = config[item];
-          }
+          let config = MY_API.CONFIG_DEFAULT;
+          MY_API.CONFIG = $.extend(true, config, GM_getValue("CONFIG") || {});
           // 载入礼物统计
           MY_API.loadGiftCount();
           p.resolve()
@@ -731,11 +734,8 @@
         // 加载CACHE
         let p = $.Deferred();
         try {
-          const cache = GM_getValue("CACHE");
-          $.extend(true, MY_API.CACHE, MY_API.CACHE_DEFAULT);
-          for (const item in MY_API.CACHE) {
-            if (cache[item] !== undefined && cache[item] !== null) MY_API.CACHE[item] = cache[item];
-          }
+          let cache = MY_API.CACHE_DEFAULT;
+          MY_API.CACHE = $.extend(true, cache, GM_getValue("CACHE") || {});
           p.resolve()
         } catch (e) {
           MYDEBUG('CACHE载入配置失败，加载默认配置', e);
@@ -826,11 +826,8 @@
       },
       loadGiftCount: () => { // 读取统计数量
         try {
-          const config = GM_getValue("GIFT_COUNT");
-          for (const item in MY_API.GIFT_COUNT) {
-            if (!MY_API.GIFT_COUNT.hasOwnProperty(item)) continue;
-            if (config[item] !== undefined && config[item] !== null) MY_API.GIFT_COUNT[item] = config[item];
-          }
+          let giftCount = MY_API.GIFT_COUNT_DEFAULT ;
+          MY_API.GIFT_COUNT = $.extend(true, giftCount, GM_getValue("GIFT_COUNT") || {});
           MYDEBUG('MY_API.GIFT_COUNT', MY_API.GIFT_COUNT);
         } catch (e) {
           MYDEBUG('读取统计失败', e);
@@ -2138,7 +2135,7 @@
           });
         }
         let mutationObserver = new MutationObserver(bodyPropertyChange);
-        const options = { attributes: true};
+        const options = { attributes: true };
         mutationObserver.observe(body[0], options);
         // 添加隐藏/显示窗口按钮
         $('.attention-btn-ctnr').append(btn);
