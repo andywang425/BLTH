@@ -1,17 +1,19 @@
 // ==UserScript==
 // @name         bliveproxy
 // @namespace    https://github.com/xfgryujk
-// @version      0.1
+// @version      0.2
 // @description  B站直播websocket hook框架
 // @author       xfgryujk
 // @include      /https?:\/\/live\.bilibili\.com\/?\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/\d+\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*/
 // @require      https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.10/pako.min.js
-// @grant        none
+// @grant        unsafeWindow
 // ==/UserScript==
 
 (function () {
+  const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
+
   const HEADER_SIZE = 16
 
   const WS_BODY_PROTOCOL_VERSION_INFLATE = 0
@@ -53,7 +55,7 @@
       this._commandHandlers[cmd] = handlers.filter(item => item !== handler)
     },
     hook() {
-      window.WebSocket = new Proxy(window.WebSocket, {
+      W.WebSocket = new Proxy(window.WebSocket, {
         construct(target, args) {
           let obj = new target(...args)
           return new Proxy(obj, proxyHandler)
