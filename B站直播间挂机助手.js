@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.7
+// @version        5.6.7.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -755,11 +755,7 @@
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
               "<strong>注意：四月底Server酱旧版停运，请及时更换推送方式。详见sc.ftqq.com。</strong>",
-              "修复部分粉丝牌无对应直播间导致送礼/打卡弹幕/获取小心心出错的bug。",
-              "修复b站直播间更新导致的全屏后脚本控制面板不隐藏/日志窗口位置不变化的bug。",
-              "部分设置支持填写JavaScript正则表达式。",
-              "优化了载入配置/缓存的效率。",
-              "弹幕设置里新增【弹幕修改】功能。"
+              "修复天选时刻关键字失效的bug。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -5024,7 +5020,7 @@
               if (MY_API.CONFIG.ANCHOR_IGNORE_BLACKLIST) {
                 // 忽略关键字
                 for (const str of MY_API.CONFIG.ANCHOR_BLACKLIST_WORD) {
-                  if (!/^\/.+\/[i|g|m]?$/) {
+                  if (!isRegexp.test(str)) {
                     if (response.data.award_name.toLowerCase().indexOf(str.toLowerCase()) > -1) {
                       MY_API.chatLog(`[天选时刻] 忽略存疑天选<br>roomid = ${linkMsg(roomid, liveRoomUrl + roomid)}, id = ${response.data.id}<br>奖品名：${response.data.award_name}<br>含有关键字：${str}<br>${response.data.require_text === '无' ? '' : '参加条件：' + response.data.require_text + '<br>'}${joinPrice === 0 ? '无需金瓜子' : "所需金瓜子：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(response.data.time)}${joinHtml()}`, 'warning');
                       joinAnchorListener();
