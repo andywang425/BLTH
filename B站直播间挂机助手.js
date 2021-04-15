@@ -5663,15 +5663,16 @@
             let regex,
               uid = info[2][0],
               danmu = info[1];
-            try { regex = eval(MY_API.CONFIG.DANMU_MODIFY_REGEX[i]) }
-            catch (e) { MYDEBUG('bliveproxy', `正则表达式出错 ${MY_API.CONFIG.DANMU_MODIFY_REGEX}`); regex = /^【/; }
-            if (regex.test(danmu) || MY_API.CONFIG.DANMU_MODIFY_UID == uid) return i;
+            try { regex = eval(MY_API.DANMU_MODIFY.configJson.DANMU_MODIFY_REGEX[i]) }
+            catch (e) { MYDEBUG('bliveproxy', `正则表达式出错 ${MY_API.DANMU_MODIFY.configJson.DANMU_MODIFY_REGEX[i]}`); regex = /^【/; }
+            if (regex.test(danmu) || MY_API.DANMU_MODIFY.configJson.DANMU_MODIFY_UID[i] == uid) return i;
           }
           return -1;
         },
         run: () => {
           if (!MY_API.CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
           MY_API.DANMU_MODIFY.handleConfig();
+          console.log('MY_API.DANMU_MODIFY.configJson', MY_API.DANMU_MODIFY.configJson)
           bliveproxy.addCommandHandler('DANMU_MSG', command => {
             if (!MY_API.CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
             let info = command.info;
