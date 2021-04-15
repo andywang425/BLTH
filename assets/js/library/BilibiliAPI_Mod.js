@@ -1344,7 +1344,7 @@ var BAPI = {
             return BAPI.ajax({
                 url: 'xlive/web-room/v1/index/getDanmuInfo',
                 data: {
-                    id: id,//roomid
+                    id: id, // roomid
                     type: type
                 }
             });
