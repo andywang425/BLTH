@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.0.2 or later
-// @version        5.6.7.1
+// @version        5.6.7.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-end
 // @connect        passport.bilibili.com
@@ -28,9 +28,10 @@
 // @connect        push.xuthus.cc
 // @connect        sctapi.ftqq.com
 // @connect        cdn.jsdelivr.net
+// @connect        raw.fastgit.org
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
 // @require        https://code.jquery.com/jquery-3.6.0.min.js
-// @require        https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.10/pako.min.js
+// @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@560749f86282ecd90f76ffb8d4e9e85bcee3d576/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/layer.min.js
@@ -755,7 +756,11 @@
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
               "<strong>注意：四月底Server酱旧版停运，请及时更换推送方式。详见sc.ftqq.com。</strong>",
-              "修复天选时刻关键字失效的bug。"
+              "优化点亮勋章失败后的处理逻辑。",
+              "修复自动送礼失败的bug。",
+              "pako.js换源至jsdelivr，防止有用户连不上cloudflare。",
+              "notice.json改为通过fastgit获取。",
+              "修复关闭天选时刻忽略关键字弹窗时使用了未定义的index的问题。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1775,7 +1780,7 @@
                     title: '添加天选时刻云端关键字',
                     btn: ['添加', '取消']
                   },
-                    function () {
+                    function (index) {
                       MY_API.CONFIG.ANCHOR_BLACKLIST_WORD = [...new Set([...localWords, ...newWords])];
                       MY_API.saveConfig(false);
                       layer.msg('已添加天选时刻云端关键字', {
@@ -3127,6 +3132,7 @@
                   break;
                 } else {
                   window.toast(`[自动送礼]勋章[${m.medalName}]点亮失败【${rsp.msg}】`, 'caution');
+                  break;
                 }
               }
             }
@@ -3237,7 +3243,7 @@
            * @param {Object} MY_API.Gift.medal_list 
            */
           const handleMedalList = () => {
-            MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(it => it.day_limit - it.today_feed > 0 && it.level < 20 && r.roomid);
+            MY_API.Gift.medal_list = MY_API.Gift.medal_list.filter(it => it.day_limit - it.today_feed > 0 && it.level < 20 && it.roomid);
             MY_API.Gift.medal_list = MY_API.Gift.sort_medals(MY_API.Gift.medal_list);
             // 排除直播间
             if (MY_API.CONFIG.GIFT_SEND_METHOD === "GIFT_SEND_BLACK") {
@@ -5668,7 +5674,7 @@
         run: () => {
           if (!MY_API.CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
           MY_API.DANMU_MODIFY.handleConfig();
-          console.log('MY_API.DANMU_MODIFY.configJson', MY_API.DANMU_MODIFY.configJson)
+          // MYDEBUG('MY_API.DANMU_MODIFY.configJson', MY_API.DANMU_MODIFY.configJson);
           bliveproxy.addCommandHandler('DANMU_MSG', command => {
             if (!MY_API.CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
             let info = command.info;
@@ -5839,11 +5845,23 @@
   }
   function checkUpdate(version) {
     if (!checkNewDay(noticeJson.lastCheckUpdateTs)) return;
+    const headers = {
+      "Accept": `text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9`,
+      "Upgrade-Insecure-Requests": "1",
+      "Referer": "https://hub.fastgit.org/andywang425/BLTH/blob/master/assets/json/notice.min.json",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7"
+    };
     XHR({
       GM: true,
       anonymous: true,
       method: "GET",
-      url: "https://cdn.jsdelivr.net/gh/andywang425/BLTH/assets/json/notice.min.json",
+      url: "https://raw.fastgit.org/andywang425/BLTH/master/assets/json/notice.min.json",
+      headers: headers,
       responseType: "json"
     }).then(response => {
       MYDEBUG("检查更新 checkUpdate", response);
@@ -5992,7 +6010,7 @@
     if (API.CONFIG.GIFT_SORT == 'high') API.CONFIG.GIFT_SORT = 'GIFT_SORT_HIGH';
     else if (API.CONFIG.GIFT_SORT == 'low') API.CONFIG.GIFT_SORT = 'GIFT_SORT_LOW'
     // 修复CACHE
-    const cache = GM_getValue(`CACHE`);
+    const cache = GM_getValue(`CACHE`) || {};
     const cacheFixList = [['materialobject_ts', 'MaterialObject_TS'], ['medalDanmu_TS', 'MedalDanmu_TS']];
     for (const i of cacheFixList) {
       if (cache.hasOwnProperty(i[0])) API.CACHE[i[1]] = cache[i[0]];

@@ -111,6 +111,12 @@
 <li>送出将在指定时间内过期的礼物</li>
 </ul>
 </details>
+<details>
+<summary>弹幕修改</summary>
+<ul>
+<li>改变特定弹幕的显示位置/大小/颜色，优化直播弹幕体验</li>
+</ul>
+</details>
 <li>自动获取小心心</li>
 <li>银瓜子换硬币</li>
 <li>直播区签到</li>
@@ -222,8 +228,8 @@
 -------------------------------
 
 ## 更新日志
->### 5.6.7.1
->1.修复天选时刻关键字失效的bug。
+>### 5.6.7.2
+>1.优化点亮勋章失败后的处理逻辑。2.修复自动送礼失败的bug。3.pako.js换源至jsdelivr，防止有用户连不上cloudflare。4.notice.json改为通过fastgit获取。5.修复关闭天选时刻忽略关键字弹窗时使用了未定义的index的问题。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/assets/markdown/update-log.md)。  
 
