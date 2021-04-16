@@ -28,6 +28,7 @@
 // @connect        push.xuthus.cc
 // @connect        sctapi.ftqq.com
 // @connect        cdn.jsdelivr.net
+// @connect        raw.fastgit.org
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
 // @require        https://code.jquery.com/jquery-3.6.0.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
@@ -758,7 +759,8 @@
               "优化点亮勋章失败后的处理逻辑。",
               "修复自动送礼失败的bug。",
               "pako.js换源至jsdelivr，防止有用户连不上cloudflare。",
-              "notice.json改为通过fastgit获取。"
+              "notice.json改为通过fastgit获取。",
+              "修复关闭天选时刻忽略关键字弹窗时使用了未定义的index的问题。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1778,7 +1780,7 @@
                     title: '添加天选时刻云端关键字',
                     btn: ['添加', '取消']
                   },
-                    function () {
+                    function (index) {
                       MY_API.CONFIG.ANCHOR_BLACKLIST_WORD = [...new Set([...localWords, ...newWords])];
                       MY_API.saveConfig(false);
                       layer.msg('已添加天选时刻云端关键字', {
@@ -5843,11 +5845,23 @@
   }
   function checkUpdate(version) {
     if (!checkNewDay(noticeJson.lastCheckUpdateTs)) return;
+    const headers = {
+      "Accept": `text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9`,
+      "Upgrade-Insecure-Requests": "1",
+      "Referer": "https://hub.fastgit.org/andywang425/BLTH/blob/master/assets/json/notice.min.json",
+      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-User": "?1",
+      "Sec-Fetch-Dest": "document",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7"
+    };
     XHR({
       GM: true,
       anonymous: true,
       method: "GET",
       url: "https://raw.fastgit.org/andywang425/BLTH/master/assets/json/notice.min.json",
+      headers: headers,
       responseType: "json"
     }).then(response => {
       MYDEBUG("检查更新 checkUpdate", response);
