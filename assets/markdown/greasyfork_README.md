@@ -108,6 +108,12 @@
 <li>送出将在指定时间内过期的礼物</li>
 </ul>
 </details>
+<details>
+<summary>弹幕修改</summary>
+<ul>
+<li>改变特定弹幕的显示位置/大小/颜色，优化直播弹幕体验</li>
+</ul>
+</details>
 <li>自动获取小心心</li>
 <li>银瓜子换硬币</li>
 <li>直播区签到</li>
