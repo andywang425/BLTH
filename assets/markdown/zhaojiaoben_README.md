@@ -1,5 +1,5 @@
 <p align ="center"><img src="https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"></p>
-<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.10-pass-green.svg" alt="TamperMonkey 4.10"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"></a> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a></p>
+<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.12-pass-green.svg" alt="TamperMonkey 4.12"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"></a> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a></p>
 <p align="center"><a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437(已满)-yellow" alt="QQ Group"></a> <a href="https://jq.qq.com/?_wv=1027&k=Bf951teI"><img src="https://img.shields.io/badge/QQ%20Group-907502444-brightgreen" alt="QQ Group"></a></p>
 <h1 align="center">B站直播间挂机助手</h1>
 
@@ -179,6 +179,7 @@
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后。  
 开启`简化直播间`功能后聊天栏顶部的日志文字无法正确地被隐藏/显示成黄色，不过不影响使用。
 2. 脚本每次更新后第一次运行可能会不工作，`shift+F5`刷新一下页面即可。   
+3. 可能和[SteamWebIntegration](https://github.com/Revadike/SteamWebIntegration)存在冲突导致同时运行时页面无响应。可以在SteamWebIntegration的设置中把B站直播间添加到黑名单。  
 
 -------------------------------
 
@@ -217,7 +218,7 @@
 -------------------------------
 
 ## 鸣谢
-[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)，[酷推](https://cp.xuthus.cc)，[冰冰羊](https://space.bilibili.com/261593393)  
+[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)，[酷推](https://cp.xuthus.cc)，[冰冰羊](https://space.bilibili.com/261593393)，[xfgryujk](https://github.com/xfgryujk)  
 以及所有提出过建议的用户。
 
 -------------------------------
