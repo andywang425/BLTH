@@ -754,7 +754,8 @@
               "修复部分用户开启【从已关注且正在直播的直播间获取天选时刻数据】后报错并卡死的bug。",
               "微调了一些需要每天定时运行的任务的运行时间。",
               "修复开启【忽略直播间】后无法正确显示相关日志的bug。",
-              "修复检查更新失败时报错的问题。"
+              "修复检查更新失败时报错的问题。",
+              "白名单内UP不再被移入BLTH天选关注/中奖UP分组。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1354,7 +1355,7 @@
           ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<mh3>注意：</mh3><mul><mli>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</mli></mul>",
           ANCHOR_TYPE_LIVEROOM: "因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://live.bilibili.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<mul><mli>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</mli><mli>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</mli><mli><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</mli></mul>",
           ANCHOR_PRIVATE_LETTER: "若中奖，会在开奖后10秒发送私信。<mul><mli>建议改一下私信内容，不要和默认值完全一样。</mli></mul>",
-          ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli>白名单内UP不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+          ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli>白名单内UP不会被移入该分组，即使在分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           RANDOM_DELAY: "抽奖前额外等待一段时间。<mul><mli>可以填小数。</mli></mul>",
           RANDOM_SKIP: "随机忽略一部分抽奖。<mul><mli>可以填小数。</mli></mul>",
           ANCHOR_CHECK_INTERVAL: "检查完一轮天选后等待的时间。<mul><mli>可以填小数。</mli></mul>",
@@ -1362,7 +1363,7 @@
           MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间发弹幕。</mli><mli>黑名单：给房间列表以外的直播间发弹幕。</mli><mli>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</mli></mul>",
           topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，每天0点时重置。</mli><mli><strong>支持输入框回车保存。</strong></mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
-          ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli>白名单内UP不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+          ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli>白名单内UP不会被移入该分组，即使在分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           debugSwitch: "开启或关闭控制台日志(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
           UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
           ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
@@ -2253,7 +2254,6 @@
           layerLogWindow.scrollTop(layerLogWindow.prop("scrollHeight"));
       },
       blocked: false,
-      max_blocked: false,
       listen: (roomId, uid, area = '本直播间') => {
         BAPI.room.getConf(roomId).then((response) => {
           MYDEBUG(`获取弹幕服务器信息 ${area}`, response);
@@ -2269,7 +2269,7 @@
               wst.close();
               MY_API.chatLog(`进了小黑屋主动与弹幕服务器断开连接-${area}`, 'warning')
             }
-            if (MY_API.max_blocked && !MY_API.CONFIG.STORM) {
+            if (!MY_API.CONFIG.STORM) {
               wst.close();
               MY_API.chatLog(`辣条最大值主动与弹幕服务器断开连接-${area}`, 'warning')
             }
@@ -2373,7 +2373,7 @@
       auto_danmu_list: ["(=・ω・=)", "（￣▽￣）", "nice", "666", "kksk", "(⌒▽⌒)", "(｀・ω・´)", "╮(￣▽￣)╭", "(￣3￣)", "Σ( ￣□￣||)",
         "(^・ω・^ )", "_(:3」∠)_"], // 共12个
       checkRoom: function (roomId, area = '本直播间') {
-        if (MY_API.blocked || MY_API.max_blocked) {
+        if (MY_API.blocked) {
           return
         }
         if (MY_API.RoomId_list.indexOf(roomId) > -1) { // 防止重复检查直播间
@@ -5394,8 +5394,9 @@
                 if (data.require_type === 1 && MY_API.CONFIG.ANCHOR_MOVETO_FOLLOW_TAG) { // 有关注要求
                   if (findVal(MY_API.AnchorLottery.uidInOriginTag, data.uid) > -1 && findVal(MY_API.AnchorLottery.uidInSpecialTag, data.uid) > -1) return; // 之前在默认/特别分组，不移动
                   setTimeout(() => {
-                    if (findVal(MY_API.AnchorLottery.BLTHprizeList, data.uid) === -1 && findVal(MY_API.AnchorLottery.BLTHfollowList, data.uid) === -1) {
-                      // 该UP不在中奖分组/关注分组才移动
+                    const id_list = GM_getValue(`AnchorFollowingList`) || []; // 白名单
+                    if (findVal(id_list, data.uid) === -1 && findVal(MY_API.AnchorLottery.BLTHprizeList, data.uid) === -1 && findVal(MY_API.AnchorLottery.BLTHfollowList, data.uid) === -1) {
+                      // 该UP不在中奖分组/关注分组/白名单才移动
                       BAPI.relation.addUsers(data.uid, MY_API.AnchorLottery.anchorFollowTagid).then((re) => {
                         MYDEBUG(`API.relation.addUsers ${data.uid} ${MY_API.AnchorLottery.anchorFollowTagid}`, re);
                         MY_API.AnchorLottery.BLTHfollowList.push(data.uid);
@@ -5796,7 +5797,7 @@
       });
       if (API.CONFIG.CHECK_HOUR_ROOM) {
         let check_top_room = async () => { // 检查小时榜房间
-          if (API.blocked || API.max_blocked) { // 如果被禁用则停止
+          if (API.blocked) { // 如果被禁用则停止
             if (API.blocked) {
               API.chatLog('进入小黑屋检查小时榜已停止运行');
               clearInterval(check_timer);
