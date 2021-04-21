@@ -3,8 +3,8 @@
 // @name:en        B站直播间挂机助手
 // @namespace      https://github.com/andywang425
 // @author         andywang425
-// @description    自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章
-// @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章
+// @description    自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章，优化弹幕体验
+// @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章，优化弹幕体验
 // @updateURL      https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH
@@ -767,7 +767,7 @@
               content: `<mol>${mliHtml}</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
-                也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437（已满）')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444')}
+                也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444（新）')}
                 </em>`
             });
             SP_CONFIG.lastShowUpdateMsgVersion = version;
@@ -980,7 +980,7 @@
         function layerOpenAbout() {
           return layer.open({
             title: `版本${GM_info.script.version}`,
-            content: `<h3 style="text-align:center">B站直播间挂机助手</h3>作者：${linkMsg("https://github.com/andywang425/", "andywang425")}<br>许可证：${linkMsg("https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE", "MIT")}<br>github项目地址：${linkMsg("https://github.com/andywang425/BLTH", "BLTH")}<br>反馈：${linkMsg("https://github.com/andywang425/BLTH/issues", "BLTH/issues")}<br>交流qq群：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437（已满）')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444')}<br>`
+            content: `<h3 style="text-align:center">B站直播间挂机助手</h3>作者：${linkMsg("https://github.com/andywang425/", "andywang425")}<br>许可证：${linkMsg("https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE", "MIT")}<br>github项目地址：${linkMsg("https://github.com/andywang425/BLTH", "BLTH")}<br>反馈：${linkMsg("https://github.com/andywang425/BLTH/issues", "BLTH/issues")}<br>交流qq群：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444（新）')}<br>`
           });
         };
         const saveAction = (div) => {
@@ -4519,17 +4519,17 @@
           });
           const checkHourRank = async () => { // 小时榜
             for (const r of roomList) {
-              await BAPI.rankdb.getTopRealTimeHour(r.id).then((data) => {
-                MYDEBUG(`API.rankdb.getTopRealTimeHour(${r.id})`, data);
-                if (data.code === 0) {
-                  const list = data.data.list;
+              await BAPI.rankdb.getTopRealTimeHour(r.id).then((response) => {
+                MYDEBUG(`API.rankdb.getTopRealTimeHour(${r.id})`, response);
+                if (response.code === 0) {
+                  const list = response.data.list;
                   MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间`, 'info');
-                  MYDEBUG(`[天选时刻] 获取${r.name + '小时榜'}房间列表`, data);
+                  MYDEBUG(`[天选时刻] 获取${r.name + '小时榜'}房间列表`, response);
                   for (const i of list) {
                     addVal(MY_API.AnchorLottery.roomidList, i.roomid);
                   }
                 } else {
-                  MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间出错<br>${data.message}`, 'warning');
+                  MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间出错<br>${response.message}`, 'warning');
                 }
               }, () => {
                 MY_API.chatLog(`[天选时刻] 获取小时榜直播间出错，请检查网络`, 'error');
@@ -5112,13 +5112,13 @@
                     return false
                   });
                 }
-                case 3: { //大航海
+                case 3: { // 大航海
                   return BAPI.xlive.getInfoByUser(roomid).then((re) => {
                     MYDEBUG(`API.xlive.getInfoByUser ${roomid}`, re);
                     if (re.code === 0) {
                       const privilege_type = re.data.privilege.privilege_type;
                       if (privilege_type !== 0 && privilege_type <= response.data.require_value) {
-                        //0：未上船，1：总督，2：提督，3：舰长。若满足要求则返回数据
+                        // 0：未上船，1：总督，2：提督，3：舰长。若满足要求则返回数据
                         return defaultJoinData;
                       } else {
                         function getPrivilegeText(typeNum) {
@@ -5938,7 +5938,7 @@
    * @param val 数组中一个元素的值
    */
   function rmVal(arr, val) {
-    const index = arr.findIndex(v => v == val); // 类型不必相同
+    const index = findVal(arr, val);
     if (index > -1) return arr.splice(index, 1);
   }
   /**
@@ -5948,7 +5948,7 @@
    * @param  mode 1: unshift 2: push
    */
   function addVal(arr, val, mode = 1) {
-    const index = arr.findIndex(v => v == val); // 类型不必相同
+    const index = findVal(arr, val);
     if (index === -1) {
       if (mode === 1) return arr.unshift(val);
       else return arr.push(val);
@@ -5958,8 +5958,10 @@
    * 在一维数组中寻找相同元素
    * @param arr 数组
    * @param val 元素
+   * @returns index, 若不是数组返回 -1
    */
   function findVal(arr, val) {
+    if (!Array.isArray(arr)) return -1;
     return arr.findIndex(v => v == val); // 类型不必相同
   }
   /**
