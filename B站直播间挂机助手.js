@@ -35,7 +35,7 @@
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@560749f86282ecd90f76ffb8d4e9e85bcee3d576/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/layer.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@5ad2e628f2b77d5aada938e7f6732d0cf1a3fb27/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/layer.css
@@ -51,6 +51,9 @@
 // @grant          GM_setValue
 // @grant          GM_deleteValue
 // @grant          GM_addStyle
+// @grant          GM_getTab
+// @grant          GM_getTabs
+// @grant          GM_saveTab
 // ==/UserScript==
 
 (function () {
@@ -221,7 +224,8 @@
       blockLiveStream: false, // 拦截直播流
       blockliveDataUpdate: false // 拦截直播观看数据上报
     };
-  let SP_CONFIG = GM_getValue("SP_CONFIG") || {},
+  let otherScriptsRunningCheck = $.Deferred(),
+    SP_CONFIG = GM_getValue("SP_CONFIG") || {},
     winPrizeNum = 0,
     winPrizeTotalCount = 0,
     SEND_GIFT_NOW = false, // 立刻送出礼物
@@ -277,6 +281,10 @@
     }
     return this.replace(new RegExp(escapeRegExp(oldSubStr), 'g'), () => newSubStr);
   }
+
+  // 初始化特殊设置
+  mergeObject(SP_CONFIG, SP_CONFIG_DEFAULT);
+
   // 拦截直播流/数据上报，需要尽早
   if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate) {
     W.fetch = (...arg) => {
@@ -290,13 +298,13 @@
       }
     }
   }
+
+  // DOM加载完成后运行
   $(function () {
     // 若 window 下无 BilibiliLive，则说明页面有 iframe，此时脚本在在 top 中运行 或 发生错误
     if (W.BilibiliLive === undefined) return;
     // 初始化右上角提示信息弹窗
     newWindow.init();
-    // 初始化特殊设置
-    mergeObject(SP_CONFIG, SP_CONFIG_DEFAULT);
     if (SP_CONFIG.DANMU_MODIFY) {
       window.bliveproxy.hook();
       MYDEBUG('bliveproxy hook complete', window.bliveproxy);
@@ -315,8 +323,12 @@
             if (XHRconfig.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
               MYDEBUG('getInfoByUser request', XHRconfig);
               XHRconfig.url = '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser?room_id=22474988';
+            } else if (SP_CONFIG.blockliveDataUpdate && XHRconfig.url.includes('//data.bilibili.com/log')) {
+              console.log("XHRconfig", XHRconfig)
+              handler.resolve("ok")
+            } else {
+              handler.next(XHRconfig);
             }
-            handler.next(XHRconfig);
           },
           onResponse: async (response, handler) => {
             if (response.config.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
@@ -348,24 +360,18 @@
     }
     try {
       // 唯一运行检测
-      let UNIQUE_CHECK_CACHE = localStorage.getItem("UNIQUE_CHECK_CACHE") || 0;
-      const t = ts_ms();
-      if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 11e3) {
-        // 其他脚本正在运行
-        window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
-        return $.Deferred().resolve();
-      }
-      let timer_unique;
-      const uniqueMark = () => {
-        timer_unique = setTimeout(() => uniqueMark(), 10e3);
-        UNIQUE_CHECK_CACHE = ts_ms();
-        localStorage.setItem("UNIQUE_CHECK_CACHE", UNIQUE_CHECK_CACHE)
-      };
-      W.addEventListener('unload', () => {
-        clearTimeout(timer_unique);
-        localStorage.setItem("UNIQUE_CHECK_CACHE", 0);
+      GM_getTab(function (tabObj) {
+        GM_saveTab(tabObj); // 上传tab
+        GM_getTabs(function (tabsDatabase) {
+          let tabDatabaseLength = Object.keys(tabsDatabase).length;
+          if (tabDatabaseLength > 1) {
+            otherScriptsRunningCheck.reject();
+            return window.toast('有其他直播间页面的脚本正在运行，本页面脚本停止运行', 'caution');
+          } else {
+            otherScriptsRunningCheck.resolve();
+          }
+        });
       });
-      uniqueMark();
     } catch (e) {
       MYDEBUG('重复运行检测错误', e);
       return $.Deferred().reject();
@@ -425,7 +431,7 @@
         }
       }, delay);
     };
-    return loadInfo();
+    return otherScriptsRunningCheck.then(() => loadInfo());
   });
   function init() { // 初始化各项功能
     const MY_API = {
@@ -6036,6 +6042,7 @@
     }
     // localStorage fix
     localStorage.removeItem("im_deviceid_IGIFTMSG");
+    localStorage.removeItem("UNIQUE_CHECK_CACHE");
     // GM storage fix
     GM_deleteValue('AnchorRoomidList');
     // save settings
@@ -6096,12 +6103,23 @@
   }
   /**
    * 合并两个对象，只合并 obj1 中不包含（或为undefined, null）但 obj2 中有的属性 
+   * 删除 obj1 有但 obj2 中没有的属性
    */
   function mergeObject(obj1, obj2) {
-    for (let i in obj2) {
-      if (obj1[i] === null || obj1[i] === undefined) obj1[i] = obj2[i];
-      else if (!Array.isArray(obj1[i]) && typeof obj1[i] === 'object') mergeObject(obj1[i], obj2[i]);
+    function combine(object1, object2) {
+      for (let i in object2) {
+        if (object1[i] === undefined || object1[i] === null) object1[i] = object2[i];
+        else if (!Array.isArray(object1[i]) && typeof object1[i] === 'object') combine(object1[i], object2[i]);
+      }
     }
+    function del(object1, object2) {
+      for (let i in object1) {
+        if (object2[i] === undefined || object2[i] === null) delete object1[i];
+        else if (!Array.isArray(object1[i]) && typeof object1[i] === 'object') del(object1[i], object2[i]);
+      }
+    }
+    combine(obj1, obj2);
+    del(obj1, obj2);
   }
   /**
    * 保存文件到本地
