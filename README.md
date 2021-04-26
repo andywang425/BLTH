@@ -1,5 +1,5 @@
 <p align ="center"><img src="https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"></p>
-<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.12-pass-green.svg" alt="TamperMonkey 4.12"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a></p>
+<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.12-pass-green.svg" alt="TamperMonkey 4.12"> <img src="https://img.shields.io/badge/Chromium_90-pass-green.svg" alt="Chromium 90"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a></p>
 <p align="center"><a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437-yellow" alt="QQ Group"></a> <a href="https://jq.qq.com/?_wv=1027&k=Bf951teI"><img src="https://img.shields.io/badge/QQ%20Group-907502444(new)-brightgreen" alt="QQ Group"></a></p>
 <h1 align="center">B站直播间挂机助手</h1>
 
@@ -227,7 +227,7 @@
 
 ## 更新日志
 >### 5.6.7.4
->1.天选时刻不再将收集到的房间号储存到本地。2.修复部分情况下了脚本无法运行的bug。3.弃用Server酱旧版推送方式，新增推送加（pushplus）推送。4.修复部分设置项无法被正确保存以及导入配置时某些设置项无法被正确合并的bug。5.修复部分情况下layer报错导致脚本无法运行的bug。6.优化了唯一运行检测的方式。6.完善了【拦截直播观看数据上报】功能，新增xhr拦截规则。7.优化了重复运行检测。当检测到有其他直播间页面的挂机助手正在运行时禁用会导致冲突的功能。
+>1.天选时刻不再将收集到的房间号储存到本地。2.修复部分情况下了脚本无法运行的bug。3.弃用Server酱旧版推送方式，新增推送加（pushplus）推送。4.修复部分设置项无法被正确保存以及导入配置时某些设置项无法被正确合并的bug。5.修复部分情况下layer报错导致脚本无法运行的bug。6.优化了唯一运行检测的方式。6.完善了【拦截直播观看数据上报】功能，新增xhr拦截规则。7.优化了重复运行检测。当检测到有其他直播间页面的挂机助手正在运行时禁用会导致冲突的功能。8.修复天选时刻金额识别功能在部分情况下丢失精度的问题。9.优化了获取粉丝勋章数据/检查更新失败时的错误处理。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/assets/markdown/update-log.md)。  
 

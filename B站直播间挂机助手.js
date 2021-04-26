@@ -15,7 +15,7 @@
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
-// @compatible     safari 13.0.2 or later
+// @compatible     safari 13.1 or later
 // @version        5.6.7.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
@@ -30,6 +30,7 @@
 // @connect        pushplus.plus
 // @connect        cdn.jsdelivr.net
 // @connect        raw.fastgit.org
+// @connect        raw.githubusercontent.com
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
 // @require        https://code.jquery.com/jquery-3.6.0.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
@@ -276,7 +277,7 @@
    * @param oldSubStr 搜索的字符串
    * @param newSubStr 替换内容
    */
-  String.prototype.replaceAll = function (oldSubStr, newSubStr) {
+  String.prototype.replaceall = function (oldSubStr, newSubStr) {
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& 代表所有被匹配的字符串
     }
@@ -306,6 +307,12 @@
     if (W.BilibiliLive === undefined) return;
     // 初始化右上角提示信息弹窗
     newWindow.init();
+    // 检查浏览器版本并显示提示信息
+    const checkBrowserArr = checkBrowserVersion();
+    if (checkBrowserArr[0] !== "ok") {
+      window.toast(...checkBrowserArr);
+      if (checkBrowserArr[1] === "error") return;
+    }
     if (SP_CONFIG.DANMU_MODIFY) {
       window.bliveproxy.hook();
       MYDEBUG('bliveproxy hook complete', window.bliveproxy);
@@ -431,7 +438,7 @@
         }
       }, delay);
     };
-    return otherScriptsRunningCheck.then(() => loadInfo());
+    return loadInfo();
   });
   function init() { // 初始化各项功能
     const MY_API = {
@@ -3000,7 +3007,7 @@
         },
         run: () => {
           try {
-            if (!MY_API.CONFIG.LIVE_SIGN|| otherScriptsRunning) return $.Deferred().resolve();
+            if (!MY_API.CONFIG.LIVE_SIGN || otherScriptsRunning) return $.Deferred().resolve();
             if (!checkNewDay(MY_API.CACHE.LiveReward_TS)) {
               // 同一天，不执行
               runMidnight(() => MY_API.LiveReward.run(), '直播签到');
@@ -4626,7 +4633,7 @@
               if (description === undefined) throw "undefined"
               lotteryInfoJson = description.match(/<p style="font-size:0px">(.*)<\/p>/)[1];
               for (const i in upperNum) {
-                lotteryInfoJson = lotteryInfoJson.replaceAll(upperNum[i], i)
+                lotteryInfoJson = lotteryInfoJson.replaceall(upperNum[i], i)
               }
               lotteryInfoJson = JSON.parse(lotteryInfoJson);
               if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
@@ -4714,7 +4721,7 @@
           }
           let jsonStr = JSON.stringify(uploadRawJson);
           for (const i in upperNum) {
-            jsonStr = jsonStr.replaceAll(i, upperNum[i])
+            jsonStr = jsonStr.replaceall(i, upperNum[i])
           }
           let finalStr = `<p style=font-size:0px>` + jsonStr + `</p>${MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE}`;
           return updateEncodeData(MY_API.AnchorLottery.myLiveRoomid, finalStr).then(() => {
@@ -4738,7 +4745,7 @@
             if (description === undefined) throw "undefined"
             lotteryInfoJson = description.match(/<p style="font-size:0px">(.*)<\/p>/)[1];
             for (const i in upperNum) {
-              lotteryInfoJson = lotteryInfoJson.replaceAll(upperNum[i], i)
+              lotteryInfoJson = lotteryInfoJson.replaceall(upperNum[i], i)
             }
             lotteryInfoJson = JSON.parse(lotteryInfoJson);
             if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
@@ -4755,7 +4762,7 @@
           return MY_API.chatLog(`[天选时刻] 简介数据获取完毕（共${MY_API.AnchorLottery.introRoomList.length}个房间）<br>数据来源：直播间${linkMsg(liveRoomUrl + MY_API.CONFIG.ANCHOR_GETDATA_ROOM, MY_API.CONFIG.ANCHOR_GETDATA_ROOM)}的个人简介${(!MY_API.CONFIG.ANCHOR_IGNORE_UPLOAD_MSG && lotteryInfoJson.hasOwnProperty('msg') && lotteryInfoJson.msg.length > 0 && !/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi.test(lotteryInfoJson.msg)) ? '<br>附加信息：' + lotteryInfoJson.msg : ''}<br>该数据最后上传时间：${new Date(lotteryInfoJson.ts).toLocaleString()}`, 'success');
         },
         moneyCheck: (award_name) => {
-          const name = award_name.replaceAll(' ', '').toLowerCase(); // 去空格+转小写
+          const name = award_name.replaceall(' ', '').toLowerCase(); // 去空格+转小写
           let numberArray = name.match(/\d+(\.\d+)?/g); // 提取阿拉伯数字
           let chineseNumberArray = name.match(/([一壹二贰两三叁四肆五伍六陆七柒八捌九玖][千仟]零?[一壹二贰两三叁四肆五伍六陆七柒八捌九玖]?[百佰]?[一壹二贰三叁四肆五伍六陆七柒八捌九玖]?[十拾]?[一壹二贰三叁四肆五伍六陆七柒八捌九玖]?)|([一壹二贰两三叁四肆五伍六陆七柒八捌九玖][百佰][一壹二贰三叁四肆五伍六陆七柒八捌九玖]?[十拾]?[一壹二贰三叁四肆五伍六陆七柒八捌九玖]?)|([一壹二贰三叁四肆五伍六陆七柒八捌九玖]?[十拾][一壹二贰三叁四肆五伍六陆七柒八捌九玖]?)|[一壹二贰两三叁四肆五伍六陆七柒八捌九玖十拾]/g); // 提取汉字数字
           const chnNumChar = { "零": 0, "一": 1, "壹": 1, "二": 2, "贰": 2, "两": 2, "三": 3, "叁": 3, "四": 4, "肆": 4, "五": 5, "伍": 5, "六": 6, "陆": 6, "七": 7, "柒": 7, "八": 8, "捌": 8, "九": 9, "玖": 9 },
@@ -4809,7 +4816,7 @@
                   if (n === chineseNumberArray.length - 1) return [false];
                   else continue;
                 }
-                else return [true, finalMoney];
+                else return [true, Number(finalMoney).toFixed(2)];
               }
             }
           }
@@ -5818,7 +5825,7 @@
       API.MaterialObject.run, // 实物抽奖
       API.AnchorLottery.run, // 天选时刻
     ];
-    runAllTasks(5000, 200, taskList);
+    otherScriptsRunningCheck.then(() => runAllTasks(5000, 200, taskList));
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000); // 刷新直播间
   }
   function checkUpdate(version) {
@@ -5891,11 +5898,17 @@
     while (true) {
       await BAPI.i.medal(page, 25).then((response) => {
         MYDEBUG('before init() getMedalList: API.i.medal', response);
-        medal_info.medal_list = medal_info.medal_list.concat(response.data.fansMedalList);
-        if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) page++;
-        else { medal_info.status.resolve(); end = true }
+        if (response.code === 0) {
+          medal_info.medal_list = medal_info.medal_list.concat(response.data.fansMedalList);
+          if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) page++;
+          else { medal_info.status.resolve(); end = true }
+        } else {
+          window.toast(`获取粉丝勋章列表失败 ${response.message}<br>部分功能将无法正常运行`, 'error');
+          setTimeout(() => getMedalList(page));
+          end = true;
+        }
       }, () => {
-        MY_API.chatLog('获取粉丝勋章列表失败，请检查网络<br>部分功能将无法正常运行', 'error');
+        window.toast('获取粉丝勋章列表失败，请检查网络<br>部分功能将无法正常运行', 'error');
         setTimeout(() => getMedalList(page));
         end = true;
       });
@@ -6128,6 +6141,16 @@
     del(obj1, obj2);
   }
   /**
+   * 通过检查某些特性是否存在判断浏览器版本
+   * @returns {Array} 0: 提示字符串 1: 等级字符串
+   */
+  function checkBrowserVersion() {
+    if (typeof String.prototype.replaceAll === 'undefined')
+      return  ["浏览器版本略低，挂机助手可以正常运行但建议升级浏览器到最新版", "info"];
+    else 
+      return ["ok", "info"]
+  }
+  /**
    * 保存文件到本地
    * @param fileName 文件名
    * @param fileContent 文件内容
@@ -6306,7 +6329,7 @@
     return (dd !== td);
   };
   /**
-    * 发送推送加通知
+    * 发送推送加通知 (http)
      @param {
       { token: string, title?: string, content: string, topic?: string, template?: string, channel?: string, webhook?: string }
      } data
