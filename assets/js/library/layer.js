@@ -211,7 +211,7 @@
       });
     };
     that.index = ++layer.index;
-    that.config.maxWidth = $(win).width() - 15 * 2; //初始最大宽度：当前屏幕宽，左右留 15px 边距
+    //that.config.maxWidth = $(win).width() - 15 * 2; //初始最大宽度：当前屏幕宽，左右留 15px 边距
     that.config = $.extend({}, that.config, ready.config, setings);
     document.body ? that.creat() : setTimeout(function () { //原为 creat()
       creat();
@@ -931,73 +931,62 @@
   };
 
   //关闭layer总方法
-  layer.close = function (index, callback) {
-    layer.ready(function () {
-      var layero = $('#' + doms[0] + index), type = layero.attr('type'), closeAnim = 'layer-anim-close';
-      if (!layero[0]) return;
-      var WRAP = 'layui-layer-wrap', remove = function () {
-        if (type === ready.type[1] && layero.attr('conType') === 'object') {
-          layero.children(':not(.' + doms[5] + ')').remove();
-          var wrap = layero.find('.' + WRAP);
-          for (var i = 0; i < 2; i++) {
-            wrap.unwrap();
-          }
-          wrap.css('display', wrap.data('display')).removeClass(WRAP);
-        } else {
-          //低版本IE 回收 iframe
-          if (type === ready.type[2]) {
-            try {
-              var iframe = $('#' + doms[4] + index)[0];
-              iframe.contentWindow.document.write('');
-              iframe.contentWindow.close();
-              layero.find('.' + doms[5])[0].removeChild(iframe);
-            } catch (e) { }
-          }
-          layero[0].innerHTML = '';
-          layero.remove();
+  layer.close = function(index){
+    var layero = $('#'+ doms[0] + index), type = layero.attr('type'), closeAnim = 'layer-anim-close';
+    if(!layero[0]) return;
+    var WRAP = 'layui-layer-wrap', remove = function(){
+      if(type === ready.type[1] && layero.attr('conType') === 'object'){
+        layero.children(':not(.'+ doms[5] +')').remove();
+        var wrap = layero.find('.'+WRAP);
+        for(var i = 0; i < 2; i++){
+          wrap.unwrap();
         }
-        typeof ready.end[index] === 'function' && ready.end[index]();
-        delete ready.end[index];
-        typeof callback === 'function' && callback();
-      };
-
-      if (layero.data('isOutAnim')) {
-        layero.addClass('layer-anim ' + closeAnim);
-      }
-
-      $('#layui-layer-moves, #layui-layer-shade' + index).remove();
-      layer.ie == 6 && ready.reselect();
-      ready.rescollbar(index);
-      if (layero.attr('minLeft')) {
-        ready.minIndex--;
-        ready.minLeft.push(layero.attr('minLeft'));
-      }
-
-      if ((layer.ie && layer.ie < 10) || !layero.data('isOutAnim')) {
-        remove()
+        wrap.css('display', wrap.data('display')).removeClass(WRAP);
       } else {
-        setTimeout(function () {
-          remove();
-        }, 200);
+        //低版本IE 回收 iframe
+        if(type === ready.type[2]){
+          try {
+            var iframe = $('#'+doms[4]+index)[0];
+            iframe.contentWindow.document.write('');
+            iframe.contentWindow.close();
+            layero.find('.'+doms[5])[0].removeChild(iframe);
+          } catch(e){}
+        }
+        layero[0].innerHTML = '';
+        layero.remove();
       }
-    });
-  };
-
-  //关闭所有层
-  layer.closeAll = function (type, callback) {
-    if (typeof type === 'function') {
-      callback = type;
-      type = null;
+      typeof ready.end[index] === 'function' && ready.end[index]();
+      delete ready.end[index];
     };
-    layer.ready(function () {
-      var domsElem = $('.' + doms[0]);
-      $.each(domsElem, function (_index) {
-        var othis = $(this);
-        var is = type ? (othis.attr('type') === type) : 1;
-        is && layer.close(othis.attr('times'), _index === domsElem.length - 1 ? callback : null);
-        is = null;
-      });
-      if (domsElem.length === 0) typeof callback === 'function' && callback();
+    
+    if(layero.data('isOutAnim')){
+      layero.addClass('layer-anim '+ closeAnim);
+    }
+    
+    $('#layui-layer-moves, #layui-layer-shade' + index).remove();
+    layer.ie == 6 && ready.reselect();
+    ready.rescollbar(index); 
+    if(layero.attr('minLeft')){
+      ready.minIndex--;
+      ready.minLeft.push(layero.attr('minLeft'));
+    }
+    
+    if((layer.ie && layer.ie < 10) || !layero.data('isOutAnim')){
+      remove()
+    } else {
+      setTimeout(function(){
+        remove();
+      }, 200);
+    }
+  };
+  
+  //关闭所有层
+  layer.closeAll = function(type){
+    $.each($('.'+doms[0]), function(){
+      var othis = $(this);
+      var is = type ? (othis.attr('type') === type) : 1;
+      is && layer.close(othis.attr('times'));
+      is = null;
     });
   };
 
