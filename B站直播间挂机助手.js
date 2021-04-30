@@ -36,7 +36,7 @@
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@560749f86282ecd90f76ffb8d4e9e85bcee3d576/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@5ad2e628f2b77d5aada938e7f6732d0cf1a3fb27/assets/js/library/layer.min.js
+// @require        file:///D:/Documents/GitHub/BLTH/assets/unused_libraries/layer_3.4.0.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/layer.css
@@ -762,7 +762,6 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "<strong>注意：四月底Server酱旧版停运，请及时更换推送方式。详见sc.ftqq.com。</strong>",
               "内容屏蔽中新增【移除直播水印】【拦截直播流】【拦截直播观看数据上报】。",
               "修复部分用户开启【从已关注且正在直播的直播间获取天选时刻数据】后报错并卡死的bug。",
               "微调了一些需要每天定时运行的任务的运行时间。",
@@ -1344,7 +1343,7 @@
           MATERIAL_LOTTERY_REM: "aid是活动的编号。如你不理解此项保持默认配置即可。",
           ANCHOR_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑天选。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
-          PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
+          PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "调用官方api，消耗20硬币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
           LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
@@ -4791,16 +4790,18 @@
               const chineseNum = chineseNumberArray[n]; // 中文数字
               if (chineseNum !== undefined) {
                 const num = ChineseToNumber(chineseNum); // 阿拉伯数字
-                const ChineseNumberIndex = chineseNumIndexList[n], // 中文数字下表
+                const ChineseNumberIndex = chineseNumIndexList[n], // 中文数字下标
                   ChineseNumLength = chineseNum.length, // 中文数字长度
-                  nextChineseNumIndex = chineseNumIndexList[n + 1]; // 下一个数字下标
-                const unitIndex = ChineseNumberIndex + ChineseNumLength; // 数字后一个中文数字的下标 可能为undefined
+                  nextChineseNumIndex = chineseNumIndexList[n + 1], // 下一个数字下标 可能为undefined
+                  lastChineseNumIndex = chineseNumIndexList[n - 1]; // 上一个数字下标 可能为undefined
+                const unitTailIndex = ChineseNumberIndex + ChineseNumLength; // 数字后一个中文数字的下标
                 let strAfterNum = ''; // 数字后面的字符串
-                if (unitIndex < nextChineseNumIndex) {
+                let strBeforeNum = ''; // 数字前面的字符串
+                if (unitTailIndex < nextChineseNumIndex) {
                   // 如果下一个数字的起始位置不在当前数字所占范围内
-                  for (let i = unitIndex; i < name.length; i++) {
+                  for (let i = unitTailIndex; i < name.length; i++) {
                     if (nextChineseNumIndex !== undefined) {
-                      if (i < nextChineseNumIndex)// 不能把下一个数字取进去
+                      if (i < nextChineseNumIndex) // 不能把下一个数字取进去
                         strAfterNum = strAfterNum + name[i];
                       else
                         break;
@@ -4809,9 +4810,23 @@
                     }
                   }
                 } else {
-                  strAfterNum = name.slice(unitIndex, name.length);
+                  strAfterNum = name.slice(unitTailIndex, name.length);
                 }
-                let finalMoney = getPrice(num, strAfterNum);
+                if (ChineseNumberIndex > lastChineseNumIndex) {
+                  for (let i = lastChineseNumIndex; i < name.length; i++) {
+                    if (lastChineseNumIndex !== undefined) {
+                      if (i < ChineseNumberIndex) // 不能把下一个数字取进去
+                        strBeforeNum = strBeforeNum + name[i];
+                      else
+                        break;
+                    } else {
+                      strBeforeNum = strBeforeNum + name[i];
+                    }
+                  }
+                } else {
+                  strBeforeNum = name.slice(0, ChineseNumberIndex);
+                }
+                let finalMoney = getPrice(num, strAfterNum, strBeforeNum);
                 if (finalMoney === undefined) {
                   if (n === chineseNumberArray.length - 1) return [false];
                   else continue;
@@ -4831,14 +4846,16 @@
             }
             for (let n = 0; n < numberArray.length; n++) {
               const num = numberArray[n]; // 数字
-              const numberIndex = name.indexOf(num), // 数字下表
+              const numberIndex = name.indexOf(num), // 数字下标
                 numLength = num.length, // 数字长度
-                nextNumIndex = numIndexList[n + 1]; // 下一个数字下标
-              const unitIndex = numberIndex + numLength; // 数字后一个字符的下标 可能为undefined
+                nextNumIndex = numIndexList[n + 1], // 下一个数字下标 可能为undefined
+                lastNumIndex = numIndexList[n -1]; // 上一个数字下标 可能为undefined
+              const unitTailIndex = numberIndex + numLength; // 数字后一个字符的下标
               let strAfterNum = ''; // 数字后面的字符串
-              if (unitIndex < nextNumIndex) {
+              let strBeforeNum = '';
+              if (unitTailIndex < nextNumIndex) {
                 // 如果下一个数字的起始位置不在当前数字所占范围内
-                for (let i = unitIndex; i < name.length; i++) {
+                for (let i = unitTailIndex; i < name.length; i++) {
                   if (nextNumIndex !== undefined) {
                     if (i < nextNumIndex) // 不能把下一个数字取进去
                       strAfterNum = strAfterNum + name[i];
@@ -4849,42 +4866,66 @@
                   }
                 }
               } else {
-                strAfterNum = name.slice(unitIndex, name.length);
+                strAfterNum = name.slice(unitTailIndex, name.length);
               }
-              let finalMoney = getPrice(num, strAfterNum);
+              if (numberIndex > lastNumIndex) {
+                for (let i = lastNumIndex; i <  name.length; i++) {
+                  if (lastNumIndex !== undefined) {
+                    if (i < numberIndex) // 不能把下一个数字取进去
+                      strBeforeNum = strBeforeNum + name[i];
+                    else
+                      break;
+                  } else {
+                    strBeforeNum = strBeforeNum + name[i];
+                  }
+                }
+              } else {
+                strBeforeNum = name.slice(0, numberIndex);
+              }
+              let finalMoney = getPrice(num, strAfterNum, strBeforeNum);
               if (finalMoney === undefined) { // 识别失败
                 if (n === numberArray.length - 1) return [false];
                 else continue;
-              } else return [true, finalMoney]
-            }
+              } else return [true, Number(finalMoney).toFixed(2)]
+            }console.log();
           }
-          function getPrice(num, strAfterNum) {
-            const yuan = ['元', 'r', '块'], // 1
-              yuanWords = ['rmb', 'cny', '人民币', '软妹币', '微信红包', '红包', 'qq红包', '现金'], // 1
-              dime = ['毛', '角'], // 0.1
-              penny = ['分'], // 0.01
-              milliWords = ['金瓜子']; // 0.001
-            const firstChar = strAfterNum[0];
+          function getPrice(num, strAfterNum, strBeforeNum) {
+            console.log(strAfterNum, strBeforeNum);
+            const after_yuan = ['元', 'r', '块'], // 1
+              after_yuanWords = ['rmb', 'cny', '人民币', '软妹币', '微信红包', '红包', 'qq红包', '现金'], // 1
+              after_dime = ['毛', '角'], // 0.1
+              after_penny = ['分'], // 0.01
+              after_milliWords = ['金瓜子']; // 0.001
+            const before_yuanWords = ['rmb', 'cny', '人民币', '软妹币', '微信红包', '红包', 'qq红包', '现金']; // 1
+            const firstAfterChar = strAfterNum[0];
             let finalMoney = undefined; // 单位：元
+            let needFurtherCheck = false;
             const number = Number(num);
-            for (const w of yuanWords) {
+            for (const w of before_yuanWords) {
+              if (strBeforeNum.indexOf(w) > -1) {
+                finalMoney = number;
+                needFurtherCheck = true;
+                break;
+              }
+            }
+            for (const w of after_yuanWords) {
               if (strAfterNum.indexOf(w) > -1) {
                 finalMoney = number;
                 break;
               }
             }
-            for (const w of milliWords) {
+            for (const w of after_milliWords) {
               if (strAfterNum.indexOf(w) > -1) {
                 finalMoney = number * 0.001;
                 break;
               }
             }
-            if (finalMoney === undefined) {
-              if (yuan.indexOf(firstChar) > -1) {
+            if (finalMoney === undefined || needFurtherCheck) {
+              if (after_yuan.indexOf(firstAfterChar) > -1) {
                 finalMoney = number
-              } else if (dime.indexOf(firstChar) > -1) {
+              } else if (after_dime.indexOf(firstAfterChar) > -1) {
                 finalMoney = number * 0.1;
-              } else if (penny.indexOf(firstChar) > -1) {
+              } else if (after_penny.indexOf(firstAfterChar) > -1) {
                 // 排除特殊奖品名
                 const ignoreList = ['分钟'];
                 for (const i of ignoreList) {
@@ -5833,8 +5874,7 @@
     const headers = {
       "Accept": `text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9`,
       "Upgrade-Insecure-Requests": "1",
-      "Referer": "https://hub.fastgit.org/andywang425/BLTH/blob/master/assets/json/notice.min.json",
-      "Sec-Fetch-Site": "same-origin",
+      "Sec-Fetch-Site": "none",
       "Sec-Fetch-Mode": "navigate",
       "Sec-Fetch-User": "?1",
       "Sec-Fetch-Dest": "document",
@@ -5845,7 +5885,7 @@
       GM: true,
       anonymous: true,
       method: "GET",
-      url: "https://raw.fastgit.org/andywang425/BLTH/master/assets/json/notice.min.json",
+      url: "https://cdn.jsdelivr.net/gh/andywang425/BLTH@master/assets/json/notice.min.json",
       headers: headers,
       responseType: "json"
     }).then(response => {
@@ -5902,14 +5942,18 @@
           medal_info.medal_list = medal_info.medal_list.concat(response.data.fansMedalList);
           if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) page++;
           else { medal_info.status.resolve(); end = true }
+        } else if (response.code === 1024) {
+          window.toast(`获取粉丝勋章列表超时 ${response.message}<br>部分功能将无法正常运行`, 'error');
+          delayCall(() => getMedalList(page));
+          end = true;
         } else {
           window.toast(`获取粉丝勋章列表失败 ${response.message}<br>部分功能将无法正常运行`, 'error');
-          setTimeout(() => getMedalList(page));
+          delayCall(() => getMedalList(page));
           end = true;
         }
       }, () => {
         window.toast('获取粉丝勋章列表失败，请检查网络<br>部分功能将无法正常运行', 'error');
-        setTimeout(() => getMedalList(page));
+        delayCall(() => getMedalList(page));
         end = true;
       });
       if (end) {
@@ -5924,7 +5968,7 @@
    * @param {Number} delay 延迟（毫秒）
    */
   function reset(delay) {
-    let resetTimer = setTimeout(() => { // 刷新直播间
+    let resetTimer = setTimeout(() => {
       if (API.raffleId_list.length > 0 || API.guardId_list.length > 0 || API.pkId_list.length > 0) {
         MYDEBUG('[刷新直播间]', '还有礼物没抽，延迟15s后刷新直播间');
         return reset(15000);
@@ -5958,8 +6002,7 @@
    * @param  mode 1: unshift 2: push
    */
   function addVal(arr, val, mode = 1) {
-    const index = findVal(arr, val);
-    if (index === -1) {
+    if (findVal(arr, val) === -1) {
       if (mode === 1) return arr.unshift(val);
       else return arr.push(val);
     }
@@ -6145,9 +6188,11 @@
    * @returns {Array} 0: 提示字符串 1: 等级字符串
    */
   function checkBrowserVersion() {
-    if (typeof String.prototype.replaceAll === 'undefined')
-      return  ["浏览器版本略低，挂机助手可以正常运行但建议升级浏览器到最新版", "info"];
-    else 
+    if (typeof Array.prototype.findIndex === "undefined")
+      return ["浏览器版本过低，挂机助手停止运行", "error"];
+    else if (typeof String.prototype.replaceAll === 'undefined')
+      return ["浏览器版本略低，挂机助手可以正常运行但建议升级浏览器到最新版", "info"];
+    else
       return ["ok", "info"]
   }
   /**
