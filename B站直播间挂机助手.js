@@ -36,10 +36,10 @@
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@560749f86282ecd90f76ffb8d4e9e85bcee3d576/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        file:///D:/Documents/GitHub/BLTH/assets/unused_libraries/layer_3.4.0.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dde39ca6020760b9188ebf7df3e17cb134e246a6/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
-// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/css/layer.css
+// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@b76b60658f0683c572a615e73478de8c6098c654/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
 // @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@304091af2f5b96f729343f3e78a8e2945675cfdb/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
@@ -243,7 +243,7 @@
       room_id: undefined,
       uid: undefined,
       ruid: undefined,
-      gift_list: undefined,
+      gift_list: [{ id: 6, price: 1e3 }, { id: 1, price: 100 }, { id: 30607, price: 5e3 }],
       rnd: undefined,
       visit_id: undefined,
       bili_jct: undefined,
@@ -389,29 +389,21 @@
           //MYDEBUG(`${GM_info.script.name}`,'无配置信息');
           return loadInfo(500);
         } else {
+          let index = layer.msg("[BLTH] 正在获取礼物/用户/账号/粉丝勋章数据...")
           Live_info.room_id = W.BilibiliLive.ROOMID;
           Live_info.uid = W.BilibiliLive.UID;
           Live_info.tid = W.BilibiliLive.ANCHOR_UID;
           await BAPI.gift.gift_config().then((response) => {
             MYDEBUG('InitData: API.gift.gift_config', response);
             if (response.data && Array.isArray(response.data)) {
-              Live_info.gift_list = response.data;
+              return Live_info.gift_list = response.data;
             } else if (response.data.list && Array.isArray(response.data.list)) {
-              Live_info.gift_list = response.data.list;
+              return Live_info.gift_list = response.data.list;
             } else {
-              Live_info.gift_list = [
-                {
-                  "id": 6, // 亿圆
-                  "price": 1000
-                }, {
-                  "id": 1, // 辣条
-                  "price": 100
-                }, {
-                  'id': 30607, //小心心
-                  'price': 5000
-                }];
-              window.toast('直播间礼物数据获取失败，使用备用数据', 'warning');
+              return window.toast('直播间礼物数据获取失败，使用默认数据', 'warning');
             }
+          }, () => {
+            return window.toast('直播间礼物数据获取失败，使用默认数据', 'warning');
           });
           await BAPI.getuserinfo().then((re) => {
             MYDEBUG('InitData: API.getuserinfo', re);
@@ -420,12 +412,18 @@
               Live_info.user_level = re.data.user_level;
             }
             else window.toast(`API.getuserinfo 获取用户信息失败 ${re.message}`, 'error');
+          }, () => {
+            window.toast(`API.getuserinfo 获取用户信息出错，请检查网络`, 'error');
+            return delayCall(() => loadInfo());
           });
           await BAPI.x.getAccInfo(Live_info.uid).then((re) => {
             MYDEBUG('InitData: API.x.getAccInfo', re);
             if (re.code === 0) {
               Live_info.level = re.data.level;
-            } else window.toast(`API.x.getAccInfo 获取用户信息失败 ${re.message}`, 'error')
+            } else window.toast(`API.x.getAccInfo 获取账号信息失败 ${re.message}`, 'error')
+          }, () => {
+            window.toast(`API.x.getAccInfo 获取账号信息出错，请检查网络`, 'error')
+            return delayCall(() => loadInfo());
           });
           Live_info.bili_jct = BAPI.getCookie('bili_jct');
           Live_info.ruid = W.BilibiliLive.ANCHOR_UID;
@@ -434,6 +432,7 @@
           MYDEBUG("Live_info", Live_info);
           await getMedalList();
           MYDEBUG("medla_info", medal_info);
+          layer.close(index);
           init();
         }
       }, delay);
@@ -762,12 +761,21 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "内容屏蔽中新增【移除直播水印】【拦截直播流】【拦截直播观看数据上报】。",
-              "修复部分用户开启【从已关注且正在直播的直播间获取天选时刻数据】后报错并卡死的bug。",
-              "微调了一些需要每天定时运行的任务的运行时间。",
-              "修复开启【忽略直播间】后无法正确显示相关日志的bug。",
-              "修复检查更新失败时报错的问题。",
-              "白名单内UP不再被移入BLTH天选关注/中奖UP分组。"
+              "天选时刻不再将收集到的房间号储存到本地。",
+              "修复部分情况下了脚本无法运行的bug。",
+              "弃用Server酱旧版推送方式，新增推送加（pushplus）推送。",
+              "修复部分设置项无法被正确保存以及导入配置时某些设置项无法被正确合并的bug。",
+              "修复部分情况下layer库报错导致脚本无法运行的bug。",
+              "优化了唯一运行检测的方式。",
+              "完善了【拦截直播观看数据上报】功能，新增xhr拦截规则。",
+              "优化了重复运行检测。当检测到有其他直播间页面的挂机助手正在运行时禁用会导致冲突的功能。",
+              "修复天选时刻金额识别功能在部分情况下丢失精度的问题，改为保留两位小数。",
+              "优化了获取粉丝勋章数据/检查更新失败时的错误处理。",
+              "增加浏览器版本判断。",
+              "优化金额识别算法，支持识别前置关键词（如红包1.66）。",
+              "使用最新版的layer弹层模块。",
+              "获取基础数据时新增弹窗提示。",
+              "findVal新增异常捕获，相关功能运行出错时不会卡死。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -4849,7 +4857,7 @@
               const numberIndex = name.indexOf(num), // 数字下标
                 numLength = num.length, // 数字长度
                 nextNumIndex = numIndexList[n + 1], // 下一个数字下标 可能为undefined
-                lastNumIndex = numIndexList[n -1]; // 上一个数字下标 可能为undefined
+                lastNumIndex = numIndexList[n - 1]; // 上一个数字下标 可能为undefined
               const unitTailIndex = numberIndex + numLength; // 数字后一个字符的下标
               let strAfterNum = ''; // 数字后面的字符串
               let strBeforeNum = '';
@@ -4869,7 +4877,7 @@
                 strAfterNum = name.slice(unitTailIndex, name.length);
               }
               if (numberIndex > lastNumIndex) {
-                for (let i = lastNumIndex; i <  name.length; i++) {
+                for (let i = lastNumIndex; i < name.length; i++) {
                   if (lastNumIndex !== undefined) {
                     if (i < numberIndex) // 不能把下一个数字取进去
                       strBeforeNum = strBeforeNum + name[i];
@@ -4887,10 +4895,9 @@
                 if (n === numberArray.length - 1) return [false];
                 else continue;
               } else return [true, Number(finalMoney).toFixed(2)]
-            }console.log();
+            }
           }
           function getPrice(num, strAfterNum, strBeforeNum) {
-            console.log(strAfterNum, strBeforeNum);
             const after_yuan = ['元', 'r', '块'], // 1
               after_yuanWords = ['rmb', 'cny', '人民币', '软妹币', '微信红包', '红包', 'qq红包', '现金'], // 1
               after_dime = ['毛', '角'], // 0.1
@@ -5960,7 +5967,7 @@
         runTomorrow(() => getMedalList(), 0, 1, "获取粉丝勋章列表");
         break;
       }
-      await sleep(100);
+      await sleep(200);
     }
   };
   /**
@@ -6014,8 +6021,12 @@
    * @returns index, 若不是数组返回 false
    */
   function findVal(arr, val) {
-    if (!Array.isArray(arr)) return false;
-    return arr.findIndex(v => v == val); // 类型不必相同
+    try {
+      if (!Array.isArray(arr)) return false;
+      return arr.findIndex(v => v == val); // 类型不必相同
+    } catch (e) {
+      MYERROR("findVal 出错", arr, val, e);
+    }
   }
   /**
    * 比较版本号大小
