@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.1
+// @version       2.1.1
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -1257,6 +1257,19 @@ var BAPI = {
                 url: '//api.bilibili.com/x/relation/stat',
                 data: {
                     vmid: vmid // uid
+                }
+            })
+        },
+        privilege_receive: (type) => {
+            return BAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '//api.bilibili.com/x/vip/privilege/receive',
+                data: {
+                    type: type
+                    /**
+                     * 1: 年度专享B币券赠送（ 5B币）
+                     * 2: 年度专享会员购优惠券（10元会员购优惠券）
+                     */
                 }
             })
         }

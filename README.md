@@ -1,6 +1,6 @@
 <p align ="center"><img src="https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"></p>
-<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.12-pass-green.svg" alt="TamperMonkey 4.12"> <img src="https://img.shields.io/badge/Chromium_83-pass-green.svg" alt="Chromium 83"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a></p>
-<p align="center"><a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437(已满)-yellow" alt="QQ Group"></a> <a href="https://jq.qq.com/?_wv=1027&k=Bf951teI"><img src="https://img.shields.io/badge/QQ%20Group-907502444-brightgreen" alt="QQ Group"></a></p>
+<p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.12-pass-green.svg" alt="TamperMonkey 4.12"> <img src="https://img.shields.io/badge/Chromium_90-pass-green.svg" alt="Chromium 90"> <img src="https://img.shields.io/badge/Firefox_77-pass-green.svg" alt="Firefox 77"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a></p>
+<p align="center"><a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437-yellow" alt="QQ Group"></a> <a href="https://jq.qq.com/?_wv=1027&k=Bf951teI"><img src="https://img.shields.io/badge/QQ%20Group-907502444(new)-brightgreen" alt="QQ Group"></a></p>
 <h1 align="center">B站直播间挂机助手</h1>
 
 ### 安装方法
@@ -92,6 +92,11 @@
 <li>移除右侧关注按钮及弹窗</li>
 <li>移除礼物栏下方广告</li>
 <li>屏蔽挂机检测</li>
+<li>移除天选时刻弹窗及图标</li>
+<li>移除大乱斗弹窗及进度条</li>
+<li>移除直播水印</li>
+<li>禁止p2p上传</li>
+<li>拦截直播观看数据上报</li>
 </ul>
 </details>
 <details>
@@ -154,14 +159,11 @@
     </tr>
 </table>
 
-注：项目文件中的[B站直播间挂机助手.user.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js)是压缩后的脚本。  
-原格式的脚本为[B站直播间挂机助手.js](https://github.com/andywang425/BLTH/blob/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.js)。  
-
 #### 脚本内置说明
 运行脚本后点击控制面板上带下划线的小问号查看各项功能的具体说明。  
 
 #### 运行日志
-+ 可以点击聊天区上方，大航海右侧的【日志】查看普通日志。部分日志上会有可点击的蓝色链接文字，方便用户进行某些操作。
++ 可以点击聊天区上方，大航海右侧的【日志】查看普通日志。部分日志上会有可点击的蓝色链接文字，方便完成某些操作。
 + 脚本默认关闭控制台日志。勾选控制面板上的`其他设置 - 控制台日志`即可开启。  
   打开控制台(Chrome可用`ctrl + shift + i`，再点击`Console`)在Filter中输入`BLTH`即可过滤出本脚本的日志。
 
@@ -175,7 +177,7 @@
 + 如果使用脚本过程中遇到问题，可以先按上述步骤开启控制台日志，然后再次运行脚本并在控制台中寻找相关错误信息。  
   若能找到请在反馈bug时附上这些控制台日志。
 + 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。
-+ 交流qq群：①群：[1106094437(已满)](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
++ 交流qq群：①群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444(新)](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
 
 -------------------------------
 
@@ -223,14 +225,14 @@
 -------------------------------
 
 ## 鸣谢
-[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)，[酷推](https://cp.xuthus.cc)，[冰冰羊](https://space.bilibili.com/261593393)，[xfgryujk](https://github.com/xfgryujk)  
+[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)，[酷推](https://cp.xuthus.cc)，[冰冰羊](https://space.bilibili.com/261593393)，[xfgryujk](https://github.com/xfgryujk)，[推送加](https://pushplus.plus)  
 以及所有提出过建议的用户。
 
 -------------------------------
 
 ## 更新日志
->### 5.6.7.3
->1.内容屏蔽中新增【移除直播水印】【拦截直播流】【拦截直播观看数据上报】。2.修复部分用户开启【从已关注且正在直播的直播间获取天选时刻数据】后报错并卡死的bug。3.微调了一些需要每天定时运行的任务的运行时间。4.修复开启【忽略直播间】后无法正确显示相关日志的bug。5.修复检查更新失败时报错的问题。6.白名单内UP不再被移入BLTH天选关注/中奖UP分组。
+>### 5.6.7.4
+>1.天选时刻不再将收集到的房间号储存到本地。2.修复部分情况下了脚本无法运行的bug。3.弃用Server酱旧版推送方式，新增推送加（pushplus）推送。4.修复部分设置项无法被正确保存以及导入配置时某些设置项无法被正确合并的bug。5.修复部分情况下layer库报错导致脚本无法运行的bug。6.优化了唯一运行检测的方式。7.完善了【拦截直播观看数据上报】功能，新增xhr拦截规则。8.优化了重复运行检测。当检测到有其他直播间页面的挂机助手正在运行时禁用会导致冲突的功能。9.修复天选时刻金额识别功能在部分情况下丢失精度的问题，改为保留两位小数。10.优化了获取粉丝勋章数据/检查更新失败时的错误处理。11.增加浏览器版本判断。12.优化金额识别算法，支持识别前置关键词（如红包1.66）。13.使用最新版的layer弹层模块。14.获取基础数据时新增弹窗提示。15.findVal新增异常捕获，相关功能运行出错时不会卡死。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/assets/markdown/update-log.md)。  
 
