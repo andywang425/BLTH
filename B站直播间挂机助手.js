@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.6.7.4
+// @version        5.6.7.5
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -330,7 +330,8 @@
           onRequest: (XHRconfig, handler) => {
             if (XHRconfig.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
               MYDEBUG('getInfoByUser request', XHRconfig);
-              XHRconfig.url = '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser?room_id=22474988';
+              XHRconfig.url = '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser?room_id=22474988&from=0';
+              handler.next(XHRconfig);
             } else if (SP_CONFIG.blockliveDataUpdate && XHRconfig.url.includes('//data.bilibili.com/log')) {
               handler.resolve("ok")
             } else {
@@ -353,6 +354,7 @@
               response.response = response.response.replace('"is_room_admin":false', '"is_room_admin":true');
               const json_response = JSON.parse(response.response);
               Live_info.danmu_length = json_response.data.property.danmu.length;
+              console.log(json_response)
             }
             handler.next(response);
           }
