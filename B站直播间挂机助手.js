@@ -36,10 +36,10 @@
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@560749f86282ecd90f76ffb8d4e9e85bcee3d576/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@725673847a28bc6912210aef1e65a6c0951ac320/assets/js/library/layer.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
-// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@725673847a28bc6912210aef1e65a6c0951ac320/assets/css/layer.css
+// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
 // @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@304091af2f5b96f729343f3e78a8e2945675cfdb/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
@@ -4406,7 +4406,7 @@
                   MY_API.AnchorLottery.BLTHfollowList.push(String(up.mid));
                 }
                 if (response.data.length < s) return p1.resolve();
-                return delayCall(() => getUpInBLTHFollowTag(uid, tid, n + 1, s), 100);
+                return delayCall(() => getUpInBLTHFollowTag(uid, tid, n + 1, s), 200);
               } else {
                 window.toast(`获取BLTH天选关注UP分组内UP出错 ${response.message}`, 'error');
                 return p1.reject();
@@ -4425,7 +4425,7 @@
                   MY_API.AnchorLottery.BLTHprizeList.push(String(up.mid));
                 }
                 if (response.data.length < s) return p2.resolve();
-                return delayCall(() => getUpInBLTHPrizeTag(uid, tid, n + 1, s), 100);
+                return delayCall(() => getUpInBLTHPrizeTag(uid, tid, n + 1, s), 200);
               } else {
                 window.toast(`获取BLTH天选中奖UP分组内UP出错 ${response.message}`, 'error');
                 return p2.reject();
@@ -4450,7 +4450,7 @@
                 MY_API.AnchorLottery.uidInSpecialTag.push(String(up.mid));
               }
               if (response.data.length < ps) return p.resolve();
-              return delayCall(() => MY_API.AnchorLottery.getUpInSpecialTag(myuid, tagid, pn + 1, ps), 100);
+              return delayCall(() => MY_API.AnchorLottery.getUpInSpecialTag(myuid, tagid, pn + 1, ps), 200);
             } else {
               window.toast(`获取特别关注关注列表出错 ${response.message}`, 'error');
               return p.reject();
@@ -4469,7 +4469,7 @@
                 MY_API.AnchorLottery.uidInOriginTag.push(String(up.mid));
               }
               if (response.data.length < ps) return p.resolve();
-              return delayCall(() => MY_API.AnchorLottery.getUpInOriginTag(myuid, tagid, pn + 1, ps), 100);
+              return delayCall(() => MY_API.AnchorLottery.getUpInOriginTag(myuid, tagid, pn + 1, ps), 200);
             } else {
               window.toast(`获取默认分组关注列表出错 ${response.message}`, 'error');
               return p.reject();
@@ -4490,7 +4490,7 @@
                   MY_API.AnchorLottery.uidInTagList.push(String(up.mid));
                 }
                 if (response.data.length < ps) return p.resolve();
-                return delayCall(() => getUpInTag(myuid, tagid, pn + 1, ps), 100);
+                return delayCall(() => getUpInTag(myuid, tagid, pn + 1, ps), 200);
               } else {
                 window.toast(`[取关BLTH天选分组内的UP] 获取关注列表出错 ${response.message}`, 'error');
                 return p.reject();
