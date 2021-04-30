@@ -36,10 +36,10 @@
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@560749f86282ecd90f76ffb8d4e9e85bcee3d576/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dde39ca6020760b9188ebf7df3e17cb134e246a6/assets/js/library/layer.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@725673847a28bc6912210aef1e65a6c0951ac320/assets/js/library/layer.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
-// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@b76b60658f0683c572a615e73478de8c6098c654/assets/css/layer.css
+// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@725673847a28bc6912210aef1e65a6c0951ac320/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
 // @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@304091af2f5b96f729343f3e78a8e2945675cfdb/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
@@ -389,7 +389,7 @@
           //MYDEBUG(`${GM_info.script.name}`,'无配置信息');
           return loadInfo(500);
         } else {
-          let index = layer.msg("[BLTH] 正在获取礼物/用户/账号/粉丝勋章数据...")
+          window.toast("正在获取礼物 / 用户 / 账号 / 粉丝勋章数据...", "info");
           Live_info.room_id = W.BilibiliLive.ROOMID;
           Live_info.uid = W.BilibiliLive.UID;
           Live_info.tid = W.BilibiliLive.ANCHOR_UID;
@@ -432,7 +432,6 @@
           MYDEBUG("Live_info", Live_info);
           await getMedalList();
           MYDEBUG("medla_info", medal_info);
-          layer.close(index);
           init();
         }
       }, delay);
