@@ -313,6 +313,8 @@
       window.toast(...checkBrowserArr);
       if (checkBrowserArr[1] === "error") return;
     }
+    // 唯一运行检测
+    onlyScriptCheck();
     if (SP_CONFIG.DANMU_MODIFY) {
       window.bliveproxy.hook();
       MYDEBUG('bliveproxy hook complete', window.bliveproxy);
@@ -354,7 +356,6 @@
               response.response = response.response.replace('"is_room_admin":false', '"is_room_admin":true');
               const json_response = JSON.parse(response.response);
               Live_info.danmu_length = json_response.data.property.danmu.length;
-              console.log(json_response)
             }
             handler.next(response);
           }
@@ -366,24 +367,6 @@
       for (const i of RTClist) {
         delete W[i];
       }
-    }
-    try {
-      // 唯一运行检测
-      GM_getTab(function (tabObj) {
-        GM_saveTab(tabObj); // 上传tab
-        GM_getTabs(function (tabsDatabase) {
-          let tabDatabaseLength = Object.keys(tabsDatabase).length;
-          if (tabDatabaseLength > 1) {
-            // otherScriptsRunningCheck.reject();
-            otherScriptsRunning = true;
-            window.toast('检测到其他直播间页面的挂机助手正在运行，无需重复运行的功能将被禁用', 'caution');
-          }
-          otherScriptsRunningCheck.resolve();
-        });
-      });
-    } catch (e) {
-      MYDEBUG('重复运行检测错误', e);
-      return $.Deferred().reject();
     }
     const loadInfo = (delay = 0) => {
       return setTimeout(async () => {
@@ -598,7 +581,7 @@
           chat_control_panel_vmHeight = $('#chat-control-panel-vm').height(),
           eleList = ['.chat-history-list', '.attention-btn-ctnr', '.live-player-mounter'];
         tabContent = $('.tab-content');
-        logDiv = $(`<li data-v-2fdbecb2="" data-v-d2be050a="" class="item dp-i-block live-skin-separate-border border-box t-center pointer live-skin-normal-text" style = 'font-weight:bold;color: #999;' id = "logDiv"><span id="logDivText">日志</span><div class="blth_num" style="display: none;" id = 'logRedPoint'>0</div></li>`);
+        logDiv = $(`<li data-v-2fdbecb2="" data-v-d2be050a="" class="item dp-i-block live-skin-separate-border border-box t-center pointer live-skin-normal-text" style = 'font-weight:bold;color: #999;' id = "logDiv"><span id="logDivText">日志</span><div class="blth_num" style="display: none;" id = 'logRedPoint'>0</div></mli>`);
         let tabOffSet = 0, top = 0, left = 0;
         if (eleList.some(i => i.length === 0) || tabList.length === 0 || tabContent.length === 0) {
           window.toast('必要页面元素缺失，强制运行（可能会看不到控制面板，提示信息）', 'error');
@@ -1338,12 +1321,12 @@
         ];
         const helpText = {
           // 帮助信息
-          ANCHOR_FANS_CHECK: "忽略粉丝数小于一定值的UP所发起的天选时刻。<mul><li>通常来说粉丝数多的UP比较讲信用，不会不兑奖。当然因为这些UP的天选抽的人多也更难中奖。</li><li>该项只能填大于等于0的整数。</li></mul>",
+          ANCHOR_FANS_CHECK: "忽略粉丝数小于一定值的UP所发起的天选时刻。<mul><mli>通常来说粉丝数多的UP比较讲信用，不会不兑奖。当然因为这些UP的天选抽的人多也更难中奖。</mli><mli>该项只能填大于等于0的整数。</mli></mul>",
           ANCHOR_PERSONAL_PROFILE: "在个人简介中所展示的信息。<mul><mli>可以填符合b站规则的html。</mli></mul>",
           ANCHOR_GOLD_JOIN_TIMES: "付费天选指需要花费金瓜子才能参加的天选。<mul><mli>多次参加同一个付费天选可以提高中奖率。</mli><mli><strong>请慎重填写本设置项。</strong></mli></mul>",
           GIFT_SEND_METHOD: "自动送礼策略，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间送礼。</mli><mli>黑名单：给房间列表以外的直播间送礼。</mli><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<mh3>注意：</mh3><mul><mli>支持识别阿拉伯数字和汉字数字。</mli><mli>识别的单位有限。</mli><mli>不支持识别外币。</mli><mli>由于一些天选时刻的奖品名比较特殊，可能会出现遗漏或误判。</mli></mul>',
-          LOTTERY: '参与礼物抽奖。<mul><li>礼物抽奖包括大乱斗抽奖和一小部分节奏风暴。经测试发现如果不在大乱斗中送礼物似乎必不可能中奖。节奏风暴抽奖也几乎抽不到。</li><li>这个功能可能会在日后被删除。</li></mul>',
+          LOTTERY: '参与礼物抽奖。<mul><mli>礼物抽奖包括大乱斗抽奖和一小部分节奏风暴。经测试发现如果不在大乱斗中送礼物似乎必不可能中奖。节奏风暴抽奖也几乎抽不到。</mli><mli>这个功能可能会在日后被删除。</mli></mul>',
           MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>脚本不会给等级大于20的粉丝勋章打卡（因为不加亲密度）。</mli><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则循环选取）。</mli><mli>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</mli></mul>',
           AUTO_DANMU: '发送直播间弹幕。<mh3>注意：</mh3><mul><mli>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</mli><mli><mp>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</mp></mli><mli><mp>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</mp></mli><mli><mp>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</mp></mli><mli><mp>可以用默认值所填的房间号来测试本功能，但是请不要一直发。</mp></mli><mli><mp>发送时间有两种填写方法</mp><mp>1.【小时】h【分钟】m【秒】s</mp><mul><mli>每隔一段时间发送一条弹幕</mli><mli>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></mli><mli>可以填小数</mli><mli>可以只填写其中一项或两项</mli></mul><mp>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</mp><mp><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></mp><mp>2.【小时】:【分钟】:【秒】</mp><mul><mli>在特定时间点发一条弹幕</mli><mli>例子： <code>10:30:10</code>, <code>0:40</code></mli><mli>只能填整数</mli><mli>小时分钟必须填写，秒数可以不填</mli></mul><mp>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</mp></mli></mul>',
           NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<mh3>原理：</mh3><mul><mli>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。</mli><mul>',
@@ -1356,7 +1339,7 @@
           BUY_MEDAL: "调用官方api，消耗20硬币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
           LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
-          STORM: "仅会参加被广播的节奏风暴。若无法参加请尝试实名后再参加。<mul><li>由于B站改版现在几乎不可能抽到节奏风暴了。</li><li>这一功能可能会在日后被删除。</li></mul>",
+          STORM: "仅会参加被广播的节奏风暴。若无法参加请尝试实名后再参加。<mul><mli>由于B站改版现在几乎不可能抽到节奏风暴了。</mli><mli>这一功能可能会在日后被删除。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
           GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
@@ -5648,7 +5631,7 @@
             if (sleepTime) { // 休眠
               MYDEBUG('[天选时刻]', `处于休眠时段，${sleepTime}毫秒后再次检查天选`);
               MY_API.chatLog(`[天选时刻] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并继续检查天选`, 'warning');
-              return setTimeout(() => Fn(), sleepTime);
+              return setTimeout(() => getDataAndJoin(), sleepTime);
             } else {
               if (MY_API.CONFIG.ANCHOR_TYPE_POLLING) { // 轮询热门房间
                 if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) await MY_API.AnchorLottery.uploadRoomList();
@@ -6374,17 +6357,49 @@
   }
   /**
    * 检查是否为新一天
-   * @param ts
+   * @param ts 被检查的时间戳
    * @returns {boolean}
    */
   function checkNewDay(ts) {
-    if (ts === 0) return true;
+    if (ts == 0) return true;
     let t = new Date(ts);
     let d = new Date();
     let td = t.getDate();
     let dd = d.getDate();
-    return (dd !== td);
+    let now_ts = d.getTime();
+    return (dd !== td || now_ts - ts > 86400000) && ts > now_ts;
   };
+  /**
+   * 唯一运行检测
+   */
+  function onlyScriptCheck() {
+      try {
+        let UNIQUE_CHECK_CACHE = localStorage.getItem("UNIQUE_CHECK_CACHE") || 0;
+        const t = ts_ms();
+        if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 11e3) {
+          // 其他脚本正在运行
+          window.toast('检测到其他直播间页面的挂机助手正在运行，无需重复运行的功能将停止运行', 'caution');
+          otherScriptsRunning = true;
+          return $.Deferred().resolve();
+        }
+        let timer_unique;
+        const uniqueMark = () => {
+          timer_unique = setTimeout(() => uniqueMark(), 10e3);
+          UNIQUE_CHECK_CACHE = ts_ms();
+          localStorage.setItem("UNIQUE_CHECK_CACHE", UNIQUE_CHECK_CACHE)
+        };
+        W.addEventListener('unload', () => {
+          clearTimeout(timer_unique);
+          localStorage.setItem("UNIQUE_CHECK_CACHE", 0);
+        });
+        uniqueMark();
+        return otherScriptsRunningCheck.resolve();
+      }
+      catch(e) {
+        MYDEBUG('重复运行检测出错', e);
+        return otherScriptsRunningCheck.reject();
+      }
+  }
   /**
     * 发送推送加通知 (http)
      @param {
