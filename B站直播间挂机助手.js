@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.6.7.5
+// @version        5.6.7.6
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -550,7 +550,7 @@
       },
       CACHE_DEFAULT: {
         AUTO_SEND_DANMU_TS: [], // 弹幕发送
-        AUTO_GROUP_SIGH_TS: 0, // 应援团执行时间，用于判断是否为新的一天
+        AUTO_GROUP_SIGH_TS: 0, // 应援团签到
         DailyReward_TS: 0, // 每日任务
         LiveReward_TS: 0, // 直播每日任务
         Silver2Coin_TS: 0, // 银瓜子换硬币
@@ -560,7 +560,7 @@
         LittleHeart_TS: 0, // 小心心
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0,
-        last_aid: 729, // 实物抽奖最后一个有效aid
+        last_aid: 732, // 实物抽奖最后一个有效aid
         MedalDanmu_TS: 0 //粉丝勋章打卡
       },
       GIFT_COUNT_DEFAULT: {
@@ -745,21 +745,10 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "天选时刻不再将收集到的房间号储存到本地。",
-              "修复部分情况下了脚本无法运行的bug。",
-              "弃用Server酱旧版推送方式，新增推送加（pushplus）推送。",
-              "修复部分设置项无法被正确保存以及导入配置时某些设置项无法被正确合并的bug。",
-              "修复部分情况下layer库报错导致脚本无法运行的bug。",
-              "优化了唯一运行检测的方式。",
-              "完善了【拦截直播观看数据上报】功能，新增xhr拦截规则。",
-              "优化了重复运行检测。当检测到有其他直播间页面的挂机助手正在运行时禁用会导致冲突的功能。",
-              "修复天选时刻金额识别功能在部分情况下丢失精度的问题，改为保留两位小数。",
-              "优化了获取粉丝勋章数据/检查更新失败时的错误处理。",
-              "增加浏览器版本判断。",
-              "优化金额识别算法，支持识别前置关键词（如红包1.66）。",
-              "使用最新版的layer弹层模块。",
-              "获取基础数据时新增弹窗提示。",
-              "findVal新增异常捕获，相关功能运行出错时不会卡死。"
+              "修复天选时刻休眠后有概率无法醒来的bug。",
+              "优化了脚本对新的一天的判断方式。",
+              "优化了部分脚本内置说明的显示方式。",
+              "使用新的重复运行检测方式，兼容暴力猴。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -6357,6 +6346,7 @@
   }
   /**
    * 检查是否为新一天
+   * 注：并无要求被检查时间戳大于当前时间戳
    * @param ts 被检查的时间戳
    * @returns {boolean}
    */
@@ -6367,7 +6357,7 @@
     let td = t.getDate();
     let dd = d.getDate();
     let now_ts = d.getTime();
-    return (dd !== td || now_ts - ts > 86400000) && ts > now_ts;
+    return dd !== td || now_ts - ts > 86400000;
   };
   /**
    * 唯一运行检测
