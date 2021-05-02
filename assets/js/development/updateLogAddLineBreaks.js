@@ -7,16 +7,8 @@ process.stdin.setEncoding('utf8');
 process.stdin.on('readable', () => {
   let chunk = process.stdin.read();
   if (chunk !== null) {
-    str = chunk
-    let list = str.split(/\d+\./);
-    // console.log("list", list)
-    let txt = "";
-    for (let i = 0; i < list.length; i++) {
-      if (list[i].length === 0) continue;
-      list[i] = list[i].replace(/[\r\n]/g, "");
-      txt += list[i];
-      if (i !== list.length - 1) txt += "\n";
-    }
-    process.stdout.write("\n处理完成: \n\n" + txt + "\n");
+    str = String(chunk);
+    str = str.replace(/。/g, "。\n");
+    process.stdout.write("\n处理完成: \n\n" + str);
   }
 });
