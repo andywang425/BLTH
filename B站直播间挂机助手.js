@@ -52,9 +52,6 @@
 // @grant          GM_setValue
 // @grant          GM_deleteValue
 // @grant          GM_addStyle
-// @grant          GM_getTab
-// @grant          GM_getTabs
-// @grant          GM_saveTab
 // ==/UserScript==
 
 (function () {
@@ -290,7 +287,7 @@
   // 拦截直播流/数据上报，需要尽早
   if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate) {
     W.fetch = (...arg) => {
-      if (SP_CONFIG.blockLiveStream && arg[0].includes('bilivideo.com')) {
+      if (SP_CONFIG.blockLiveStream && arg[0].includes('bilivideo')) {
         return $.Deferred().resolve();
       } else if (SP_CONFIG.blockliveDataUpdate && arg[0].includes("data.bilibili.com/gol/postweb")) {
         return $.Deferred().resolve();
@@ -1347,7 +1344,7 @@
           ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<mh3>注意：</mh3><mul><mli>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</mli></mul>",
           ANCHOR_TYPE_LIVEROOM: "因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://live.bilibili.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<mul><mli>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</mli><mli>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</mli><mli><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</mli></mul>",
           ANCHOR_PRIVATE_LETTER: "若中奖，会在开奖后10秒发送私信。<mul><mli>建议改一下私信内容，不要和默认值完全一样。</mli></mul>",
-          ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli>白名单内UP不会被移入该分组，即使在分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+          ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli>在白名单内或天选功能运行前在默认/特别关注分组内的UP不会被移入该分组，即使后来出现在该分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           RANDOM_DELAY: "抽奖前额外等待一段时间。<mul><mli>可以填小数。</mli></mul>",
           RANDOM_SKIP: "随机忽略一部分抽奖。<mul><mli>可以填小数。</mli></mul>",
           ANCHOR_CHECK_INTERVAL: "检查完一轮天选后等待的时间。<mul><mli>可以填小数。</mli></mul>",
@@ -1355,7 +1352,7 @@
           MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间发弹幕。</mli><mli>黑名单：给房间列表以外的直播间发弹幕。</mli><mli>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</mli></mul>",
           topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，每天0点时重置。</mli><mli><strong>支持输入框回车保存。</strong></mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
-          ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli>白名单内UP不会被移入该分组，即使在分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+          ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli>在白名单内或天选功能运行前在默认/特别关注分组内的UP不会被移入该分组，即使后来出现在该分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           debugSwitch: "开启或关闭控制台日志(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
           UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
           ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
@@ -3783,10 +3780,15 @@
           if (Number(roomId) <= 10000) {
             realRoomId = await BAPI.room.get_info(roomId).then((res) => {
               MYDEBUG(`API.room.get_info roomId=${roomId} res`, res); // 可能是短号，要用长号发弹幕
-              return res.data.room_id;
+              if (res.code === 0) {
+                return res.data.room_id;
+              } else {
+                window.toast(`[自动发弹幕]房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
+                return roomId
+              }
             }), () => {
-              window.toast(`[自动发弹幕]房间号【${roomId}】信息获取失败`, 'error')
-              return $.Deferred().reject();
+              window.toast(`[自动发弹幕]房间号【${roomId}】信息获取失败，请检查网络`, 'error')
+              return roomId;
             };
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
@@ -3936,10 +3938,15 @@
           if (Number(roomId) <= 10000) {
             realRoomId = await BAPI.room.get_info(roomId).then((res) => {
               MYDEBUG(`API.room.get_info roomId=${roomId} res`, res); // 可能是短号，要用长号发弹幕
-              return res.data.room_id;
+              if(res.code === 0) {
+                return res.data.room_id;
+              } else {
+                window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
+                return roomId;
+              }
             }), () => {
-              window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败`, 'error')
-              return $.Deferred().reject();
+              window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败，请检查网络`, 'error')
+              return roomId;;
             };
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
@@ -5398,10 +5405,15 @@
           if (Number(roomId) <= 10000) {
             realRoomId = await BAPI.room.get_info(roomId).then((res) => {
               MYDEBUG(`API.room.get_info roomId=${roomId} res`, res); // 可能是短号，要用长号发弹幕
-              return res.data.room_id;
+              if (res.code === 0) {
+                return res.data.room_id;
+              } else {
+                window.toast(`[天选中奖弹幕] 房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
+                return roomId;
+              }
             }), () => {
-              window.toast(`[天选中奖弹幕] 房间号【${roomId}】信息获取失败`, 'error')
-              return $.Deferred().reject();
+              window.toast(`[天选中奖弹幕] 房间号【${roomId}】信息获取失败，请检查网络`, 'error');
+              return roomId;
             };
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
@@ -5635,7 +5647,22 @@
                 for (const i of MY_API.AnchorLottery.liveUserList) {
                   const roomid = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)$/)[1],
                     uid = i.uid;
-                  addVal(MY_API.AnchorLottery.liveRoomList, roomid);
+                  let realRoomId = roomid;
+                  if (Number(roomid) <= 10000) {
+                    realRoomId = await BAPI.room.get_info(roomid).then((res) => {
+                      MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号发弹幕
+                      if (res.code === 0) {
+                        return res.data.room_id;
+                      } else {
+                        window.toast(`[天选时刻]获取房间号【${roomid}】信息出错 ${res.message}`, 'error');
+                        return roomid;
+                      }
+                    }), () => {
+                      window.toast(`[天选时刻]获取房间号【${roomid}】信息失败，请检查网络`, 'error');
+                      return roomid;
+                    };
+                  }
+                  addVal(MY_API.AnchorLottery.liveRoomList, realRoomId);
                   MY_API.AnchorLottery.roomidAndUid[roomid] = uid;
                 }
                 MY_API.chatLog(`[天选时刻] 已关注的开播直播间获取完毕<br>共${MY_API.AnchorLottery.liveRoomList.length}个`, 'success');
@@ -6088,7 +6115,6 @@
     }
     // localStorage fix
     localStorage.removeItem("im_deviceid_IGIFTMSG");
-    localStorage.removeItem("UNIQUE_CHECK_CACHE");
     // GM storage fix
     GM_deleteValue('AnchorRoomidList');
     // save settings
@@ -6363,32 +6389,32 @@
    * 唯一运行检测
    */
   function onlyScriptCheck() {
-      try {
-        let UNIQUE_CHECK_CACHE = localStorage.getItem("UNIQUE_CHECK_CACHE") || 0;
-        const t = ts_ms();
-        if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 11e3) {
-          // 其他脚本正在运行
-          window.toast('检测到其他直播间页面的挂机助手正在运行，无需重复运行的功能将停止运行', 'caution');
-          otherScriptsRunning = true;
-          return $.Deferred().resolve();
-        }
-        let timer_unique;
-        const uniqueMark = () => {
-          timer_unique = setTimeout(() => uniqueMark(), 10e3);
-          UNIQUE_CHECK_CACHE = ts_ms();
-          localStorage.setItem("UNIQUE_CHECK_CACHE", UNIQUE_CHECK_CACHE)
-        };
-        W.addEventListener('unload', () => {
-          clearTimeout(timer_unique);
-          localStorage.setItem("UNIQUE_CHECK_CACHE", 0);
-        });
-        uniqueMark();
+    try {
+      let UNIQUE_CHECK_CACHE = localStorage.getItem("UNIQUE_CHECK_CACHE") || 0;
+      const t = ts_ms();
+      if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 11e3) {
+        // 其他脚本正在运行
+        window.toast('检测到其他直播间页面的挂机助手正在运行，无需重复运行的功能将停止运行', 'caution');
+        otherScriptsRunning = true;
         return otherScriptsRunningCheck.resolve();
       }
-      catch(e) {
-        MYDEBUG('重复运行检测出错', e);
-        return otherScriptsRunningCheck.reject();
-      }
+      let timer_unique;
+      const uniqueMark = () => {
+        timer_unique = setTimeout(() => uniqueMark(), 10e3);
+        UNIQUE_CHECK_CACHE = ts_ms();
+        localStorage.setItem("UNIQUE_CHECK_CACHE", UNIQUE_CHECK_CACHE)
+      };
+      W.addEventListener('unload', () => {
+        clearTimeout(timer_unique);
+        localStorage.setItem("UNIQUE_CHECK_CACHE", 0);
+      });
+      uniqueMark();
+      return otherScriptsRunningCheck.resolve();
+    }
+    catch (e) {
+      MYDEBUG('重复运行检测出错', e);
+      return otherScriptsRunningCheck.reject();
+    }
   }
   /**
     * 发送推送加通知 (http)
