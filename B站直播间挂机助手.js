@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.6.7.6
+// @version        5.6.8
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -35,13 +35,13 @@
 // @require        https://code.jquery.com/jquery-3.6.0.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@560749f86282ecd90f76ffb8d4e9e85bcee3d576/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@46cf1a3a0f99b8c4625c71ff293e3fec1e2f0e2a/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@304091af2f5b96f729343f3e78a8e2945675cfdb/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@4b22f41e3bfe3c8c7aec6dd5267519d956c190d4/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -52,9 +52,6 @@
 // @grant          GM_setValue
 // @grant          GM_deleteValue
 // @grant          GM_addStyle
-// @grant          GM_getTab
-// @grant          GM_getTabs
-// @grant          GM_saveTab
 // ==/UserScript==
 
 (function () {
@@ -223,7 +220,9 @@
       lastShowUpdateMsgVersion: "0", // 上次显示更新信息的版本
       DANMU_MODIFY: false, // 修改弹幕
       blockLiveStream: false, // 拦截直播流
-      blockliveDataUpdate: false // 拦截直播观看数据上报
+      blockliveDataUpdate: false, // 拦截直播观看数据上报
+      wear_medal_before_danmu: false, // 手动发弹幕前自动佩戴当前房间勋章
+      wear_medal_type: 'ONLY_FIRST' // 自动佩戴勋章方式
     };
   let otherScriptsRunningCheck = $.Deferred(),
     otherScriptsRunning = false,
@@ -239,8 +238,10 @@
     mainSiteTasksBtnClickable = true,
     danmuTaskRunning = false,
     medalDanmuRunning = false,
+    hasWornMedal = false,
     Live_info = {
       room_id: undefined,
+      short_room_id: undefined,
       uid: undefined,
       ruid: undefined,
       gift_list: [{ id: 6, price: 1e3 }, { id: 1, price: 100 }, { id: 30607, price: 5e3 }],
@@ -251,7 +252,8 @@
       uname: undefined,
       user_level: undefined, // 直播等级
       level: undefined,  // 主站等级
-      danmu_length: undefined // 直播弹幕长度限制
+      danmu_length: undefined, // 直播弹幕长度限制
+      medal: undefined // 当前直播间勋章的 target_id
     },
     medal_info = { status: $.Deferred(), medal_list: [] },
     userToken = undefined,
@@ -288,12 +290,67 @@
   mergeObject(SP_CONFIG, SP_CONFIG_DEFAULT);
 
   // 拦截直播流/数据上报，需要尽早
-  if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate) {
+  if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate || SP_CONFIG.wear_medal_before_danmu) {
     W.fetch = (...arg) => {
-      if (SP_CONFIG.blockLiveStream && arg[0].includes('bilivideo.com')) {
+      if (SP_CONFIG.blockLiveStream && arg[0].includes('bilivideo')) {
         return $.Deferred().resolve();
       } else if (SP_CONFIG.blockliveDataUpdate && arg[0].includes("data.bilibili.com/gol/postweb")) {
         return $.Deferred().resolve();
+      } else if (SP_CONFIG.wear_medal_before_danmu && arg[0].includes('//api.live.bilibili.com/msg/send')) {
+        if (medal_info.status.state() !== "resolved" || Live_info.medal === null || (SP_CONFIG.wear_medal_type === "ONLY_FIRST" && hasWornMedal)) return wfetch(...arg);
+        if (typeof Live_info.medal === "undefined") {
+          for (const m of medal_info.medal_list) {
+            if (m.roomid === Live_info.short_room_id) {
+              Live_info.medal = m;
+              break;
+            }
+          }
+        }
+        if (typeof Live_info.medal === "undefined") {
+          Live_info.medal = null; // 没有该勋章，之后无需再检查
+          return wfetch(...arg);
+        }
+        return BAPI.xlive.wearMedal(Live_info.medal.medal_id).then((response) => {
+          MYDEBUG('API.xlive.wearMedal', response);
+          if (response.code === 0) {
+            hasWornMedal = true;
+            try {
+              let medalJqItem = $(".dp-i-block.medal-item-margin");
+              if (medalJqItem === null) return;
+              let border = medalJqItem.find(".v-middle.fans-medal-item");
+              const medalColor = '#' + Live_info.medal.color.toString(16);
+              const medalLevel = Live_info.medal.medal_level;
+              const medalText = Live_info.medal.medalName;
+              if (border.length !== 0) {
+                // 之前戴着勋章
+                let background = border.find('.fans-medal-label');
+                let level = border.find('.fans-medal-level');
+                let text = background.find('.fans-medal-content');
+                border.css('border-color', medalColor);
+                background.css('background-image', `linear-gradient(45deg, ${medalColor}, ${medalColor})`);
+                level.text(medalLevel);
+                text.text(medalText);
+              } else {
+                // 如果没戴勋章则需插入缺失的 html
+                $(".action-item.medal.wear-medal").remove(); // 移除提示水印
+                medalJqItem.html(`<div data-v-2c4630d2="" data-v-34b5b0e1="" class="v-middle fans-medal-item" style="border-color: ${medalColor}">
+                  <div data-v-2c4630d2="" class="fans-medal-label" style="background-image: linear-gradient(45deg, ${medalColor}, ${medalColor});">
+                    <span data-v-2c4630d2="" class="fans-medal-content">${medalText}</span>
+                  </div>
+                  <div data-v-2c4630d2="" class="fans-medal-level" style="color: ${medalColor};">${medalLevel}</div>
+                </div>`);
+              }
+            } catch (e) {
+              MYERROR("修改弹幕框左侧粉丝拍样式出错", e);
+            }
+          } else {
+            window.toast(`自动佩戴粉丝勋章出错 ${response.message}`, 'error');
+          }
+          return wfetch(...arg);
+        }, () => {
+          window.toast('自动佩戴粉丝勋章失败，请检查网络', 'error');
+          return wfetch(...arg);
+        })
       }
       else {
         return wfetch(...arg);
@@ -326,16 +383,16 @@
         else return eventListener(...arg);
       }
     }
-    if (SP_CONFIG.invisibleEnter) {
+    if (SP_CONFIG.invisibleEnter || SP_CONFIG.blockliveDataUpdate) {
       try {
         ah.proxy({
           onRequest: (XHRconfig, handler) => {
-            if (XHRconfig.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
+            if (SP_CONFIG.invisibleEnter && XHRconfig.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
               MYDEBUG('getInfoByUser request', XHRconfig);
               XHRconfig.url = '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser?room_id=22474988&from=0';
               handler.next(XHRconfig);
             } else if (SP_CONFIG.blockliveDataUpdate && XHRconfig.url.includes('//data.bilibili.com/log')) {
-              handler.resolve("ok")
+              handler.resolve("ok");
             } else {
               handler.next(XHRconfig);
             }
@@ -376,6 +433,7 @@
         } else {
           window.toast("正在获取礼物 / 用户 / 账号 / 粉丝勋章数据...", "info");
           Live_info.room_id = W.BilibiliLive.ROOMID;
+          Live_info.short_room_id = W.BilibiliLive.SHORT_ROOMID;
           Live_info.uid = W.BilibiliLive.UID;
           Live_info.tid = W.BilibiliLive.ANCHOR_UID;
           await BAPI.gift.gift_config().then((response) => {
@@ -546,7 +604,7 @@
         TIME_RELOAD: false, // 定时刷新直播间
         TIME_RELOAD_MINUTE: 120, // 直播间重载时间
         UPDATE_TIP: true, //更新提示
-        WATCH: true, // 观看视频
+        WATCH: true // 观看视频
       },
       CACHE_DEFAULT: {
         AUTO_SEND_DANMU_TS: [], // 弹幕发送
@@ -745,10 +803,9 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "修复天选时刻休眠后有概率无法醒来的bug。",
-              "优化了脚本对新的一天的判断方式。",
-              "优化了部分脚本内置说明的显示方式。",
-              "使用新的重复运行检测方式，兼容暴力猴。"
+              "修复天选时刻从已关注且正在直播的直播间获取天选时刻数据时若获取到的直播间号为短号则无法正确检测到天选的bug。",
+              "修复拦截直播流在部分情况下失效的bug。",
+              "新增【手动发弹幕前自动佩戴当前房间勋章】功能。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1347,7 +1404,7 @@
           ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<mh3>注意：</mh3><mul><mli>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</mli></mul>",
           ANCHOR_TYPE_LIVEROOM: "因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://live.bilibili.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<mul><mli>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</mli><mli>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</mli><mli><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</mli></mul>",
           ANCHOR_PRIVATE_LETTER: "若中奖，会在开奖后10秒发送私信。<mul><mli>建议改一下私信内容，不要和默认值完全一样。</mli></mul>",
-          ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli>白名单内UP不会被移入该分组，即使在分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+          ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli>在白名单内或天选功能运行前在默认/特别关注分组内的UP不会被移入该分组，即使后来出现在该分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           RANDOM_DELAY: "抽奖前额外等待一段时间。<mul><mli>可以填小数。</mli></mul>",
           RANDOM_SKIP: "随机忽略一部分抽奖。<mul><mli>可以填小数。</mli></mul>",
           ANCHOR_CHECK_INTERVAL: "检查完一轮天选后等待的时间。<mul><mli>可以填小数。</mli></mul>",
@@ -1355,7 +1412,7 @@
           MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间发弹幕。</mli><mli>黑名单：给房间列表以外的直播间发弹幕。</mli><mli>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</mli></mul>",
           topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，每天0点时重置。</mli><mli><strong>支持输入框回车保存。</strong></mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
-          ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli>白名单内UP不会被移入该分组，即使在分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
+          ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli>在白名单内或天选功能运行前在默认/特别关注分组内的UP不会被移入该分组，即使后来出现在该分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           debugSwitch: "开启或关闭控制台日志(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
           UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
           ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
@@ -1381,7 +1438,8 @@
           banP2p: "禁止p2p上传（下载），减少上行带宽的占用。<mh3>原理：</mh3><mul>删除window下部分WebRTC方法，如<code>RTCPeerConnection</code>,<code>RTCDataChannel</code>。</mul><h3>说明：</h3><mul><mli>B站的<a href = 'https://baike.baidu.com/item/%E5%AF%B9%E7%AD%89%E7%BD%91%E7%BB%9C/5482934' target = '_blank'>P2P</a>上传速率大概在600KB/s左右，目的是为了让其他用户能更加流畅地观看直播。如果你的上行带宽较小建议禁用。</mli><mli>开启后控制台可能会出现大量报错如<code style='color:red;'>unsupported bilibili p2p</code>，<code style='color:red;'>Error: launch bili_p2p failed</code>，此类报错均为b站js的报错，无视即可。</mli></mul>",
           DANMU_MODIFY: "修改匹配到的当前直播间弹幕，改变弹幕的显示方式。<mh3>注意：</mh3><mul><mli>匹配弹幕和修改弹幕中的所有设置项都支持填写多个数据。若要填写多个，请用半角逗号<code>,</code>隔开。例：正则表达式 <code>/团【/,/P【/</code>。 </mli><mli>若填写了多个数据，脚本会把这些数据一一匹配，创建不同的规则。缺失的数据会自动向前对齐。<br>例：脚本设置为 匹配弹幕：<code>/团【/,/P【/</code> 发送者UID：<code>0</code> 弹幕池：<code>4,5</code> 颜色：<code>#FF0000,#9932CC</code> 大小：<code>1.2</code><br>此时有这么一条弹幕：<code>P【这个塔的伤害好高啊</code>，满足了第二条匹配规则<code>/P【/</code>。但由于该规则中缺少【大小】数据，则自动向前对齐，即大小被设为<code>1.2</code>。</mli></mli></mul><mh3>匹配弹幕</mh3>有【正则表达式】和【发送者UID】两种匹配方式，任意一项匹配成功则对弹幕进行修改。<mul><mli>正则表达式：即<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。<br>如果填写的正则表达式能匹配弹幕内容则对弹幕进行修改。 </mli><mli>发送者UID：如果填写的UID中包含弹幕发送者的UID则对弹幕进行修改。</mli></mul><mh3>修改弹幕</mh3><mul><mli>弹幕池：修改弹幕所在的弹幕池，可以改变弹幕的显示位置。<br>弹幕池编号：<code>1</code>滚动，<code>4</code>底部，<code>5</code>顶部。如果填写其他数字则不会显示。</mli><mli>颜色：修改弹幕的颜色。<br>需填写所要修改颜色的<a href='http://tools.jb51.net/color/rgb_hex_color' target='_blank'>十六进制颜色码</a>，如<code style='color:#FF0000;'>#FF0000</code>。</mli><mli>大小：缩放弹幕到指定大小。<br>填<code>1.5</code>就是放大到原来的1.5倍，填<code>0.5</code>则是缩小到一半。</mli></mul>",
           blockLiveStream: `拦截直播流。开启本功能后将无法观看直播。<mh3>原理：</mh3><mul>劫持页面上的fetch，通过判断url是否含有<code>bilivideo.com</code>拦截所有直播流请求。</mul><mh3>注意：</mh3><mul><mli>开启本功能后控制台中会出现大量报错，如<code style='color:red;'>id 38: player core NetworkError, {"code":11001,"errInfo":{"url":"https://d1--cn-gotcha204.bilivideo.com/live-bvc/284219/live_50333369_2753084_4000/index.m3u8?expires=1618677399&len=0&oi=1700331273&pt=web&qn=0&trid=9cc4c8772c0543999b03360f513dd1fa&sigparams=cdn,expires,len,oi,pt,qn,trid&cdn=cn-gotcha04&sign=bd05d848ebf2c7a815e0242ac1477187&p2p_type=1&src=9&sl=4&sk=59b4112a8c653bb","info":"TypeError: Cannot read property 'then' of undefined"}}</code>，此类报错均为b站js的报错，无视即可。</mli></mul>`,
-          blockliveDataUpdate: "拦截直播观看数据上报。<mh3>原理：</mh3><mul>劫持页面上的fetch和XMLHttpRequest，拦截所有url中含有<code>data.bilibili.com/gol/postweb</code>的fetch请求和url中含有<code>data.bilibili.com/log</code>的xhr请求。</mul><mh3>注意：</mh3><mul><mli>开启本功能后控制台中会出现大量警告，如<code style='color:rgb(255 131 0);'>jQuexry.Deferred exception: Cannot read property 'status' of undefined TypeError: Cannot read property 'status' of undefined</code>，此类报错均为b站js的报错，无视即可。 </mli></mul><mh3>说明：</mh3><mul><mli>根据观察，目前上报的数据有：p2p种类，直播画质，直播流编码方式，直播流地址，直播流名称，直播流协议，窗口大小，观看时长，请求花费时长， 请求成功/失败数量，通过p2p下载的有效直播流大小，通过p2p上传的直播流大小，当前直播间地址，当前时间戳等等。 </mli></mul>"
+          blockliveDataUpdate: "拦截直播观看数据上报。<mh3>原理：</mh3><mul>劫持页面上的fetch和XMLHttpRequest，拦截所有url中含有<code>data.bilibili.com/gol/postweb</code>的fetch请求和url中含有<code>data.bilibili.com/log</code>的xhr请求。</mul><mh3>注意：</mh3><mul><mli>开启本功能后控制台中会出现大量警告，如<code style='color:rgb(255 131 0);'>jQuexry.Deferred exception: Cannot read property 'status' of undefined TypeError: Cannot read property 'status' of undefined</code>，此类报错均为b站js的报错，无视即可。 </mli></mul><mh3>说明：</mh3><mul><mli>根据观察，目前上报的数据有：p2p种类，直播画质，直播流编码方式，直播流地址，直播流名称，直播流协议，窗口大小，观看时长，请求花费时长， 请求成功/失败数量，通过p2p下载的有效直播流大小，通过p2p上传的直播流大小，当前直播间地址，当前时间戳等等。 </mli></mul>",
+          WEAR_MEDAL_BEFORE_DANMU: "手动发送弹幕前自动佩戴当前房间的粉丝勋章再发弹幕。<mul><mli>如果没有当前直播间的粉丝勋章则不进行任何操作。</mli><mli>【一直自动佩戴】比较适合需要同时在多个直播间发弹幕的情况。如果只想在某一个直播间发弹幕勾选【仅在首次发弹幕时自动佩戴】即可。</mli><mli>佩戴成功后会把弹幕框左侧的粉丝牌替换为当前直播间的粉丝牌。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1748,11 +1806,11 @@
               });
               myDiv.find('button[data-action="addCloud_ANCHOR_BLACKLIST_WORD"]').click(() => {
                 // 加入天选云端忽略关键字
-                const cloudWords = noticeJson.anchor_blacklist_word,
+                const cloudWords = noticeJson.anchor_blacklist_word || [],
                   localWords = [...MY_API.CONFIG.ANCHOR_BLACKLIST_WORD];
                 let newWords = [];
                 for (const i of cloudWords) {
-                  if (localWords.indexOf(i) === -1) newWords.push(i);
+                  if (findVal(localWords, i) === -1) newWords.push(i);
                 }
                 const wordsLength = newWords.length;
                 if (wordsLength > 0) {
@@ -1772,6 +1830,36 @@
                     });
                 } else {
                   layer.msg('本地关键字已包含所有云端关键字', {
+                    time: 2500
+                  });
+                }
+              });
+              myDiv.find('button[data-action="addCloud_ANCHOR_IGNORE_ROOMLIST"]').click(() => {
+                // 加入天选云端忽略直播间
+                const cloudRooms = noticeJson.anchor_ignore_roomlist || [],
+                  localRooms = [...MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST];
+                let newRooms = [];
+                for (const i of cloudRooms) {
+                  if (findVal(localRooms, i) === -1) newRooms.push(i);
+                }
+                const roomsLength = newRooms.length;
+                if (roomsLength > 0) {
+                  layer.confirm(`<div style = "text-align:center">将要被添加的直播间有</div><div style = "font-weight:bold">${String(newRooms)}<code>（共${roomsLength}个）</code></div><div style = "text-align:center">是否添加这些直播间到本地忽略直播间？</div>`, {
+                    title: '添加天选时刻云端忽略直播间',
+                    btn: ['添加', '取消']
+                  },
+                    function (index) {
+                      MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST = [...new Set([...localRooms, ...newRooms])];
+                      MY_API.saveConfig(false);
+                      layer.msg('已添加天选时刻云端忽略直播间', {
+                        time: 2500,
+                        icon: 1
+                      });
+                      myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOMLIST"] label.str').html(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length + '个')
+                      layer.close(index);
+                    });
+                } else {
+                  layer.msg('本地忽略直播间已包含所有云端忽略直播间', {
                     time: 2500
                   });
                 }
@@ -2016,28 +2104,28 @@
               // 绑定特殊设置（不在MY_API.CONFIG中）
               const specialSetting = [
                 {
-                  jqPath: `div[data-toggle="INVISIBLE_ENTER"] input:checkbox`,
+                  jqPath1: `div[data-toggle="INVISIBLE_ENTER"] input:checkbox`,
                   gmItem: `invisibleEnter`,
                   toastMsg: ["[隐身入场] 配置已保存", "info"],
                 },
                 {
-                  jqPath: `div[data-toggle="NOSLEEP"] input:checkbox`,
+                  jqPath1: `div[data-toggle="NOSLEEP"] input:checkbox`,
                   gmItem: `nosleep`,
                   toastMsg: ["[屏蔽挂机检测] 配置已保存", "info"],
                 },
                 {
-                  jqPath: `div[data-toggle="banP2p"] input:checkbox`,
+                  jqPath1: `div[data-toggle="banP2p"] input:checkbox`,
                   gmItem: `banP2p`,
                   toastMsg: ["[禁止p2p上传] 配置已保存", "info"],
                 },
                 {
-                  jqPath: `div[data-toggle="debugSwitch"] input:checkbox`,
+                  jqPath1: `div[data-toggle="debugSwitch"] input:checkbox`,
                   gmItem: `debugSwitch`,
                   toastMsg: ["[控制台日志] 配置已保存", "info"],
                   changeFn: function (self) { SP_CONFIG.debugSwitch = $(self).prop('checked'); }
                 },
                 {
-                  jqPath: `div[data-toggle="windowToast"] input:checkbox`,
+                  jqPath1: `div[data-toggle="windowToast"] input:checkbox`,
                   gmItem: `windowToast`,
                   // toastMsg: ["[提示信息] 配置已保存", "info"],
                   changeFn: function (self) {
@@ -2047,30 +2135,55 @@
                   }
                 },
                 {
-                  jqPath: `div[data-toggle="DANMU_MODIFY"] input:checkbox`,
+                  jqPath1: `div[data-toggle="DANMU_MODIFY"] input:checkbox`,
                   gmItem: `DANMU_MODIFY`,
                   toastMsg: ["[弹幕修改] 配置已保存", "info"]
                 },
                 {
-                  jqPath: `div[data-toggle="blockLiveStream"] input:checkbox`,
+                  jqPath1: `div[data-toggle="blockLiveStream"] input:checkbox`,
                   gmItem: `blockLiveStream`,
                   toastMsg: ["[拦截直播流] 配置已保存", "info"]
                 }, {
-                  jqPath: `div[data-toggle="blockliveDataUpdate"] input:checkbox`,
+                  jqPath1: `div[data-toggle="blockliveDataUpdate"] input:checkbox`,
                   gmItem: `blockliveDataUpdate`,
                   toastMsg: ["[拦截直播观看数据上报] 配置已保存", "info"]
+                }, {
+                  jqPath1: `div[data-toggle="WEAR_MEDAL_BEFORE_DANMU"] input:checkbox`,
+                  gmItem: `wear_medal_before_danmu`,
+                  toastMsg: ["[自动佩戴勋章] 配置已保存", "info"]
+                }, {
+                  jqPath1: `div[data-toggle="ONLY_FIRST"] input:radio`,
+                  jqPath2: `div[data-toggle="ALWAYS"] input:radio`,
+                  changeFn: function (self, gmItem) {
+                    if ($(self).is(':checked')) SP_CONFIG[gmItem] = $(self).parent().attr("data-toggle");
+                  },
+                  name: 'WEAR_MEDAL_BEFORE_DANMU',
+                  gmItem: `wear_medal_type`,
+                  toastMsg: ["[自动佩戴勋章] 配置已保存", "info"]
                 }
               ];
               for (const i of specialSetting) {
-                const input = myDiv.find(i.jqPath),
-                  setting = SP_CONFIG[i.gmItem];
-                if (setting) input.attr('checked', '');
+                let input, isradio = i.hasOwnProperty('name') ? true : false;
+                for (let count = 1; true; count++) {
+                  const jqPathNum = "jqPath" + String(count);
+                  if (!i.hasOwnProperty(jqPathNum)) break;
+                  input = myDiv.find(i[jqPathNum]);
+                  const setting = SP_CONFIG[i.gmItem];
+                  if (!isradio) {
+                    if (setting) input.attr('checked', '');
+                  } else {
+                    if (setting === i[jqPathNum].match(/data\-toggle="(.*)"/)[1]) {
+                      $(i[jqPathNum]).attr('checked', '');
+                    }
+                  }
+                }
+                if (isradio) input = $(`input:radio[name= ${i.name} ]`);
                 input.change(function () {
-                  let self = this;
-                  if (i.hasOwnProperty('changeFn')) i.changeFn(self);
-                  SP_CONFIG[i.gmItem] = $(self).prop('checked');
-                  saveSpConfig();
-                  if (i.hasOwnProperty('toastMsg')) window.toast(i.toastMsg[0], i.toastMsg[1]);
+                    let self = this;
+                    if (i.hasOwnProperty('changeFn')) isradio ? i.changeFn(self, i.gmItem) : i.changeFn(self);
+                    if (!isradio) SP_CONFIG[i.gmItem] = $(self).prop('checked');
+                    saveSpConfig();
+                    if (i.hasOwnProperty('toastMsg')) window.toast(i.toastMsg[0], i.toastMsg[1]);
                 })
               }
               // 绑定回车保存
@@ -2102,7 +2215,7 @@
               }
               // 绑定帮助文字 (?)
               $('.helpText').click(function () {
-                const id = $(this).attr('helpData');
+                const id = $(this).attr('helpdata');
                 if (id !== undefined) {
                   if (helpText.hasOwnProperty(id)) {
                     return layer.open({
@@ -3783,10 +3896,15 @@
           if (Number(roomId) <= 10000) {
             realRoomId = await BAPI.room.get_info(roomId).then((res) => {
               MYDEBUG(`API.room.get_info roomId=${roomId} res`, res); // 可能是短号，要用长号发弹幕
-              return res.data.room_id;
+              if (res.code === 0) {
+                return res.data.room_id;
+              } else {
+                window.toast(`[自动发弹幕]房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
+                return roomId
+              }
             }), () => {
-              window.toast(`[自动发弹幕]房间号【${roomId}】信息获取失败`, 'error')
-              return $.Deferred().reject();
+              window.toast(`[自动发弹幕]房间号【${roomId}】信息获取失败，请检查网络`, 'error')
+              return roomId;
             };
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
@@ -3936,10 +4054,15 @@
           if (Number(roomId) <= 10000) {
             realRoomId = await BAPI.room.get_info(roomId).then((res) => {
               MYDEBUG(`API.room.get_info roomId=${roomId} res`, res); // 可能是短号，要用长号发弹幕
-              return res.data.room_id;
+              if (res.code === 0) {
+                return res.data.room_id;
+              } else {
+                window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
+                return roomId;
+              }
             }), () => {
-              window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败`, 'error')
-              return $.Deferred().reject();
+              window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败，请检查网络`, 'error')
+              return roomId;;
             };
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
@@ -5398,10 +5521,15 @@
           if (Number(roomId) <= 10000) {
             realRoomId = await BAPI.room.get_info(roomId).then((res) => {
               MYDEBUG(`API.room.get_info roomId=${roomId} res`, res); // 可能是短号，要用长号发弹幕
-              return res.data.room_id;
+              if (res.code === 0) {
+                return res.data.room_id;
+              } else {
+                window.toast(`[天选中奖弹幕] 房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
+                return roomId;
+              }
             }), () => {
-              window.toast(`[天选中奖弹幕] 房间号【${roomId}】信息获取失败`, 'error')
-              return $.Deferred().reject();
+              window.toast(`[天选中奖弹幕] 房间号【${roomId}】信息获取失败，请检查网络`, 'error');
+              return roomId;
             };
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
@@ -5635,7 +5763,22 @@
                 for (const i of MY_API.AnchorLottery.liveUserList) {
                   const roomid = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)$/)[1],
                     uid = i.uid;
-                  addVal(MY_API.AnchorLottery.liveRoomList, roomid);
+                  let realRoomId = roomid;
+                  if (Number(roomid) <= 10000) {
+                    realRoomId = await BAPI.room.get_info(roomid).then((res) => {
+                      MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号发弹幕
+                      if (res.code === 0) {
+                        return res.data.room_id;
+                      } else {
+                        window.toast(`[天选时刻]获取房间号【${roomid}】信息出错 ${res.message}`, 'error');
+                        return roomid;
+                      }
+                    }), () => {
+                      window.toast(`[天选时刻]获取房间号【${roomid}】信息失败，请检查网络`, 'error');
+                      return roomid;
+                    };
+                  }
+                  addVal(MY_API.AnchorLottery.liveRoomList, realRoomId);
                   MY_API.AnchorLottery.roomidAndUid[roomid] = uid;
                 }
                 MY_API.chatLog(`[天选时刻] 已关注的开播直播间获取完毕<br>共${MY_API.AnchorLottery.liveRoomList.length}个`, 'success');
@@ -6088,7 +6231,6 @@
     }
     // localStorage fix
     localStorage.removeItem("im_deviceid_IGIFTMSG");
-    localStorage.removeItem("UNIQUE_CHECK_CACHE");
     // GM storage fix
     GM_deleteValue('AnchorRoomidList');
     // save settings
@@ -6363,32 +6505,32 @@
    * 唯一运行检测
    */
   function onlyScriptCheck() {
-      try {
-        let UNIQUE_CHECK_CACHE = localStorage.getItem("UNIQUE_CHECK_CACHE") || 0;
-        const t = ts_ms();
-        if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 11e3) {
-          // 其他脚本正在运行
-          window.toast('检测到其他直播间页面的挂机助手正在运行，无需重复运行的功能将停止运行', 'caution');
-          otherScriptsRunning = true;
-          return $.Deferred().resolve();
-        }
-        let timer_unique;
-        const uniqueMark = () => {
-          timer_unique = setTimeout(() => uniqueMark(), 10e3);
-          UNIQUE_CHECK_CACHE = ts_ms();
-          localStorage.setItem("UNIQUE_CHECK_CACHE", UNIQUE_CHECK_CACHE)
-        };
-        W.addEventListener('unload', () => {
-          clearTimeout(timer_unique);
-          localStorage.setItem("UNIQUE_CHECK_CACHE", 0);
-        });
-        uniqueMark();
+    try {
+      let UNIQUE_CHECK_CACHE = localStorage.getItem("UNIQUE_CHECK_CACHE") || 0;
+      const t = ts_ms();
+      if (t - UNIQUE_CHECK_CACHE >= 0 && t - UNIQUE_CHECK_CACHE <= 11e3) {
+        // 其他脚本正在运行
+        window.toast('检测到其他直播间页面的挂机助手正在运行，无需重复运行的功能将停止运行', 'caution');
+        otherScriptsRunning = true;
         return otherScriptsRunningCheck.resolve();
       }
-      catch(e) {
-        MYDEBUG('重复运行检测出错', e);
-        return otherScriptsRunningCheck.reject();
-      }
+      let timer_unique;
+      const uniqueMark = () => {
+        timer_unique = setTimeout(() => uniqueMark(), 10e3);
+        UNIQUE_CHECK_CACHE = ts_ms();
+        localStorage.setItem("UNIQUE_CHECK_CACHE", UNIQUE_CHECK_CACHE)
+      };
+      W.addEventListener('unload', () => {
+        clearTimeout(timer_unique);
+        localStorage.setItem("UNIQUE_CHECK_CACHE", 0);
+      });
+      uniqueMark();
+      return otherScriptsRunningCheck.resolve();
+    }
+    catch (e) {
+      MYDEBUG('重复运行检测出错', e);
+      return otherScriptsRunningCheck.reject();
+    }
   }
   /**
     * 发送推送加通知 (http)

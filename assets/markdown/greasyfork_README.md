@@ -9,7 +9,9 @@
 &nbsp;<a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Github stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a>
 
 ### 使用方法 
-在[Tampermonkey](https://www.tampermonkey.net/)中启用脚本，登陆bilibili后打开任意b站直播间。 
+在 [Tampermonkey](https://www.tampermonkey.net) / [Violentmonkey](https://violentmonkey.github.io) 中启用脚本，登陆bilibili后打开任意b站直播间。 
++ 在 Tampermonkey 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
++ 不保证能通过其它油猴插件(如Greasemonkey)运行。  
 
 -------------------------------
 
@@ -160,19 +162,22 @@
 运行脚本后点击控制面板上带下划线的小问号查看各项功能的具体说明。  
 
 #### 运行日志
+运行日志分普通日志和控制台日志两种。
+##### 普通日志
 + 可以点击聊天区上方，大航海右侧的【日志】查看普通日志。部分日志上会有可点击的蓝色链接文字，方便完成某些操作。
+##### 控制台日志
++ 打开控制台(Chrome可点`F12`或`ctrl + shift + i`，再点击`Console`)在Filter中输入`BLTH`即可过滤出本脚本的控制台日志。  
+  *注：某些意料之外的报错不会带有`BLTH`字样，反馈 bug 时请多加注意。*
 + 脚本默认关闭控制台日志。勾选控制面板上的`其他设置 - 控制台日志`即可开启。  
-  打开控制台(Chrome可用`ctrl + shift + i`，再点击`Console`)在Filter中输入`BLTH`即可过滤出本脚本的日志。
 
 #### 风控
-+ 若出现`...，请检查网络`的红色日志，有两种可能。一是网络状况不佳，二被B站风控了。
++ 若出现`...，请检查网络`的红色日志，有两种可能。一是网络状况不佳，二是被B站风控了。
 + 风控过一段时间会自动解除。
 + 因为风控是针对ip地址的，被风控后可通过挂代理等方式更换ip，继续正常使用脚本。
 + 被风控通常是因为api请求过于频繁，可通过修改脚本的相关设置（如果有的话）降低请求频率。
 
 #### 关于反馈
-+ 如果使用脚本过程中遇到问题，可以先按上述步骤开启控制台日志，然后再次运行脚本并在控制台中寻找相关错误信息。  
-  若能找到请在反馈bug时附上这些控制台日志。
++ 如果使用脚本过程中遇到问题，可以先按上述步骤[开启控制台日志](#控制台日志)，然后关掉无关功能再次运行脚本并在控制台中寻找相关错误信息。若能找到请在反馈bug时附上这些控制台日志。
 + 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。
 + 交流qq群：①群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444(新)](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
 
