@@ -318,16 +318,28 @@
               let medalJqItem = $(".dp-i-block.medal-item-margin");
               if (medalJqItem === null) return;
               let border = medalJqItem.find(".v-middle.fans-medal-item");
-              let background = border.find('.fans-medal-label');
-              let level = border.find('.fans-medal-level');
-              let text = background.find('.fans-medal-content');
               const medalColor = '#' + Live_info.medal.color.toString(16);
               const medalLevel = Live_info.medal.medal_level;
               const medalText = Live_info.medal.medalName;
-              border.css('border-color', medalColor);
-              background.css('background-image', `linear-gradient(45deg, ${medalColor}, ${medalColor})`);
-              level.text(medalLevel);
-              text.text(medalText);
+              if (border.length !== 0) {
+                // 之前戴着勋章
+                let background = border.find('.fans-medal-label');
+                let level = border.find('.fans-medal-level');
+                let text = background.find('.fans-medal-content');
+                border.css('border-color', medalColor);
+                background.css('background-image', `linear-gradient(45deg, ${medalColor}, ${medalColor})`);
+                level.text(medalLevel);
+                text.text(medalText);
+              } else {
+                // 如果没戴勋章则需插入缺失的 html
+                $(".action-item.medal.wear-medal").remove(); // 移除提示水印
+                medalJqItem.html(`<div data-v-2c4630d2="" data-v-34b5b0e1="" class="v-middle fans-medal-item" style="border-color: ${medalColor}">
+                  <div data-v-2c4630d2="" class="fans-medal-label" style="background-image: linear-gradient(45deg, ${medalColor}, ${medalColor});">
+                    <span data-v-2c4630d2="" class="fans-medal-content">${medalText}</span>
+                  </div>
+                  <div data-v-2c4630d2="" class="fans-medal-level" style="color: ${medalColor};">${medalLevel}</div>
+                </div>`);
+              }
             } catch (e) {
               MYERROR("修改弹幕框左侧粉丝拍样式出错", e);
             }
