@@ -1379,7 +1379,7 @@ var BAPI = {
                 method: 'POST',
                 url: 'xlive/web-room/v1/fansMedal/wear',
                 data: {
-                    medal_id: medal_id // medal_id 为勋章的 target_id
+                    medal_id: medal_id
                 }
             })
         },

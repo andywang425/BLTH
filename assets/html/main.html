@@ -196,11 +196,26 @@
                         </div>
                 </fieldset>
                 <fieldset class="blth_fs">
-                        <legend>购买粉丝勋章</legend>
-                        <div data-toggle="BUY_MEDAL">输入粉丝勋章对应房间号：<input class="num blth_input" type="text"
-                                        onclick="select();" style="width:70px"><button class="blth_btn"
-                                        data-action="buy_medal">点击购买勋章</button><span helpdata="BUY_MEDAL"
-                                        class="clickableText helpText">?</span>
+                        <legend>粉丝勋章</legend>
+                        <div data-toggle="BUY_MEDAL">
+                                <div style="color:purple">花费20硬币购买粉丝勋章</div>
+                                <div class="lineStartSpace">输入粉丝勋章对应房间号：<input class="num blth_input" type="text"
+                                                onclick="select();" style="width:70px"><button class="blth_btn"
+                                                data-action="buy_medal">点击购买勋章</button><span helpdata="BUY_MEDAL"
+                                                class="clickableText helpText">?</span>
+                                </div>
+                        </div>
+                        <div data-toggle="WEAR_MEDAL_BEFORE_DANMU">
+                                <input type="checkbox">手动发弹幕前自动佩戴当前房间勋章
+                                <span helpdata="WEAR_MEDAL_BEFORE_DANMU" class="clickableText helpText">?</span>
+                                <div class="lineStartSpace">
+                                        <div data-toggle="ONLY_FIRST">
+                                                <input type="radio" name="WEAR_MEDAL_BEFORE_DANMU"> 仅在首次发弹幕时自动佩戴
+                                        </div>
+                                        <div data-toggle="ALWAYS">
+                                                <input type="radio" name="WEAR_MEDAL_BEFORE_DANMU"> 一直自动佩戴
+                                        </div>
+                                </div>
                         </div>
                 </fieldset>
                 <fieldset class="blth_fs">
@@ -263,7 +278,9 @@
                         </div>
                         <div data-toggle="ANCHOR_IGNORE_ROOM"><label><input type="checkbox">忽略直播间
                                         <label class="str" style="font-weight:bold">1个</label><button class="blth_btn"
-                                                data-action="edit_ANCHOR_IGNORE_ROOMLIST">编辑直播间</button></label><span
+                                                data-action="edit_ANCHOR_IGNORE_ROOMLIST">编辑直播间</button>
+                                        <button class="blth_btn"
+                                                data-action="addCloud_ANCHOR_IGNORE_ROOMLIST">添加云端直播间</button></label><span
                                         helpdata="ANCHOR_IGNORE_ROOM" class="clickableText helpText">?</span></div>
                         <div data-toggle="ANCHOR_FANS_CHECK"><label><input type="checkbox">忽略粉丝数小于 <input
                                                 class="num blth_input" style="width:60px;"
