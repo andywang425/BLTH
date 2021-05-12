@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.6.8
+// @version        5.6.9
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -76,6 +76,7 @@
     },
     MYDEBUG = (sign, ...data) => {
       if (!SP_CONFIG.debugSwitch) return;
+      if (typeof data[0] === "object" && data[0].netError) return MYERROR(sign, ...data);
       let d = new Date();
       d = `%c[${NAME}]%c[${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}]%c`;
       if (data.length === 1) { console.log(d, "font-weight: bold;", "color: #0920e6;", "", `${sign}:`, data[0],); return }
@@ -405,9 +406,7 @@
                 response.response = await BAPI.xlive.getInfoByUser(W.BilibiliLive.ROOMID).then((re) => {
                   MYDEBUG('API.xlive.getInfoByUser(W.BilibiliLive.ROOMID)', re);
                   if (re.code === 0) return JSON.stringify(re);
-                  else return window.toast('获取房间基础信息失败', 'error')
-                }, () => {
-                  return window.toast('获取房间基础信息失败，请检查网络', 'error')
+                  else return window.toast(`获取房间基础信息失败 ${re.message}`, 'error')
                 });
               }
               response.response = response.response.replace('"is_room_admin":false', '"is_room_admin":true');
@@ -443,30 +442,28 @@
             } else if (response.data.list && Array.isArray(response.data.list)) {
               return Live_info.gift_list = response.data.list;
             } else {
-              return window.toast('直播间礼物数据获取失败，使用默认数据', 'warning');
+              return window.toast(`直播间礼物数据获取失败 ${response.message}\n使用默认数据`, 'warning');
             }
-          }, () => {
-            return window.toast('直播间礼物数据获取失败，使用默认数据', 'warning');
           });
           await BAPI.getuserinfo().then((re) => {
             MYDEBUG('InitData: API.getuserinfo', re);
-            if (re.data) {
+            if (re.code === "REPONSE_OK") {
               Live_info.uname = re.data.uname;
               Live_info.user_level = re.data.user_level;
             }
-            else window.toast(`API.getuserinfo 获取用户信息失败 ${re.message}`, 'error');
-          }, () => {
-            window.toast(`API.getuserinfo 获取用户信息出错，请检查网络`, 'error');
-            return delayCall(() => loadInfo());
+            else {
+              window.toast(`API.getuserinfo 获取用户信息失败 ${re.message}`, 'error');
+              return delayCall(() => loadInfo());
+            }
           });
           await BAPI.x.getAccInfo(Live_info.uid).then((re) => {
             MYDEBUG('InitData: API.x.getAccInfo', re);
             if (re.code === 0) {
               Live_info.level = re.data.level;
-            } else window.toast(`API.x.getAccInfo 获取账号信息失败 ${re.message}`, 'error')
-          }, () => {
-            window.toast(`API.x.getAccInfo 获取账号信息出错，请检查网络`, 'error')
-            return delayCall(() => loadInfo());
+            } else {
+              window.toast(`API.x.getAccInfo 获取账号信息失败 ${re.message}`, 'error');
+              return delayCall(() => loadInfo());
+            }
           });
           Live_info.bili_jct = BAPI.getCookie('bili_jct');
           Live_info.ruid = W.BilibiliLive.ANCHOR_UID;
@@ -2179,11 +2176,11 @@
                 }
                 if (isradio) input = $(`input:radio[name= ${i.name} ]`);
                 input.change(function () {
-                    let self = this;
-                    if (i.hasOwnProperty('changeFn')) isradio ? i.changeFn(self, i.gmItem) : i.changeFn(self);
-                    if (!isradio) SP_CONFIG[i.gmItem] = $(self).prop('checked');
-                    saveSpConfig();
-                    if (i.hasOwnProperty('toastMsg')) window.toast(i.toastMsg[0], i.toastMsg[1]);
+                  let self = this;
+                  if (i.hasOwnProperty('changeFn')) isradio ? i.changeFn(self, i.gmItem) : i.changeFn(self);
+                  if (!isradio) SP_CONFIG[i.gmItem] = $(self).prop('checked');
+                  saveSpConfig();
+                  if (i.hasOwnProperty('toastMsg')) window.toast(i.toastMsg[0], i.toastMsg[1]);
                 })
               }
               // 绑定回车保存
@@ -2346,86 +2343,88 @@
       blocked: false,
       LOTTERY: {
         // 大乱斗抽奖
-        listen: (roomId, uid, area = '本直播间') => {
+        listen: (roomId, uid, area = '本直播间') => { // ${response.message}
           BAPI.room.getConf(roomId).then((response) => {
             MYDEBUG(`获取弹幕服务器信息 ${area}`, response);
-            let wst = new BAPI.DanmuWebSocket(uid, roomId, response.data.host_server_list, response.data.token);
-            wst.bind((newWst) => {
-              wst = newWst;
-              MY_API.chatLog(`[${area}]弹幕服务器连接断开，尝试重连`, 'warning');
-            }, () => {
-              MY_API.chatLog(`——————连接弹幕服务器成功——————<br>房间号: ${roomId} 分区: ${area}`
-                , 'success');
-            }, () => {
-              if (MY_API.blocked || MY_API.stormBlack) {
-                wst.close();
-                MY_API.chatLog(`进了小黑屋主动与弹幕服务器断开连接-${area}`, 'warning')
-              }
-            }, (obj) => {
-              MYDEBUG('弹幕公告' + area, obj);
-              switch (obj.cmd) {
-                case 'GUARD_MSG':
-                  if (obj.roomid === obj.real_roomid) {
-                    MY_API.checkRoom(obj.roomid, area);
-                  } else {
-                    MY_API.checkRoom(obj.roomid, area);
-                    MY_API.checkRoom(obj.real_roomid, area);
-                  }
-                  break;
-                case 'PK_BATTLE_SETTLE_USER':
-                  if (obj.data.winner) {
+            if (response.code == 0) {
+              let wst = new BAPI.DanmuWebSocket(uid, roomId, response.data.host_server_list, response.data.token);
+              wst.bind((newWst) => {
+                wst = newWst;
+                MY_API.chatLog(`[${area}]弹幕服务器连接断开，尝试重连`, 'warning');
+              }, () => {
+                MY_API.chatLog(`——————连接弹幕服务器成功——————<br>房间号: ${roomId} 分区: ${area}`
+                  , 'success');
+              }, () => {
+                if (MY_API.blocked || MY_API.stormBlack) {
+                  wst.close();
+                  MY_API.chatLog(`进了小黑屋主动与弹幕服务器断开连接-${area}`, 'warning')
+                }
+              }, (obj) => {
+                MYDEBUG('弹幕公告' + area, obj);
+                switch (obj.cmd) {
+                  case 'GUARD_MSG':
+                    if (obj.roomid === obj.real_roomid) {
+                      MY_API.checkRoom(obj.roomid, area);
+                    } else {
+                      MY_API.checkRoom(obj.roomid, area);
+                      MY_API.checkRoom(obj.real_roomid, area);
+                    }
+                    break;
+                  case 'PK_BATTLE_SETTLE_USER':
+                    if (obj.data.winner) {
+                      MY_API.checkRoom(obj.data.winner.room_id, area);
+                    } else {
+                      MY_API.checkRoom(obj.data.my_info.room_id, area);
+                    }
                     MY_API.checkRoom(obj.data.winner.room_id, area);
-                  } else {
-                    MY_API.checkRoom(obj.data.my_info.room_id, area);
-                  }
-                  MY_API.checkRoom(obj.data.winner.room_id, area);
-                  break;
-                case 'NOTICE_MSG':
-                  switch (obj.msg_type) {
-                    case 1: break; // 系统
-                    case 2:
-                    case 3: // 舰队领奖
-                    case 4: // 登船
-                    case 8: // 礼物抽奖
-                      if (obj.roomid === obj.real_roomid) {
-                        MY_API.checkRoom(obj.roomid, area);
-                      } else {
-                        MY_API.checkRoom(obj.roomid, area);
-                        MY_API.checkRoom(obj.real_roomid, area);
-                      }
-                      break;
-                    /*case 4:
-                        // 登船
-                        break;*/
-                    case 5:
-                      // 获奖
-                      break;
-                    case 6:
-                      // 节奏风暴
-                      window.toast(`监控到房间 ${obj.roomid} 的节奏风暴`, 'info');
-                      MY_API.Storm.run(obj.roomid);
-                      break;
-                  }
-                  break;
-                case 'SPECIAL_GIFT':
-                  // MYDEBUG(`DanmuWebSocket${area}(${roomid})`, str);
-                  if (obj.data['39']) {
-                    switch (obj.data['39'].action) {
-                      case 'start':
-                        // 节奏风暴开始
+                    break;
+                  case 'NOTICE_MSG':
+                    switch (obj.msg_type) {
+                      case 1: break; // 系统
+                      case 2:
+                      case 3: // 舰队领奖
+                      case 4: // 登船
+                      case 8: // 礼物抽奖
+                        if (obj.roomid === obj.real_roomid) {
+                          MY_API.checkRoom(obj.roomid, area);
+                        } else {
+                          MY_API.checkRoom(obj.roomid, area);
+                          MY_API.checkRoom(obj.real_roomid, area);
+                        }
+                        break;
+                      /*case 4:
+                          // 登船
+                          break;*/
+                      case 5:
+                        // 获奖
+                        break;
+                      case 6:
+                        // 节奏风暴
                         window.toast(`监控到房间 ${obj.roomid} 的节奏风暴`, 'info');
                         MY_API.Storm.run(obj.roomid);
-                      case 'end':
-                      // 节奏风暴结束
+                        break;
                     }
-                  };
-                  break;
-                default:
-                  return;
-              }
-            });
-          }, () => {
-            MY_API.chatLog('获取弹幕服务器地址错误', 'error')
+                    break;
+                  case 'SPECIAL_GIFT':
+                    // MYDEBUG(`DanmuWebSocket${area}(${roomid})`, str);
+                    if (obj.data['39']) {
+                      switch (obj.data['39'].action) {
+                        case 'start':
+                          // 节奏风暴开始
+                          window.toast(`监控到房间 ${obj.roomid} 的节奏风暴`, 'info');
+                          MY_API.Storm.run(obj.roomid);
+                        case 'end':
+                        // 节奏风暴结束
+                      }
+                    };
+                    break;
+                  default:
+                    return;
+                }
+              });
+            } else {
+              MY_API.chatLog(`获取弹幕服务器地址错误 ${response.message}`, 'error')
+            }
           });
         },
         run: async () => {
@@ -2434,19 +2433,23 @@
           await BAPI.room.getList().then((response) => {
             // 获取各分区的房间号
             MYDEBUG('[礼物抽奖] 分区列表', response);
-            roomList = response.data;
-            for (const obj of response.data) {
-              BAPI.room.getRoomList(obj.id, 0, 0, 1, 1).then((response) => {
-                MYDEBUG('[礼物抽奖] 直播间列表', response);
-                for (let j = 0; j < response.data.list.length; ++j) {
-                  MY_API.LOTTERY.listen(response.data.list[j].roomid, Live_info.uid, `${obj.name}区`);
-                }
-              }, () => {
-                MY_API.chatLog(`[礼物抽奖] 获取直播间列表出错，请检查网络`, 'error');
-              });
+            if (response.code === 0) {
+              roomList = response.data;
+              for (const obj of response.data) {
+                BAPI.room.getRoomList(obj.id, 0, 0, 1, 1).then((re) => {
+                  MYDEBUG('[礼物抽奖] 直播间列表', re);
+                  if (re.code === 0) {
+                    for (let j = 0; j < re.data.list.length; ++j) {
+                      MY_API.LOTTERY.listen(re.data.list[j].roomid, Live_info.uid, `${obj.name}区`);
+                    }
+                  } else {
+                    MY_API.chatLog(`[礼物抽奖] 获取直播间列表出错 ${re.message}`, 'error');
+                  }
+                });
+              }
+            } else {
+              MY_API.chatLog(`[礼物抽奖] 获取各分区的房间号出错 ${response.message}`, 'error');
             }
-          }, () => {
-            MY_API.chatLog(`[礼物抽奖] 获取各分区的房间号出错，请检查网络`, 'error');
           });
           if (MY_API.CONFIG.CHECK_HOUR_ROOM) {
             let check_timer;
@@ -2466,11 +2469,15 @@
                 return MY_API.chatLog('当前时间段不检查小时榜礼物', 'warning');
               }
               for (const r of roomList) {
-                await BAPI.rankdb.getTopRealTimeHour(r.id).then((data) => {
-                  let list = data.data.list;
-                  MY_API.chatLog(`检查${r.name + '小时榜'}房间的礼物`, 'warning');
-                  for (const i of list) {
-                    MY_API.checkRoom(i.roomid, `小时榜-${i.area_v2_parent_name}区`);
+                await BAPI.rankdb.getTopRealTimeHour(r.id).then((response) => {
+                  if (response.code === 0) {
+                    let list = response.data.list;
+                    MY_API.chatLog(`检查${r.name + '小时榜'}房间的礼物`, 'warning');
+                    for (const i of list) {
+                      MY_API.checkRoom(i.roomid, `小时榜-${i.area_v2_parent_name}区`);
+                    }
+                  } else {
+                    return MY_API.chatLog(`检查小时榜房间礼物出错 ${response.message}`, 'error')
                   }
                 })
               }
@@ -2782,7 +2789,7 @@
           return BAPI.Group.my_groups().then((response) => {
             MYDEBUG('GroupSign.getGroups: API.Group.my_groups', response);
             if (response.code === 0) return $.Deferred().resolve(response.data.list);
-            window.toast(`[自动应援团签到]'${response.msg}`, 'caution');
+            window.toast(`[自动应援团签到]' ${response.msg}`, 'error');
             return $.Deferred().reject();
           }, () => {
             window.toast('[自动应援团签到]获取应援团列表失败，请检查网络', 'error');
@@ -2811,14 +2818,11 @@
                 p.reject();
               }
             } else {
-              window.toast(`[自动应援团签到]'${response.msg}`, 'caution');
-              //return MY_API.GroupSign.signInList(list, i);
-              return $.Deferred().reject();
+              window.toast(`[自动应援团签到] 应援团(group_id=${obj.group_id},owner_uid=${obj.owner_uid})签到失败 ${response.msg}`, 'caution');
+              p.reject();
+              return delayCall(() => MY_API.GroupSign.signInList(list, i));
             }
             return $.when(MY_API.GroupSign.signInList(list, i + 1), p);
-          }, () => {
-            window.toast(`[自动应援团签到]应援团(group_id=${obj.group_id},owner_uid=${obj.owner_uid})签到失败，请检查网络`, 'error');
-            return delayCall(() => MY_API.GroupSign.signInList(list, i));
           });
         },
         run: () => {
@@ -2856,12 +2860,13 @@
         // 每日任务
         coin_exp: 0,
         login: () => {
-          return BAPI.DailyReward.login().then(() => {
+          return BAPI.DailyReward.login().then((response) => {
             MYDEBUG('DailyReward.login: API.DailyReward.login');
-            window.toast('[自动每日奖励][每日登录]完成', 'success');
-          }, () => {
-            window.toast('[自动每日奖励][每日登录]完成失败，请检查网络', 'error');
-            return delayCall(() => MY_API.DailyReward.login());
+            if (response.code === 0) window.toast('[自动每日奖励][每日登录]完成', 'success');
+            else {
+              window.toast(`[自动每日奖励][每日登录]失败 ${response.message}`, 'error');
+              return delayCall(() => MY_API.DailyReward.login());
+            }
           });
         },
         watch: (aid, cid) => {
@@ -2871,11 +2876,9 @@
             if (response.code === 0) {
               window.toast(`[自动每日奖励][每日观看]完成(av=${aid})`, 'success');
             } else {
-              window.toast(`[自动每日奖励][每日观看]'${response.msg}`, 'caution');
+              window.toast(`[自动每日奖励][每日观看]失败 aid=${aid}, cid=${cid} ${response.msg}`, 'error');
+              return delayCall(() => MY_API.DailyReward.watch(aid, cid));
             }
-          }, () => {
-            window.toast('[自动每日奖励][每日观看]完成失败，请检查网络', 'error');
-            return delayCall(() => MY_API.DailyReward.watch(aid, cid));
           });
         },
         coin: (cards, n, i = 0, one = false) => {
@@ -2892,36 +2895,41 @@
           let num = Math.min(2, n);
           if (one) num = 1;
           return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
-            if (re.data.multiply === 2) {
-              MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
-              return MY_API.DailyReward.coin(vlist, n, i + 1);
-            }
-            else {
-              if (re.data.multiply === 1) num = 1;
-              return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
-                MYDEBUG('DailyReward.coin: API.DailyReward.coin', response);
-                if (response.code === 0) {
-                  MY_API.DailyReward.coin_exp += num * 10;
-                  window.toast(`[自动每日奖励][每日投币]投币成功(av=${obj.aid},num=${num})`, 'success');
-                  return MY_API.DailyReward.coin(cards, n - num, i + 1);
-                } else if (response.code === -110) {
-                  window.toast('[自动每日奖励][每日投币]未绑定手机，已停止', 'error');
-                  return $.Deferred().reject();
-                } else if (response.code === 34003) {
-                  // 非法的投币数量
-                  if (one) return MY_API.DailyReward.coin(cards, n, i + 1);
-                  return MY_API.DailyReward.coin(cards, n, i, true);
-                } else if (response.code === 34005) {
-                  // 塞满啦！先看看库存吧~
-                  return MY_API.DailyReward.coin(cards, n, i + 1);
-                } else if (response.code === -104) {
-                  //硬币余额不足
-                  window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
-                  return $.Deferred().reject();
-                }
-                window.toast(`[自动每日奖励][每日投币]'${response.msg}`, 'caution');
-                return MY_API.DailyReward.coin(cards, n, i + 1);
-              }, () => delayCall(() => MY_API.DailyReward.coin(cards, n, i)));
+            if (re.code === 0) {
+              if (re.data.multiply === 2) {
+                MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
+                return MY_API.DailyReward.coin(vlist, n, i + 1);
+              }
+              else {
+                if (re.data.multiply === 1) num = 1;
+                return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
+                  MYDEBUG('DailyReward.coin: API.DailyReward.coin', response);
+                  if (response.code === 0) {
+                    MY_API.DailyReward.coin_exp += num * 10;
+                    window.toast(`[自动每日奖励][每日投币]投币成功(av=${obj.aid},num=${num})`, 'success');
+                    return MY_API.DailyReward.coin(cards, n - num, i + 1);
+                  } else if (response.code === -110) {
+                    window.toast('[自动每日奖励][每日投币]未绑定手机，已停止', 'error');
+                    return $.Deferred().reject();
+                  } else if (response.code === 34003) {
+                    // 非法的投币数量
+                    if (one) return MY_API.DailyReward.coin(cards, n, i + 1);
+                    return MY_API.DailyReward.coin(cards, n, i, true);
+                  } else if (response.code === 34005) {
+                    // 塞满啦！先看看库存吧~
+                    return MY_API.DailyReward.coin(cards, n, i + 1);
+                  } else if (response.code === -104) {
+                    //硬币余额不足
+                    window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
+                    return $.Deferred().reject();
+                  }
+                  window.toast(`[自动每日奖励][每日投币]出错 ${response.msg}`, 'error');
+                  return delayCall(() => MY_API.DailyReward.coin(cards, n, i))
+                });
+              }
+            } else {
+              window.toast(`[自动每日奖励][每日投币]获取视频(aid=${obj.aid})投币状态出错 ${response.msg}`, 'error');
+              return delayCall(() => MY_API.DailyReward.coin(cards, n, i))
             }
           })
         },
@@ -2942,39 +2950,43 @@
           let num = Math.min(2, n);
           if (one) num = 1;
           return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
-            if (re.data.multiply === 2) {
-              MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
-              return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
-            }
-            else {
-              if (re.data.multiply === 1) num = 1;
-              return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
-                MYDEBUG('DailyReward.coin_uid: API.DailyReward.coin_uid', response);
-                if (response.code === 0) {
-                  MY_API.DailyReward.coin_exp += num * 10;
-                  window.toast(`[自动每日奖励][每日投币]投币成功(av=${obj.aid},num=${num})`, 'success');
-                  return MY_API.DailyReward.coin_uid(vlist, n - num, pagenum, uidIndex, i + 1);
-                } else if (response.code === -110) {
-                  window.toast('[自动每日奖励][每日投币]未绑定手机，已停止', 'error');
-                  return $.Deferred().reject();
-                } else if (response.code === 34003) {
-                  // 非法的投币数量
-                  if (one) return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
-                  return MY_API.DailyReward.coin_uid(vlist, n, i, pagenum, uidIndex, true);
-                } else if (response.code === 34005) {
-                  // 塞满啦！先看看库存吧~
-                  return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
-                } else if (response.code === -104) {
-                  // 硬币余额不足
-                  window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
-                  return $.Deferred().reject();
-                }
-                window.toast(`[自动每日奖励][每日投币]'${response.msg}`, 'caution');
+            if (re.code === 0) {
+              if (re.data.multiply === 2) {
+                MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
                 return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
-              }, () => delayCall(() => MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i)));
+              }
+              else {
+                if (re.data.multiply === 1) num = 1;
+                return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
+                  MYDEBUG('DailyReward.coin_uid: API.DailyReward.coin_uid', response);
+                  if (response.code === 0) {
+                    MY_API.DailyReward.coin_exp += num * 10;
+                    window.toast(`[自动每日奖励][每日投币]投币成功(av=${obj.aid},num=${num})`, 'success');
+                    return MY_API.DailyReward.coin_uid(vlist, n - num, pagenum, uidIndex, i + 1);
+                  } else if (response.code === -110) {
+                    window.toast('[自动每日奖励][每日投币]未绑定手机，已停止', 'error');
+                    return $.Deferred().reject();
+                  } else if (response.code === 34003) {
+                    // 非法的投币数量
+                    if (one) return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
+                    return MY_API.DailyReward.coin_uid(vlist, n, i, pagenum, uidIndex, true);
+                  } else if (response.code === 34005) {
+                    // 塞满啦！先看看库存吧~
+                    return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
+                  } else if (response.code === -104) {
+                    // 硬币余额不足
+                    window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
+                    return $.Deferred().reject();
+                  }
+                  window.toast(`[自动每日奖励][每日投币] 出错 ${response.msg}`, 'caution');
+                  return delayCall(() => MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i))
+                });
+              }
+            } else {
+              window.toast(`[自动每日奖励][每日投币]获取视频(aid=${obj.aid})投币状态出错 ${response.msg}`, 'error');
+              return delayCall(() => MY_API.DailyReward.coin(cards, n, i))
             }
           });
-
         },
         share: (aid) => {
           if (!MY_API.CONFIG.SHARE) return $.Deferred().resolve();
@@ -2986,19 +2998,21 @@
               // 重复分享
               window.toast('[自动每日奖励][每日分享]今日分享已完成', 'info');
             } else {
-              window.toast(`[自动每日奖励][每日分享]'${response.msg}`, 'caution');
+              window.toast(`[自动每日奖励][每日分享] 出错 ${response.msg}`, 'caution');
+              return delayCall(() => MY_API.DailyReward.share(aid));
             }
-          }, () => {
-            window.toast('[自动每日奖励][每日分享]分享失败，请检查网络', 'error');
-            return delayCall(() => MY_API.DailyReward.share(aid));
           });
         },
         dynamic: async () => {
           const coinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
           const throwCoinNum = await BAPI.getuserinfo().then((re) => {
             MYDEBUG('DailyReward.dynamic: API.getuserinfo', re);
-            if (re.data.biliCoin < coinNum) return re.data.biliCoin
-            else return coinNum
+            if (re.code === "REPONSE_OK") {
+              if (re.data.biliCoin < coinNum) return re.data.biliCoin
+              else return coinNum
+            } else {
+              window.toast(`[自动每日奖励][每日投币] 获取用户信息失败 ${response.message}`, 'error');
+            }
           });
           if (throwCoinNum < coinNum) window.toast(`[自动每日奖励][每日投币]剩余硬币不足，仅能投${throwCoinNum}个币`, 'warning');
           return BAPI.dynamic_svr.dynamic_new(Live_info.uid, 8).then((response) => {
@@ -3019,11 +3033,9 @@
                 window.toast('[自动每日奖励]"动态-投稿视频"中暂无动态', 'info');
               }
             } else {
-              window.toast(`[自动每日奖励]获取"动态-投稿视频"'${response.msg}`, 'caution');
+              window.toast(`[自动每日奖励]获取"动态-投稿视频"失败 ${response.msg}`, 'caution');
+              return delayCall(() => MY_API.DailyReward.dynamic());
             }
-          }, () => {
-            window.toast('[自动每日奖励]获取"动态-投稿视频"失败，请检查网络', 'error');
-            return delayCall(() => MY_API.DailyReward.dynamic());
           });
         },
         UserSpace: (uidIndex, ps, tid, pn, keyword, order, jsonp) => {
@@ -3041,12 +3053,10 @@
               }
             }
             else {
-              window.toast(`[自动每日奖励]获取UID = ${MY_API.CONFIG.COIN_UID[uidIndex]}的"空间-投稿视频"'${response.msg}`, 'caution');
+              window.toast(`[自动每日奖励]获取UID = ${MY_API.CONFIG.COIN_UID[uidIndex]}的"空间-投稿视频"失败 ${response.msg}`, 'caution');
+              return delayCall(() => MY_API.DailyReward.UserSpace(uid, ps, tid, pn, keyword, order, jsonp));
             }
-          }, () => {
-            window.toast('[自动每日奖励]获取"空间-投稿视频"失败，请检查网络', 'error');
-            return delayCall(() => MY_API.DailyReward.UserSpace(uid, ps, tid, pn, keyword, order, jsonp));
-          })
+          });
         },
         run: (forceRun = false) => {
           try {
@@ -3066,11 +3076,9 @@
                 MY_API.saveCache();
                 runMidnight(() => MY_API.DailyReward.run(), '每日任务');
               } else {
-                window.toast(`[自动每日奖励]${response.message}`, 'caution');
+                window.toast(`[自动每日奖励] 获取今日已获得的投币经验出错 ${response.message}`, 'caution');
+                return delayCall(() => MY_API.DailyReward.run());
               }
-            }, () => {
-              window.toast('[自动每日奖励]获取每日奖励信息失败，请检查网络', 'error');
-              return delayCall(() => MY_API.DailyReward.run());
             });
           } catch (err) {
             window.toast('[自动每日奖励]运行时出现异常', 'error');
@@ -3090,12 +3098,10 @@
             } else if (response.code === 1011040) {
               window.toast('[自动直播签到]今日直播签到已完成', 'info')
             } else {
-              window.toast(`[自动直播签到]${response.message}，尝试点击签到按钮`, 'caution');
+              window.toast(`[自动直播签到]失败 ${response.message}，尝试点击签到按钮`, 'caution');
               $('.checkin-btn').click();
+              return delayCall(() => MY_API.LiveReward.dailySignIn());
             }
-          }, () => {
-            window.toast('[自动直播签到]直播签到失败，请检查网络', 'error');
-            return delayCall(() => MY_API.LiveReward.dailySignIn());
           });
         },
         run: () => {
@@ -3125,11 +3131,9 @@
               window.toast(`[硬币换银瓜子] ${response.msg}，获得${response.data.silver}银瓜子`, 'success');
             } else {
               // 其它状态码待补充
-              window.toast(`[银瓜子换硬币] ${response.msg}`, 'caution');
+              window.toast(`[银瓜子换硬币] 失败 ${response.msg}`, 'caution');
+              return delayCall(() => MY_API.Exchange.coin2silver(num));
             }
-          }, () => {
-            window.toast('[硬币换银瓜子] 兑换失败，请检查网络', 'error');
-            return delayCall(() => MY_API.Exchange.coin2silver(num));
           });
         },
         silver2coin: () => {
@@ -3140,11 +3144,9 @@
             } else if (response.code === 403) {
               window.toast(`[银瓜子换硬币] ${response.msg}`, 'info'); // 每天最多能兑换 1 个 or 银瓜子余额不足
             } else {
-              window.toast(`[银瓜子换硬币] ${response.msg}`, 'caution');
+              window.toast(`[银瓜子换硬币] 失败 ${response.msg}`, 'caution');
+              return delayCall(() => MY_API.Exchange.silver2coin());
             }
-          }, () => {
-            window.toast('[银瓜子换硬币] 兑换失败，请检查网络', 'error');
-            return delayCall(() => MY_API.Exchange.silver2coin());
           });
         },
         runC2S: () => {
@@ -3196,10 +3198,12 @@
         getBagList: async () => {
           return BAPI.gift.bag_list().then((response) => {
             MYDEBUG('Gift.getBagList: API.gift.bag_list', response);
-            MY_API.Gift.bag_list = response.data.list;
-          }, () => {
-            window.toast('[自动送礼]获取包裹列表失败，请检查网络', 'error');
-            return delayCall(() => MY_API.Gift.getBagList());
+            if (response.code === 0) {
+              MY_API.Gift.bag_list = response.data.list;
+            } else {
+              window.toast(`[自动送礼]获取包裹列表失败，${response.message}`, 'error');
+              return delayCall(() => MY_API.Gift.getBagList());
+            }
           });
         },
         /**
@@ -3269,10 +3273,16 @@
               }
               for (const g of MY_API.Gift.bag_list) {
                 if (g.gift_id !== 30607 || g.gift_num <= 0) continue;
-                let response = await BAPI.room.room_init(parseInt(m.roomid, 10));
+                let response = await BAPI.room.room_init(parseInt(m.roomid, 10)).then(re => {
+                  MYDEBUG(`[自动送礼][自动点亮勋章] API.room.room_init(${m.roomid})`, re);
+                  if (response.code !== 0) throw re.msg;
+                });
                 let send_room_id = parseInt(response.data.room_id, 10);
                 const feed_num = 1;
-                let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, m.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd)
+                let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, m.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd).then(re => {
+                  MYDEBUG(`[自动送礼][自动点亮勋章] API.gift.bag_send ${Live_info.uid}, 30607, ${m.target_id}, ${feed_num}, ${g.bag_id}, ${send_room_id}, ${Live_info.rnd}`, re);
+                  if (re.code !== 0) throw re.msg;
+                });
                 if (rsp.code === 0) {
                   m.is_lighted = 1;
                   g.gift_num -= feed_num;
@@ -3469,7 +3479,10 @@
                   MY_API.Gift.over = true;
                   break;
                 }
-                const response = await BAPI.room.room_init(parseInt(v.roomid, 10));
+                const response = await BAPI.room.room_init(parseInt(v.roomid, 10)).then(re => {
+                  MYDEBUG(`[自动送礼] API.room.room_init(${m.roomid})`, re);
+                  if (re.code !== 0) throw re.msg;
+                });
                 MY_API.Gift.room_id = parseInt(response.data.room_id, 10);
                 MY_API.Gift.ruid = v.target_id;
                 MY_API.Gift.remain_feed = v.day_limit - v.today_feed;
@@ -3509,11 +3522,9 @@
                   MY_API.Gift.remain_feed -= feed_num * feed;
                   window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
                 } else {
-                  window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常:${response.msg}`, 'caution');
+                  window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常：${response.msg}`, 'caution');
+                  return delayCall(() => MY_API.Gift.sendGift(medal));
                 }
-              }, () => {
-                window.toast('[自动送礼]包裹送礼失败，请检查网络', 'error');
-                return delayCall(() => MY_API.Gift.sendGift(medal));
               });
             }
           }
@@ -3525,8 +3536,8 @@
             MYDEBUG('API.room.room_init', response);
             if (response.code === 0) UID = response.data.uid;
             else {
-              window.toast('[自动送礼]【剩余礼物】检查房间出错');
-              return $.Deferred().reject();
+              window.toast(`[自动送礼]【剩余礼物】检查房间出错 ${response.message}`);
+              return delayCall(() => BAPI.room.room_init(ROOM_ID));
             }
           })
           let bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
@@ -3544,13 +3555,10 @@
                   v.gift_num -= feed_num;
                   window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼成功，送出${feed_num}个${v.gift_name}`, 'success');
                 } else {
-                  window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼异常:${response.msg}`, 'caution');
+                  window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼异常：${response.msg}`, 'caution');
+                  return delayCall(() => MY_API.Gift.sendGift(medal));
                 }
-              }, () => {
-                window.toast('[自动送礼]【剩余礼物】包裹送礼失败，请检查网络', 'error');
-                return delayCall(() => MY_API.Gift.sendGift(medal));
               });
-
             }
           }
         }
@@ -3614,11 +3622,9 @@
                 MY_API.Storm.join(data.id, data.roomid, Math.round(new Date().getTime() / 1000) + data.time);
                 return $.Deferred().resolve();
               } else {
-                window.toast(`[自动抽奖][节奏风暴](roomid=${roomid})${response.msg}`, 'caution');
+                window.toast(`[自动抽奖][节奏风暴](roomid=${roomid}) ${response.msg}`, 'caution');
+                //return delayCall(() => MY_API.Storm.run(roomid));
               }
-            }, () => {
-              window.toast(`[自动抽奖][节奏风暴]检查直播间(${roomid})失败，请检查网络`, 'error');
-              //return delayCall(() => MY_API.Storm.run(roomid));
             });
           } catch (err) {
             window.toast('[自动抽奖][节奏风暴]运行时出现异常', 'error');
@@ -3764,9 +3770,14 @@
           let todayHeart = 0;
           await BAPI.gift.bag_list().then((re) => {
             MYDEBUG('[小心心]检查包裹 API.gift.bag_list', re);
-            const allHeart = re.data.list.filter(r => r.gift_id == 30607 && r.corner_mark == "7天");
-            for (const heart of allHeart) {
-              todayHeart += heart.gift_num;
+            if (re.code === 0) {
+              const allHeart = re.data.list.filter(r => r.gift_id == 30607 && r.corner_mark == "7天");
+              for (const heart of allHeart) {
+                todayHeart += heart.gift_num;
+              }
+            } else {
+              window.toast(`[小心心] 获取包裹数据失败 ${re.message}`);
+              return delayCall(() =>  BAPI.gift.bag_list());
             }
           });
           MYDEBUG(`[小心心]检测到包裹内7天小心心数量`, todayHeart);
@@ -3902,10 +3913,7 @@
                 window.toast(`[自动发弹幕]房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
                 return roomId
               }
-            }), () => {
-              window.toast(`[自动发弹幕]房间号【${roomId}】信息获取失败，请检查网络`, 'error')
-              return roomId;
-            };
+            });
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
             MYDEBUG(`[自动发弹幕]弹幕发送内容【${danmuContent}】，房间号【${roomId}】`, response);
@@ -3914,9 +3922,6 @@
             } else {
               window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）出错 ${response.msg}`, 'caution');
             }
-          }, () => {
-            window.toast(`[自动发弹幕]弹幕【${danmuContent}】（房间号【${roomId}】）发送失败`, 'error');
-            return $.Deferred().reject();
           })
         },
         getMaxLength: () => {
@@ -4060,10 +4065,7 @@
                 window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
                 return roomId;
               }
-            }), () => {
-              window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败，请检查网络`, 'error')
-              return roomId;;
-            };
+            })
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
             MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，粉丝勋章【${medal_name}】`, response);
@@ -4072,9 +4074,6 @@
             } else {
               return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】，粉丝勋章【${medal_name}】）出错 ${response.msg}`, 'caution');
             }
-          }, () => {
-            window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】，粉丝勋章【${medal_name}】）发送失败`, 'error');
-            return $.Deferred().reject();
           })
         },
         run: async () => {
@@ -4181,11 +4180,9 @@
               if (rem) return MY_API.MaterialObject.check(aid + 1, valid, rem - 1);
               return $.Deferred().resolve(MY_API.MaterialObject.firstAid || valid);
             } else {
-              MY_API.chatLog(`[实物抽奖] ${response.msg}`, 'warning');
+              MY_API.chatLog(`[实物抽奖] 获取抽奖(aid=${aid})状态失败 ${response.msg}`, 'warning');
+              return delayCall(() => MY_API.MaterialObject.check(aid, valid));
             }
-          }, () => {
-            MY_API.chatLog(`[实物抽奖] 检查抽奖(aid = ${aid})失败，请检查网络`, 'error');
-            return delayCall(() => MY_API.MaterialObject.check(aid, valid));
           });
         },
         join: (aid, title, typeB, i = 0) => {
@@ -4263,14 +4260,10 @@
               }, (obj.join_end_time - ts_s() + 1) * 1e3);
             } else {
               MY_API.chatLog(
-                `[实物抽奖] "${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)<br>${response.msg}`,
+                `[实物抽奖] 参加"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)失败<br>${response.msg}`,
                 'warning');
+                return delayCall(() => MY_API.MaterialObject.draw(obj));
             }
-          }, () => {
-            MY_API.chatLog(
-              `[实物抽奖] 参加"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)<br>失败，请检查网络`,
-              'error');
-            return delayCall(() => MY_API.MaterialObject.draw(obj));
           });
         },
         notice: (obj) => {
@@ -4365,14 +4358,10 @@
               MY_API.chatLog(`[实物抽奖] 抽奖"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)未中奖`, 'info');
             } else {
               MY_API.chatLog(
-                `[实物抽奖] 抽奖"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)<br>${response.msg}`,
+                `[实物抽奖] 获取抽奖"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)中奖名单失败<br>${response.msg}`,
                 'warning');
+                return delayCall(() => MY_API.MaterialObject.notice(obj));
             }
-          }, () => {
-            MY_API.chatLog(
-              `[实物抽奖] 获取抽奖"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)<br>获取中奖名单失败，请检查网络`,
-              'error');
-            return delayCall(() => MY_API.MaterialObject.notice(obj));
           });
         }
       },
@@ -4409,11 +4398,8 @@
               return p.resolve();
             } else {
               window.toast(`[保存当前关注列表为白名单] 获取关注列表出错 ${response.message}`, 'error');
-              return p.reject();
+              return delayCall(() => MY_API.AnchorLottery.get_attention_list(mid));
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 获取关注列表出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.get_attention_list(mid));
           })
         },
         getLiveUsers: () => {
@@ -4425,11 +4411,8 @@
               return p.resolve();
             } else {
               MY_API.chatLog(`[天选时刻] 获取正在直播的已关注UP出错 ${response.msg}`, 'caution');
-              return p.reject();
+              return delayCall(() => MY_API.AnchorLottery.getLiveUsers());
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 获取正在直播的已关注UP出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.getLiveUsers());
           })
         },
         getTag: async (tagName, click = false) => {
@@ -4466,11 +4449,8 @@
               }
             } else {
               MY_API.chatLog(`[天选时刻] 获取关注分组出错 ${response.message}`, 'error');
-              return p.reject();
+              return delayCall(() => MY_API.AnchorLottery.getTag(tagName));
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 获取关注分组出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.getTag(tagName));
           });
         },
         creatTag: (tagName) => {
@@ -4485,11 +4465,8 @@
               return p.resolve();
             } else {
               MY_API.chatLog(`[天选时刻] 创建分组【${tagName}】出错 ${re.message}`, 'error');
-              return p.reject();
+              return delayCall(() => MY_API.AnchorLottery.creatTag(tagName));
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 创建关注分组出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.creatTag(tagName));
           })
         },
         getUpInBLTHTag: (myuid, tagid, pn = 1, ps = 50) => {
@@ -4505,12 +4482,9 @@
                 if (response.data.length < s) return p1.resolve();
                 return delayCall(() => getUpInBLTHFollowTag(uid, tid, n + 1, s), 200);
               } else {
-                window.toast(`获取BLTH天选关注UP分组内UP出错 ${response.message}`, 'error');
-                return p1.reject();
+                MY_API.chatLog(`[天选时刻] 获取BLTH天选关注UP分组内UP出错 ${response.message}`, 'error');
+                return delayCall(() => MY_API.AnchorLottery.getUpInTag(uid, tid, n, s));
               }
-            }, () => {
-              MY_API.chatLog(`[天选时刻] 获取BLTH天选关注UP分组内UP出错，请检查网络`, 'error');
-              return delayCall(() => MY_API.AnchorLottery.getUpInTag(uid, tid, n, s));
             })
           }
           function getUpInBLTHPrizeTag(uid, tid, n, s) {
@@ -4524,12 +4498,9 @@
                 if (response.data.length < s) return p2.resolve();
                 return delayCall(() => getUpInBLTHPrizeTag(uid, tid, n + 1, s), 200);
               } else {
-                window.toast(`获取BLTH天选中奖UP分组内UP出错 ${response.message}`, 'error');
-                return p2.reject();
+                MY_API.chatLog(`[天选时刻] 获取BLTH天选中奖UP分组内UP出错 ${response.message}`, 'error');
+                return delayCall(() => MY_API.AnchorLottery.getUpInTag(uid, tid, n, s));
               }
-            }, () => {
-              MY_API.chatLog(`[天选时刻] 获取BLTH天选中奖UP分组内UP出错，请检查网络`, 'error');
-              return delayCall(() => MY_API.AnchorLottery.getUpInTag(uid, tid, n, s));
             })
           }
           if (MY_API.AnchorLottery.anchorFollowTagid) getUpInBLTHFollowTag(myuid, tagid[0], pn, ps);
@@ -4549,12 +4520,9 @@
               if (response.data.length < ps) return p.resolve();
               return delayCall(() => MY_API.AnchorLottery.getUpInSpecialTag(myuid, tagid, pn + 1, ps), 200);
             } else {
-              window.toast(`获取特别关注关注列表出错 ${response.message}`, 'error');
-              return p.reject();
+              MY_API.chatLog(`[天选时刻] 获取特别关注关注列表出错 ${response.message}`, 'error');
+              return delayCall(() => MY_API.AnchorLottery.getUpInSpecialTag(myuid, tagid, pn, ps));
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 获取特别关注Tag内UP列表出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.getUpInSpecialTag(myuid, tagid, pn, ps));
           })
         },
         getUpInOriginTag: (myuid, tagid = 0, pn = 1, ps = 50) => {
@@ -4568,12 +4536,9 @@
               if (response.data.length < ps) return p.resolve();
               return delayCall(() => MY_API.AnchorLottery.getUpInOriginTag(myuid, tagid, pn + 1, ps), 200);
             } else {
-              window.toast(`获取默认分组关注列表出错 ${response.message}`, 'error');
-              return p.reject();
+              MY_API.chatLog(`[天选时刻] 获取默认分组关注列表出错 ${response.message}`, 'error');
+              return delayCall(() => MY_API.AnchorLottery.getUpInOriginTag(myuid, tagid, pn, ps));
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 获取默认分组Tag内UP列表出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.getUpInOriginTag(myuid, tagid, pn, ps));
           })
         },
         delAnchorFollowing: (mode = 1) => {
@@ -4590,11 +4555,10 @@
                 return delayCall(() => getUpInTag(myuid, tagid, pn + 1, ps), 200);
               } else {
                 window.toast(`[取关BLTH天选分组内的UP] 获取关注列表出错 ${response.message}`, 'error');
-                return p.reject();
+                return delayCall(() => getUpInTag(myuid, tagid, pn = 1, ps = 50));
               }
             }, () => {
               MY_API.chatLog(`[天选时刻] 获取Tag内UP列表出错，请检查网络`, 'error');
-              return delayCall(() => getUpInTag(myuid, tagid, pn = 1, ps = 50));
             })
           }
           function get_attention_list(mid) {
@@ -4606,11 +4570,8 @@
                 return p.resolve();
               } else {
                 window.toast(`[取关不在白名单内的UP主] 获取关注列表出错 ${response.message}`, 'error');
-                return p.reject();
+                return delayCall(() => get_attention_list(mid));
               }
-            }, () => {
-              MY_API.chatLog(`[天选时刻] 获取关注列表出错，请检查网络`, 'error');
-              return delayCall(() => get_attention_list(mid));
             });
           }
           function delFollowingList(targetList) {
@@ -4644,10 +4605,8 @@
                     else {
                       window.toast(`[天选时刻取关UP主] 取关UP(uid = ${doUnfollowList[i]})出错  ${response.message}`, 'error');
                       pList[i + 1].reject();
+                      return delayCall(() => delFollowingList(targetList));
                     }
-                  }, () => {
-                    MY_API.chatLog(`[天选时刻] 取消关注出错，请检查网络`, 'error');
-                    return delayCall(() => delFollowingList());
                   })
                 })
               });
@@ -4664,10 +4623,11 @@
         getRoomList: async () => {
           let roomList = await BAPI.room.getList().then((response) => { // 获取各分区的房间号
             MYDEBUG('直播间列表', response);
-            return response.data;
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 获取各分区的房间号出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.getRoomList());
+            if (response.code === 0) return response.data;
+            else {
+              MY_API.chatLog(`[天选时刻] 获取各分区的房间号出错，${response.message}`, 'error');
+              return delayCall(() => MY_API.AnchorLottery.getRoomList());
+            }
           });
           const checkHourRank = async () => { // 小时榜
             for (const r of roomList) {
@@ -4682,10 +4642,8 @@
                   }
                 } else {
                   MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间出错<br>${response.message}`, 'warning');
+                  return delayCall(() => checkHourRank());
                 }
-              }, () => {
-                MY_API.chatLog(`[天选时刻] 获取小时榜直播间出错，请检查网络`, 'error');
-                return delayCall(() => checkHourRank());
               });
               await sleep(MY_API.CONFIG.ANCHOR_INTERVAL)
             }
@@ -4703,10 +4661,8 @@
                   }
                 } else {
                   MY_API.chatLog(`[天选时刻] 获取${r.name + '分区'}的直播间出错<br>${re.message}`, 'warning');
+                  return delayCall(() => checkRoomList());
                 }
-              }, () => {
-                MY_API.chatLog(`[天选时刻] 获取分区直播间出错，请检查网络`, 'error');
-                return delayCall(() => checkRoomList());
               });
               await sleep(MY_API.CONFIG.ANCHOR_INTERVAL)
             }
@@ -4727,9 +4683,8 @@
                 description = response.data.by_room_ids[MY_API.CONFIG.ANCHOR_GETDATA_ROOM].description;
               } else {
                 MY_API.chatLog(`[天选时刻] 获取直播间个人简介错误 ${response.message}`, 'error');
+                return p.reject();
               }
-            }, () => {
-              MY_API.chatLog(`[天选时刻] 获取直播间个人简介出错，请检查网络`, 'error');
             });
             let lotteryInfoJson;
             try {
@@ -4764,12 +4719,9 @@
               if (response.code === 0) {
                 MY_API.AnchorLottery.myLiveRoomid = response.data.roomid; // 没有则返回0
               } else {
-                MY_API.chatLog('[天选时刻] 获取直播间信息出错 ' + response.data.message, 'error');
-                return p.reject()
+                MY_API.chatLog(`[天选时刻] 获取直播间信息出错 ${response.data.message}`, 'error');
+                return p.reject();
               }
-            }, () => {
-              MY_API.chatLog('[天选时刻] 获取直播间信息出错，请检查网络', 'error');
-              return delayCall(() => MY_API.AnchorLottery.uploadRoomList());
             });
           }
           if (MY_API.AnchorLottery.myLiveRoomid === 0) {
@@ -4806,7 +4758,7 @@
                   return p.resolve()
                 }
                 else {
-                  MY_API.chatLog('[天选时刻] 上传失败 ' + re.message, 'warning');
+                  MY_API.chatLog(`[天选时刻] 上传失败 ${re.message}`, 'warning');
                   return p.reject()
                 }
               } else if (re.code === -1) {
@@ -4814,12 +4766,9 @@
                 MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL += 5;
                 return p.resolve();
               } else {
-                MY_API.chatLog('[天选时刻] 房间列表上传失败 ' + re.message, 'error');
+                MY_API.chatLog(`[天选时刻] 房间列表上传失败 ${re.message}`, 'error');
                 return p.reject();
               }
-            }, () => {
-              MY_API.chatLog('[天选时刻] 房间列表上传出错，请检查网络', 'error');
-              return p.reject();
             })
           }
           let jsonStr = JSON.stringify(uploadRawJson);
@@ -4840,8 +4789,6 @@
             } else {
               MY_API.chatLog(`[天选时刻] 获取直播间个人简介错误 ${response.message}`, 'error');
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 获取直播间个人简介出错，请检查网络`, 'error');
           });
           let lotteryInfoJson;
           try {
@@ -5353,11 +5300,9 @@
 
             }
             else {
-              return false
+              MY_API.chatLog(`[天选时刻] 天选检查出错，${response.message}`, 'error');
+              return delayCall(() => MY_API.AnchorLottery.check(roomid));
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 天选检查出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.check(roomid));
           });
         },
         reCheck: (data) => {
@@ -5510,10 +5455,10 @@
                   window.toast(`[天选时刻] 已将UP（uid = ${anchorUid}）添加至白名单`, 'success');
                 }
               }
+            } else {
+              MY_API.chatLog(`[天选时刻] 天选检查出错，${response.message}`, 'error');
+              return delayCall(() => MY_API.AnchorLottery.check(roomid));
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 天选检查出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.check(roomid));
           });
         },
         sendDanmu: async (danmuContent, roomId) => {
@@ -5527,10 +5472,7 @@
                 window.toast(`[天选中奖弹幕] 房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
                 return roomId;
               }
-            }), () => {
-              window.toast(`[天选中奖弹幕] 房间号【${roomId}】信息获取失败，请检查网络`, 'error');
-              return roomId;
-            };
+            });
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
             MYDEBUG(`[天选中奖弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】`, response);
@@ -5539,9 +5481,6 @@
             } else {
               window.toast(`[天选中奖弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】）出错 ${response.msg}`, 'caution');
             }
-          }, () => {
-            window.toast(`[天选中奖弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】）发送失败`, 'error');
-            return $.Deferred().reject();
           })
         },
         countDown: (time, color = '#da4939') => {
@@ -5554,9 +5493,10 @@
             MYDEBUG(`API.room.verify_room_pwd(${room_id}, ${pwd})`, response);
             if (response.code === -1) return true; // message: ╮(￣▽￣)╭请输入密码 / 你确定不是掏错卡了？("▔□▔)/请重新输入密码
             else if (response.code === 0) return false; // message: room_not_encrypted
-            else return true;
-          }, () => {
-            MY_API.chatLog('[天选时刻] 直播间加密检查出错，请检查网络', 'error');
+            else {
+              MY_API.chatLog(`[天选时刻] 直播间加密检查出错，${response.message} 视为加密`, 'error');
+              return true;
+            }
           });
         },
         /**
@@ -5618,9 +5558,6 @@
             else {
               return MY_API.chatLog(`[天选时刻] 天选参加失败<br>roomid = ${linkMsg(liveRoomUrl + data.roomid, data.roomid)}, id = ${data.id}<br>奖品：${data.award_name}<br>${response.msg}`, 'warning')
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 天选参加出错，请检查网络`, 'error');
-            return delayCall(() => MY_API.AnchorLottery.join(data, joinTimes));
           })
         },
         /**
@@ -5644,7 +5581,7 @@
          */
         getAnchorUid: (roomid) => {
           if (MY_API.AnchorLottery.roomidAndUid.hasOwnProperty(roomid)) return $.Deferred().resolve(MY_API.AnchorLottery.roomidAndUid[roomid]);
-          return BAPI.room.getRoomBaseInfo(roomid).then((response) => { // mark
+          return BAPI.room.getRoomBaseInfo(roomid).then((response) => {
             MYDEBUG(`API.room.getRoomBaseInfo(${roomid}) getAnchorUid`, response);
             if (response.code === 0) {
               const uid = response.data.by_room_ids[roomid].uid;
@@ -5654,9 +5591,6 @@
               MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}<br>${response.message}`, 'error');
               return -1
             }
-          }, () => {
-            MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}，${response.message}<br>请检查网络`, 'error');
-            return -1
           })
         },
         /**
@@ -5673,12 +5607,9 @@
                 if (response.code === 0) {
                   return response.data.follower;
                 } else {
-                  MY_API.chatLog(`[天选时刻] 获取粉丝数(uid=${uid})错误 ${response.message}`, 'error');
+                  MY_API.chatLog(`[天选时刻] 获取粉丝数(uid=${uid})失败 ${response.message}`, 'error');
                   return -1;
                 }
-              }, () => {
-                MY_API.chatLog(`[天选时刻] 获取粉丝数出错，请检查网络`, 'error');
-                return -1;
               })
             }
             case 1: {
@@ -5690,9 +5621,6 @@
                   MY_API.chatLog(`[天选时刻] 获取粉丝数(uid=${uid})错误 ${response.message}`, 'error');
                   return -1;
                 }
-              }, () => {
-                MY_API.chatLog(`[天选时刻] 获取粉丝数出错，请检查网络`, 'error');
-                return -1;
               })
             }
             default: return -1;
@@ -5770,13 +5698,10 @@
                       if (res.code === 0) {
                         return res.data.room_id;
                       } else {
-                        window.toast(`[天选时刻]获取房间号【${roomid}】信息出错 ${res.message}`, 'error');
+                        window.toast(`[天选时刻]获取房间【${roomid}】信息出错 ${res.message}`, 'error');
                         return roomid;
                       }
-                    }), () => {
-                      window.toast(`[天选时刻]获取房间号【${roomid}】信息失败，请检查网络`, 'error');
-                      return roomid;
-                    };
+                    })
                   }
                   addVal(MY_API.AnchorLottery.liveRoomList, realRoomId);
                   MY_API.AnchorLottery.roomidAndUid[roomid] = uid;
@@ -6074,10 +5999,6 @@
           delayCall(() => getMedalList(page));
           end = true;
         }
-      }, () => {
-        window.toast('获取粉丝勋章列表失败，请检查网络<br>部分功能将无法正常运行', 'error');
-        delayCall(() => getMedalList(page));
-        end = true;
       });
       if (end) {
         runTomorrow(() => getMedalList(), 0, 1, "获取粉丝勋章列表");

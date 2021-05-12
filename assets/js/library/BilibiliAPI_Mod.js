@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       2.1.2
+// @version       3.0
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -80,36 +80,23 @@ var BAPI = {
         share: (aid) => BAPI.x.share_add(aid)
     },
     // ajax调用B站API
-    runUntilSucceed: (callback, delay = 0, maxTry = 2) => {
-        if (maxTry > 0) {
-            setTimeout(() => {
-                if (!callback()) BAPI.runUntilSucceed(callback, 500, --maxTry);
-            }, delay);
-        }
-    },
-    processing: 0,
     ajax: (settings) => {
         if (settings.xhrFields === undefined) settings.xhrFields = {};
         settings.xhrFields.withCredentials = true;
         jQuery.extend(settings, {
-            url: (settings.url.substr(0, 2) === '//' ? '' : '//api.live.bilibili.com/') + settings.url,
+            url: (settings.url.substr(0, 2) === '//' || settings.url.substr(0, 4) === 'http' ? '' : '//api.live.bilibili.com/') + settings.url,
             method: settings.method || 'GET',
             crossDomain: true,
             dataType: settings.dataType || 'json'
         });
         const p = jQuery.Deferred();
-        BAPI.runUntilSucceed(() => {
-            if (BAPI.processing > 8) return false;
-            ++BAPI.processing;
-            return jQuery.ajax(settings).then((arg1, arg2, arg3,) => {
-                --BAPI.processing;
-                p.resolve(arg1, arg2, arg3);
-                return true;
-            }, (arg1, arg2, arg3) => {
-                --BAPI.processing;
-                p.reject(arg1, arg2, arg3);
-                return true;
-            });
+        jQuery.ajax(settings).then((...arg) => {
+            p.resolve(...arg);
+        }).catch(e => {
+            if (e.responseJSON) e.responseJSON.msg = e.responseJSON.message;
+            else e.responseJSON = { code: "NET_ERR", msg: "请检查网络", message: "请检查网络" }
+            e.responseJSON.netError = true;
+            p.resolve(e.responseJSON);
         });
         return p;
     },

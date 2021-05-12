@@ -8,14 +8,13 @@
 [github.com/andywang425/BLTH](https://github.com/andywang425/BLTH)
 &nbsp;<a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Github stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a>
 
-### 使用方法 
+## 使用方法 
 在 [Tampermonkey](https://www.tampermonkey.net) / [Violentmonkey](https://violentmonkey.github.io) 中启用脚本，登陆bilibili后打开任意b站直播间。 
 + 在 Tampermonkey 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
 + 不保证能通过其它油猴插件(如Greasemonkey)运行。  
-
 -------------------------------
 
-### 一些建议
+## 一些建议
 + 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新(`shift+F5`)页面。  
 + 部分设置更改后需要刷新页面才能生效。  
 + 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。  
@@ -37,7 +36,7 @@
 
 -------------------------------
 
-## 功能细节 
+# 功能细节 
 
 脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到。
 点击**直播画面上方**按钮隐藏/显示脚本窗口和提示信息。    
@@ -133,8 +132,8 @@
 
 -------------------------------
 
-## 说明
-#### 脚本代码格式
+# 说明
+### 脚本代码格式
 本脚本在三个平台上的代码格式有所不同
 <table>
     <tr>
@@ -159,25 +158,27 @@
     </tr>
 </table>
 
-#### 脚本内置说明
+### 脚本内置说明
 运行脚本后点击控制面板上带下划线的小问号查看各项功能的具体说明。  
 
-#### 运行日志
+### 运行日志
 运行日志分普通日志和控制台日志两种。
-##### 普通日志
+
+#### 普通日志
 + 可以点击聊天区上方，大航海右侧的【日志】查看普通日志。部分日志上会有可点击的蓝色链接文字，方便完成某些操作。
-##### 控制台日志
-+ 打开控制台(Chrome可点`F12`或`ctrl + shift + i`，再点击`Console`)在Filter中输入`BLTH`即可过滤出本脚本的控制台日志。  
+
+#### 控制台日志
++ 打开控制台(Chrome可以按`F12`或`ctrl + shift + i`，再点击`Console`)在Filter中输入`BLTH`即可过滤出本脚本的控制台日志。  
   *注：某些意料之外的报错不会带有`BLTH`字样，反馈 bug 时请多加注意。*
 + 脚本默认关闭控制台日志。勾选控制面板上的`其他设置 - 控制台日志`即可开启。  
 
-#### 风控
-+ 若出现`...，请检查网络`的红色日志，有两种可能。一是网络状况不佳，二是被B站风控了。
+### 风控
++ 若出现`... 请求被拦截`的红色/橙色日志或提示信息，则是被B站风控了。
 + 风控过一段时间会自动解除。
 + 因为风控是针对ip地址的，被风控后可通过挂代理等方式更换ip，继续正常使用脚本。
 + 被风控通常是因为api请求过于频繁，可通过修改脚本的相关设置（如果有的话）降低请求频率。
 
-#### 关于反馈
+### 关于反馈
 + 如果使用脚本过程中遇到问题，可以先按上述步骤[开启控制台日志](#控制台日志)，然后关掉无关功能再次运行脚本并在控制台中寻找相关错误信息。若能找到请在反馈bug时附上这些控制台日志。
 + 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。
 + 交流qq群：①群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444(新)](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
@@ -193,14 +194,14 @@
 
 -------------------------------
 
-## 许可证  
-该脚本以`MIT`许可证开源。  
+# 许可证
+本项目以`MIT`许可证开源。  
 
 <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/andywang425/BLTH?style=for-the-badge"></a>
 
 -------------------------------
 
-## 其它信息  
+# 其它信息  
 这个项目的部分代码来源于以下几个项目:  
 + [B站直播签到助手](https://wwa.lanzous.com/iLjOmkfuvxe) (MIT) by [十六夜](https://space.bilibili.com/4317450)
 + [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)
@@ -222,7 +223,7 @@
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。
 + [myCss.css](https://github.com/andywang425/BLTH/blob/master/assets/css/myCss.css)：脚本样式。
-+ [main.html](https://github.com/andywang425/BLTH/blob/master/assets/html/main.html)：控制面板html。
++ [main.html](https://github.com/andywang425/BLTH/blob/master/assets/html/main.html)：脚本控制面板的html。
 + [eula.html](https://github.com/andywang425/BLTH/blob/master/assets/html/eula.html)：最终用户许可协议。
 
 -------------------------------
@@ -233,27 +234,30 @@
 
 -------------------------------
 
-## 更新日志
+# 更新日志
+>### 5.6.9
+>1.重构了BAPI中的ajax请求，现在请求出错时能返回错误原因。
+
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/assets/markdown/update-log.md)。  
 
 -------------------------------
 
-## 相关推荐
+# 相关推荐
 
-### Bilibili-Evolved
+## Bilibili-Evolved
 作者：[the1812](https://github.com/the1812)
 + [Github](https://github.com/the1812/Bilibili-Evolved)  
 
 强大的哔哩哔哩增强脚本: 下载视频, 音乐, 封面, 弹幕 / 简化直播间, 评论区, 首页 / 自定义顶栏, 删除广告, 夜间模式 / 触屏设备支持。
 
-### bilibili直播净化
+## bilibili直播净化
 作者：[lzghzr](https://github.com/lzghzr)
 + [Github](https://github.com/lzghzr/TampermonkeyJS/raw/master/BiLiveNoVIP/BiLiveNoVIP.user.js)
 + [GreasyFork](https://greasyfork.org/zh-CN/scripts/21416-bilibili%E7%9B%B4%E6%92%AD%E5%87%80%E5%8C%96)  
 
 屏蔽聊天室礼物以及关键字，净化聊天室环境。
 
-### 哔站直播全裸2233娘
+## 哔站直播全裸2233娘
 作者：[journey-ad](https://gist.github.com/journey-ad)
 + [Github](https://gist.github.com/journey-ad/5d3021fd40db75de2df827b876ef5b7e)
 + [GreasyFork](https://greasyfork.org/zh-CN/scripts/369477-%E5%93%94%E7%AB%99%E7%9B%B4%E6%92%AD%E5%85%A8%E8%A3%B82233%E5%A8%98)  
