@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.0
+// @version       3.0.1
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -94,6 +94,7 @@ var BAPI = {
             p.resolve(...arg);
         }).catch(e => {
             if (e.responseJSON) e.responseJSON.msg = e.responseJSON.message;
+            else if (e.status !== 0) e.responseJSON = { code: e.status, message: `状态码: ${e.status}`, msg: `状态码: ${e.status}` };
             else e.responseJSON = { code: "NET_ERR", msg: "请检查网络", message: "请检查网络" }
             e.responseJSON.netError = true;
             p.resolve(e.responseJSON);
