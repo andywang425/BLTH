@@ -506,7 +506,7 @@
         ANCHOR_UPLOAD_MSG_CONTENT: "", // 附加信息
         ANCHOR_IGNORE_UPLOAD_MSG: false, // 天选忽略附加信息
         ANCHOR_UPLOAD_ROOMLIST: false, // 上传天选数据至 BLTH-server
-        ANCHOR_SERVER_APIKEY: "apikey", // 天选时刻 BLTH-server apikey
+        ANCHOR_SERVER_APIKEY: "", // 天选时刻 BLTH-server apikey
         ANCHOR_TYPE_SERVER: false, // 天选时刻 - BLTH-server
         ANCHOR_TYPE_POLLING: true, // 天选模式 - 轮询
         ANCHOR_TYPE_LIVEROOM: false, // 天选模式 - 直播间简介
@@ -4805,6 +4805,8 @@
         },
         uploadRoomList: () => {
           if (MY_API.AnchorLottery.BLTHuploadRoomList.length === 0) return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), 20e3);
+          if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法上传天选数据至BLTH-server`, 'warning');
+          const uploadRoomlist = MY_API.AnchorLottery.BLTHuploadRoomList.slice(0, 50);
           const settings = {
             GM: true,
             anonymous: true,
@@ -4819,7 +4821,7 @@
             if (response.body === null)
               return MY_API.chatLog(`[天选时刻] 连接BLTH-server出错<br>状态码: ${response.response.status}`, 'error');
             if (response.body.code === 0) {
-              MY_API.chatLog(`[天选时刻] 上传房间列表至BLTH-server成功`, 'success');
+              MY_API.chatLog(`[天选时刻] 上传房间列表至BLTH-server成功<br>上传房间数：${uploadRoomlist.length}`, 'success');
               MY_API.AnchorLottery.BLTHuploadRoomList = [];
             }
             else MY_API.chatLog(`[天选时刻] 上传直播间至BLTH-server出错<br>${response.body.msg}`, 'error');
@@ -4831,10 +4833,11 @@
           });
         },
         getDataFromBLTHserver: () => {
+          if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法从BLTH-server获取天选数据`, 'warning');
           const settings = {
             GM: true,
             anonymous: true,
-            url: `https://andywang.top:3001/api/v1/anchor/getroomlist?apikey=${MY_API.CONFIG.ANCHOR_SERVER_APIKEY}&uid=${Live_info.uid}&num=100`,
+            url: `https://andywang.top:3001/api/v1/anchor/getroomlist?apikey=${MY_API.CONFIG.ANCHOR_SERVER_APIKEY}&uid=${Live_info.uid}&num=50`,
             method: "GET",
             headers: { "content-type": "charset=utf-8" },
             responseType: "json"
@@ -4849,7 +4852,7 @@
               for (const i of roomList) {
                 addVal(MY_API.AnchorLottery.BLTHserverRoomList, i);
               }
-              MY_API.chatLog(`[天选时刻] BTLH-server天选数据获取完毕`, 'success');
+              MY_API.chatLog(`[天选时刻] BTLH-server天选数据获取完毕<br>共${roomList.length}个房间`, 'success');
               return $.Deferred().resolve();
             } else {
               return MY_API.chatLog(`[天选时刻] 连接BLTH-server出错<br>${response.body.msg}`, 'error');
