@@ -12,6 +12,7 @@
 在 [Tampermonkey](https://www.tampermonkey.net) / [Violentmonkey](https://violentmonkey.github.io) 中启用脚本，登陆bilibili后打开任意b站直播间。 
 + 在 Tampermonkey 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
 + 不保证能通过其它油猴插件(如Greasemonkey)运行。  
+
 -------------------------------
 
 ## 一些建议
@@ -235,8 +236,6 @@
 -------------------------------
 
 # 更新日志
->### 5.6.9
->1.重构了BAPI中的ajax请求，现在请求出错时能返回错误原因。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/assets/markdown/update-log.md)。  
 

@@ -14,6 +14,7 @@
 在 [Tampermonkey](https://www.tampermonkey.net) / [Violentmonkey](https://violentmonkey.github.io) 中启用脚本，登陆bilibili后打开任意b站直播间。 
 + 在 Tampermonkey 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
 + 不保证能通过其它油猴插件(如Greasemonkey)运行。  
+
 -------------------------------
 
 ## 一些建议
