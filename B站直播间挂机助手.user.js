@@ -32,7 +32,6 @@
 // @connect        raw.fastgit.org
 // @connect        raw.githubusercontent.com
 // @connect        andywang.top
-// @connect        localhost
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
 // @require        https://code.jquery.com/jquery-3.6.0.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
