@@ -5763,14 +5763,6 @@
               if (MY_API.CONFIG.ANCHOR_TYPE_SERVER) { // BLTH-server
                 await MY_API.AnchorLottery.getDataFromBLTHserver();
               }
-              if (MY_API.CONFIG.ANCHOR_UPLOAD_ROOMLIST) {
-                // 上传至BLTH-server
-                await MY_API.AnchorLottery.uploadRoomList();
-              }
-              if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) {
-                // 上传至直播间简介
-                await MY_API.AnchorLottery.uploadData();
-              }
               if (MY_API.CONFIG.ANCHOR_TYPE_POLLING) { // 轮询热门房间
                 await MY_API.AnchorLottery.getRoomList();
               }
@@ -5804,6 +5796,14 @@
                 MY_API.AnchorLottery.customLiveRoomList = MY_API.CONFIG.ANCHOR_CUSTOM_ROOMLIST;
               } else {
                 MY_API.AnchorLottery.customLiveRoomList = [];
+              }
+              if (MY_API.CONFIG.ANCHOR_UPLOAD_ROOMLIST) {
+                // 上传至BLTH-server
+                MY_API.AnchorLottery.uploadRoomList();
+              }
+              if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) {
+                // 上传至直播间简介
+                MY_API.AnchorLottery.uploadData();
               }
               // 整理数据并参加
               const id_list = [...MY_API.AnchorLottery.BLTHserverRoomList, ...MY_API.AnchorLottery.customLiveRoomList, ...MY_API.AnchorLottery.liveRoomList, ...MY_API.AnchorLottery.introRoomList, ...MY_API.AnchorLottery.roomidList];
