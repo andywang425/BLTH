@@ -5721,6 +5721,14 @@
           await MY_API.AnchorLottery.getUpInBLTHTag(Live_info.uid, [MY_API.AnchorLottery.anchorFollowTagid, MY_API.AnchorLottery.anchorPrizeTagid]);
           await MY_API.AnchorLottery.getUpInOriginTag(Live_info.uid);
           await MY_API.AnchorLottery.getUpInSpecialTag(Live_info.uid);
+          if (MY_API.CONFIG.ANCHOR_UPLOAD_ROOMLIST) {
+            // 上传至BLTH-server
+            MY_API.AnchorLottery.uploadRoomList();
+          }
+          if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) {
+            // 上传至直播间简介
+            MY_API.AnchorLottery.uploadData();
+          }
           function waitForNextRun(Fn, firstRun = false, toNext = false) {
             const sleepTime = MY_API.AnchorLottery.sleepCheck();
             if (sleepTime) { // 休眠
@@ -5796,14 +5804,6 @@
                 MY_API.AnchorLottery.customLiveRoomList = MY_API.CONFIG.ANCHOR_CUSTOM_ROOMLIST;
               } else {
                 MY_API.AnchorLottery.customLiveRoomList = [];
-              }
-              if (MY_API.CONFIG.ANCHOR_UPLOAD_ROOMLIST) {
-                // 上传至BLTH-server
-                MY_API.AnchorLottery.uploadRoomList();
-              }
-              if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) {
-                // 上传至直播间简介
-                MY_API.AnchorLottery.uploadData();
               }
               // 整理数据并参加
               const id_list = [...MY_API.AnchorLottery.BLTHserverRoomList, ...MY_API.AnchorLottery.customLiveRoomList, ...MY_API.AnchorLottery.liveRoomList, ...MY_API.AnchorLottery.introRoomList, ...MY_API.AnchorLottery.roomidList];
