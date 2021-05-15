@@ -806,7 +806,7 @@
             const mliList = [
               "重构了BAPI中的ajax请求，现在请求出错时能返回错误原因。",
               "修复刷新直播间不生效的bug。",
-              "天选时刻新增BLTH-server相关功能（测试中）。"
+              "天选时刻模块新增BLTH-server相关功能（测试中）。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
