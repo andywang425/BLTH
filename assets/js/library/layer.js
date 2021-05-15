@@ -13,19 +13,7 @@
   
     var isLayui = window.layui && layui.define, $, win, ready = {
       getPath: function () {
-        var jsPath = document.currentScript ? document.currentScript.src : function () {
-          var js = document.scripts
-            , last = js.length - 1
-            , src;
-          for (var i = last; i > 0; i--) {
-            if (js[i].readyState === 'interactive') {
-              src = js[i].src;
-              break;
-            }
-          }
-          return src || js[last].hasOwnProperty("src") ? js[last].src : "";
-        }();
-        return jsPath.substring(0, jsPath.lastIndexOf('/') + 1);
+        return "";
       }(),
   
       config: {}, end: {}, minIndex: 0, minLeft: [],
