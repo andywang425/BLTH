@@ -238,7 +238,7 @@
 
 # 更新日志
 >### 5.6.9
->1.重构了BAPI中的ajax请求，现在请求出错时能返回错误原因。
+>1.重构了BAPI中的ajax请求，现在请求出错时能返回错误原因。2.修复刷新直播间不生效的bug。3.天选时刻新增BLTH-server相关功能（测试中）。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/assets/markdown/update-log.md)。  
 
