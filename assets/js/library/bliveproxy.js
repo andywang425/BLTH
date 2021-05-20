@@ -35,7 +35,7 @@
       return
     }
     initApi()
-    hook();
+    // window.bliveproxy.hook();
   }
 
   function initApi() {
@@ -57,6 +57,14 @@
       }
       this._commandHandlers[cmd] = handlers.filter(item => item !== handler)
     },
+    hook() {
+      W.WebSocket = new Proxy(window.WebSocket, {
+        construct(target, args) {
+          let obj = new target(...args)
+          return new Proxy(obj, proxyHandler)
+        }
+      })
+    },
 
     // 私有API
     _commandHandlers: {},
@@ -64,15 +72,6 @@
       return this._commandHandlers[cmd] || null
     }
   }
-
-  function hook() {
-    W.WebSocket = new Proxy(window.WebSocket, {
-      construct(target, args) {
-        let obj = new target(...args)
-        return new Proxy(obj, proxyHandler)
-      }
-    })
-  };
 
   let proxyHandler = {
     get(target, property) {
