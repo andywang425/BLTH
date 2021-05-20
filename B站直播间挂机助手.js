@@ -34,9 +34,9 @@
 // @connect        andywang.top
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
 // @require        https://code.jquery.com/jquery-3.2.1.min.js
-// @require        https://cdn.jsdelivr.net/gh/google/brotli@5692e422da6af1e991f9182345d58df87866bc5e/js/decode.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d7e974a95e3c0328691561c52c66c39287e3b89f/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
@@ -377,7 +377,7 @@
     onlyScriptCheck();
     if (SP_CONFIG.DANMU_MODIFY) {
       window.bliveproxy.hook();
-      MYDEBUG('bliveproxy hook complete', window.bliveproxy);
+      MYDEBUG('bliveproxy hook complete', bliveproxy);
     }
     if (SP_CONFIG.nosleep) {
       setInterval(() => mouseMove(), 300e3);
@@ -5907,11 +5907,11 @@
           return -1;
         },
         run: () => {
-          if (!MY_API.CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
+          if (!SP_CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
           MY_API.DANMU_MODIFY.handleConfig();
           // MYDEBUG('MY_API.DANMU_MODIFY.configJson', MY_API.DANMU_MODIFY.configJson);
           bliveproxy.addCommandHandler('DANMU_MSG', command => {
-            if (!MY_API.CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
+            if (!SP_CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
             let info = command.info;
             MYDEBUG('bliveproxy DANMU_MSG', info);
             let index = MY_API.DANMU_MODIFY.check(info);
