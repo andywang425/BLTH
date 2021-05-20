@@ -8,7 +8,7 @@
 // @include      /https?:\/\/live\.bilibili\.com\/\d+\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*/
 // @run-at       document-start
-// @require      https://cdn.jsdelivr.net/gh/google/brotli@5692e422da6af1e991f9182345d58df87866bc5e/js/decode.min.js
+// @require      https://cdn.jsdelivr.net/gh/google/brotli@5692e422da6af1e991f9182345d58df87866bc5e/js/decode.js
 // @require      https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.min.js
 // @grant        none
 // ==/UserScript==
@@ -42,7 +42,7 @@
       return
     }
     initApi()
-    hook()
+    // window.bliveproxy.hook();
   }
 
   function initApi() {
@@ -64,21 +64,20 @@
       }
       this._commandHandlers[cmd] = handlers.filter(item => item !== handler)
     },
+    hook() {
+      window.WebSocket = new Proxy(window.WebSocket, {
+        construct(target, args) {
+          let obj = new target(...args)
+          return new Proxy(obj, proxyHandler)
+        }
+      })
+    },
 
     // 私有API
     _commandHandlers: {},
     _getCommandHandlers(cmd) {
       return this._commandHandlers[cmd] || null
     }
-  }
-
-  function hook() {
-    window.WebSocket = new Proxy(window.WebSocket, {
-      construct(target, args) {
-        let obj = new target(...args)
-        return new Proxy(obj, proxyHandler)
-      }
-    })
   }
 
   let proxyHandler = {
