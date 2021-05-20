@@ -223,8 +223,8 @@
 + [layer](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web弹层组件。
 + [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器XMLHttpRequest的库。
 + [bliveproxy](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B站直播websocket hook框架。
-+ [pako_inflate](https://github.com/nodeca/pako) (MIT)：用于解码B站弹幕。
-+ [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：用于解码B站弹幕。
++ [pako_inflate](https://github.com/nodeca/pako) (MIT)：基于zlib的javascript压缩/解压缩库。
++ [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli项目中的javascript解码库。
 
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。
@@ -242,7 +242,7 @@
 
 # 更新日志
 >### 5.6.9.1
->1.小心心token支持多账号保存。2.天选时刻apikey支持多账号保存。3.尝试修复在网速很慢时脚本加载失败的问题。
+>1.小心心token支持多账号保存。2.天选时刻apikey支持多账号保存。3.尝试修复在网速很慢时脚本加载失败的问题。4.更新bliveproxy，兼容B站websocket协议升级，修复【弹幕修改】功能无效的问题。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/assets/markdown/update-log.md)。  
 
