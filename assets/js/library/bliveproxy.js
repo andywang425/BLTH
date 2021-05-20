@@ -30,16 +30,16 @@
   let textDecoder = new TextDecoder()
 
   function main() {
-    if (W.bliveproxy) {
+    if (window.bliveproxy) {
       // 防止多次加载
       return
     }
     initApi()
-    // W.bliveproxy.hook();
+    // window.bliveproxy.hook();
   }
 
   function initApi() {
-    W.bliveproxy = api
+    window.bliveproxy = api
   }
 
   let api = {
