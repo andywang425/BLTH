@@ -33,8 +33,9 @@
 // @connect        raw.githubusercontent.com
 // @connect        andywang.top
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
-// @require        https://code.jquery.com/jquery-3.6.0.min.js
-// @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
+// @require        https://code.jquery.com/jquery-3.2.1.min.js
+// @require        https://cdn.jsdelivr.net/gh/google/brotli@5692e422da6af1e991f9182345d58df87866bc5e/js/decode.min.js
+// @require        https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d7e974a95e3c0328691561c52c66c39287e3b89f/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js

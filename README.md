@@ -239,7 +239,7 @@
 
 # 更新日志
 >### 5.6.9.1
->1.小心心token支持多账号保存。2.天选时刻apikey支持多账号保存。
+>1.小心心token支持多账号保存。2.天选时刻apikey支持多账号保存。3.尝试修复在网速很慢时脚本加载失败的问题。
 
 完整更新日志见[update-log.md](https://github.com/andywang425/BLTH/blob/master/assets/markdown/update-log.md)。  
 
