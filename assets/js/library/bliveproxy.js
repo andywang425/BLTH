@@ -10,18 +10,11 @@
 // @run-at       document-start
 // @require      https://cdn.jsdelivr.net/gh/google/brotli@5692e422da6af1e991f9182345d58df87866bc5e/js/decode.js
 // @require      https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.min.js
-// @grant        none
+// @grant        unsafeWindow
 // ==/UserScript==
 
-// 使用方法：
-// bliveproxy.addCommandHandler('DANMU_MSG', command => {
-//   console.log(command)
-//   let info = command.info
-//   info[1] = '测试'
-// })
-
 (function() {
-  // const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
+  const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
 
   const HEADER_SIZE = 16
 
@@ -37,16 +30,16 @@
   let textDecoder = new TextDecoder()
 
   function main() {
-    if (window.bliveproxy) {
+    if (W.bliveproxy) {
       // 防止多次加载
       return
     }
     initApi()
-    // window.bliveproxy.hook();
+    // W.bliveproxy.hook();
   }
 
   function initApi() {
-    window.bliveproxy = api
+    W.bliveproxy = api
   }
 
   let api = {
@@ -65,7 +58,7 @@
       this._commandHandlers[cmd] = handlers.filter(item => item !== handler)
     },
     hook() {
-      window.WebSocket = new Proxy(window.WebSocket, {
+      W.WebSocket = new Proxy(window.WebSocket, {
         construct(target, args) {
           let obj = new target(...args)
           return new Proxy(obj, proxyHandler)
