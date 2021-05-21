@@ -6266,7 +6266,10 @@
     // localStorage fix
     localStorage.removeItem("im_deviceid_IGIFTMSG");
     // GM storage fix
-    GM_deleteValue('AnchorRoomidList');
+    const gmDeleteList = ['AnchorRoomidList', 'im_deviceid_', 'blnvConfig', 'UNIQUE_CHECK_CACHE'];
+    for (const i of gmDeleteList) {
+      GM_deleteValue(i);
+    }
     let token = GM_getValue("Token");
     if (token.hasOwnProperty("access_token")) GM_setValue("Token", {});
     const apikey = API.CONFIG.ANCHOR_SERVER_APIKEY;
