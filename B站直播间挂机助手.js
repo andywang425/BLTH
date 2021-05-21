@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name           B站直播间挂机助手
-// @name:en        B站直播间挂机助手
+// @name:en        Bilibili Live Helper
 // @namespace      https://github.com/andywang425
 // @author         andywang425
-// @description    自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章，优化弹幕体验，发弹幕前自动佩戴当前直播间的粉丝勋章
-// @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章，优化弹幕体验，发弹幕前自动佩戴当前直播间的粉丝勋章
+// @description    优化直播观看体验
+// @description:en Improve live viewing experience
 // @updateURL      https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH
@@ -43,7 +43,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@afff97b8be7d446a7a2224587245bd51c784f8be/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@bfc4678a8266d6e6f12aa5c1fbad72c1c0314c2b/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -805,9 +805,10 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "重构了BAPI中的ajax请求，现在请求出错时能返回错误原因。",
-              "修复刷新直播间不生效的bug。",
-              "天选时刻模块新增BLTH-server相关功能（测试中）。"
+              "小心心token支持多账号保存（旧版本升至新版本时token会被重置），并添加了重置token按钮。",
+              "天选时刻apikey支持多账号保存（旧版本升至新版本时apikey可能会错位，出现该情况时请再填写一次）。",
+              "尝试修复在网速很慢时脚本加载失败的问题。",
+              "更新bliveproxy，兼容B站websocket协议升级，修复【弹幕修改】功能无效的问题。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -817,6 +818,7 @@
               title: `${version}更新提示`,
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `<mol>${mliHtml}</mol>
+              <mol><blockquote style="margin-inline-start:0px;">The darker the sky,<br>the brighter the stars,<br>know which direction you should be heading.</blockquote></mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444（新）')}
@@ -1388,7 +1390,7 @@
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "调用官方api，消耗20硬币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
-          LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
+          LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli><mli>【重置token】可在无法获取小心心时点击，下次获取小心心前会重新获取token。<strong>请谨慎点击该按钮，不要频繁使用。</strong></mli></mul>",
           STORM: "仅会参加被广播的节奏风暴。若无法参加请尝试实名后再参加。<mul><mli>由于B站改版现在几乎不可能抽到节奏风暴了。</mli><mli>这一功能可能会在日后被删除。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
@@ -2092,6 +2094,28 @@
                     });
                   })
                 }
+              });
+              myDiv.find('button[data-action="resetToken"]').click(() => {
+                // 重置token
+                layer.confirm(`<h3 style="text-align:center">是否重置移动端Token？</h3>重置后下次获取小心心前会重新获取Token。`, {
+                  title: '重置Token',
+                  btn: ['是', '否']
+                }, function () {
+                  let token = GM_getValue('Token');
+                  if (token && !token.hasOwnProperty("access_token")) {
+                    delete token[Live_info.uid];
+                    GM_setValue('Token', token);
+                  } else {
+                    GM_setValue('Token', {});
+                  }
+                  layer.msg('已重置Token', {
+                    time: 2000,
+                  });
+                }, function () {
+                  layer.msg('已取消', {
+                    time: 2000
+                  });
+                })
               });
               myDiv.find('button[data-action="sendGiftNow"]').click(() => {
                 // 立刻开始送礼
@@ -6243,13 +6267,8 @@
     localStorage.removeItem("im_deviceid_IGIFTMSG");
     // GM storage fix
     GM_deleteValue('AnchorRoomidList');
-    const token = GM_getValue('Token');
-    if (token !== undefined && token.hasOwnProperty("access_token")) {
-      GM_deleteValue('Token');
-      let obj = {};
-      obj[Live_info.uid] = token;
-      GM_setValue('Token', obj);
-    }
+    let token = GM_getValue("Token");
+    if (token.hasOwnProperty("access_token")) GM_setValue("Token", {});
     const apikey = API.CONFIG.ANCHOR_SERVER_APIKEY;
     if (typeof apikey === "string") {
       API.CONFIG.ANCHOR_SERVER_APIKEY = {};
