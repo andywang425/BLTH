@@ -140,7 +140,7 @@
     appToken = new BilibiliToken(),
     baseQuery = `actionKey=appkey&appkey=${BilibiliToken.appKey}&build=5561000&channel=bili&device=android&mobi_app=android&platform=android&statistics=%7B%22appId%22%3A1%2C%22platform%22%3A3%2C%22version%22%3A%225.57.0%22%2C%22abtest%22%3A%22%22%7D`,
     setToken = async () => {
-      if (tokenData !== undefined && tokenData[Live_info.uid]['time'] > ts_s()) {
+      if (tokenData.hasOwnProperty(Live_info.uid) && tokenData[Live_info.uid]['time'] > ts_s()) {
         userToken = tokenData[Live_info.uid];
       } else {
         tokenData[Live_info.uid] = await appToken.getToken();
@@ -260,7 +260,7 @@
     },
     medal_info = { status: $.Deferred(), medal_list: [] },
     userToken = undefined,
-    tokenData = GM_getValue("Token"),
+    tokenData = GM_getValue("Token") || {},
     mainIndex = undefined,
     logIndex = undefined,
     layerUiMain = undefined, // 控制面板
@@ -817,12 +817,14 @@
             layer.open({
               title: `${version}更新提示`,
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
-              content: `<mol>${mliHtml}</mol>
-              <mol><blockquote style="margin-inline-start:0px;">The darker the sky,<br>the brighter the stars,<br>know which direction you should be heading.</blockquote></mol>
+              content: `
+                <mol><blockquote style="margin-inline-start:0px;">The darker the sky,<br>the brighter the stars,<br>know which direction you should be heading.</blockquote></mol>
+                <mol>${mliHtml}</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444（新）')}
-                </em>`
+                </em>
+                `
             });
             SP_CONFIG.lastShowUpdateMsgVersion = version;
             saveSpConfig();
