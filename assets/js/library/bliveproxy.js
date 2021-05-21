@@ -1,24 +1,27 @@
 // ==UserScript==
 // @name         bliveproxy
-// @namespace    https://github.com/xfgryujk
-// @version      0.2
+// @namespace    http://tampermonkey.net/
+// @version      0.3
 // @description  B站直播websocket hook框架
-// @author       xfgryujk
+// @author       https://github.com/xfgryujk
 // @include      /https?:\/\/live\.bilibili\.com\/?\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/\d+\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*/
-// @require      https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.10/pako.min.js
+// @run-at       document-start
+// @require      https://cdn.jsdelivr.net/gh/google/brotli@5692e422da6af1e991f9182345d58df87866bc5e/js/decode.js
+// @require      https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.min.js
 // @grant        unsafeWindow
 // ==/UserScript==
 
-(function () {
+(function() {
   const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
 
   const HEADER_SIZE = 16
 
-  const WS_BODY_PROTOCOL_VERSION_INFLATE = 0
-  const WS_BODY_PROTOCOL_VERSION_NORMAL = 1
+  const WS_BODY_PROTOCOL_VERSION_NORMAL = 0
+  const WS_BODY_PROTOCOL_VERSION_HEARTBEAT = 1
   const WS_BODY_PROTOCOL_VERSION_DEFLATE = 2
+  const WS_BODY_PROTOCOL_VERSION_BROTLI = 3
 
   const OP_HEARTBEAT_REPLY = 3
   const OP_SEND_MSG_REPLY = 5
@@ -31,12 +34,12 @@
       // 防止多次加载
       return
     }
-    initApi();
+    initApi()
     // window.bliveproxy.hook();
   }
 
   function initApi() {
-    window.bliveproxy = api
+    window.bliveproxy = api;
   }
 
   let api = {
@@ -62,6 +65,7 @@
         }
       })
     },
+
     // 私有API
     _commandHandlers: {},
     _getCommandHandlers(cmd) {
@@ -80,7 +84,7 @@
     set(target, property, value) {
       if (property === 'onmessage') {
         let realOnMessage = value
-        value = function (event) {
+        value = function(event) {
           myOnMessage(event, realOnMessage)
         }
       }
@@ -97,7 +101,7 @@
 
     let data = new Uint8Array(event.data)
     function callRealOnMessageByPacket(packet) {
-      realOnMessage({ ...event, data: packet })
+      realOnMessage({...event, data: packet})
     }
     handleMessage(data, callRealOnMessageByPacket)
   }
@@ -111,8 +115,8 @@
     let packLen = HEADER_SIZE + body.byteLength
     let packet = new ArrayBuffer(packLen)
 
-    // 不需要DEFLATE
-    let ver = operation === OP_HEARTBEAT_REPLY ? WS_BODY_PROTOCOL_VERSION_INFLATE : WS_BODY_PROTOCOL_VERSION_NORMAL
+    // 不需要压缩
+    let ver = operation === OP_HEARTBEAT_REPLY ? WS_BODY_PROTOCOL_VERSION_HEARTBEAT : WS_BODY_PROTOCOL_VERSION_NORMAL
     let packetView = new DataView(packet)
     packetView.setUint32(0, packLen)        // pack_len
     packetView.setUint16(4, HEADER_SIZE)    // raw_header_size
@@ -139,12 +143,25 @@
 
       let body = new Uint8Array(data.buffer, offset + HEADER_SIZE, packLen - HEADER_SIZE)
       if (operation === OP_SEND_MSG_REPLY) {
-        if (ver == WS_BODY_PROTOCOL_VERSION_DEFLATE) {
+        switch (ver) {
+        case WS_BODY_PROTOCOL_VERSION_NORMAL:
+          body = textDecoder.decode(body)
+          body = JSON.parse(body)
+          handleCommand(body, callRealOnMessageByPacket)
+          break
+        case WS_BODY_PROTOCOL_VERSION_DEFLATE:
           body = pako.inflate(body)
           handleMessage(body, callRealOnMessageByPacket)
-        } else {
-          body = JSON.parse(textDecoder.decode(body))
-          handleCommand(body, callRealOnMessageByPacket)
+          break
+        case WS_BODY_PROTOCOL_VERSION_BROTLI:
+          body = BrotliDecode(body)
+          handleMessage(body, callRealOnMessageByPacket)
+          break
+        default: {
+          let packet = makePacketFromUint8Array(body, operation)
+          callRealOnMessageByPacket(packet)
+          break
+        }
         }
       } else {
         let packet = makePacketFromUint8Array(body, operation)

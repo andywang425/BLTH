@@ -16,21 +16,6 @@
 + 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新(`shift+F5`)页面。  
 + 部分设置更改后需要刷新页面才能生效。  
 + 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。  
-+ 修改浏览器设置缩减或不发送Referer。
-  <details>
-  <summary>点击展开具体方法</summary>
-
-  + Chrome / Edge   
-  安装浏览器拓展[Referer Control](https://chrome.google.com/webstore/detail/referer-control/hnkcfpcejkafcihlgbojoidoihckciin)，在设置页面中找到`default referer for all other sites`，选择`Custom` - `target host`。  
-  若无法科学上网可进Q群下载群文件中的crx文件，在浏览器地址栏输入`chrome://extensions/`，打开右上角的`开发者模式`，把crx文件拖进去安装。
-  + FireFox   
-  在地址栏输入`about:config`，搜索`network.http.sendRefererHeader`，把这个设置的值改为`0`。
-  + 建议这样做的原因：
-  B站直播间api在被调用时，其referer值为`https://live.bilibili.com/当前房间号`。所以若不修改设置，脚本发出的相当一部分api请求所携带的referer值是不合理的。如在直播间`777`使用脚本，参加了直播间`666`的天选时刻，那么发出请求所携带的referer值就是`https://live.bilibili.com/777`。但正常情况下天选时刻只能在对应房间参加，如果B站有相关检测的话很容易发现刚刚那个请求是异常的。  
-  + 请注意：
-  某些网站为了防盗链要求referer必须为本站链接，不发送referer可能导致无法正常访问这些网站。同时不发送referer还可能会影响网站的广告收入。
-  
-  </details>
 
 -------------------------------
 
@@ -39,94 +24,10 @@
 脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到。
 点击**直播画面上方**按钮隐藏/显示脚本窗口和提示信息。    
 
-<details>
-<summary>自动参加礼物抽奖</summary>
-<ul>
-<li>抽奖前随机延迟</li>
-<li>随机跳过抽奖</li>
-<li>抽奖前模拟进入目标房间</li>
-<li>抽奖前发送活跃弹幕（防检测）</li>
-</ul>
-</details>
-<details>
-<summary>自动参加实物（金宝箱）抽奖</summary>
-<ul>
-<li>忽略含特定关键字或匹配特定正则表达式的存疑抽奖</li>
-<li>中奖后通过推送平台通知中奖信息</li>
-</ul>
-</details>
-<details>
-<summary>自动参与天选时刻</summary>
-<ul>
-<li>忽略所需金瓜子大于设置值的天选</li>  
-<li>忽略含特定关键字或匹配特定正则表达式的存疑天选</li>
-<li>忽略指定直播间的天选</li>
-<li>尝试识别天选中的金额并忽略金额低于设置值的天选</li>
-<li>保存当前关注列表为白名单/取关不在白名单内的UP主</li>  
-<li>上传天选信息至自己的直播间/从特定直播间获取天选信息</li>
-<li>把参与天选时关注的UP移动到新关注分组/取关该分组内的UP主</li>
-<li>未中奖自动取关</li>
-<li>中奖后自动发私信/弹幕</li>
-<li>中奖后通过推送平台通知中奖信息</li>
-</ul>
-</details>
-<details>
-<summary>自动完成主站每日任务</summary>
-<ul>
-<li>登陆主站</li>  
-<li>观看视频</li>  
-<li>自动投币（可指定给某用户的视频投币）</li>  
-<li>分享视频</li>   
-</ul>
-</details>
-<details>
-<summary>屏蔽不必要的内容</summary>
-<ul>
-<li>移除2233模型</li>
-<li>移除活动入口</li>
-<li>移除排行榜</li>
-<li>移除右侧关注按钮及弹窗</li>
-<li>移除礼物栏下方广告</li>
-<li>屏蔽挂机检测</li>
-<li>移除天选时刻弹窗及图标</li>
-<li>移除大乱斗弹窗及进度条</li>
-<li>移除直播水印</li>
-<li>禁止p2p上传</li>
-<li>拦截直播观看数据上报</li>
-</ul>
-</details>
-<details>
-<summary>自动点亮粉丝勋章</summary>
-<ul>
-<li>发送粉丝勋章打卡弹幕</li>
-<li>送出小心心</li>
-</ul>
-</details>
-<details>
-<summary>自动送礼</summary>
-<ul>
-<li>白名单/黑名单送礼模式</li>
-<li>优先给某些直播间送礼</li>
-<li>按照粉丝勋章等级顺序送礼</li>
-<li>送出指定种类的礼物</li>
-<li>送出将在指定时间内过期的礼物</li>
-</ul>
-</details>
-<details>
-<summary>弹幕修改</summary>
-<ul>
-<li>改变特定弹幕的显示位置/大小/颜色，优化直播弹幕体验</li>
-</ul>
-</details>
-<li>自动获取小心心</li>
-<li>银瓜子换硬币</li>
-<li>直播区签到</li>
-<li>应援团签到</li>
-<li>自动参加被广播的节奏风暴</li>
-<li>自动发弹幕</li>
 <li>快捷购买粉丝勋章</li>
 <li>发弹幕前自动佩戴当前直播间的粉丝勋章</li>
 <li>隐身入场</li><br>
+以及其他能优化直播观看体验的功能。
 
 -------------------------------
 
@@ -170,11 +71,6 @@
   *注：某些意料之外的报错不会带有`BLTH`字样，反馈 bug 时请多加注意。*
 + 脚本默认关闭控制台日志。勾选控制面板上的`其他设置 - 控制台日志`即可开启。  
 
-### 风控
-+ 若出现`... 请求被拦截`的红色/橙色日志或提示信息，则是被B站风控了。
-+ 风控过一段时间会自动解除。
-+ 因为风控是针对ip地址的，被风控后可通过挂代理等方式更换ip，继续正常使用脚本。
-+ 被风控通常是因为api请求过于频繁，可通过修改脚本的相关设置（如果有的话）降低请求频率。
 
 ### 关于反馈
 + 如果使用脚本过程中遇到问题，可以先按上述步骤[开启控制台日志](#控制台日志)，然后关掉无关功能再次运行脚本并在控制台中寻找相关错误信息。若能找到请在反馈bug时附上这些控制台日志。
@@ -208,15 +104,18 @@
 + [layer](https://github.com/sentsin/layer) (MIT) by [sentsin](https://github.com/sentsin)
 + [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT) by [wendux](https://github.com/wendux)
 + [bliveproxy](https://github.com/xfgryujk/bliveproxy) (MIT) by [xfgryujk](https://github.com/xfgryujk)
++ [brotli](https://github.com/google/brotli) (MIT) by [google](https://github.com/google)
 
 本脚本使用的库：  
 + [jQuery](https://github.com/jquery/jquery) (MIT)  
-+ [BilibiliAPI_Mod.js](https://github.com/andywang425/BLTH/blob/master/assets/js/library/BilibiliAPI_Mod.js) (MIT)：各种B站API。
-+ [libBilibiliToken.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libBilibiliToken/libBilibiliToken.js) (MIT)：获取移动端token。
-+ [libWasmHash.js](https://github.com/lzghzr/TampermonkeyJS/blob/master/libWasmHash/libWasmHash.js) (MIT)：WebAssembly实现的Hash，计算心跳请求参数。
-+ [layer.js](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web弹层组件。
-+ [Ajax-hook.js](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器XMLHttpRequest的库。
-+ [bliveproxy.js](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B站直播websocket hook框架。
++ [BilibiliAPI_Mod](https://github.com/andywang425/BLTH/blob/master/assets/js/library/BilibiliAPI_Mod.js) (MIT)：各种B站API。
++ [libBilibiliToken](https://github.com/lzghzr/TampermonkeyJS/blob/master/libBilibiliToken/libBilibiliToken.js) (MIT)：获取移动端token。
++ [libWasmHash](https://github.com/lzghzr/TampermonkeyJS/blob/master/libWasmHash/libWasmHash.js) (MIT)：WebAssembly实现的Hash，计算心跳请求参数。
++ [layer](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web弹层组件。
++ [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器XMLHttpRequest的库。
++ [bliveproxy](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B站直播websocket hook框架。
++ [pako_inflate](https://github.com/nodeca/pako) (MIT)：基于zlib的javascript压缩/解压缩库。
++ [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli项目中的javascript解码库。
 
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。
@@ -240,20 +139,20 @@
 
 # 相关推荐
 
-## Bilibili-Evolved
+### Bilibili-Evolved
 作者：[the1812](https://github.com/the1812)
 + [Github](https://github.com/the1812/Bilibili-Evolved)  
 
 强大的哔哩哔哩增强脚本: 下载视频, 音乐, 封面, 弹幕 / 简化直播间, 评论区, 首页 / 自定义顶栏, 删除广告, 夜间模式 / 触屏设备支持。
 
-## bilibili直播净化
+### bilibili直播净化
 作者：[lzghzr](https://github.com/lzghzr)
 + [Github](https://github.com/lzghzr/TampermonkeyJS/raw/master/BiLiveNoVIP/BiLiveNoVIP.user.js)
 + [GreasyFork](https://greasyfork.org/zh-CN/scripts/21416-bilibili%E7%9B%B4%E6%92%AD%E5%87%80%E5%8C%96)  
 
 屏蔽聊天室礼物以及关键字，净化聊天室环境。
 
-## 哔站直播全裸2233娘
+### 哔站直播全裸2233娘
 作者：[journey-ad](https://gist.github.com/journey-ad)
 + [Github](https://gist.github.com/journey-ad/5d3021fd40db75de2df827b876ef5b7e)
 + [GreasyFork](https://greasyfork.org/zh-CN/scripts/369477-%E5%93%94%E7%AB%99%E7%9B%B4%E6%92%AD%E5%85%A8%E8%A3%B82233%E5%A8%98)  

@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name           B站直播间挂机助手
-// @name:en        B站直播间挂机助手
+// @name:en        Bilibili Live Helper
 // @namespace      https://github.com/andywang425
 // @author         andywang425
-// @description    自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章，优化弹幕体验，发弹幕前自动佩戴当前直播间的粉丝勋章
-// @description:en 自动获取小心心，参加天选时刻抽奖，直播区签到，应援团签到，银瓜子换硬币，完成主站每日任务(登录,观看视频,投币,分享视频)，批量送礼，发送粉丝勋章打卡弹幕，参与实物抽奖，参与Bilibili直播区礼物抽奖，参加被广播的节奏风暴，定时发弹幕，快捷购买粉丝勋章，优化弹幕体验，发弹幕前自动佩戴当前直播间的粉丝勋章
+// @description    优化直播观看体验
+// @description:en Improve live viewing experience
 // @updateURL      https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH
@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.6.9
+// @version        5.6.9.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -33,16 +33,17 @@
 // @connect        raw.githubusercontent.com
 // @connect        andywang.top
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
-// @require        https://code.jquery.com/jquery-3.6.0.min.js
-// @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@84aacffd78056bee0ebfb551f657a1b061ca5335/assets/js/library/bliveproxy.min.js
+// @require        https://code.jquery.com/jquery-3.2.1.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
+// @require        https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d7e974a95e3c0328691561c52c66c39287e3b89f/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@afff97b8be7d446a7a2224587245bd51c784f8be/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@bfc4678a8266d6e6f12aa5c1fbad72c1c0314c2b/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -139,14 +140,14 @@
     appToken = new BilibiliToken(),
     baseQuery = `actionKey=appkey&appkey=${BilibiliToken.appKey}&build=5561000&channel=bili&device=android&mobi_app=android&platform=android&statistics=%7B%22appId%22%3A1%2C%22platform%22%3A3%2C%22version%22%3A%225.57.0%22%2C%22abtest%22%3A%22%22%7D`,
     setToken = async () => {
-      if (tokenData.time > ts_s()) {
-        userToken = tokenData;
+      if (tokenData.hasOwnProperty(Live_info.uid) && tokenData[Live_info.uid]['time'] > ts_s()) {
+        userToken = tokenData[Live_info.uid];
       } else {
-        tokenData = await appToken.getToken();
-        if (tokenData === undefined) return MYERROR('appToken', 'tokenData获取失败');
-        tokenData.time = ts_s() + tokenData.expires_in;
+        tokenData[Live_info.uid] = await appToken.getToken();
+        if (tokenData[Live_info.uid] === undefined) return MYERROR('appToken', 'tokenData获取失败');
+        tokenData[Live_info.uid].time = ts_s() + tokenData[Live_info.uid].expires_in;
         GM_setValue(`Token`, tokenData);
-        userToken = tokenData;
+        userToken = tokenData[Live_info.uid];
       };
       MYDEBUG(`appToken`, tokenData);
       return 'OK';
@@ -259,7 +260,7 @@
     },
     medal_info = { status: $.Deferred(), medal_list: [] },
     userToken = undefined,
-    tokenData = GM_getValue("Token") || { time: 0 },
+    tokenData = GM_getValue("Token") || {},
     mainIndex = undefined,
     logIndex = undefined,
     layerUiMain = undefined, // 控制面板
@@ -376,7 +377,7 @@
     onlyScriptCheck();
     if (SP_CONFIG.DANMU_MODIFY) {
       window.bliveproxy.hook();
-      MYDEBUG('bliveproxy hook complete', window.bliveproxy);
+      MYDEBUG('bliveproxy hook complete', bliveproxy);
     }
     if (SP_CONFIG.nosleep) {
       setInterval(() => mouseMove(), 300e3);
@@ -505,7 +506,7 @@
         ANCHOR_UPLOAD_MSG_CONTENT: "", // 附加信息
         ANCHOR_IGNORE_UPLOAD_MSG: false, // 天选忽略附加信息
         ANCHOR_UPLOAD_ROOMLIST: false, // 上传天选数据至 BLTH-server
-        ANCHOR_SERVER_APIKEY: "", // 天选时刻 BLTH-server apikey
+        ANCHOR_SERVER_APIKEY: (function () { let obj = {}; obj[Live_info.uid] = ""; return obj; })(), // 天选时刻 BLTH-server apikey
         ANCHOR_TYPE_SERVER: false, // 天选时刻 - BLTH-server
         ANCHOR_TYPE_POLLING: true, // 天选模式 - 轮询
         ANCHOR_TYPE_LIVEROOM: false, // 天选模式 - 直播间简介
@@ -804,9 +805,10 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "重构了BAPI中的ajax请求，现在请求出错时能返回错误原因。",
-              "修复刷新直播间不生效的bug。",
-              "天选时刻模块新增BLTH-server相关功能（测试中）。"
+              "小心心token支持多账号保存（旧版本升至新版本时token会被重置），并添加了重置token按钮。",
+              "天选时刻apikey支持多账号保存（旧版本升至新版本时apikey可能会错位，出现该情况时请再填写一次）。",
+              "尝试修复在网速很慢时脚本加载失败的问题。",
+              "更新bliveproxy，兼容B站websocket协议升级，修复【弹幕修改】功能无效的问题。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -815,11 +817,14 @@
             layer.open({
               title: `${version}更新提示`,
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
-              content: `<mol>${mliHtml}</mol>
+              content: `
+                <mol><blockquote style="margin-inline-start:0px;">The darker the sky,<br>the brighter the stars,<br>know which direction you should be heading.</blockquote></mol>
+                <mol>${mliHtml}</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444（新）')}
-                </em>`
+                </em>
+                `
             });
             SP_CONFIG.lastShowUpdateMsgVersion = version;
             saveSpConfig();
@@ -1387,7 +1392,7 @@
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "调用官方api，消耗20硬币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
-          LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
+          LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli><mli>【重置token】可在无法获取小心心时点击，下次获取小心心前会重新获取token。<strong>请谨慎点击该按钮，不要频繁使用。</strong></mli></mul>",
           STORM: "仅会参加被广播的节奏风暴。若无法参加请尝试实名后再参加。<mul><mli>由于B站改版现在几乎不可能抽到节奏风暴了。</mli><mli>这一功能可能会在日后被删除。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
@@ -1593,12 +1598,12 @@
                 // 编辑 BLTH-server apikey
                 layer.prompt({
                   formType: 2,
-                  value: String(MY_API.CONFIG.ANCHOR_SERVER_APIKEY),
+                  value: String(MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid] || ""),
                   title: '请输入 BLTH-server apikey',
                   btn: ['保存', '取消'],
                 },
                   function (value, index) {
-                    MY_API.CONFIG.ANCHOR_SERVER_APIKEY = value;
+                    MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid] = value;
                     MY_API.saveConfig(false);
                     layer.msg('BLTH-server apikey 保存成功', {
                       time: 2500,
@@ -2091,6 +2096,28 @@
                     });
                   })
                 }
+              });
+              myDiv.find('button[data-action="resetToken"]').click(() => {
+                // 重置token
+                layer.confirm(`<h3 style="text-align:center">是否重置移动端Token？</h3>重置后下次获取小心心前会重新获取Token。`, {
+                  title: '重置Token',
+                  btn: ['是', '否']
+                }, function () {
+                  let token = GM_getValue('Token');
+                  if (token && !token.hasOwnProperty("access_token")) {
+                    delete token[Live_info.uid];
+                    GM_setValue('Token', token);
+                  } else {
+                    GM_setValue('Token', {});
+                  }
+                  layer.msg('已重置Token', {
+                    time: 2000,
+                  });
+                }, function () {
+                  layer.msg('已取消', {
+                    time: 2000
+                  });
+                })
               });
               myDiv.find('button[data-action="sendGiftNow"]').click(() => {
                 // 立刻开始送礼
@@ -3692,8 +3719,8 @@
               }
               let response;
               try {
-                if (userToken && appToken && tokenData.access_token) {
-                  response = await BAPI.Storm.join_ex(id, roomid, tokenData.access_token, BilibiliToken.appKey, BilibiliToken.headers);
+                if (userToken && appToken && userToken.access_token) {
+                  response = await BAPI.Storm.join_ex(id, roomid, userToken.access_token, BilibiliToken.appKey, BilibiliToken.headers);
                 } else {
                   response = await BAPI.Storm.join(id, captcha_token = '', captcha_phrase = '', roomid);
                 }
@@ -3758,7 +3785,7 @@
           GM: true,
           anonymous: true,
           method: 'GET',
-          url: `https://passport.bilibili.com/x/passport-login/oauth2/info?${appToken.signLoginQuery(`access_key=${tokenData.access_token}`)}`,
+          url: `https://passport.bilibili.com/x/passport-login/oauth2/info?${appToken.signLoginQuery(`access_key=${userToken.access_token}`)}`,
           responseType: 'json',
           headers: appToken.headers
         }),
@@ -3776,7 +3803,7 @@
             GM: true,
             anonymous: true,
             method: 'GET',
-            url: `https://api.live.bilibili.com/fans_medal/v1/FansMedal/get_list_in_room?${BilibiliToken.signQuery(`access_key=${tokenData.access_token}&target_id=${Live_info.tid}&uid=${Live_info.uid}&${baseQuery}`)}`,
+            url: `https://api.live.bilibili.com/fans_medal/v1/FansMedal/get_list_in_room?${BilibiliToken.signQuery(`access_key=${userToken.access_token}&target_id=${Live_info.tid}&uid=${Live_info.uid}&${baseQuery}`)}`,
             responseType: 'json',
             headers: appToken.headers
           });
@@ -3817,7 +3844,7 @@
             anonymous: true,
             method: 'POST',
             url: 'https://live-trace.bilibili.com/xlive/data-interface/v1/heartbeat/mobileHeartBeat',
-            data: BilibiliToken.signQuery(`access_key=${tokenData.access_token}&${postData}&${baseQuery}`),
+            data: BilibiliToken.signQuery(`access_key=${userToken.access_token}&${postData}&${baseQuery}`),
             responseType: 'json',
             headers: appToken.headers
           });
@@ -3875,7 +3902,7 @@
           }
           if (await setToken() === undefined)
             return;
-          else if (!tokenData.access_token && !tokenData.mid && !tokenData.refresh_token) {
+          else if (!userToken.access_token && !userToken.mid && !userToken.refresh_token) {
             const userInfo = await MY_API.LITTLE_HEART.getInfo();
             MYDEBUG('[小心心]userInfo', userInfo);
             if (userInfo === undefined)
@@ -3885,7 +3912,7 @@
             else if (userInfo.body.data.mid !== Live_info.uid && await setToken() === undefined)
               return;
           };
-          MYDEBUG('[小心心] 开始客户端心跳 tokenData', tokenData.access_token);
+          MYDEBUG('[小心心] 开始客户端心跳 userToken.access_token', userToken.access_token);
           window.toast('[小心心]开始获取小心心', 'success');
           const giftNum = await MY_API.LITTLE_HEART.getGiftNum();
           if (giftNum < 24) {
@@ -4804,7 +4831,7 @@
         },
         uploadRoomList: () => {
           if (MY_API.AnchorLottery.BLTHuploadRoomList.length === 0) return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), 20e3);
-          if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法上传天选数据至BLTH-server`, 'warning');
+          if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法上传天选数据至BLTH-server`, 'warning');
           const uploadRoomlist = MY_API.AnchorLottery.BLTHuploadRoomList.slice(0, 50);
           const settings = {
             GM: true,
@@ -4812,7 +4839,7 @@
             url: 'https://andywang.top:3001/api/v1/anchor/updateroomlist',
             method: "POST",
             headers: { "content-type": "charset=utf-8" },
-            data: `apikey=${MY_API.CONFIG.ANCHOR_SERVER_APIKEY}&uid=${Live_info.uid}&roomList=${[...MY_API.AnchorLottery.BLTHuploadRoomList.slice(0, 50)]}`,
+            data: `apikey=${MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]}&uid=${Live_info.uid}&roomList=${[...MY_API.AnchorLottery.BLTHuploadRoomList.slice(0, 50)]}`,
             responseType: "json"
           };
           return XHR(settings).then((response) => {
@@ -4832,11 +4859,11 @@
           });
         },
         getDataFromBLTHserver: () => {
-          if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法从BLTH-server获取天选数据`, 'warning');
+          if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法从BLTH-server获取天选数据`, 'warning');
           const settings = {
             GM: true,
             anonymous: true,
-            url: `https://andywang.top:3001/api/v1/anchor/getroomlist?apikey=${MY_API.CONFIG.ANCHOR_SERVER_APIKEY}&uid=${Live_info.uid}&num=50`,
+            url: `https://andywang.top:3001/api/v1/anchor/getroomlist?apikey=${MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]}&uid=${Live_info.uid}&num=50`,
             method: "GET",
             headers: { "content-type": "charset=utf-8" },
             responseType: "json"
@@ -5906,11 +5933,11 @@
           return -1;
         },
         run: () => {
-          if (!MY_API.CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
+          if (!SP_CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
           MY_API.DANMU_MODIFY.handleConfig();
           // MYDEBUG('MY_API.DANMU_MODIFY.configJson', MY_API.DANMU_MODIFY.configJson);
           bliveproxy.addCommandHandler('DANMU_MSG', command => {
-            if (!MY_API.CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
+            if (!SP_CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
             let info = command.info;
             MYDEBUG('bliveproxy DANMU_MSG', info);
             let index = MY_API.DANMU_MODIFY.check(info);
@@ -6215,7 +6242,7 @@
    */
   function fixVersionDifferences(API, version) {
     // 添加新的修复后需修改版本号
-    if (versionStringCompare(SP_CONFIG.storageLastFixVersion, "5.6.7.4") >= 0) return;
+    if (versionStringCompare(SP_CONFIG.storageLastFixVersion, "5.6.9.1") >= 0) return;
     // 修复变量类型错误
     const configFixList = ['AUTO_GIFT_ROOMID', 'COIN_UID'];
     if (!configFixList.every(i => Array.isArray(API.CONFIG[i]))) {
@@ -6241,7 +6268,17 @@
     // localStorage fix
     localStorage.removeItem("im_deviceid_IGIFTMSG");
     // GM storage fix
-    GM_deleteValue('AnchorRoomidList');
+    const gmDeleteList = ['AnchorRoomidList', 'im_deviceid_', 'blnvConfig', 'UNIQUE_CHECK_CACHE'];
+    for (const i of gmDeleteList) {
+      GM_deleteValue(i);
+    }
+    let token = GM_getValue("Token");
+    if (token.hasOwnProperty("access_token")) GM_setValue("Token", {});
+    const apikey = API.CONFIG.ANCHOR_SERVER_APIKEY;
+    if (typeof apikey === "string") {
+      API.CONFIG.ANCHOR_SERVER_APIKEY = {};
+      API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid] = apikey;
+    }
     // save settings
     SP_CONFIG.storageLastFixVersion = version;
     API.saveConfig(false);
