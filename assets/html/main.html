@@ -95,8 +95,8 @@
                 <fieldset class="blth_fs">
                         <legend>小心心</legend>
                         <div data-toggle="LITTLE_HEART"><label><input type="checkbox">自动获取小心心
-                                </label><button class="blth_btn"
-                                data-action="resetToken">重置token</button><span helpdata="LITTLE_HEART" class="clickableText helpText">?</span></div>
+                                </label><button class="blth_btn" data-action="resetToken">重置token</button><span
+                                        helpdata="LITTLE_HEART" class="clickableText helpText">?</span></div>
                         <div data-toggle="LIGHT_MEDALS" style="color:purple">自动点亮勋章房间号 <input class="num blth_input"
                                         style="width:200px;" type="text"><span helpdata="LIGHT_MEDALS"
                                         class="clickableText helpText">?</span></div>
@@ -223,7 +223,12 @@
                         <legend>天选时刻</legend>
                         <div data-toggle="ANCHOR_LOTTERY"><label style="color:purple"><input type="checkbox">参加天选时刻抽奖
                                 </label><span helpdata="ANCHOR_LOTTERY" class="clickableText helpText">?</span></div>
-                        天选时刻数据获取方式<br>
+                        <div data-toggle="ANCHOR_AWPUSH">
+                                <input type="checkbox">
+                                <label style="font-weight: bold;">启用 awpush</label>
+                                <span helpdata="ANCHOR_AWPUSH" class="clickableText helpText">?</span>
+                        </div>
+                        <div>天选时刻数据获取方式</div>
                         <div data-toggle="ANCHOR_TYPE_POLLING" class="lineStartSpace"><input
                                         type="checkbox">从高热度直播间获取天选时刻数据 <span helpdata="ANCHOR_TYPE_POLLING"
                                         class="clickableText helpText">?</span></div>
@@ -232,7 +237,7 @@
                                         helpdata="ANCHOR_TYPE_LIVEROOM" class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="ANCHOR_TYPE_SERVER" class="lineStartSpace"><input type="checkbox"><span
-                                        style="font-weight: bold;">从
+                                        style="color: purple;">从
                                         BLTH-server 获取天选时刻数据</span>
                                 <button class="blth_btn" data-action="edit_ANCHOR_SERVER_APIKEY">编辑apikey</button>
                                 <span helpdata="ANCHOR_TYPE_SERVER" class="clickableText helpText">?</span>
@@ -259,7 +264,7 @@
                                 <span helpdata="ANCHOR_PERSONAL_PROFILE" class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="ANCHOR_UPLOAD_ROOMLIST"><label><input type="checkbox"><span
-                                                style="font-weight: bold;">上传天选数据至BLTH-server</span>
+                                                style="color: purple;">上传天选数据至BLTH-server</span>
                                 </label><button class="blth_btn"
                                         data-action="edit_ANCHOR_SERVER_APIKEY">编辑apikey</button><span
                                         helpdata="ANCHOR_UPLOAD_ROOMLIST" class="clickableText helpText">?</span>
