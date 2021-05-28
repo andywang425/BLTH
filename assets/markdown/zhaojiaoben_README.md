@@ -114,7 +114,7 @@
 + [layer](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web弹层组件。
 + [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器XMLHttpRequest的库。
 + [bliveproxy](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B站直播websocket hook框架。
-+ [pako_inflate](https://github.com/nodeca/pako) (MIT)：基于zlib的javascript压缩/解压缩库。
++ [pako](https://github.com/nodeca/pako) (MIT)：javascript压缩/解压缩库。
 + [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli项目中的javascript解码库。
 
 本脚本引用的外部资源：  
