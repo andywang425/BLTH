@@ -5822,7 +5822,7 @@
                 } else p.resolve();
               });
               await p;
-              await sleep(MY_API.CONFIG.ANCHOR_INTERVAL);
+              await sleep(500);
             };
           },
           handleTask: async (task, ts) => {
@@ -6026,7 +6026,7 @@
                       }
                       case 'RES_UPDATE_ANCHOR_DATA': {
                         // 上传天选数据成功
-                        window.toast(`[awpush] 上传天选数据（id=${response.data.id}）成功`, 'success');
+                        window.toast(`[awpush] 上传天选数据（id=${json.data}）成功`, 'success');
                         break;
                       }
                       default: {
@@ -6041,15 +6041,23 @@
               ws.onclose = function (event) {
                 MY_API.AnchorLottery.awpush.websocket.status = 'close';
                 heartBeat.stop();
-                let json = event.reason;
+                let json;
                 try {
                   json = JSON.parse(event.reason);
-                } catch (e) { }
+                } catch (e) { json = event.reason; }
                 window.toast(`[awpush] ${json.data || '连接已关闭'} 30秒后尝试重连`, 'warning');
                 MYDEBUG('awpush 服务端已关闭连接，30秒后尝试重连', event.code, event.reason);
+                reconnect();
+              };
+              /**
+               * websocket 重连
+               */
+              function reconnect() {
+                if (MY_API.AnchorLottery.awpush.websocket.status === 'reconnecting') return;
+                MY_API.AnchorLottery.awpush.websocket.status = 'reconnecting';
                 MY_API.AnchorLottery.awpush.websocket.ws = null;
                 setTimeout(() => MY_API.AnchorLottery.awpush.websocket.run(), 30e3);
-              };
+              }
             }
           },
           run: () => {
