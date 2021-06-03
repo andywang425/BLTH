@@ -5160,6 +5160,13 @@
           }
         },
         filter: {
+          delUselessData(obj) {
+            const delList = ['asset_icon', 'url', 'web_url'];
+            for (const i of delList) {
+              delete obj[i];
+            }
+            return obj;
+          },
           ignore_room: (roomid) => {
             if (MY_API.CONFIG.ANCHOR_IGNORE_ROOM && findVal(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST, roomid) > -1) {
               MY_API.chatLog(`[天选时刻] 忽略直播间<br>不参加直播间${linkMsg(liveRoomUrl + roomid, roomid)}的天选`, 'warning');
@@ -5797,7 +5804,11 @@
             POLLING_HOT_ROOMS: "轮询热门直播间",
             POLLING_LIVEROOMS: "轮询已关注的开播直播间"
           },
-          polling_allRoomList: async (ts) => {
+          userInfo: {
+            task: undefined,
+            ts: undefined
+          },
+          polling_allRoomList: async () => {
             if (MY_API.AnchorLottery.allRoomList.length > 500) MY_API.AnchorLottery.allRoomList.splice(0, 500);
             MY_API.chatLog(`[天选时刻] 开始检查天选（共${MY_API.AnchorLottery.allRoomList.length}个房间）`, 'success');
             for (const room of MY_API.AnchorLottery.allRoomList) {
@@ -5805,7 +5816,7 @@
               let p = $.Deferred();
               const uid = MY_API.AnchorLottery.roomidAndUid.hasOwnProperty(room) ? MY_API.AnchorLottery.roomidAndUid[room] : undefined;
               if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
-              MY_API.AnchorLottery.awpush.check(room, uid, ts).then((re) => {
+              MY_API.AnchorLottery.awpush.check(room, uid).then((re) => {
                 if (re) {
                   // 数据格式正确，可以参加
                   let hasPwd = false, fans = { lackFan: false, fanNum: -1 };
@@ -5849,14 +5860,23 @@
               await sleep(500);
             };
           },
-          handleTask: async (task, ts) => {
-            switch (task) {
+          handleTask: async () => {
+            const sleepTime = MY_API.AnchorLottery.sleepCheck();
+            if (sleepTime) {
+              // 休眠
+              MYDEBUG('[天选时刻] awpush', `处于休眠时段，${sleepTime}毫秒后再次检查天选`);
+              MY_API.AnchorLottery.awpush.websocket.status = 'active_close';
+              MY_API.AnchorLottery.awpush.websocket.ws.close();
+              MY_API.chatLog(`[天选时刻] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并再次连接awpush`, 'warning');
+              return setTimeout(() => MY_API.AnchorLottery.awpush.websocket.run(), sleepTime);
+            }
+            switch (MY_API.AnchorLottery.awpush.userInfo.task) {
               case "POLLING_HOT_ROOMS": {
                 await MY_API.AnchorLottery.getRoomList();
                 for (const r of MY_API.AnchorLottery.roomidList) {
                   addVal(MY_API.AnchorLottery.allRoomList, r);
                 }
-                await MY_API.AnchorLottery.awpush.polling_allRoomList(ts);
+                await MY_API.AnchorLottery.awpush.polling_allRoomList();
                 break;
               }
               case "POLLING_LIVEROOMS": {
@@ -5884,19 +5904,24 @@
                 for (const r of MY_API.AnchorLottery.liveRoomList) {
                   addVal(MY_API.AnchorLottery.allRoomList, r);
                 }
-                await MY_API.AnchorLottery.awpush.polling_allRoomList(ts);
+                await MY_API.AnchorLottery.awpush.polling_allRoomList();
                 break;
               }
               default: {
-                MYERROR("awpush 未知任务", task);
+                MYERROR("awpush 未知任务", MY_API.AnchorLottery.awpush.userInfo.task);
                 return;
               }
             }
-            setTimeout(() => MY_API.AnchorLottery.awpush.handleTask(task, ts), 300e3);
-            MY_API.chatLog(`[天选时刻] 5分钟后开始执行下一轮任务<br>${MY_API.AnchorLottery.awpush.taskName[task]}`);
-            MYDEBUG(`awpush 5分钟后运行下一轮任务 ${task}`);
+            const json = {
+              code: "GET_TASK",
+              uid: Live_info.uid,
+              ts: MY_API.AnchorLottery.awpush.userInfo.ts,
+            };
+            setTimeout(() => MY_API.AnchorLottery.awpush.websocket.desend(JSON.stringify(json)), 300e3);
+            MY_API.chatLog(`[天选时刻] 5分钟后开始执行下一轮任务`);
+            MYDEBUG(`awpush 5分钟后运行下一轮任务`);
           },
-          check: (roomid, uid, ts) => {
+          check: (roomid, uid) => {
             return BAPI.xlive.anchor.check(roomid).then((response) => {
               MYDEBUG(`API.xlive.anchor.check(${roomid}) response`, response);
               if (response.code === 0) {
@@ -5907,8 +5932,8 @@
                 const update_data = {
                   code: "UPDATE_ANCHOR_DATA",
                   uid: Live_info.uid,
-                  ts: ts,
-                  data: response.data
+                  ts: MY_API.AnchorLottery.awpush.userInfo.ts,
+                  data: MY_API.AnchorLottery.filter.delUselessData(response.data)
                 };
                 MYDEBUG('awpush 上传天选数据: ', update_data);
                 MY_API.AnchorLottery.awpush.websocket.desend(JSON.stringify(update_data));
@@ -5967,6 +5992,7 @@
               // 连接成功
               ws.onopen = function () {
                 MY_API.AnchorLottery.awpush.websocket.status = 'open';
+                MY_API.AnchorLottery.awpush.websocket.ws.close()
                 heartBeat.start();
                 const verify = {
                   code: "VERIFY_APIKEY",
@@ -5998,7 +6024,9 @@
                         task = json.data.task;
                         window.toast(`[awpush] 获得任务: ${MY_API.AnchorLottery.awpush.taskName[task]}`, 'info');
                         MYDEBUG(`awpush HAND_OUT_TASKS 分发任务 获得任务: ${task} 和 ts: ${ts} `);
-                        MY_API.AnchorLottery.awpush.handleTask(task, ts);
+                        MY_API.AnchorLottery.awpush.userInfo.task = task;
+                        MY_API.AnchorLottery.awpush.userInfo.ts = ts;
+                        MY_API.AnchorLottery.awpush.handleTask();
                         break;
                       }
                       case 'HAND_OUT_ANCHOR_DATA': {
@@ -6050,7 +6078,7 @@
                       }
                       case 'RES_UPDATE_ANCHOR_DATA': {
                         // 上传天选数据成功
-                        window.toast(`[awpush] 上传天选数据（id=${json.data}）成功`, 'success');
+                        window.toast(`[awpush] 上传天选数据（id=${json.data.id}）成功`, 'success');
                         break;
                       }
                       default: {
@@ -6064,6 +6092,11 @@
               };
               // 关闭
               ws.onclose = function (event) {
+                if (MY_API.AnchorLottery.awpush.websocket.status === 'active_close') {
+                  MYDEBUG('awpush 已主动断开连接');
+                  window.toast('[awpush] 已主动断开连接', 'warning');
+                  return;
+                }
                 MY_API.AnchorLottery.awpush.websocket.status = 'close';
                 heartBeat.stop();
                 let json = {};
