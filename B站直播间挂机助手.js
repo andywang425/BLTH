@@ -1455,8 +1455,8 @@
           blockliveDataUpdate: "拦截直播观看数据上报。<mh3>原理：</mh3><mul>劫持页面上的fetch和XMLHttpRequest，拦截所有url中含有<code>data.bilibili.com/gol/postweb</code>的fetch请求和url中含有<code>data.bilibili.com/log</code>的xhr请求。</mul><mh3>注意：</mh3><mul><mli>开启本功能后控制台中会出现大量警告，如<code style='color:rgb(255 131 0);'>jQuexry.Deferred exception: Cannot read property 'status' of undefined TypeError: Cannot read property 'status' of undefined</code>，此类报错均为b站js的报错，无视即可。 </mli></mul><mh3>说明：</mh3><mul><mli>根据观察，目前上报的数据有：p2p种类，直播画质，直播流编码方式，直播流地址，直播流名称，直播流协议，窗口大小，观看时长，请求花费时长， 请求成功/失败数量，通过p2p下载的有效直播流大小，通过p2p上传的直播流大小，当前直播间地址，当前时间戳等等。 </mli></mul>",
           WEAR_MEDAL_BEFORE_DANMU: "手动发送弹幕前自动佩戴当前房间的粉丝勋章再发弹幕。<mul><mli>如果没有当前直播间的粉丝勋章则不进行任何操作。</mli><mli>【一直自动佩戴】比较适合需要同时在多个直播间发弹幕的情况。如果只想在某一个直播间发弹幕勾选【仅在首次发弹幕时自动佩戴】即可。</mli><mli>佩戴成功后会把弹幕框左侧的粉丝牌替换为当前直播间的粉丝牌。</mli></mul>",
           ANCHOR_UPLOAD_ROOMLIST: "上传你所收集到的直播间列表至BLTH-server。<mul><mli>如果可以的话请在【天选时刻获取数据方式】中勾选至少两项，因为单纯地把你从BLTH-server获取到的直播间号再上传回去意义不大。</mli><mli>由于该功能处于测试阶段，上传数据也需要<code>apikey</code>。</mli></mul>",
-          ANCHOR_TYPE_SERVER: "<strong>BLTH-server</strong>是本脚本的服务端，用于推送天选时刻数据，提供脚本更新信息等。<mul><mli>使用前需先填写<code>apikey</code>。apikey可以进q群找群主要。</mli><mli>该功能的原理为ajax轮询，与awpush不同。awpush使用webSocket实时推送天选数据。</mli><mli>BLTH-server基于MIT协议开源，项目地址：<a href='https://github.com/andywang425/BLTH-server' target='_blank'>andywang425/BLTH-server</a>。</mli></mul>",
-          ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻数据推送系统。可以实现天选数据的收集和分发。<mh3>说明</mh3><mul><mli>这个功能仍处于测试阶段，不是很稳定。</mli><mli>由于处在测试阶段，使用前需先填写<code>apikey</code>。apikey可以进q群找群主要。</mli><mli>启用这个功能后你的部分设置将会失效，如【天选时刻数据获取方式】（由服务端决定），检查房间最大数量（500），请求间隔（500）。</mli><mli>该功能与【从BLTH-server获取天选时刻数据】不同。awpush使用webSocket实现实时推送，【从BLTH-server获取天选时刻数据】通过ajax轮询获取数据。</mli><mli>BLTH-server基于MIT协议开源，项目地址：<a href='https://github.com/andywang425/BLTH-server' target='_blank'>andywang425/BLTH-server</a>。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的天选数据。同时服务端会实时推送收到的天选数据。</mul>",
+          ANCHOR_TYPE_SERVER: "<strong>BLTH-server</strong>是本脚本的服务端，用于推送天选时刻数据，提供脚本更新信息等。<mul><mli>使用前需先填写<code>apikey</code>。apikey可以进q群找群主要。</mli><mli>该功能的原理为ajax轮询，与awpush不同。awpush使用webSocket实时推送天选数据。</mli></mul>",
+          ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻数据推送系统。可以实现天选数据的收集和分发。<mh3>说明</mh3><mul><mli>这个功能仍处于测试阶段，不是很稳定。</mli><mli>由于处在测试阶段，使用前需先填写<code>apikey</code>。apikey可以进q群找群主要。</mli><mli>启用这个功能后你的部分设置将会失效，如【天选时刻数据获取方式】（由服务端决定），检查房间最大数量（500），请求间隔（500）。</mli><mli>该功能与【从BLTH-server获取天选时刻数据】不同。awpush使用webSocket实现实时推送，【从BLTH-server获取天选时刻数据】通过ajax轮询获取数据。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的天选数据。同时服务端会实时推送收到的天选数据。</mul>",
           ANCHOR_AUTO_BUY_LV1_MEDAL: "检测到有1级粉丝牌要求的天选后，如果没有该勋章，则自动用20硬币购买再参加。"
         };
         const openMainWindow = () => {
@@ -5806,7 +5806,7 @@
           },
           userInfo: {
             task: undefined,
-            ts: undefined
+            secret: undefined
           },
           polling_allRoomList: async () => {
             if (MY_API.AnchorLottery.allRoomList.length > 500) MY_API.AnchorLottery.allRoomList.splice(0, 500);
@@ -5915,7 +5915,7 @@
             const json = {
               code: "GET_TASK",
               uid: Live_info.uid,
-              ts: MY_API.AnchorLottery.awpush.userInfo.ts,
+              secret: MY_API.AnchorLottery.awpush.userInfo.secret,
             };
             setTimeout(() => MY_API.AnchorLottery.awpush.websocket.desend(JSON.stringify(json)), 300e3);
             MY_API.chatLog(`[天选时刻] 5分钟后开始执行下一轮任务`);
@@ -5932,7 +5932,7 @@
                 const update_data = {
                   code: "UPDATE_ANCHOR_DATA",
                   uid: Live_info.uid,
-                  ts: MY_API.AnchorLottery.awpush.userInfo.ts,
+                  secret: MY_API.AnchorLottery.awpush.userInfo.secret,
                   data: MY_API.AnchorLottery.filter.delUselessData(response.data)
                 };
                 MYDEBUG('awpush 上传天选数据: ', update_data);
@@ -5949,7 +5949,7 @@
             });
           },
           websocket: {
-            wsinit: function () { MY_API.AnchorLottery.awpush.websocket.ws = new WebSocket('wss://andywang.top:3001/ws') }, // andywang.top localhost
+            wsinit: function () { MY_API.AnchorLottery.awpush.websocket.ws = new WebSocket('wss://localhost:3001/ws') }, // andywang.top localhost
             ws: null,
             status: 'close',
             /** 自定义消息发送 - 压缩 */
@@ -5961,7 +5961,7 @@
             run: () => {
               MY_API.AnchorLottery.awpush.websocket.wsinit();
               let ws = MY_API.AnchorLottery.awpush.websocket.ws;
-              let ts = 0;
+              let secret;
               let task;
               /** 心跳 */
               let heartBeat = {
@@ -5992,7 +5992,6 @@
               // 连接成功
               ws.onopen = function () {
                 MY_API.AnchorLottery.awpush.websocket.status = 'open';
-                MY_API.AnchorLottery.awpush.websocket.ws.close()
                 heartBeat.start();
                 const verify = {
                   code: "VERIFY_APIKEY",
@@ -6020,12 +6019,12 @@
                         break;
                       }
                       case 'HAND_OUT_TASKS': {
-                        ts = json.data.ts;
+                        secret = json.data.secret;
                         task = json.data.task;
                         window.toast(`[awpush] 获得任务: ${MY_API.AnchorLottery.awpush.taskName[task]}`, 'info');
-                        MYDEBUG(`awpush HAND_OUT_TASKS 分发任务 获得任务: ${task} 和 ts: ${ts} `);
+                        MYDEBUG(`awpush HAND_OUT_TASKS 分发任务 获得任务: ${task} 和 secret: ${secret} `);
                         MY_API.AnchorLottery.awpush.userInfo.task = task;
-                        MY_API.AnchorLottery.awpush.userInfo.ts = ts;
+                        MY_API.AnchorLottery.awpush.userInfo.secret = secret;
                         MY_API.AnchorLottery.awpush.handleTask();
                         break;
                       }
