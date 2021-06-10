@@ -87,7 +87,8 @@
 本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在Bilibili-Evolved设置-其它中，将`加载模式`设置为延后。  
 开启`简化直播间`功能后聊天栏顶部的日志文字无法正确地被隐藏/显示成黄色，不过不影响使用。
 2. 脚本每次更新后第一次运行可能会不工作，`shift+F5`刷新一下页面即可。  
-3. 可能和[SteamWebIntegration](https://github.com/Revadike/SteamWebIntegration)存在冲突导致同时运行时页面无响应。可以在SteamWebIntegration的设置中把B站直播间添加到黑名单。  
+3. 可能和[SteamWebIntegration](https://github.com/Revadike/SteamWebIntegration)存在冲突导致同时运行时页面无响应。可以在SteamWebIntegration的设置中把B站直播间添加到黑名单。 
+4. 如果无论怎么刷新页面脚本都不工作，可以先关闭油猴，刷新页面，然后再打开油猴，再等一小段时间看看脚本能否加载出来。也可以试试直接重启电脑。
 
 -------------------------------
 
@@ -117,7 +118,7 @@
 + [layer](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web弹层组件。
 + [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器XMLHttpRequest的库。
 + [bliveproxy](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B站直播websocket hook框架。
-+ [pako_inflate](https://github.com/nodeca/pako) (MIT)：基于zlib的javascript压缩/解压缩库。
++ [pako](https://github.com/nodeca/pako) (MIT)：javascript压缩/解压缩库。
 + [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli项目中的javascript解码库。
 
 本脚本引用的外部资源：  
