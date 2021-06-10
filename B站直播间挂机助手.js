@@ -5840,8 +5840,11 @@
           polling_allRoomList: async () => {
             if (MY_API.AnchorLottery.allRoomList.length > 500) MY_API.AnchorLottery.allRoomList.splice(0, 500);
             MY_API.chatLog(`[天选时刻] 开始检查天选（共${MY_API.AnchorLottery.allRoomList.length}个房间）`, 'success');
+            let lastStatus = MY_API.AnchorLottery.awpush.websocket.status;
             for (const room of MY_API.AnchorLottery.allRoomList) {
-              if (MY_API.AnchorLottery.awpush.websocket.status === 'close') return;
+              // 如果重连成功则不执行之前的任务
+              if (lastStatus !== 'open' && MY_API.AnchorLottery.awpush.websocket.status === 'open') return;
+              lastStatus = MY_API.AnchorLottery.awpush.websocket.status;
               let p = $.Deferred();
               const uid = MY_API.AnchorLottery.roomidAndUid.hasOwnProperty(room) ? MY_API.AnchorLottery.roomidAndUid[room] : undefined;
               if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
@@ -5980,6 +5983,7 @@
           websocket: {
             wsinit: function () { MY_API.AnchorLottery.awpush.websocket.ws = new WebSocket('wss://andywang.top:3001/ws') }, // 测试时用 localhost
             ws: null,
+            /** open, active_close, close, reconnecting  */
             status: 'close',
             /** 自定义消息发送 - 压缩 */
             desend: function (...arg) {
