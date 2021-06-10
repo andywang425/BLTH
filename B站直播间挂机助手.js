@@ -5843,7 +5843,7 @@
             let lastStatus = MY_API.AnchorLottery.awpush.websocket.status;
             for (const room of MY_API.AnchorLottery.allRoomList) {
               // 如果重连成功则不执行之前的任务
-              if (lastStatus !== 'open' && MY_API.AnchorLottery.awpush.websocket.status === 'open') return;
+              if (lastStatus !== 'open' && MY_API.AnchorLottery.awpush.websocket.status === 'open') return $.Deferred.resolve('return');
               lastStatus = MY_API.AnchorLottery.awpush.websocket.status;
               let p = $.Deferred();
               const uid = MY_API.AnchorLottery.roomidAndUid.hasOwnProperty(room) ? MY_API.AnchorLottery.roomidAndUid[room] : undefined;
@@ -5908,8 +5908,9 @@
                 for (const r of MY_API.AnchorLottery.roomidList) {
                   addVal(MY_API.AnchorLottery.allRoomList, r);
                 }
-                await MY_API.AnchorLottery.awpush.polling_allRoomList();
-                break;
+                let re = await MY_API.AnchorLottery.awpush.polling_allRoomList();
+                if (re === 'return') return;
+                else break;
               }
               case "POLLING_LIVEROOMS": {
                 await MY_API.AnchorLottery.getLiveUsers();
