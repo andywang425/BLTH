@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7
+// @version        5.7.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -380,7 +380,7 @@
       MYDEBUG('bliveproxy hook complete', bliveproxy);
     }
     if (SP_CONFIG.nosleep) {
-      setInterval(() => mouseMove(), 300e3);
+      setInterval(() => mouseMove(), 200e3);
       W.addEventListener = (...arg) => {
         if (arg[0].indexOf('visibilitychange') > -1) return;
         else return eventListener(...arg);
@@ -507,7 +507,7 @@
         ANCHOR_UPLOAD_MSG_CONTENT: "", // 附加信息
         ANCHOR_IGNORE_UPLOAD_MSG: false, // 天选忽略附加信息
         ANCHOR_UPLOAD_ROOMLIST: false, // 上传天选数据至 BLTH-server
-        ANCHOR_SERVER_APIKEY: (function () { let obj = {}; obj[Live_info.uid] = ""; return obj; })(), // 天选时刻 BLTH-server apikey
+        ANCHOR_SERVER_APIKEY: (function () { let obj = {}; obj[Live_info.uid] = "apikey"; return obj; })(), // 天选时刻 BLTH-server apikey
         ANCHOR_TYPE_SERVER: false, // 天选时刻 - BLTH-server
         ANCHOR_TYPE_POLLING: true, // 天选模式 - 轮询
         ANCHOR_TYPE_LIVEROOM: false, // 天选模式 - 直播间简介
@@ -807,14 +807,11 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "尝试修复在非东八区地区运行每日任务时间不正确的bug。",
-              "修复进入再退出网页全屏后脚本控制面板未正确隐藏, 仍能进行交互的bug。",
-              "天选时刻新增awpush（测试中）。",
-              "修复部分情况下无法推送天选中奖信息的bug。",
-              "部分任务运行流程优化。",
-              "新功能：检测到有1级粉丝牌要求的天选后自动购买勋章再参加。",
-              "天选时刻检测机制优化。",
-              "新增推送测试功能。"
+              "修复天选时刻自定义直播间列表无法保存的bug。",
+              "修复天选时刻【忽略粉丝数小于__的天选】部分情况下无效的bug。",
+              "修复天选时刻勾选忽略直播间后有可能会报错的bug。",
+              "修复天选时刻添加云端忽略直播间后计数不变的bug。",
+              "【屏蔽挂机检测】缩短了模拟鼠标活动的间隔。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1455,8 +1452,8 @@
           blockliveDataUpdate: "拦截直播观看数据上报。<mh3>原理：</mh3><mul>劫持页面上的fetch和XMLHttpRequest，拦截所有url中含有<code>data.bilibili.com/gol/postweb</code>的fetch请求和url中含有<code>data.bilibili.com/log</code>的xhr请求。</mul><mh3>注意：</mh3><mul><mli>开启本功能后控制台中会出现大量警告，如<code style='color:rgb(255 131 0);'>jQuexry.Deferred exception: Cannot read property 'status' of undefined TypeError: Cannot read property 'status' of undefined</code>，此类报错均为b站js的报错，无视即可。 </mli></mul><mh3>说明：</mh3><mul><mli>根据观察，目前上报的数据有：p2p种类，直播画质，直播流编码方式，直播流地址，直播流名称，直播流协议，窗口大小，观看时长，请求花费时长， 请求成功/失败数量，通过p2p下载的有效直播流大小，通过p2p上传的直播流大小，当前直播间地址，当前时间戳等等。 </mli></mul>",
           WEAR_MEDAL_BEFORE_DANMU: "手动发送弹幕前自动佩戴当前房间的粉丝勋章再发弹幕。<mul><mli>如果没有当前直播间的粉丝勋章则不进行任何操作。</mli><mli>【一直自动佩戴】比较适合需要同时在多个直播间发弹幕的情况。如果只想在某一个直播间发弹幕勾选【仅在首次发弹幕时自动佩戴】即可。</mli><mli>佩戴成功后会把弹幕框左侧的粉丝牌替换为当前直播间的粉丝牌。</mli></mul>",
           ANCHOR_UPLOAD_ROOMLIST: "上传你所收集到的直播间列表至BLTH-server。<mul><mli>如果可以的话请在【天选时刻获取数据方式】中勾选至少两项，因为单纯地把你从BLTH-server获取到的直播间号再上传回去意义不大。</mli><mli>由于该功能处于测试阶段，上传数据也需要<code>apikey</code>。</mli></mul>",
-          ANCHOR_TYPE_SERVER: "<strong>BLTH-server</strong>是本脚本的服务端，用于推送天选时刻数据，提供脚本更新信息等。<mul><mli>使用前需先填写<code>apikey</code>。apikey可以进q群找群主要。</mli><mli>该功能的原理为ajax轮询，与awpush不同。awpush使用webSocket实时推送天选数据。</mli></mul>",
-          ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻数据推送系统。可以实现天选数据的收集和分发。<mh3>说明</mh3><mul><mli>这个功能仍处于测试阶段，不是很稳定。</mli><mli>由于处在测试阶段，使用前需先填写<code>apikey</code>。apikey可以进q群找群主要。</mli><mli>启用这个功能后你的部分设置将会失效，如【天选时刻数据获取方式】（由服务端决定），检查房间最大数量（500），请求间隔（500）。</mli><mli>该功能与【从BLTH-server获取天选时刻数据】不同。awpush使用webSocket实现实时推送，【从BLTH-server获取天选时刻数据】通过ajax轮询获取数据。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的天选数据。同时服务端会实时推送收到的天选数据。</mul>",
+          ANCHOR_TYPE_SERVER: "<strong>BLTH-server</strong>是本脚本的服务端，用于推送天选时刻数据，提供脚本更新信息等。<mul><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid即可。</mli><mli>该功能的原理为ajax轮询，与awpush不同。awpush使用webSocket实时推送天选数据。</mli></mul>",
+          ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻数据推送系统。可以实现天选数据的收集和分发。<mh3>说明</mh3><mul><mli>这个功能仍处于测试阶段，不是很稳定。</mli><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid即可。</mli><mli>启用这个功能后你的部分设置将会失效，如【天选时刻数据获取方式】（由服务端决定），检查房间最大数量（500），请求间隔（500）。</mli><mli>该功能与【从BLTH-server获取天选时刻数据】不同。awpush使用webSocket实现实时推送，【从BLTH-server获取天选时刻数据】通过ajax轮询获取数据。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的天选数据。同时服务端会实时推送收到的天选数据。</mul>",
           ANCHOR_AUTO_BUY_LV1_MEDAL: "检测到有1级粉丝牌要求的天选后，如果没有该勋章，则自动用20硬币购买再参加。",
           REMOVE_ELEMENT_followSideBar: "开启本功能后会导致【实验室】按钮点击后无法出现弹窗。"
         };
@@ -1631,7 +1628,7 @@
                   `## 实物抽奖中奖  \n  \n## 中奖账号id：测试  \n  \n## 测试  \n  \n## aid = 测试  \n  \n## 第测试轮  \n  \n## 获得奖品：  \n  \n# 测试  \n  \n## 此条为测试消息`
                 ).then((re) => {
                   MYDEBUG('ServerTurbo_sendMsg response', re);
-                  if (re.body.code === 0) {
+                  if (re.body && re.body.code === 0) {
                     window.toast('[实物抽奖] Server酱Turbo版推送测试消息发送成功', 'success');
                   } else {
                     window.toast(`[实物抽奖] Server酱Turbo版推送测试消息发送失败 ${re.body.error}`, 'error');
@@ -1942,7 +1939,7 @@
                         time: 2500,
                         icon: 1
                       });
-                      myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOMLIST"] label.str').html(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length + '个')
+                      myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').html(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length + '个');
                       layer.close(index);
                     });
                 } else {
@@ -2056,6 +2053,7 @@
                       }
                     }
                     MY_API.CONFIG.ANCHOR_CUSTOM_ROOMLIST = val;
+                    MY_API.saveConfig(false);
                     layer.msg('天选时刻自定义直播间列表保存成功', {
                       time: 2500,
                       icon: 1
@@ -4440,7 +4438,7 @@
                           `## 实物抽奖中奖  \n  \n## 中奖账号id：${Live_info.uname}  \n  \n## ${obj.title}  \n  \n## aid = ${obj.aid}  \n  \n## 第${obj.number}轮  \n  \n## 获得奖品：  \n  \n# ${i.giftTitle}  \n  \n## 请及时填写领奖信息`
                         ).then((re) => {
                           MYDEBUG('ServerTurbo_sendMsg response', re);
-                          if (re.body.code === 0) {
+                          if (re.body && re.body.code === 0) {
                             window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
                           } else {
                             window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
@@ -4886,7 +4884,7 @@
         },
         uploadRoomList: () => {
           if (MY_API.AnchorLottery.BLTHuploadRoomList.length === 0) return setTimeout(() => MY_API.AnchorLottery.uploadRoomList(), 20e3);
-          if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法上传天选数据至BLTH-server`, 'warning');
+          // if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法上传天选数据至BLTH-server`, 'warning');
           const uploadRoomlist = MY_API.AnchorLottery.BLTHuploadRoomList.slice(0, 50);
           const settings = {
             GM: true,
@@ -4914,7 +4912,7 @@
           });
         },
         getDataFromBLTHserver: () => {
-          if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法从BLTH-server获取天选数据`, 'warning');
+          // if (!MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]) return MY_API.chatLog(`[天选时刻] 未填写apikey，<br>无法从BLTH-server获取天选数据`, 'warning');
           const settings = {
             GM: true,
             anonymous: true,
@@ -4933,7 +4931,7 @@
               for (const i of roomList) {
                 addVal(MY_API.AnchorLottery.BLTHserverRoomList, i);
               }
-              MY_API.chatLog(`[天选时刻] BTLH-server天选数据获取完毕<br>共${roomList.length}个房间`, 'success');
+              MY_API.chatLog(`[天选时刻] BLTH-server天选数据获取完毕<br>共${roomList.length}个房间`, 'success');
               return $.Deferred().resolve();
             } else {
               return MY_API.chatLog(`[天选时刻] 连接BLTH-server出错<br>${response.body.msg}`, 'error');
@@ -5497,7 +5495,7 @@
           }
         },
         check: (roomid, uid) => {
-          if (!MY_API.AnchorLottery.filter.ignore_room(roomid)) return false;
+          if (!MY_API.AnchorLottery.filter.ignore_room(roomid)) return $.Deferred().resolve(false);
           return BAPI.xlive.anchor.check(roomid).then((response) => {
             MYDEBUG(`API.xlive.anchor.check(${roomid}) response`, response);
             if (response.code === 0) {
@@ -5631,7 +5629,7 @@
                       `## 天选时刻中奖  \n  \n## 中奖账号id：${Live_info.uname}  \n  \n## 房间号roomid = ${data.roomid}  \n  \n## 主播uid = ${anchorUid}  \n  \n## 抽奖id = ${data.id}  \n  \n## 获得奖品：  \n  \n# ${data.award_name}  \n  \n## 请及时私信主播发放奖励`
                     ).then((re) => {
                       MYDEBUG('ServerTurbo_sendMsg response', re);
-                      if (re.body.code === 0) {
+                      if (re.body && re.body.code === 0) {
                         window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
                       } else {
                         window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
@@ -6085,7 +6083,7 @@
                             })
                           } else p1.resolve();
                           if (MY_API.CONFIG.ANCHOR_FANS_CHECK) {
-                            MY_API.AnchorLottery.getAnchorUid(room).then((uid) => {
+                            MY_API.AnchorLottery.getAnchorUid(data.room_id).then((uid) => {
                               if (uid === -1) return p2.resolve();
                               MY_API.AnchorLottery.fansCheck(uid).then((res) => {
                                 if (res === -1) return p2.resolve();
