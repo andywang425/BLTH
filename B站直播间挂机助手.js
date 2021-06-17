@@ -32,8 +32,9 @@
 // @connect        raw.fastgit.org
 // @connect        raw.githubusercontent.com
 // @connect        andywang.top
+// @connect        localhost
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
-// @require        https://code.jquery.com/jquery-3.2.1.min.js
+// @require        https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
@@ -507,7 +508,7 @@
         ANCHOR_UPLOAD_MSG_CONTENT: "", // 附加信息
         ANCHOR_IGNORE_UPLOAD_MSG: false, // 天选忽略附加信息
         ANCHOR_UPLOAD_ROOMLIST: false, // 上传天选数据至 BLTH-server
-        ANCHOR_SERVER_APIKEY: (function () { let obj = {}; obj[Live_info.uid] = "apikey"; return obj; })(), // 天选时刻 BLTH-server apikey
+        ANCHOR_SERVER_APIKEY: (function () { let obj = {}; obj[Live_info.uid] = ""; return obj; })(), // 天选时刻 BLTH-server apikey
         ANCHOR_TYPE_SERVER: false, // 天选时刻 - BLTH-server
         ANCHOR_TYPE_POLLING: true, // 天选模式 - 轮询
         ANCHOR_TYPE_LIVEROOM: false, // 天选模式 - 直播间简介
@@ -867,7 +868,7 @@
         MY_API.saveCache();
         layer.msg('配置和CACHE已重置为默认。3秒后刷新页面', { icon: 1 });
         setTimeout(() => {
-          window.location.reload()
+          W.location.reload()
         }, 3000);
       },
       ReDoAllTasks: () => {
@@ -1451,7 +1452,7 @@
           blockLiveStream: `拦截直播流。开启本功能后将无法观看直播。<mh3>原理：</mh3><mul>劫持页面上的fetch，通过判断url是否含有<code>bilivideo</code>拦截所有直播流请求。</mul><mh3>注意：</mh3><mul><mli>开启本功能后控制台中会出现大量报错，如<code style='color:red;'>id 38: player core NetworkError, {"code":11001,"errInfo":{"url":"https://d1--cn-gotcha204.bilivideo.com/live-bvc/284219/live_50333369_2753084_4000/index.m3u8?expires=1618677399&len=0&oi=1700331273&pt=web&qn=0&trid=9cc4c8772c0543999b03360f513dd1fa&sigparams=cdn,expires,len,oi,pt,qn,trid&cdn=cn-gotcha04&sign=bd05d848ebf2c7a815e0242ac1477187&p2p_type=1&src=9&sl=4&sk=59b4112a8c653bb","info":"TypeError: Cannot read property 'then' of undefined"}}</code>，此类报错均为b站js的报错，无视即可。</mli></mul>`,
           blockliveDataUpdate: "拦截直播观看数据上报。<mh3>原理：</mh3><mul>劫持页面上的fetch和XMLHttpRequest，拦截所有url中含有<code>data.bilibili.com/gol/postweb</code>的fetch请求和url中含有<code>data.bilibili.com/log</code>的xhr请求。</mul><mh3>注意：</mh3><mul><mli>开启本功能后控制台中会出现大量警告，如<code style='color:rgb(255 131 0);'>jQuexry.Deferred exception: Cannot read property 'status' of undefined TypeError: Cannot read property 'status' of undefined</code>，此类报错均为b站js的报错，无视即可。 </mli></mul><mh3>说明：</mh3><mul><mli>根据观察，目前上报的数据有：p2p种类，直播画质，直播流编码方式，直播流地址，直播流名称，直播流协议，窗口大小，观看时长，请求花费时长， 请求成功/失败数量，通过p2p下载的有效直播流大小，通过p2p上传的直播流大小，当前直播间地址，当前时间戳等等。 </mli></mul>",
           WEAR_MEDAL_BEFORE_DANMU: "手动发送弹幕前自动佩戴当前房间的粉丝勋章再发弹幕。<mul><mli>如果没有当前直播间的粉丝勋章则不进行任何操作。</mli><mli>【一直自动佩戴】比较适合需要同时在多个直播间发弹幕的情况。如果只想在某一个直播间发弹幕勾选【仅在首次发弹幕时自动佩戴】即可。</mli><mli>佩戴成功后会把弹幕框左侧的粉丝牌替换为当前直播间的粉丝牌。</mli></mul>",
-          ANCHOR_UPLOAD_ROOMLIST: "上传你所收集到的直播间列表至BLTH-server。<mul><mli>如果可以的话请在【天选时刻获取数据方式】中勾选至少两项，因为单纯地把你从BLTH-server获取到的直播间号再上传回去意义不大。</mli><mli>由于该功能处于测试阶段，上传数据也需要<code>apikey</code>。</mli></mul>",
+          ANCHOR_UPLOAD_ROOMLIST: "上传你所收集到的直播间列表至BLTH-server。<mul><mli>如果可以的话请在【天选时刻获取数据方式】中勾选至少两项，因为单纯地把你从BLTH-server获取到的直播间号再上传回去意义不大。</mli><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid即可。</mli></mul>",
           ANCHOR_TYPE_SERVER: "<strong>BLTH-server</strong>是本脚本的服务端，用于推送天选时刻数据，提供脚本更新信息等。<mul><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid即可。</mli><mli>该功能的原理为ajax轮询，与awpush不同。awpush使用webSocket实时推送天选数据。</mli></mul>",
           ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻数据推送系统。可以实现天选数据的收集和分发。<mh3>说明</mh3><mul><mli>这个功能仍处于测试阶段，不是很稳定。</mli><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid即可。</mli><mli>启用这个功能后你的部分设置将会失效，如【天选时刻数据获取方式】（由服务端决定），检查房间最大数量（500），请求间隔（500）。</mli><mli>该功能与【从BLTH-server获取天选时刻数据】不同。awpush使用webSocket实现实时推送，【从BLTH-server获取天选时刻数据】通过ajax轮询获取数据。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的天选数据。同时服务端会实时推送收到的天选数据。</mul>",
           ANCHOR_AUTO_BUY_LV1_MEDAL: "检测到有1级粉丝牌要求的天选后，如果没有该勋章，则自动用20硬币购买再参加。",
@@ -1569,7 +1570,7 @@
                     icon: 1
                   });
                   setTimeout(() => {
-                    window.location.reload()
+                    W.location.reload()
                   }, 3000);
                 })
               });
@@ -4397,55 +4398,49 @@
                     if (JQlogRedPoint.is(":hidden")) JQlogRedPoint.show();
                     if (MY_API.CONFIG.PP_NOTICE) {
                       // pushplus
-                      (function PP_notice() {
-                        const data = {
-                          token: MY_API.CONFIG.PP_token,
-                          title: `【${GM_info.script.name}】实物抽奖中奖通知 ${obj.title}，第${obj.number}轮`,
-                          content: `<div style="border: 1px solid rgb(223, 187, 0);color: rgb(145, 123, 0);background: none 0% 0% repeat scroll rgb(255, 215, 0, 30%);text-align: center;border-radius: 5%;padding: 15px 20px;"><h3>实物抽奖中奖</h3><br /><h4>中奖账号id：${Live_info.uname}</h4><br /><h4>${obj.title}</h4><br /><h4>aid=${obj.aid}</h4><br /><h4>第${obj.number}轮</h4><br /><h4>获得奖品：</h4><br /><h3>${i.giftTitle}</h3><br /><h4>请及时填写领奖信息</h4></div>`
-                        };
-                        return PP_sendMsg(data).then((re) => {
-                          MYDEBUG('PP_sendMsg response', re);
-                          if (re.body.code == 200) {
-                            window.toast('[实物抽奖] 推送加中奖提示发送成功', 'success');
-                          } else {
-                            window.toast(`[实物抽奖] 推送加中奖提示发送失败 ${re.body.msg}`, 'error')
-                          }
-                          return $.Deferred().resolve();
-                        });
-                      })();
+                      const data = {
+                        token: MY_API.CONFIG.PP_token,
+                        title: `【${GM_info.script.name}】实物抽奖中奖通知 ${obj.title}，第${obj.number}轮`,
+                        content: `<div style="border: 1px solid rgb(223, 187, 0);color: rgb(145, 123, 0);background: none 0% 0% repeat scroll rgb(255, 215, 0, 30%);text-align: center;border-radius: 5%;padding: 15px 20px;"><h3>实物抽奖中奖</h3><br /><h4>中奖账号id：${Live_info.uname}</h4><br /><h4>${obj.title}</h4><br /><h4>aid=${obj.aid}</h4><br /><h4>第${obj.number}轮</h4><br /><h4>获得奖品：</h4><br /><h3>${i.giftTitle}</h3><br /><h4>请及时填写领奖信息</h4></div>`
+                      };
+                      PP_sendMsg(data).then((re) => {
+                        MYDEBUG('PP_sendMsg response', re);
+                        if (re.body.code == 200) {
+                          window.toast('[实物抽奖] 推送加中奖提示发送成功', 'success');
+                        } else {
+                          window.toast(`[实物抽奖] 推送加中奖提示发送失败 ${re.body.msg}`, 'error')
+                        }
+                        return $.Deferred().resolve();
+                      });
                     }
                     if (MY_API.CONFIG.CP_NOTICE) {
                       // 酷推
-                      (function CP_notice() {
-                        return CP_sendMsg(MY_API.CONFIG.CP_Skey,
-                          `【${GM_info.script.name}实物抽奖中奖通知\n${obj.title}\n第${obj.number}轮\n中奖账号id：${Live_info.uname}\n${obj.title}\naid = ${obj.aid}\n第${obj.number}轮\n获得奖品：\n${i.giftTitle}\n请及时填写领奖信息`
-                        ).then((re) => {
-                          MYDEBUG('CP_sendMsg response', re);
-                          if (re.body.code === 200) {
-                            window.toast('[实物抽奖] 酷推中奖提示发送成功', 'success');
-                          } else {
-                            window.toast(`[实物抽奖] 酷推中奖提示发送失败 ${re.body.message}`, 'error')
-                          }
-                          return $.Deferred().resolve();
-                        });
-                      })()
+                      CP_sendMsg(MY_API.CONFIG.CP_Skey,
+                        `【${GM_info.script.name}实物抽奖中奖通知\n${obj.title}\n第${obj.number}轮\n中奖账号id：${Live_info.uname}\n${obj.title}\naid = ${obj.aid}\n第${obj.number}轮\n获得奖品：\n${i.giftTitle}\n请及时填写领奖信息`
+                      ).then((re) => {
+                        MYDEBUG('CP_sendMsg response', re);
+                        if (re.body.code === 200) {
+                          window.toast('[实物抽奖] 酷推中奖提示发送成功', 'success');
+                        } else {
+                          window.toast(`[实物抽奖] 酷推中奖提示发送失败 ${re.body.message}`, 'error')
+                        }
+                        return $.Deferred().resolve();
+                      });
                     }
                     if (MY_API.CONFIG.ServerTurbo_NOTICE) {
                       // Server酱turbo版
-                      (function ServerTurbo_notice() {
-                        return ServerTurbo_sendMsg(MY_API.CONFIG.ServerTurbo_SendKey,
-                          `【${GM_info.script.name}】实物抽奖中奖通知 ${obj.title}，第${obj.number}轮`,
-                          `## 实物抽奖中奖  \n  \n## 中奖账号id：${Live_info.uname}  \n  \n## ${obj.title}  \n  \n## aid = ${obj.aid}  \n  \n## 第${obj.number}轮  \n  \n## 获得奖品：  \n  \n# ${i.giftTitle}  \n  \n## 请及时填写领奖信息`
-                        ).then((re) => {
-                          MYDEBUG('ServerTurbo_sendMsg response', re);
-                          if (re.body && re.body.code === 0) {
-                            window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
-                          } else {
-                            window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
-                          }
-                          return $.Deferred().resolve();
-                        });
-                      })();
+                      ServerTurbo_sendMsg(MY_API.CONFIG.ServerTurbo_SendKey,
+                        `【${GM_info.script.name}】实物抽奖中奖通知 ${obj.title}，第${obj.number}轮`,
+                        `## 实物抽奖中奖  \n  \n## 中奖账号id：${Live_info.uname}  \n  \n## ${obj.title}  \n  \n## aid = ${obj.aid}  \n  \n## 第${obj.number}轮  \n  \n## 获得奖品：  \n  \n# ${i.giftTitle}  \n  \n## 请及时填写领奖信息`
+                      ).then((re) => {
+                        MYDEBUG('ServerTurbo_sendMsg response', re);
+                        if (re.body && re.body.code === 0) {
+                          window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
+                        } else {
+                          window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
+                        }
+                        return $.Deferred().resolve();
+                      });
                     }
                     if (MY_API.CONFIG.GM_NOTICE) {
                       GM_notice("实物抽奖中奖", `${obj.title}，奖品：${i.giftTitle}`)
@@ -5588,55 +5583,49 @@
                 }
                 if (MY_API.CONFIG.PP_NOTICE) {
                   // pushplus
-                  (function PP_notice() {
-                    const data = {
-                      token: MY_API.CONFIG.PP_token,
-                      title: `${GM_info.script.name} 天选时刻中奖通知`,
-                      content: `<div style="border: 1px solid rgb(223, 187, 0);color: rgb(145, 123, 0);background: none 0% 0% repeat scroll rgb(255, 215, 0, 30%);text-align: center;border-radius: 5%;padding: 15px 20px;"><h3>天选时刻中奖</h3><br /><h4>中奖账号id：${Live_info.uname}</h4><br /><h4>房间号roomid=${data.roomid}</h4><br /><h4>主播uid=${anchorUid}</h4><br /><h4>抽奖id=${data.id}</h4><br /><h4>获得奖品：</h4><br /><h3>${data.award_name}</h3><br /><h4>请及时私信主播发放奖励</h4></div>`
-                    };
-                    return PP_sendMsg(data).then((re) => {
-                      MYDEBUG('PP_sendMsg response', re);
-                      if (re.body.code == 200) {
-                        window.toast('[天选时刻] 推送加中奖提示发送成功', 'success');
-                      } else {
-                        window.toast(`[天选时刻] 推送加中奖提示发送失败 ${re.body.msg}`, 'error')
-                      }
-                      return $.Deferred().resolve();
-                    });
-                  })()
+                  const data = {
+                    token: MY_API.CONFIG.PP_token,
+                    title: `${GM_info.script.name} 天选时刻中奖通知`,
+                    content: `<div style="border: 1px solid rgb(223, 187, 0);color: rgb(145, 123, 0);background: none 0% 0% repeat scroll rgb(255, 215, 0, 30%);text-align: center;border-radius: 5%;padding: 15px 20px;"><h3>天选时刻中奖</h3><br /><h4>中奖账号id：${Live_info.uname}</h4><br /><h4>房间号roomid=${data.roomid}</h4><br /><h4>主播uid=${anchorUid}</h4><br /><h4>抽奖id=${data.id}</h4><br /><h4>获得奖品：</h4><br /><h3>${data.award_name}</h3><br /><h4>请及时私信主播发放奖励</h4></div>`
+                  };
+                  PP_sendMsg(data).then((re) => {
+                    MYDEBUG('PP_sendMsg response', re);
+                    if (re.body.code == 200) {
+                      window.toast('[天选时刻] 推送加中奖提示发送成功', 'success');
+                    } else {
+                      window.toast(`[天选时刻] 推送加中奖提示发送失败 ${re.body.msg}`, 'error')
+                    }
+                    return $.Deferred().resolve();
+                  });
                 }
                 if (MY_API.CONFIG.CP_NOTICE) {
                   // 酷推
-                  (function CP_notice() {
-                    return CP_sendMsg(MY_API.CONFIG.CP_Skey,
-                      `【${GM_info.script.name}】天选时刻中奖通知\n中奖账号id：${Live_info.uname}\n房间号roomid = ${data.roomid}\n主播uid = ${anchorUid}\n抽奖id = ${data.id}\n获得奖品：\n${data.award_name}\n请及时私信主播发放奖励`
-                    ).then((re) => {
-                      MYDEBUG('CP_sendMsg response', re);
-                      if (re.body.code === 200) {
-                        window.toast('[天选时刻] 酷推中奖提示发送成功', 'success');
-                      } else {
-                        window.toast(`[天选时刻] 酷推中奖提示发送失败 ${re.body.message}`, 'error')
-                      }
-                      return $.Deferred().resolve();
-                    });
-                  })();
+                  CP_sendMsg(MY_API.CONFIG.CP_Skey,
+                    `【${GM_info.script.name}】天选时刻中奖通知\n中奖账号id：${Live_info.uname}\n房间号roomid = ${data.roomid}\n主播uid = ${anchorUid}\n抽奖id = ${data.id}\n获得奖品：\n${data.award_name}\n请及时私信主播发放奖励`
+                  ).then((re) => {
+                    MYDEBUG('CP_sendMsg response', re);
+                    if (re.body.code === 200) {
+                      window.toast('[天选时刻] 酷推中奖提示发送成功', 'success');
+                    } else {
+                      window.toast(`[天选时刻] 酷推中奖提示发送失败 ${re.body.message}`, 'error')
+                    }
+                    return $.Deferred().resolve();
+                  });
                 }
                 if (MY_API.CONFIG.ServerTurbo_NOTICE) {
                   // Server酱turbo版
-                  (function ServerTurbo_notice() {
-                    return ServerTurbo_sendMsg(MY_API.CONFIG.ServerTurbo_SendKey,
-                      `${GM_info.script.name} 天选时刻中奖通知`,
-                      `## 天选时刻中奖  \n  \n## 中奖账号id：${Live_info.uname}  \n  \n## 房间号roomid = ${data.roomid}  \n  \n## 主播uid = ${anchorUid}  \n  \n## 抽奖id = ${data.id}  \n  \n## 获得奖品：  \n  \n# ${data.award_name}  \n  \n## 请及时私信主播发放奖励`
-                    ).then((re) => {
-                      MYDEBUG('ServerTurbo_sendMsg response', re);
-                      if (re.body && re.body.code === 0) {
-                        window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
-                      } else {
-                        window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
-                      }
-                      return $.Deferred().resolve();
-                    })
-                  })();
+                  ServerTurbo_sendMsg(MY_API.CONFIG.ServerTurbo_SendKey,
+                    `${GM_info.script.name} 天选时刻中奖通知`,
+                    `## 天选时刻中奖  \n  \n## 中奖账号id：${Live_info.uname}  \n  \n## 房间号roomid = ${data.roomid}  \n  \n## 主播uid = ${anchorUid}  \n  \n## 抽奖id = ${data.id}  \n  \n## 获得奖品：  \n  \n# ${data.award_name}  \n  \n## 请及时私信主播发放奖励`
+                  ).then((re) => {
+                    MYDEBUG('ServerTurbo_sendMsg response', re);
+                    if (re.body && re.body.code === 0) {
+                      window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
+                    } else {
+                      window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
+                    }
+                    return $.Deferred().resolve();
+                  })
                 }
                 if (MY_API.CONFIG.GM_NOTICE) {
                   // 系统通知
@@ -5841,7 +5830,7 @@
             let lastStatus = MY_API.AnchorLottery.awpush.websocket.status;
             for (const room of MY_API.AnchorLottery.allRoomList) {
               // 如果重连成功则不执行之前的任务
-              if (lastStatus !== 'open' && MY_API.AnchorLottery.awpush.websocket.status === 'open') return $.Deferred.resolve('return');
+              if (lastStatus !== 'open' && MY_API.AnchorLottery.awpush.websocket.status === 'open') return $.Deferred().resolve('return');
               lastStatus = MY_API.AnchorLottery.awpush.websocket.status;
               let p = $.Deferred();
               const uid = MY_API.AnchorLottery.roomidAndUid.hasOwnProperty(room) ? MY_API.AnchorLottery.roomidAndUid[room] : undefined;
@@ -5980,7 +5969,7 @@
             });
           },
           websocket: {
-            wsinit: function () { MY_API.AnchorLottery.awpush.websocket.ws = new WebSocket('wss://andywang.top:3001/ws') }, // 测试时用 localhost
+            wsinit: function () { MY_API.AnchorLottery.awpush.websocket.ws = new WebSocket('wss://andywang.top:3001/ws') }, // 测试时用 localhost, 原为 andywang.top
             ws: null,
             /** open, active_close, close, reconnecting  */
             status: 'close',
@@ -6470,13 +6459,13 @@
           clearTimeout(resetTimer);
           return reset(600e3);
         }
-        if (API.CONFIG.TIME_AREA_DISABLE && inTimeArea(API.CONFIG.TIME_AREA_START_H0UR, API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE)) { // 在不抽奖时段且不抽奖时段不刷新开启
+        if (API.CONFIG.TIME_AREA_DISABLE && !API.CONFIG.IN_TIME_RELOAD_DISABLE && inTimeArea(API.CONFIG.TIME_AREA_START_H0UR, API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_START_MINUTE, API.CONFIG.TIME_AREA_END_MINUTE)) { // 在不抽奖时段且不抽奖时段不刷新开启
           const resetTime = getIntervalTime(API.CONFIG.TIME_AREA_END_H0UR, API.CONFIG.TIME_AREA_END_MINUTE);
           MYDEBUG('[刷新直播间]', `处于休眠时间段，将在${resetTime}毫秒后刷新直播间`);
           clearTimeout(resetTimer);
           return reset(resetTime);
         }
-        window.location.reload();
+        W.location.reload();
       }, delay);
     };
   }
@@ -6730,7 +6719,7 @@
         localStorage.removeItem(key); i--;
       }
     }
-    window.location.reload();
+    W.location.reload();
   }
   /**
    * 保存特殊设置
