@@ -4717,17 +4717,36 @@
           else if (mode === 3) // 中奖分组
             return getUpInTag(Live_info.uid, MY_API.AnchorLottery.anchorPrizeTagid).then(() => delFollowingList(MY_API.AnchorLottery.uidInTagList).then(() => { unFollowBtnClickable = true }));
         },
-        getRoomList: async () => {
-          let roomList = await BAPI.room.getList().then((response) => { // 获取各分区的房间号
-            MYDEBUG('直播间列表', response);
+        getAreaData: () => {
+          return BAPI.room.getList().then((response) => {
+            MYDEBUG('API.room.getList 分区信息', response);
             if (response.code === 0) return response.data;
             else {
-              MY_API.chatLog(`[天选时刻] 获取各分区的房间号出错，${response.message}`, 'error');
-              return delayCall(() => MY_API.AnchorLottery.getRoomList());
+              MY_API.chatLog(`[天选时刻] 获取各分区信息出错，${response.message}`, 'error');
+              return delayCall(() => MY_API.AnchorLottery.getAreaData());
             }
           });
+        },
+        getRoomList: (data) => {
+          return BAPI.room.getRoomList(data.id, 0, 0, data.page, data.size).then((re) => {
+            MYDEBUG(`API.room.getRoomList(${data.id}, 0, 0, ${data.page}, ${data.size})`, re);
+            if (re.code === 0) {
+              const list = re.data.list;
+              MY_API.chatLog(`[天选时刻] 获取${data.name + '分区'}的直播间`, 'info');
+              MYDEBUG(`[天选时刻] 获取${data.name + '分区'}房间列表`, re);
+              for (const i of list) {
+                addVal(MY_API.AnchorLottery.roomidList, i.roomid);
+              }
+            } else {
+              MY_API.chatLog(`[天选时刻] 获取${data.name + '分区'}的直播间出错<br>${re.message}`, 'warning');
+              return delayCall(() => checkRoomList());
+            }
+          });
+        },
+        getHotRoomList: async () => {
+          let areaData = await MY_API.AnchorLottery.getAreaData();
           const checkHourRank = async () => { // 小时榜
-            for (const r of roomList) {
+            for (const r of areaData) {
               await BAPI.rankdb.getTopRealTimeHour(r.id).then((response) => {
                 MYDEBUG(`API.rankdb.getTopRealTimeHour(${r.id})`, response);
                 if (response.code === 0) {
@@ -4746,21 +4765,8 @@
             }
           };
           const checkRoomList = async () => { // 分区列表
-            for (const r of roomList) {
-              await BAPI.room.getRoomList(r.id, 0, 0, 1, 50).then((re) => {
-                MYDEBUG(`API.room.getRoomList(${r.id}, 0, 0, 1, 50)`, re);
-                if (re.code === 0) {
-                  const list = re.data.list;
-                  MY_API.chatLog(`[天选时刻] 获取${r.name + '分区'}的直播间`, 'info');
-                  MYDEBUG(`[天选时刻] 获取${r.name + '分区'}房间列表`, re);
-                  for (const i of list) {
-                    addVal(MY_API.AnchorLottery.roomidList, i.roomid);
-                  }
-                } else {
-                  MY_API.chatLog(`[天选时刻] 获取${r.name + '分区'}的直播间出错<br>${re.message}`, 'warning');
-                  return delayCall(() => checkRoomList());
-                }
-              });
+            for (const r of areaData) {
+              await MY_API.AnchorLottery.getRoomList(r);
               await sleep(MY_API.CONFIG.ANCHOR_INTERVAL)
             }
           };
@@ -5822,7 +5828,8 @@
           },
           userInfo: {
             task: undefined,
-            secret: undefined
+            secret: undefined,
+            area_data: undefined
           },
           polling_allRoomList: async () => {
             if (MY_API.AnchorLottery.allRoomList.length > 500) MY_API.AnchorLottery.allRoomList.splice(0, 500);
@@ -5891,7 +5898,7 @@
             }
             switch (MY_API.AnchorLottery.awpush.userInfo.task) {
               case "POLLING_HOT_ROOMS": {
-                await MY_API.AnchorLottery.getRoomList();
+                await MY_API.AnchorLottery.getHotRoomList();
                 for (const r of MY_API.AnchorLottery.roomidList) {
                   addVal(MY_API.AnchorLottery.allRoomList, r);
                 }
@@ -5922,6 +5929,14 @@
                 }
                 MY_API.chatLog(`[天选时刻] 已关注的开播直播间获取完毕<br>共${MY_API.AnchorLottery.liveRoomList.length}个`, 'success');
                 for (const r of MY_API.AnchorLottery.liveRoomList) {
+                  addVal(MY_API.AnchorLottery.allRoomList, r);
+                }
+                await MY_API.AnchorLottery.awpush.polling_allRoomList();
+                break;
+              }
+              case "POLLING_AREA": {
+                await MY_API.AnchorLottery.getRoomList(MY_API.AnchorLottery.awpush.userInfo.area_data);
+                for (const r of MY_API.AnchorLottery.roomidList) {
                   addVal(MY_API.AnchorLottery.allRoomList, r);
                 }
                 await MY_API.AnchorLottery.awpush.polling_allRoomList();
@@ -5969,7 +5984,7 @@
             });
           },
           websocket: {
-            wsinit: function () { MY_API.AnchorLottery.awpush.websocket.ws = new WebSocket('wss://andywang.top:3001/ws') }, // 测试时用 localhost, 原为 andywang.top
+            wsinit: function () { MY_API.AnchorLottery.awpush.websocket.ws = new WebSocket('wss://localhost:3001/ws') }, // 测试时用 localhost, 原为 andywang.top
             ws: null,
             /** open, active_close, close, reconnecting  */
             status: 'close',
@@ -5982,11 +5997,10 @@
             run: () => {
               MY_API.AnchorLottery.awpush.websocket.wsinit();
               let ws = MY_API.AnchorLottery.awpush.websocket.ws;
-              let secret;
-              let task;
+              let secret, task, area_data;
               /** 心跳 */
               let heartBeat = {
-                timeout: 30e3,
+                timeout: 300e3,
                 timeoutObj: null,
                 serverTimeoutObj: null,
                 reset: function () {
@@ -6026,8 +6040,8 @@
               // 收到消息
               ws.onmessage = function (event) {
                 MYDEBUG('awpush 收到来自服务端的消息', event.data);
-                heartBeat.reset();
-                if (event.data !== 'pong') {
+                if (event.data === 'pong') heartBeat.reset();
+                else {
                   let json = '';
                   let reader = new FileReader();
                   reader.onload = function () {
@@ -6042,10 +6056,12 @@
                       case 'HAND_OUT_TASKS': {
                         secret = json.data.secret;
                         task = json.data.task;
+                        area_data = json.data.area_data || -1;
                         window.toast(`[awpush] 获得任务: ${MY_API.AnchorLottery.awpush.taskName[task]}`, 'info');
                         MYDEBUG(`awpush HAND_OUT_TASKS 分发任务 获得任务: ${task} 和 secret: ${secret} `);
                         MY_API.AnchorLottery.awpush.userInfo.task = task;
                         MY_API.AnchorLottery.awpush.userInfo.secret = secret;
+                        MY_API.AnchorLottery.awpush.userInfo.area_data = area_data;
                         MY_API.AnchorLottery.awpush.handleTask();
                         break;
                       }
@@ -6212,7 +6228,7 @@
                 await MY_API.AnchorLottery.getDataFromBLTHserver();
               }
               if (MY_API.CONFIG.ANCHOR_TYPE_POLLING) { // 轮询热门房间
-                await MY_API.AnchorLottery.getRoomList();
+                await MY_API.AnchorLottery.getHotRoomList();
               }
               if (MY_API.CONFIG.ANCHOR_TYPE_LIVEROOM) { // 从直播间简介
                 await MY_API.AnchorLottery.getLotteryInfoFromRoom();
