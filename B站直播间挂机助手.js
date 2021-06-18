@@ -5824,15 +5824,20 @@
         awpush: {
           taskName: {
             POLLING_HOT_ROOMS: "轮询热门直播间",
-            POLLING_LIVEROOMS: "轮询已关注的开播直播间"
+            POLLING_LIVEROOMS: "轮询已关注的开播直播间",
+            POLLING_AREA: "轮询指定分区"
           },
           userInfo: {
             task: undefined,
             secret: undefined,
-            area_data: undefined
+            area_data: undefined,
+            sleep_time: undefined,
+            interval: undefined,
+            max_room: undefined
           },
           polling_allRoomList: async () => {
-            if (MY_API.AnchorLottery.allRoomList.length > 500) MY_API.AnchorLottery.allRoomList.splice(0, 500);
+            if (MY_API.AnchorLottery.allRoomList.length > MY_API.AnchorLottery.awpush.userInfo.max_room)
+              MY_API.AnchorLottery.allRoomList = [...MY_API.AnchorLottery.allRoomList.slice(0, MY_API.AnchorLottery.awpush.userInfo.max_room)]
             MY_API.chatLog(`[天选时刻] 开始检查天选（共${MY_API.AnchorLottery.allRoomList.length}个房间）`, 'success');
             let lastStatus = MY_API.AnchorLottery.awpush.websocket.status;
             for (const room of MY_API.AnchorLottery.allRoomList) {
@@ -5883,10 +5888,11 @@
                 } else p.resolve();
               });
               await p;
-              await sleep(500);
+              await sleep(MY_API.AnchorLottery.awpush.userInfo.interval);
             };
           },
           handleTask: async () => {
+            // 用户自己设置的休眠
             const sleepTime = MY_API.AnchorLottery.sleepCheck();
             if (sleepTime) {
               // 休眠
@@ -5952,9 +5958,11 @@
               uid: Live_info.uid,
               secret: MY_API.AnchorLottery.awpush.userInfo.secret,
             };
-            setTimeout(() => MY_API.AnchorLottery.awpush.websocket.desend(JSON.stringify(json)), 300e3);
-            MY_API.chatLog(`[天选时刻] 5分钟后开始执行下一轮任务`);
-            MYDEBUG(`awpush 5分钟后运行下一轮任务`);
+            setTimeout(() => MY_API.AnchorLottery.awpush.websocket.desend(JSON.stringify(json)), MY_API.AnchorLottery.awpush.userInfo.sleep_time);
+            // 每两轮请求间的休息时间
+            const sleep_time = (MY_API.AnchorLottery.awpush.userInfo.sleep_time / 1000).toFixed(0);
+            MY_API.chatLog(`[天选时刻] ${sleep_time}秒后开始执行下一轮任务`);
+            MYDEBUG(`awpush ${sleep_time}秒后运行下一轮任务`);
           },
           check: (roomid, uid) => {
             return BAPI.xlive.anchor.check(roomid).then((response) => {
@@ -5997,10 +6005,10 @@
             run: () => {
               MY_API.AnchorLottery.awpush.websocket.wsinit();
               let ws = MY_API.AnchorLottery.awpush.websocket.ws;
-              let secret, task, area_data;
+              let secret, task, area_data, sleep_time, interval, max_room;
               /** 心跳 */
               let heartBeat = {
-                timeout: 300e3,
+                timeout: 30e3,
                 timeoutObj: null,
                 serverTimeoutObj: null,
                 reset: function () {
@@ -6056,12 +6064,18 @@
                       case 'HAND_OUT_TASKS': {
                         secret = json.data.secret;
                         task = json.data.task;
-                        area_data = json.data.area_data || -1;
-                        window.toast(`[awpush] 获得任务: ${MY_API.AnchorLottery.awpush.taskName[task]}`, 'info');
-                        MYDEBUG(`awpush HAND_OUT_TASKS 分发任务 获得任务: ${task} 和 secret: ${secret} `);
+                        area_data = json.data.area_data || {};
+                        sleep_time = json.data.sleep_time || 30e3;
+                        interval = json.data.interval || 500;
+                        max_room = json.data.max_room || 500;
+                        window.toast(`[awpush] 获得任务: ${MY_API.AnchorLottery.awpush.taskName[task]}${area_data.name ? " - " + area_data.name : ""}`, 'info');
+                        MYDEBUG(`awpush HAND_OUT_TASKS 分发任务 获得任务: ${task}, secret: ${secret}, 最大轮询房间数: ${max_room}, 休息时间: ${sleep_time}毫秒, 请求间隔: ${interval}毫秒, 分区信息`, area_data);
                         MY_API.AnchorLottery.awpush.userInfo.task = task;
                         MY_API.AnchorLottery.awpush.userInfo.secret = secret;
                         MY_API.AnchorLottery.awpush.userInfo.area_data = area_data;
+                        MY_API.AnchorLottery.awpush.userInfo.sleep_time = sleep_time;
+                        MY_API.AnchorLottery.awpush.userInfo.interval = interval;
+                        MY_API.AnchorLottery.awpush.userInfo.max_room = max_room;
                         MY_API.AnchorLottery.awpush.handleTask();
                         break;
                       }
