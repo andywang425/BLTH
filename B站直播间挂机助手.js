@@ -32,19 +32,18 @@
 // @connect        raw.fastgit.org
 // @connect        raw.githubusercontent.com
 // @connect        andywang.top
-// @connect        localhost
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
 // @require        https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d7e974a95e3c0328691561c52c66c39287e3b89f/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@bb6510e6a12a8a26add3cfb21527ed4d28bc6f71/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@ddb36ae79475bf1621f63355fe3f48d8e4773c9d/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@bb6510e6a12a8a26add3cfb21527ed4d28bc6f71/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -623,7 +622,7 @@
         LittleHeart_TS: 0, // 小心心
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0,
-        last_aid: 732, // 实物抽奖最后一个有效aid
+        last_aid: 761, // 实物抽奖最后一个有效aid
         MedalDanmu_TS: 0 //粉丝勋章打卡
       },
       GIFT_COUNT_DEFAULT: {
@@ -808,11 +807,13 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "修复天选时刻自定义直播间列表无法保存的bug。",
-              "修复天选时刻【忽略粉丝数小于__的天选】部分情况下无效的bug。",
-              "修复天选时刻勾选忽略直播间后有可能会报错的bug。",
-              "修复天选时刻添加云端忽略直播间后计数不变的bug。",
-              "【屏蔽挂机检测】缩短了模拟鼠标活动的间隔。"
+              "修复【不抽奖时段不刷新直播间】设置不生效的 bug。",
+              "优化消息推送。",
+              "awpush 任务分配优化（服务端的代码会过几天再更新，等一定数量的用户更新至新版本后再采用新的分配逻辑）。",
+              "awpush采用更严格的心跳逻辑。",
+              "适配B站货币升级，把金瓜子改为电池（1电池=100金瓜子，请手动修改相关设置项的值）。",
+              "适配B站api升级，修改了兑换硬币和银瓜子的api。",
+              "适配B站api升级，修复【从已关注正在直播的直播间获取天选时刻数据】开启后报错的bug。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -823,7 +824,6 @@
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
                 <mol>${mliHtml}</mol>
-                <mul><blockquote style="margin-inline-start:0px;">The darker the sky,<br>the brighter the stars,<br>know which direction you should be heading.</blockquote></mul>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444（新）')}
@@ -1632,7 +1632,7 @@
                   if (re.body && re.body.code === 0) {
                     window.toast('[实物抽奖] Server酱Turbo版推送测试消息发送成功', 'success');
                   } else {
-                    window.toast(`[实物抽奖] Server酱Turbo版推送测试消息发送失败 ${re.body.error}`, 'error');
+                    window.toast(`[实物抽奖] Server酱Turbo版推送测试消息发送失败 ${re.response.status}`, 'error');
                   }
                   return $.Deferred().resolve();
                 });
@@ -1646,7 +1646,7 @@
                   if (re.body.code === 200) {
                     window.toast('[天选时刻] 酷推推送测试消息发送成功', 'success');
                   } else {
-                    window.toast(`[天选时刻] 酷推推送测试消息发送失败 ${re.body.message}`, 'error')
+                    window.toast(`[天选时刻] 酷推推送测试消息发送失败 ${re.body.code}`, 'error')
                   }
                   return $.Deferred().resolve();
                 });
@@ -4422,7 +4422,7 @@
                         if (re.body.code === 200) {
                           window.toast('[实物抽奖] 酷推中奖提示发送成功', 'success');
                         } else {
-                          window.toast(`[实物抽奖] 酷推中奖提示发送失败 ${re.body.message}`, 'error')
+                          window.toast(`[实物抽奖] 酷推中奖提示发送失败 ${re.body.code}`, 'error')
                         }
                         return $.Deferred().resolve();
                       });
@@ -4437,7 +4437,7 @@
                         if (re.body && re.body.code === 0) {
                           window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
                         } else {
-                          window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
+                          window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.response.status}`, 'error');
                         }
                         return $.Deferred().resolve();
                       });
@@ -5612,7 +5612,7 @@
                     if (re.body.code === 200) {
                       window.toast('[天选时刻] 酷推中奖提示发送成功', 'success');
                     } else {
-                      window.toast(`[天选时刻] 酷推中奖提示发送失败 ${re.body.message}`, 'error')
+                      window.toast(`[天选时刻] 酷推中奖提示发送失败 ${re.body.code}`, 'error')
                     }
                     return $.Deferred().resolve();
                   });
@@ -5627,7 +5627,7 @@
                     if (re.body && re.body.code === 0) {
                       window.toast('[实物抽奖] Server酱Turbo版发起推送成功', 'success');
                     } else {
-                      window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.body.error}`, 'error');
+                      window.toast(`[实物抽奖] Server酱Turbo版发起推送失败 ${re.response.status}`, 'error');
                     }
                     return $.Deferred().resolve();
                   })
@@ -5915,9 +5915,11 @@
                 await MY_API.AnchorLottery.getLiveUsers();
                 MY_API.AnchorLottery.liveRoomList = [];
                 for (const i of MY_API.AnchorLottery.liveUserList) {
-                  const roomid = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)$/)[1],
+                  let realRoomId;
+                  const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
                     uid = i.uid;
-                  let realRoomId = roomid;
+                  if (Array.isArray(roomList)) realRoomId = roomidList[1];
+                  if (!realRoomId) return MYERROR('[天选时刻] 获取已关注开播直播间号失败', roomidList);
                   if (Number(roomid) <= 10000) {
                     realRoomId = await BAPI.room.get_info(roomid).then((res) => {
                       MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号发弹幕
@@ -6251,7 +6253,7 @@
                 MY_API.AnchorLottery.liveRoomList = [];
                 for (const i of MY_API.AnchorLottery.liveUserList) {
                   let realRoomId;
-                  const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)$/),
+                  const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
                     uid = i.uid;
                   if (Array.isArray(roomList)) realRoomId = roomidList[1];
                   if (!realRoomId) return;
