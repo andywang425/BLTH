@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.2.1
+// @version        5.7.2.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -5122,12 +5122,6 @@
             for (const w of after_yuanWords) {
               if (strAfterNum.indexOf(w) > -1) {
                 finalMoney = number;
-                break;
-              }
-            }
-            for (const w of after_milliWords) {
-              if (strAfterNum.indexOf(w) > -1) {
-                finalMoney = number * 0.001;
                 break;
               }
             }
