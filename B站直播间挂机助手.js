@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.2
+// @version        5.7.2.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -5915,11 +5915,11 @@
                 await MY_API.AnchorLottery.getLiveUsers();
                 MY_API.AnchorLottery.liveRoomList = [];
                 for (const i of MY_API.AnchorLottery.liveUserList) {
-                  let realRoomId;
+                  let realRoomId, roomid;
                   const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
                     uid = i.uid;
-                  if (Array.isArray(roomList)) realRoomId = roomidList[1];
-                  if (!realRoomId) return MYERROR('[天选时刻] 获取已关注开播直播间号失败', roomidList);
+                  if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+                  if (!roomid) return MYERROR('[天选时刻] 获取已关注开播直播间号失败', roomidList);
                   if (Number(roomid) <= 10000) {
                     realRoomId = await BAPI.room.get_info(roomid).then((res) => {
                       MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号发弹幕
@@ -5930,9 +5930,10 @@
                         return roomid;
                       }
                     })
-                  }
+                  } else realRoomId = roomid;
                   addVal(MY_API.AnchorLottery.liveRoomList, realRoomId);
                   MY_API.AnchorLottery.roomidAndUid[roomid] = uid;
+                  MY_API.AnchorLottery.roomidAndUid[realRoomId] = uid;
                 }
                 MY_API.chatLog(`[天选时刻] 已关注的开播直播间获取完毕<br>共${MY_API.AnchorLottery.liveRoomList.length}个`, 'success');
                 for (const r of MY_API.AnchorLottery.liveRoomList) {
@@ -6252,11 +6253,11 @@
                 await MY_API.AnchorLottery.getLiveUsers();
                 MY_API.AnchorLottery.liveRoomList = [];
                 for (const i of MY_API.AnchorLottery.liveUserList) {
-                  let realRoomId;
+                  let realRoomId, roomid;
                   const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
                     uid = i.uid;
-                  if (Array.isArray(roomList)) realRoomId = roomidList[1];
-                  if (!realRoomId) return;
+                  if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+                  if (!roomid) return MYERROR('[天选时刻] 获取已关注开播直播间号失败', roomidList);
                   if (Number(roomid) <= 10000) {
                     realRoomId = await BAPI.room.get_info(roomid).then((res) => {
                       MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号发弹幕
@@ -6267,9 +6268,10 @@
                         return roomid;
                       }
                     })
-                  }
+                  } else realRoomId = roomid;
                   addVal(MY_API.AnchorLottery.liveRoomList, realRoomId);
                   MY_API.AnchorLottery.roomidAndUid[roomid] = uid;
+                  MY_API.AnchorLottery.roomidAndUid[realRoomId] = uid;
                 }
                 MY_API.chatLog(`[天选时刻] 已关注的开播直播间获取完毕<br>共${MY_API.AnchorLottery.liveRoomList.length}个`, 'success');
               }
