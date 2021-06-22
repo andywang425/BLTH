@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.2.2
+// @version        5.7.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -43,7 +43,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@bb6510e6a12a8a26add3cfb21527ed4d28bc6f71/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@f573172a36253a1b10a2802fa027d31b72425a66/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -209,7 +209,7 @@
     }),
     linkMsg = (link, msg = link) => '<a href="' + link + '"target="_blank" style="color:">' + msg + '</a>',
     liveRoomUrl = 'https://live.bilibili.com/',
-    upperNum = { 0: ")", 1: "!", 2: "@", 3: "#", 4: "$", 5: "%", 6: "^", 7: "7", 8: "*", 9: "(" },
+    replaceList = { 0: "寚", 1: "寜", 2: "寠", 3: "寣", 4: "寪", 5: "寭", 6: "寮", 7: "寰", 8: "寯", 9: "寴", "{": "懕", "}": "懖", "[": "懗", "]": "懘" },
     isRegexp = /^\/.+\/[i|g|m]?$/,
     SP_CONFIG_DEFAULT = {
       showEula: true, // 显示EULA
@@ -503,7 +503,6 @@
         ANCHOR_UPLOAD_DATA: false, // 天选上传数据
         ANCHOR_UPLOAD_DATA_INTERVAL: 10, // 上传数据间隔
         ANCHOR_UPLOAD_MSG: false, // 天选上传时的附加信息开关
-        ANCHOR_PERSONAL_PROFILE: "", // 天选上传的个人简介表层信息
         ANCHOR_UPLOAD_MSG_CONTENT: "", // 附加信息
         ANCHOR_IGNORE_UPLOAD_MSG: false, // 天选忽略附加信息
         ANCHOR_UPLOAD_ROOMLIST: false, // 上传天选数据至 BLTH-server
@@ -528,6 +527,8 @@
         ANCHOR_MONEY_ONLY: false, // 仅参加现金抽奖
         ANCHOR_FANS_CHECK: false, // 忽略粉丝数小于__的天选
         ANCHOR_FANS_LEAST: 0, // 最少粉丝数
+        ANCHOR_IGNORE_AREA: false, // 忽略指定分区
+        ANCHOR_IGNORE_AREA_LIST: ["学习", "大事件"], // 忽略分区内容
         ANCHOR_AUTO_BUY_LV1_MEDAL: false, // 参与有1级粉丝牌要求的天选前自动购买勋章
         CHECK_HOUR_ROOM: false, // 检查小时榜
         CHECK_HOUR_ROOM_INTERVAL: 600, // 小时榜检查间隔时间(秒)
@@ -807,13 +808,10 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "修复【不抽奖时段不刷新直播间】设置不生效的 bug。",
-              "优化消息推送。",
-              "awpush 任务分配优化（服务端的代码会过几天再更新，等一定数量的用户更新至新版本后再采用新的分配逻辑）。",
-              "awpush采用更严格的心跳逻辑。",
-              "适配B站货币升级，把金瓜子改为电池（1电池=100金瓜子，请手动修改相关设置项的值）。",
-              "适配B站api升级，修改了兑换硬币和银瓜子的api。",
-              "适配B站api升级，修复【从已关注正在直播的直播间获取天选时刻数据】开启后报错的bug。"
+              "天选时刻不再检查小时榜。",
+              "提高了天选时刻各分区检索的热门房间数量。",
+              "天选时刻新增【忽略指定分区功能】。",
+              "解决了上传天选数据至个人简介会提示违规的问题。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1337,7 +1335,8 @@
           'ANCHOR_TYPE_SERVER',
           'ANCHOR_UPLOAD_ROOMLIST',
           'ANCHOR_AWPUSH',
-          'ANCHOR_AUTO_BUY_LV1_MEDAL'
+          'ANCHOR_AUTO_BUY_LV1_MEDAL',
+          'ANCHOR_IGNORE_AREA'
         ];
         const radioList = [
           /**
@@ -1380,7 +1379,6 @@
         const helpText = {
           // 帮助信息
           ANCHOR_FANS_CHECK: "忽略粉丝数小于一定值的UP所发起的天选时刻。<mul><mli>通常来说粉丝数多的UP比较讲信用，不会不兑奖。当然因为这些UP的天选抽的人多也更难中奖。</mli><mli>该项只能填大于等于0的整数。</mli></mul>",
-          ANCHOR_PERSONAL_PROFILE: "在个人简介中所展示的信息。<mul><mli>可以填符合b站规则的html。</mli></mul>",
           ANCHOR_GOLD_JOIN_TIMES: "付费天选指需要花费电池才能参加的天选。<mul><mli>多次参加同一个付费天选可以提高中奖率。</mli><mli><strong>请慎重填写本设置项。</strong></mli></mul>",
           GIFT_SEND_METHOD: "自动送礼策略，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间送礼。</mli><mli>黑名单：给房间列表以外的直播间送礼。</mli><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<mh3>注意：</mh3><mul><mli>支持识别阿拉伯数字和汉字数字。</mli><mli>识别的单位有限。</mli><mli>不支持识别外币。</mli><mli>由于一些天选时刻的奖品名比较特殊，可能会出现遗漏或误判。</mli></mul>',
@@ -1409,9 +1407,9 @@
           ANCHOR_WAIT_REPLY: "发起检查直播间天选信息，取关的请求后会等待回复，收到回复后等待一个间隔时间再发起下一个请求。<mh3>任务流程：</mh3><mul><mli>发起请求 - 等待回复 - 等待一个间隔时间 - 发起下一个请求</mli></mul>",
           ANCHOR_AUTO_DEL_FOLLOW: "如果该UP在白名单内或一开始就在默认/特别关注分组则不会被取关。",
           anchorBtnArea: "参加天选时会关注很多UP。可以在参加天选前点击【保存当前关注列表为白名单】，参与完天选后再点【取关不在白名单内的UP主】来清理关注列表。<mul><mli>不建议频繁清理，可能会被风控。</mli><mli>【编辑白名单】每两个uid之间用半角逗号<code>,</code>隔开。</mli><mli>推荐大家使用【取关分组内的UP主】的功能来清理关注列表，【取关不在白名单内的UP主】可以作为一个备选方案。</mli></mul>",
-          ANCHOR_TYPE_POLLING: "高热度房间来源于各分区小时榜和热门房间列表。",
-          ANCHOR_UPLOAD_DATA: "使用这个功能前你必须先拥有自己的直播间。  <mul><mli>上传数据格式：<code>&lt;p style=\"font-size:0px;\"&gt;JSONSTRING&lt;/p&gt;个人简介表层信息</code>。<br>JSONSTRING: 经处理的JSON字符串。处理方法为把数字替换成按Shift时输入的对应字符（除了7）。JSON格式：<code>{ roomList: [直播间1, 直播间2, ...], ts: 时间戳, msg?: 附加信息 }</code>。</mli><mli>【间隔__秒】：这个设置项若填<code>10</code>秒，则每<code>10</code>秒检查一次是否收集到了新的数据，若有才上传。</mli><mli>上传的天选数据将会通过缩小字体到0的方法隐藏起来。如果需要在个人简介中显示内容请编辑脚本设置中的【个人简介表层信息】。<strong>由于B站更新隐藏天选数据的功能已经失效。</strong></mli></mul>",
-          ANCHOR_UPLOAD_MSG: "在上传天选数据的同时可以上传一段附加信息。<mul><mli>可以填写html<br>如：<code>&lt;span style=\"color:red;\"&gt;测试&lt;/span&gt;</code> 效果：<span style=\"color:red;\">测试</span></mli><mli>如果想把附加信息设为空，请点击编辑界面上的<code>留空</code>按钮。</mli></mul>",
+          ANCHOR_TYPE_POLLING: "高热度房间来源于各分区热门房间列表。",
+          ANCHOR_UPLOAD_DATA: "使用这个功能前你必须先拥有自己的直播间。<mul><mli>【间隔__秒】：这个设置项若填<code>10</code>秒，则每<code>10</code>秒检查一次是否收集到了新的数据，若有才上传。</mli></mul>",
+          ANCHOR_UPLOAD_MSG: "在上传天选数据的同时可以上传一段附加信息。<mul><mli>如果想把附加信息设为空，请点击编辑界面上的<code>留空</code>按钮。</mli></mul>",
           ANCHOR_MAXLIVEROOM_SAVE: "个人简介有长度限制（约为一万个字符），若【个人简介储存房间最大数量】太大会无法上传。",
           ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<mh3>注意：</mh3><mul><mli>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</mli></mul>",
           ANCHOR_TYPE_LIVEROOM: "因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://live.bilibili.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<mul><mli>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</mli><mli>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</mli><mli><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</mli></mul>",
@@ -1454,9 +1452,10 @@
           WEAR_MEDAL_BEFORE_DANMU: "手动发送弹幕前自动佩戴当前房间的粉丝勋章再发弹幕。<mul><mli>如果没有当前直播间的粉丝勋章则不进行任何操作。</mli><mli>【一直自动佩戴】比较适合需要同时在多个直播间发弹幕的情况。如果只想在某一个直播间发弹幕勾选【仅在首次发弹幕时自动佩戴】即可。</mli><mli>佩戴成功后会把弹幕框左侧的粉丝牌替换为当前直播间的粉丝牌。</mli></mul>",
           ANCHOR_UPLOAD_ROOMLIST: "上传你所收集到的直播间列表至BLTH-server。<mul><mli>如果可以的话请在【天选时刻获取数据方式】中勾选至少两项，因为单纯地把你从BLTH-server获取到的直播间号再上传回去意义不大。</mli><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid即可。</mli></mul>",
           ANCHOR_TYPE_SERVER: "<strong>BLTH-server</strong>是本脚本的服务端，用于推送天选时刻数据，提供脚本更新信息等。<mul><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid即可。</mli><mli>该功能的原理为ajax轮询，与awpush不同。awpush使用webSocket实时推送天选数据。</mli></mul>",
-          ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻数据推送系统。可以实现天选数据的收集和分发。<mh3>说明</mh3><mul><mli>这个功能仍处于测试阶段，不是很稳定。</mli><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid即可。</mli><mli>启用这个功能后你的部分设置将会失效，如【天选时刻数据获取方式】（由服务端决定），检查房间最大数量（500），请求间隔（500）。</mli><mli>该功能与【从BLTH-server获取天选时刻数据】不同。awpush使用webSocket实现实时推送，【从BLTH-server获取天选时刻数据】通过ajax轮询获取数据。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的天选数据。同时服务端会实时推送收到的天选数据。</mul>",
+          ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻数据推送系统。可以实现天选数据的收集和分发。<mh3>说明</mh3><mul><mli>这个功能仍处于测试阶段，不是很稳定。</mli><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid即可。</mli><mli>启用这个功能后你的部分设置将会由服务端决定，如【天选时刻数据获取方式】，检查房间最大数量，请求间隔等。</mli><mli>该功能与【从BLTH-server获取天选时刻数据】不同。awpush使用webSocket实现实时推送，【从BLTH-server获取天选时刻数据】通过ajax轮询获取数据。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的天选数据。同时服务端会实时推送收到的天选数据。</mul>",
           ANCHOR_AUTO_BUY_LV1_MEDAL: "检测到有1级粉丝牌要求的天选后，如果没有该勋章，则自动用20硬币购买再参加。",
-          REMOVE_ELEMENT_followSideBar: "开启本功能后会导致【实验室】按钮点击后无法出现弹窗。"
+          REMOVE_ELEMENT_followSideBar: "开启本功能后会导致【实验室】按钮点击后无法出现弹窗。",
+          ANCHOR_IGNORE_AREA: "忽略指定分区，即不检索这些分区的天选。<mul><mli>请正确填写所要忽略分区的名称，如:<code>娱乐,网游,手游,电台,单机游戏,虚拟主播,生活,学习,大事件</code>。</mli><mli>如果要填写多个分区，每两项之间请用半角逗号<code>,</code>隔开。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1669,32 +1668,6 @@
                     layer.close(index);
                   });
               });
-              myDiv.find('button[data-action="edit_ANCHOR_PERSONAL_PROFILE"]').click(() => {
-                // 编辑个人简介表层信息
-                layer.prompt({
-                  formType: 2,
-                  value: String(MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE),
-                  title: '请输入上传的个人简介表层信息',
-                  btn: ['保存', '留空', '取消'],
-                  btn2: function () {
-                    MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE = "";
-                    MY_API.saveConfig(false);
-                    layer.msg('个人简介表层信息已被设为空字符串', {
-                      time: 2500,
-                      icon: 1
-                    });
-                  }
-                },
-                  function (value, index) {
-                    MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE = value;
-                    MY_API.saveConfig(false);
-                    layer.msg('表层信息保存成功', {
-                      time: 2500,
-                      icon: 1
-                    });
-                    layer.close(index);
-                  });
-              });
               myDiv.find('button[data-action="edit_ANCHOR_UPLOAD_MSG"]').click(() => {
                 // 编辑天选附加信息
                 layer.prompt({
@@ -1794,6 +1767,28 @@
                     layer.close(index);
                   });
               });
+              myDiv.find('button[data-action="edit_ANCHOR_IGNORE_AREA"]').click(() => {
+                // 编辑忽略分区
+                layer.prompt({
+                  formType: 2,
+                  value: String(MY_API.CONFIG.ANCHOR_IGNORE_AREA_LIST),
+                  title: '请输入所要忽略分区的名称',
+                  btn: ['保存', '取消']
+                },
+                  function (value, index) {
+                    let valArray = value.split(",");
+                    for (let i = 0; i < valArray.length; i++) {
+                      if (!valArray[i]) valArray.splice(i, 1);
+                    };
+                    MY_API.CONFIG.ANCHOR_IGNORE_AREA_LIST = [...valArray];
+                    MY_API.saveConfig(false);
+                    layer.msg('天选时刻忽略分区保存成功', {
+                      time: 2500,
+                      icon: 1
+                    });
+                    layer.close(index);
+                  });
+              })
               myDiv.find('button[data-action="edit_ANCHOR_DANMU_CONTENT"]').click(() => {
                 // 编辑天选弹幕内容
                 layer.prompt({
@@ -4728,6 +4723,8 @@
           });
         },
         getRoomList: (data) => {
+          if (!data.page) data.page = 1;
+          if (!data.size) data.size = 50;
           return BAPI.room.getRoomList(data.id, 0, 0, data.page, data.size).then((re) => {
             MYDEBUG(`API.room.getRoomList(${data.id}, 0, 0, ${data.page}, ${data.size})`, re);
             if (re.code === 0) {
@@ -4743,39 +4740,16 @@
             }
           });
         },
-        getHotRoomList: async () => {
+        getHotRoomList: async (ignore_area = []) => {
           let areaData = await MY_API.AnchorLottery.getAreaData();
-          const checkHourRank = async () => { // 小时榜
-            for (const r of areaData) {
-              await BAPI.rankdb.getTopRealTimeHour(r.id).then((response) => {
-                MYDEBUG(`API.rankdb.getTopRealTimeHour(${r.id})`, response);
-                if (response.code === 0) {
-                  const list = response.data.list;
-                  MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间`, 'info');
-                  MYDEBUG(`[天选时刻] 获取${r.name + '小时榜'}房间列表`, response);
-                  for (const i of list) {
-                    addVal(MY_API.AnchorLottery.roomidList, i.roomid);
-                  }
-                } else {
-                  MY_API.chatLog(`[天选时刻] 获取${r.name + '小时榜'}的直播间出错<br>${response.message}`, 'warning');
-                  return delayCall(() => checkHourRank());
-                }
-              });
-              await sleep(MY_API.AnchorLottery.awpush.userInfo.interval || MY_API.CONFIG.ANCHOR_INTERVAL)
-            }
-          };
-          const checkRoomList = async () => { // 分区列表
-            for (const r of areaData) {
-              await MY_API.AnchorLottery.getRoomList(r);
-              await sleep(MY_API.AnchorLottery.awpush.userInfo.interval || MY_API.CONFIG.ANCHOR_INTERVAL)
-            }
-          };
           MY_API.AnchorLottery.roomidList = [];
-          return checkHourRank().then(async () => {
-            await checkRoomList();
-            MY_API.chatLog(`[天选时刻] 高热度直播间收集完毕<br>共${MY_API.AnchorLottery.roomidList.length}个`, 'success');
-            return $.Deferred().resolve();
-          });
+          for (const r of areaData) {
+            if (ignore_area.indexOf(r.name) > -1) continue;
+            await MY_API.AnchorLottery.getRoomList(r);
+            await sleep(MY_API.AnchorLottery.awpush.userInfo.interval || MY_API.CONFIG.ANCHOR_INTERVAL)
+          }
+          MY_API.chatLog(`[天选时刻] 高热度直播间收集完毕<br>共${MY_API.AnchorLottery.roomidList.length}个`, 'success');
+          return $.Deferred().resolve();
         },
         uploadData: async () => {
           let description = undefined, p = $.Deferred();
@@ -4792,9 +4766,9 @@
             let lotteryInfoJson;
             try {
               if (description === undefined) throw "undefined"
-              lotteryInfoJson = description.match(/<p style="font-size:0px">(.*)<\/p>/)[1];
-              for (const i in upperNum) {
-                lotteryInfoJson = lotteryInfoJson.replaceall(upperNum[i], i)
+              lotteryInfoJson = description.match(/狧(.*)狨/)[1];
+              for (const i in replaceList) {
+                lotteryInfoJson = lotteryInfoJson.replaceall(replaceList[i], i)
               }
               lotteryInfoJson = JSON.parse(lotteryInfoJson);
               if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
@@ -4875,10 +4849,10 @@
             })
           }
           let jsonStr = JSON.stringify(uploadRawJson);
-          for (const i in upperNum) {
-            jsonStr = jsonStr.replaceall(i, upperNum[i])
+          for (const i in replaceList) {
+            jsonStr = jsonStr.replaceall(i, replaceList[i])
           }
-          let finalStr = `<p style=font-size:0px>` + jsonStr + `</p>${MY_API.CONFIG.ANCHOR_PERSONAL_PROFILE}`;
+          let finalStr = '狧' + jsonStr + '狨';
           return updateEncodeData(MY_API.AnchorLottery.myLiveRoomid, finalStr).then(() => {
             return setTimeout(() => MY_API.AnchorLottery.uploadData(), MY_API.CONFIG.ANCHOR_UPLOAD_DATA_INTERVAL * 1000)
           });
@@ -4955,9 +4929,9 @@
           let lotteryInfoJson;
           try {
             if (description === undefined) throw "undefined"
-            lotteryInfoJson = description.match(/<p style="font-size:0px">(.*)<\/p>/)[1];
-            for (const i in upperNum) {
-              lotteryInfoJson = lotteryInfoJson.replaceall(upperNum[i], i)
+            lotteryInfoJson = description.match(/狧(.*)狨/)[1];
+            for (const i in replaceList) {
+              lotteryInfoJson = lotteryInfoJson.replaceall(replaceList[i], i)
             }
             lotteryInfoJson = JSON.parse(lotteryInfoJson);
             if (typeof lotteryInfoJson !== 'object' || !lotteryInfoJson)
@@ -6238,7 +6212,7 @@
                 await MY_API.AnchorLottery.getDataFromBLTHserver();
               }
               if (MY_API.CONFIG.ANCHOR_TYPE_POLLING) { // 轮询热门房间
-                await MY_API.AnchorLottery.getHotRoomList();
+                await MY_API.AnchorLottery.getHotRoomList(MY_API.CONFIG.ANCHOR_IGNORE_AREA ? MY_API.CONFIG.ANCHOR_IGNORE_AREA_LIST : []);
               }
               if (MY_API.CONFIG.ANCHOR_TYPE_LIVEROOM) { // 从直播间简介
                 await MY_API.AnchorLottery.getLotteryInfoFromRoom();
