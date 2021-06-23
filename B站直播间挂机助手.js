@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.3
+// @version        5.7.3.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -808,10 +808,9 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "天选时刻不再检查小时榜。",
-              "提高了天选时刻各分区检索的热门房间数量。",
-              "天选时刻新增【忽略指定分区功能】。",
-              "解决了上传天选数据至个人简介会提示违规的问题。"
+              "修复推送无效的Bug。",
+              "修复自动买一级牌子导致卡死的Bug。",
+              "修复已关注用户无人开播引起的相关Bug。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -4499,7 +4498,8 @@
             MYDEBUG(`API.dynamic_svr.w_live_users`, response);
             let p = $.Deferred();
             if (response.code === 0) {
-              MY_API.AnchorLottery.liveUserList = [...response.data.items];
+              const items = response.data.items;
+              MY_API.AnchorLottery.liveUserList =  items instanceof Array ? [...items] : [];
               return p.resolve();
             } else {
               MY_API.chatLog(`[天选时刻] 获取正在直播的已关注UP出错 ${response.msg}`, 'caution');
@@ -5395,7 +5395,7 @@
                         MYDEBUG('API.link_group.buy_medal 自动买一级牌子 re', re);
                         if (re.code === 0) {
                           window.toast(`[天选时刻] 自动购买UP【${medalJson.anchorInfo.uname}】的1级粉丝牌（uid=${medalJson.anchorInfo.uid}）成功`, 'success');
-                          medal_list.push(medalJson);
+                          MY_API.AnchorLottery.medal_list.push(medalJson);
                           return defaultJoinData;
                         } else {
                           window.toast(`[天选时刻] 自动购买UP【${medalJson.anchorInfo.uname}】的1级粉丝牌（uid=${medalJson.anchorInfo.uid}）失败<br>${re.message}`, 'warning');
@@ -5556,12 +5556,12 @@
                 }
                 if (MY_API.CONFIG.PP_NOTICE) {
                   // pushplus
-                  const data = {
+                  const sendData = {
                     token: MY_API.CONFIG.PP_token,
                     title: `${GM_info.script.name} 天选时刻中奖通知`,
                     content: `<div style="border: 1px solid rgb(223, 187, 0);color: rgb(145, 123, 0);background: none 0% 0% repeat scroll rgb(255, 215, 0, 30%);text-align: center;border-radius: 5%;padding: 15px 20px;"><h3>天选时刻中奖</h3><br /><h4>中奖账号id：${Live_info.uname}</h4><br /><h4>房间号roomid=${data.roomid}</h4><br /><h4>主播uid=${anchorUid}</h4><br /><h4>抽奖id=${data.id}</h4><br /><h4>获得奖品：</h4><br /><h3>${data.award_name}</h3><br /><h4>请及时私信主播发放奖励</h4></div>`
                   };
-                  PP_sendMsg(data).then((re) => {
+                  PP_sendMsg(sendData).then((re) => {
                     MYDEBUG('PP_sendMsg response', re);
                     if (re.body.code == 200) {
                       window.toast('[天选时刻] 推送加中奖提示发送成功', 'success');
