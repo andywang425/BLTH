@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.3.1
+// @version        5.7.3.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -43,7 +43,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@f573172a36253a1b10a2802fa027d31b72425a66/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@e4abf91b354b622302e399094f5614c16a7428f6/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -538,8 +538,8 @@
         COIN_UID: ['0'], // 投币up主
         COIN2SILVER: false, // 银币换银瓜子
         COIN2SILVER_NUM: 1, // 银币换银瓜子，硬币数量
-        CP_NOTICE: false, // 酷推
-        CP_Skey: 'Skey', // 酷推Skey
+        SECONDS_NOTICE: false, // SECONDS QQ 推送
+        SECONDS_QQ: '请输入你的QQ号', // seconds qq号
         DANMU_CONTENT: ["这是一条弹幕"], // 弹幕内容
         DANMU_ROOMID: ["22474988"], // 发弹幕房间号
         DANMU_INTERVAL_TIME: ["10m"], // 弹幕发送时间
@@ -577,7 +577,7 @@
         MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "(￣3￣)", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄", "←◡←"], // 粉丝勋章打卡弹幕内容
         PP_NOTICE: false, // 推送加开关
         PP_token: "token", // 推送加 token
-        QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼'], // 存疑实物抽奖
+        QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼', '内网', '员工', '企业', '公司', '行政', '登记'], // 存疑实物抽奖
         RANDOM_DELAY: true, // 抽奖随机延迟
         RANDOM_SEND_DANMU: 0, // 随机弹幕发送概率
         RANDOM_SKIP: 0, // 随机跳过抽奖概率
@@ -808,9 +808,9 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "修复推送无效的Bug。",
-              "修复自动买一级牌子导致卡死的Bug。",
-              "修复已关注用户无人开播引起的相关Bug。"
+              "加强了实物抽奖的关键字过滤，如果抽奖规则含有关键字该抽奖也会被忽略。",
+              "通过 BLTH-server 检查新版本并更新（之前使用的是 fastgit，有较大延迟）。",
+              "用私有化qq推送取代酷推"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1325,7 +1325,7 @@
           'ANCHOR_TYPE_POLLING',
           'ANCHOR_TYPE_LIVEROOM',
           'ANCHOR_TYPE_FOLLOWING',
-          'CP_NOTICE',
+          'SECONDS_NOTICE',
           'ServerTurbo_NOTICE',
           'ANCHOR_TYPE_CUSTOM',
           'REMOVE_ELEMENT_anchor',
@@ -1389,7 +1389,7 @@
           MATERIAL_LOTTERY: '实物抽奖，即金宝箱抽奖。某些特殊的直播间会有金宝箱抽奖。<mh3>注意：</mh3><mul><mli>【忽略关键字】中每一项之间用半角逗号<code>,</code>隔开。</mli></mul>',
           MATERIAL_LOTTERY_REM: "aid是活动的编号。如你不理解此项保持默认配置即可。",
           ANCHOR_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑天选。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
-          MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
+          MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名/抽奖规则中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "调用官方api，消耗20硬币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
@@ -1438,7 +1438,7 @@
           windowToast: `右上角的提示信息。相对来说不是那么重要，所以不放在日志窗口里。<mul style = "line-height:1em;"><div class="link-toast info fixed"><span class="toast-text">普通消息</span></div><br><br><br><div class="link-toast success fixed"><span class="toast-text">成功</span></div><br><br><br><div class="link-toast error fixed"><span class="toast-text">发生错误</span></div></mul>`,
           GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。</mli><mli>在脚本中打开控制台日志后，在控制台(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和 id 的json。将data下的几项全部展开，再搜索礼物名即可找到 id 。</mli><mli>常用 id ：1: <code>辣条</code> 6: <code>亿圆</code> 30607: <code>小心心</code></mli></mul>",
           ANCHOR_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的天选时刻。",
-          CP_NOTICE: "<a href = 'https://cp.xuthus.cc/' target = '_blank'>酷推（点我注册）</a>，英文名「Cool Push」，QQ消息推送服务。使用前请先前往酷推官网完成注册，然后回到脚本界面填写Skey。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的QQ私聊消息提醒你中奖了。</mli></mu;>",
+          SECONDS_NOTICE: "seconds是专门用来推送中奖信息的qqbot。使用前请先添加seconds（QQ: 2397433013）为好友，然后后点击【编辑QQ号】按钮输入你的QQ号。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的QQ私聊消息提醒你中奖了。</mli></mul>",
           ServerTurbo_NOTICE: "<a href = 'https://sct.ftqq.com/' target = '_blank'>Server酱Turbo版（点我注册）</a>，是「<a href='http://sc.ftqq.com' target='_blank'>公众号版</a>」分离出来的一个版本，它为捐赠用户提供更多的推送渠道选择，除了方糖服务号（因为举报原因卡片不显示正文），它还包括了到微信官方提供的「<a href='https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login' target='_blank'>测试号</a>」、企业微信群、钉钉群、飞书群的推送。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信推送提醒你中奖了。</mli></mul>",
           ANCHOR_TYPE_CUSTOM: "手动填写直播间列表，脚本会逐个检查这些直播间是否有天选时刻。<mul><mli>如果要填写多个直播间，每两个直播间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
           REMOVE_ELEMENT_anchor: "屏蔽天选时刻弹窗和礼物栏左侧的图标。<mh3>注意：</mh3><mul><mli>开启这一功能后会消耗相对较多的资源。</mli><mli>弹窗出现后（不可见）0-200ms的时间内浏览器窗口会无法滚动。</mli></mul><mh3>原理：</mh3><mul>通过修改css样式使弹窗不显示。但弹窗出现时浏览器窗口会被限制滚动，脚本检测到之后会将其关闭来解除滚动限制。</mul>",
@@ -1612,7 +1612,7 @@
                 };
                 return PP_sendMsg(data).then((re) => {
                   MYDEBUG('PP_sendMsg test response', re);
-                  if (re.body.code == 200) {
+                  if (re.body && re.body.code == 200) {
                     window.toast('[天选时刻] 推送加推送测试消息发送成功', 'success');
                   } else {
                     window.toast(`[天选时刻] 推送加推送测试消息发送失败 ${re.body.msg}`, 'error')
@@ -1635,16 +1635,16 @@
                   return $.Deferred().resolve();
                 });
               });
-              myDiv.find('button[data-action="test_CP"]').click(() => {
-                // 酷推推送测试
-                return CP_sendMsg(MY_API.CONFIG.CP_Skey,
+              myDiv.find('button[data-action="test_seconds"]').click(() => {
+                // seconds推送测试
+                return SECONDS_sendMsg(MY_API.CONFIG.SECONDS_QQ,
                   `【${GM_info.script.name}】推送测试\n中奖账号id：测试\n房间号roomid = 测试\n主播uid = 测试\n抽奖id = 测试\n获得奖品：\n测试\n此条为测试消息`
                 ).then((re) => {
-                  MYDEBUG('CP_sendMsg test response', re);
-                  if (re.body.code === 200) {
-                    window.toast('[天选时刻] 酷推推送测试消息发送成功', 'success');
+                  MYDEBUG('SECONDS_sendMsg test response', re);
+                  if (re.body && re.body.code === 0) {
+                    window.toast('[天选时刻] seconds推送测试消息发送成功', 'success');
                   } else {
-                    window.toast(`[天选时刻] 酷推推送测试消息发送失败 ${re.body.code}`, 'error')
+                    window.toast(`[天选时刻] seconds推送测试消息发送失败 ${re.response.status}`, 'error')
                   }
                   return $.Deferred().resolve();
                 });
@@ -1990,18 +1990,18 @@
                   }
                 )
               });
-              myDiv.find('button[data-action="edit_CP_Skey"]').click(() => {
-                // 编辑酷推Skey
+              myDiv.find('button[data-action="edit_seconds_qq"]').click(() => {
+                // 编辑 seconds qq号
                 layer.prompt({
                   formType: 0,
-                  value: MY_API.CONFIG.CP_Skey,
-                  title: '请输入酷推Skey',
+                  value: MY_API.CONFIG.SECONDS_QQ,
+                  title: '请输入您用于接受推送的QQ号',
                   btn: ['保存', '取消']
                 },
                   function (value, index) {
-                    MY_API.CONFIG.CP_Skey = value;
+                    MY_API.CONFIG.SECONDS_QQ = value;
                     MY_API.saveConfig(false);
-                    layer.msg('酷推Skey保存成功', {
+                    layer.msg('qq号保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -4262,16 +4262,17 @@
               if (response.data.typeB[response.data.typeB.length - 1].status != 3 && MY_API.MaterialObject.firstAid === undefined)
                 MY_API.MaterialObject.firstAid = aid;
               if (MY_API.CONFIG.MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY) {
+                const checkList = [response.data.title, response.data.rule];
                 for (const str of MY_API.CONFIG.QUESTIONABLE_LOTTERY) {
                   if (!isRegexp.test(str)) {
-                    if (response.data.title.toLowerCase().indexOf(str.toLowerCase()) > -1) {
+                    if (checkList.some(i => i.toLowerCase().indexOf(str.toLowerCase()) > -1 ? true : false)) {
                       MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖<br>${response.data.title} (aid = ${aid})<br>含有关键字：` + str, 'warning');
                       return MY_API.MaterialObject.check(aid + 1, aid);
                     }
                   }
                   else {
                     const reg = eval(str);
-                    if (reg.test(response.data.title)) {
+                    if (checkList.some(i => reg.test(i))) {
                       MY_API.chatLog(`[实物抽奖] 忽略存疑抽奖<br>${response.data.title} (aid = ${aid})<br>匹配正则：` + str, 'warning');
                       return MY_API.MaterialObject.check(aid + 1, aid);
                     }
@@ -4399,24 +4400,24 @@
                       };
                       PP_sendMsg(data).then((re) => {
                         MYDEBUG('PP_sendMsg response', re);
-                        if (re.body.code == 200) {
+                        if (re.body && re.body.code == 200) {
                           window.toast('[实物抽奖] 推送加中奖提示发送成功', 'success');
                         } else {
-                          window.toast(`[实物抽奖] 推送加中奖提示发送失败 ${re.body.msg}`, 'error')
+                          window.toast(`[实物抽奖] 推送加中奖提示发送失败 ${re.response.status}`, 'error')
                         }
                         return $.Deferred().resolve();
                       });
                     }
-                    if (MY_API.CONFIG.CP_NOTICE) {
-                      // 酷推
-                      CP_sendMsg(MY_API.CONFIG.CP_Skey,
+                    if (MY_API.CONFIG.SECONDS_NOTICE) {
+                      // seconds
+                      SECONDS_sendMsg(MY_API.CONFIG.SECONDS_QQ,
                         `【${GM_info.script.name}实物抽奖中奖通知\n${obj.title}\n第${obj.number}轮\n中奖账号id：${Live_info.uname}\n${obj.title}\naid = ${obj.aid}\n第${obj.number}轮\n获得奖品：\n${i.giftTitle}\n请及时填写领奖信息`
                       ).then((re) => {
-                        MYDEBUG('CP_sendMsg response', re);
-                        if (re.body.code === 200) {
-                          window.toast('[实物抽奖] 酷推中奖提示发送成功', 'success');
+                        MYDEBUG('SECONDS_sendMsg response', re);
+                        if (re.body && re.body.code === 0) {
+                          window.toast('[实物抽奖] seconds中奖提示发送成功', 'success');
                         } else {
-                          window.toast(`[实物抽奖] 酷推中奖提示发送失败 ${re.body.code}`, 'error')
+                          window.toast(`[实物抽奖] seconds中奖提示发送失败 ${re.response.status}`, 'error')
                         }
                         return $.Deferred().resolve();
                       });
@@ -4499,7 +4500,7 @@
             let p = $.Deferred();
             if (response.code === 0) {
               const items = response.data.items;
-              MY_API.AnchorLottery.liveUserList =  items instanceof Array ? [...items] : [];
+              MY_API.AnchorLottery.liveUserList = items instanceof Array ? [...items] : [];
               return p.resolve();
             } else {
               MY_API.chatLog(`[天选时刻] 获取正在直播的已关注UP出错 ${response.msg}`, 'caution');
@@ -5563,24 +5564,24 @@
                   };
                   PP_sendMsg(sendData).then((re) => {
                     MYDEBUG('PP_sendMsg response', re);
-                    if (re.body.code == 200) {
+                    if (re.body && re.body.code == 200) {
                       window.toast('[天选时刻] 推送加中奖提示发送成功', 'success');
                     } else {
-                      window.toast(`[天选时刻] 推送加中奖提示发送失败 ${re.body.msg}`, 'error')
+                      window.toast(`[天选时刻] 推送加中奖提示发送失败 ${re.response.status}`, 'error')
                     }
                     return $.Deferred().resolve();
                   });
                 }
-                if (MY_API.CONFIG.CP_NOTICE) {
-                  // 酷推
-                  CP_sendMsg(MY_API.CONFIG.CP_Skey,
+                if (MY_API.CONFIG.SECONDS_NOTICE) {
+                  // seconds
+                  SECONDS_sendMsg(MY_API.CONFIG.SECONDS_QQ,
                     `【${GM_info.script.name}】天选时刻中奖通知\n中奖账号id：${Live_info.uname}\n房间号roomid = ${data.roomid}\n主播uid = ${anchorUid}\n抽奖id = ${data.id}\n获得奖品：\n${data.award_name}\n请及时私信主播发放奖励`
                   ).then((re) => {
-                    MYDEBUG('CP_sendMsg response', re);
-                    if (re.body.code === 200) {
-                      window.toast('[天选时刻] 酷推中奖提示发送成功', 'success');
+                    MYDEBUG('SECONDS_sendMsg response', re);
+                    if (re.body && re.body.code === 0) {
+                      window.toast('[天选时刻] seconds中奖提示发送成功', 'success');
                     } else {
-                      window.toast(`[天选时刻] 酷推中奖提示发送失败 ${re.body.code}`, 'error')
+                      window.toast(`[天选时刻] seconds中奖提示发送失败 ${re.response.status}`, 'error')
                     }
                     return $.Deferred().resolve();
                   });
@@ -6488,17 +6489,17 @@
       GM: true,
       anonymous: true,
       method: "GET",
-      url: "https://cdn.jsdelivr.net/gh/andywang425/BLTH@master/assets/json/notice.min.json",
+      url: "https://andywang.top:3001/api/v1/notice",
       headers: headers,
       responseType: "json"
     }).then(response => {
       MYDEBUG("检查更新 checkUpdate", response);
       if (response.response.status !== 200)
         return window.toast(`[检查更新] 获取notice.json出错 ${response.response.statusText}`, 'caution');
-      noticeJson = response.body;
+      noticeJson = response.body.data;
       noticeJson.lastCheckUpdateTs = ts_ms();
       GM_setValue(`noticeJson`, noticeJson);
-      const scriptVersion = response.body.version;
+      const scriptVersion = noticeJson.version;
       const githubOpenTabOptions = { active: false, insert: true, setParent: true },
         greasyforkOpenTabOptions = { active: true, insert: true, setParent: true };
       if (versionStringCompare(version, scriptVersion) === -1) { // version < scriptVersion
@@ -6508,8 +6509,8 @@
           updateSource = "Greasy Fork"
           updateURL = "https://greasyfork.org/scripts/406048-b%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B";
         } else {
-          updateSource = "Github";
-          updateURL = "https://raw.fastgit.org/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js";
+          updateSource = "BLTH-server";
+          updateURL = "https://andywang.top:3001/api/v1/BLTH.user.js";
         }
         let index = layer.confirm(`检测到新版本 <strong>${scriptVersion}</strong>。<br>是否从 ${updateSource} 更新脚本？`, {
           title: '更新脚本',
@@ -7013,18 +7014,17 @@
     })
   }
   /**
-   * 发送酷推消息
-   * @param Skey 
+   * 发送seconds消息
+   * @param user_id qq号
    * @param content
    * @returns {object}  resolve({response: res, body: res.response})
    */
-  function CP_sendMsg(Skey, content) {
+  function SECONDS_sendMsg(user_id, message) {
     return XHR({
       GM: true,
       anonymous: true,
-      method: 'POST',
-      url: `https://push.xuthus.cc/send/${Skey}`,
-      data: `${content}`,
+      method: 'GET',
+      url: `https://andywang.top:3001/api/v1/qq/send_private_msg?user_id=${user_id}&message=${encodeURIComponent(message)}`,
       responseType: 'json'
     })
   }
