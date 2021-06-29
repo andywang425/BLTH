@@ -7020,7 +7020,6 @@
    * @returns {object}  resolve({response: res, body: res.response})
    */
   function SECONDS_sendMsg(user_id, message) {
-    //https://andywang.top:3001/api/v1/qq/send_private_msg?user_id=717871828&message=hello
     return XHR({
       GM: true,
       anonymous: true,
