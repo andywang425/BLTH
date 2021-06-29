@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.3.1
+// @version        5.7.3.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -808,9 +808,9 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "修复推送无效的Bug。",
-              "修复自动买一级牌子导致卡死的Bug。",
-              "修复已关注用户无人开播引起的相关Bug。"
+              "加强了实物抽奖的关键字过滤，如果抽奖规则含有关键字该抽奖也会被忽略。",
+              "通过 BLTH-server 检查新版本并更新（之前使用的是 fastgit，有较大延迟）。",
+              "用私有化qq推送取代酷推"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
