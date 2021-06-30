@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.3.2
+// @version        5.7.3.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -808,9 +808,7 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "加强了实物抽奖的关键字过滤，如果抽奖规则含有关键字该抽奖也会被忽略。",
-              "通过 BLTH-server 检查新版本并更新（之前使用的是 fastgit，有较大延迟）。",
-              "用私有化qq推送取代酷推"
+              "修复了awpush相关bug。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -1638,7 +1636,7 @@
               myDiv.find('button[data-action="test_seconds"]').click(() => {
                 // seconds推送测试
                 return SECONDS_sendMsg(MY_API.CONFIG.SECONDS_QQ,
-                  `【${GM_info.script.name}】推送测试\n中奖账号id：测试\n房间号roomid = 测试\n主播uid = 测试\n抽奖id = 测试\n获得奖品：\n测试\n此条为测试消息`
+                  `${GM_info.script.name} 推送测试\n此条为测试消息`
                 ).then((re) => {
                   MYDEBUG('SECONDS_sendMsg test response', re);
                   if (re.body && re.body.code === 0) {
@@ -6064,7 +6062,7 @@
                           let hasPwd = false, fans = { lackFan: false, fanNum: -1 };
                           let p1 = $.Deferred(), p2 = $.Deferred();
                           if (MY_API.CONFIG.ANCHOR_IGNORE_PWDROOM) {
-                            MY_API.AnchorLottery.pwdCheck(room).then((res) => {
+                            MY_API.AnchorLottery.pwdCheck(data.room_id).then((res) => {
                               if (res) hasPwd = true; // 加密
                               return p1.resolve();
                             }, () => {
