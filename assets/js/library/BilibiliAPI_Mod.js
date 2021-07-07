@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.0.3
+// @version       3.0.4
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -1302,6 +1302,14 @@ var BAPI = {
                         roomid: roomid
                     }
                 });
+            },
+            gettLotteryInfoWeb: (roomid) => {
+                return BAPI.ajax({
+                    url: 'xlive/lottery-interface/v1/lottery/getLotteryInfoWeb',
+                    data: {
+                        roomid: roomid
+                    }
+                });
             }
         },
         smalltv: {
@@ -1389,7 +1397,7 @@ var BAPI = {
                 }
             })
         },
-        getHotRank: (room_id, ruid, is_pre =0, area_id, page_size, source) => {
+        getHotRank: (room_id, ruid, is_pre = 0, area_id, page_size, source) => {
             return BAPI.ajax({
                 url: 'xlive/general-interface/v1/rank/getHotRank',
                 data: {
