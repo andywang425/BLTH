@@ -1,6 +1,6 @@
 <p align ="center"><img src="https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"></p>
 <p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.12-pass-green.svg" alt="TamperMonkey 4.12"> <img src="https://img.shields.io/badge/Violentmonkey_2.12.14-pass-green.svg" alt="Violentmonkey 2.12.14"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a></p>
-<p align="center"><a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437-yellow" alt="QQ Group"></a> <a href="https://jq.qq.com/?_wv=1027&k=Bf951teI"><img src="https://img.shields.io/badge/QQ%20Group-907502444(new)-brightgreen" alt="QQ Group"></a></p>
+<p align="center"><a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"><img src="https://img.shields.io/badge/QQ%20Group-1106094437-yellow" alt="QQ Group"></a></p>
 <h1 align="center">B站直播间挂机助手</h1>
 
 ### 安装方法
@@ -80,7 +80,7 @@
 ### 关于反馈
 + 如果使用脚本过程中遇到问题，可以先按上述步骤[开启控制台日志](#控制台日志)，然后关掉无关功能再次运行脚本并在控制台中寻找相关错误信息。若能找到请在反馈bug时附上这些控制台日志。
 + 反馈bug前请先阅读[bug_report.md](https://github.com/andywang425/BLTH/blob/master/.github/ISSUE_TEMPLATE/bug_report.md)。
-+ 交流qq群：①群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)，②群：[907502444(新)](https://jq.qq.com/?_wv=1027&k=Bf951teI)。欢迎进来聊天或者提点建议~    
++ 交流qq群：①群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)。欢迎进来聊天或者提点建议~    
 
 -------------------------------
 
