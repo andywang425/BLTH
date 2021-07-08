@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.3.4
+// @version        5.7.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -37,7 +37,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@bb6510e6a12a8a26add3cfb21527ed4d28bc6f71/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@a8bc8706cf60a85442e0c5055f9abb3c12171186/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
@@ -809,8 +809,9 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion;
           if (cache === undefined || cache === null || versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "修复使用awpush时参加部分天选报错的问题。",
-              "限制了qq推送测试消息的发送频率。"
+              "修复天选时刻【忽略粉丝数小于__的UP的天选】功能在部分情况下失效的问题，并重构优化了过滤方式。",
+              "新增部分日志的快捷操作（可点击的蓝色链接文字）。",
+              "新增一种检查天选的API，一个API被风控后会自动切换下一个。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -823,7 +824,7 @@
                 <mol>${mliHtml}</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
-                也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444（新）')}
+                也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
                 </em>
                 `
             });
@@ -1035,7 +1036,7 @@
         function layerOpenAbout() {
           return layer.open({
             title: `版本${GM_info.script.version}`,
-            content: `<h3 style="text-align:center">B站直播间挂机助手</h3>作者：${linkMsg("https://github.com/andywang425/", "andywang425")}<br>许可证：${linkMsg("https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE", "MIT")}<br>github项目地址：${linkMsg("https://github.com/andywang425/BLTH", "BLTH")}<br>反馈：${linkMsg("https://github.com/andywang425/BLTH/issues", "BLTH/issues")}<br>交流qq群：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}，${linkMsg('https://jq.qq.com/?_wv=1027&k=Bf951teI', '907502444（新）')}<br>`
+            content: `<h3 style="text-align:center">B站直播间挂机助手</h3>作者：${linkMsg("https://github.com/andywang425/", "andywang425")}<br>许可证：${linkMsg("https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE", "MIT")}<br>github项目地址：${linkMsg("https://github.com/andywang425/BLTH", "BLTH")}<br>反馈：${linkMsg("https://github.com/andywang425/BLTH/issues", "BLTH/issues")}<br>交流qq群：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}<br>`
           });
         };
         const saveAction = (div) => {
@@ -4481,6 +4482,8 @@
         BLTHprizeList: [], // BLTH天选中奖分组
         uidInOriginTag: [], // 默认关注分组内up
         uidInSpecialTag: [], // 特别关注分组内up
+        getAnchorDataType: 1, // 获取天选数据的api种类
+        getAnchorDataApiNum: 2, // 获取天选数据的api数量
         medal_list: [],
         anchorFollowTagid: undefined,
         anchorPrizeTagid: undefined,
@@ -5207,7 +5210,7 @@
               return false
             } else return true;
           },
-          further: (data, uid = MY_API.AnchorLottery.roomidAndUid[data.room_id]) => {
+          further: async (data, uid = MY_API.AnchorLottery.roomidAndUid[data.room_id]) => {
             const joinPrice = (data.gift_num * data.gift_price) / 100, // 1 电池 = 100 金瓜子
               joinTextTitle = `${NAME}_ANCHOR_${data.id}`,
               ts = ts_ms();
@@ -5363,9 +5366,31 @@
               }
             }
             if (joinPrice > MY_API.CONFIG.ANCHOR_NEED_GOLD) {
+              // 忽略付费天选
               MY_API.chatLog(`[天选时刻] 忽略付费天选<br>roomid = ${linkMsg(liveRoomUrl + defaultJoinData.roomid, defaultJoinData.roomid)}, id = ${data.id}<br>奖品名：${data.award_name}<br>${data.require_text === '无' ? '' : '参加条件：' + data.require_text + '<br>'}${joinPrice === 0 ? '无需电池' : "所需电池：" + joinPrice}<br>${MY_API.AnchorLottery.countDown(data.time)}${joinHtml()}`, 'warning');
               joinAnchorListener();
               return $.Deferred().resolve(false)
+            }
+            if (MY_API.CONFIG.ANCHOR_FANS_CHECK) {
+              // 忽略粉丝数不足的天选
+              let uid = await MY_API.AnchorLottery.getAnchorUid(data.room_id);
+              if (uid !== -1) {
+                let fans = await MY_API.AnchorLottery.fansCheck(uid);
+                if (fans < MY_API.CONFIG.ANCHOR_FANS_LEAST) {
+                  MY_API.chatLog(`[天选时刻] 忽略UP粉丝数不足的天选<br>roomid = ${linkMsg(liveRoomUrl + defaultJoinData.roomid, defaultJoinData.roomid)}, id = ${data.id}<br>${joinPrice === 0 ? '' : ('所需电池：' + joinPrice + '<br>')}UP粉丝数：${fans}<br>奖品：${data.award_name}<br>${MY_API.AnchorLottery.countDown(data.time)}${joinHtml()}`, 'warning');
+                  joinAnchorListener();
+                  return $.Deferred().resolve(false);
+                }
+              }
+            }
+            if (MY_API.CONFIG.ANCHOR_IGNORE_PWDROOM) {
+              // 忽略有密码的天选
+              let pwd = await MY_API.AnchorLottery.pwdCheck(data.room_id);
+              if (pwd) {
+                MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(liveRoomUrl + defaultJoinData.roomid, defaultJoinData.roomid)}, id = ${data.id}<br>${joinPrice === 0 ? '' : ('所需电池：' + joinPrice + '<br>')}奖品：${data.award_name}<br>${MY_API.AnchorLottery.countDown(data.time)}${joinHtml()}`, 'warning');
+                joinAnchorListener();
+                return $.Deferred().resolve(false);
+              }
             }
             switch (data.require_type) {
               case 0: // 无要求
@@ -5469,32 +5494,59 @@
             }
           }
         },
+        getAnchorData: (roomid) => {
+          if (MY_API.AnchorLottery.getAnchorDataType > MY_API.AnchorLottery.getAnchorDataApiNum) {
+            MY_API.AnchorLottery.getAnchorDataType = 1;
+            MY_API.chatLog(`[天选时刻] 检查天选的API均无法使用，30分钟后再次尝试`, 'error');
+            return delayCall(() => MY_API.AnchorLottery.getAnchorData(roomid));
+          }
+          switch (MY_API.AnchorLottery.getAnchorDataType) {
+            case 2: {
+              return BAPI.xlive.lottery.gettLotteryInfoWeb(roomid).then((response) => {
+                MYDEBUG(`API.xlive.lottery.gettLotteryInfoWeb(${roomid}) response`, response);
+                if (response.code === 0) {
+                    return response.data.anchor
+                } else {
+                  MY_API.chatLog(`[天选时刻] 检查天选的API(lottery.gettLotteryInfoWeb)无法使用，${response.message}<br>尝试更换下一个API`, 'warning');
+                  MY_API.AnchorLottery.getAnchorDataType++
+                  return MY_API.AnchorLottery.getAnchorData(roomid);
+                }
+              })
+            }
+            case 1:
+            default: {
+              return BAPI.xlive.anchor.check(roomid).then((response) => {
+                MYDEBUG(`API.xlive.anchor.check(${roomid}) response`, response);
+                if (response.code === 0) {
+                    return response.data
+                } else {
+                  MY_API.chatLog(`[天选时刻] 检查天选的API(anchor.check)无法使用，${response.message}<br>尝试更换下一个API`, 'warning');
+                  MY_API.AnchorLottery.getAnchorDataType++
+                  return MY_API.AnchorLottery.getAnchorData(roomid);
+                }
+              })
+            }
+          }
+        },
         check: (roomid, uid) => {
           if (!MY_API.AnchorLottery.filter.ignore_room(roomid)) return $.Deferred().resolve(false);
-          return BAPI.xlive.anchor.check(roomid).then((response) => {
-            MYDEBUG(`API.xlive.anchor.check(${roomid}) response`, response);
-            if (response.code === 0) {
-              if (!response.data) return false;
-              if (!MY_API.AnchorLottery.filter.hasChecked(response.data)) return false;
-              if (!MY_API.AnchorLottery.filter.time(response.data)) return false;
-              if (!MY_API.AnchorLottery.filter.status(response.data)) return false;
+          return MY_API.AnchorLottery.getAnchorData(roomid).then((data) => {
+              if (!data) return false;
+              if (!MY_API.AnchorLottery.filter.hasChecked(data)) return false;
+              if (!MY_API.AnchorLottery.filter.time(data)) return false;
+              if (!MY_API.AnchorLottery.filter.status(data)) return false;
               // 添加至上传列表
-              addVal(MY_API.AnchorLottery.lotteryResponseList, response.data.room_id);
-              addVal(MY_API.AnchorLottery.BLTHuploadRoomList, response.data.room_id);
-              return MY_API.AnchorLottery.filter.further(response.data, uid);
-            }
-            else {
-              MY_API.chatLog(`[天选时刻] 天选检查出错，${response.message}`, 'error');
-              return delayCall(() => MY_API.AnchorLottery.check(roomid));
-            }
+              addVal(MY_API.AnchorLottery.lotteryResponseList, roomid);
+              addVal(MY_API.AnchorLottery.BLTHuploadRoomList, roomid);
+              return MY_API.AnchorLottery.filter.further(data, uid);
           });
         },
         reCheck: (data) => {
-          return BAPI.xlive.anchor.check(data.roomid).then((response) => {
-            MYDEBUG(`API.xlive.anchor.reCheck(${data.roomid}) response`, response);
-            if (response.code === 0 && response.data && response.data.hasOwnProperty('award_users') && response.data.award_users) {
+          return MY_API.AnchorLottery.getAnchorData(data.roomid).then((re) => {
+            MYDEBUG(`MY_API.AnchorLottery.reCheck re`, re);
+            if (re && re.award_users) {
               let anchorUid = data.uid, award = false;
-              for (const i of response.data.award_users) {
+              for (const i of re.award_users) {
                 if (i.uid === Live_info.uid) {
                   award = true;
                   break;
@@ -5624,9 +5676,6 @@
                   window.toast(`[天选时刻] 已将UP（uid = ${anchorUid}）添加至白名单`, 'success');
                 }
               }
-            } else if (response.code !== 0) {
-              MY_API.chatLog(`[天选时刻] 天选检查出错，${response.message}`, 'error');
-              return delayCall(() => MY_API.AnchorLottery.check(roomid));
             }
           });
         },
@@ -5824,41 +5873,7 @@
               MY_API.AnchorLottery.awpush.check(room, uid).then((re) => {
                 if (re) {
                   // 数据格式正确，可以参加
-                  let hasPwd = false, fans = { lackFan: false, fanNum: -1 };
-                  let p1 = $.Deferred(), p2 = $.Deferred();
-                  if (MY_API.CONFIG.ANCHOR_IGNORE_PWDROOM) {
-                    MY_API.AnchorLottery.pwdCheck(room).then((res) => {
-                      if (res) hasPwd = true; // 加密
-                      return p1.resolve();
-                    }, () => {
-                      MY_API.chatLog('[天选时刻] 直播间加密检查出错，请检查网络', 'error')
-                      return p1.resolve();
-                    })
-                  } else p1.resolve();
-                  if (MY_API.CONFIG.ANCHOR_FANS_CHECK) {
-                    MY_API.AnchorLottery.getAnchorUid(room).then((uid) => {
-                      if (uid === -1) return p2.resolve();
-                      MY_API.AnchorLottery.fansCheck(uid).then((res) => {
-                        if (res === -1) return p2.resolve();
-                        if (res < MY_API.CONFIG.ANCHOR_FANS_LEAST) {
-                          fans.lackFan = true;
-                          fans.fanNum = res;
-                        }
-                        return p2.resolve();
-                      })
-                    })
-                  } else p2.resolve();
-                  $.when(p1, p2).then(() => {
-                    if (hasPwd) {
-                      MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(liveRoomUrl + re.roomid, re.roomid)}, id = ${re.id}<br>${re.joinPrice === 0 ? '' : ('所需电池：' + re.joinPrice + '<br>')}奖品：${re.award_name}<br>${MY_API.AnchorLottery.countDown(re.time)}`, 'warning');
-                      return p.resolve();
-                    }
-                    if (fans.lackFan) {
-                      MY_API.chatLog(`[天选时刻] 忽略UP粉丝数不足的天选<br>roomid = ${linkMsg(liveRoomUrl + re.roomid, re.roomid)}, id = ${re.id}<br>${re.joinPrice === 0 ? '' : ('所需电池：' + re.joinPrice + '<br>')}UP粉丝数：${fans.fanNum}<br>奖品：${re.award_name}<br>${MY_API.AnchorLottery.countDown(re.time)}`, 'warning');
-                      return p.resolve();
-                    }
-                    MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES).then(() => p.resolve());
-                  })
+                  MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES).then(() => p.resolve());
                 } else p.resolve();
               });
               await p;
@@ -5877,15 +5892,6 @@
               return setTimeout(() => MY_API.AnchorLottery.awpush.websocket.run(), sleepTime);
             }
             switch (MY_API.AnchorLottery.awpush.userInfo.task) {
-              case "POLLING_HOT_ROOMS": {
-                await MY_API.AnchorLottery.getHotRoomList();
-                for (const r of MY_API.AnchorLottery.roomidList) {
-                  addVal(MY_API.AnchorLottery.allRoomList, r);
-                }
-                let re = await MY_API.AnchorLottery.awpush.polling_allRoomList();
-                if (re === 'return') return;
-                else break;
-              }
               case "POLLING_LIVEROOMS": {
                 await MY_API.AnchorLottery.getLiveUsers();
                 MY_API.AnchorLottery.liveRoomList = [];
@@ -5942,30 +5948,23 @@
             MYDEBUG(`awpush ${sleep_time}秒后运行下一轮任务`);
           },
           check: (roomid, uid) => {
-            return BAPI.xlive.anchor.check(roomid).then((response) => {
-              MYDEBUG(`API.xlive.anchor.check(${roomid}) response`, response);
-              if (response.code === 0) {
-                if (!response.data) return false;
-                if (!MY_API.AnchorLottery.filter.hasChecked(response.data)) return false;
-                if (!MY_API.AnchorLottery.filter.time(response.data)) return false;
-                if (!MY_API.AnchorLottery.filter.status(response.data)) return false;
+            return MY_API.AnchorLottery.getAnchorData(roomid).then((data) => {
+                if (!data) return false;
+                if (!MY_API.AnchorLottery.filter.hasChecked(data)) return false;
+                if (!MY_API.AnchorLottery.filter.time(data)) return false;
+                if (!MY_API.AnchorLottery.filter.status(data)) return false;
                 const update_data = {
                   code: "UPDATE_ANCHOR_DATA",
                   uid: Live_info.uid,
                   secret: MY_API.AnchorLottery.awpush.userInfo.secret,
-                  data: MY_API.AnchorLottery.filter.delUselessData(response.data)
+                  data: MY_API.AnchorLottery.filter.delUselessData(data)
                 };
                 MYDEBUG('awpush 上传天选数据: ', update_data);
                 MY_API.AnchorLottery.awpush.websocket.desend(JSON.stringify(update_data));
                 // 添加至上传列表
-                addVal(MY_API.AnchorLottery.lotteryResponseList, response.data.room_id);
-                addVal(MY_API.AnchorLottery.BLTHuploadRoomList, response.data.room_id);
-                return MY_API.AnchorLottery.filter.further(response.data, uid);
-              }
-              else {
-                MY_API.chatLog(`[天选时刻] 天选检查出错，${response.message}`, 'error');
-                return delayCall(() => MY_API.AnchorLottery.check(roomid));
-              }
+                addVal(MY_API.AnchorLottery.lotteryResponseList, roomid);
+                addVal(MY_API.AnchorLottery.BLTHuploadRoomList, roomid);
+                return MY_API.AnchorLottery.filter.further(data, uid);
             });
           },
           websocket: {
@@ -6067,39 +6066,7 @@
                         MY_API.AnchorLottery.filter.further(data).then(re => {
                           if (re) {
                             // 数据格式正确，可以参加
-                            let hasPwd = false, fans = { lackFan: false, fanNum: -1 };
-                            let p1 = $.Deferred(), p2 = $.Deferred();
-                            if (MY_API.CONFIG.ANCHOR_IGNORE_PWDROOM) {
-                              MY_API.AnchorLottery.pwdCheck(data.room_id).then((res) => {
-                                if (res) hasPwd = true; // 加密
-                                return p1.resolve();
-                              }, () => {
-                                MY_API.chatLog('[天选时刻] 直播间加密检查出错，请检查网络', 'error')
-                                return p1.resolve();
-                              })
-                            } else p1.resolve();
-                            if (MY_API.CONFIG.ANCHOR_FANS_CHECK) {
-                              MY_API.AnchorLottery.getAnchorUid(data.room_id).then((uid) => {
-                                if (uid === -1) return p2.resolve();
-                                MY_API.AnchorLottery.fansCheck(uid).then((res) => {
-                                  if (res === -1) return p2.resolve();
-                                  if (res < MY_API.CONFIG.ANCHOR_FANS_LEAST) {
-                                    fans.lackFan = true;
-                                    fans.fanNum = res;
-                                  }
-                                  return p2.resolve();
-                                })
-                              })
-                            } else p2.resolve();
-                            $.when(p1, p2).then(() => {
-                              if (hasPwd) {
-                                MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(liveRoomUrl + re.roomid, re.roomid)}, id = ${re.id}<br>${re.joinPrice === 0 ? '' : ('所需电池：' + re.joinPrice + '<br>')}奖品：${re.award_name}<br>${MY_API.AnchorLottery.countDown(re.time)}`, 'warning');
-                              }
-                              if (fans.lackFan) {
-                                MY_API.chatLog(`[天选时刻] 忽略UP粉丝数不足的天选<br>roomid = ${linkMsg(liveRoomUrl + re.roomid, re.roomid)}, id = ${re.id}<br>${re.joinPrice === 0 ? '' : ('所需电池：' + re.joinPrice + '<br>')}UP粉丝数：${fans.fanNum}<br>奖品：${re.award_name}<br>${MY_API.AnchorLottery.countDown(re.time)}`, 'warning');
-                              }
-                              MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES);
-                            })
+                            MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES);
                           }
                         });
                         break;
@@ -6271,41 +6238,7 @@
                 MY_API.AnchorLottery.check(room, uid).then((re) => {
                   if (re) {
                     // 数据格式正确，可以参加
-                    let hasPwd = false, fans = { lackFan: false, fanNum: -1 };
-                    let p1 = $.Deferred(), p2 = $.Deferred();
-                    if (MY_API.CONFIG.ANCHOR_IGNORE_PWDROOM) {
-                      MY_API.AnchorLottery.pwdCheck(room).then((res) => {
-                        if (res) hasPwd = true; // 加密
-                        return p1.resolve();
-                      }, () => {
-                        MY_API.chatLog('[天选时刻] 直播间加密检查出错，请检查网络', 'error')
-                        return p1.resolve();
-                      })
-                    } else p1.resolve();
-                    if (MY_API.CONFIG.ANCHOR_FANS_CHECK) {
-                      MY_API.AnchorLottery.getAnchorUid(room).then((uid) => {
-                        if (uid === -1) return p2.resolve();
-                        MY_API.AnchorLottery.fansCheck(uid).then((res) => {
-                          if (res === -1) return p2.resolve();
-                          if (res < MY_API.CONFIG.ANCHOR_FANS_LEAST) {
-                            fans.lackFan = true;
-                            fans.fanNum = res;
-                          }
-                          return p2.resolve();
-                        })
-                      })
-                    } else p2.resolve();
-                    $.when(p1, p2).then(() => {
-                      if (hasPwd) {
-                        MY_API.chatLog(`[天选时刻] 忽略加密直播间的天选<br>roomid = ${linkMsg(liveRoomUrl + re.roomid, re.roomid)}, id = ${re.id}<br>${re.joinPrice === 0 ? '' : ('所需电池：' + re.joinPrice + '<br>')}奖品：${re.award_name}<br>${MY_API.AnchorLottery.countDown(re.time)}`, 'warning');
-                        return p.resolve();
-                      }
-                      if (fans.lackFan) {
-                        MY_API.chatLog(`[天选时刻] 忽略UP粉丝数不足的天选<br>roomid = ${linkMsg(liveRoomUrl + re.roomid, re.roomid)}, id = ${re.id}<br>${re.joinPrice === 0 ? '' : ('所需电池：' + re.joinPrice + '<br>')}UP粉丝数：${fans.fanNum}<br>奖品：${re.award_name}<br>${MY_API.AnchorLottery.countDown(re.time)}`, 'warning');
-                        return p.resolve();
-                      }
-                      MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES).then(() => p.resolve());
-                    })
+                    MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES).then(() => p.resolve());
                   } else p.resolve();
                 });
                 await p;
