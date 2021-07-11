@@ -206,6 +206,14 @@
     margin: 10px;
     list-style: none;
 }
+.layui-layer-content::-webkit-scrollbar {
+    width: 10px;
+    height: 6px
+}
+.layui-layer-content::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #aaa
+}
 mp {
     display: block;
     margin-block-start: 1em;
