@@ -214,6 +214,9 @@
     border-radius: 10px;
     background-color: #aaa
 }
+.dark-textbox {
+    background-color: #c2c2c2
+}
 mp {
     display: block;
     margin-block-start: 1em;
