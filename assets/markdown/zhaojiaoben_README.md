@@ -16,6 +16,7 @@
 + 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新(`shift+F5`)页面。  
 + 部分设置更改后需要刷新页面才能生效。  
 + 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。  
++ **如果因使用脚本而产生了某些问题，请向本项目的开发者反馈，而不是去打扰B站客服，谢谢。**
 
 -------------------------------
 
@@ -140,6 +141,13 @@
 
 # 相关推荐
 
+### Bilibili 一键已读
+作者：[CKylinMC](https://github.com/CKylinMC)
++ [Github](https://github.com/CKylinMC/UserJS/blob/main/scripts/ckylin-script-bilibili-mark-as-read.user.js)
++ [GreasyFork](https://greasyfork.org/zh-CN/scripts/429152-bilibili-markasread)  
+
+一键标记所有哔哩哔哩私信会话已读！
+
 ### Bilibili-Evolved
 作者：[the1812](https://github.com/the1812)
 + [Github](https://github.com/the1812/Bilibili-Evolved)  
@@ -152,10 +160,3 @@
 + [GreasyFork](https://greasyfork.org/zh-CN/scripts/21416-bilibili%E7%9B%B4%E6%92%AD%E5%87%80%E5%8C%96)  
 
 屏蔽聊天室礼物以及关键字，净化聊天室环境。
-
-### 哔站直播全裸2233娘
-作者：[journey-ad](https://gist.github.com/journey-ad)
-+ [Github](https://gist.github.com/journey-ad/5d3021fd40db75de2df827b876ef5b7e)
-+ [GreasyFork](https://greasyfork.org/zh-CN/scripts/369477-%E5%93%94%E7%AB%99%E7%9B%B4%E6%92%AD%E5%85%A8%E8%A3%B82233%E5%A8%98)  
-
-哔站直播间的2233娘挂件替换为全裸版本。

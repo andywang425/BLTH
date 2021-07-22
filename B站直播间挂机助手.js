@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.5
+// @version        5.7.6
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -37,13 +37,13 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@a8bc8706cf60a85442e0c5055f9abb3c12171186/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d073f782c34287efb0532b4301996293847ecf8/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
-// @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@765b34762789803b1554cc097d1022bdc21df290/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@765b34762789803b1554cc097d1022bdc21df290/assets/html/main.min.html
+// @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@499341db09b5fb07cabaa1a488f62ba5cd57322d/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -658,7 +658,7 @@
         for (let i = 0; i < tabList.children('li').length; i++) {
           tabListItems.push(tabList.children('li')[i]);
         };
-        logIndex = layer.open({
+        logIndex = myopen({
           type: 1,
           title: false,
           offset: [String(top) + 'px', String(left) + 'px'],
@@ -811,18 +811,14 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
           if (versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "适配B站深色模式。",
-              "UI界面优化。",
-              "实物抽奖支持从云端添加关键字。",
-              "修复风控后休息时间不正确的bug。",
-              "修复无法取关BLTH分组内UP的bug。",
-              "awpush: 提高了获取apikey的门槛。"
+              "深色模式适配优化，观感更舒适。",
+              "添加了【移除排行榜】的小问号内容。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
               mliHtml = mliHtml + "<mli>" + mli + "</mli>";
             }
-            layer.open({
+            myopen({
               title: `${version}更新提示`,
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
@@ -869,7 +865,7 @@
         MY_API.CACHE = MY_API.CACHE_DEFAULT;
         MY_API.saveConfig();
         MY_API.saveCache();
-        layer.msg('配置和CACHE已重置为默认。3秒后刷新页面', { icon: 1 });
+        mymsg('配置和CACHE已重置为默认。3秒后刷新页面', { icon: 1 });
         setTimeout(() => {
           W.location.reload()
         }, 3000);
@@ -995,38 +991,38 @@
           if (response.code === 0 && response.data.info) {
             const uid = String(response.data.info.uid),
               uname = response.data.info.uname;
-            layer.confirm(`<div style = "text-align:center">是否消耗20硬币购买UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>的粉丝勋章？</div>`, {
+            layer.confirm(`<div style = "text-align:center">是否消耗5B币购买UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>的粉丝勋章？</div>`, {
               title: `购买勋章 房间号：${room_id}`,
               btn: ['是', '否']
             }, function () {
-              BAPI.link_group.buy_medal(response.data.info.uid).then((re) => {
-                MYDEBUG('API.link_group.buy_medal re', re);
+              BAPI.x.elec_pay_quick(response.data.info.uid).then((re) => {
+                MYDEBUG('API.x.elec_pay_quick re', re);
                 if (re.code === 0) {
-                  layer.msg('购买成功', {
+                  mymsg('购买成功', {
                     time: 2000,
                     icon: 1
                   });
                 } else {
-                  layer.msg(`购买失败 ${re.message}`, {
+                  mymsg(`购买失败 ${re.message}`, {
                     time: 2500,
                     icon: 2
                   });
                 }
               });
             }, function () {
-              layer.msg('已取消购买', {
+              mymsg('已取消购买', {
                 time: 2000
               });
             });
 
           }
           else if (response.code === 0 && response.data.info === undefined) {
-            layer.msg(`房间不存在`, {
+            mymsg(`房间不存在`, {
               time: 2500
             });
           }
           else {
-            layer.msg(`检查房间出错 ${response.message}`, {
+            mymsg(`检查房间出错 ${response.message}`, {
               time: 2500
             });
           }
@@ -1040,7 +1036,7 @@
         const webHtml = $('html');
         const html = GM_getResourceText('main');
         function layerOpenAbout() {
-          return layer.open({
+          return myopen({
             title: `版本${GM_info.script.version}`,
             content: `<h3 style="text-align:center">B站直播间挂机助手</h3>作者：${linkMsg("https://github.com/andywang425/", "andywang425")}<br>许可证：${linkMsg("https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE", "MIT")}<br>github项目地址：${linkMsg("https://github.com/andywang425/BLTH", "BLTH")}<br>反馈：${linkMsg("https://github.com/andywang425/BLTH/issues", "BLTH/issues")}<br>交流qq群：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}<br>`
           });
@@ -1398,7 +1394,7 @@
           ANCHOR_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑天选。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名/抽奖规则中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
-          BUY_MEDAL: "调用官方api，消耗20硬币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
+          BUY_MEDAL: "通过给UP充电，消耗5B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
           LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli><mli>【重置token】可在无法获取小心心时点击，下次获取小心心前会重新获取token。<strong>请谨慎点击该按钮，不要频繁使用。</strong></mli></mul>",
           STORM: "仅会参加被广播的节奏风暴。若无法参加请尝试实名后再参加。<mul><mli>由于B站改版现在几乎不可能抽到节奏风暴了。</mli><mli>这一功能可能会在日后被删除。</mli></mul>",
@@ -1459,14 +1455,14 @@
           ANCHOR_UPLOAD_ROOMLIST: "上传你所收集到的直播间列表至BLTH-server。<mul><mli>如果可以的话请在【天选时刻获取数据方式】中勾选至少两项，因为单纯地把你从BLTH-server获取到的直播间号再上传回去意义不大。</mli><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid和<a href='https://andywang.top:3001/apikey' target='_blank'>secret</a>即可。</mli></mul>",
           ANCHOR_TYPE_SERVER: "<strong>BLTH-server</strong>是本脚本的服务端，用于推送天选时刻数据，提供脚本更新信息等。<mul><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid和<a href='https://andywang.top:3001/apikey' target='_blank'>secret</a>即可。</mli><mli>该功能的原理为ajax轮询，与awpush不同。awpush使用webSocket实时推送天选数据。</mli></mul>",
           ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻数据推送系统。可以实现天选数据的收集和分发。<mh3>说明</mh3><mul><mli>这个功能仍处于测试阶段，不是很稳定。</mli><mli>填写了正确的apikey的用户可以长期使用该功能，不填也能用但当服务器资源紧缺时会无法使用。apikey可以进q群找群主要，私聊群主说明来意并附上你的B站uid和<a href='https://andywang.top:3001/apikey' target='_blank'>secret</a>即可。</mli><mli>启用这个功能后你的部分设置将会由服务端决定，如【天选时刻数据获取方式】，检查房间最大数量，请求间隔等。</mli><mli>该功能与【从BLTH-server获取天选时刻数据】不同。awpush使用webSocket实现实时推送，【从BLTH-server获取天选时刻数据】通过ajax轮询获取数据。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的天选数据。同时服务端会实时推送收到的天选数据。</mul>",
-          ANCHOR_AUTO_BUY_LV1_MEDAL: "检测到有1级粉丝牌要求的天选后，如果没有该勋章，则自动用20硬币购买再参加。",
+          ANCHOR_AUTO_BUY_LV1_MEDAL: "检测到有1级粉丝牌要求的天选后，如果没有该勋章，则自动用5B币充电购买再参加。",
           REMOVE_ELEMENT_followSideBar: "开启本功能后会导致【实验室】按钮点击后无法出现弹窗。",
           ANCHOR_IGNORE_AREA: "忽略指定分区，即不检索这些分区的天选。<mul><mli>请正确填写所要忽略分区的名称，如:<code>娱乐,网游,手游,电台,单机游戏,虚拟主播,生活,学习,大事件</code>。</mli><mli>如果要填写多个分区，每两项之间请用半角逗号<code>,</code>隔开。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
             settingTableHeight = $('.live-player-mounter').height();
-          mainIndex = layer.open({
+          mainIndex = myopen({
             type: 1,
             title: false,
             offset: [String(settingTableoffset.top - getScrollPosition().y) + 'px', String(settingTableoffset.left - getScrollPosition().x) + 'px'],
@@ -1551,7 +1547,7 @@
               myDiv.find('button[data-action="exportConfig"]').click(() => {
                 // 导出配置按钮
                 exportConfig(MY_API.CONFIG, SP_CONFIG, GM_getValue("AnchorFollowingList") || [])
-                layer.msg('配置已导出', {
+                mymsg('配置已导出', {
                   time: 2500,
                 });
               });
@@ -1570,7 +1566,7 @@
                     let followingList = GM_getValue("AnchorFollowingList") || [];
                     GM_setValue("AnchorFollowingList", [...new Set([...followingList, ...json.AnchorFollowingList])]);
                   }
-                  layer.msg('配置导入成功，3秒后将自动刷新页面', {
+                  mymsg('配置导入成功，3秒后将自动刷新页面', {
                     time: 3000,
                     icon: 1
                   });
@@ -1594,7 +1590,7 @@
                   layer.close(index);
                   MY_API.setDefaults();
                 }, function () {
-                  layer.msg('已取消', { time: 2000 });
+                  mymsg('已取消', { time: 2000 });
                 })
               });
               myDiv.find('button[data-action="redoAllTasks"]').click(() => {
@@ -1664,7 +1660,7 @@
               });
               myDiv.find('button[data-action="edit_ANCHOR_SERVER_APIKEY"]').click(() => {
                 // 编辑 BLTH-server apikey
-                layer.prompt({
+                myprompt({
                   formType: 0,
                   value: String(MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid] || ""),
                   title: '请输入 BLTH-server apikey',
@@ -1673,7 +1669,7 @@
                   function (value, index) {
                     MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid] = value;
                     MY_API.saveConfig(false);
-                    layer.msg('BLTH-server apikey 保存成功', {
+                    mymsg('BLTH-server apikey 保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1682,7 +1678,7 @@
               });
               myDiv.find('button[data-action="edit_ANCHOR_UPLOAD_MSG"]').click(() => {
                 // 编辑天选附加信息
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT),
                   title: '请输入上传天选信息时的附加信息',
@@ -1690,7 +1686,7 @@
                   btn2: function () {
                     MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT = "";
                     MY_API.saveConfig(false);
-                    layer.msg('附加信息已被设为空字符串', {
+                    mymsg('附加信息已被设为空字符串', {
                       time: 2500,
                       icon: 1
                     });
@@ -1699,7 +1695,7 @@
                   function (value, index) {
                     MY_API.CONFIG.ANCHOR_UPLOAD_MSG_CONTENT = value;
                     MY_API.saveConfig(false);
-                    layer.msg('附加信息保存成功', {
+                    mymsg('附加信息保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1708,7 +1704,7 @@
               });
               myDiv.find('button[data-action="edit_GIFT_SEND_ROOM"]').click(() => {
                 // 编辑自动送礼黑白名单策略
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.GIFT_SEND_ROOM),
                   maxlength: Number.MAX_SAFE_INTEGER,
@@ -1723,7 +1719,7 @@
                     };
                     MY_API.CONFIG.GIFT_SEND_ROOM = [...valArray];
                     MY_API.saveConfig(false);
-                    layer.msg('自动送礼房间列表保存成功', {
+                    mymsg('自动送礼房间列表保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1732,7 +1728,7 @@
               });
               myDiv.find('button[data-action="edit_ANCHOR_IGNORE_ROOMLIST"]').click(() => {
                 // 编辑忽略直播间
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST),
                   maxlength: Number.MAX_SAFE_INTEGER,
@@ -1747,7 +1743,7 @@
                     };
                     MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST = [...valArray];
                     MY_API.saveConfig(false);
-                    layer.msg('天选时刻忽略直播间保存成功', {
+                    mymsg('天选时刻忽略直播间保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1757,7 +1753,7 @@
               });
               myDiv.find('button[data-action="edit_lightMedalList"]').click(() => {
                 // 编辑打卡弹幕房间列表
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.MEDAL_DANMU_ROOM),
                   maxlength: Number.MAX_SAFE_INTEGER,
@@ -1772,7 +1768,7 @@
                     };
                     MY_API.CONFIG.MEDAL_DANMU_ROOM = [...valArray];
                     MY_API.saveConfig(false);
-                    layer.msg('粉丝勋章打卡弹幕房间列表保存成功', {
+                    mymsg('粉丝勋章打卡弹幕房间列表保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1781,7 +1777,7 @@
               });
               myDiv.find('button[data-action="edit_ANCHOR_IGNORE_AREA"]').click(() => {
                 // 编辑忽略分区
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.ANCHOR_IGNORE_AREA_LIST),
                   title: '请输入所要忽略分区的名称',
@@ -1794,7 +1790,7 @@
                     };
                     MY_API.CONFIG.ANCHOR_IGNORE_AREA_LIST = [...valArray];
                     MY_API.saveConfig(false);
-                    layer.msg('天选时刻忽略分区保存成功', {
+                    mymsg('天选时刻忽略分区保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1803,7 +1799,7 @@
               })
               myDiv.find('button[data-action="edit_ANCHOR_DANMU_CONTENT"]').click(() => {
                 // 编辑天选弹幕内容
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.ANCHOR_DANMU_CONTENT),
                   title: '请输入天选时刻中奖后弹幕',
@@ -1816,7 +1812,7 @@
                     };
                     MY_API.CONFIG.ANCHOR_DANMU_CONTENT = [...valArray];
                     MY_API.saveConfig(false);
-                    layer.msg('天选时刻中奖后弹幕保存成功', {
+                    mymsg('天选时刻中奖后弹幕保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1825,7 +1821,7 @@
               });
               myDiv.find('button[data-action="edit_medalDanmu"]').click(() => {
                 // 编辑打卡弹幕内容
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.MEDAL_DANMU_CONTENT),
                   maxlength: Number.MAX_SAFE_INTEGER,
@@ -1839,7 +1835,7 @@
                     };
                     MY_API.CONFIG.MEDAL_DANMU_CONTENT = [...valArray];
                     MY_API.saveConfig(false);
-                    layer.msg('粉丝勋章打卡弹幕保存成功', {
+                    mymsg('粉丝勋章打卡弹幕保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1848,7 +1844,7 @@
               });
               myDiv.find('button[data-action="edit_QUESTIONABLE_LOTTERY"]').click(() => {
                 // 编辑实物忽略关键字
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.QUESTIONABLE_LOTTERY),
                   maxlength: Number.MAX_SAFE_INTEGER,
@@ -1863,7 +1859,7 @@
                     };
                     MY_API.CONFIG.QUESTIONABLE_LOTTERY = [...valArray];
                     MY_API.saveConfig(false);
-                    layer.msg('实物抽奖忽略关键字保存成功', {
+                    mymsg('实物抽奖忽略关键字保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1873,7 +1869,7 @@
               });
               myDiv.find('button[data-action="edit_ANCHOR_BLACKLIST_WORD"]').click(() => {
                 // 编辑天选忽略关键字
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD),
                   maxlength: Number.MAX_SAFE_INTEGER,
@@ -1888,7 +1884,7 @@
                     };
                     MY_API.CONFIG.ANCHOR_BLACKLIST_WORD = [...valArray];
                     MY_API.saveConfig(false);
-                    layer.msg('天选时刻忽略关键字保存成功', {
+                    mymsg('天选时刻忽略关键字保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1913,7 +1909,7 @@
                     function (index) {
                       MY_API.CONFIG.QUESTIONABLE_LOTTERY = [...new Set([...localWords, ...newWords])];
                       MY_API.saveConfig(false);
-                      layer.msg('已添加实物抽奖云端关键字', {
+                      mymsg('已添加实物抽奖云端关键字', {
                         time: 2500,
                         icon: 1
                       });
@@ -1921,7 +1917,7 @@
                       layer.close(index);
                     });
                 } else {
-                  layer.msg('本地关键字已包含所有云端关键字', {
+                  mymsg('本地关键字已包含所有云端关键字', {
                     time: 2500
                   });
                 }
@@ -1943,7 +1939,7 @@
                     function (index) {
                       MY_API.CONFIG.ANCHOR_BLACKLIST_WORD = [...new Set([...localWords, ...newWords])];
                       MY_API.saveConfig(false);
-                      layer.msg('已添加天选时刻云端关键字', {
+                      mymsg('已添加天选时刻云端关键字', {
                         time: 2500,
                         icon: 1
                       });
@@ -1951,7 +1947,7 @@
                       layer.close(index);
                     });
                 } else {
-                  layer.msg('本地关键字已包含所有云端关键字', {
+                  mymsg('本地关键字已包含所有云端关键字', {
                     time: 2500
                   });
                 }
@@ -1973,7 +1969,7 @@
                     function (index) {
                       MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST = [...new Set([...localRooms, ...newRooms])];
                       MY_API.saveConfig(false);
-                      layer.msg('已添加天选时刻云端忽略直播间', {
+                      mymsg('已添加天选时刻云端忽略直播间', {
                         time: 2500,
                         icon: 1
                       });
@@ -1981,14 +1977,14 @@
                       layer.close(index);
                     });
                 } else {
-                  layer.msg('本地忽略直播间已包含所有云端忽略直播间', {
+                  mymsg('本地忽略直播间已包含所有云端忽略直播间', {
                     time: 2500
                   });
                 }
               });
               myDiv.find('button[data-action="edit_ANCHOR_LETTER_CONTENT"]').click(() => {
                 // 编辑天选私信
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: MY_API.CONFIG.ANCHOR_LETTER_CONTENT,
                   title: '请输入天选时刻中奖后发送私信内容',
@@ -1999,7 +1995,7 @@
                     if (!val) val = 'UP我中天选了，怎么领奖'
                     MY_API.CONFIG.ANCHOR_LETTER_CONTENT = val;
                     MY_API.saveConfig(false);
-                    layer.msg('天选时刻私信内容保存成功', {
+                    mymsg('天选时刻私信内容保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -2016,7 +2012,7 @@
               });
               myDiv.find('button[data-action="edit_PP_SCKEY"]').click(() => {
                 // 编辑推送加 token
-                layer.prompt({
+                myprompt({
                   formType: 0,
                   value: MY_API.CONFIG.PP_token,
                   title: '请输入推送加token',
@@ -2025,7 +2021,7 @@
                   function (value, index) {
                     MY_API.CONFIG.PP_token = value;
                     MY_API.saveConfig(false);
-                    layer.msg('推送加token保存成功', {
+                    mymsg('推送加token保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -2035,7 +2031,7 @@
               });
               myDiv.find('button[data-action="edit_seconds_qq"]').click(() => {
                 // 编辑 seconds qq号
-                layer.prompt({
+                myprompt({
                   formType: 0,
                   value: MY_API.CONFIG.SECONDS_QQ,
                   title: '请输入您用于接受推送的QQ号',
@@ -2044,7 +2040,7 @@
                   function (value, index) {
                     MY_API.CONFIG.SECONDS_QQ = value;
                     MY_API.saveConfig(false);
-                    layer.msg('qq号保存成功', {
+                    mymsg('qq号保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -2054,7 +2050,7 @@
               });
               myDiv.find('button[data-action="edit_ServerTurbo_SendKey"]').click(() => {
                 // 编辑Server酱·Turbo版SendKey
-                layer.prompt({
+                myprompt({
                   formType: 0,
                   value: MY_API.CONFIG.ServerTurbo_SendKey,
                   title: '请输入Server酱·Turbo版SendKey',
@@ -2063,7 +2059,7 @@
                   function (value, index) {
                     MY_API.CONFIG.ServerTurbo_SendKey = value;
                     MY_API.saveConfig(false);
-                    layer.msg('Server酱·Turbo版SendKey保存成功', {
+                    mymsg('Server酱·Turbo版SendKey保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -2073,7 +2069,7 @@
               });
               myDiv.find('button[data-action="edit_ANCHOR_CUSTOM_ROOMLIST"]').click(() => {
                 // 自定义直播间列表
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   value: MY_API.CONFIG.ANCHOR_CUSTOM_ROOMLIST,
                   maxlength: Number.MAX_SAFE_INTEGER,
@@ -2092,7 +2088,7 @@
                     }
                     MY_API.CONFIG.ANCHOR_CUSTOM_ROOMLIST = val;
                     MY_API.saveConfig(false);
-                    layer.msg('天选时刻自定义直播间列表保存成功', {
+                    mymsg('天选时刻自定义直播间列表保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -2102,7 +2098,7 @@
               myDiv.find('button[data-action="editWhiteList"]').click(() => {
                 // 编辑白名单
                 const list = GM_getValue(`AnchorFollowingList`) || "";
-                layer.prompt({
+                myprompt({
                   formType: 2,
                   maxlength: Number.MAX_SAFE_INTEGER,
                   value: String(list),
@@ -2120,7 +2116,7 @@
                       }
                     }
                     GM_setValue(`AnchorFollowingList`, val);
-                    layer.msg('天选时刻UID白名单保存成功', {
+                    mymsg('天选时刻UID白名单保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -2143,12 +2139,12 @@
                     btn: ['是', '否']
                   }, function () {
                     unFollowBtnClickable = false;
-                    layer.msg('开始取关', {
+                    mymsg('开始取关', {
                       time: 2000,
                     });
                     return MY_API.AnchorLottery.getTag(anchorPrizeTagName, true).then(() => MY_API.AnchorLottery.delAnchorFollowing(3));
                   }, function () {
-                    layer.msg('已取消', {
+                    mymsg('已取消', {
                       time: 2000
                     });
                   })
@@ -2162,12 +2158,12 @@
                     btn: ['是', '否']
                   }, function () {
                     unFollowBtnClickable = false;
-                    layer.msg('开始取关', {
+                    mymsg('开始取关', {
                       time: 2000,
                     });
                     return MY_API.AnchorLottery.getTag(anchorFollowTagName, true).then(() => MY_API.AnchorLottery.delAnchorFollowing(2));
                   }, function () {
-                    layer.msg('已取消', {
+                    mymsg('已取消', {
                       time: 2000
                     });
                   })
@@ -2181,12 +2177,12 @@
                     btn: ['是', '否']
                   }, function () {
                     unFollowBtnClickable = false;
-                    layer.msg('开始取关', {
+                    mymsg('开始取关', {
                       time: 2000,
                     });
                     return MY_API.AnchorLottery.delAnchorFollowing(1);
                   }, function () {
-                    layer.msg('已取消', {
+                    mymsg('已取消', {
                       time: 2000
                     });
                   })
@@ -2205,11 +2201,11 @@
                   } else {
                     GM_setValue('Token', {});
                   }
-                  layer.msg('已重置Token', {
+                  mymsg('已重置Token', {
                     time: 2000,
                   });
                 }, function () {
-                  layer.msg('已取消', {
+                  mymsg('已取消', {
                     time: 2000
                   });
                 })
@@ -2363,7 +2359,7 @@
                 const id = $(this).attr('helpdata');
                 if (id !== undefined) {
                   if (helpText.hasOwnProperty(id)) {
-                    return layer.open({
+                    myopen({
                       title: `帮助信息 ${id}`,
                       anim: 5,
                       area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
@@ -5334,17 +5330,17 @@
                       })
                     } else getUid.resolve();
                     getUid.then(() => {
-                      BAPI.link_group.buy_medal(defaultJoinData.uid).then((re) => {
-                        MYDEBUG('API.link_group.buy_medal re', re);
+                      BAPI.x.elec_pay_quick(defaultJoinData.uid).then((re) => {
+                        MYDEBUG('API.x.elec_pay_quick re', re);
                         if (re.code === 0) {
                           if (data.require_value === 1) {
-                            layer.msg('粉丝勋章购买成功，约2秒后参加天选', {
+                            mymsg('粉丝勋章购买成功，约2秒后参加天选', {
                               time: 2000,
                               icon: 1
                             });
                             setTimeout(() => p.resolve(), 2000);
                           } else {
-                            layer.msg('粉丝勋章购买成功', {
+                            mymsg('粉丝勋章购买成功', {
                               time: 2000,
                               icon: 1
                             });
@@ -5353,7 +5349,7 @@
                           if (medalJson !== undefined)
                             MY_API.AnchorLottery.medal_list.push(medalJson);
                         } else {
-                          layer.msg(`粉丝勋章购买失败 ${re.message}`, {
+                          mymsg(`粉丝勋章购买失败 ${re.message}`, {
                             time: 3500,
                             icon: 2
                           });
@@ -5486,8 +5482,8 @@
                     }
                     if (MY_API.CONFIG.ANCHOR_AUTO_BUY_LV1_MEDAL && data.require_value === 1) {
                       // 自动买一级牌子
-                      return BAPI.link_group.buy_medal(defaultJoinData.uid).then((re) => {
-                        MYDEBUG('API.link_group.buy_medal 自动买一级牌子 re', re);
+                      return BAPI.x.elec_pay_quick(defaultJoinData.uid).then((re) => {
+                        MYDEBUG('API.x.elec_pay_quick 自动充电买一级牌子 re', re);
                         if (re.code === 0) {
                           window.toast(`[天选时刻] 自动购买UP【${medalJson.anchorInfo.uname}】的1级粉丝牌（uid=${medalJson.anchorInfo.uid}）成功`, 'success');
                           MY_API.AnchorLottery.medal_list.push(medalJson);
@@ -6377,7 +6373,7 @@
         let runNext = $.Deferred();
         if (SP_CONFIG.showEula) {
           const eula = GM_getResourceText('eula');
-          layer.open({
+          myopen({
             title: `${GM_info.script.name}最终用户许可协议`,
             btn: ['同意协议并继续', '不同意'],
             closeBtn: 0,
@@ -6390,7 +6386,7 @@
               runNext.resolve();
             },
             btn2: function () {
-              layer.msg('脚本已停止运行', {
+              mymsg('脚本已停止运行', {
                 time: 3000,
                 icon: 2
               });
@@ -6526,7 +6522,7 @@
           }
           else {
             GM_openInTab(updateURL, githubOpenTabOptions);
-            layer.msg('正在更新...', { time: 2000 });
+            mymsg('正在更新...', { time: 2000 });
           }
         }, function () {
           // 不更新
@@ -6846,7 +6842,7 @@
     };
     reader.readAsText(selectedFile);
     function wrongFile(msg = '文件格式错误') {
-      return layer.msg(msg, {
+      return mymsg(msg, {
         time: 2500,
         icon: 2
       });
@@ -7124,5 +7120,53 @@
         xhr.send(XHROptions.data);
       }
     });
+  };
+  /**
+   * 包装layer的prompt方法
+   * @param obj 
+   * @param func 
+   * @returns index
+   */
+  function myprompt(obj, func) {
+    if (SP_CONFIG.darkMode) {
+      if (obj.title) obj.title = '<span style="color:#f2f3f5;">' + obj.title + '</span>'
+    }
+    let index = layer.prompt(obj, func);
+    if (SP_CONFIG.darkMode) {
+      layer.style(index, {
+        'background-color': '#1c1c1c'
+      });
+    }
+    return index;
+  }
+  /**
+   * 包装layer的msg方法
+   * @param  msg 
+   * @param  obj 
+   */
+  function mymsg(msg, obj) {
+    let index = layer.msg(msg, obj);
+    if (SP_CONFIG.darkMode) {
+      layer.style(index, {
+        'background-color': '#1c1c1c'
+      });
+    }
+    return index;
+  }
+  /**
+ * 包装layer的open方法
+ * @param  obj 
+ */
+  function myopen(obj) {
+    if (SP_CONFIG.darkMode) {
+      if (obj.title) obj.title = '<span style="color:#f2f3f5;">' + obj.title + '</span>'
+    }
+    let index = layer.open(obj);
+    if (SP_CONFIG.darkMode) {
+      layer.style(index, {
+        'background-color': '#1c1c1c'
+      });
+    }
+    return index;
   }
 })();

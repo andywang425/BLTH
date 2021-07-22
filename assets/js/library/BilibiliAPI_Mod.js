@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.0.4
+// @version       3.0.5
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -1249,6 +1249,7 @@ var BAPI = {
             })
         },
         privilege_receive: (type) => {
+            // 直播预约
             return BAPI.ajaxWithCommonArgs({
                 method: 'POST',
                 url: '//api.bilibili.com/x/vip/privilege/receive',
@@ -1258,6 +1259,31 @@ var BAPI = {
                      * 1: 年度专享B币券赠送（ 5B币）
                      * 2: 年度专享会员购优惠券（10元会员购优惠券）
                      */
+                }
+            })
+        },
+        reserve: (sid, jsonp = 'jsonp') => {
+            // 直播预约
+            return BAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '//api.bilibili.com/x/space/reserve',
+                data: {
+                    sid: sid,
+                    jsonp: jsonp
+                }
+            })
+        },
+        elec_pay_quick: (up_mid, bp_num = 5, otype = 'up', is_bp_remains_prior = true, oid = up_mid) => {
+            // 给UP充电
+            return BAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '//api.bilibili.com/x/ugcpay/web/v2/trade/elec/pay/quick',
+                data: {
+                    up_mid: up_mid,
+                    bp_num: bp_num,
+                    otype: otype,
+                    is_bp_remains_prior: is_bp_remains_prior,
+                    oid: oid
                 }
             })
         }
