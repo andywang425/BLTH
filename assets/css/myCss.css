@@ -214,8 +214,11 @@
     border-radius: 10px;
     background-color: #aaa
 }
-.dark-textbox {
+html[lab-style*=dark] input{
     background-color: #c2c2c2
+}
+html[lab-style*=dark] textarea {
+    background-color: #d1d1d1;
 }
 mp {
     display: block;
