@@ -13,25 +13,23 @@
         <div id="bottom_fieldset" class="fieldset">
                 <fieldset class="blth_fs">
                         <legend>抽奖设置</legend>
-                        <div data-toggle="LOTTERY"><label style="color:blueviolet;"><input type="checkbox">参与礼物抽奖
-                                </label><span helpdata="LOTTERY" class="clickableText helpText">?</span></div>
-                        <div data-toggle="RANDOM_DELAY"><label class="lineStartSpace"><input type="checkbox">抽奖附加随机延迟
-                                        <input class="RND_DELAY_START blth_input" style="width:30px;vertical-align:top;"
-                                                type="text">~
-                                        <input class="RND_DELAY_END blth_input" style="width:30px;vertical-align:top;"
-                                                type="text">s
-                                </label><span helpdata="RANDOM_DELAY" class="clickableText helpText">?</span></div>
-                        <div data-toggle="RANDOM_SKIP"><label class="lineStartSpace">随机跳过抽奖<input class="per blth_input"
-                                                style="width:30px;" type="text">% </label><span helpdata="RANDOM_SKIP"
-                                        class="clickableText helpText">?</span></div>
-                        <div data-toggle="RANDOM_SEND_DANMU"><label class="lineStartSpace">抽奖时活跃弹幕发送概率(0到5,为0则不发送)<input
-                                                class="per blth_input" style="width:30px;" type="text">% </label>
+                        <div data-toggle="PLATE_ACTIVITY"><label style="color:blueviolet;"><input
+                                                type="checkbox">参与转盘抽奖</label>
+                                <span helpdata="PLATE_ACTIVITY" class="clickableText helpText">?</span>
                         </div>
-                        <div data-toggle="CHECK_HOUR_ROOM"><label class="lineStartSpace"><input
-                                                type="checkbox">检查小时榜（间隔时间<input class="num blth_input"
-                                                style="width:25px;" type="text">秒） </label>
+                        <div data-toggle="PLATE_ACTIVITY_GETTIMES_INTERVAL"><label class="lineStartSpace">获取抽奖次数请求间隔
+                                        <input class="num blth_input" style="width:30px;" type="text">毫秒
+                                        <span helpdata="PLATE_ACTIVITY_GETTIMES_INTERVAL" class="clickableText helpText">?</span>
                         </div>
-                        <div data-toggle="MATERIAL_LOTTERY"><label style="color:blueviolet;"><input type="checkbox">参与实物抽奖
+                        <div data-toggle="PLATE_ACTIVITY_LOTTERY_INTERVAL"><label class="lineStartSpace">参与抽奖请求间隔
+                                <input class="num blth_input" style="width:30px;" type="text">秒
+                                <span helpdata="PLATE_ACTIVITY_LOTTERY_INTERVAL" class="clickableText helpText">?</span>
+                </div>
+                        <div data-toggle="PLATE_ACTIVITY_CHECK_INTERVAL"><label class="lineStartSpace">检查间隔
+                                        <input class="num blth_input" style="width:30px;" type="text">分钟
+                        </div>
+                        <div data-toggle="MATERIAL_LOTTERY"><label style="color:blueviolet;"><input
+                                                type="checkbox">参与实物抽奖
                                 </label><span helpdata="MATERIAL_LOTTERY" class="clickableText helpText">?</span></div>
                         <div data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"><label class="lineStartSpace">检查间隔 <input
                                                 class="num blth_input" style="width:30px;" type="text">分钟 </label>
@@ -222,7 +220,8 @@
                 </fieldset>
                 <fieldset class="blth_fs">
                         <legend>天选时刻</legend>
-                        <div data-toggle="ANCHOR_LOTTERY"><label style="color:blueviolet"><input type="checkbox">参加天选时刻抽奖
+                        <div data-toggle="ANCHOR_LOTTERY"><label style="color:blueviolet"><input
+                                                type="checkbox">参加天选时刻抽奖
                                 </label><span helpdata="ANCHOR_LOTTERY" class="clickableText helpText">?</span></div>
                         <div data-toggle="ANCHOR_AWPUSH">
                                 <input type="checkbox">

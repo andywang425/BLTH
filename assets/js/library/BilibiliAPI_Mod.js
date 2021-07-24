@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.0.5
+// @version       3.0.6
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -1286,6 +1286,36 @@ var BAPI = {
                     oid: oid
                 }
             })
+        },
+        activity: {
+            getLotteryMyTimes: (sid) => {
+                return BAPI.ajax({
+                    url: '//api.bilibili.com/x/activity/lottery/mytimes',
+                    data: {
+                        sid: sid
+                    }
+                })
+            },
+            doLottery: (sid, type = 1) => {
+                return BAPI.ajaxWithCommonArgs({
+                    method: 'POST',
+                    url: '//api.bilibili.com/x/activity/lottery/do',
+                    data: {
+                        sid: sid,
+                        type: type
+                    }
+                })
+            },
+            addLotteryTimes: (sid, action_type = 3) => {
+                return BAPI.ajaxWithCommonArgs({
+                    method: 'POST',
+                    url: '//api.bilibili.com/x/activity/lottery/addtimes',
+                    data: {
+                        sid: sid,
+                        action_type: action_type
+                    }
+                })
+            }
         }
     },
     xlive: {
