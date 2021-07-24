@@ -621,7 +621,7 @@
         LittleHeart_TS: 0, // 小心心
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0, // 天选时刻
-        last_aid: 761, // 实物抽奖最后一个有效aid
+        last_aid: 778, // 实物抽奖最后一个有效aid
         MedalDanmu_TS: 0, //粉丝勋章打卡
         PlateActivity_TS: 0 // 转盘抽奖
       },
