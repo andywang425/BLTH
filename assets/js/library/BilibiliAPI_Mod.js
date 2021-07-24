@@ -1296,8 +1296,9 @@ var BAPI = {
                     }
                 })
             },
-            lotteryDo: (sid, type = 1) => {
-                return BAPI.ajax({
+            doLottery: (sid, type = 1) => {
+                return BAPI.ajaxWithCommonArgs({
+                    method: 'POST',
                     url: '//api.bilibili.com/x/activity/lottery/do',
                     data: {
                         sid: sid,
@@ -1306,11 +1307,12 @@ var BAPI = {
                 })
             },
             addLotteryTimes: (sid, action_type = 3) => {
-                return BAPI.ajax({
+                return BAPI.ajaxWithCommonArgs({
+                    method: 'POST',
                     url: '//api.bilibili.com/x/activity/lottery/addtimes',
                     data: {
                         sid: sid,
-                        action_type: action_type,
+                        action_type: action_type
                     }
                 })
             }

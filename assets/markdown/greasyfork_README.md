@@ -121,6 +121,7 @@
 + [bliveproxy](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B站直播websocket hook框架。
 + [pako](https://github.com/nodeca/pako) (MIT)：javascript压缩/解压缩库。
 + [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli项目中的javascript解码库。
++ [哔哩猫](https://greasyfork.org/zh-CN/scripts/422731) (MIT) by [荒年](https://gitee.com/java_cn)
 
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。
@@ -131,7 +132,21 @@
 -------------------------------
 
 ## 鸣谢
-[十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)，[SeaLoong](https://github.com/SeaLoong)，[pjy612](https://github.com/pjy612)，[lzghzr](https://github.com/lzghzr)，[sentsin](https://github.com/sentsin)，[wendux](https://github.com/wendux)，[风绫丨钰袖](https://space.bilibili.com/20842051)，[Server酱](https://sc.ftqq.com)，[无尾玦的小尾巴](https://space.bilibili.com/234368216)，[酷推](https://cp.xuthus.cc)，[冰冰羊](https://space.bilibili.com/261593393)，[xfgryujk](https://github.com/xfgryujk)，[推送加](https://pushplus.plus)，[spiritLHL](https://github.com/spiritLHL)  
++ [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)：本脚本初期大部分代码都来自于十六夜。
++ [SeaLoong](https://github.com/SeaLoong)：参考了部分功能实现；B站API库的原作者。
++ [pjy612](https://github.com/pjy612)：参考了部分功能实现。
++ [lzghzr](https://github.com/lzghzr)：提供了油猴脚本的小心心heartbeat解决方案。
++ [sentsin](https://github.com/sentsin)：弹出层组件库作者。
++ [wendux](https://github.com/wendux)：ajax拦截库作者。
++ [风绫丨钰袖](https://space.bilibili.com/20842051)：参考了部分功能实现。
++ [Server酱](https://sct.ftqq.com)，[推送加](https://pushplus.plus)：本脚本使用的微信推送平台。
++ [酷推](https://cp.xuthus.cc)：本脚本曾经使用的qq推送平台。
++ [无尾玦的小尾巴](https://space.bilibili.com/234368216)：贡献了一个舰长账号。
++ [冰冰羊](https://space.bilibili.com/261593393)：q群内新手使用教程和屏蔽词库的作者。
++ [xfgryujk](https://github.com/xfgryujk)：B站直播websocket hook框架作者。
++ [spiritLHL](https://github.com/spiritLHL)：协助搭建本脚本的私有化qq推送平台。
++ [荒年](https://gitee.com/java_cn)：参考了部分功能实现；提供了本脚本运行所需的部分数据。
+
 以及所有提出过建议的用户。
 
 -------------------------------
