@@ -110,6 +110,7 @@
 + [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT) by [wendux](https://github.com/wendux)
 + [bliveproxy](https://github.com/xfgryujk/bliveproxy) (MIT) by [xfgryujk](https://github.com/xfgryujk)
 + [brotli](https://github.com/google/brotli) (MIT) by [google](https://github.com/google)
++ [哔哩猫](https://greasyfork.org/zh-CN/scripts/422731) (MIT) by [荒年](https://gitee.com/java_cn)
 
 本脚本使用的库：  
 + [jQuery](https://github.com/jquery/jquery) (MIT)  
@@ -121,7 +122,6 @@
 + [bliveproxy](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B站直播websocket hook框架。
 + [pako](https://github.com/nodeca/pako) (MIT)：javascript压缩/解压缩库。
 + [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli项目中的javascript解码库。
-+ [哔哩猫](https://greasyfork.org/zh-CN/scripts/422731) (MIT) by [荒年](https://gitee.com/java_cn)
 
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。
