@@ -1,5 +1,5 @@
 {
-    "version": "5.7.7",
+    "version": "5.7.8",
     "anchor_blacklist_word": [
         "测试",
         "钓鱼",
@@ -55,7 +55,8 @@
         "开舰",
         "开船",
         "兑舰",
-        "兑船"
+        "兑船",
+        "看号"
     ],
     "anchor_ignore_roomlist": [
         48443,
