@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.7
+// @version        5.7.8
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -35,13 +35,13 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@8b4aa130e9553396de60dae92f57655b9971fbe2/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@91f469fef739c8ecfd4f101d3b4ba7e5e95be42d/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@9678b1623f6a7d5104f4e12e140329b2a51e95ea/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@91f469fef739c8ecfd4f101d3b4ba7e5e95be42d/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -589,6 +589,9 @@
         REMOVE_ELEMENT_playerIcon: true, // 移除直播水印
         RND_DELAY_END: 5, // 延迟最大值
         RND_DELAY_START: 2, // 延迟最小值
+        RESERVE_ACTIVITY: false, // 预约抽奖
+        RESERVE_ACTIVITY_INTERVAL: 2000, // 预约抽奖请求间隔
+        RESERVE_ACTIVITY_CHECK_INTERVAL: 60, // 预约抽奖检查间隔
         SEND_ALL_GIFT: false, // 送满全部勋章
         SHARE: true, // 分享
         SILVER2COIN: false, // 银瓜子换硬币
@@ -623,7 +626,8 @@
         AnchorLottery_TS: 0, // 天选时刻
         last_aid: 778, // 实物抽奖最后一个有效aid
         MedalDanmu_TS: 0, //粉丝勋章打卡
-        PlateActivity_TS: 0 // 转盘抽奖
+        PlateActivity_TS: 0, // 转盘抽奖
+        ReserveActivity_TS: 0 // 直播预约抽奖
       },
       GIFT_COUNT_DEFAULT: {
         COUNT: 0, // 辣条（目前没用）
@@ -808,10 +812,7 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
           if (versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "深色模式适配优化。",
-              "修复购买勋章因B币不足而失败时回显不正确的bug。",
-              "删除了大乱斗抽奖。",
-              "新增转盘抽奖。"
+              "新增直播预约抽奖。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
@@ -884,6 +885,8 @@
           MY_API.MaterialObject.run, // 实物抽奖
           MY_API.AnchorLottery.run, // 天选时刻
           MY_API.MEDAL_DANMU.run, // 粉丝勋章打卡弹幕
+          MY_API.PLATE_ACTIVITY.run, // 转盘抽奖
+          MY_API.RESERVE_ACTIVITY.run // 预约抽奖
         ];
         runAllTasks(3000, 200, taskList);
       },
@@ -1259,6 +1262,14 @@
           val = parseInt(div.find('[data-toggle="PLATE_ACTIVITY_GETTIMES_INTERVAL"] .num').val());
           if (isNaN(val) || val <= 0) return window.toast('[转盘获取次数请求间隔] 错误输入', 'caution');
           MY_API.CONFIG.PLATE_ACTIVITY_GETTIMES_INTERVAL = val;
+          // RESERVE_ACTIVITY_INTERVAL
+          val = parseInt(div.find('[data-toggle="RESERVE_ACTIVITY_INTERVAL"] .num').val());
+          if (isNaN(val) || val <= 0) return window.toast('[直播预约抽奖请求间隔] 错误输入', 'caution');
+          MY_API.CONFIG.RESERVE_ACTIVITY_INTERVAL = val;
+          // RESERVE_ACTIVITY_CHECK_INTERVAL
+          val = parseInt(div.find('[data-toggle="RESERVE_ACTIVITY_CHECK_INTERVAL"] .num').val());
+          if (isNaN(val) || val <= 0) return window.toast('[直播预约抽奖检查间隔] 错误输入', 'caution');
+          MY_API.CONFIG.RESERVE_ACTIVITY_CHECK_INTERVAL = val;
           return MY_API.saveConfig();
         };
         const checkList = [
@@ -1320,7 +1331,8 @@
           'ANCHOR_AWPUSH',
           'ANCHOR_AUTO_BUY_LV1_MEDAL',
           'ANCHOR_IGNORE_AREA',
-          'PLATE_ACTIVITY'
+          'PLATE_ACTIVITY',
+          'RESERVE_ACTIVITY'
         ];
         const radioList = [
           /**
@@ -1399,7 +1411,7 @@
           ANCHOR_PRIVATE_LETTER: "若中奖，会在开奖后10秒发送私信。<mul><mli>建议改一下私信内容，不要和默认值完全一样。</mli></mul>",
           ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli>在白名单内或天选功能运行前在默认/特别关注分组内的UP不会被移入该分组，即使后来出现在该分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           ANCHOR_CHECK_INTERVAL: "检查完一轮天选后等待的时间。<mul><mli>可以填小数。</mli></mul>",
-          TIME_AREA_DISABLE: "处于这个时段内时，脚本会暂停检查天选时刻。<br><mul><mli>24小时制，只能填整数。</mli></mul>",
+          TIME_AREA_DISABLE: "处于这个时段内时，脚本会暂停检查天选时刻，转盘抽奖，直播预约抽奖。<br><mul><mli>24小时制，只能填整数。</mli></mul>",
           MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间发弹幕。</mli><mli>黑名单：给房间列表以外的直播间发弹幕。</mli><mli>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_DANMU: "检测到中奖后在发起抽奖的直播间发一条弹幕。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将从中随机抽取弹幕进行发送。</mli></mul>",
           topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，北京时间0点时重置。</mli><mli><strong>支持输入框回车保存。</strong></mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
@@ -1439,7 +1451,9 @@
           ANCHOR_IGNORE_AREA: "忽略指定分区，即不检索这些分区的天选。<mul><mli>请正确填写所要忽略分区的名称，如:<code>娱乐,网游,手游,电台,单机游戏,虚拟主播,生活,学习,大事件</code>。</mli><mli>如果要填写多个分区，每两项之间请用半角逗号<code>,</code>隔开。</mli></mul>",
           PLATE_ACTIVITY: "参与B站的转盘抽奖。<mul><mli>脚本会尝试增加转盘的抽奖次数并参与抽奖。</mli><mli>转盘抽奖的数据由<a href='https://gitee.com/java_cn' target='_blank'>荒年</a>提供。</mli></mul>",
           PLATE_ACTIVITY_GETTIMES_INTERVAL: "获取某一转盘抽奖次数的间隔。<mul><mli>间隔太短可能会导致获取抽奖次数失败。</mli><mli>请注意本设置项的单位是<strong>毫秒</strong>。</mli></mul>",
-          PLATE_ACTIVITY_LOTTERY_INTERVAL: "参与某一转盘抽奖的间隔。<mul><mli>建议填写十秒左右的间隔时间，太低容易因为抽奖过快而失败。</mli><mli>请注意本设置项的单位是<strong>秒</strong>.</mli></mul>"
+          PLATE_ACTIVITY_LOTTERY_INTERVAL: "参与某一转盘抽奖的间隔。<mul><mli>建议填写十秒左右的间隔时间，太低容易因为抽奖过快而失败。</mli><mli>请注意本设置项的单位是<strong>秒</strong>.</mli></mul>",
+          RESERVE_ACTIVITY: "参与B站的直播预约抽奖。<mul><mli>转盘抽奖的数据由<a href='https://gitee.com/java_cn' target='_blank'>荒年</a>提供。</mli></mul>",
+          RESERVE_ACTIVITY_INTERVAL: "参与直播预约抽奖的间隔。<mul><mli>间隔太短会因为抽奖过快而失败。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1467,7 +1481,9 @@
               myDiv.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] label.str').text(String(MY_API.CONFIG.QUESTIONABLE_LOTTERY.length) + '个');
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label.str').text(String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length) + '个');
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').text(String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length) + '个');
-              // 显示输入框的值 PLATE_ACTIVITY_LOTTERY_INTERVAL
+              // 显示输入框的值
+              myDiv.find('div[data-toggle="RESERVE_ACTIVITY_CHECK_INTERVAL"] .num').val(MY_API.CONFIG.RESERVE_ACTIVITY_CHECK_INTERVAL.toString());
+              myDiv.find('div[data-toggle="RESERVE_ACTIVITY_INTERVAL"] .num').val(MY_API.CONFIG.RESERVE_ACTIVITY_INTERVAL.toString());
               myDiv.find('div[data-toggle="PLATE_ACTIVITY_LOTTERY_INTERVAL"] .num').val(MY_API.CONFIG.PLATE_ACTIVITY_LOTTERY_INTERVAL.toString());
               myDiv.find('div[data-toggle="PLATE_ACTIVITY_GETTIMES_INTERVAL"] .num').val(MY_API.CONFIG.PLATE_ACTIVITY_GETTIMES_INTERVAL.toString());
               myDiv.find('div[data-toggle="PLATE_ACTIVITY_CHECK_INTERVAL"] .num').val(MY_API.CONFIG.PLATE_ACTIVITY_CHECK_INTERVAL.toString());
@@ -5998,7 +6014,7 @@
           if (!MY_API.CONFIG.PLATE_ACTIVITY || otherScriptsRunning) return $.Deferred().resolve();
           const sleepTime = sleepCheck(MY_API.CONFIG);
           if (sleepTime) {
-            MYDEBUG('[转盘抽奖]', `处于休眠时段，${sleepTime}毫秒后再次检查天选`);
+            MYDEBUG('[转盘抽奖]', `处于休眠时段，${sleepTime}毫秒后再次检查转盘`);
             MY_API.chatLog(`[转盘抽奖] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并继续检查转盘`, 'warning');
             return setTimeout(() => MY_API.PLATE_ACTIVITY.run(), sleepTime);
           }
@@ -6054,6 +6070,113 @@
           MY_API.saveCache();
           MY_API.chatLog(`[转盘抽奖] 本轮抽奖结束，${MY_API.CONFIG.PLATE_ACTIVITY_CHECK_INTERVAL}分钟后再次检查`, 'info');
           return setTimeout(() => MY_API.PLATE_ACTIVITY.run(false), MY_API.CONFIG.PLATE_ACTIVITY_CHECK_INTERVAL * 60e3);
+        }
+      },
+      RESERVE_ACTIVITY: {
+        reserveFilterData: {},
+        maxCheckedSid: 0,
+        getReserveData: () => {
+          return XHR({
+            GM: true,
+            anonymous: true,
+            method: 'GET',
+            url: 'https://gitee.com/java_cn/BILIBLI_RES/raw/master/HNPLATE/reserveSid.json',
+            responseType: 'json'
+          }).then(response => {
+            MYDEBUG(`MY_API.PLATE_ACTIVITY.getPlateData response`, response);
+            if (response.response.status === 200) return response.body;
+            else {
+              MY_API.chatLog(`[预约抽奖] 获取直播预约数据失败，请检查网络`, 'error');
+              return delayCall(() => MY_API.RESERVE_ACTIVITY.getReserveData(), 1800e3);
+            }
+          })
+        },
+        get_reserve_info: (json) => {
+          let listStr = '';
+          for (const key in json) {
+            const numKey = Number(key);
+            if (numKey <= MY_API.RESERVE_ACTIVITY.maxCheckedSid) continue;
+            else {
+              listStr = listStr.concat(key, ',');
+              MY_API.RESERVE_ACTIVITY.maxCheckedSid = numKey;
+            }
+          }
+          if (listStr.length === 0) return false;
+          listStr = listStr.substring(0, listStr.length - 1);
+          return BAPI.x.get_reserve_info(listStr).then(response => {
+            MYDEBUG(`API.x.get_reserve_info(${listStr}) response`, response);
+            if (response.code === 0) {
+              let list = JSON.parse(JSON.stringify(response.data.list))
+              for (const key in list) {
+                if (list[key].isFollow === 1 || list[key].state === 150) {
+                  addVal(MY_API.RESERVE_ACTIVITY.noCheckSid, key);
+                  delete list[key];
+                }
+              }
+              if (list === {}) list = false;
+              return list;
+            }
+            else {
+              MY_API.chatLog(`[预约抽奖] 获取抽奖信息失败<br>${response.message}`, 'error');
+              return false;
+            }
+          })
+        },
+        reserve: (obj) => {
+          return BAPI.x.reserve(obj.sid).then(response => {
+            MYDEBUG(`API.x.reserve(${obj.sid}) response`, response);
+            switch (response.code) {
+              case 0:
+                MY_API.chatLog(`[预约抽奖] 成功参加预约抽奖<br>${obj.name}<br>${obj.prizeInfo.text}`, 'success');
+                return true
+              case 75003: // 活动已结束
+                MY_API.chatLog(`[预约抽奖] 活动已结束<br>${obj.name}`, 'warning');
+                return false
+              case 75077: // 重复参加活动
+                MY_API.chatLog(`[预约抽奖] 重复参加活动<br>${obj.name}`, 'warning');
+                return false;
+            }
+          })
+        },
+        run: async (cacheCheck = true) => {
+          if (!MY_API.CONFIG.RESERVE_ACTIVITY || otherScriptsRunning) return $.Deferred().resolve();
+          const sleepTime = sleepCheck(MY_API.CONFIG);
+          function endFunc() {
+            MY_API.CACHE.PlateActivity_TS = ts_ms();
+            MY_API.saveCache();
+            return setTimeout(() => MY_API.RESERVE_ACTIVITY.run(false), MY_API.CONFIG.RESERVE_ACTIVITY_CHECK_INTERVAL * 60e3);
+          }
+          MY_API.RESERVE_ACTIVITY.maxCheckedSid = GM_getValue('reserveMaxCheckedSid') || 0;
+          if (sleepTime) {
+            MYDEBUG('[预约抽奖]', `处于休眠时段，${sleepTime}毫秒后再次检查预约抽奖`);
+            MY_API.chatLog(`[预约抽奖] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并继续检查抽奖`, 'warning');
+            return setTimeout(() => MY_API.RESERVE_ACTIVITY.run(), sleepTime);
+          }
+          if (cacheCheck) {
+            const diff = ts_ms() - MY_API.CACHE.ReserveActivity_TS;
+            const interval = MY_API.CONFIG.RESERVE_ACTIVITY_CHECK_INTERVAL * 60e3 || 600e3;
+            const tillnextRun = interval - diff;
+            if (diff < interval) {
+              MY_API.chatLog(`[预约抽奖] 将会在${(tillnextRun / 60e3).toFixed(2)}分钟后运行预约抽奖`, 'info');
+              MYDEBUG('[预约抽奖]', `${tillnextRun}毫秒后再次运行`);
+              setTimeout(MY_API.RESERVE_ACTIVITY.run, tillnextRun);
+              return $.Deferred().resolve();
+            }
+          }
+          let reserveData = await MY_API.RESERVE_ACTIVITY.getReserveData();
+          MY_API.RESERVE_ACTIVITY.reserveFilterData = await MY_API.RESERVE_ACTIVITY.get_reserve_info(reserveData);
+          if (!MY_API.RESERVE_ACTIVITY.reserveFilterData) {
+            MY_API.chatLog(`[预约抽奖] 暂无可参与抽奖，${MY_API.CONFIG.RESERVE_ACTIVITY_CHECK_INTERVAL}分钟后再次检查`, 'info');
+            return endFunc();
+          }
+          for (const r in MY_API.RESERVE_ACTIVITY.reserveFilterData) {
+            const obj = MY_API.RESERVE_ACTIVITY.reserveFilterData[r];
+            await MY_API.RESERVE_ACTIVITY.reserve(obj);
+            await sleep(MY_API.CONFIG.RESERVE_ACTIVITY_INTERVAL);
+          }
+          GM_setValue('reserveMaxCheckedSid', MY_API.RESERVE_ACTIVITY.maxCheckedSid);
+          MY_API.chatLog(`[预约抽奖] 本轮抽奖结束，${MY_API.CONFIG.PLATE_ACTIVITY_CHECK_INTERVAL}分钟后再次检查`, 'info');
+          return endFunc();
         }
       }
     };
@@ -6130,13 +6253,14 @@
       API.LiveReward.run, // 直播每日任务
       API.Exchange.runS2C, // 银瓜子换硬币
       API.Exchange.runC2S, // 硬币换银瓜子
-      API.PLATE_ACTIVITY.run, // 转盘抽奖
       // 其它任务
       API.AUTO_DANMU.run, // 自动发弹幕
       API.LITTLE_HEART.run, // 小心心
       API.Gift.run, // 送礼物
       API.MaterialObject.run, // 实物抽奖
       API.AnchorLottery.run, // 天选时刻
+      API.PLATE_ACTIVITY.run, // 转盘抽奖
+      API.RESERVE_ACTIVITY.run // 预约抽奖
     ];
     otherScriptsRunningCheck.then(() => runAllTasks(5000, 200, taskList));
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000);// 刷新直播间
