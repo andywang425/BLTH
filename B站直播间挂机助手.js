@@ -812,10 +812,7 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
           if (versionStringCompare(cache, version) === -1) { // cache < version
             const mliList = [
-              "深色模式适配优化。",
-              "修复购买勋章因B币不足而失败时回显不正确的bug。",
-              "删除了大乱斗抽奖。",
-              "新增转盘抽奖。"
+              "新增直播预约抽奖。"
             ];
             let mliHtml = "";
             for (const mli of mliList) {
