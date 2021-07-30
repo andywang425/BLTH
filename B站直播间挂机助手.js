@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.8
+// @version        5.7.8.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -811,18 +811,28 @@
         try {
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
           if (versionStringCompare(cache, version) === -1) { // cache < version
-            const mliList = [
-              "新增直播预约抽奖。"
+            const clientMliList = [
+              "修复部分情况下点亮勋章出错的bug。"
             ];
-            let mliHtml = "";
-            for (const mli of mliList) {
-              mliHtml = mliHtml + "<mli>" + mli + "</mli>";
+            const serverMliList = [
+              "改为从fastgit检查脚本更新。"
+            ];
+            function createHtml(mliList) {
+              if (mliList.length === 0) return "无";
+              let mliHtml = "";
+              for (const mli of mliList) {
+                mliHtml = mliHtml + "<mli>" + mli + "</mli>";
+              }
+              return mliHtml;
             }
             myopen({
               title: `${version}更新提示`,
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
-                <mol>${mliHtml}</mol>
+                <h3>客户端</h3>
+                <mol>${createHtml(clientMliList)}</mol>
+                <h3>服务端</h3>
+                <mol>${createHtml(serverMliList)}</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
@@ -3002,7 +3012,7 @@
                 if (g.gift_id !== 30607 || g.gift_num <= 0) continue;
                 let response = await BAPI.room.room_init(parseInt(m.roomid, 10)).then(re => {
                   MYDEBUG(`[自动送礼][自动点亮勋章] API.room.room_init(${m.roomid})`, re);
-                  if (response.code !== 0) throw re.msg;
+                  if (re.code !== 0) throw re.msg;
                 });
                 let send_room_id = parseInt(response.data.room_id, 10);
                 const feed_num = 1;
