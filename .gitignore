@@ -1,5 +1,6 @@
 .gitignore
 .vscode
+.github/ISSUE_TEMPLATE/bug_report.md
 /node_modules
 /note
 /assets/unused_libraries
