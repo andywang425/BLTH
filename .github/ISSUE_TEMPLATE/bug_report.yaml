@@ -1,13 +1,14 @@
 name: Bug反馈
-description: 「推荐」创建一个反馈来帮助我们对脚本进行改进
+description: 创建一个反馈来帮助我们对脚本进行改进
 labels: ["bug"]
+assignees: andywang425
 
 body:
   - type: markdown
     attributes:
       value: |
-        ## 注意
-        在反馈bug之前，请确保你已经认真阅读了本项目的README和脚本的内置说明。
+        ## 欢迎
+        你可能可以在本项目的[README](https://github.com/andywang425/BLTH/blob/master/README.md)，脚本的内置说明（控制面板上蓝色的小问号）或[已存在的issue](https://github.com/andywang425/BLTH/issues)中找到答案。
         <br />
 
   - id: describe
@@ -19,7 +20,7 @@ body:
       description: |
         简要描述所遇到的bug。
       placeholder: |
-        请简要描述您遇到的bug。
+        eg: 点击【取关天选关注UP分组的UP主】后右上角弹出提示 [取关不在白名单内的UP主]请先点击[保存当前关注列表为白名单] 的报错，并且没有进行取关操作。
 
   - id: reproduction
     type: textarea
@@ -42,7 +43,7 @@ body:
       description: |
         简要描述进行以上操作后预期的脚本行为。
       placeholder: |
-        简要描述进行以上操作后预期的脚本行为。
+        eg: 点击【取关天选关注UP分组的UP主】后正常取关天选关注UP分组里的UP。
 
   - id: picture
     type: textarea
@@ -53,7 +54,7 @@ body:
       description: |
         如果可以，请提供有关截图。
       placeholder: |
-        可以使用QQ等工具截图后在此处ctrl + v黏贴。
+        可使用 QQ / Snipaste 等工具截图后在此处 ctrl + v 黏贴。
 
   - id: log
     type: textarea
@@ -68,17 +69,14 @@ body:
       placeholder: |
         请在此黏贴运行日志。
 
-  - type: markdown
-    attributes:
-      value: |
-        ## 使用环境
-
   - id: system
     type: input
     validations:
       required: true
     attributes:
       label: "操作系统"
+      description: |
+        请给出操作系统名称和版本号。
       placeholder: |
         eg: Windows 10
 
@@ -88,6 +86,8 @@ body:
       required: true
     attributes:
       label: "浏览器"
+      description: |
+        请给出浏览器名称和版本号。
       placeholder: |
         eg: Chrome 81.0.3147.89
 
@@ -97,6 +97,8 @@ body:
       required: true
     attributes:
       label: "用户脚本管理器"
+      description: |
+        请给出用户脚本管理器名称和版本号。
       placeholder: |
         eg: Tampermonkey 4.11
 
@@ -106,6 +108,8 @@ body:
       required: true
     attributes:
       label: "挂机助手版本"
+      description: |
+        BLTH的版本。可以在用户脚本管理器中查看。
       placeholder: |
         eg: 5.6
 
@@ -141,3 +145,10 @@ body:
       label: "其他"
       description: |
         若您有其他想要补充的内容，请在此说明
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 感谢反馈！
+        我们会尽快回复您提出的issue。
+        <br />
