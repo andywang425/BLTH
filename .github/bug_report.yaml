@@ -1,0 +1,143 @@
+name: Bug反馈
+description: 「推荐」创建一个反馈来帮助我们对脚本进行改进
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 注意
+        在反馈bug之前，请确保你已经认真阅读了本项目的README和脚本的内置说明。
+        <br />
+
+  - id: describe
+    type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "描述bug"
+      description: |
+        简要描述所遇到的bug。
+      placeholder: |
+        请简要描述您遇到的bug。
+
+  - id: reproduction
+    type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "重现bug"
+      description: |
+        说明您在进行了怎样的操作后出现了bug。
+      placeholder: |
+        1. xxx
+        2. xxx
+
+  - id: expection
+    type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "预期行为"
+      description: |
+        简要描述进行以上操作后预期的脚本行为。
+      placeholder: |
+        简要描述进行以上操作后预期的脚本行为。
+
+  - id: picture
+    type: textarea
+    validations:
+      required: false
+    attributes:
+      label: "截图"
+      description: |
+        如果可以，请提供有关截图。
+      placeholder: |
+        可以使用QQ等工具截图后在此处ctrl + v黏贴。
+
+  - id: log
+    type: textarea
+    validations:
+      required: true
+    attributes:
+      label: "运行日志"
+      description: |
+        脚本日志窗口中的普通日志或控制台日志。  
+        控制台日志的打开方式见README中[控制台日志](https://github.com/andywang425/BLTH/blob/master/README.md#控制台日志)一节。  
+        普通日志请直接截图。控制台日志可截图或右键导出。
+      placeholder: |
+        请在此黏贴运行日志。
+
+  - type: markdown
+    attributes:
+      value: |
+        ## 使用环境
+
+  - id: system
+    type: input
+    validations:
+      required: true
+    attributes:
+      label: "操作系统"
+      placeholder: |
+        eg: Windows 10
+
+  - id: browser
+    type: input
+    validations:
+      required: true
+    attributes:
+      label: "浏览器"
+      placeholder: |
+        eg: Chrome 81.0.3147.89
+
+  - id: userscript_manager
+    type: input
+    validations:
+      required: true
+    attributes:
+      label: "用户脚本管理器"
+      placeholder: |
+        eg: Tampermonkey 4.11
+
+  - id: BLTH_version
+    type: input
+    validations:
+      required: true
+    attributes:
+      label: "挂机助手版本"
+      placeholder: |
+        eg: 5.6
+
+  - id: network_condition
+    type: dropdown
+    validations:
+      required: true
+    attributes:
+      label: "网络情况"
+      description: |
+        可以理解为网速情况。
+      options:
+        - 好
+        - 一般
+        - 坏
+
+  - id: other_scripts
+    type: input
+    validations:
+      required: true
+    attributes:
+      label: "其他浏览器插件/脚本"
+      description: |
+        在此写上您认为可能会对本脚本产生影响的插件/脚本。
+      placeholder: |
+        eg: adblock
+
+  - id: extra
+    type: textarea
+    validations:
+      required: false
+    attributes:
+      label: "其他"
+      description: |
+        若您有其他想要补充的内容，请在此说明

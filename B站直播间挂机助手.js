@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.8.1
+// @version        5.7.8.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -810,12 +810,13 @@
       newMessage: (version) => {
         try {
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
-          if (versionStringCompare(cache, version) === -1) { // cache < version
+          if (versionStringCompare(cache, version) === -1) {
+            // cache < version
             const clientMliList = [
-              "修复部分情况下点亮勋章出错的bug。"
+              "修复用小心心点亮勋章时会报错的bug。"
             ];
             const serverMliList = [
-              "改为从fastgit检查脚本更新。"
+              "无"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -3013,12 +3014,14 @@
                 let response = await BAPI.room.room_init(parseInt(m.roomid, 10)).then(re => {
                   MYDEBUG(`[自动送礼][自动点亮勋章] API.room.room_init(${m.roomid})`, re);
                   if (re.code !== 0) throw re.msg;
+                  return re;
                 });
                 let send_room_id = parseInt(response.data.room_id, 10);
                 const feed_num = 1;
                 let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, m.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd).then(re => {
                   MYDEBUG(`[自动送礼][自动点亮勋章] API.gift.bag_send ${Live_info.uid}, 30607, ${m.target_id}, ${feed_num}, ${g.bag_id}, ${send_room_id}, ${Live_info.rnd}`, re);
                   if (re.code !== 0) throw re.msg;
+                  return re;
                 });
                 if (rsp.code === 0) {
                   m.is_lighted = 1;
