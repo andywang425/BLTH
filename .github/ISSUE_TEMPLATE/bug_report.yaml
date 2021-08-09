@@ -1,7 +1,7 @@
 name: Bug反馈
 description: 创建一个反馈来帮助我们对脚本进行改进
 labels: ["bug"]
-assignees: andywang425
+assignees: dong-jpg
 
 body:
   - type: markdown
