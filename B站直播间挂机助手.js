@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.8.3
+// @version        5.7.8.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -39,7 +39,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@91f469fef739c8ecfd4f101d3b4ba7e5e95be42d/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@af29b3b2b029f4353b4827e117979aea40c7e1e3/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -81,13 +81,13 @@
       if (typeof data[0] === "object" && data[0].netError) return MYERROR(sign, ...data);
       let d = new Date();
       d = `%c[${NAME}]%c[${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}]%c`;
-      if (data.length === 1) { console.log(d, "font-weight: bold;", "color: #0920e6;", "", `${sign}:`, data[0],); return }
+      if (data.length === 1) return console.log(d, "font-weight: bold;", "color: #0920e6;", "", `${sign}:`, data[0],);
       console.log(d, "font-weight: bold;", "color: #0920e6;", "", `${sign}:`, data,);
     },
     MYERROR = (sign, ...data) => {
       let d = new Date();
       d = `[${NAME}][${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}]`;
-      if (data.length === 1) { console.error(d, `${sign}:`, data[0]); return }
+      if (data.length === 1) return console.error(d, `${sign}:`, data[0]);
       console.error(d, `${sign}:`, data);
     },
     runMidnight = (callback, msg) => {
@@ -590,6 +590,8 @@
         RESERVE_ACTIVITY: false, // 预约抽奖
         RESERVE_ACTIVITY_INTERVAL: 2000, // 预约抽奖请求间隔
         RESERVE_ACTIVITY_CHECK_INTERVAL: 60, // 预约抽奖检查间隔
+        RESERVE_ACTIVITY_IGNORE_BLACKLIST: false, // 预约抽奖忽略关键字
+        RESERVE_ACTIVITY_BLACKLIST_WORD: ['测试', '钓鱼'], // 预约抽奖屏蔽词
         SEND_ALL_GIFT: false, // 送满全部勋章
         SHARE: true, // 分享
         SILVER2COIN: false, // 银瓜子换硬币
@@ -631,11 +633,12 @@
         COUNT: 0, // 辣条（目前没用）
         ANCHOR_COUNT: 0, // 天选
         MATERIAL_COUNT: 0, // 实物
+        LITTLE_HEART_COUNT: 0, // 小心心
         CLEAR_TS: 0, // 重置统计
       },
       CONFIG: {},
       CACHE: {},
-      GIFT_COUNT: {},
+      GIFT_COUNT: {}, // 抽奖次数/送出礼物统计
       init: () => {
         addStyle();
         SP_CONFIG.darkMode = $('html').attr('lab-style') === 'dark' ? true : false;
@@ -811,7 +814,11 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "更新脚本内置说明。apikey不再公开发放。"
+              "尝试修复【显示/隐藏控制面板】按钮不显示的问题。",
+              "【实物抽奖】增大重试间隔。",
+              "预约抽奖新增忽略关键字，支持从云端添加。",
+              "优化小心心上限检测逻辑。",
+              "控制台日志中不再输出token的值"
             ];
             const serverMliList = [
 
@@ -1341,7 +1348,8 @@
           'ANCHOR_AUTO_BUY_LV1_MEDAL',
           'ANCHOR_IGNORE_AREA',
           'PLATE_ACTIVITY',
-          'RESERVE_ACTIVITY'
+          'RESERVE_ACTIVITY',
+          'RESERVE_ACTIVITY_IGNORE_BLACKLIST'
         ];
         const radioList = [
           /**
@@ -1462,7 +1470,8 @@
           PLATE_ACTIVITY_GETTIMES_INTERVAL: "获取某一转盘抽奖次数的间隔。<mul><mli>间隔太短可能会导致获取抽奖次数失败。</mli><mli>请注意本设置项的单位是<strong>毫秒</strong>。</mli></mul>",
           PLATE_ACTIVITY_LOTTERY_INTERVAL: "参与某一转盘抽奖的间隔。<mul><mli>建议填写十秒左右的间隔时间，太低容易因为抽奖过快而失败。</mli><mli>请注意本设置项的单位是<strong>秒</strong>.</mli></mul>",
           RESERVE_ACTIVITY: "参与B站的直播预约抽奖。<mul><mli>转盘抽奖的数据由<a href='https://gitee.com/java_cn' target='_blank'>荒年</a>提供。</mli></mul>",
-          RESERVE_ACTIVITY_INTERVAL: "参与直播预约抽奖的间隔。<mul><mli>间隔太短会因为抽奖过快而失败。</mli></mul>"
+          RESERVE_ACTIVITY_INTERVAL: "参与直播预约抽奖的间隔。<mul><mli>间隔太短会因为抽奖过快而失败。</mli></mul>",
+          RESERVE_ACTIVITY_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1490,6 +1499,7 @@
               myDiv.find('div[data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"] label.str').text(String(MY_API.CONFIG.QUESTIONABLE_LOTTERY.length) + '个');
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label.str').text(String(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length) + '个');
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').text(String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length) + '个');
+              myDiv.find('div[data-toggle="RESERVE_ACTIVITY_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD.length + '个');
               // 显示输入框的值
               myDiv.find('div[data-toggle="RESERVE_ACTIVITY_CHECK_INTERVAL"] .num').val(MY_API.CONFIG.RESERVE_ACTIVITY_CHECK_INTERVAL.toString());
               myDiv.find('div[data-toggle="RESERVE_ACTIVITY_INTERVAL"] .num').val(MY_API.CONFIG.RESERVE_ACTIVITY_INTERVAL.toString());
@@ -1897,6 +1907,31 @@
                     layer.close(index);
                   });
               });
+              myDiv.find('button[data-action="edit_RESERVE_ACTIVITY_BLACKLIST_WORD"]').click(() => {
+                // 编辑预约抽奖忽略关键字
+                myprompt({
+                  formType: 2,
+                  value: String(MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD),
+                  maxlength: Number.MAX_SAFE_INTEGER,
+                  title: '请输入预约抽奖忽略关键字',
+                  btn: ['保存', '取消']
+                },
+                  function (value, index) {
+                    let valArray = value.split(",");
+                    valArray = [...new Set(valArray)];
+                    for (let i = 0; i < valArray.length; i++) {
+                      if (valArray[i] === '') valArray.splice(i, 1);
+                    };
+                    MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD = [...valArray];
+                    MY_API.saveConfig(false);
+                    mymsg('预约抽奖忽略关键字保存成功', {
+                      time: 2500,
+                      icon: 1
+                    });
+                    myDiv.find('div[data-toggle="RESERVE_ACTIVITY_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD.length + '个')
+                    layer.close(index);
+                  });
+              });
               myDiv.find('button[data-action="addCloud_MATERIAL_BLACKLIST_WORD"]').click(() => {
                 // 加入实物云端忽略关键字
                 const cloudWords = noticeJson.material_blacklist_word || [],
@@ -1949,6 +1984,36 @@
                         icon: 1
                       });
                       myDiv.find('div[data-toggle="ANCHOR_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.ANCHOR_BLACKLIST_WORD.length + '个')
+                      layer.close(index);
+                    });
+                } else {
+                  mymsg('本地关键字已包含所有云端关键字', {
+                    time: 2500
+                  });
+                }
+              });
+              myDiv.find('button[data-action="addCloud_RESERVE_ACTIVITY_BLACKLIST_WORD"]').click(() => {
+                // 加入预约抽奖云端忽略关键字
+                const cloudWords = noticeJson.reserve_blacklist_word || [],
+                  localWords = [...MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD];
+                let newWords = [];
+                for (const i of cloudWords) {
+                  if (findVal(localWords, i) === -1) newWords.push(i);
+                }
+                const wordsLength = newWords.length;
+                if (wordsLength > 0) {
+                  myconfirm(`<div style = "text-align:center">将要被添加的关键字有</div><div style = "font-weight:bold">${String(newWords)}<code>（共${wordsLength}个）</code></div><div style = "text-align:center">是否添加这些关键字到本地关键字？</div>`, {
+                    title: '添加预约抽奖云端关键字',
+                    btn: ['添加', '取消']
+                  },
+                    function (index) {
+                      MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD = [...new Set([...localWords, ...newWords])];
+                      MY_API.saveConfig(false);
+                      mymsg('已添加预约抽奖云端关键字', {
+                        time: 2500,
+                        icon: 1
+                      });
+                      myDiv.find('div[data-toggle="RESERVE_ACTIVITY_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD.length + '个')
                       layer.close(index);
                     });
                 } else {
@@ -2384,10 +2449,23 @@
             }
           });
         };
+        // 打开窗口
+        openMainWindow();
+        let JQshow = false;
+        if (SP_CONFIG.mainDisplay === 'hide') {
+          layerUiMain.hide();
+          JQshow = true;
+        }
+        if (SP_CONFIG.darkMode) {
+          layer.style(mainIndex, {
+            'background-color': '#1c1c1c'
+          });
+        }
         // 添加隐藏/显示窗口按钮
         $('.attention-btn-ctnr').append(btn);
+        // 来自 https://github.com/andywang425/BLTH/issues/156#issuecomment-893685649
+        $('.follow-ctnr').append(btn);
         // 监听隐藏/显示窗口按钮
-        let JQshow = false;
         btn.click(() => {
           if (hideBtnClickable) {
             hideBtnClickable = false;
@@ -2412,17 +2490,6 @@
             }
           }
         });
-        // 打开窗口
-        openMainWindow();
-        if (SP_CONFIG.mainDisplay === 'hide') {
-          layerUiMain.hide();
-          JQshow = true;
-        }
-        if (SP_CONFIG.darkMode) {
-          layer.style(mainIndex, {
-            'background-color': '#1c1c1c'
-          });
-        }
         // 监听播放器全屏变化
         function bodyPropertyChange() {
           let attr = body.attr('class'), tabOffSet = tabContent.offset(), top = tabOffSet.top, left = tabOffSet.left;
@@ -2465,8 +2532,6 @@
         }
         let webHtmlMutationObserver = new MutationObserver(webHtmlPropertyChange);
         webHtmlMutationObserver.observe(webHtml[0], { attributes: true });
-        // 添加隐藏/显示窗口按钮
-        $('.attention-btn-ctnr').append(btn);
         // 初次运行时tips
         if (!MY_API.CACHE.DailyReward_TS) {
           mytips('点我隐藏/显示控制面板', '#hiderbtn', {
@@ -3019,6 +3084,7 @@
                 let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, m.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd).then(re => {
                   MYDEBUG(`[自动送礼][自动点亮勋章] API.gift.bag_send ${Live_info.uid}, 30607, ${m.target_id}, ${feed_num}, ${g.bag_id}, ${send_room_id}, ${Live_info.rnd}`, re);
                   if (re.code !== 0) throw re.msg;
+                  MY_API.GIFT_COUNT.LITTLE_HEART_COUNT++;
                   return re;
                 });
                 if (rsp.code === 0) {
@@ -3253,6 +3319,7 @@
                   medal.today_feed += feed_num * feed;
                   MY_API.Gift.remain_feed -= feed_num * feed;
                   window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
+                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT++;
                 } else {
                   window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常：${response.msg}`, 'caution');
                   return delayCall(() => MY_API.Gift.sendGift(medal));
@@ -3286,6 +3353,7 @@
                 if (response.code === 0) {
                   v.gift_num -= feed_num;
                   window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼成功，送出${feed_num}个${v.gift_name}`, 'success');
+                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT++;
                 } else {
                   window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼异常：${response.msg}`, 'caution');
                   return delayCall(() => MY_API.Gift.sendGift(medal));
@@ -3575,12 +3643,13 @@
           };
           const endFunc = async (check = true) => {
             if (check) await sleep(5000); // 小心心获取有延时等待5秒
-            if (!check || await MY_API.LITTLE_HEART.getGiftNum() >= 24) {
+            if (!check || await MY_API.LITTLE_HEART.getGiftNum() >= 24 || MY_API.GIFT_COUNT.LITTLE_HEART_COUNT >= 24) {
               window.toast('[小心心]今日小心心已全部获取', 'success');
               MY_API.CACHE.LittleHeart_TS = ts_ms();
               MY_API.saveCache();
               return runMidnight(() => MY_API.LITTLE_HEART.run(), '获取小心心');
-            } else { // 出于某些原因心跳次数到到了但小心心个数没到，再次运行
+            } else {
+              // 出于某些原因心跳次数到到了但小心心个数没到，再次运行
               window.toast('[小心心]小心心未全部获取，60秒后将再次运行', 'info');
               return setTimeout(() => MY_API.LITTLE_HEART.run(), 60 * 1000)
             }
@@ -3597,7 +3666,7 @@
             else if (userInfo.body.data.mid !== Live_info.uid && await setToken() === undefined)
               return;
           };
-          MYDEBUG('[小心心] 开始客户端心跳 userToken.access_token', userToken.access_token);
+          MYDEBUG('[小心心] 开始客户端心跳 userToken.access_token 长度', userToken.access_token.length);
           window.toast('[小心心]开始获取小心心', 'success');
           const giftNum = await MY_API.LITTLE_HEART.getGiftNum();
           if (giftNum < 24) {
@@ -3995,7 +4064,7 @@
               MY_API.chatLog(
                 `[实物抽奖] 参加"${obj.title}"(aid = ${obj.aid}，第${obj.number}轮)失败<br>${response.msg}`,
                 'warning');
-              return delayCall(() => MY_API.MaterialObject.draw(obj));
+              return delayCall(() => MY_API.MaterialObject.draw(obj), 600e3);
             }
           });
         },
@@ -6182,6 +6251,32 @@
           }
           for (const r in MY_API.RESERVE_ACTIVITY.reserveFilterData) {
             const obj = MY_API.RESERVE_ACTIVITY.reserveFilterData[r];
+            let next = false;
+            if (MY_API.CONFIG.RESERVE_ACTIVITY_IGNORE_BLACKLIST) {
+              // 忽略关键字
+              for (const str of MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD) {
+                if (!isRegexp.test(str)) {
+                  if (obj.prizeInfo.text.toLowerCase().indexOf(str.toLowerCase()) > -1) {
+                    MY_API.chatLog(`[预约抽奖] 忽略存疑抽奖<br>奖品名：${obj.prizeInfo.text}<br>含有关键字：${str}`, 'warning');
+                    next = true;
+                    break;
+                  }
+                }
+                else {
+                  try {
+                    const reg = eval(str);
+                    if (reg.test(obj.prizeInfo.text)) {
+                      MY_API.chatLog(`[预约抽奖] 忽略存疑抽奖<br>奖品名：${obj.prizeInfo.text}<br>匹配正则：${str}`, 'warning');
+                      next = true;
+                      break;
+                    }
+                  } catch (e) {
+                    MYDEBUG('[天选时刻] 正则eval出错：', str);
+                  }
+                }
+              }
+            };
+            if (next) continue;
             await MY_API.RESERVE_ACTIVITY.reserve(obj);
             await sleep(MY_API.CONFIG.RESERVE_ACTIVITY_INTERVAL);
           }
