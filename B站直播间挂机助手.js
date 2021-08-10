@@ -81,13 +81,13 @@
       if (typeof data[0] === "object" && data[0].netError) return MYERROR(sign, ...data);
       let d = new Date();
       d = `%c[${NAME}]%c[${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}]%c`;
-      if (data.length === 1) { console.log(d, "font-weight: bold;", "color: #0920e6;", "", `${sign}:`, data[0],); return }
+      if (data.length === 1) return console.log(d, "font-weight: bold;", "color: #0920e6;", "", `${sign}:`, data[0],);
       console.log(d, "font-weight: bold;", "color: #0920e6;", "", `${sign}:`, data,);
     },
     MYERROR = (sign, ...data) => {
       let d = new Date();
       d = `[${NAME}][${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}]`;
-      if (data.length === 1) { console.error(d, `${sign}:`, data[0]); return }
+      if (data.length === 1) return console.error(d, `${sign}:`, data[0]);
       console.error(d, `${sign}:`, data);
     },
     runMidnight = (callback, msg) => {
@@ -2451,6 +2451,7 @@
         };
         // 打开窗口
         openMainWindow();
+        let JQshow = false;
         if (SP_CONFIG.mainDisplay === 'hide') {
           layerUiMain.hide();
           JQshow = true;
@@ -2465,7 +2466,6 @@
         // 来自 https://github.com/andywang425/BLTH/issues/156#issuecomment-893685649
         $('.follow-ctnr').append(btn);
         // 监听隐藏/显示窗口按钮
-        let JQshow = false;
         btn.click(() => {
           if (hideBtnClickable) {
             hideBtnClickable = false;
