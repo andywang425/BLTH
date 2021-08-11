@@ -148,6 +148,7 @@
 + [xfgryujk](https://github.com/xfgryujk)：B站直播websocket hook框架作者。
 + [spiritLHL](https://github.com/spiritLHL)：协助搭建本脚本的私有化qq推送平台。
 + [荒年](https://gitee.com/java_cn)：参考了部分功能实现；提供了本脚本运行所需的部分数据。
++ [dong-jpg](https://github.com/dong-jpg)：帮忙回答issue。
 
 以及所有提出过建议的用户。
 
