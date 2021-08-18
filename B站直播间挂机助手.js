@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.8.4
+// @version        5.7.8.5
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -39,7 +39,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@af29b3b2b029f4353b4827e117979aea40c7e1e3/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@f3caf1d878912d5d103bf1fa30e75f9cd20f144b/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -578,7 +578,7 @@
         PLATE_ACTIVITY_LOTTERY_INTERVAL: 10, // 转盘抽奖请求间隔
         QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼', '内网', '员工', '企业', '公司', '行政', '登记'], // 存疑实物抽奖
         REMOVE_ELEMENT_2233: false, // 移除2233
-        REMOVE_ELEMENT_activity: true, // 移除活动入口
+        REMOVE_ELEMENT_pkBanner: true, // 移除大乱斗入口
         REMOVE_ELEMENT_rank: true, // 移除排行榜入口
         REMOVE_ELEMENT_followSideBar: false, // 移除右侧关注按钮及弹窗
         REMOVE_ELEMENT_flipView: true, // 移除移除礼物栏下方广告
@@ -814,14 +814,12 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "尝试修复【显示/隐藏控制面板】按钮不显示的问题。",
-              "【实物抽奖】增大重试间隔。",
-              "预约抽奖新增忽略关键字，支持从云端添加。",
-              "优化小心心上限检测逻辑。",
-              "控制台日志中不再输出token的值"
-            ];
-            const serverMliList = [
-
+              "修复【银瓜子换硬币】回显不正确的bug。",
+              "调整了【显示/隐藏控制面板】按钮的位置。",
+              "更新部分设置项的小问号内容。",
+              "优化了【粉丝勋章打卡弹幕】的回显。",
+              "更新了预约抽奖数据的链接。",
+              "内容屏蔽中的【移除活动入口】调整为【移除大乱斗入口】。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -835,10 +833,7 @@
               title: `${version}更新提示`,
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
-                <h3>客户端</h3>
                 <mol>${createHtml(clientMliList)}</mol>
-                <h3>服务端</h3>
-                <mol>${createHtml(serverMliList)}</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
@@ -944,12 +939,12 @@
             rmJQpath: ['#my-dear-haruna-vm']
           },
           {
-            // 活动入口
-            settingName: 'REMOVE_ELEMENT_activity',
-            rmJQpath: ['.activity-entry']
+            // 大乱斗入口
+            settingName: 'REMOVE_ELEMENT_pkBanner',
+            rmJQpath: ['.chaos-pk-banner']
           },
           {
-            // 排行榜
+            // 排行榜（活动？）
             settingName: 'REMOVE_ELEMENT_rank',
             rmJQpath: ['.activity-rank']
           },
@@ -1305,7 +1300,7 @@
           'STORM',
           'LITTLE_HEART',
           'REMOVE_ELEMENT_2233',
-          'REMOVE_ELEMENT_activity',
+          'REMOVE_ELEMENT_pkBanner',
           'REMOVE_ELEMENT_rank',
           'REMOVE_ELEMENT_playerIcon',
           'MATERIAL_LOTTERY',
@@ -1398,7 +1393,7 @@
           MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>脚本不会给等级大于20的粉丝勋章打卡（因为不加亲密度）。</mli><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则循环选取）。</mli><mli>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</mli></mul>',
           AUTO_DANMU: '发送直播间弹幕。<mh3>注意：</mh3><mul><mli>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</mli><mli><mp>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</mp></mli><mli><mp>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</mp></mli><mli><mp>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</mp></mli><mli><mp>可以用默认值所填的房间号来测试本功能，但是请不要一直发。</mp></mli><mli><mp>发送时间有两种填写方法</mp><mp>1.【小时】h【分钟】m【秒】s</mp><mul><mli>每隔一段时间发送一条弹幕</mli><mli>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></mli><mli>可以填小数</mli><mli>可以只填写其中一项或两项</mli></mul><mp>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</mp><mp><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></mp><mp>2.【小时】:【分钟】:【秒】</mp><mul><mli>在特定时间点（本地时间）发一条弹幕</mli><mli>例子： <code>10:30:10</code>, <code>0:40</code></mli><mli>只能填整数</mli><mli>小时分钟必须填写，秒数可以不填</mli></mul><mp>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</mp></mli></mul>',
           NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<mh3>原理：</mh3><mul><mli>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。</mli><mul>',
-          INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<mh3>缺点：</mh3>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管点击后会提示接口返回错误），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。',
+          INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<mh3>缺点：</mh3><mli>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管操作后会显示你没有权限），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。</mli><mli>无法打开页面下拉后出现的动态的评论区。</mli>',
           MATERIAL_LOTTERY: '实物抽奖，即金宝箱抽奖。某些特殊的直播间会有金宝箱抽奖。<mh3>注意：</mh3><mul><mli>【忽略关键字】中每一项之间用半角逗号<code>,</code>隔开。</mli></mul>',
           MATERIAL_LOTTERY_REM: "aid是活动的编号。如你不理解此项保持默认配置即可。",
           ANCHOR_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑天选。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
@@ -1471,7 +1466,9 @@
           PLATE_ACTIVITY_LOTTERY_INTERVAL: "参与某一转盘抽奖的间隔。<mul><mli>建议填写十秒左右的间隔时间，太低容易因为抽奖过快而失败。</mli><mli>请注意本设置项的单位是<strong>秒</strong>.</mli></mul>",
           RESERVE_ACTIVITY: "参与B站的直播预约抽奖。<mul><mli>转盘抽奖的数据由<a href='https://gitee.com/java_cn' target='_blank'>荒年</a>提供。</mli></mul>",
           RESERVE_ACTIVITY_INTERVAL: "参与直播预约抽奖的间隔。<mul><mli>间隔太短会因为抽奖过快而失败。</mli></mul>",
-          RESERVE_ACTIVITY_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>"
+          RESERVE_ACTIVITY_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
+          REMOVE_ELEMENT_pkBanner: "移除位于直播画面上方的大乱斗入口。",
+          REMOVE_ELEMENT_rank: "移除位于直播画面上方的排行榜（？）入口。<mul><mli>这个位置有时候会变成某个活动的入口。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -2462,9 +2459,8 @@
           });
         }
         // 添加隐藏/显示窗口按钮
-        $('.attention-btn-ctnr').append(btn);
-        // 来自 https://github.com/andywang425/BLTH/issues/156#issuecomment-893685649
-        $('.follow-ctnr').append(btn);
+        let followCntr = $('.follow-ctnr');
+        followCntr[0].insertBefore(btn[0], followCntr.children()[0])
         // 监听隐藏/显示窗口按钮
         btn.click(() => {
           if (hideBtnClickable) {
@@ -2929,10 +2925,10 @@
           return BAPI.xlive.revenue.coin2silver(num).then((response) => {
             MYDEBUG('Exchange.coin2silver: API.Exchange.coin2silver', response);
             if (response.code === 0) {
-              window.toast(`[硬币换银瓜子] ${response.msg}，获得${response.data.silver}银瓜子`, 'success');
+              window.toast(`[硬币换银瓜子] ${response.message}，获得${response.data.silver}银瓜子`, 'success');
             } else {
               // 其它状态码待补充
-              window.toast(`[银瓜子换硬币] 失败 ${response.msg}`, 'caution');
+              window.toast(`[银瓜子换硬币] 失败 ${response.message}`, 'caution');
               return delayCall(() => MY_API.Exchange.coin2silver(num));
             }
           });
@@ -2941,11 +2937,11 @@
           return BAPI.xlive.revenue.silver2coin().then((response) => {
             MYDEBUG('Exchange.silver2coin: API.Exchange.silver2coin', response);
             if (response.code === 0) {
-              window.toast(`[银瓜子换硬币] ${response.msg}`, 'success'); // 兑换成功
+              window.toast(`[银瓜子换硬币] ${response.message}`, 'success'); // 兑换成功
             } else if (response.code === 403) {
-              window.toast(`[银瓜子换硬币] ${response.msg}`, 'info'); // 每天最多能兑换 1 个 or 银瓜子余额不足
+              window.toast(`[银瓜子换硬币] ${response.message}`, 'info'); // 每天最多能兑换 1 个 or 银瓜子余额不足
             } else {
-              window.toast(`[银瓜子换硬币] 失败 ${response.msg}`, 'caution');
+              window.toast(`[银瓜子换硬币] 失败 ${response.message}`, 'caution');
               return delayCall(() => MY_API.Exchange.silver2coin());
             }
           });
@@ -3869,11 +3865,11 @@
             })
           }
           return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
-            MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，粉丝勋章【${medal_name}】`, response);
-            if (response.code === 0) {
+            MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，真实房间号【${realRoomId}】，粉丝勋章【${medal_name}】`, response);
+            if (response.code === 0 && response.message.length === 0) {
               return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】发送成功，房间号【${roomId}】，粉丝勋章【${medal_name}】已点亮，当前亲密度+100`, 'success');
             } else {
-              return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】，粉丝勋章【${medal_name}】）出错 ${response.msg}`, 'caution');
+              return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】，粉丝勋章【${medal_name}】）出错 ${response.message}`, 'caution');
             }
           })
         },
@@ -6160,7 +6156,7 @@
             GM: true,
             anonymous: true,
             method: 'GET',
-            url: 'https://gitee.com/java_cn/BILIBLI_RES/raw/master/HNPLATE/reserveSid.json',
+            url: 'https://gitee.com/java_cn/BILIBLI_RES/raw/master/HNPLATE/reserveSids.json',
             responseType: 'json'
           }).then(response => {
             MYDEBUG(`MY_API.PLATE_ACTIVITY.getPlateData response`, response);
