@@ -78,7 +78,7 @@
 
 ### 关于反馈
 + 如果使用脚本过程中遇到问题，可以先按上述步骤[开启控制台日志](#控制台日志)，然后关掉无关功能再次运行脚本并在控制台中寻找相关错误信息。若能找到请在反馈bug时附上这些控制台日志。
-+ 反馈bug请点击[bug_report](https://github.com/andywang425/BLTH/issues/new?assignees=andywang425&labels=bug&template=bug_report.yaml)。
++ 反馈bug请点击[bug_report](https://github.com/andywang425/BLTH/issues/new?assignees=dong-jpg&labels=bug&template=bug_report.yaml)。
 + 交流qq群：①群：[1106094437](https://jq.qq.com/?_wv=1027&k=fCSfWf1O)。欢迎进来聊天或者提点建议~    
 
 -------------------------------
@@ -102,7 +102,7 @@
 
 # 其它信息  
 这个项目的部分代码来源于以下几个项目:  
-+ [B站直播签到助手](https://wwa.lanzous.com/iLjOmkfuvxe) (MIT) by [十六夜](https://space.bilibili.com/4317450)
++ [B站直播签到助手](https://wwa.lanzoui.com/iLjOmkfuvxe) (MIT) by [十六夜](https://space.bilibili.com/4317450)
 + [BLRHH](https://github.com/SeaLoong/BLRHH) (MIT) by [SeaLoong](https://github.com/SeaLoong)
 + [Bilibili-LRHH](https://github.com/pjy612/Bilibili-LRHH) (MIT, _forked from SeaLoong/BLRHH_) by [pjy612](https://github.com/pjy612)
 + [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS) (MIT) by [lzghzr](https://github.com/lzghzr)
@@ -146,7 +146,7 @@
 + [xfgryujk](https://github.com/xfgryujk)：B站直播websocket hook框架作者。
 + [spiritLHL](https://github.com/spiritLHL)：协助搭建本脚本的私有化qq推送平台。
 + [荒年](https://gitee.com/java_cn)：参考了部分功能实现；提供了本脚本运行所需的部分数据。
-+ [dong-jpg](https://github.com/dong-jpg)：帮忙回答issue。
++ [dong-jpg](https://github.com/dong-jpg)：帮忙回答issue；BLTH-server的运维。
 
 以及所有提出过建议的用户。
 
