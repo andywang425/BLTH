@@ -9,7 +9,8 @@
 &nbsp;<a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Github stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a>
 
 ## 使用方法 
-在 [Tampermonkey](https://www.tampermonkey.net) / [Violentmonkey](https://violentmonkey.github.io) 中启用脚本，登陆bilibili后打开任意b站直播间。 
+在 [Tampermonkey](https://www.tampermonkey.net) / [Violentmonkey](https://violentmonkey.github.io) 中启用脚本，登陆bilibili后打开任意b站直播间。  
++ 点击**直播画面上方**按钮或者按快捷键`alt + b`隐藏/显示脚本窗口。显示日志窗口的按钮位于**右侧聊天栏上方**。
 + 在 Tampermonkey 脚本设置中需要将此脚本的设置 “仅在顶层页面（框架）运行” 设置为否(默认为否)才使脚本在特殊直播间运行。  
 + 不保证能通过其它油猴插件(如Greasemonkey)运行。  
 
@@ -24,9 +25,6 @@
 -------------------------------
 
 # 功能细节 
-
-脚本窗口可以上下滚动！部分设置可能需要滚动后才能看到。
-点击**直播画面上方**按钮隐藏/显示脚本窗口和提示信息。    
 
 <li>快捷购买粉丝勋章</li>
 <li>发弹幕前自动佩戴当前直播间的粉丝勋章</li>
@@ -122,6 +120,7 @@
 + [bliveproxy](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B站直播websocket hook框架。
 + [pako](https://github.com/nodeca/pako) (MIT)：javascript压缩/解压缩库。
 + [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli项目中的javascript解码库。
++ [hotkeys](https://github.com/jaywcjlove/hotkeys) (MIT)：一个强健的 Javascript 库，用于捕获键盘输入和输入的组合键。
 
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。

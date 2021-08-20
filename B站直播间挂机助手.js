@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.8.5
+// @version        5.7.8.6
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -37,6 +37,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
+// @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
 // @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@f3caf1d878912d5d103bf1fa30e75f9cd20f144b/assets/html/main.min.html
@@ -814,12 +815,7 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "修复【银瓜子换硬币】回显不正确的bug。",
-              "调整了【显示/隐藏控制面板】按钮的位置。",
-              "更新部分设置项的小问号内容。",
-              "优化了【粉丝勋章打卡弹幕】的回显。",
-              "更新了预约抽奖数据的链接。",
-              "内容屏蔽中的【移除活动入口】调整为【移除大乱斗入口】。"
+              "新增隐藏/显示控制面版的快捷键<code>alt + b</code>。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -2462,7 +2458,7 @@
         let followCntr = $('.follow-ctnr');
         followCntr[0].insertBefore(btn[0], followCntr.children()[0])
         // 监听隐藏/显示窗口按钮
-        btn.click(() => {
+        function btnClickFunc() {
           if (hideBtnClickable) {
             hideBtnClickable = false;
             setTimeout(function () { hideBtnClickable = true }, 310);
@@ -2485,7 +2481,10 @@
               document.getElementById('hiderbtn').innerHTML = "隐藏控制面板";
             }
           }
-        });
+        }
+        btn.click(btnClickFunc);
+        // 绑定快捷键
+        hotkeys('alt+b', btnClickFunc);
         // 监听播放器全屏变化
         function bodyPropertyChange() {
           let attr = body.attr('class'), tabOffSet = tabContent.offset(), top = tabOffSet.top, left = tabOffSet.left;
