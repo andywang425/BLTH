@@ -35,8 +35,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@91f469fef739c8ecfd4f101d3b4ba7e5e95be42d/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libBilibiliToken.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/libWasmHash.min.js
+// @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
@@ -3107,7 +3106,7 @@
               }
             }
           } catch (e) {
-            console.error(e);
+            MYERROR('自动送礼点亮勋章出错', e);
             window.toast(`[自动送礼]点亮勋章出错:${e}`, 'error');
           }
         },
@@ -3539,166 +3538,232 @@
         }
       },
       LITTLE_HEART: {
-        getInfo: () => XHR({
-          GM: true,
-          anonymous: true,
-          method: 'GET',
-          url: `https://passport.bilibili.com/x/passport-login/oauth2/info?${appToken.signLoginQuery(`access_key=${userToken.access_token}`)}`,
-          responseType: 'json',
-          headers: appToken.headers
-        }),
-        RandomHex: (length) => {
-          const words = '0123456789abcdef';
-          let randomID = '';
-          randomID += words[Math.floor(Math.random() * 15) + 1];
-          for (let i = 0; i < length - 1; i++)
-            randomID += words[Math.floor(Math.random() * 16)];
-          return randomID;
-        },
-        uuid: () => MY_API.LITTLE_HEART.RandomHex(32).replace(/(\w{8})(\w{4})\w(\w{3})\w(\w{3})(\w{12})/, `$1-$2-4$3-${'89ab'[Math.floor(Math.random() * 4)]}$4-$5`),
-        getFansMedal: async () => {
-          const funsMedals = await XHR({
-            GM: true,
-            anonymous: true,
-            method: 'GET',
-            url: `https://api.live.bilibili.com/fans_medal/v1/FansMedal/get_list_in_room?${BilibiliToken.signQuery(`access_key=${userToken.access_token}&target_id=${Live_info.tid}&uid=${Live_info.uid}&${baseQuery}`)}`,
-            responseType: 'json',
-            headers: appToken.headers
+        patchData: {},
+        RoomHeart: class {
+          constructor(roomID) {
+            this.getInfoByRoom(roomID);
+          }
+          areaID;
+          parentID;
+          seq = 0;
+          roomID;
+          get id() {
+            return [this.parentID, this.areaID, this.seq, this.roomID];
+          }
+          buvid = this.getItem('LIVE_BUVID');
+          uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, t => {
+            const e = 16 * Math.random() | 0;
+            return ('x' === t ? e : 3 & e | 8).toString(16);
           });
-          MYDEBUG('[小心心] getFansMedal', funsMedals.response);
-          if (funsMedals !== undefined && funsMedals.response.status === 200)
-            if (funsMedals.body.code === 0)
-              if (funsMedals.body.data.length > 0)
-                return funsMedals.body.data.filter(m => m.room_id !== 0);
-        },
-        getGiftNum: async () => {
-          let todayHeart = 0;
-          await BAPI.gift.bag_list().then((re) => {
-            MYDEBUG('[小心心]检查包裹 API.gift.bag_list', re);
-            if (re.code === 0) {
-              const allHeart = re.data.list.filter(r => r.gift_id == 30607 && r.corner_mark == "7天");
-              for (const heart of allHeart) {
-                todayHeart += heart.gift_num;
-              }
-            } else {
-              window.toast(`[小心心] 获取包裹数据失败 ${re.message}`);
-              return delayCall(() => BAPI.gift.bag_list());
+          device = [this.buvid, this.uuid];
+          get ts() {
+            return Date.now();
+          }
+          get patchData() {
+            const list = [];
+            for (const [_, data] of Object.entries(MY_API.LITTLE_HEART.patchData))
+              list.push(data);
+            return list;
+          }
+          isPatch = this.patchData.length === 0 ? 0 : 1;
+          ua = W && W.navigator ? W.navigator.userAgent : '';
+          csrf = this.getItem("bili_jct") || '';
+          nextInterval = Math.floor(5) + Math.floor(Math.random() * (60 - 5));
+          heartbeatInterval;
+          secretKey;
+          secretRule;
+          timestamp;
+          async getInfoByRoom(roomID) {
+            const getInfoByRoom = await fetch(`//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${roomID}`, {
+              mode: 'cors',
+              credentials: 'include',
+            }).then(res => res.json());
+            if (getInfoByRoom.code === 0) {
+              const roomInfo = getInfoByRoom.data.room_info;
+              ({ area_id: this.areaID, parent_area_id: this.parentID, room_id: this.roomID } = roomInfo);
+              this.e();
             }
-          });
-          MYDEBUG(`[小心心]检测到包裹内7天小心心数量`, todayHeart);
-          return todayHeart
-        },
-        mobileHeartBeat: async (postJSON) => {
-          const wasm = new WasmHash();
-          await wasm.init();
-          const clientSign = (data) => wasm.hash('BLAKE2b512', wasm.hash('SHA3-384', wasm.hash('SHA384', wasm.hash('SHA3-512', wasm.hash('SHA512', JSON.stringify(data))))));
-          const sign = clientSign(postJSON);
-          let postData = '';
-          for (const i in postJSON)
-            postData += `${i}=${encodeURIComponent(postJSON[i])}&`;
-          postData += `client_sign=${sign}`;
-          const mobileHeartBeat = await XHR({
-            GM: true,
-            anonymous: true,
-            method: 'POST',
-            url: 'https://live-trace.bilibili.com/xlive/data-interface/v1/heartbeat/mobileHeartBeat',
-            data: BilibiliToken.signQuery(`access_key=${userToken.access_token}&${postData}&${baseQuery}`),
-            responseType: 'json',
-            headers: appToken.headers
-          });
-          MYDEBUG('[小心心] mobileHeartBeat', mobileHeartBeat.response);
-          if (mobileHeartBeat !== undefined && mobileHeartBeat.response.status === 200)
-            if (mobileHeartBeat.body.code === 0)
-              return true;
-          return false;
+            else {
+              window.toast(`[小心心] 未获取到房间 ${roomID} 信息`, 'error')
+              MYERROR('小心心', `未获取到房间 ${roomID} 信息`);
+            }
+          }
+          async webHeartBeat() {
+            if (this.seq > 6)
+              return;
+            const arg = `${this.nextInterval}|${this.roomID}|1|0`;
+            const argUtf8 = CryptoJS.enc.Utf8.parse(arg);
+            const argBase64 = CryptoJS.enc.Base64.stringify(argUtf8);
+            const webHeartBeat = await fetch(`//live-trace.bilibili.com/xlive/rdata-interface/v1/heartbeat/webHeartBeat?hb=${encodeURIComponent(argBase64)}&pf=web`, {
+              mode: 'cors',
+              credentials: 'include',
+            }).then(res => res.json());
+            if (webHeartBeat.code === 0) {
+              this.nextInterval = webHeartBeat.data.next_interval;
+              setTimeout(() => this.webHeartBeat(), this.nextInterval * 1000);
+            }
+            else {
+              window.toast(`[小心心] 房间 ${this.roomID} 心跳失败`, 'error');
+              MYERROR('小心心', `房间 ${this.roomID} 心跳失败`);
+            }
+          }
+          async e() {
+            const arg = {
+              id: JSON.stringify(this.id),
+              device: JSON.stringify(this.device),
+              ts: this.ts,
+              is_patch: this.isPatch,
+              heart_beat: JSON.stringify(this.patchData),
+              ua: this.ua,
+            };
+            const e = await fetch('//live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E', {
+              headers: {
+                "content-type": "application/x-www-form-urlencoded",
+              },
+              method: 'POST',
+              body: `${this.json2str(arg)}&csrf_token=${this.csrf}&csrf=${this.csrf}&visit_id=`,
+              mode: 'cors',
+              credentials: 'include',
+            }).then(res => res.json());
+            if (e.code === 0) {
+              this.seq += 1;
+              ({ heartbeat_interval: this.heartbeatInterval, secret_key: this.secretKey, secret_rule: this.secretRule, timestamp: this.timestamp } = e.data);
+              setTimeout(() => this.x(), this.heartbeatInterval * 1000);
+            }
+            else {
+              window.toast(`[小心心] 房间 ${this.roomID} 获取小心心失败`, 'error');
+              MYERROR('小心心', `房间 ${this.roomID} 获取小心心失败`);
+            }
+          }
+          async x() {
+            if (this.seq > 6)
+              return;
+            const sypderData = {
+              id: JSON.stringify(this.id),
+              device: JSON.stringify(this.device),
+              ets: this.timestamp,
+              benchmark: this.secretKey,
+              time: this.heartbeatInterval,
+              ts: this.ts,
+              ua: this.ua,
+            };
+            const s = this.sypder(JSON.stringify(sypderData), this.secretRule);
+            const arg = Object.assign({ s }, sypderData);
+            MY_API.LITTLE_HEART.patchData[this.roomID] = arg;
+            const x = await fetch('//live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X', {
+              headers: {
+                "content-type": "application/x-www-form-urlencoded",
+              },
+              method: 'POST',
+              body: `${this.json2str(arg)}&csrf_token=${this.csrf}&csrf=${this.csrf}&visit_id=`,
+              mode: 'cors',
+              credentials: 'include',
+            }).then(res => res.json());
+            if (x.code === 0) {
+              this.seq += 1;
+              ({ heartbeat_interval: this.heartbeatInterval, secret_key: this.secretKey, secret_rule: this.secretRule, timestamp: this.timestamp } = x.data);
+              setTimeout(() => this.x(), this.heartbeatInterval * 1000);
+            }
+            else {
+              window.toast(`[小心心] 房间 ${this.roomID} 心跳失败`, 'error');
+              MYERROR('小心心', `房间 ${this.roomID} 小心心 心跳失败`);
+            }
+          }
+          sypder(str, rule) {
+            const data = JSON.parse(str);
+            const [parent_id, area_id, seq_id, room_id] = JSON.parse(data.id);
+            const [buvid, uuid] = JSON.parse(data.device);
+            const key = data.benchmark;
+            const newData = {
+              platform: 'web',
+              parent_id,
+              area_id,
+              seq_id,
+              room_id,
+              buvid,
+              uuid,
+              ets: data.ets,
+              time: data.time,
+              ts: data.ts,
+            };
+            let s = JSON.stringify(newData);
+            for (const r of rule) {
+              switch (r) {
+                case 0:
+                  s = CryptoJS.HmacMD5(s, key).toString(CryptoJS.enc.Hex);
+                  break;
+                case 1:
+                  s = CryptoJS.HmacSHA1(s, key).toString(CryptoJS.enc.Hex);
+                  break;
+                case 2:
+                  s = CryptoJS.HmacSHA256(s, key).toString(CryptoJS.enc.Hex);
+                  break;
+                case 3:
+                  s = CryptoJS.HmacSHA224(s, key).toString(CryptoJS.enc.Hex);
+                  break;
+                case 4:
+                  s = CryptoJS.HmacSHA512(s, key).toString(CryptoJS.enc.Hex);
+                  break;
+                case 5:
+                  s = CryptoJS.HmacSHA384(s, key).toString(CryptoJS.enc.Hex);
+                  break;
+                default:
+                  break;
+              }
+            }
+            return s;
+          }
+          getItem(t) {
+            return decodeURIComponent(document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(t).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1')) || '';
+          }
+          json2str(arg) {
+            let str = '';
+            for (const name in arg)
+              str += `${name}=${encodeURIComponent(arg[name])}&`;
+            return str.slice(0, -1);
+          }
         },
         run: async () => {
-          if (!MY_API.CONFIG.LITTLE_HEART || otherScriptsRunning) return $.Deferred().resolve();
-          if (!checkNewDay(MY_API.CACHE.LittleHeart_TS)) {
-            runMidnight(() => MY_API.LITTLE_HEART.run(), '获取小心心');
-            return $.Deferred().resolve();
+          const bagList = await fetch(`//api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=${Date.now()}&room_id=${W.BilibiliLive.ROOMID}`, {
+            mode: 'cors',
+            credentials: 'include',
+          }).then(res => res.json());
+          if (bagList.code !== 0) {
+            window.toast('[小心心] 未获取到包裹列表', 'error');
+            return MYERROR('小心心', '未获取到包裹列表');
           }
-          const mobileHeartBeatJSON = {
-            platform: 'android',
-            uuid: MY_API.LITTLE_HEART.uuid(),
-            buvid: appToken.buvid,
-            seq_id: '0', // 1 ~ 5
-            room_id: '{room_id}',
-            parent_id: '6',
-            area_id: '283',
-            timestamp: '{timestamp}',
-            secret_key: 'axoaadsffcazxksectbbb',
-            watch_time: '60',
-            up_id: '{target_id}',
-            up_level: '40',
-            jump_from: '30000',
-            gu_id: MY_API.LITTLE_HEART.RandomHex(43),
-            play_type: '0',
-            play_url: '',
-            s_time: '0',
-            data_behavior_id: '',
-            data_source_id: '',
-            up_session: 'l:one:live:record:{room_id}:{last_wear_time}',
-            visit_id: MY_API.LITTLE_HEART.RandomHex(32),
-            watch_status: '%7B%22pk_id%22%3A0%2C%22screen_status%22%3A1%7D',
-            click_id: MY_API.LITTLE_HEART.uuid(),
-            session_id: '',
-            player_type: '0',
-            client_ts: '{client_ts}'
-          };
-          const endFunc = async (check = true) => {
-            if (check) await sleep(5000); // 小心心获取有延时等待5秒
-            if (!check || await MY_API.LITTLE_HEART.getGiftNum() >= 24 || MY_API.GIFT_COUNT.LITTLE_HEART_COUNT >= 24) {
-              window.toast('[小心心]今日小心心已全部获取', 'success');
-              MY_API.CACHE.LittleHeart_TS = ts_ms();
-              MY_API.saveCache();
-              return runMidnight(() => MY_API.LITTLE_HEART.run(), '获取小心心');
-            } else {
-              // 出于某些原因心跳次数到到了但小心心个数没到，再次运行
-              window.toast('[小心心]小心心未全部获取，60秒后将再次运行', 'info');
-              return setTimeout(() => MY_API.LITTLE_HEART.run(), 60 * 1000)
-            }
-          }
-          if (await setToken() === undefined)
-            return;
-          else if (!userToken.access_token && !userToken.mid && !userToken.refresh_token) {
-            const userInfo = await MY_API.LITTLE_HEART.getInfo();
-            MYDEBUG('[小心心]userInfo', userInfo);
-            if (userInfo === undefined)
-              return MYERROR('小心心', '获取用户信息错误');
-            if (userInfo.body.code !== 0 && await setToken() === undefined)
-              return;
-            else if (userInfo.body.data.mid !== Live_info.uid && await setToken() === undefined)
-              return;
-          };
-          MYDEBUG('[小心心] 开始客户端心跳 userToken.access_token 长度', userToken.access_token.length);
-          window.toast('[小心心]开始获取小心心', 'success');
-          const giftNum = await MY_API.LITTLE_HEART.getGiftNum();
-          if (giftNum < 24) {
-            const fansMedal = await MY_API.LITTLE_HEART.getFansMedal();
-            if (fansMedal !== undefined) {
-              const control = 24 - giftNum;
-              const loopNum = Math.ceil(control / fansMedal.length) * 5;
-              for (let i = 0; i < loopNum; i++) {
-                let count = 0;
-                for (const funsMedalData of fansMedal) {
-                  if (count >= control) break;
-                  const postData = Object.assign({}, mobileHeartBeatJSON, {
-                    room_id: funsMedalData.room_id.toString(),
-                    timestamp: (BilibiliToken.TS - 60).toString(),
-                    up_id: funsMedalData.target_id.toString(),
-                    up_session: `l:one:live:record:${funsMedalData.room_id}:${funsMedalData.last_wear_time}`,
-                    client_ts: BilibiliToken.TS.toString()
-                  });
-                  await MY_API.LITTLE_HEART.mobileHeartBeat(postData);
-                  count++;
-                }
-                await sleep(60 * 1000);
+          let giftNum = 0;
+          if (bagList.data.list.length > 0)
+            for (const gift of bagList.data.list) {
+              if (gift.gift_id === 30607) {
+                const expire = (gift.expire_at - Date.now() / 1000) / 60 / 60 / 24;
+                if (expire > 6 && expire <= 7)
+                  giftNum += gift.gift_num;
               }
-              return endFunc();
             }
-          } else {
-            return endFunc(false);
+          if (giftNum >= 24)
+            return MYDEBUG('小心心', '已获取今日小心心');
+          const medal = await fetch('//api.live.bilibili.com/i/api/medal?page=1&pageSize=1000', {
+            mode: 'cors',
+            credentials: 'include',
+          }).then(res => res.json());
+          if (medal.code !== 0) {
+            window.toast('[小心心] 未获取到勋章列表', 'error');
+            return MYERROR('小心心', '未获取到勋章列表');
+          }
+          const fansMedalList = medal.data.fansMedalList;
+          const control = 24 - giftNum;
+          const loopNum = Math.ceil(control / fansMedalList.length);
+          for (let i = 0; i < loopNum; i++) {
+            let count = 0;
+            for (const funsMedalData of fansMedalList) {
+              if (count >= control)
+                break;
+              new MY_API.LITTLE_HEART.RoomHeart(funsMedalData.roomid);
+              await sleep(1000);
+              count++;
+            }
+            await sleep(6 * 60 * 1000);
           }
         }
       },
