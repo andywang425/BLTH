@@ -729,7 +729,7 @@ var BAPI = {
                     }
                 });
             },
-            join_ex: (id, roomid, access_token, appKey, headers/*, captcha_token = "", captcha_phrase = "", color = 16777215*/) => {
+            join_ex: (id, roomid, access_token, appKey, headers /*, captcha_token = "", captcha_phrase = "", color = 16777215*/ ) => {
                 // 参加节奏风暴
                 let param = TokenUtil.signQuery(KeySign.sort({
                     id: id,
