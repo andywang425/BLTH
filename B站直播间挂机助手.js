@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.9
+// @version        5.7.9.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -803,13 +803,8 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "修复屏蔽挂机检测失效的问题。",
-              "尝试修复打开【手动发弹幕前自动佩戴当前房间勋章】功能后无法正常加载直播流的bug。",
-              "修复粉丝勋章无法正常获取的bug。",
-              "删除了节奏风暴模块。",
-              "修复部分用户无法获取小心心的问题，改变了获取小心心的方式，无需重置token，删除相关按钮和代码。",
-              "优化了脚本更新的方式，更新时不再打开一个新标签页。",
-              `BLTH-server任务分配逻辑调整；代码已开源，项目地址${linkMsg("https://github.com/andywang425/BLTH-server")}。服务器已续费，将在2022年11月1日到期。`
+              "修复小心心送礼计数异常的bug。",
+              "等级大于20的粉丝勋章也会进行打卡。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -3037,7 +3032,7 @@
                 let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, m.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd).then(re => {
                   MYDEBUG(`[自动送礼][自动点亮勋章] API.gift.bag_send ${Live_info.uid}, 30607, ${m.target_id}, ${feed_num}, ${g.bag_id}, ${send_room_id}, ${Live_info.rnd}`, re);
                   if (re.code !== 0) throw re.msg;
-                  MY_API.GIFT_COUNT.LITTLE_HEART_COUNT++;
+                  MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
                   return re;
                 });
                 if (rsp.code === 0) {
@@ -3272,7 +3267,7 @@
                   medal.today_feed += feed_num * feed;
                   MY_API.Gift.remain_feed -= feed_num * feed;
                   window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
-                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT++;
+                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
                 } else {
                   window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常：${response.msg}`, 'caution');
                   return delayCall(() => MY_API.Gift.sendGift(medal));
@@ -3306,7 +3301,7 @@
                 if (response.code === 0) {
                   v.gift_num -= feed_num;
                   window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼成功，送出${feed_num}个${v.gift_name}`, 'success');
-                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT++;
+                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
                 } else {
                   window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼异常：${response.msg}`, 'caution');
                   return delayCall(() => MY_API.Gift.sendGift(medal));
@@ -3752,9 +3747,9 @@
           medalDanmuRunning = true;
           let lightMedalList;
           if (MY_API.CONFIG.MEDAL_DANMU_METHOD === 'MEDAL_DANMU_WHITE')
-            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1 && r.medal_level <= 20 && r.roomid);
+            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1 && r.roomid);
           else {
-            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) === -1 && r.medal_level <= 20 && r.roomid);
+            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) === -1 && r.roomid);
           }
           MYDEBUG('[粉丝牌打卡] 过滤后的粉丝勋章房间列表', lightMedalList);
           let danmuContentIndex = 0;
