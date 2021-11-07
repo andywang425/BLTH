@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.9.1
+// @version        5.7.9.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -803,8 +803,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "修复小心心送礼计数异常的bug。",
-              "等级大于20的粉丝勋章也会进行打卡。"
+              "修复小心心模块在打开多个页面时重复运行的bug。",
+              "小心心未完全获取时立刻再次尝试获取。",
+              "再次尝试获取时跳过之前获取失败的直播间。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -3313,6 +3314,7 @@
       },
       LITTLE_HEART: {
         patchData: {},
+        failedRoomList: [],
         RoomHeart: class {
           constructor(roomID) {
             this.getInfoByRoom(roomID);
@@ -3405,6 +3407,7 @@
             else {
               window.toast(`[小心心] 房间 ${this.roomID} 心跳E失败`, 'error');
               MYERROR('小心心', `房间 ${this.roomID} 心跳E失败`);
+              addVal(MY_API.LITTLE_HEART.failedRoomList, this.roomID);
             }
           }
           async x() {
@@ -3440,6 +3443,7 @@
             else {
               window.toast(`[小心心] 房间 ${this.roomID} 心跳X失败`, 'error');
               MYERROR('小心心', `房间 ${this.roomID} 心跳X失败`);
+              addVal(MY_API.LITTLE_HEART.failedRoomList, this.roomID);
             }
           }
           sypder(str, rule) {
@@ -3497,7 +3501,7 @@
           }
         },
         run: async () => {
-          if (!MY_API.CONFIG.LITTLE_HEART) return $.Deferred().resolve();
+          if (!MY_API.CONFIG.LITTLE_HEART || otherScriptsRunning) return $.Deferred().resolve();
           const bagList = await getBagList();
           if (bagList.code !== 0) {
             window.toast('[小心心] 未获取到包裹列表，停止运行', 'error');
@@ -3506,7 +3510,7 @@
           let giftNum = getGiftNum(bagList);
           if (giftNum >= 24) return window.toast('[小心心] 已获取今日小心心', 'info');
           window.toast('[小心心] 开始获取今日小心心', 'info');
-          const fansMedalList = medal_info.medal_list.filter(m => m.roomid);
+          const fansMedalList = medal_info.medal_list.filter(m => m.roomid && !MY_API.LITTLE_HEART.failedRoomList.includes(m.roomid));
           const control = 24 - giftNum;
           const loopNum = Math.ceil(control / fansMedalList.length);
           for (let i = 0; i < loopNum; i++) {
@@ -3523,8 +3527,8 @@
           const newBagList = await getBagList();
           let newGiftNum = getGiftNum(newBagList);
           if (newGiftNum < 24) {
-            window.toast('[小心心] 今日小心心未完全获取，5分钟后再次获取', 'warning');
-            return setTimeout(() => MY_API.LITTLE_HEART.run(), 300e3);
+            window.toast('[小心心] 今日小心心未完全获取，再次获取', 'warning');
+            return MY_API.LITTLE_HEART.run();
           } else window.toast('[小心心] 今日小心心已获取', 'success');
 
           async function getBagList() {
