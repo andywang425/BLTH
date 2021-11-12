@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.9.2
+// @version        5.7.9.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -33,13 +33,13 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4ea615eec712700ee131b3af722c4a654bd2de33/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@60aeae37f3409e3779fb2abcd047138cbd3078a0/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@72759db85ddae0cbb2b9c95006e58e306301cf45/assets/html/main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@60aeae37f3409e3779fb2abcd047138cbd3078a0/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -241,7 +241,8 @@
       user_level: undefined, // 直播等级
       level: undefined,  // 主站等级
       danmu_length: undefined, // 直播弹幕长度限制
-      medal: undefined // 当前直播间勋章的 target_id
+      medal: undefined, // 当前直播间勋章的 target_id
+      vipStatus: undefined // 大会员状态 (0:无, 1:有)
     },
     medal_info = { status: $.Deferred(), medal_list: [] },
     mainIndex = undefined,
@@ -453,6 +454,7 @@
             MYDEBUG('InitData: API.x.getAccInfo', re);
             if (re.code === 0) {
               Live_info.level = re.data.level;
+              Live_info.vipStatus = re.data.vip.status;
             } else {
               window.toast(`API.x.getAccInfo 获取账号信息失败 ${re.message}`, 'error');
               return delayCall(() => loadInfo());
@@ -548,6 +550,7 @@
         GIFT_SEND_METHOD: "GIFT_SEND_BLACK", // 送礼黑白名单策略
         GIFT_SEND_ROOM: ["0"], // 送礼黑白名单策略 - 房间列表
         GM_NOTICE: false, // GM通知
+        GET_PRIVILEGE: true, // 自动领取大会员权益
         IN_TIME_RELOAD_DISABLE: false, // 休眠时段是否禁止刷新直播间 false为刷新
         LIVE_SIGN: true, // 直播区签到
         LOGIN: true, // 主站登陆
@@ -616,7 +619,8 @@
         last_aid: 778, // 实物抽奖最后一个有效aid
         MedalDanmu_TS: 0, //粉丝勋章打卡
         PlateActivity_TS: 0, // 转盘抽奖
-        ReserveActivity_TS: 0 // 直播预约抽奖
+        ReserveActivity_TS: 0, // 直播预约抽奖
+        NextVipPrivilege_TS: 0 // 领取大会员权益
       },
       GIFT_COUNT_DEFAULT: {
         COUNT: 0, // 辣条（目前没用）
@@ -803,9 +807,8 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "修复小心心模块在打开多个页面时重复运行的bug。",
-              "小心心未完全获取时立刻再次尝试获取。",
-              "再次尝试获取时跳过之前获取失败的直播间。"
+              "新增自动领取大会员权益的功能。",
+              "优化了小心心获取失败时的回显。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -1320,7 +1323,8 @@
           'ANCHOR_IGNORE_AREA',
           'PLATE_ACTIVITY',
           'RESERVE_ACTIVITY',
-          'RESERVE_ACTIVITY_IGNORE_BLACKLIST'
+          'RESERVE_ACTIVITY_IGNORE_BLACKLIST',
+          'GET_PRIVILEGE'
         ];
         const radioList = [
           /**
@@ -1443,7 +1447,8 @@
           RESERVE_ACTIVITY_INTERVAL: "参与直播预约抽奖的间隔。<mul><mli>间隔太短会因为抽奖过快而失败。</mli></mul>",
           RESERVE_ACTIVITY_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           REMOVE_ELEMENT_pkBanner: "移除位于直播画面上方的大乱斗入口。",
-          REMOVE_ELEMENT_rank: "移除位于直播画面上方的排行榜（？）入口。<mul><mli>这个位置有时候会变成某个活动的入口。</mli></mul>"
+          REMOVE_ELEMENT_rank: "移除位于直播画面上方的排行榜（？）入口。<mul><mli>这个位置有时候会变成某个活动的入口。</mli></mul>",
+          GET_PRIVILEGE: "每个月领取一次大会员权益。<mul><mli>目前仅支持领取B币券和会员购优惠券。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -3405,8 +3410,8 @@
               setTimeout(() => this.x(), this.heartbeatInterval * 1000);
             }
             else {
-              window.toast(`[小心心] 房间 ${this.roomID} 心跳E失败`, 'error');
-              MYERROR('小心心', `房间 ${this.roomID} 心跳E失败`);
+              window.toast(`[小心心] 房间 ${this.roomID} 心跳E失败 ${e.message}`, 'error');
+              MYERROR('小心心', `房间 ${this.roomID} 心跳E失败`, e);
               addVal(MY_API.LITTLE_HEART.failedRoomList, this.roomID);
             }
           }
@@ -3441,8 +3446,8 @@
               setTimeout(() => this.x(), this.heartbeatInterval * 1000);
             }
             else {
-              window.toast(`[小心心] 房间 ${this.roomID} 心跳X失败`, 'error');
-              MYERROR('小心心', `房间 ${this.roomID} 心跳X失败`);
+              window.toast(`[小心心] 房间 ${this.roomID} 心跳X失败 ${x.message}`, 'error');
+              MYERROR('小心心', `房间 ${this.roomID} 心跳X失败`, x);
               addVal(MY_API.LITTLE_HEART.failedRoomList, this.roomID);
             }
           }
@@ -6140,6 +6145,55 @@
           MY_API.chatLog(`[预约抽奖] 本轮抽奖结束，${MY_API.CONFIG.PLATE_ACTIVITY_CHECK_INTERVAL}分钟后再次检查`, 'info');
           return endFunc();
         }
+      },
+      GET_PRIVILEGE: {
+        check_cache: () => {
+          if (ts_ms() >= MY_API.CACHE.NextVipPrivilege_TS) return true;
+          else return false;
+        },
+        save_cache: (expire_time) => {
+          const newTs = (expire_time + 2) * 1000;
+          if (newTs < MY_API.CACHE.NextVipPrivilege_TS || !MY_API.CACHE.NextVipPrivilege_TS) {
+            MY_API.CACHE.NextVipPrivilege_TS = newTs;
+            return MY_API.saveCache(false);
+          }
+        },
+        get_info: () => {
+          return BAPI.x.vip.privilege.my().then(response => {
+            MYDEBUG(`API.x.vip.privilege.my response`, response);
+            if (response.code === 0) return response.data.list;
+            else window.toast(`[大会员] 获取权益状态失败 ${response.message}`, 'error');
+            return false;
+          })
+        },
+        receive: (type) => {
+          return BAPI.x.vip.privilege.receive(type).then(response => {
+            MYDEBUG(`API.x.vip.privilege.receive response`, response);
+            if (response.code === 0) return true;
+            else window.toast(`[大会员] 领取权益失败(type=${type}) ${response.message}`, 'error');
+            return false;
+          })
+        },
+        run: async () => {
+          if (!MY_API.CONFIG.GET_PRIVILEGE || otherScriptsRunning || Live_info.vipStatus === 0 || ts_ms() < MY_API.CACHE.NextVipPrivilege_TS) return $.Deferred().resolve();
+          let privilege_info = await MY_API.GET_PRIVILEGE.get_info();
+          if (!privilege_info) return $.Deferred().resolve();
+          let flag = false;
+          for (const i of privilege_info) {
+            if (i.state === 0) {
+              flag = await MY_API.GET_PRIVILEGE.receive(i.type, i.expire_time);
+            }
+          }
+          if (flag) window.toast("[大会员] 权益已领取", "success");
+          if (privilege_info.every(obj => obj.state === 1)) {
+            let min_expire_time = privilege_info[0].expire_time;
+            for (let i = 1; i < privilege_info.length; i++) {
+              if (privilege_info[i].expire_time < min_expire_time) min_expire_time = privilege_info[i].expire_time;
+            }
+            MY_API.GET_PRIVILEGE.save_cache(min_expire_time);
+          }
+          return $.Deferred().resolve();
+        }
       }
     };
     MY_API.init().then(() => {
@@ -6222,7 +6276,8 @@
       API.MaterialObject.run, // 实物抽奖
       API.AnchorLottery.run, // 天选时刻
       API.PLATE_ACTIVITY.run, // 转盘抽奖
-      API.RESERVE_ACTIVITY.run // 预约抽奖
+      API.RESERVE_ACTIVITY.run, // 预约抽奖
+      API.GET_PRIVILEGE.run // 领取大会员权益
     ];
     otherScriptsRunningCheck.then(() => runAllTasks(5000, 200, taskList));
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000);// 刷新直播间
