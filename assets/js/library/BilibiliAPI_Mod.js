@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.0.8
+// @version       3.0.9
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -729,7 +729,7 @@ var BAPI = {
                     }
                 });
             },
-            join_ex: (id, roomid, access_token, appKey, headers /*, captcha_token = "", captcha_phrase = "", color = 16777215*/ ) => {
+            join_ex: (id, roomid, access_token, appKey, headers /*, captcha_token = "", captcha_phrase = "", color = 16777215*/) => {
                 // 参加节奏风暴
                 let param = TokenUtil.signQuery(KeySign.sort({
                     id: id,
@@ -1248,20 +1248,6 @@ var BAPI = {
                 }
             })
         },
-        privilege_receive: (type) => {
-            // 直播预约
-            return BAPI.ajaxWithCommonArgs({
-                method: 'POST',
-                url: '//api.bilibili.com/x/vip/privilege/receive',
-                data: {
-                    type: type
-                    /**
-                     * 1: 年度专享B币券赠送（ 5B币）
-                     * 2: 年度专享会员购优惠券（10元会员购优惠券）
-                     */
-                }
-            })
-        },
         reserve: (sid, jsonp = 'jsonp') => {
             // 直播预约
             return BAPI.ajaxWithCommonArgs({
@@ -1323,6 +1309,28 @@ var BAPI = {
                         action_type: action_type
                     }
                 })
+            }
+        },
+        vip: {
+            privilege: {
+                my: () => {
+                    return BAPI.ajax({
+                        url: '//api.bilibili.com/x/vip/privilege/my'
+                    })
+                },
+                receive: (type) => {
+                    return BAPI.ajaxWithCommonArgs({
+                        method: 'POST',
+                        url: '//api.bilibili.com/x/vip/privilege/receive',
+                        data: {
+                            /**
+                            * 1: 年度专享B币券赠送（ 5B币）
+                            * 2: 年度专享会员购优惠券（10元会员购优惠券）
+                            */
+                            type: type
+                        }
+                    })
+                }
             }
         }
     },
