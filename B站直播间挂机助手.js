@@ -3545,9 +3545,10 @@
             return bagList;
           }
           function getGiftNum(bagList) {
-            if (bagList.data.list.length === 0) return 0;
+            const list = bagList.data.list || []
+            if (list.length === 0) return 0;
             let giftNum = 0;
-            for (const gift of bagList.data.list) {
+            for (const gift of list) {
               if (gift.gift_id === 30607) {
                 const expire = (gift.expire_at - Date.now() / 1000) / 60 / 60 / 24;
                 if (expire > 6 && expire <= 7)
@@ -5971,7 +5972,7 @@
             }
           }
           MY_API.PLATE_ACTIVITY.plateData = await MY_API.PLATE_ACTIVITY.getPlateData();
-          for (const plate of MY_API.PLATE_ACTIVITY.plateData) {
+          for (const plate of MY_API.PLATE_ACTIVITY.plateData.acriviries_type1) {
             if (!plate.sid) continue;
             MY_API.chatLog(`[转盘抽奖] 开始获取转盘【${plate.name}】的抽奖次数`, 'info');
             let lotteryTimes = await MY_API.PLATE_ACTIVITY.getLotteryMyTimes(plate);
