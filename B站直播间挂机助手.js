@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.9.3
+// @version        5.7.9.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -807,8 +807,8 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "新增自动领取大会员权益的功能。",
-              "优化了小心心获取失败时的回显。"
+              "修复包裹为空时无法正确获取小心心的bug，获取失败时显示错误提示。",
+              "修复转盘抽奖失效的bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -3541,11 +3541,12 @@
               mode: 'cors',
               credentials: 'include',
             }).then(res => res.json());
+            if (bagList.code != 0) window.toast(`[小心心] 获取包裹列表失败 ${bagList.message}`, "error");
             MYDEBUG('[小心心] 获取包裹列表', bagList);
             return bagList;
           }
           function getGiftNum(bagList) {
-            const list = bagList.data.list || []
+            const list = bagList.data.list || [];
             if (list.length === 0) return 0;
             let giftNum = 0;
             for (const gift of list) {
