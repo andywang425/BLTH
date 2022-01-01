@@ -552,10 +552,10 @@ var BAPI = {
         medal: (page = 1, pageSize = 10) => {
             // 获取勋章列表信息
             return BAPI.ajax({
-                url: 'i/api/medal',
+                url: 'xlive/app-ucenter/v1/user/GetMyMedals',
                 data: {
                     page: page,
-                    pageSize: pageSize
+                    page_size: pageSize
                 }
             });
         },

@@ -6369,8 +6369,8 @@
       await BAPI.i.medal(page).then((response) => {
         MYDEBUG('before init() getMedalList: API.i.medal', response);
         if (response.code === 0) {
-          medal_info.medal_list = medal_info.medal_list.concat(response.data.fansMedalList);
-          if (response.data.pageinfo.curPage < response.data.pageinfo.totalpages) page++;
+          medal_info.medal_list = medal_info.medal_list.concat(response.data.items);
+          if (response.data.page_info.cur_page < response.data.page_info.total_page) page++;
           else { medal_info.status.resolve(); end = true }
         } else if (response.code === 1024) {
           window.toast(`获取粉丝勋章列表超时 ${response.message} 部分功能将无法正常运行`, 'error');
