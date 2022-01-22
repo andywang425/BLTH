@@ -16,7 +16,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.9.4
+// @version        5.7.9.5
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -33,7 +33,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@60aeae37f3409e3779fb2abcd047138cbd3078a0/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@ef660b8133ebb7104fe52ede557d7af268d2e69e/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
@@ -307,7 +307,7 @@
               let border = medalJqItem.find(".v-middle.fans-medal-item");
               const medalColor = '#' + Live_info.medal.color.toString(16);
               const medalLevel = Live_info.medal.medal_level;
-              const medalText = Live_info.medal.medalName;
+              const medalText = Live_info.medal.medal_name;
               if (border.length !== 0) {
                 // 之前戴着勋章
                 let background = border.find('.fans-medal-label');
@@ -807,8 +807,8 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "修复包裹为空时无法正确获取小心心的bug，获取失败时显示错误提示。",
-              "修复转盘抽奖失效的bug。"
+              "修复无法获取粉丝勋章列表的bug（感谢<a href=\"https://github.com/XiaoMiku01\">一心向晚</a>提供的帮助）。",
+              "调整了【移除排行榜】功能。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -823,6 +823,7 @@
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
                 <mol>${createHtml(clientMliList)}</mol>
+                <mol>&emsp;作者的话：前段时间一直没空更新，寒假期间会逐步解决之前遗留下来的问题。感谢各位一直以来对本脚本的支持，你们在我直播间送的礼物甚至都能让我提现几块钱了233。大家用着开心就好，没必要送礼物嗷。</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
@@ -935,7 +936,7 @@
           {
             // 排行榜（活动？）
             settingName: 'REMOVE_ELEMENT_rank',
-            rmJQpath: ['.activity-rank']
+            rmJQpath: ['.activity-gather-entry', '.activity-rank', '.rank-item']
           },
           {
             // 关注按钮及弹窗
@@ -1370,7 +1371,7 @@
           ANCHOR_GOLD_JOIN_TIMES: "付费天选指需要花费电池才能参加的天选。<mul><mli>多次参加同一个付费天选可以提高中奖率。</mli><mli><strong>请慎重填写本设置项。</strong></mli></mul>",
           GIFT_SEND_METHOD: "自动送礼策略，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间送礼。</mli><mli>黑名单：给房间列表以外的直播间送礼。</mli><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_IGNORE_MONEY: '脚本会尝试识别天选标题中是否有金额并忽略金额小于设置值的天选。<mh3>注意：</mh3><mul><mli>支持识别阿拉伯数字和汉字数字。</mli><mli>识别的单位有限。</mli><mli>不支持识别外币。</mli><mli>由于一些天选时刻的奖品名比较特殊，可能会出现遗漏或误判。</mli></mul>',
-          MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>脚本不会给等级大于20的粉丝勋章打卡（因为不加亲密度）。</mli><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则循环选取）。</mli><mli>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</mli></mul>',
+          MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则循环选取）。</mli><mli>本功能运行时【自动发弹幕】和【自动送礼】将暂停运行。</mli></mul>',
           AUTO_DANMU: '发送直播间弹幕。<mh3>注意：</mh3><mul><mli>本功能运行时【粉丝勋章打卡弹幕】将暂停运行。</mli><mli><mp>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</mp></mli><mli><mp>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</mp></mli><mli><mp>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</mp></mli><mli><mp>可以用默认值所填的房间号来测试本功能，但是请不要一直发。</mp></mli><mli><mp>发送时间有两种填写方法</mp><mp>1.【小时】h【分钟】m【秒】s</mp><mul><mli>每隔一段时间发送一条弹幕</mli><mli>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></mli><mli>可以填小数</mli><mli>可以只填写其中一项或两项</mli></mul><mp>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</mp><mp><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></mp><mp>2.【小时】:【分钟】:【秒】</mp><mul><mli>在特定时间点（本地时间）发一条弹幕</mli><mli>例子： <code>10:30:10</code>, <code>0:40</code></mli><mli>只能填整数</mli><mli>小时分钟必须填写，秒数可以不填</mli></mul><mp>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</mp></mli></mul>',
           NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<mh3>原理：</mh3><mul><mli>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。同时劫持页面上的setTimeout和setInterval避免暂停直播的函数被调用。</mli><mul>',
           INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<mh3>缺点：</mh3><mli>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管操作后会显示你没有权限），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。</mli><mli>无法打开页面下拉后出现的动态的评论区。</mli>',
@@ -1447,7 +1448,7 @@
           RESERVE_ACTIVITY_INTERVAL: "参与直播预约抽奖的间隔。<mul><mli>间隔太短会因为抽奖过快而失败。</mli></mul>",
           RESERVE_ACTIVITY_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           REMOVE_ELEMENT_pkBanner: "移除位于直播画面上方的大乱斗入口。",
-          REMOVE_ELEMENT_rank: "移除位于直播画面上方的排行榜（？）入口。<mul><mli>这个位置有时候会变成某个活动的入口。</mli></mul>",
+          REMOVE_ELEMENT_rank: "移除位于直播画面上方的排行榜（？）入口。<mul><mli>这个位置有时候会变成某个活动的入口。如果你不是主播也不是喜欢给主播送礼物的观众，那么这些活动通常和你没关系。</mli></mul>",
           GET_PRIVILEGE: "每个月领取一次大会员权益。<mul><mli>目前仅支持领取B币券和会员购优惠券。</mli></mul>"
         };
         const openMainWindow = () => {
@@ -3046,11 +3047,11 @@
                   g.gift_num -= feed_num;
                   m.today_feed += feed_num * feed;
                   remain_feed -= feed_num * feed;
-                  window.toast(`[自动送礼]勋章[${m.medalName}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`, 'success');
-                  MYDEBUG('Gift.auto_light', `勋章[${m.medalName}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`);
+                  window.toast(`[自动送礼]勋章[${m.medal_name}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`, 'success');
+                  MYDEBUG('Gift.auto_light', `勋章[${m.medal_name}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`);
                   break;
                 } else {
-                  window.toast(`[自动送礼]勋章[${m.medalName}]点亮失败【${rsp.msg}】`, 'caution');
+                  window.toast(`[自动送礼]勋章[${m.medal_name}]点亮失败【${rsp.msg}】`, 'caution');
                   break;
                 }
               }
@@ -3239,10 +3240,10 @@
                 MY_API.Gift.ruid = v.target_id;
                 MY_API.Gift.remain_feed = v.day_limit - v.today_feed;
                 if (MY_API.Gift.remain_feed > 0) {
-                  window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度未满[${v.today_feed}/${v.day_limit}]，预计需要[${MY_API.Gift.remain_feed}]送礼开始`, 'info');
+                  window.toast(`[自动送礼]勋章[${v.medal_name}] 今日亲密度未满[${v.today_feed}/${v.day_limit}]，预计需要[${MY_API.Gift.remain_feed}]送礼开始`, 'info');
                   await MY_API.Gift.sendGift(v);
                 } else {
-                  window.toast(`[自动送礼]勋章[${v.medalName}] 今日亲密度已满`, 'info');
+                  window.toast(`[自动送礼]勋章[${v.medal_name}] 今日亲密度已满`, 'info');
                 }
               }
             }
@@ -3257,7 +3258,7 @@
         sendGift: async (medal) => {
           for (const v of MY_API.Gift.bag_list) {
             if (MY_API.Gift.remain_feed <= 0) {
-              return window.toast(`[自动送礼]勋章[${medal.medalName}]送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`, 'info');
+              return window.toast(`[自动送礼]勋章[${medal.medal_name}]送礼结束，今日亲密度已满[${medal.today_feed}/${medal.day_limit}]`, 'info');
             }
             if (v.gift_num === 0) continue; // 如果这一礼物送完了则跳到下一个礼物
             const feed = MY_API.Gift.giftFeed_list[v.gift_id];
@@ -3272,10 +3273,10 @@
                   v.gift_num -= feed_num;
                   medal.today_feed += feed_num * feed;
                   MY_API.Gift.remain_feed -= feed_num * feed;
-                  window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
+                  window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
                   if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
                 } else {
-                  window.toast(`[自动送礼]勋章[${medal.medalName}] 送礼异常：${response.msg}`, 'caution');
+                  window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼异常：${response.msg}`, 'caution');
                   return delayCall(() => MY_API.Gift.sendGift(medal));
                 }
               });
