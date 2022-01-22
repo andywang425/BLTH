@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.0.9
+// @version       3.1
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -552,10 +552,10 @@ var BAPI = {
         medal: (page = 1, pageSize = 10) => {
             // 获取勋章列表信息
             return BAPI.ajax({
-                url: 'i/api/medal',
+                url: 'xlive/app-ucenter/v1/user/GetMyMedals',
                 data: {
                     page: page,
-                    pageSize: pageSize
+                    page_size: pageSize
                 }
             });
         },
