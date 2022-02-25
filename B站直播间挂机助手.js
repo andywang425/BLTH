@@ -4305,7 +4305,7 @@
               }
             } else {
               MY_API.chatLog(`[天选时刻] 获取${data.name + '分区'}的直播间出错<br>${re.message}`, 'warning');
-              return delayCall(() => checkRoomList());
+              return delayCall(() => MY_API.AnchorLottery.getRoomList());
             }
           });
         },
@@ -5079,7 +5079,7 @@
           }
           switch (MY_API.AnchorLottery.getAnchorDataType) {
             case 2: {
-              return BAPI.xlive.lottery.gettLotteryInfoWeb(roomid).then((response) => {
+              return BAPI.xlive.lottery.getLotteryInfoWeb(roomid).then((response) => {
                 MYDEBUG(`API.xlive.lottery.gettLotteryInfoWeb(${roomid}) response`, response);
                 if (response.code === 0) {
                   return response.data.anchor
@@ -6218,6 +6218,96 @@
             MY_API.GET_PRIVILEGE.save_cache(min_expire_time);
           }
           return $.Deferred().resolve();
+        }
+      },
+      PopularityRedpocketLottery: {
+        roomidList: [],
+        getAreaData: () => {
+          return BAPI.room.getList().then((response) => {
+            MYDEBUG('API.room.getList 分区信息', response);
+            if (response.code === 0) return response.data;
+            else {
+              MY_API.chatLog(`[红包抽奖] 获取各分区信息出错，${response.message}`, 'error');
+              return delayCall(() => MY_API.PopularityRedpocketLottery.getAreaData());
+            }
+          });
+        },
+        getRoomList: (data) => {
+          if (!data.page) data.page = 1;
+          if (!data.size) data.size = 50;
+          return BAPI.room.getRoomList(data.id, 0, 0, data.page, data.size).then((re) => {
+            MYDEBUG(`API.room.getRoomList(${data.id}, 0, 0, ${data.page}, ${data.size})`, re);
+            if (re.code === 0) {
+              const list = re.data.list;
+              MY_API.chatLog(`[红包抽奖] 获取${data.name + '分区'}的直播间`, 'info');
+              MYDEBUG(`[红包抽奖] 获取${data.name + '分区'}房间列表`, re);
+              for (const i of list) {
+                addVal(MY_API.PopularityRedpocketLottery.roomidList, i.roomid);
+              }
+            } else {
+              MY_API.chatLog(`[红包抽奖] 获取${data.name + '分区'}的直播间出错<br>${re.message}`, 'warning');
+              return delayCall(() => MY_API.PopularityRedpocketLottery.getRoomList());
+            }
+          });
+        },
+        getHotRoomList: async () => {
+          let areaData = await MY_API.PopularityRedpocketLottery.getAreaData();
+          MY_API.PopularityRedpocketLottery.roomidList = [];
+          for (const r of areaData) {
+            await MY_API.PopularityRedpocketLottery.getRoomList(r);
+          }
+          MY_API.chatLog(`[红包抽奖] 高热度直播间收集完毕<br>共${MY_API.PopularityRedpocketLottery.roomidList.length}个`, 'success');
+          return $.Deferred().resolve();
+        },
+        getRedPocketData: (roomid) => {
+          return BAPI.xlive.lottery.getLotteryInfoWeb(roomid).then((response) => {
+            MYDEBUG(`API.xlive.lottery.gettLotteryInfoWeb(${roomid}) response`, response);
+            if (response.code === 0) {
+              return response.data.popularity_red_pocket;
+            } else {
+              MY_API.chatLog(`[红包抽奖] 检查房间出错 ${response.message}<br>`, 'warning');
+              return delayCall(() => MY_API.PopularityRedpocketLottery.getRedPocketData(roomid));
+            }
+          })
+        },
+        getUidbyRoomid: (roomid) => {
+          return BAPI.live_user.get_anchor_in_room(defaultJoinData.roomid).then(re => {
+            if (re.code === 0) {
+              return re.data.info.uid;
+            } else {
+              MY_API.chatLog(`[红包抽奖] 获取直播间${roomid}对应的uid出错<br>${re.msg}`, 'error');
+              return false
+            }
+          })
+        },
+        draw: (data) => {
+          return BAPI.xlive.popularityRedPocket.draw().then((response) => {
+            MYDEBUG(`API.xlive.popularityRedPocket.draw(${data.ruid}, ${data.roomid}, ${data.lot_id}) response`, response);
+            if (response.code === 0)
+            {
+              MY_API.chatLog(`[红包抽奖] 成功参加红包红包抽奖<br>lot_id = ${data.lot_id}<br>奖品价值：${data.total_price / 1000}电池`, 'info');
+              return response;
+            } else {
+              MY_API.chatLog(`[红包抽奖] 参加红包红包抽奖失败<br>lot_id = ${data.lot_id}<br>${response.message}`, 'info');
+              return false;
+            }
+            
+          });
+        },
+        run: async () => {
+          if (!MY_API.CONFIG.POPULARITY_REDPOCKET_LOTTERY || otherScriptsRunning) return $.Deferred().resolve();
+          await MY_API.PopularityRedpocketLottery.getHotRoomList();
+          for (const room of MY_API.PopularityRedpocketLottery.roomidList) {
+            let data = await MY_API.PopularityRedpocketLottery.getRedPocketData(room);
+            if (data && data.lot_status === 1) {
+              let uid = await MY_API.PopularityRedpocketLottery.getUidbyRoomid(room);
+              if (uid) {
+                data.ruid = uid;
+                await MY_API.PopularityRedpocketLottery.draw(data);
+              }
+            }
+            await sleep(500);
+          }
         }
       }
     };

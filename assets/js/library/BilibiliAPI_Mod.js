@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.1
+// @version       3.1.1
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -1375,7 +1375,7 @@ var BAPI = {
                     }
                 });
             },
-            gettLotteryInfoWeb: (roomid) => {
+            getLotteryInfoWeb: (roomid) => {
                 return BAPI.ajax({
                     url: 'xlive/lottery-interface/v1/lottery/getLotteryInfoWeb',
                     data: {
@@ -1514,6 +1514,31 @@ var BAPI = {
             randTime: (id) => {
                 return BAPI.ajax({
                     url: 'xlive/lottery-interface/v1/Anchor/RandTime?id=' + id
+                })
+            }
+        },
+        popularityRedPocket:
+        {
+            followRelation: (uid, target_uid) => {
+                return BAPI.ajax({
+                    url: 'xlive/lottery-interface/v1/popularityRedPocket/FollowRelation',
+                    data: {
+                        uid: uid,
+                        target_uid: target_uid
+                    }
+                })
+            },
+            draw: (ruid, roomid, lot_id, spm_id = '444.8.red_envelope.extract', jump_from = '') => {
+                return BAPI.ajaxWithCommonArgs({
+                    method: 'POST',
+                    url: 'xlive/lottery-interface/v1/PopularityRedPocket/RedPocketDraw',
+                    data: {
+                        ruid: ruid, // 主播uid
+                        roomid: roomid,
+                        lot_id: lot_id,
+                        spm_id: spm_id,
+                        jump_from: jump_from
+                    }
                 })
             }
         }
