@@ -1528,15 +1528,16 @@ var BAPI = {
                     }
                 })
             },
-            draw: (ruid, roomid, lot_id, spm_id = '444.8.red_envelope.extract', jump_from = '') => {
+            draw: (ruid, room_id, lot_id, spm_id = '444.8.red_envelope.extract', session_id = '', jump_from = '') => {
                 return BAPI.ajaxWithCommonArgs({
                     method: 'POST',
-                    url: 'xlive/lottery-interface/v1/PopularityRedPocket/RedPocketDraw',
+                    url: 'xlive/lottery-interface/v1/popularityRedPocket/RedPocketDraw',
                     data: {
                         ruid: ruid, // 主播uid
-                        roomid: roomid,
+                        room_id: room_id,
                         lot_id: lot_id,
                         spm_id: spm_id,
+                        session_id: session_id,
                         jump_from: jump_from
                     }
                 })
@@ -1564,8 +1565,8 @@ var BAPI = {
             }
             return new Uint8Array(uintArray);
         }
-        static uintToString(uintArray) {
-            return decodeURIComponent(escape(String.fromCharCode.apply(null, uintArray)));
+        static uintToString(uint8array) {
+            return new TextDecoder("utf-8").decode(uint8array);
         }
         constructor(uid, roomid, host_server_list, token) {
             // 总字节长度 int(4bytes) + 头字节长度(16=4+2+2+4+4) short(2bytes) + protover(1,2) short(2bytes) + operation int(4bytes) + sequence(1,0) int(4bytes) + Data
@@ -1659,9 +1660,10 @@ var BAPI = {
                     const headerLen = dv.getUint16(position + 4);
                     const protover = dv.getUint16(position + 6);
                     const operation = dv.getUint32(position + 8);
-                    const sequence = dv.getUint32(position + 12);
+                    const sequence = dv.getUint32(position + 10);
                     let data = event.data.slice(position + headerLen, position + len);
-                    if (protover === 2 && this.unzip) data = this.unzip(data);
+                    let body = data;
+                    if (protover === 2 && this.unzip) body = this.unzip(data);
                     this.dispatchEvent(new CustomEvent('receive', {
                         detail: {
                             len: len,
@@ -1687,14 +1689,42 @@ var BAPI = {
                             }
                         case 5:
                             {
-                                const str = BAPI.DanmuWebSocket.uintToString(new Uint8Array(data));
-                                const obj = JSON.parse(str);
-                                this.dispatchEvent(new CustomEvent('cmd', {
-                                    detail: {
-                                        obj: obj,
-                                        str: str
+                                let str = BAPI.DanmuWebSocket.uintToString(new Uint8Array(body));
+                                let obj;
+                                let cmdEvent = (obj, str) => {
+                                    this.dispatchEvent(new CustomEvent('cmd', {
+                                        detail: {
+                                            obj: obj,
+                                            str: str
+                                        }
+                                    }));
+                                }
+                                try {
+                                    obj = JSON.parse(str);
+                                    cmdEvent(obj, str);
+                                } catch (e) {
+                                    let jsonStr = '';
+                                    let meetNormalSybmol = false;
+                                    for (let i = 0; i < str.length; i++) {
+                                        if (str[i].charCodeAt(0) === 0) {
+                                            if (meetNormalSybmol) {
+                                                obj = JSON.parse(jsonStr);
+                                                cmdEvent(obj, jsonStr);
+                                                jsonStr = '';
+                                            }
+                                            i += 15;
+                                        } else {
+                                            meetNormalSybmol = true;
+                                            jsonStr += str[i];
+                                        }
                                     }
-                                }));
+                                    try {
+                                        obj = JSON.parse(jsonStr);
+                                        cmdEvent(obj, jsonStr);
+                                    } catch (e) {
+                                        console.log('[BLTH] cmd getJson failed', e);
+                                    }
+                                }
                                 break;
                             }
                         case 8:
