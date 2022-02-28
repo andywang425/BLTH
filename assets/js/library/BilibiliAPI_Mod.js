@@ -1690,7 +1690,6 @@ var BAPI = {
                         case 5:
                             {
                                 let str = BAPI.DanmuWebSocket.uintToString(new Uint8Array(body));
-                                let obj;
                                 let cmdEvent = (obj, str) => {
                                     this.dispatchEvent(new CustomEvent('cmd', {
                                         detail: {
@@ -1699,32 +1698,9 @@ var BAPI = {
                                         }
                                     }));
                                 }
-                                try {
-                                    obj = JSON.parse(str);
-                                    cmdEvent(obj, str);
-                                } catch (e) {
-                                    let jsonStr = '';
-                                    let meetNormalSybmol = false;
-                                    for (let i = 0; i < str.length; i++) {
-                                        if (str[i].charCodeAt(0) === 0) {
-                                            if (meetNormalSybmol) {
-                                                obj = JSON.parse(jsonStr);
-                                                cmdEvent(obj, jsonStr);
-                                                jsonStr = '';
-                                            }
-                                            i += 15;
-                                        } else {
-                                            meetNormalSybmol = true;
-                                            jsonStr += str[i];
-                                        }
-                                    }
-                                    try {
-                                        obj = JSON.parse(jsonStr);
-                                        cmdEvent(obj, jsonStr);
-                                    } catch (e) {
-                                        console.log('[BLTH] cmd getJson failed', e);
-                                    }
-                                }
+                                let strList = str.split(/[\x00-\x1f]+/);
+
+                                strList.forEach(s => { if (s.includes('{')) { cmdEvent(JSON.parse(s), s) } });
                                 break;
                             }
                         case 8:
