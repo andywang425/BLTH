@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name           B站直播间挂机助手
+// @name:zh     B站直播间挂机助手
 // @name:en        Bilibili Live Helper
 // @namespace      https://github.com/andywang425
 // @author         andywang425
@@ -1459,7 +1460,8 @@
           RESERVE_ACTIVITY_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           REMOVE_ELEMENT_pkBanner: "移除位于直播画面上方的大乱斗入口。",
           REMOVE_ELEMENT_rank: "移除位于直播画面上方的排行榜（？）入口。<mul><mli>这个位置有时候会变成某个活动的入口。如果你不是主播也不是喜欢给主播送礼物的观众，那么这些活动通常和你没关系。</mli></mul>",
-          GET_PRIVILEGE: "每个月领取一次大会员权益。<mul><mli>目前仅支持领取B币券和会员购优惠券。</mli></mul>"
+          GET_PRIVILEGE: "每个月领取一次大会员权益。<mul><mli>目前仅支持领取B币券和会员购优惠券。</mli></mul>",
+          POPULARITY_REDPOCKET_LOTTERY: "参与直播红包抽奖。<mh3>注意：</mh3><mul><mli>根据群友反应，本功能风险较高，请自行斟酌是否开启。</mli></mul><mh3>原理：</mh3><mul><mli>从热门直播间列表等来源获取直播间数据，每隔一段时间逐一检查这些房间是否有红包抽奖，若有则参与抽奖并建立一个与该房间的webSocket连接以持续获取该房间之后可能出现的红包数据。如果该直播间长时间没有红包抽奖会断开与该房间webSocket连接。</mli></mul>",
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -6294,10 +6296,10 @@
           return BAPI.xlive.popularityRedPocket.draw(ruid, roomid, lot_id).then((response) => {
             MYDEBUG(`API.xlive.popularityRedPocket.draw(ruid = ${ruid}, roomid = ${roomid}, lot_id = ${lot_id}, total_price = ${total_price}) response`, response);
             if (response.code === 0) {
-              MY_API.chatLog(`[红包抽奖] 成功参加红包抽奖<br>lot_id = ${lot_id}<br>奖品总价值：${total_price / 1000}电池`, 'info');
+              MY_API.chatLog(`[红包抽奖] 成功参加红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${lot_id}<br>奖品总价值：${total_price / 1000}电池`, 'success');
               return response;
             } else {
-              MY_API.chatLog(`[红包抽奖] 参加红包红包抽奖失败<br>lot_id = ${lot_id}<br>${response.message}`, 'info');
+              MY_API.chatLog(`[红包抽奖] 参加红包红包抽奖失败<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${lot_id}<br>${response.message}`, 'error');
               return false;
             }
           });
@@ -6389,41 +6391,6 @@
           }
           MY_API.chatLog(`[红包抽奖] 本轮抽奖结束，10分钟后再次检查`, 'info');
           setTimeout(() => MY_API.PopularityRedpocketLottery.run(), 10 * 60 * 1000);
-        }
-      },
-      test: {
-        run: () => {
-          let roomid = Live_info.room_id;
-          BAPI.room.getConf(roomid).then((response) => {
-            MYDEBUG('[预约抽奖]', '服务器地址', response);
-            let wst = new BAPI.DanmuWebSocket(Live_info.uid, roomid, response.data.host_server_list, response.data.token);
-            wst.setUnzip(pako.inflate);
-            wst.bind((newWst) => {
-              wst = newWst;
-              MY_API.chatLog(`[红包抽奖] 弹幕服务器连接断开，尝试重连<br>roomid = ${roomid}`, 'warning');
-            }, () => {
-              MY_API.chatLog(`[红包抽奖] 连接弹幕服务器成功<br>roomid = ${roomid}`
-                , 'success');
-              //addVal(wsConnectingList, roomid);
-            }, () => {
-              // heartbeat
-            }, (obj) => {
-              switch (obj.cmd) {
-                case 'POPULARITY_RED_POCKET_WINNER_LIST':
-                  console.log('[红包抽奖] 红包抽奖结果', obj);
-                  break;
-                case 'POPULARITY_RED_POCKET_START':
-                  console.log('[红包抽奖] 红包抽奖开始', obj);
-                  break;
-                default:
-                  console.log('弹幕公告', obj);
-              }
-            }, (obj) => {
-              //console.log("recieve", obj);
-            });
-          }, () => {
-            MY_API.chatLog('获取弹幕服务器地址错误', 'warning')
-          });
         }
       }
     };

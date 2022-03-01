@@ -1699,8 +1699,7 @@ var BAPI = {
                                     }));
                                 }
                                 let strList = str.split(/[\x00-\x1f]+/);
-
-                                strList.forEach(s => { if (s.includes('{')) { cmdEvent(JSON.parse(s), s) } });
+                                strList.forEach(s => { if (s.length >= 5) { cmdEvent(JSON.parse(s), s) } });
                                 break;
                             }
                         case 8:
