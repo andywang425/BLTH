@@ -34,7 +34,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
-// @require        file:///D:/Documents/GitHub/BLTH/assets/js/library/BilibiliAPI_Mod.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f65bef507277284eae3b13d5dd1b6fa1b8df1228/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
@@ -51,7 +51,7 @@
 // @grant          GM_setValue
 // @grant          GM_deleteValue
 // @grant          GM_addStyle
-// ==/UserScript==
+// ==/UserScript== 
 
 (function () {
   localstorage2gm();
