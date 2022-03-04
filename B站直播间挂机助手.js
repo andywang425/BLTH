@@ -34,7 +34,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f65bef507277284eae3b13d5dd1b6fa1b8df1228/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@71de7ef8b55dfb1108390e3e9dfc8bb8c9304f62/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
@@ -6299,7 +6299,7 @@
           MY_API.PopularityRedpocketLottery.roomidList = [];
           for (const r of areaData) {
             await MY_API.PopularityRedpocketLottery.getRoomList(r);
-            await sleep(200);
+            await sleep(MY_API.CONFIG.POPULARITY_REDPOCKET_REQUEST_INTERVAL);
           }
           MY_API.chatLog(`[红包抽奖] 高热度直播间收集完毕<br>共${MY_API.PopularityRedpocketLottery.roomidList.length}个`, 'success');
           return $.Deferred().resolve();
@@ -6330,7 +6330,7 @@
         filter: async (roomid, data) => {
           if (data.user_status !== 2) // 忽略已参加的抽奖
             return $.Deferred().resolve(false);
-          if (data.total_price < MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY) {
+          if ((data.total_price / 1000) < MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY) {
             MY_API.chatLog(`[红包抽奖] 忽略奖品总价值小于${MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY}电池的红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>奖品总价值：${data.total_price / 1000}电池`)
             return $.Deferred().resolve(false);
           }
