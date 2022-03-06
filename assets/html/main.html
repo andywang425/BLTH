@@ -330,6 +330,13 @@
                                                 type="checkbox">检测到有1级粉丝牌要求的天选后自动购买勋章再参加
                                 </label><span helpdata="ANCHOR_AUTO_BUY_LV1_MEDAL"
                                         class="clickableText helpText">?</span></div>
+                        <div data-toggle="ANCHOR_AUTO_BUY_LV1_MEDAL_TYPE" class="lineStartSpace">
+                                <div data-toggle="B_COIN"><input type="radio"
+                                                name="ANCHOR_AUTO_BUY_LV1_MEDAL_TYPE">使用5B币 </div>
+                                <div data-toggle="B_KELA"><input type="radio" name="ANCHOR_AUTO_BUY_LV1_MEDAL_TYPE"
+                                                class="smallInterval">使用包裹中的B坷垃
+                                </div>
+                        </div>
                         <div data-toggle="ANCHOR_INTERVAL"><label>请求间隔 <input class="num blth_input" style="width:30px;"
                                                 type="text">毫秒 </label><span helpdata="ANCHOR_INTERVAL"
                                         class="clickableText helpText">?</span></div>
@@ -368,6 +375,31 @@
                                         style="color:red;">取关不在白名单内的UP主</button><button data-action="editWhiteList"
                                         class="blth_btn">编辑白名单</button><span helpdata="anchorBtnArea"
                                         class="clickableText helpText">?</span>
+                        </div>
+                </fieldset>
+                <fieldset class="blth_fs">
+                        <legend>直播红包抽奖</legend>
+                        <div data-toggle="POPULARITY_REDPOCKET_LOTTERY"><label style="color:blueviolet"><input
+                                                type="checkbox">参加直播红包抽奖
+                                </label><span helpdata="POPULARITY_REDPOCKET_LOTTERY"
+                                        class="clickableText helpText">?</span></div>
+                        <div data-toggle="POPULARITY_REDPOCKET_IGNORE_BATTERY"><label>忽略奖品总价值小于 <input
+                                                class="num blth_input" style="width:30px;" type="text">电池的红包
+                                </label></div>
+                        <div data-toggle="POPULARITY_REDPOCKET_CHECK_INTERVAL"><label>获取红包数据间隔 <input
+                                                class="num blth_input" style="width:25px;" type="text">分钟 </label><span
+                                        helpdata="POPULARITY_REDPOCKET_CHECK_INTERVAL"
+                                        class="clickableText helpText">?</span>
+                        </div>
+                        <div data-toggle="POPULARITY_REDPOCKET_REQUEST_INTERVAL"><label>请求间隔 <input
+                                                class="num blth_input" style="width:30px;" type="text">毫秒
+                                </label><span helpdata="POPULARITY_REDPOCKET_REQUEST_INTERVAL"
+                                        class="clickableText helpText">?</span>
+                        </div>
+                        <div data-toggle="POPULARITY_REDPOCKET_DELAY">
+                                <label>参与抽奖前随机延迟 <input class="min num blth_input" style="width:40px;" type="text"> ~
+                                        <input class="max num blth_input" style="width:40px;" type="text"> 毫秒</label>
+                                <span helpdata="POPULARITY_REDPOCKET_DELAY" class="clickableText helpText">?</span>
                         </div>
                 </fieldset>
                 <fieldset class="blth_fs">

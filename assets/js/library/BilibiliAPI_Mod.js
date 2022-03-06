@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.1
+// @version       3.1.1
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -46,6 +46,7 @@ var BAPI = {
         MaterialObject: {
             getRoomActivityByRoomid: (roomid) => BAPI.lottery.box.getRoomActivityByRoomid(roomid),
             getStatus: (aid, times) => BAPI.lottery.box.getStatus(aid, times),
+            check: (aid) => BAPI.lottery.box.getBoxInfo(aid),
             draw: (aid, number) => BAPI.lottery.box.draw(aid, number),
             getWinnerGroupInfo: (aid, number) => BAPI.lottery.box.getWinnerGroupInfo(aid, number)
         },
@@ -662,6 +663,14 @@ var BAPI = {
                     }
                 });
             },
+            getBoxInfo: (aid) => {
+                return BAPI.ajax({
+                    url: '/xlive/lottery-interface/v1/goldBox/getBoxInfo',
+                    data: {
+                        aid: aid
+                    }
+                })
+            },
             draw: (aid, number = 1) => {
                 // 参加实物抽奖
                 return BAPI.ajax({
@@ -675,7 +684,7 @@ var BAPI = {
             getWinnerGroupInfo: (aid, number = 1) => {
                 // 获取中奖名单
                 return BAPI.ajax({
-                    url: 'lottery/v2/box/getWinnerGroupInfo',
+                    url: '/xlive/lottery-interface/v2/Box/getWinnerGroupInfo',
                     data: {
                         aid: aid,
                         number: number
@@ -1375,7 +1384,7 @@ var BAPI = {
                     }
                 });
             },
-            gettLotteryInfoWeb: (roomid) => {
+            getLotteryInfoWeb: (roomid) => {
                 return BAPI.ajax({
                     url: 'xlive/lottery-interface/v1/lottery/getLotteryInfoWeb',
                     data: {
@@ -1490,6 +1499,16 @@ var BAPI = {
                 }
             })
         },
+        roomEntryAction: (room_id, platform = 'pc') => {
+            return BAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '/xlive/web-room/v1/index/roomEntryAction',
+                data: {
+                    room_id: room_id,
+                    platform: platform
+                }
+            });
+        },
         anchor: {
             check: (roomid) => {
                 return BAPI.ajax({
@@ -1516,6 +1535,32 @@ var BAPI = {
                     url: 'xlive/lottery-interface/v1/Anchor/RandTime?id=' + id
                 })
             }
+        },
+        popularityRedPocket:
+        {
+            followRelation: (uid, target_uid) => {
+                return BAPI.ajax({
+                    url: 'xlive/lottery-interface/v1/popularityRedPocket/FollowRelation',
+                    data: {
+                        uid: uid,
+                        target_uid: target_uid
+                    }
+                })
+            },
+            draw: (ruid, room_id, lot_id, spm_id = '444.8.red_envelope.extract', session_id = '', jump_from = '') => {
+                return BAPI.ajaxWithCommonArgs({
+                    method: 'POST',
+                    url: 'xlive/lottery-interface/v1/popularityRedPocket/RedPocketDraw',
+                    data: {
+                        ruid: ruid, // 主播uid
+                        room_id: room_id,
+                        lot_id: lot_id,
+                        spm_id: spm_id,
+                        session_id: session_id,
+                        jump_from: jump_from
+                    }
+                })
+            }
         }
     },
     YearWelfare: {
@@ -1539,8 +1584,8 @@ var BAPI = {
             }
             return new Uint8Array(uintArray);
         }
-        static uintToString(uintArray) {
-            return decodeURIComponent(escape(String.fromCharCode.apply(null, uintArray)));
+        static uintToString(uint8array) {
+            return new TextDecoder("utf-8").decode(uint8array);
         }
         constructor(uid, roomid, host_server_list, token) {
             // 总字节长度 int(4bytes) + 头字节长度(16=4+2+2+4+4) short(2bytes) + protover(1,2) short(2bytes) + operation int(4bytes) + sequence(1,0) int(4bytes) + Data
@@ -1634,9 +1679,10 @@ var BAPI = {
                     const headerLen = dv.getUint16(position + 4);
                     const protover = dv.getUint16(position + 6);
                     const operation = dv.getUint32(position + 8);
-                    const sequence = dv.getUint32(position + 12);
+                    const sequence = dv.getUint32(position + 10);
                     let data = event.data.slice(position + headerLen, position + len);
-                    if (protover === 2 && this.unzip) data = this.unzip(data);
+                    let body = data;
+                    if (protover === 2 && this.unzip) body = this.unzip(data);
                     this.dispatchEvent(new CustomEvent('receive', {
                         detail: {
                             len: len,
@@ -1662,14 +1708,17 @@ var BAPI = {
                             }
                         case 5:
                             {
-                                const str = BAPI.DanmuWebSocket.uintToString(new Uint8Array(data));
-                                const obj = JSON.parse(str);
-                                this.dispatchEvent(new CustomEvent('cmd', {
-                                    detail: {
-                                        obj: obj,
-                                        str: str
-                                    }
-                                }));
+                                let str = BAPI.DanmuWebSocket.uintToString(new Uint8Array(body));
+                                let cmdEvent = (obj, str) => {
+                                    this.dispatchEvent(new CustomEvent('cmd', {
+                                        detail: {
+                                            obj: obj,
+                                            str: str
+                                        }
+                                    }));
+                                }
+                                let strList = str.split(/[\x00-\x1f]+/);
+                                strList.forEach(s => { if (s.length >= 5) { cmdEvent(JSON.parse(s), s) } });
                                 break;
                             }
                         case 8:
