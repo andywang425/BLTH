@@ -46,6 +46,7 @@ var BAPI = {
         MaterialObject: {
             getRoomActivityByRoomid: (roomid) => BAPI.lottery.box.getRoomActivityByRoomid(roomid),
             getStatus: (aid, times) => BAPI.lottery.box.getStatus(aid, times),
+            check: (aid) => BAPI.lottery.box.getBoxInfo(aid),
             draw: (aid, number) => BAPI.lottery.box.draw(aid, number),
             getWinnerGroupInfo: (aid, number) => BAPI.lottery.box.getWinnerGroupInfo(aid, number)
         },
@@ -662,6 +663,14 @@ var BAPI = {
                     }
                 });
             },
+            getBoxInfo: (aid) => {
+                return BAPI.ajax({
+                    url: '/xlive/lottery-interface/v1/goldBox/getBoxInfo',
+                    data: {
+                        aid: aid
+                    }
+                })
+            },
             draw: (aid, number = 1) => {
                 // 参加实物抽奖
                 return BAPI.ajax({
@@ -675,7 +684,7 @@ var BAPI = {
             getWinnerGroupInfo: (aid, number = 1) => {
                 // 获取中奖名单
                 return BAPI.ajax({
-                    url: 'lottery/v2/box/getWinnerGroupInfo',
+                    url: '/xlive/lottery-interface/v2/Box/getWinnerGroupInfo',
                     data: {
                         aid: aid,
                         number: number
@@ -1489,6 +1498,16 @@ var BAPI = {
                     room_id: room_id
                 }
             })
+        },
+        roomEntryAction: (room_id, platform = 'pc') => {
+            return BAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '/xlive/web-room/v1/index/roomEntryAction',
+                data: {
+                    room_id: room_id,
+                    platform: platform
+                }
+            });
         },
         anchor: {
             check: (roomid) => {
