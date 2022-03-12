@@ -580,7 +580,7 @@
         POPULARITY_REDPOCKET_REQUEST_INTERVAL: 500, // 直播红包抽奖请求间隔
         POPULARITY_REDPOCKET_IGNORE_BATTERY: 1.6, // 忽略奖品电池小于__的红包
         POPULARITY_REDPOCKET_DELAY_MIN: 20, // 直播红包抽奖延迟最小值
-        POPULARITY_REDPOCKET_DELAY_MAX: 50, // 直播红包抽奖延迟最大值
+        POPULARITY_REDPOCKET_DELAY_MAX: 30, // 直播红包抽奖延迟最大值
         QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼', '内网', '员工', '企业', '公司', '行政', '登记'], // 存疑实物抽奖
         REMOVE_ELEMENT_2233: false, // 移除2233
         REMOVE_ELEMENT_pkBanner: true, // 移除大乱斗入口
@@ -6296,7 +6296,13 @@
         draw: async (ruid, roomid, data) => {
           let filterResult = await MY_API.PopularityRedpocketLottery.filter(roomid, data);
           if (!filterResult) return $.Deferred().resolve();
-          await sleep(getRandomNum(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN * 1000, MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX * 1000));
+          let randomNum = getRandomNum(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN, MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX) * 1000;
+          let replaceTime = data["replace_time"] * 1000; // the end time
+          let attendTime = replaceTime - randomNum;
+          let delayTime = attendTime - new Date().getTime();
+          if(attendTime > replaceTime) delayTime = 0; // execute immediately
+          MYDEBUG(`MY_API.PopularityRedpocketLottery.draw delayTime`, delayTime);
+          await sleep(delayTime);
           await BAPI.xlive.roomEntryAction(roomid).then(re => MYDEBUG(`API.xlive.roomEntryAction(${roomid})`, re));
           return BAPI.xlive.popularityRedPocket.draw(ruid, roomid, data.lot_id).then((response) => {
             MYDEBUG(`API.xlive.popularityRedPocket.draw(ruid = ${ruid}, roomid = ${roomid}, lot_id = ${data.lot_id}, total_price = ${data.total_price}) response`, response);
@@ -6683,7 +6689,7 @@
    */
   function fixVersionDifferences(API, version) {
     // 添加新的修复后需修改版本号
-    if (versionStringCompare(SP_CONFIG.storageLastFixVersion, "5.7.9") >= 0) return;
+    if (versionStringCompare(SP_CONFIG.storageLastFixVersion, "5.7.10") >= 0) return;
     // 修复变量类型错误
     const configFixList = ['AUTO_GIFT_ROOMID', 'COIN_UID'];
     if (!configFixList.every(i => Array.isArray(API.CONFIG[i]))) {
