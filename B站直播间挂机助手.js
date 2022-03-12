@@ -1490,7 +1490,7 @@
           POPULARITY_REDPOCKET_LOTTERY: "参与直播红包抽奖。<mh3>注意：</mh3><mul><mli>本功能风险较高，请自行斟酌是否开启。</mli></mul><mh3>原理：</mh3><mul><mli>从热门直播间列表等来源获取直播间数据，每隔一段时间逐一检查这些房间是否有红包抽奖，若有则参与抽奖并建立一个与该房间的webSocket连接以持续获取该房间之后可能出现的红包数据。如果该直播间长时间没有红包抽奖会断开与该房间webSocket连接。</mli></mul>",
           POPULARITY_REDPOCKET_CHECK_INTERVAL: "主动去搜寻红包抽奖的间隔。",
           POPULARITY_REDPOCKET_REQUEST_INTERVAL: "每两个请求之间的间隔时间。<mul><mli>若间隔时间过短可能会被风控。</mli></mul>",
-          POPULARITY_REDPOCKET_DELAY: "参与抽奖前等待一段时间。"
+          POPULARITY_REDPOCKET_DELAY: "参与抽奖前等待一段时间，不建议将值设置的太小，可能会导致请求逾期。"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -6310,7 +6310,7 @@
               MY_API.chatLog(`[红包抽奖] 成功参加红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>奖品总价值：${data.total_price / 1000}电池`, 'success');
               return response;
             } else {
-              MY_API.chatLog(`[红包抽奖] 参加红包红包抽奖失败<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>${response.message}`, 'error');
+              MY_API.chatLog(`[红包抽奖] 参加红包抽奖失败<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>${response.message}`, 'error');
               return false;
             }
           });
