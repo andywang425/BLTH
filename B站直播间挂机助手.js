@@ -6286,7 +6286,7 @@
           if (data.user_status !== 2) // 忽略已参加的抽奖
             return $.Deferred().resolve(false);
           if ((data.total_price / 1000) < MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY) {
-            MY_API.chatLog(`[红包抽奖] 忽略奖品总价值小于${MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY}电池的红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>奖品总价值：${data.total_price / 1000}电池`)
+            MY_API.chatLog(`[红包抽奖] 忽略奖品总价值小于${MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY}元的红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>奖品总价值：${data.total_price / 1000}元`)
             return $.Deferred().resolve(false);
           }
           if (ts_s() < data.start_time)
