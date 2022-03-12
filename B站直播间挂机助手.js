@@ -6297,9 +6297,9 @@
           let filterResult = await MY_API.PopularityRedpocketLottery.filter(roomid, data);
           if (!filterResult) return $.Deferred().resolve();
           let randomNum = getRandomNum(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN, MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX) * 1000;
-          let replaceTime = data["replace_time"] * 1000; // the end time
+          let replaceTime = data.replace_time * 1000; // the end time
           let attendTime = replaceTime - randomNum;
-          let delayTime = attendTime - new Date().getTime();
+          let delayTime = attendTime - ts_ms();
           if(attendTime > replaceTime) delayTime = 0; // execute immediately
           MYDEBUG(`MY_API.PopularityRedpocketLottery.draw delayTime`, delayTime);
           await sleep(delayTime);
