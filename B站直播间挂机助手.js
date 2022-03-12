@@ -579,8 +579,8 @@
         POPULARITY_REDPOCKET_CHECK_INTERVAL: 10, // 直播红包抽奖检查间隔
         POPULARITY_REDPOCKET_REQUEST_INTERVAL: 500, // 直播红包抽奖请求间隔
         POPULARITY_REDPOCKET_IGNORE_BATTERY: 1.6, // 忽略奖品电池小于__的红包
-        POPULARITY_REDPOCKET_DELAY_MIN: 2500, // 直播红包抽奖延迟最小值
-        POPULARITY_REDPOCKET_DELAY_MAX: 3000, // 直播红包抽奖延迟最大值
+        POPULARITY_REDPOCKET_DELAY_MIN: 25000, // 直播红包抽奖延迟最小值
+        POPULARITY_REDPOCKET_DELAY_MAX: 30000, // 直播红包抽奖延迟最大值
         QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼', '内网', '员工', '企业', '公司', '行政', '登记'], // 存疑实物抽奖
         REMOVE_ELEMENT_2233: false, // 移除2233
         REMOVE_ELEMENT_pkBanner: true, // 移除大乱斗入口
