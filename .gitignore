@@ -1,6 +1,11 @@
 .gitignore
 .vscode
-node_modules
-note
-unused_modules
-markdown/开发目标记录.md
+.github/ISSUE_TEMPLATE/bug_report.md
+/node_modules
+/note
+/assets/unused_libraries
+/${tmpdir}
+/other_scripts
+/assets/markdown/development_todo.md
+/assets/markdown/tasks_before-update.md
+/assets/markdown/original_README.md

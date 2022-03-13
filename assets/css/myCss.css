@@ -33,7 +33,10 @@
     border: 1px solid rgb(203, 195, 255);
     background: rgb(233, 230, 255) none repeat scroll 0% 0%;
 }
-.igiftMsg_input {
+.blth_main {
+    margin: 10px;
+}
+.blth_input {
     outline: none;
     margin-inline: 5px;
     border: 1px solid #e9eaec;
@@ -45,7 +48,7 @@
     line-height: 19px;
     width: 30px;
 }
-.igiftMsg_btn {
+.blth_btn {
     background-color: #23ade5;
     font-size: small;
     margin-inline-start: 5px;
@@ -57,12 +60,15 @@
     box-shadow: 0 0 2px #00000075;
     line-height: 10px;
 }
-.igiftMsg_btn:active {
-    background-color: #0e8bbd;
+.blth_btn:hover:active {
+    background-color: #0e86b6;
     position: relative;
     top: 1px;
 }
-.igiftMsg_fs {
+.blth_btn:hover {
+    background-color:#1097cc;
+}
+.blth_fs {
     border: 2px solid #d4d4d4;
     line-height: 25px;
 }
@@ -118,7 +124,7 @@
     color: rgb(145, 123, 0);
     background: none 0% 0% repeat scroll rgb(255, 215, 0, 30%);
 }
-.igiftMsg_num {
+.blth_num {
     min-width: 12px;
     height: 16px;
     padding: 0 3px;
@@ -133,10 +139,17 @@
     background-color: #fa5a57;
 }
 .clickableText {
-    font-size: 12px;
+    font-size: 1.1em;
     color: #0080c6;
     cursor: pointer;
     text-decoration: underline;
+}
+.clickableText:hover {
+    font-weight: bold;
+}
+.clickableText:hover:active {
+    position: relative;
+    top: 1px;
 }
 .helpText {
     padding-inline-start: 5px;
@@ -145,13 +158,20 @@
 .lineStartSpace {
     margin-inline-start: 18px;
 }
+.smallInerval {
+    margin-inline-start: 5px;
+}
+.inline {
+    display: inline;
+}
 .statNum {
-    margin-inline: 5px;
+    margin-inline-start: 5px;
+    margin-inline-end: 5px;
 }
 .layui-layer [type="checkbox"],
 [type="radio"] {
     margin-inline-end: 5px;
-    vertical-align:text-top;
+    vertical-align: text-top;
 }
 .layui-layer [type="button"] {
     font-size: small;
@@ -178,6 +198,27 @@
 }
 .layui-layer a {
     color: blue;
+}
+.layui-layer-content ul {
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    padding-inline-start: 0px;
+    margin: 10px;
+    list-style: none;
+}
+.layui-layer-content::-webkit-scrollbar {
+    width: 10px;
+    height: 6px
+}
+.layui-layer-content::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: #aaa
+}
+html[lab-style*=dark] input{
+    background-color: #c2c2c2
+}
+html[lab-style*=dark] textarea {
+    background-color: #d1d1d1;
 }
 mp {
     display: block;
