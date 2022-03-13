@@ -1,6 +1,9 @@
 /**
  * 转换为数组字符串格式
  */
+const { exec } = require('child_process');
+const iconv = require('iconv-lite');
+
 let str = "";
 process.stdout.write('【转换为数组字符串格式】\n请输入README中的更新内容字符串（1.xxx。2.xxx。3.xxx。）:\n');
 process.stdin.setEncoding('utf8');
@@ -17,7 +20,8 @@ process.stdin.on('readable', () => {
       txt += `"` + list[i] + `"`;
       if (i !== list.length - 1) txt += ",\n";
     }
-    process.stdout.write("\n处理完成: \n\n" + txt + "\n");
+    process.stdout.write("\n处理完成（已复制到剪切板）: \n\n" + txt + "\n");
+    exec('clip').stdin.end(iconv.encode(txt, 'gbk'));
   }
 });
 

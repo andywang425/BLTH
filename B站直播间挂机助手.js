@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           B站直播间挂机助手
-// @name:zh     B站直播间挂机助手
+// @name:zh        B站直播间挂机助手
 // @name:en        Bilibili Live Helper
 // @namespace      https://github.com/andywang425
 // @author         andywang425
@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.9.6
+// @version        5.7.9.7
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -816,11 +816,8 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "【天选时刻】【检测到有1级粉丝牌要求的天选后自动购买勋章再参加】新增通过赠送包裹中的B坷垃来获取勋章的方式。",
-              "修复了购买粉丝勋章失败时无错误提示的Bug。",
-              "新功能【直播红包抽奖】。",
-              "【实物抽奖】Bug修复（由于没有进行中的实物抽奖，只测试了检索抽奖的部分，抽奖和中奖检测部分可能仍无法正常工作）；增加了从云端自动获取最后一个有效aid的功能；增加了一个内置的请求间隔。",
-              "【BLTH-server】：性能优化；限制了seconds每天能加的好友数量并且以后在添加好友时需要输入正确的验证信息（详见小问号内容）。目前seconds不接受好友申请，之后会开放好友添加。"
+              "【红包抽奖】修复抽奖前随机等待一段时间导致抽奖超时的bug。",
+              "【红包抽奖】修复奖品总价值判断不正确的bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -835,6 +832,7 @@
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
                 <mol>${createHtml(clientMliList)}</mol>
+                <mol>感谢<a href=\"https://github.com/ZiuChen\" target=\"_blank\">ZiuChen</a>提供的帮助。</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
@@ -6285,8 +6283,8 @@
         filter: async (roomid, data) => {
           if (data.user_status !== 2) // 忽略已参加的抽奖
             return $.Deferred().resolve(false);
-          if ((data.total_price / 1000) < MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY) {
-            MY_API.chatLog(`[红包抽奖] 忽略奖品总价值小于${MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY}电池的红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>奖品总价值：${data.total_price / 1000}电池`)
+          if ((data.total_price / 100) < MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY) {
+            MY_API.chatLog(`[红包抽奖] 忽略奖品总价值小于${MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY}电池的红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>奖品总价值：${data.total_price / 100}电池`)
             return $.Deferred().resolve(false);
           }
           if (ts_s() < data.start_time)
@@ -6296,15 +6294,17 @@
         draw: async (ruid, roomid, data) => {
           let filterResult = await MY_API.PopularityRedpocketLottery.filter(roomid, data);
           if (!filterResult) return $.Deferred().resolve();
-          await sleep(getRandomNum(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN, MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX));
+          let randomSleepTime = getRandomNum(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN, MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX);
+          if (ts_ms() + randomSleepTime >= data.end_time * 1000) randomSleepTime = 0;
+          await sleep(randomSleepTime);
           await BAPI.xlive.roomEntryAction(roomid).then(re => MYDEBUG(`API.xlive.roomEntryAction(${roomid})`, re));
           return BAPI.xlive.popularityRedPocket.draw(ruid, roomid, data.lot_id).then((response) => {
             MYDEBUG(`API.xlive.popularityRedPocket.draw(ruid = ${ruid}, roomid = ${roomid}, lot_id = ${data.lot_id}, total_price = ${data.total_price}) response`, response);
             if (response.code === 0) {
-              MY_API.chatLog(`[红包抽奖] 成功参加红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>奖品总价值：${data.total_price / 1000}电池`, 'success');
+              MY_API.chatLog(`[红包抽奖] 成功参加红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>奖品总价值：${data.total_price / 100}电池`, 'success');
               return response;
             } else {
-              MY_API.chatLog(`[红包抽奖] 参加红包红包抽奖失败<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>${response.message}`, 'error');
+              MY_API.chatLog(`[红包抽奖] 参加红包抽奖失败<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>${response.message}`, 'error');
               return false;
             }
           });
