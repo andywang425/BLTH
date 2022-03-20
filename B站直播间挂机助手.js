@@ -3861,7 +3861,7 @@
           MYDEBUG('API.MaterialObject.check: aid=', aid);
           await sleep(200); // TODO: 改为设置项
           return BAPI.Lottery.MaterialObject.check(aid).then((response) => {
-            MYDEBUG('API.MaterialObject.check(getBoxInfo):', response);
+            MYDEBUG('API.MaterialObject.check(getBoxInfo)', response);
             if (response.code === 0 && response.data) {
               rem = MY_API.CONFIG.MATERIAL_LOTTERY_REM;
               MY_API.CACHE.last_aid = aid;
@@ -6294,10 +6294,10 @@
         draw: async (ruid, roomid, data) => {
           let filterResult = await MY_API.PopularityRedpocketLottery.filter(roomid, data);
           if (!filterResult) return $.Deferred().resolve();
+          await BAPI.xlive.roomEntryAction(roomid).then(re => MYDEBUG(`API.xlive.roomEntryAction(${roomid})`, re));
           let randomSleepTime = getRandomNum(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN, MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX);
           if (ts_ms() + randomSleepTime >= data.end_time * 1000) randomSleepTime = 0;
           await sleep(randomSleepTime);
-          await BAPI.xlive.roomEntryAction(roomid).then(re => MYDEBUG(`API.xlive.roomEntryAction(${roomid})`, re));
           return BAPI.xlive.popularityRedPocket.draw(ruid, roomid, data.lot_id).then((response) => {
             MYDEBUG(`API.xlive.popularityRedPocket.draw(ruid = ${ruid}, roomid = ${roomid}, lot_id = ${data.lot_id}, total_price = ${data.total_price}) response`, response);
             if (response.code === 0) {
