@@ -3320,7 +3320,11 @@
                   MY_API.Gift.remain_feed -= feed_num * feed;
                   window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
                   if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
-                } else {
+                } else if (response.code === 200028) {
+                  // 当前直播间无法赠送礼物哦～
+                  window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼失败：${response.msg}`, 'caution');
+                }
+                else {
                   window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼异常：${response.msg}`, 'caution');
                   return delayCall(() => MY_API.Gift.sendGift(medal));
                 }
@@ -3354,6 +3358,9 @@
                   v.gift_num -= feed_num;
                   window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼成功，送出${feed_num}个${v.gift_name}`, 'success');
                   if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
+                } else if (response.code === 200028) {
+                  // 当前直播间无法赠送礼物哦～
+                  window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼失败：${response.msg}`, 'caution');
                 } else {
                   window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼异常：${response.msg}`, 'caution');
                   return delayCall(() => MY_API.Gift.sendGift(medal));
@@ -3367,12 +3374,13 @@
         patchData: {},
         failedRoomList: [],
         RoomHeart: class {
-          constructor(roomID) {
-            this.getInfoByRoom(roomID);
+          constructor(inputRoomID) {
+            this.inputRoomID = inputRoomID;
           }
           areaID;
           parentID;
           seq = 0;
+          inputRoomID;
           roomID;
           get id() {
             return [this.parentID, this.areaID, this.seq, this.roomID];
@@ -3400,16 +3408,24 @@
           secretKey;
           secretRule;
           timestamp;
+          async start() {
+            return await this.getInfoByRoom(this.inputRoomID);
+          }
           async getInfoByRoom(roomID) {
+            if (!roomID)
+              return $.Deferred().resolve(false);
             const getInfoByRoom = await BAPI.xlive.getInfoByRoom(roomID);
             if (getInfoByRoom.code === 0) {
               const roomInfo = getInfoByRoom.data.room_info;
               ({ area_id: this.areaID, parent_area_id: this.parentID, room_id: this.roomID } = roomInfo);
+              if (!this.areaID || !this.parentID)
+                return $.Deferred().resolve(false);
               this.e();
+              return $.Deferred().resolve(true);
             }
             else {
-              window.toast(`[小心心] 未获取到房间 ${roomID} 信息`, 'error')
-              MYERROR('小心心', `未获取到房间 ${roomID} 信息`);
+              console.error(GM_info.script.name, `未获取到房间 ${roomID} 信息`);
+              return $.Deferred().resolve(false);
             }
           }
           async webHeartBeat() {
@@ -3569,9 +3585,11 @@
             for (const funsMedalData of fansMedalList) {
               if (count >= control)
                 break;
-              new MY_API.LITTLE_HEART.RoomHeart(funsMedalData.roomid);
+              await new MY_API.LITTLE_HEART.RoomHeart(funsMedalData.roomid).start().then(heartStatus => {
+                if (heartStatus)
+                  count++;
+              });
               await sleep(1000);
-              count++;
             }
             await sleep(6 * 60 * 1000);
           }
@@ -5871,11 +5889,30 @@
         plateData: [],
         maxTimes: 20,
         getPlateData: () => {
+          const headers = {
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+            'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'DNT': '1',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Sec-Fetch-Site': 'same-origin',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-User': '?1',
+            'Sec-Fetch-Dest': 'document',
+            'Referer': 'https://gitee.com/java_cn/BILIBLI_RES/raw/master/HNPLATE/activities.json',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7'
+          }
           return XHR({
             GM: true,
             anonymous: true,
             method: 'GET',
             url: 'https://gitee.com/java_cn/BILIBLI_RES/raw/master/HNPLATE/activities.json',
+            headers: headers,
             responseType: 'json'
           }).then(response => {
             MYDEBUG(`MY_API.PLATE_ACTIVITY.getPlateData response`, response);
@@ -6038,11 +6075,30 @@
         reserveFilterData: {},
         maxCheckedSid: 0,
         getReserveData: () => {
+          const headers = {
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache',
+            'sec-ch-ua': '" Not A;Brand";v="99", "Chromium";v="99", "Google Chrome";v="99"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'DNT': '1',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.82 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Sec-Fetch-Site': 'same-origin',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-User': '?1',
+            'Sec-Fetch-Dest': 'document',
+            'Referer': 'https://gitee.com/java_cn/BILIBLI_RES/raw/master/HNPLATE/reserveSids.json',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7'
+          }
           return XHR({
             GM: true,
             anonymous: true,
             method: 'GET',
             url: 'https://gitee.com/java_cn/BILIBLI_RES/raw/master/HNPLATE/reserveSids.json',
+            headers: headers,
             responseType: 'json'
           }).then(response => {
             MYDEBUG(`MY_API.PLATE_ACTIVITY.getPlateData response`, response);
@@ -6191,7 +6247,7 @@
           return BAPI.x.vip.privilege.receive(type).then(response => {
             MYDEBUG(`API.x.vip.privilege.receive response`, response);
             if (response.code === 0) return true;
-            else window.toast(`[大会员] 领取权益失败(type=${type}) ${response.message}`, 'error');
+            else window.toast(`[大会员] 领取权益失败(type=${type}) ${response.message}`, 'warning');
             return false;
           })
         },
