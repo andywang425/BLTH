@@ -120,6 +120,7 @@
 + [pako](https://github.com/nodeca/pako) (MIT)：javascript压缩/解压缩库。
 + [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli项目中的javascript解码库。
 + [hotkeys](https://github.com/jaywcjlove/hotkeys) (MIT)：一个强健的 Javascript 库，用于捕获键盘输入和输入的组合键。
++ [emitter](https://github.com/component/emitter) (MIT): 事件触发器组件。
 
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。

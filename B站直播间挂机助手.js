@@ -36,6 +36,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@5c63659de1ebf53d127309ccf04d2554b725c83e/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
+// @require        https://cdn.staticaly.com/gh/component/emitter/master/index.js
 // @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
@@ -4060,6 +4061,7 @@
         medal_list: [],
         anchorFollowTagid: undefined,
         anchorPrizeTagid: undefined,
+        anchorLotteryBridge: new LotteryBridge('anchor'),
         get_attention_list: (mid) => {
           return BAPI.relation.get_attention_list(mid).then((response) => {
             MYDEBUG(`get_attention_list API.relation.get_attention_list ${mid}`, response);
@@ -5096,6 +5098,7 @@
               return BAPI.xlive.lottery.getLotteryInfoWeb(roomid).then((response) => {
                 MYDEBUG(`API.xlive.lottery.gettLotteryInfoWeb(${roomid}) response`, response);
                 if (response.code === 0) {
+                  if (response.data.popularity_red_pocket) MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.pushLottery(response.data.popularity_red_pocket, roomid);
                   return response.data.anchor
                 } else {
                   MY_API.chatLog(`[天选时刻] 检查天选的API(lottery.gettLotteryInfoWeb)无法使用<br>${response.message}<br>尝试更换下一个API`, 'warning');
@@ -5535,19 +5538,6 @@
             // awpush 入口
             MY_API.AWPUSH.wsinit();
             let secret, task, area_data, sleep_time, interval, max_room;
-            // 连接成功
-            MY_API.AWPUSH.ws.addEventListener('open', function () {
-              MY_API.AWPUSH.status = 'open';
-              MY_API.AWPUSH.heartBeat.start();
-              const verify = {
-                code: "VERIFY_APIKEY",
-                uid: Live_info.uid,
-                apikey: MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]
-              };
-              const str = JSON.stringify(verify);
-              MYDEBUG('awpush 发送身份验证数据', str);
-              MY_API.AWPUSH.desend(str);
-            });
             // 收到消息
             MY_API.AWPUSH.ws.addEventListener('message', function (event) {
               MYDEBUG('awpush 收到来自服务端的消息', event.data);
@@ -5644,6 +5634,14 @@
           await MY_API.AnchorLottery.getUpInBLTHTag(Live_info.uid, [MY_API.AnchorLottery.anchorFollowTagid, MY_API.AnchorLottery.anchorPrizeTagid]);
           await MY_API.AnchorLottery.getUpInOriginTag(Live_info.uid);
           await MY_API.AnchorLottery.getUpInSpecialTag(Live_info.uid);
+          // 接收从红包抽奖处获得的天选数据
+          MY_API.AnchorLottery.anchorLotteryBridge.addLotteryListener(function (data) {
+            if (!data) return false;
+            if (!MY_API.AnchorLottery.filter.hasChecked(data)) return false;
+            if (!MY_API.AnchorLottery.filter.time(data)) return false;
+            if (!MY_API.AnchorLottery.filter.status(data)) return false;
+            return MY_API.AnchorLottery.filter.further(data, uid);
+          });
           if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) {
             // 上传至直播间简介
             MY_API.AnchorLottery.uploadData();
@@ -5768,6 +5766,19 @@
         wsinit: function () {
           // 测试时用 localhost, 原为 andywang.top
           MY_API.AWPUSH.ws = new WebSocket('wss://andywang.top:3001/ws');
+          // 连接成功
+          MY_API.AWPUSH.ws.addEventListener('open', function () {
+            MY_API.AWPUSH.status = 'open';
+            MY_API.AWPUSH.heartBeat.start();
+            const verify = {
+              code: "VERIFY_APIKEY",
+              uid: Live_info.uid,
+              apikey: MY_API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid]
+            };
+            const str = JSON.stringify(verify);
+            MYDEBUG('awpush 发送身份验证数据', str);
+            MY_API.AWPUSH.desend(str);
+          });
         },
         ws: null,
         /** open, active_close, close, reconnecting  */
@@ -6265,8 +6276,10 @@
         }
       },
       PopularityRedpocketLottery: {
+        checkedIdList: [], // 已检查过的lot_id列表
         roomidList: [],
         wsConnectingList: [],
+        popularityRedPocketBridge: new LotteryBridge('popularityRedPocket'),
         getAreaData: () => {
           return BAPI.room.getList().then((response) => {
             MYDEBUG('API.room.getList 分区信息', response);
@@ -6309,6 +6322,7 @@
           return BAPI.xlive.lottery.getLotteryInfoWeb(roomid).then((response) => {
             MYDEBUG(`API.xlive.lottery.gettLotteryInfoWeb(${roomid}) response`, response);
             if (response.code === 0) {
+              if (response.data.anchor) MY_API.AnchorLottery.anchorLotteryBridge.pushLottery(response.data.anchor);
               return response.data.popularity_red_pocket;
             } else {
               MY_API.chatLog(`[红包抽奖] 检查房间出错 ${response.message}<br>`, 'warning');
@@ -6331,6 +6345,14 @@
         filter: async (roomid, data) => {
           if (data.user_status !== 2) // 忽略已参加的抽奖
             return $.Deferred().resolve(false);
+          if (findVal(MY_API.PopularityRedpocketLottery.checkedIdList, data.lot_id) > -1) {
+            MY_API.chatLog(`[红包抽奖] 忽略已检索过的抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, id = ${data.lot_id}`, 'info');
+            if (MY_API.PopularityRedpocketLottery.checkedIdList.length > 500) MY_API.PopularityRedpocketLottery.checkedIdList.splice(0, 500);
+            return $.Deferred().resolve(false);
+          } else {
+            // 添加到已检索过的 lot_id 列表
+            addVal(MY_API.PopularityRedpocketLottery.checkedIdList, data.lot_id);
+          }
           if ((data.total_price / 100) < MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY) {
             MY_API.chatLog(`[红包抽奖] 忽略奖品总价值小于${MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY}电池的红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${data.lot_id}<br>奖品总价值：${data.total_price / 100}电池`)
             return $.Deferred().resolve(false);
@@ -6416,6 +6438,14 @@
             MY_API.chatLog(`[红包抽奖] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并继续检查抽奖`, 'warning');
             return setTimeout(() => MY_API.PopularityRedpocketLottery.run(), sleepTime);
           }
+          MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.addLotteryListener(function (data, roomid) {
+            if (data.lot_status === 1) {
+              const ruid = await MY_API.PopularityRedpocketLottery.getUidbyRoomid(roomid);
+              if (ruid) {
+                await MY_API.PopularityRedpocketLottery.draw(ruid, roomid, lot);
+              }
+            }
+          })
           await MY_API.PopularityRedpocketLottery.getHotRoomList();
           MY_API.chatLog(`[红包抽奖] 开始检查红包抽奖（共${MY_API.PopularityRedpocketLottery.roomidList.length}个房间）`, 'info');
           for (const roomid of MY_API.PopularityRedpocketLottery.roomidList) {
@@ -6632,6 +6662,23 @@
       await sleep(200);
     }
   };
+  /**
+   * 跨模块推送和接收抽奖信息
+   */
+  class LotteryBridge {
+    constructor(lotteryType) {
+      this.lotteryType = lotteryType;
+      this.lotteryEmitter = new Emitter();
+    }
+    lotteryEmitter;
+    lotteryType;
+    addLotteryListener(callback) {
+      this.lotteryEmitter.on(this.lotteryType, callback);
+    }
+    pushLottery(...args) {
+      this.lotteryEmitter.emit(...args);
+    }
+  }
   /**
    * 给一维数组添加不重复的元素
    * @param  val 元素
