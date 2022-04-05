@@ -36,7 +36,7 @@
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@5c63659de1ebf53d127309ccf04d2554b725c83e/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
-// @require        https://cdn.staticaly.com/gh/component/emitter/master/index.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
 // @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
@@ -52,7 +52,7 @@
 // @grant          GM_setValue
 // @grant          GM_deleteValue
 // @grant          GM_addStyle
-// ==/UserScript== 
+// ==/UserScript==
 
 (function () {
   localstorage2gm();
@@ -6438,7 +6438,7 @@
             MY_API.chatLog(`[红包抽奖] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并继续检查抽奖`, 'warning');
             return setTimeout(() => MY_API.PopularityRedpocketLottery.run(), sleepTime);
           }
-          MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.addLotteryListener(function (data, roomid) {
+          MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.addLotteryListener(async function (data, roomid) {
             if (data.lot_status === 1) {
               const ruid = await MY_API.PopularityRedpocketLottery.getUidbyRoomid(roomid);
               if (ruid) {
@@ -6676,7 +6676,7 @@
       this.lotteryEmitter.on(this.lotteryType, callback);
     }
     pushLottery(...args) {
-      this.lotteryEmitter.emit(...args);
+      this.lotteryEmitter.emit(this.lotteryType, ...args);
     }
   }
   /**
