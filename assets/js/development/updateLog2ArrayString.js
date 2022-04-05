@@ -20,8 +20,8 @@ process.stdin.on('readable', () => {
       txt += `"` + list[i] + `"`;
       if (i !== list.length - 1) txt += ",\n";
     }
-    process.stdout.write("\n处理完成（已复制到剪切板）: \n\n" + txt + "\n");
     exec('clip').stdin.end(iconv.encode(txt, 'gbk'));
+    process.stdout.write("\n处理完成（已复制到剪切板）: \n\n" + txt + "\n");
   }
 });
 
