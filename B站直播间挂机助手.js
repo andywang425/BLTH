@@ -41,7 +41,7 @@
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@71de7ef8b55dfb1108390e3e9dfc8bb8c9304f62/assets/html/main.min.html
+// @resource       main     file://D:\Documents\GitHub\BLTH\assets\html\main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -582,6 +582,8 @@
         POPULARITY_REDPOCKET_IGNORE_BATTERY: 1.6, // 忽略奖品电池小于__的红包
         POPULARITY_REDPOCKET_DELAY_MIN: 1000, // 直播红包抽奖延迟最小值
         POPULARITY_REDPOCKET_DELAY_MAX: 3000, // 直播红包抽奖延迟最大值
+        POPULARITY_REDPOCKET_TYPE_POLLING: true, // 直播红包抽奖模式：轮询
+        POPULARITY_REDPOCKET_TYPE_FOLLOWING: false, // 直播红包抽奖模式：关注
         QUESTIONABLE_LOTTERY: ['test', 'encrypt', '测试', '钓鱼', '加密', '炸鱼', '内网', '员工', '企业', '公司', '行政', '登记'], // 存疑实物抽奖
         REMOVE_ELEMENT_2233: false, // 移除2233
         REMOVE_ELEMENT_pkBanner: true, // 移除大乱斗入口
@@ -1337,6 +1339,8 @@
           "MEDAL_DANMU",
           "PLATE_ACTIVITY",
           "POPULARITY_REDPOCKET_LOTTERY",
+          "POPULARITY_REDPOCKET_TYPE_POLLING",
+          "POPULARITY_REDPOCKET_TYPE_FOLLOWING",
           "PP_NOTICE",
           "REMOVE_ELEMENT_2233",
           "REMOVE_ELEMENT_anchor",
@@ -1449,7 +1453,7 @@
           ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
           MEDAL_DANMU_INTERVAL: "每两条弹幕间所等待的时间。<mh3>注意：</mh3><mul><mli>由于B站服务器限制，间隔时间必须大于等于1秒，否则弹幕发送会出错。</mli></mul>",
           ANCHOR_IGNORE_ROOM: "不检查和参加这些直播间的天选。<mul><mli>如果要填写多个直播间，每两个直播间号之间请用半角逗号<code>,</code>隔开。</mli></mul>",
-          ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。</mli></mul>",
+          ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。</mli></mul><mh3>注意：</mh3><mul><mli>检索天选抽奖的同时也可以检索到红包抽奖。</mli><mli>如果你想同时参与天选时刻和红包抽奖，请勾选<code>参加天选时刻抽奖</code>和<code>参加直播红包抽奖</code>，但建议<strong>不要</strong>同时勾选<code>天选时刻数据获取方式</code>和<code>天选时刻数据获取方式</code>中的选项，否则极其容易触发风控。</mli><mli>如果选择勾选<code>天选时刻数据获取方式</code>中的选项，触发风控后脚本会尝试切换备用API来获取天选数据，但在这种状态下无法获取红包抽奖数据。</mli></mul>",
           SHARE: "并不会真的分享视频，通过调用特定api直接完成任务。",
           ANCHOR_MONEY_ONLY: "仅参加能识别到金额的天选。<mul><mli>由于部分天选的奖品名较特殊，可能会遗漏或误判一些天选。</mli></mul>",
           LIGHT_MEDALS: "根据点亮模式的不同，这些直播间的粉丝勋章将会被点亮或排除在外。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
@@ -1486,10 +1490,12 @@
           REMOVE_ELEMENT_pkBanner: "移除位于直播画面上方的大乱斗入口。",
           REMOVE_ELEMENT_rank: "移除位于直播画面上方的排行榜（？）入口。<mul><mli>这个位置有时候会变成某个活动的入口。如果你不是主播也不是喜欢给主播送礼物的观众，那么这些活动通常和你没关系。</mli></mul>",
           GET_PRIVILEGE: "每个月领取一次大会员权益。<mul><mli>目前仅支持领取B币券和会员购优惠券。</mli></mul>",
-          POPULARITY_REDPOCKET_LOTTERY: "参与直播红包抽奖。<mh3>注意：</mh3><mul><mli>本功能风险较高，请自行斟酌是否开启。</mli></mul><mh3>原理：</mh3><mul><mli>从热门直播间列表等来源获取直播间数据，每隔一段时间逐一检查这些房间是否有红包抽奖，若有则参与抽奖并建立一个与该房间的webSocket连接以持续获取该房间之后可能出现的红包数据。如果该直播间长时间没有红包抽奖会断开与该房间webSocket连接。</mli></mul>",
+          POPULARITY_REDPOCKET_LOTTERY: "参与直播红包抽奖。<mh3>原理：</mh3><mul><mli>从热门直播间列表等来源获取直播间数据，每隔一段时间逐一检查这些房间是否有红包抽奖，若有则参与抽奖并建立一个与该房间的webSocket连接以持续获取该房间之后可能出现的红包数据。如果该直播间长时间没有红包抽奖会断开与该房间webSocket连接。</mli></mul><mh3>注意：</mh3><mul><mli>如果参与红包抽奖时自动发送的弹幕出现在了你使用脚本的直播间，那就说明你被风控了。</mli><mli>小号给大号送礼物可能会导致大号账户被冻结，无法提现。</mli><mli>检索红包抽奖的同时也可以检索到天选抽奖。</mlii>如果你想同时参与天选时刻和红包抽奖，请勾选<code>参加天选时刻抽奖</code>和<code>参加直播红包抽奖</code>，但建议<strong>不要</strong>同时勾选<code>天选时刻数据获取方式</code>和<code>天选时刻数据获取方式</code>中的选项，否则极其容易触发风控。</mli><mli>如果选择勾选<code>天选时刻数据获取方式</code>中的选项，触发风控后脚本会尝试切换备用API来获取天选数据，但在这种状态下无法获取红包抽奖数据。</mli></mul>",
           POPULARITY_REDPOCKET_CHECK_INTERVAL: "主动去搜寻红包抽奖的间隔。",
           POPULARITY_REDPOCKET_REQUEST_INTERVAL: "每两个请求之间的间隔时间。<mul><mli>若间隔时间过短可能会被风控。</mli></mul>",
-          POPULARITY_REDPOCKET_DELAY: "参与抽奖前等待一段时间。"
+          POPULARITY_REDPOCKET_DELAY: "参与抽奖前等待一段时间。",
+          POPULARITY_REDPOCKET_TYPE_POLLING: "高热度房间来源于各分区热门房间列表。",
+          POPULARITY_REDPOCKET_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的红包抽奖。"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -5094,7 +5100,7 @@
             return delayCall(() => MY_API.AnchorLottery.getAnchorData(roomid), 1800e3);
           }
           switch (MY_API.AnchorLottery.getAnchorDataType) {
-            case 2: {
+            case 1: {
               return BAPI.xlive.lottery.getLotteryInfoWeb(roomid).then((response) => {
                 MYDEBUG(`API.xlive.lottery.gettLotteryInfoWeb(${roomid}) response`, response);
                 if (response.code === 0) {
@@ -5107,7 +5113,7 @@
                 }
               })
             }
-            case 1:
+            case 2:
             default: {
               return BAPI.xlive.anchor.check(roomid).then((response) => {
                 MYDEBUG(`API.xlive.anchor.check(${roomid}) response`, response);
@@ -5640,7 +5646,7 @@
             if (!MY_API.AnchorLottery.filter.hasChecked(data)) return false;
             if (!MY_API.AnchorLottery.filter.time(data)) return false;
             if (!MY_API.AnchorLottery.filter.status(data)) return false;
-            return MY_API.AnchorLottery.filter.further(data, uid);
+            return MY_API.AnchorLottery.filter.further(data);
           });
           if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) {
             // 上传至直播间简介
@@ -6277,7 +6283,8 @@
       },
       PopularityRedpocketLottery: {
         checkedIdList: [], // 已检查过的lot_id列表
-        roomidList: [],
+        roomidList: [], // 直播间id列表
+        liveUserList: [], // 关注的直播用户列表
         wsConnectingList: [],
         popularityRedPocketBridge: new LotteryBridge('popularityRedPocket'),
         getAreaData: () => {
@@ -6307,6 +6314,18 @@
               return delayCall(() => MY_API.PopularityRedpocketLottery.getRoomList());
             }
           });
+        },
+        getLiveUsers: () => {
+          return BAPI.dynamic_svr.w_live_users(2000).then((response) => {
+            MYDEBUG(`API.dynamic_svr.w_live_users`, response);
+            if (response.code === 0) {
+              const items = response.data.items;
+              MY_API.PopularityRedpocketLottery.liveUserList = items instanceof Array ? [...items] : [];
+            } else {
+              MY_API.chatLog(`[红包抽奖] 获取正在直播的已关注UP出错 ${response.msg}`, 'caution');
+              return delayCall(() => MY_API.PopularityRedpocketLottery.getLiveUsers());
+            }
+          })
         },
         getHotRoomList: async () => {
           let areaData = await MY_API.PopularityRedpocketLottery.getAreaData();
@@ -6384,12 +6403,12 @@
           let resetTimer = null;
           const resetTime = 20 * 60 * 1000;
           if (response.code === 0) {
-            MYDEBUG('[预约抽奖] 服务器地址', response);
+            MYDEBUG('[红包抽奖] 服务器地址', response);
             let wst = new BAPI.DanmuWebSocket(Live_info.uid, roomid, response.data.host_server_list, response.data.token);
             let reset = (time = resetTime) => {
               clearTimeout(resetTimer);
               resetTimer = setTimeout(() => {
-                MYDEBUG(`[预约抽奖] 与房间${roomid}的websocket连接长时间没有收到预期的cmd，断开连接`, wst);
+                MYDEBUG(`[红包抽奖] 与房间${roomid}的websocket连接长时间没有收到预期的cmd，断开连接`, wst);
                 wst.close(1000);
               }, time)
             }
@@ -6439,14 +6458,44 @@
             return setTimeout(() => MY_API.PopularityRedpocketLottery.run(), sleepTime);
           }
           MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.addLotteryListener(async function (data, roomid) {
-            if (data.lot_status === 1) {
-              const ruid = await MY_API.PopularityRedpocketLottery.getUidbyRoomid(roomid);
-              if (ruid) {
-                await MY_API.PopularityRedpocketLottery.draw(ruid, roomid, lot);
+            for (const lot of data) {
+              if (lot.lot_status === 1) {
+                const ruid = await MY_API.PopularityRedpocketLottery.getUidbyRoomid(roomid);
+                if (ruid) {
+                  await MY_API.PopularityRedpocketLottery.draw(ruid, roomid, lot);
+                  if (findVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid) === -1 && MY_API.PopularityRedpocketLottery.wsConnectingList.length < 64)
+                    MY_API.PopularityRedpocketLottery.createWebsocket(roomid, ruid);
+                }
               }
             }
           })
-          await MY_API.PopularityRedpocketLottery.getHotRoomList();
+          if (MY_API.CONFIG.POPULARITY_REDPOCKET_TYPE_POLLING)
+            await MY_API.PopularityRedpocketLottery.getHotRoomList();
+          if (MY_API.CONFIG.POPULARITY_REDPOCKET_TYPE_FOLLOWING) {
+            await MY_API.PopularityRedpocketLottery.getLiveUsers();
+            for (const i of MY_API.PopularityRedpocketLottery.liveUserList) {
+              let realRoomId, roomid;
+              const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
+                uid = i.uid;
+              if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+              if (!roomid) return MYERROR('[红包抽奖] 获取已关注开播直播间号失败', roomidList);
+              if (Number(roomid) <= 10000) {
+                realRoomId = await BAPI.room.get_info(roomid).then((res) => {
+                  MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号
+                  if (res.code === 0) {
+                    return res.data.room_id;
+                  } else {
+                    window.toast(`[红包抽奖] 获取房间【${roomid}】信息出错 ${res.message}`, 'error');
+                    return roomid;
+                  }
+                })
+              } else realRoomId = roomid;
+              addVal(MY_API.PopularityRedpocketLottery.roomidList, realRoomId);
+              roomidAndUid[roomid] = uid;
+              roomidAndUid[realRoomId] = uid;
+            }
+            MY_API.chatLog(`[天选时刻] 已关注的开播直播间获取完毕<br>共${MY_API.PopularityRedpocketLottery.liveUserList.length}个`, 'success');
+          }
           MY_API.chatLog(`[红包抽奖] 开始检查红包抽奖（共${MY_API.PopularityRedpocketLottery.roomidList.length}个房间）`, 'info');
           for (const roomid of MY_API.PopularityRedpocketLottery.roomidList) {
             let data = await MY_API.PopularityRedpocketLottery.getRedPocketData(roomid);
