@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.7.9.7
+// @version        5.8
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -41,7 +41,7 @@
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.min.html
+// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@980351c4cddf9b86258e73cd49c374702b692f1b/assets/html/main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -819,8 +819,13 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "【红包抽奖】修复抽奖前随机等待一段时间导致抽奖超时的bug。",
-              "【红包抽奖】修复奖品总价值判断不正确的bug。"
+              "修复获取部分粉丝勋章的小心心出错的Bug，跳过无法获取小心心的粉丝勋章。",
+              "优化自动送礼出错时的错误处理。",
+              "【红包抽奖】新增从已关注的开播直播间获取红包抽奖数据。",
+              "<strong>【awpush】awpush已支持红包抽奖。</strong>",
+              "检索天选时刻或红包抽奖时能获取到另一种抽奖的数据并参加。",
+              "优化了同时参与天选时刻和红包抽奖时容易风控的问题，采用新的抽奖数据检索策略，请点击【参与天选时刻抽奖】和【参与直播红包抽奖】后的小问号查看新的策略并调整您的脚本设置。",
+              "目前脚本中有不少功能是冗余的，从下个版本开始会逐步删除一些没用的功能来精简脚本。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
