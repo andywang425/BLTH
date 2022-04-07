@@ -11,7 +11,7 @@ process.stdin.on('readable', () => {
   if (chunk !== null) {
     str = String(chunk);
     str = str.replace(/。/g, "。\n");
-    process.stdout.write("\n处理完成（已复制到剪切板）: \n\n" + str);
     exec('clip').stdin.end(iconv.encode(str, 'gbk'));
+    process.stdout.write("\n处理完成（已复制到剪切板）: \n\n" + str);
   }
 });

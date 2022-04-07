@@ -19,9 +19,10 @@
 -------------------------------
 
 ## 一些建议
-+ 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新(`shift+F5`)页面。  
++ 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新(`ctrl+F5`)页面。  
 + 部分设置更改后需要刷新页面才能生效。  
 + 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如cookie权限，脚本拦截)否则该脚本可能无法正常运行。  
++ 修改脚本设置前，如果该设置后面有蓝色小问号，请点击小问号查看说明再修改。  
 + **如果因使用脚本而产生了某些问题，请向本项目的开发者反馈，而不是去打扰B站客服，谢谢。**
 
 -------------------------------
@@ -122,6 +123,7 @@
 + [pako](https://github.com/nodeca/pako) (MIT)：javascript压缩/解压缩库。
 + [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli项目中的javascript解码库。
 + [hotkeys](https://github.com/jaywcjlove/hotkeys) (MIT)：一个强健的 Javascript 库，用于捕获键盘输入和输入的组合键。
++ [emitter](https://github.com/component/emitter) (MIT): 事件触发器组件。
 
 本脚本引用的外部资源：  
 + [layer.css](https://github.com/sentsin/layer/blob/master/dist/theme/default/layer.css)：layer.js的内置样式。

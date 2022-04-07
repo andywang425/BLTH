@@ -1,8 +1,6 @@
 .gitignore
 .vscode
 .github/ISSUE_TEMPLATE/bug_report.md
-package-lock.json
-package.json
 /node_modules
 /note
 /assets/unused_libraries
