@@ -825,7 +825,6 @@
               "<strong>【awpush】awpush已支持红包抽奖。</strong>",
               "检索天选时刻或红包抽奖时能获取到另一种抽奖的数据并参加。",
               "优化了同时参与天选时刻和红包抽奖时容易风控的问题，采用新的抽奖数据检索策略，请点击【参与天选时刻抽奖】和【参与直播红包抽奖】后的小问号查看新的策略并调整您的脚本设置。",
-              "目前脚本中有不少功能是冗余的，从下个版本开始会逐步删除一些没用的功能来精简脚本。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -840,10 +839,10 @@
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
                 <mol>${createHtml(clientMliList)}</mol>
-                <mol>感谢<a href=\"https://github.com/ZiuChen\" target=\"_blank\">ZiuChen</a>提供的帮助。</mol>
+                <mol>目前脚本中有不少功能是冗余的，从下个版本开始会逐步删除一些没用的功能来精简脚本。</mol>
                 <hr><em style="color:grey;">
-                如果使用过程中遇到问题，欢迎去 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
-                也可以进q群讨论：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
+                如果使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
+                也欢迎进q群聊聊天：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
                 </em>
                 `
             });
@@ -1458,7 +1457,7 @@
           ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
           MEDAL_DANMU_INTERVAL: "每两条弹幕间所等待的时间。<mh3>注意：</mh3><mul><mli>由于B站服务器限制，间隔时间必须大于等于1秒，否则弹幕发送会出错。</mli></mul>",
           ANCHOR_IGNORE_ROOM: "不检查和参加这些直播间的天选。<mul><mli>如果要填写多个直播间，每两个直播间号之间请用半角逗号<code>,</code>隔开。</mli></mul>",
-          ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。</mli></mul><mh3>注意：</mh3><mul><mli>检索天选抽奖的同时也可以检索到红包抽奖。</mli><mli>如果你想同时参与天选时刻和红包抽奖，请勾选<code>参加天选时刻抽奖</code>和<code>参加直播红包抽奖</code>，但建议<strong>不要</strong>同时勾选<code>天选时刻数据获取方式</code>和<code>天选时刻数据获取方式</code>中的选项，否则极其容易触发风控。</mli><mli>如果选择勾选<code>天选时刻数据获取方式</code>中的选项，触发风控后脚本会尝试切换备用API来获取天选数据，但在这种状态下无法获取红包抽奖数据。</mli></mul>",
+          ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。 </mli></mul><mh3>注意：</mh3><mul><mli>检索天选抽奖的同时也可以检索到红包抽奖。</mli><mli>在不使用awpush的情况下，如果你想同时参与天选时刻和红包抽奖，建议<strong>不要</strong>同时勾选<code>天选时刻数据获取方式</code>和<code>红包抽奖数据获取方式</code>中的选项（即只勾选<code>天选时刻数据获取方式</code>或<code>红包抽奖数据获取方式</code>中的选项），否则极其容易触发风控。如果启用awpush的话就不必在意这个了，因为相关设置将由BLTH-server来决定。 </mli><mli>如果选择勾选<code>天选时刻数据获取方式</code>中的选项，触发风控后脚本会尝试切换备用API来获取天选数据，但在这种状态下无法获取红包抽奖数据。</mli></mul>",
           SHARE: "并不会真的分享视频，通过调用特定api直接完成任务。",
           ANCHOR_MONEY_ONLY: "仅参加能识别到金额的天选。<mul><mli>由于部分天选的奖品名较特殊，可能会遗漏或误判一些天选。</mli></mul>",
           LIGHT_MEDALS: "根据点亮模式的不同，这些直播间的粉丝勋章将会被点亮或排除在外。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
@@ -1495,7 +1494,7 @@
           REMOVE_ELEMENT_pkBanner: "移除位于直播画面上方的大乱斗入口。",
           REMOVE_ELEMENT_rank: "移除位于直播画面上方的排行榜（？）入口。<mul><mli>这个位置有时候会变成某个活动的入口。如果你不是主播也不是喜欢给主播送礼物的观众，那么这些活动通常和你没关系。</mli></mul>",
           GET_PRIVILEGE: "每个月领取一次大会员权益。<mul><mli>目前仅支持领取B币券和会员购优惠券。</mli></mul>",
-          POPULARITY_REDPOCKET_LOTTERY: "参与直播红包抽奖。<mh3>原理：</mh3><mul><mli>从热门直播间列表等来源获取直播间数据，每隔一段时间逐一检查这些房间是否有红包抽奖，若有则参与抽奖并建立一个与该房间的webSocket连接以持续获取该房间之后可能出现的红包数据。如果该直播间长时间没有红包抽奖会断开与该房间webSocket连接。</mli></mul><mh3>注意：</mh3><mul><mli>如果参与红包抽奖时自动发送的弹幕出现在了你使用脚本的直播间，那就说明你被风控了。</mli><mli>小号给大号送礼物可能会导致大号账户被冻结，无法提现。</mli><mli>检索红包抽奖的同时也可以检索到天选抽奖。</mlii>如果你想同时参与天选时刻和红包抽奖，请勾选<code>参加天选时刻抽奖</code>和<code>参加直播红包抽奖</code>，但建议<strong>不要</strong>同时勾选<code>天选时刻数据获取方式</code>和<code>天选时刻数据获取方式</code>中的选项，否则极其容易触发风控。</mli><mli>如果选择勾选<code>天选时刻数据获取方式</code>中的选项，触发风控后脚本会尝试切换备用API来获取天选数据，但在这种状态下无法获取红包抽奖数据。</mli></mul>",
+          POPULARITY_REDPOCKET_LOTTERY: "参与直播红包抽奖。<mh3>原理：</mh3><mul><mli>从热门直播间列表等来源获取直播间数据，每隔一段时间逐一检查这些房间是否有红包抽奖，若有则参与抽奖并建立一个与该房间的webSocket连接以持续获取该房间之后可能出现的红包数据。如果该直播间长时间没有红包抽奖会断开与该房间webSocket连接。 </mli></mul><mh3>注意：</mh3><mul><mli>如果参与红包抽奖时自动发送的弹幕出现在了你使用脚本的直播间，那就说明你被风控了。</mli><mli>小号给大号送礼物可能会导致大号账户被冻结，无法提现。</mli><mli>检索红包抽奖的同时也可以检索到天选抽奖。</mli><mli>在不使用awpush的情况下，如果你想同时参与天选时刻和红包抽奖，建议<strong>不要</strong>同时勾选<code>天选时刻数据获取方式</code>和<code>红包抽奖数据获取方式</code>中的选项（即只勾选<code>天选时刻数据获取方式</code>或<code>红包抽奖数据获取方式</code>中的选项），否则极其容易触发风控。如果启用awpush的话就不必在意这个了，因为相关设置将由BLTH-server来决定。 </mli><mli>如果选择勾选<code>天选时刻数据获取方式</code>中的选项，触发风控后脚本会尝试切换备用API来获取天选数据，但在这种状态下无法获取红包抽奖数据。</mli></mul>",
           POPULARITY_REDPOCKET_CHECK_INTERVAL: "主动去搜寻红包抽奖的间隔。",
           POPULARITY_REDPOCKET_REQUEST_INTERVAL: "每两个请求之间的间隔时间。<mul><mli>若间隔时间过短可能会被风控。</mli></mul>",
           POPULARITY_REDPOCKET_DELAY: "参与抽奖前等待一段时间。",
@@ -5836,7 +5835,7 @@
                   case 'HAND_OUT_POPULARITY_REDPOCKET_DATA': {
                     if (!config.popularity_red_pocket) return;
                     const data = json.data;
-                    window.toast(`[awpush] 获得已解析的红包数据 lot_id = ${data[0].lot_id}`);
+                    window.toast(`[awpush] 获得已解析的红包数据 lot_id = ${data.lot_id}`);
                     MYDEBUG('awpush 获得解析后的红包数据，准备参加', data);
                     MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.pushLottery(data, false);
                     break;
