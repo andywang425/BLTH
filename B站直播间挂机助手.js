@@ -41,7 +41,7 @@
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     file://D:\Documents\GitHub\BLTH\assets\html\main.min.html
+// @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.min.html
 // @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -1436,7 +1436,7 @@
           anchorBtnArea: "参加天选时会关注很多UP。可以在参加天选前点击【保存当前关注列表为白名单】，参与完天选后再点【取关不在白名单内的UP主】来清理关注列表。<mul><mli>不建议频繁清理，可能会被风控。</mli><mli>【编辑白名单】每两个uid之间用半角逗号<code>,</code>隔开。</mli><mli>推荐大家使用【取关分组内的UP主】的功能来清理关注列表，【取关不在白名单内的UP主】可以作为一个备选方案。</mli></mul>",
           ANCHOR_TYPE_POLLING: "高热度房间来源于各分区热门房间列表。",
           ANCHOR_UPLOAD_DATA: "使用这个功能前你必须先拥有自己的直播间。<mul><mli>【间隔__秒】：这个设置项若填<code>10</code>秒，则每<code>10</code>秒检查一次是否收集到了新的数据，若有才上传。</mli></mul>",
-          ANCHOR_UPLOAD_MSG: "在上传天选数据的同时可以上传一段附加信息。<mul><mli>如果想把附加信息设为空，请点击编辑界面上的<code>留空</code>按钮。</mli></mul>",
+          ANCHOR_UPLOAD_MSG: "在上传天选数据到直播间简介的同时可以上传一段附加信息。<mul><mli>如果想把附加信息设为空，请点击编辑界面上的<code>留空</code>按钮。</mli></mul>",
           ANCHOR_MAXLIVEROOM_SAVE: "个人简介有长度限制（约为一万个字符），若【个人简介储存房间最大数量】太大会无法上传。",
           ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<mh3>注意：</mh3><mul><mli>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</mli></mul>",
           ANCHOR_TYPE_LIVEROOM: "因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://live.bilibili.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<mul><mli>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</mli><mli>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</mli><mli><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</mli></mul>",
@@ -1477,7 +1477,7 @@
           WEAR_MEDAL_BEFORE_DANMU: "手动发送弹幕前自动佩戴当前房间的粉丝勋章再发弹幕。<mul><mli>如果没有当前直播间的粉丝勋章则不进行任何操作。</mli><mli>【一直自动佩戴】比较适合需要同时在多个直播间发弹幕的情况。如果只想在某一个直播间发弹幕勾选【仅在首次发弹幕时自动佩戴】即可。</mli><mli>佩戴成功后会把弹幕框左侧的粉丝牌替换为当前直播间的粉丝牌。</mli></mul>",
           ANCHOR_UPLOAD_ROOMLIST: "上传你所收集到的直播间列表至BLTH-server。<mul><mli>如果可以的话请在【天选时刻获取数据方式】中勾选至少两项，因为单纯地把你从BLTH-server获取到的直播间号再上传回去意义不大。</mli><mli>apikey目前已经不公开发放了。</mli></mul>",
           ANCHOR_TYPE_SERVER: "<strong>BLTH-server</strong>是本脚本的服务端，用于推送天选时刻数据，提供脚本更新信息等。<mul><mli>apikey目前已经不公开发放了。</mli><mli>该功能的原理为ajax轮询，与awpush不同。awpush使用webSocket实时推送天选数据。</mli></mul>",
-          ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻数据推送系统。可以实现天选数据的收集和分发。<mh3>说明</mh3><mul><mli>这个功能仍处于测试阶段，不是很稳定。</mli><mli>apikey目前已经不公开发放了。</mli><mli>启用这个功能后你的部分设置将会由服务端决定，如【天选时刻数据获取方式】，检查房间最大数量，请求间隔等。</mli><mli>该功能与【从BLTH-server获取天选时刻数据】不同。awpush使用webSocket实现实时推送，【从BLTH-server获取天选时刻数据】通过ajax轮询获取数据。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的天选数据。同时服务端会实时推送收到的天选数据。</mul>",
+          ANCHOR_AWPUSH: "<strong>awpush</strong>是搭建在<strong>BLTH-server</strong>的一个天选时刻/红包抽奖数据推送系统。可以实现天选/红包数据的收集和分发。<mh3>说明</mh3><mul><mli>目前看来awpush效果很好，欢迎尝试~</mli><mli>BLTH-server偶尔会掉线，请谅解。</mli><mli>apikey暂停发放。在服务器负载不高的情况下下无需apikey也能正常使用本服务。</mli><mli>启用这个功能后你的部分设置将会由服务端决定，如【天选时刻数据获取方式】，检查房间最大数量，请求间隔等。</mli><mli>天选时刻和直播红包抽奖中的本设置项是同步的。</mli></mul><mh3>原理</mh3><mul>首先客户端连接awpush并进行身份验证。验证成功后服务端会下发一个任务，若失败则断开连接。 接着客户端执行任务并上报所检索到的抽奖数据。同时服务端会实时推送收到的抽奖数据。</mul>",
           ANCHOR_AUTO_BUY_LV1_MEDAL: "检测到有1级粉丝牌要求的天选后，如果没有该勋章，则自动购买再参加。",
           REMOVE_ELEMENT_followSideBar: "开启本功能后会导致【实验室】按钮点击后无法出现弹窗。",
           ANCHOR_IGNORE_AREA: "忽略指定分区，即不检索这些分区的天选。<mul><mli>请正确填写所要忽略分区的名称，如:<code>娱乐,网游,手游,电台,单机游戏,虚拟主播,生活,学习,大事件</code>。</mli><mli>如果要填写多个分区，每两项之间请用半角逗号<code>,</code>隔开。</mli></mul>",
@@ -2310,9 +2310,10 @@
               // 绑定所有checkbox事件
               for (const i of checkList) {
                 const input = myDiv.find(`div[data-toggle="${i}"] input:checkbox`);
-                if (MY_API.CONFIG[i]) input.attr('checked', '');
+                if (MY_API.CONFIG[i]) input.prop('checked', true);
                 input.change(function () {
                   MY_API.CONFIG[i] = $(this).prop('checked');
+                  input.each(function () { this.checked = MY_API.CONFIG[i] });
                   MY_API.saveConfig();
                 });
               };
@@ -4762,15 +4763,15 @@
             }
             return obj;
           },
-          ignore_room: (roomid) => {
+          ignore_room: (roomid, chatlog = MY_API.CONFIG.ANCHOR_LOTTERY) => {
             if (MY_API.CONFIG.ANCHOR_IGNORE_ROOM && findVal(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST, roomid) > -1) {
-              MY_API.chatLog(`[天选时刻] 忽略直播间<br>不参加直播间${linkMsg(liveRoomUrl + roomid, roomid)}的天选`, 'warning');
+              if (chatlog) MY_API.chatLog(`[天选时刻] 忽略直播间<br>不参加直播间${linkMsg(liveRoomUrl + roomid, roomid)}的天选`, 'warning');
               return false;
             } else return true;
           },
-          hasChecked: (data) => {
+          hasChecked: (data, chatlog = MY_API.CONFIG.ANCHOR_LOTTERY) => {
             if (findVal(MY_API.AnchorLottery.checkedIdList, data.id) > -1) {
-              MY_API.chatLog(`[天选时刻] 忽略已检索过的天选<br>roomid = ${linkMsg(liveRoomUrl + data.room_id, data.room_id)}, id = ${data.id}`, 'info');
+              if (chatlog) MY_API.chatLog(`[天选时刻] 忽略已检索过的天选<br>roomid = ${linkMsg(liveRoomUrl + data.room_id, data.room_id)}, id = ${data.id}`, 'info');
               if (MY_API.AnchorLottery.checkedIdList.length > 500) MY_API.AnchorLottery.checkedIdList.splice(0, 500);
               return false
             } else {
@@ -4779,15 +4780,15 @@
               return true;
             }
           },
-          time: (data) => {
+          time: (data, chatlog = MY_API.CONFIG.ANCHOR_LOTTERY) => {
             if (data.time === 0) {
-              MY_API.chatLog(`[天选时刻] 忽略过期天选<br>roomid = ${linkMsg(liveRoomUrl + data.room_id, data.room_id)}, id = ${data.id}`, 'info');
+              if (chatlog) MY_API.chatLog(`[天选时刻] 忽略过期天选<br>roomid = ${linkMsg(liveRoomUrl + data.room_id, data.room_id)}, id = ${data.id}`, 'info');
               return false
             } else return true;
           },
-          status: (data) => {
+          status: (data, chatlog = MY_API.CONFIG.ANCHOR_LOTTERY) => {
             if (data.status === 2) {
-              MY_API.chatLog(`[天选时刻] 忽略已参加天选<br>roomid = ${linkMsg(liveRoomUrl + data.room_id, data.room_id)}, id = ${data.id}<br>奖品名：${data.award_name}<br>`, 'info');
+              if (chatlog) MY_API.chatLog(`[天选时刻] 忽略已参加天选<br>roomid = ${linkMsg(liveRoomUrl + data.room_id, data.room_id)}, id = ${data.id}<br>奖品名：${data.award_name}<br>`, 'info');
               return false
             } else return true;
           },
@@ -5104,7 +5105,11 @@
               return BAPI.xlive.lottery.getLotteryInfoWeb(roomid).then((response) => {
                 MYDEBUG(`API.xlive.lottery.gettLotteryInfoWeb(${roomid}) response`, response);
                 if (response.code === 0) {
-                  if (response.data.popularity_red_pocket) MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.pushLottery(response.data.popularity_red_pocket, roomid);
+                  if (response.data.popularity_red_pocket) {
+                    let data = response.data.popularity_red_pocket;
+                    data.forEach(i => i.roomid = roomid);
+                    MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.pushLottery(data);
+                  }
                   return response.data.anchor
                 } else {
                   MY_API.chatLog(`[天选时刻] 检查天选的API(lottery.gettLotteryInfoWeb)无法使用<br>${response.message}<br>尝试更换下一个API`, 'warning');
@@ -5430,203 +5435,7 @@
             default: return -1;
           }
         },
-        awpush: {
-          polling_allRoomList: async () => {
-            if (MY_API.AnchorLottery.allRoomList.length > MY_API.AWPUSH.userInfo.max_room)
-              MY_API.AnchorLottery.allRoomList = [...MY_API.AnchorLottery.allRoomList.slice(0, MY_API.AWPUSH.userInfo.max_room)]
-            MY_API.chatLog(`[天选时刻] 开始检查天选（共${MY_API.AnchorLottery.allRoomList.length}个房间）`, 'success');
-            let lastStatus = MY_API.AWPUSH.status;
-            for (const room of MY_API.AnchorLottery.allRoomList) {
-              // 如果重连成功则不执行之前的任务
-              if (lastStatus !== 'open' && MY_API.AWPUSH.status === 'open') return $.Deferred().resolve('return');
-              lastStatus = MY_API.AWPUSH.status;
-              let p = $.Deferred();
-              const uid = roomidAndUid.hasOwnProperty(room) ? roomidAndUid[room] : undefined;
-              if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
-              MY_API.AnchorLottery.awpush.check(room, uid).then((re) => {
-                if (re) {
-                  // 数据格式正确，可以参加
-                  MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES).then(() => p.resolve());
-                } else p.resolve();
-              });
-              await p;
-              await sleep(MY_API.AWPUSH.userInfo.interval);
-            };
-          },
-          handleTask: async () => {
-            // 用户自己设置的休眠
-            const sleepTime = sleepCheck(MY_API.CONFIG);
-            if (sleepTime) {
-              // 休眠
-              MYDEBUG('[天选时刻] awpush', `处于休眠时段，${sleepTime}毫秒后再次检查天选`);
-              MY_API.AWPUSH.status = 'active_close';
-              MY_API.AWPUSH.ws.close();
-              MY_API.chatLog(`[天选时刻] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并再次连接awpush`, 'warning');
-              return setTimeout(() => MY_API.AWPUSH.run(), sleepTime);
-            }
-            switch (MY_API.AWPUSH.userInfo.task) {
-              case "POLLING_LIVEROOMS": {
-                await MY_API.AnchorLottery.getLiveUsers();
-                MY_API.AnchorLottery.liveRoomList = [];
-                for (const i of MY_API.AnchorLottery.liveUserList) {
-                  let realRoomId, roomid;
-                  const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
-                    uid = i.uid;
-                  if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
-                  if (!roomid) return MYERROR('[天选时刻] 获取已关注开播直播间号失败', roomidList);
-                  if (Number(roomid) <= 10000) {
-                    realRoomId = await BAPI.room.get_info(roomid).then((res) => {
-                      MYDEBUG(`API.room.get_info roomid=${roomid} res`, res);
-                      if (res.code === 0) {
-                        return res.data.room_id;
-                      } else {
-                        window.toast(`[天选时刻]获取房间【${roomid}】信息出错 ${res.message}`, 'error');
-                        return roomid;
-                      }
-                    })
-                  } else realRoomId = roomid;
-                  addVal(MY_API.AnchorLottery.liveRoomList, realRoomId);
-                  roomidAndUid[roomid] = uid;
-                  roomidAndUid[realRoomId] = uid;
-                }
-                MY_API.chatLog(`[天选时刻] 已关注的开播直播间获取完毕<br>共${MY_API.AnchorLottery.liveRoomList.length}个`, 'success');
-                for (const r of MY_API.AnchorLottery.liveRoomList) {
-                  addVal(MY_API.AnchorLottery.allRoomList, r);
-                }
-                await MY_API.AnchorLottery.awpush.polling_allRoomList();
-                break;
-              }
-              case "POLLING_AREA": {
-                await MY_API.AnchorLottery.getRoomList(MY_API.AWPUSH.userInfo.area_data);
-                for (const r of MY_API.AnchorLottery.roomidList) {
-                  addVal(MY_API.AnchorLottery.allRoomList, r);
-                }
-                await MY_API.AnchorLottery.awpush.polling_allRoomList();
-                break;
-              }
-              default: {
-                MYERROR("awpush 未知任务", MY_API.AWPUSH.userInfo.task);
-                return;
-              }
-            }
-            const json = {
-              code: "GET_TASK",
-              uid: Live_info.uid,
-              secret: MY_API.AWPUSH.userInfo.secret,
-            };
-            setTimeout(() => MY_API.AWPUSH.desend(JSON.stringify(json)), MY_API.AWPUSH.userInfo.sleep_time);
-            // 每两轮请求间的休息时间
-            const sleep_time = (MY_API.AWPUSH.userInfo.sleep_time / 1000).toFixed(0);
-            MY_API.chatLog(`[天选时刻] ${sleep_time}秒后开始执行下一轮任务`);
-            MYDEBUG(`awpush ${sleep_time}秒后运行下一轮任务`);
-          },
-          check: (roomid, uid) => {
-            return MY_API.AnchorLottery.getAnchorData(roomid).then((data) => {
-              if (!data) return false;
-              if (!MY_API.AnchorLottery.filter.hasChecked(data)) return false;
-              if (!MY_API.AnchorLottery.filter.time(data)) return false;
-              if (!MY_API.AnchorLottery.filter.status(data)) return false;
-              const update_data = {
-                code: "UPDATE_ANCHOR_DATA",
-                uid: Live_info.uid,
-                secret: MY_API.AWPUSH.userInfo.secret,
-                data: MY_API.AnchorLottery.filter.delUselessData(data)
-              };
-              MYDEBUG('awpush 上传天选数据: ', update_data);
-              MY_API.AWPUSH.desend(JSON.stringify(update_data));
-              // 添加至上传列表
-              addVal(MY_API.AnchorLottery.lotteryResponseList, roomid);
-              addVal(MY_API.AnchorLottery.BLTHuploadRoomList, roomid);
-              return MY_API.AnchorLottery.filter.further(data, uid);
-            });
-          },
-          run: () => {
-            // awpush 入口
-            MY_API.AWPUSH.wsinit();
-            let secret, task, area_data, sleep_time, interval, max_room;
-            // 收到消息
-            MY_API.AWPUSH.ws.addEventListener('message', function (event) {
-              MYDEBUG('awpush 收到来自服务端的消息', event.data);
-              if (event.data === 'pong') MY_API.AWPUSH.heartBeat.reset();
-              else {
-                let json = '';
-                let reader = new FileReader();
-                reader.onload = function () {
-                  json = JSON.parse(pako.inflate(reader.result, { to: 'string' }));
-                  if (json.code !== 0) return MYERROR('awpush 收到消息中的code不为0，出错', json);
-                  MYDEBUG('awpush 解析后消息', json);
-                  switch (json.type) {
-                    case 'WS_OPEN': {
-                      window.toast('[awpush] 连接成功', 'success');
-                      break;
-                    }
-                    case 'HAND_OUT_TASKS': {
-                      secret = json.data.secret;
-                      task = json.data.task;
-                      area_data = json.data.area_data || {};
-                      sleep_time = json.data.sleep_time || 30e3;
-                      interval = json.data.interval || 500;
-                      max_room = json.data.max_room || 500;
-                      window.toast(`[awpush] 获得任务: ${MY_API.AWPUSH.taskName[task]}${area_data.name ? " - " + area_data.name : ""}`, 'info');
-                      MYDEBUG(`awpush HAND_OUT_TASKS 分发任务 获得任务: ${task}, secret: ${secret}, 最大轮询房间数: ${max_room}, 休息时间: ${sleep_time}毫秒, 请求间隔: ${interval}毫秒, 分区信息`, area_data);
-                      MY_API.AWPUSH.userInfo.task = task;
-                      MY_API.AWPUSH.userInfo.secret = secret;
-                      MY_API.AWPUSH.userInfo.area_data = area_data;
-                      MY_API.AWPUSH.userInfo.sleep_time = sleep_time;
-                      MY_API.AWPUSH.userInfo.interval = interval;
-                      MY_API.AWPUSH.userInfo.max_room = max_room;
-                      MY_API.AnchorLottery.awpush.handleTask();
-                      break;
-                    }
-                    case 'HAND_OUT_ANCHOR_DATA': {
-                      const data = json.data;
-                      window.toast(`[awpush] 获得已解析的天选数据 id=${data.id} roomid=${data.room_id}`);
-                      MYDEBUG('awpush 获得解析后的天选数据，准备参加', data);
-                      if (!MY_API.AnchorLottery.filter.hasChecked(data)) return false;
-                      if (!MY_API.AnchorLottery.filter.ignore_room(data.room_id)) return false;
-                      if (!MY_API.AnchorLottery.filter.time(data)) return false;
-                      if (!MY_API.AnchorLottery.filter.status(data)) return false;
-                      MY_API.AnchorLottery.filter.further(data).then(re => {
-                        if (re) {
-                          // 数据格式正确，可以参加
-                          MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES);
-                        }
-                      });
-                      break;
-                    }
-                    case 'RES_UPDATE_ANCHOR_DATA': {
-                      // 上传天选数据成功
-                      window.toast(`[awpush] 上传天选数据（id=${json.data.id}）成功`, 'success');
-                      break;
-                    }
-                    default: {
-                      window.toast(`[awpush] 未知的消息种类 ${json.type}`, 'warning');
-                      MYERROR('awpush 未知的消息种类', json);
-                    }
-                  }
-                }
-                reader.readAsBinaryString(event.data);
-              }
-            });
-            // 关闭连接
-            MY_API.AWPUSH.ws.addEventListener('close', function (event) {
-              if (MY_API.AWPUSH.status === 'active_close') {
-                MYDEBUG('awpush 已主动断开连接');
-                window.toast('[awpush] 已主动断开连接', 'warning');
-                return;
-              }
-              MY_API.AWPUSH.status = 'close';
-              MY_API.AWPUSH.heartBeat.stop();
-              let json = {};
-              try {
-                json = JSON.parse(event.reason);
-              } catch (e) { json.data = event.reason; }
-              window.toast(`[awpush] ${json.data || '连接已关闭'} 30秒后尝试重连`, 'warning');
-              MYDEBUG('awpush 服务端已关闭连接，30秒后尝试重连', event.code, event.reason);
-              MY_API.AWPUSH.reconnect(MY_API.AnchorLottery.awpush.run);
-            });
-          }
-        },
+
         run: async () => {
           if (!MY_API.CONFIG.ANCHOR_LOTTERY || otherScriptsRunning) return $.Deferred().resolve();
           if (medal_info.status.state() === "resolved") MY_API.AnchorLottery.medal_list = [...medal_info.medal_list];
@@ -5646,6 +5455,16 @@
             if (!MY_API.AnchorLottery.filter.hasChecked(data)) return false;
             if (!MY_API.AnchorLottery.filter.time(data)) return false;
             if (!MY_API.AnchorLottery.filter.status(data)) return false;
+            if (MY_API.CONFIG.ANCHOR_AWPUSH) {
+              const update_data = {
+                code: "UPDATE_ANCHOR_DATA",
+                uid: Live_info.uid,
+                secret: MY_API.AWPUSH.userInfo.secret,
+                data: MY_API.AnchorLottery.filter.delUselessData(data)
+              };
+              MYDEBUG('awpush 上传天选数据: ', update_data);
+              MY_API.AWPUSH.desend(JSON.stringify(update_data));
+            }
             return MY_API.AnchorLottery.filter.further(data);
           });
           if (MY_API.CONFIG.ANCHOR_UPLOAD_DATA) {
@@ -5658,7 +5477,7 @@
           }
           if (MY_API.CONFIG.ANCHOR_AWPUSH) {
             // 如果开启了 awpush 中断后续流程
-            return MY_API.AnchorLottery.awpush.run();
+            return MY_API.AWPUSH.run();
           }
           function waitForNextRun(Fn, firstRun = false, toNext = false) {
             const sleepTime = sleepCheck(MY_API.CONFIG);
@@ -5769,9 +5588,10 @@
         } // run结束
       },
       AWPUSH: {
+        running: false,
         wsinit: function () {
           // 测试时用 localhost, 原为 andywang.top
-          MY_API.AWPUSH.ws = new WebSocket('wss://andywang.top:3001/ws');
+          MY_API.AWPUSH.ws = new WebSocket('ws://localhost:3000/ws');
           // 连接成功
           MY_API.AWPUSH.ws.addEventListener('open', function () {
             MY_API.AWPUSH.status = 'open';
@@ -5836,6 +5656,222 @@
           MY_API.AWPUSH.status = 'reconnecting';
           MY_API.AWPUSH.ws = null;
           setTimeout(fn, 30e3);
+        },
+        polling_allRoomList: async () => {
+          if (MY_API.AnchorLottery.allRoomList.length > MY_API.AWPUSH.userInfo.max_room)
+            MY_API.AnchorLottery.allRoomList = [...MY_API.AnchorLottery.allRoomList.slice(0, MY_API.AWPUSH.userInfo.max_room)]
+          MY_API.chatLog(`[awpush] 开始检查抽奖（共${MY_API.AnchorLottery.allRoomList.length}个房间）`, 'success');
+          let lastStatus = MY_API.AWPUSH.status;
+          for (const room of MY_API.AnchorLottery.allRoomList) {
+            // 如果重连成功则不执行之前的任务
+            if (lastStatus !== 'open' && MY_API.AWPUSH.status === 'open') return $.Deferred().resolve('return');
+            lastStatus = MY_API.AWPUSH.status;
+            let p = $.Deferred();
+            const uid = roomidAndUid.hasOwnProperty(room) ? roomidAndUid[room] : undefined;
+            if (!MY_API.CONFIG.ANCHOR_WAIT_REPLY) p.resolve();
+            MY_API.AWPUSH.check(room, uid).then((re) => {
+              if (re && MY_API.CONFIG.ANCHOR_LOTTERY) {
+                // 数据格式正确，可以参加
+                MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES).then(() => p.resolve());
+              } else p.resolve();
+            });
+            await p;
+            await sleep(MY_API.AWPUSH.userInfo.interval);
+          };
+        },
+        handleTask: async () => {
+          // 用户自己设置的休眠
+          const sleepTime = sleepCheck(MY_API.CONFIG);
+          if (sleepTime) {
+            // 休眠
+            MYDEBUG('[awpush] awpush', `处于休眠时段，${sleepTime}毫秒后再次检查天选`);
+            MY_API.AWPUSH.status = 'active_close';
+            MY_API.AWPUSH.ws.close();
+            MY_API.chatLog(`[awpush] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并再次连接awpush`, 'warning');
+            return setTimeout(() => MY_API.AWPUSH.run(), sleepTime);
+          }
+          switch (MY_API.AWPUSH.userInfo.task) {
+            case "POLLING_LIVEROOMS": {
+              await MY_API.AnchorLottery.getLiveUsers();
+              MY_API.AnchorLottery.liveRoomList = [];
+              for (const i of MY_API.AnchorLottery.liveUserList) {
+                let realRoomId, roomid;
+                const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
+                  uid = i.uid;
+                if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+                if (!roomid) return MYERROR('[awpush] 获取已关注开播直播间号失败', roomidList);
+                if (Number(roomid) <= 10000) {
+                  realRoomId = await BAPI.room.get_info(roomid).then((res) => {
+                    MYDEBUG(`API.room.get_info roomid=${roomid} res`, res);
+                    if (res.code === 0) {
+                      return res.data.room_id;
+                    } else {
+                      window.toast(`[awpush]获取房间【${roomid}】信息出错 ${res.message}`, 'error');
+                      return roomid;
+                    }
+                  })
+                } else realRoomId = roomid;
+                addVal(MY_API.AnchorLottery.liveRoomList, realRoomId);
+                roomidAndUid[roomid] = uid;
+                roomidAndUid[realRoomId] = uid;
+              }
+              MY_API.chatLog(`[awpush] 已关注的开播直播间获取完毕<br>共${MY_API.AnchorLottery.liveRoomList.length}个`, 'success');
+              for (const r of MY_API.AnchorLottery.liveRoomList) {
+                addVal(MY_API.AnchorLottery.allRoomList, r);
+              }
+              await MY_API.AWPUSH.polling_allRoomList();
+              break;
+            }
+            case "POLLING_AREA": {
+              await MY_API.AnchorLottery.getRoomList(MY_API.AWPUSH.userInfo.area_data);
+              for (const r of MY_API.AnchorLottery.roomidList) {
+                addVal(MY_API.AnchorLottery.allRoomList, r);
+              }
+              await MY_API.AWPUSH.polling_allRoomList();
+              break;
+            }
+            default: {
+              MYERROR("awpush 未知任务", MY_API.AWPUSH.userInfo.task);
+              return;
+            }
+          }
+          const json = {
+            code: "GET_TASK",
+            uid: Live_info.uid,
+            secret: MY_API.AWPUSH.userInfo.secret,
+          };
+          setTimeout(() => MY_API.AWPUSH.desend(JSON.stringify(json)), MY_API.AWPUSH.userInfo.sleep_time);
+          // 每两轮请求间的休息时间
+          const sleep_time = (MY_API.AWPUSH.userInfo.sleep_time / 1000).toFixed(0);
+          MY_API.chatLog(`[awpush] ${sleep_time}秒后开始执行下一轮任务`);
+          MYDEBUG(`awpush ${sleep_time}秒后运行下一轮任务`);
+        },
+        check: (roomid, uid) => {
+          return MY_API.AnchorLottery.getAnchorData(roomid).then((data) => {
+            if (!data) return false;
+            if (!MY_API.AnchorLottery.filter.hasChecked(data)) return false;
+            if (!MY_API.AnchorLottery.filter.time(data)) return false;
+            if (!MY_API.AnchorLottery.filter.status(data)) return false;
+            const update_data = {
+              code: "UPDATE_ANCHOR_DATA",
+              uid: Live_info.uid,
+              secret: MY_API.AWPUSH.userInfo.secret,
+              data: MY_API.AnchorLottery.filter.delUselessData(data)
+            };
+            MYDEBUG('awpush 上传天选数据: ', update_data);
+            MY_API.AWPUSH.desend(JSON.stringify(update_data));
+            if (!MY_API.CONFIG.ANCHOR_LOTTERY) return;
+            // 添加至上传列表
+            addVal(MY_API.AnchorLottery.lotteryResponseList, roomid);
+            addVal(MY_API.AnchorLottery.BLTHuploadRoomList, roomid);
+            return MY_API.AnchorLottery.filter.further(data, uid);
+          });
+        },
+        run: () => {
+          // awpush 入口
+          if (MY_API.AWPUSH.running) return;
+          MY_API.AWPUSH.running = true;
+          MY_API.AWPUSH.wsinit();
+          let secret, task, area_data, sleep_time, interval, max_room;
+          const config = {
+            anchor: MY_API.CONFIG.ANCHOR_LOTTERY,
+            popularity_red_pocket: MY_API.CONFIG.POPULARITY_REDPOCKET_LOTTERY
+          };
+          // 收到消息
+          MY_API.AWPUSH.ws.addEventListener('message', function (event) {
+            MYDEBUG('awpush 收到来自服务端的消息', event.data);
+            if (event.data === 'pong') MY_API.AWPUSH.heartBeat.reset();
+            else {
+              let json = '';
+              let reader = new FileReader();
+              reader.onload = function () {
+                json = JSON.parse(pako.inflate(reader.result, { to: 'string' }));
+                if (json.code !== 0) return MYERROR('awpush 收到消息中的code不为0，出错', json);
+                MYDEBUG('awpush 解析后消息', json);
+                switch (json.type) {
+                  case 'WS_OPEN': {
+                    window.toast('[awpush] 连接成功', 'success');
+                    break;
+                  }
+                  case 'HAND_OUT_TASKS': {
+                    secret = json.data.secret;
+                    task = json.data.task;
+                    area_data = json.data.area_data || {};
+                    sleep_time = json.data.sleep_time || 30e3;
+                    interval = json.data.interval || 500;
+                    max_room = json.data.max_room || 500;
+                    window.toast(`[awpush] 获得任务: ${MY_API.AWPUSH.taskName[task]}${area_data.name ? " - " + area_data.name : ""}`, 'info');
+                    MYDEBUG(`awpush HAND_OUT_TASKS 分发任务 获得任务: ${task}, secret: ${secret}, 最大轮询房间数: ${max_room}, 休息时间: ${sleep_time}毫秒, 请求间隔: ${interval}毫秒, 分区信息`, area_data);
+                    MY_API.AWPUSH.userInfo.task = task;
+                    MY_API.AWPUSH.userInfo.secret = secret;
+                    MY_API.AWPUSH.userInfo.area_data = area_data;
+                    MY_API.AWPUSH.userInfo.sleep_time = sleep_time;
+                    MY_API.AWPUSH.userInfo.interval = interval;
+                    MY_API.AWPUSH.userInfo.max_room = max_room;
+                    MY_API.AWPUSH.handleTask();
+                    break;
+                  }
+                  case 'HAND_OUT_ANCHOR_DATA': {
+                    if (!config.anchor) return;
+                    const data = json.data;
+                    window.toast(`[awpush] 获得已解析的天选数据 id=${data.id} roomid=${data.room_id}`);
+                    MYDEBUG('awpush 获得解析后的天选数据，准备参加', data);
+                    if (!MY_API.AnchorLottery.filter.hasChecked(data)) return false;
+                    if (!MY_API.AnchorLottery.filter.ignore_room(data.room_id)) return false;
+                    if (!MY_API.AnchorLottery.filter.time(data)) return false;
+                    if (!MY_API.AnchorLottery.filter.status(data)) return false;
+                    MY_API.AnchorLottery.filter.further(data).then(re => {
+                      if (re) {
+                        // 数据格式正确，可以参加
+                        MY_API.AnchorLottery.join(re, MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES);
+                      }
+                    });
+                    break;
+                  }
+                  case 'HAND_OUT_POPULARITY_REDPOCKET_DATA': {
+                    if (!config.popularity_red_pocket) return;
+                    const data = json.data;
+                    window.toast(`[awpush] 获得已解析的红包数据 lot_id = ${data[0].lot_id}`);
+                    MYDEBUG('awpush 获得解析后的红包数据，准备参加', data);
+                    MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.pushLottery(data, false);
+                    break;
+                  }
+                  case 'RES_UPDATE_POPULARITY_REDPOCKET_DATA': {
+                    // 上传红包数据成功
+                    window.toast(`[awpush] 上传红包数据（lot_id=${json.data.lot_id}）成功`, 'success');
+                    break;
+                  }
+                  case 'RES_UPDATE_ANCHOR_DATA': {
+                    // 上传天选数据成功
+                    window.toast(`[awpush] 上传天选数据（id=${json.data.id}）成功`, 'success');
+                    break;
+                  }
+                  default: {
+                    window.toast(`[awpush] 未知的消息种类 ${json.type}`, 'warning');
+                    MYERROR('awpush 未知的消息种类', json);
+                  }
+                }
+              }
+              reader.readAsBinaryString(event.data);
+            }
+          });
+          // 关闭连接
+          MY_API.AWPUSH.ws.addEventListener('close', function (event) {
+            if (MY_API.AWPUSH.status === 'active_close') {
+              MYDEBUG('awpush 已主动断开连接');
+              window.toast('[awpush] 已主动断开连接', 'warning');
+              return;
+            }
+            MY_API.AWPUSH.status = 'close';
+            MY_API.AWPUSH.heartBeat.stop();
+            let json = {};
+            try {
+              json = JSON.parse(event.reason);
+            } catch (e) { json.data = event.reason; }
+            window.toast(`[awpush] ${json.data || '连接已关闭'} 30秒后尝试重连`, 'warning');
+            MYDEBUG('awpush 服务端已关闭连接，30秒后尝试重连', event.code, event.reason);
+            MY_API.AWPUSH.reconnect(MY_API.AWPUSH.run);
+          });
         }
       },
       DANMU_MODIFY: {
@@ -6439,6 +6475,18 @@
                 case 'POPULARITY_RED_POCKET_START':
                   reset();
                   MYDEBUG(`[红包抽奖] 准备参加websocket推送的红包抽奖 lot_id = ${obj.data.lot_id}`, obj);
+                  if (MY_API.CONFIG.ANCHOR_AWPUSH) {
+                    obj.data.uid = uid;
+                    obj.data.roomid = roomid;
+                    const update_data = {
+                      code: "UPDATE_POPULARITY_REDPOCKET_DATA",
+                      uid: Live_info.uid,
+                      secret: MY_API.AWPUSH.userInfo.secret,
+                      data: MY_API.PopularityRedpocketLottery.delUselessData(obj.data)
+                    };
+                    MYDEBUG('awpush 上传红包数据: ', update_data);
+                    MY_API.AWPUSH.desend(JSON.stringify(update_data));
+                  }
                   await MY_API.PopularityRedpocketLottery.draw(uid, roomid, obj.data);
                   break;
                 default:
@@ -6449,6 +6497,16 @@
             MY_API.chatLog('[红包抽奖] 获取弹幕服务器地址错误', 'warning')
           }
         },
+        delUselessData: (data) => {
+          const delList = ['sender_face', 'h5_url']
+          for (const i of delList) {
+            delete data[i];
+          }
+          for (const j of data.awards) {
+            delete j.gift_pic
+          }
+          return data;
+        },
         run: async () => {
           if (!MY_API.CONFIG.POPULARITY_REDPOCKET_LOTTERY || otherScriptsRunning) return $.Deferred().resolve();
           const sleepTime = sleepCheck(MY_API.CONFIG);
@@ -6457,11 +6515,24 @@
             MY_API.chatLog(`[红包抽奖] 处于休眠时段，将会在<br>${new Date(ts_ms() + sleepTime).toLocaleString()}<br>结束休眠并继续检查抽奖`, 'warning');
             return setTimeout(() => MY_API.PopularityRedpocketLottery.run(), sleepTime);
           }
-          MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.addLotteryListener(async function (data, roomid) {
+          MY_API.PopularityRedpocketLottery.popularityRedPocketBridge.addLotteryListener(async function (data, update = true) {
+            if (!Array.isArray(data)) data = [data];
             for (const lot of data) {
               if (lot.lot_status === 1) {
-                const ruid = await MY_API.PopularityRedpocketLottery.getUidbyRoomid(roomid);
+                const roomid = lot.roomid;
+                const ruid = lot.uid || await MY_API.PopularityRedpocketLottery.getUidbyRoomid(roomid);
                 if (ruid) {
+                  if (MY_API.CONFIG.ANCHOR_AWPUSH && update) {
+                    lot.uid = ruid;
+                    const update_data = {
+                      code: "UPDATE_POPULARITY_REDPOCKET_DATA",
+                      uid: Live_info.uid,
+                      secret: MY_API.AWPUSH.userInfo.secret,
+                      data: MY_API.PopularityRedpocketLottery.delUselessData(lot)
+                    };
+                    MYDEBUG('awpush 上传红包数据: ', update_data);
+                    MY_API.AWPUSH.desend(JSON.stringify(update_data));
+                  }
                   await MY_API.PopularityRedpocketLottery.draw(ruid, roomid, lot);
                   if (findVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid) === -1 && MY_API.PopularityRedpocketLottery.wsConnectingList.length < 64)
                     MY_API.PopularityRedpocketLottery.createWebsocket(roomid, ruid);
@@ -6469,6 +6540,10 @@
               }
             }
           })
+          if (MY_API.CONFIG.ANCHOR_AWPUSH) {
+            // 如果开启了 awpush 中断后续流程
+            return MY_API.AWPUSH.run();
+          }
           if (MY_API.CONFIG.POPULARITY_REDPOCKET_TYPE_POLLING)
             await MY_API.PopularityRedpocketLottery.getHotRoomList();
           if (MY_API.CONFIG.POPULARITY_REDPOCKET_TYPE_FOLLOWING) {
@@ -6504,6 +6579,17 @@
                 if (lot.lot_status === 1) {
                   const ruid = await MY_API.PopularityRedpocketLottery.getUidbyRoomid(roomid);
                   if (ruid) {
+                    if (MY_API.CONFIG.ANCHOR_AWPUSH) {
+                      lot.uid = ruid;
+                      const update_data = {
+                        code: "UPDATE_POPULARITY_REDPOCKET_DATA",
+                        uid: Live_info.uid,
+                        secret: MY_API.AWPUSH.userInfo.secret,
+                        data: MY_API.PopularityRedpocketLottery.delUselessData(lot)
+                      };
+                      MYDEBUG('awpush 上传红包数据: ', update_data);
+                      MY_API.AWPUSH.desend(JSON.stringify(update_data));
+                    }
                     await MY_API.PopularityRedpocketLottery.draw(ruid, roomid, lot);
                     if (findVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid) === -1 && MY_API.PopularityRedpocketLottery.wsConnectingList.length < 64)
                       MY_API.PopularityRedpocketLottery.createWebsocket(roomid, ruid);
@@ -6601,7 +6687,6 @@
       API.RESERVE_ACTIVITY.run, // 预约抽奖
       API.GET_PRIVILEGE.run, // 领取大会员权益
       API.PopularityRedpocketLottery.run, // 直播红包抽奖
-      //API.test.run
     ];
     otherScriptsRunningCheck.then(() => runAllTasks(5000, 200, taskList));
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000);// 刷新直播间
