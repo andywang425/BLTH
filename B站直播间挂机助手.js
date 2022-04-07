@@ -5596,7 +5596,7 @@
         running: false,
         wsinit: function () {
           // 测试时用 localhost, 原为 andywang.top
-          MY_API.AWPUSH.ws = new WebSocket('ws://localhost:3000/ws');
+          MY_API.AWPUSH.ws = new WebSocket('wss://andywang.top:3001/ws');
           // 连接成功
           MY_API.AWPUSH.ws.addEventListener('open', function () {
             MY_API.AWPUSH.status = 'open';
