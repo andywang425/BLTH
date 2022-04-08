@@ -5535,12 +5535,10 @@
                 await MY_API.AnchorLottery.getLiveUsers();
                 MY_API.AnchorLottery.liveRoomList = [];
                 for (const i of MY_API.AnchorLottery.liveUserList) {
-                  let realRoomId, roomid;
-                  const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
-                    uid = i.uid;
-                  if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+                  const uid = i.uid;
+                  let realRoomId, roomid = liveLink2Roomid(i.link);
                   if (!roomid) return MYERROR('[天选时刻] 获取已关注开播直播间号失败', roomidList);
-                  if (Number(roomid) <= 10000) {
+                  if (roomid <= 10000) {
                     realRoomId = await BAPI.room.get_info(roomid).then((res) => {
                       MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号发弹幕
                       if (res.code === 0) {
@@ -5699,12 +5697,10 @@
               await MY_API.AnchorLottery.getLiveUsers();
               MY_API.AnchorLottery.liveRoomList = [];
               for (const i of MY_API.AnchorLottery.liveUserList) {
-                let realRoomId, roomid;
-                const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
-                  uid = i.uid;
-                if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+                const uid = i.uid;
+                let realRoomId, roomid = liveLink2Roomid(i.link);
                 if (!roomid) return MYERROR('[awpush] 获取已关注开播直播间号失败', roomidList);
-                if (Number(roomid) <= 10000) {
+                if (roomid <= 10000) {
                   realRoomId = await BAPI.room.get_info(roomid).then((res) => {
                     MYDEBUG(`API.room.get_info roomid=${roomid} res`, res);
                     if (res.code === 0) {
@@ -6553,12 +6549,10 @@
           if (MY_API.CONFIG.POPULARITY_REDPOCKET_TYPE_FOLLOWING) {
             await MY_API.PopularityRedpocketLottery.getLiveUsers();
             for (const i of MY_API.PopularityRedpocketLottery.liveUserList) {
-              let realRoomId, roomid;
-              const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
-                uid = i.uid;
-              if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+              const uid = i.uid;
+              let realRoomId, roomid = liveLink2Roomid(i.link);
               if (!roomid) return MYERROR('[红包抽奖] 获取已关注开播直播间号失败', roomidList);
-              if (Number(roomid) <= 10000) {
+              if (roomid <= 10000) {
                 realRoomId = await BAPI.room.get_info(roomid).then((res) => {
                   MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号
                   if (res.code === 0) {
@@ -6583,17 +6577,6 @@
                 if (lot.lot_status === 1) {
                   const ruid = await MY_API.PopularityRedpocketLottery.getUidbyRoomid(roomid);
                   if (ruid) {
-                    if (MY_API.CONFIG.ANCHOR_AWPUSH) {
-                      lot.uid = ruid;
-                      const update_data = {
-                        code: "UPDATE_POPULARITY_REDPOCKET_DATA",
-                        uid: Live_info.uid,
-                        secret: MY_API.AWPUSH.userInfo.secret,
-                        data: MY_API.PopularityRedpocketLottery.delUselessData(lot)
-                      };
-                      MYDEBUG('awpush 上传红包数据: ', update_data);
-                      MY_API.AWPUSH.desend(JSON.stringify(update_data));
-                    }
                     await MY_API.PopularityRedpocketLottery.draw(ruid, roomid, lot);
                     if (findVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid) === -1 && MY_API.PopularityRedpocketLottery.wsConnectingList.length < 64)
                       MY_API.PopularityRedpocketLottery.createWebsocket(roomid, ruid);
@@ -6800,6 +6783,16 @@
       await sleep(200);
     }
   };
+  /**
+   * 从形如 https://live.bilibili.com/123 的字符串中提取房间号
+   * @param {*} liveLink 
+   * @returns roomid
+   */
+  function liveLink2Roomid(liveLink) {
+    let result = liveLink.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/);
+    if (Array.isArray(roomidList) && roomidList.length >= 2) return Number(result[1]);
+    else return false;
+  }
   /**
    * 跨模块推送和接收抽奖信息
    */
