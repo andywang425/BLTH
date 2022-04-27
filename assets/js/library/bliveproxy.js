@@ -9,6 +9,7 @@
 // @include      /https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*/
 // @run-at       document-start
 // @require      https://cdn.jsdelivr.net/gh/google/brotli@5692e422da6af1e991f9182345d58df87866bc5e/js/decode.js
+// @license      MIT
 // ==/UserScript==
 
 // 使用方法：
