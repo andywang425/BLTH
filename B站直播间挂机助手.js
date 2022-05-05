@@ -1010,30 +1010,43 @@
           if (response.code === 0 && response.data.info) {
             const uid = String(response.data.info.uid),
               uname = response.data.info.uname;
-            myconfirm(`<div style = "text-align:center">是否消耗5B币购买UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>的粉丝勋章？</div>`, {
-              title: `购买勋章 房间号：${room_id}`,
-              btn: ['是', '否']
-            }, function () {
-              BAPI.x.elec_pay_quick(response.data.info.uid).then((re) => {
-                MYDEBUG('API.x.elec_pay_quick re', re);
-                if (re.code === 0 && re.data.status === 4) {
-                  mymsg('购买成功', {
-                    time: 2000,
-                    icon: 1
-                  });
-                } else {
-                  mymsg(`购买失败 ${re.data.message}`, {
+            return BAPI.xlive.getInfoByUser(room_id).then(function (res) {
+              if (res.code === 0) {
+                if (!res.data.medal.up_medal) {
+                  return mymsg(`<div style = "text-align:center">UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>没有粉丝勋章，无法购买</div>`, {
                     time: 2500,
                     icon: 2
                   });
                 }
-              });
-            }, function () {
-              mymsg('已取消购买', {
-                time: 2000
-              });
+                myconfirm(`<div style = "text-align:center">是否消耗5B币购买UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>的粉丝勋章？</div>`, {
+                  title: `购买勋章 房间号：${room_id}`,
+                  btn: ['是', '否']
+                }, function () {
+                  BAPI.x.elec_pay_quick(response.data.info.uid).then((re) => {
+                    MYDEBUG('API.x.elec_pay_quick re', re);
+                    if (re.code === 0 && re.data.status === 4) {
+                      mymsg('购买成功', {
+                        time: 2000,
+                        icon: 1
+                      });
+                    } else {
+                      mymsg(`购买失败 ${re.data.message}`, {
+                        time: 2500,
+                        icon: 2
+                      });
+                    }
+                  });
+                }, function () {
+                  mymsg('已取消购买', {
+                    time: 2000
+                  });
+                });
+              } else {
+                return mymsg(`检查房间出错 ${response.message}`, {
+                  time: 2500
+                });
+              }
             });
-
           }
           else if (response.code === 0 && response.data.info === undefined) {
             mymsg(`房间不存在`, {
