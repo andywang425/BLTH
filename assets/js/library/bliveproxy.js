@@ -1,45 +1,57 @@
 // ==UserScript==
 // @name         bliveproxy
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.5
 // @description  B站直播websocket hook框架
-// @author       https://github.com/xfgryujk
+// @author       xfgryujk
 // @include      /https?:\/\/live\.bilibili\.com\/?\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/\d+\??.*/
 // @include      /https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*/
 // @run-at       document-start
 // @require      https://cdn.jsdelivr.net/gh/google/brotli@5692e422da6af1e991f9182345d58df87866bc5e/js/decode.js
-// @require      https://cdn.jsdelivr.net/npm/pako@2.0.3/dist/pako_inflate.min.js
-// @grant        unsafeWindow
+// @grant        none
 // ==/UserScript==
 
-(function() {
-  const W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
+// 使用方法：
+// bliveproxy.addCommandHandler('DANMU_MSG', command => {
+//   console.log(command)
+//   let info = command.info
+//   info[1] = '测试'
+// })
+//
+// 如果@grant不是none，则要使用unsafeWindow.bliveproxy
 
+(function () {
   const HEADER_SIZE = 16
 
   const WS_BODY_PROTOCOL_VERSION_NORMAL = 0
   const WS_BODY_PROTOCOL_VERSION_HEARTBEAT = 1
-  const WS_BODY_PROTOCOL_VERSION_DEFLATE = 2
   const WS_BODY_PROTOCOL_VERSION_BROTLI = 3
 
-  const OP_HEARTBEAT_REPLY = 3
-  const OP_SEND_MSG_REPLY = 5
+  const OP_HEARTBEAT_REPLY = 3 // WS_OP_HEARTBEAT_REPLY
+  const OP_SEND_MSG_REPLY = 5 // WS_OP_MESSAGE
+  const OP_AUTH_REPLY = 8 // WS_OP_CONNECT_SUCCESS
+
+  // 兼容@grant不是none的情况
+  let pageWindow = window
+  if (typeof unsafeWindow !== 'undefined') {
+    pageWindow = unsafeWindow
+  }
 
   let textEncoder = new TextEncoder()
   let textDecoder = new TextDecoder()
 
   function main() {
-    if (window.bliveproxy) {
+    if (pageWindow.bliveproxy) {
       // 防止多次加载
       return
     }
     initApi()
-    // window.bliveproxy.hook();
+    //hook()
   }
 
   function initApi() {
-    window.bliveproxy = api;
+    pageWindow.bliveproxy = api
   }
 
   let api = {
@@ -58,7 +70,7 @@
       this._commandHandlers[cmd] = handlers.filter(item => item !== handler)
     },
     hook() {
-      W.WebSocket = new Proxy(window.WebSocket, {
+      pageWindow.WebSocket = new Proxy(pageWindow.WebSocket, {
         construct(target, args) {
           let obj = new target(...args)
           return new Proxy(obj, proxyHandler)
@@ -84,7 +96,7 @@
     set(target, property, value) {
       if (property === 'onmessage') {
         let realOnMessage = value
-        value = function(event) {
+        value = function (event) {
           myOnMessage(event, realOnMessage)
         }
       }
@@ -101,7 +113,7 @@
 
     let data = new Uint8Array(event.data)
     function callRealOnMessageByPacket(packet) {
-      realOnMessage({...event, data: packet})
+      realOnMessage({ ...event, data: packet })
     }
     handleMessage(data, callRealOnMessageByPacket)
   }
@@ -132,43 +144,71 @@
   }
 
   function handleMessage(data, callRealOnMessageByPacket) {
-    let offset = 0
-    while (offset < data.byteLength) {
-      let dataView = new DataView(data.buffer, offset)
-      let packLen = dataView.getUint32(0)
-      // let rawHeaderSize = dataView.getUint16(4)
-      let ver = dataView.getUint16(6)
-      let operation = dataView.getUint32(8)
-      // let seqId = dataView.getUint32(12)
+    let dataView = new DataView(data.buffer)
+    let operation = dataView.getUint32(8)
 
-      let body = new Uint8Array(data.buffer, offset + HEADER_SIZE, packLen - HEADER_SIZE)
-      if (operation === OP_SEND_MSG_REPLY) {
-        switch (ver) {
-        case WS_BODY_PROTOCOL_VERSION_NORMAL:
-          body = textDecoder.decode(body)
-          body = JSON.parse(body)
-          handleCommand(body, callRealOnMessageByPacket)
-          break
-        case WS_BODY_PROTOCOL_VERSION_DEFLATE:
-          body = pako.inflate(body)
-          handleMessage(body, callRealOnMessageByPacket)
-          break
-        case WS_BODY_PROTOCOL_VERSION_BROTLI:
-          body = BrotliDecode(body)
-          handleMessage(body, callRealOnMessageByPacket)
-          break
-        default: {
-          let packet = makePacketFromUint8Array(body, operation)
-          callRealOnMessageByPacket(packet)
-          break
+    switch (operation) {
+      case OP_AUTH_REPLY:
+      case OP_SEND_MSG_REPLY: {
+        // 可能有多个包一起发，需要分包
+        let offset = 0
+        while (offset < data.byteLength) {
+          let dataView = new DataView(data.buffer, offset)
+          let packLen = dataView.getUint32(0)
+          let rawHeaderSize = dataView.getUint16(4)
+          let ver = dataView.getUint16(6)
+          let operation = dataView.getUint32(8)
+          // let seqId = dataView.getUint32(12)
+
+          let body = new Uint8Array(data.buffer, offset + rawHeaderSize, packLen - rawHeaderSize)
+          if (operation === OP_SEND_MSG_REPLY) {
+            // 业务消息
+            switch (ver) {
+              case WS_BODY_PROTOCOL_VERSION_NORMAL: {
+                // body是单个JSON消息
+                body = textDecoder.decode(body)
+                body = JSON.parse(body)
+                handleCommand(body, callRealOnMessageByPacket)
+                break
+              }
+              case WS_BODY_PROTOCOL_VERSION_BROTLI: {
+                // body是压缩过的多个消息
+                body = BrotliDecode(body)
+                handleMessage(body, callRealOnMessageByPacket)
+                break
+              }
+              default: {
+                // 未知的body格式
+                let packet = makePacketFromUint8Array(body, operation)
+                callRealOnMessageByPacket(packet)
+                break
+              }
+            }
+          } else {
+            // 非业务消息
+            let packet = makePacketFromUint8Array(body, operation)
+            callRealOnMessageByPacket(packet)
+          }
+
+          offset += packLen
         }
-        }
-      } else {
-        let packet = makePacketFromUint8Array(body, operation)
-        callRealOnMessageByPacket(packet)
+        break
       }
 
-      offset += packLen
+      // 服务器心跳包，前4字节是人气值，后面是客户端发的心跳包内容
+      // packLen不包括客户端发的心跳包内容，不知道是不是服务器BUG
+      // 这里没用到心跳包就不处理了
+      // case OP_HEARTBEAT_REPLY:
+      default: {
+        // 只有一个包
+        let packLen = dataView.getUint32(0)
+        let rawHeaderSize = dataView.getUint16(4)
+
+        let body = new Uint8Array(data.buffer, rawHeaderSize, packLen - rawHeaderSize)
+        let packet = makePacketFromUint8Array(body, operation)
+        callRealOnMessageByPacket(packet)
+        break
+      }
     }
   }
 
