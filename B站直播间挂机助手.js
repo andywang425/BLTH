@@ -33,12 +33,13 @@
 // @require        https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
+// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@5c63659de1ebf53d127309ccf04d2554b725c83e/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
 // @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
+// @require        file:///D:/Documents/GitHub/BLTH/assets/js/library/DanmuWebSocket.js
 // @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
 // @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@980351c4cddf9b86258e73cd49c374702b692f1b/assets/html/main.min.html
@@ -363,7 +364,7 @@
     // 唯一运行检测
     onlyScriptCheck();
     if (SP_CONFIG.DANMU_MODIFY) {
-      window.bliveproxy.hook();
+      W.bliveproxy.hook();
       MYDEBUG('bliveproxy hook complete', bliveproxy);
     }
     if (SP_CONFIG.nosleep) {
@@ -5930,6 +5931,7 @@
           // MYDEBUG('MY_API.DANMU_MODIFY.configJson', MY_API.DANMU_MODIFY.configJson);
           bliveproxy.addCommandHandler('DANMU_MSG', command => {
             if (!SP_CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
+            console.log(command)
             let info = command.info;
             MYDEBUG('bliveproxy DANMU_MSG', info);
             let index = MY_API.DANMU_MODIFY.check(info);
@@ -6602,6 +6604,49 @@
           MY_API.chatLog(`[红包抽奖] 本轮抽奖结束，10分钟后再次检查`, 'info');
           setTimeout(() => MY_API.PopularityRedpocketLottery.run(), MY_API.CONFIG.POPULARITY_REDPOCKET_CHECK_INTERVAL * 60 * 1000);
         }
+      },
+      test: {
+        run: async (roomid = 8560181) => {
+          MYDEBUG('[TEST] 测试开始');
+          let wst = await new DanmuWebSocket({ roomid: roomid, uid: Live_info.uid });
+          wst.bind({
+            onreconnect: (newWst) => {
+              wst = newWst;
+              MYDEBUG(`[TEST] 弹幕服务器连接断开，尝试重连`, wst);
+            },
+            onheartbeat: (obj) => {
+              MYDEBUG(`[TEST] 弹幕服务器心跳`, obj);
+            },
+            onlogin: (json) => {
+              MYDEBUG(`[TEST] 登录弹幕服务器成功`, json);
+            },
+            oncmd: (obj) => {
+              MYDEBUG(`[TEST] 收到CMD消息 cmd = ${obj.cmd}`, obj);
+            },
+            onunknownmsg: (obj) => {
+              MYDEBUG(`[TEST] 收到未知消息`, obj);
+            }
+          })
+          // ----------------------------------------------------
+          // let response = await BAPI.room.getConf(roomid);
+          // if (response.code === 0) {
+          //   MYDEBUG('[TEST] 服务器地址', response);
+          //   let wst = new BAPI.DanmuWebSocket(Live_info.uid, roomid, response.data.host_server_list, response.data.token);
+          //   wst.setUnzip(pako.inflate);
+          //   wst.bind((newWst) => {
+          //     wst = newWst;
+          //     MYDEBUG(`[TEST] 弹幕服务器连接断开，尝试重连 roomid = ${roomid}`, wst);
+          //   }, () => {
+          //     MYDEBUG(`[TEST] 连接弹幕服务器成功 roomid = ${roomid}`, wst);
+          //   }, () => {
+          //     /* heartbeat */
+          //   }, async (obj) => {
+          //     MYDEBUG(`[TEST] 收到CMD消息 cmd = ${obj.cmd}`, obj);
+          //   });
+          // } else {
+          //   MY_API.chatLog('[红包抽奖] 获取弹幕服务器地址错误', 'warning')
+          // }
+        }
       }
     };
     MY_API.init().then(() => {
@@ -6687,6 +6732,7 @@
       API.RESERVE_ACTIVITY.run, // 预约抽奖
       API.GET_PRIVILEGE.run, // 领取大会员权益
       API.PopularityRedpocketLottery.run, // 直播红包抽奖
+      API.test.run
     ];
     otherScriptsRunningCheck.then(() => runAllTasks(5000, 200, taskList));
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000);// 刷新直播间
