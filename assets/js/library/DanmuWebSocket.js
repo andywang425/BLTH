@@ -168,7 +168,7 @@ class DanmuWebSocket extends WebSocket {
                                 // 心跳回应，人气值
                                 this.emitEvent('heartbeat', {
                                     detail: {
-                                        popularity: parseInt([...body].map(x => x.toString(16)).join(''), 10),
+                                        popularity: parseInt([...body].map(x => x.toString(16)).join(''), 16),
                                         heartbeat: this.textdecode(body.buffer.slice(packLen))
                                     }
                                 });
@@ -232,7 +232,7 @@ class DanmuWebSocket extends WebSocket {
                 let body = new Uint8Array(arrBuffer, rawHeaderSize, packLen - rawHeaderSize)
                 this.emitEvent('heartbeat', {
                     detail: {
-                        popularity: parseInt([...body].map(x => x.toString(16)).join(''), 10),
+                        popularity: parseInt([...body].map(x => x.toString(16)).join(''), 16),
                         heartbeat: this.textdecode(body.buffer.slice(packLen))
                     }
                 });
