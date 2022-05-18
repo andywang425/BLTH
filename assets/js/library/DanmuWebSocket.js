@@ -4,18 +4,25 @@ class DanmuWebSocket extends WebSocket {
     WS_BODY_PROTOCOL_VERSION_HEARTBEAT = 1
     WS_BODY_PROTOCOL_VERSION_INFLATE = 2;
     WS_BODY_PROTOCOL_VERSION_BROTLI = 3
-
     OP_HEARTBEAT_REPLY = 3 // WS_OP_HEARTBEAT_REPLY
     OP_SEND_MSG_REPLY = 5 // WS_OP_MESSAGE
     OP_AUTH_REPLY = 8 // WS_OP_CONNECT_SUCCESS
 
+    MY_STATE_LIST = ['reconnect', 'login', 'heartbeat', 'cmd', 'unknownmsg'];
+
+    reconnectInterval = 10e3;
     closed = false;
     handlers = {
         reconnect: [],
         login: [],
         heartbeat: [],
         cmd: [],
-        receive: []
+        receive: [],
+
+        open: [],
+        close: [],
+        error: [],
+        message: []
     };
     initObj = {};
     roomid = 0;
@@ -31,7 +38,7 @@ class DanmuWebSocket extends WebSocket {
     /**
      * 触发事件
      * @param {string} type 事件类型
-     * @param {Object} event 事件
+     * @param {JSON | Event} event 事件，当 type 为自定义事件类型 (MY_STATE_LIST) 时为 JSON，否则为 Event
      */
 
     emitEvent(type, event) {
@@ -96,42 +103,9 @@ class DanmuWebSocket extends WebSocket {
         setTimeout(async () => {
             const ws = await new DanmuWebSocket(this.initObj);
             ws.handlers = this.handlers;
-            ws.unzip = this.unzip;
-            for (const key in this.handlers) {
-                if (this.handlers.hasOwnProperty(key)) {
-                    this.handlers[key].forEach(handler => {
-                        switch (key) {
-                            case 'reconnect':
-                                ws.addEventListener('reconnect', event => {
-                                    handler.call(ws, event.detail);
-                                });
-                                break;
-                            case 'login':
-                                ws.addEventListener('login', event => {
-                                    handler.call(ws, event.detail);
-                                });
-                                break;
-                            case 'heartbeat':
-                                ws.addEventListener('heartbeat', event => {
-                                    handler.call(ws, event.detail);
-                                });
-                                break;
-                            case 'cmd':
-                                ws.addEventListener('cmd', event => {
-                                    handler.call(ws, event.detail);
-                                });
-                                break;
-                            case 'unknownmsg':
-                                ws.addEventListener('unknownmsg', event => {
-                                    handler.call(ws, event.detail);
-                                });
-                                break;
-                        }
-                    });
-                }
-            }
-            this.emitEvent('reconnect', { detail: ws });
-        }, 10e3);
+            Object.keys(ws.handlers).forEach(key => { ws.addEventListener(key, event => ws.handlers[key].call(ws, event)) });
+            if (ws.handlers.onreconnect.length > 0) this.emitEvent('reconnect', { detail: ws });
+        }, this.reconnectInterval);
     }
     /**
      * 处理收到的消息
@@ -166,6 +140,7 @@ class DanmuWebSocket extends WebSocket {
                             }
                             case this.WS_BODY_PROTOCOL_VERSION_HEARTBEAT: {
                                 // 心跳回应，人气值
+                                console.log('心跳会在这里吗？')
                                 this.emitEvent('heartbeat', {
                                     detail: {
                                         popularity: parseInt([...body].map(x => x.toString(16)).join(''), 16),
@@ -297,64 +272,17 @@ class DanmuWebSocket extends WebSocket {
     }
     /**
      * 绑定 handlers
-     * @param {{onreconnect: Function, onlogin: Function, onheartbeat: Function, oncmd: Function, onunknownmsg: Function}} obj 
+     * @param {{reconnect: function({detail:DanmuWebSocket}), login: function({detail:{code: int}}), heartbeat: function({detail:popularity: int, heartbeat: string}), cmd: function({detail:{cmd: string, data: Object}}), unknownmsg: function({detail:{rawArrayBuffer: ArrayBuffer, packLen: int, headerLen: int, protover: int, operation: int, sequence: int, body: Uint8Array}})}} obj 
      */
     bind(obj) {
-        if (typeof obj.onreconnect === 'function') {
-            this.addEventListener('reconnect',
-                /**
-                 * 重连
-                 * @param {{detail:DanmuWebSocket}} event 新的 DanmuWebSocket 对象
-                 */
-                event => {
-                    obj.onreconnect.call(this, event.detail);
-                });
-            this.handlers.reconnect.push(obj.onreconnect);
-        }
-        if (typeof obj.onlogin === 'function') {
-            this.addEventListener('login',
-                /**
-                 * 登录成功回复
-                 * @param {{{detail:code: 0}}} event 
-                 */
-                event => {
-                    obj.onlogin.call(this, event.detail);
-                });
-            this.handlers.login.push(obj.onlogin);
-        }
-        if (typeof obj.onheartbeat === 'function') {
-            this.addEventListener('heartbeat',
-                /**
-                 * 心跳回应
-                 * @param {{{detail:popularity: int, heartbeat: string}}} event 
-                 */
-                event => {
-                    obj.onheartbeat.call(this, event.detail);
-                });
-            this.handlers.heartbeat.push(obj.onheartbeat);
-        }
-        if (typeof obj.oncmd === 'function') {
+        Object.keys(obj).forEach(key => {
+            if (typeof obj[key] === 'function') {
+                this.addEventListener(key, event => obj[key].call(this, this.MY_STATE_LIST.includes(key) ? event.detail : event));
+                if (!this.handlers[key]) this.handlers[key] = [];
+                this.handlers[key].push(obj[key]);
+            }
+        })
 
-            this.addEventListener('cmd',
-                /**
-                 * cmd消息
-                 * @param {{detail:{cmd: string, data: Object}}} event
-                 */
-                event => {
-                    obj.oncmd.call(this, event.detail);
-                });
-            this.handlers.cmd.push(obj.oncmd);
-        }
-        if (typeof obj.onunknownmsg === 'function') {
-            this.addEventListener('unknownmsg',
-                /**
-                 * @param {{detail:{rawArrayBuffer: ArrayBuffer, packLen: int, headerLen: int, protover: int, operation: int, sequence: int, body: Uint8Array}}} event 
-                 */
-                event => {
-                    obj.onunknownmsg.call(this, event.detail);
-                });
-            this.handlers.receive.push(obj.onunknownmsg);
-        }
     }
     /**
      * 

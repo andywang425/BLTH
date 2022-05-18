@@ -5604,7 +5604,6 @@
         } // run结束
       },
       AWPUSH: {
-        running: false,
         wsinit: function () {
           // 测试时用 localhost, 原为 andywang.top
           MY_API.AWPUSH.ws = new WebSocket('wss://andywang.top:3001/ws');
@@ -5680,7 +5679,7 @@
           let lastStatus = MY_API.AWPUSH.status;
           for (const room of MY_API.AnchorLottery.allRoomList) {
             // 如果重连成功则不执行之前的任务
-            if (lastStatus !== 'open' && MY_API.AWPUSH.status === 'open') return $.Deferred().resolve('return');
+            if (lastStatus !== 'open' && MY_API.AWPUSH.status === 'open') return $.Deferred().resolve();
             lastStatus = MY_API.AWPUSH.status;
             let p = $.Deferred();
             const uid = roomidAndUid.hasOwnProperty(room) ? roomidAndUid[room] : undefined;
@@ -5783,8 +5782,6 @@
         },
         run: () => {
           // awpush 入口
-          if (MY_API.AWPUSH.running) return;
-          MY_API.AWPUSH.running = true;
           MY_API.AWPUSH.wsinit();
           let secret, task, area_data, sleep_time, interval, max_room;
           const config = {
@@ -6606,25 +6603,28 @@
         }
       },
       test: {
-        run: async (roomid = 8560181) => {
+        run: async (roomid = 22474988) => {
           MYDEBUG('[TEST] 测试开始');
           let wst = await new DanmuWebSocket({ roomid: roomid, uid: Live_info.uid });
           wst.bind({
-            onreconnect: (newWst) => {
+            reconnect: (newWst) => {
               wst = newWst;
               MYDEBUG(`[TEST] 弹幕服务器连接断开，尝试重连`, wst);
             },
-            onheartbeat: (obj) => {
+            heartbeat: (obj) => {
               MYDEBUG(`[TEST] 弹幕服务器心跳`, obj);
             },
-            onlogin: (json) => {
+            login: (json) => {
               MYDEBUG(`[TEST] 登录弹幕服务器成功`, json);
             },
-            oncmd: (obj) => {
+            cmd: (obj) => {
               MYDEBUG(`[TEST] 收到CMD消息 cmd = ${obj.cmd}`, obj);
             },
-            onunknownmsg: (obj) => {
+            unknownmsg: (obj) => {
               MYDEBUG(`[TEST] 收到未知消息`, obj);
+            },
+            open: (event) => {
+              MYDEBUG(`[TEST] 弹幕服务器连接成功`, event);
             }
           })
           // ----------------------------------------------------
