@@ -10,7 +10,7 @@
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH
 // @supportURL     https://github.com/andywang425/BLTH/issues
-// @icon           https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png
+// @icon           https://fastly.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png
 // @copyright      2021, andywang425 (https://github.com/andywang425)
 // @license        MIT
 // @compatible     chrome 80 or later
@@ -29,21 +29,21 @@
 // @connect        pushplus.plus
 // @connect        andywang.top
 // @connect        gitee.com
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
-// @require        https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
-// @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@5c63659de1ebf53d127309ccf04d2554b725c83e/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
-// @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
-// @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
+// @require        https://fastly.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
+// @require        https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@5c63659de1ebf53d127309ccf04d2554b725c83e/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
+// @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
+// @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @require        file:///D:/Documents/GitHub/BLTH/assets/js/library/DanmuWebSocket.js
-// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
-// @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@980351c4cddf9b86258e73cd49c374702b692f1b/assets/html/main.min.html
-// @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
+// @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
+// @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
+// @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.min.html
+// @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
@@ -209,6 +209,7 @@
       banP2p: false, // 禁止p2p上传
       lastShowUpdateMsgVersion: "0", // 上次显示更新信息的版本
       DANMU_MODIFY: false, // 修改弹幕
+      AUTO_CHECK_DANMU: false, // 检查弹幕是否发送成功
       blockLiveStream: false, // 拦截直播流
       blockliveDataUpdate: false, // 拦截直播观看数据上报
       wear_medal_before_danmu: false, // 手动发弹幕前自动佩戴当前房间勋章
@@ -230,6 +231,7 @@
     danmuTaskRunning = false,
     medalDanmuRunning = false,
     hasWornMedal = false,
+    danmuEmitter = new Emitter(),
     Live_info = {
       room_id: undefined,
       short_room_id: undefined,
@@ -281,13 +283,14 @@
   mergeObject(SP_CONFIG, SP_CONFIG_DEFAULT);
 
   // 拦截直播流/数据上报，需要尽早
-  if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate || SP_CONFIG.wear_medal_before_danmu) {
+  if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate || SP_CONFIG.wear_medal_before_danmu || SP_CONFIG.AUTO_CHECK_DANMU) {
     W.fetch = (...arg) => {
       if (SP_CONFIG.blockLiveStream && arg[0].includes('bilivideo')) {
         return $.Deferred().resolve();
       } else if (SP_CONFIG.blockliveDataUpdate && arg[0].includes("data.bilibili.com/gol/postweb")) {
         return $.Deferred().resolve();
-      } else if (SP_CONFIG.wear_medal_before_danmu && arg[0].includes('//api.live.bilibili.com/msg/send')) {
+      } else if ((SP_CONFIG.wear_medal_before_danmu || SP_CONFIG.AUTO_CHECK_DANMU) && arg[0].includes('//api.live.bilibili.com/msg/send')) {
+        danmuEmitter.emit('danmu', arg[1].data.msg);
         if (medal_info.status.state() !== "resolved" || Live_info.medal === null || (SP_CONFIG.wear_medal_type === "ONLY_FIRST" && hasWornMedal)) return wfetch(...arg);
         if (typeof Live_info.medal === "undefined") {
           for (const m of medal_info.medal_list) {
@@ -363,7 +366,7 @@
     }
     // 唯一运行检测
     onlyScriptCheck();
-    if (SP_CONFIG.DANMU_MODIFY) {
+    if (SP_CONFIG.DANMU_MODIFY || SP_CONFIG.AUTO_CHECK_DANMU) {
       W.bliveproxy.hook();
       MYDEBUG('bliveproxy hook complete', bliveproxy);
     }
@@ -481,6 +484,7 @@
     const MY_API = {
       CONFIG_DEFAULT: {
         AUTO_DANMU: false, // 发送弹幕
+        AUTO_CHECK_DANMU_TIMEOUT: 3000, // 检测弹幕是否发送成功 超时时间
         AUTO_GIFT: false, // 自动送礼
         AUTO_GIFT_ROOMID: ["0"], // 送礼优先房间
         AUTO_GROUP_SIGN: true, // 应援团签到开关
@@ -1312,6 +1316,10 @@
           val = parseInt(div.find('[data-toggle="POPULARITY_REDPOCKET_DELAY"] .max').val());
           if (isNaN(val) || val <= 0) return window.toast('[红包抽奖参与抽奖前延迟最大时间] 错误输入', 'caution');
           MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX = val;
+          // AUTO_CHECK_DANMU_TIMEOUT
+          val = parseInt(div.find('[data-toggle="AUTO_CHECK_DANMU_TIMEOUT"] .num').val());
+          if (isNaN(val) || val <= 0) return window.toast('[检查弹幕是否发送成功超时时间] 错误输入', 'caution');
+          MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT = val;
           return MY_API.saveConfig();
         };
         const checkList = [
@@ -1513,7 +1521,9 @@
           POPULARITY_REDPOCKET_REQUEST_INTERVAL: "每两个请求之间的间隔时间。<mul><mli>若间隔时间过短可能会被风控。</mli></mul>",
           POPULARITY_REDPOCKET_DELAY: "参与抽奖前等待一段时间。",
           POPULARITY_REDPOCKET_TYPE_POLLING: "高热度房间来源于各分区热门房间列表。",
-          POPULARITY_REDPOCKET_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的红包抽奖。"
+          POPULARITY_REDPOCKET_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的红包抽奖。",
+          AUTO_CHECK_DANMU: "检查你在当前直播间发送的弹幕是否发送成功。脚本向其它直播间发送的弹幕不在检测范围内。<mul><mli>这里的发送成功指的是你发送的弹幕对其他人可见。有时候表面上弹幕发送成功了，但实际上只有你自己能看见那条弹幕。</mli><mli>若弹幕疑似发送失败，则在右上角显示一条提示信息。</mli></mul>",
+          AUTO_CHECK_DANMU_TIMEOUT: "弹幕被发送出去后开始计时，如果没有在超时时间内从当前直播间的webSocket中接收到之前所发送的弹幕则认为发送失败。"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1543,6 +1553,7 @@
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').text(String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length) + '个');
               myDiv.find('div[data-toggle="RESERVE_ACTIVITY_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD.length + '个');
               // 显示输入框的值
+              myDiv.find('div[data-toggle="AUTO_CHECK_DANMU_TIMEOUT"] .num').val(MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_DELAY"] .max').val(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_DELAY"] .min').val(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_IGNORE_BATTERY"] .num').val(MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY.toString());
@@ -2394,6 +2405,10 @@
                   name: 'WEAR_MEDAL_BEFORE_DANMU',
                   gmItem: `wear_medal_type`,
                   toastMsg: ["[自动佩戴勋章] 配置已保存", "info"]
+                }, {
+                  jqPath1: `div[data-toggle="AUTO_CHECK_DANMU"] input:checkbox`,
+                  gmItem: `AUTO_CHECK_DANMU`,
+                  toastMsg: ["[检测弹幕是否发送成功] 配置已保存", "info"]
                 }
               ];
               for (const i of specialSetting) {
@@ -3804,6 +3819,35 @@
             }
           }
           danmuTaskRunning = false;
+        }
+      },
+      AUTO_CHECK_DANMU: {
+        sendDanmu: {},
+        initEmitter: () => {
+          danmuEmitter.on('danmu', (msg) => {
+            let timer = setTimeout(() => {
+              window.toast(`弹幕【${msg}】疑似发送失败`, 'caution');
+              delete MY_API.AUTO_CHECK_DANMU.sendDanmu[timer];
+            }, MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT);
+            MY_API.AUTO_CHECK_DANMU.sendDanmu[timer] = msg;
+          })
+        },
+        run: () => {
+          if (!SP_CONFIG.AUTO_CHECK_DANMU) return;
+          MY_API.AUTO_CHECK_DANMU.initEmitter();
+          bliveproxy.addCommandHandler("DANMU_MSG", (command) => {
+            if (MY_API.AUTO_CHECK_DANMU.sendDanmu === {}) return;
+            const info = command.info;
+            if (info[2][0] === Live_info.uid) {
+              for (const d in MY_API.AUTO_CHECK_DANMU.sendDanmu) {
+                if (MY_API.AUTO_CHECK_DANMU.sendDanmu[d] === info[1]) {
+                  MYDEBUG(`[检查弹幕是否发送成功] 已找到弹幕(timer = ${d})`, MY_API.AUTO_CHECK_DANMU.sendDanmu[d])
+                  clearTimeout(d);
+                  delete MY_API.AUTO_CHECK_DANMU.sendDanmu[d];
+                }
+              }
+            }
+          });
         }
       },
       MEDAL_DANMU: {
@@ -5928,7 +5972,6 @@
           // MYDEBUG('MY_API.DANMU_MODIFY.configJson', MY_API.DANMU_MODIFY.configJson);
           bliveproxy.addCommandHandler('DANMU_MSG', command => {
             if (!SP_CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
-            console.log(command)
             let info = command.info;
             MYDEBUG('bliveproxy DANMU_MSG', info);
             let index = MY_API.DANMU_MODIFY.check(info);
@@ -6732,6 +6775,7 @@
       API.RESERVE_ACTIVITY.run, // 预约抽奖
       API.GET_PRIVILEGE.run, // 领取大会员权益
       API.PopularityRedpocketLottery.run, // 直播红包抽奖
+      API.AUTO_CHECK_DANMU.run, // 检查弹幕是否发送成功
       API.test.run
     ];
     otherScriptsRunningCheck.then(() => runAllTasks(5000, 200, taskList));
