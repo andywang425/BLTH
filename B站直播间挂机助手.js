@@ -34,7 +34,7 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@5c63659de1ebf53d127309ccf04d2554b725c83e/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        file:///D:\Documents\GitHub\BLTH\assets\js\library\BilibiliAPI_Mod.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
 // @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
@@ -42,7 +42,7 @@
 // @require        file:///D:/Documents/GitHub/BLTH/assets/js/library/DanmuWebSocket.js
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.min.html
+// @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.html
 // @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -289,64 +289,65 @@
         return $.Deferred().resolve();
       } else if (SP_CONFIG.blockliveDataUpdate && arg[0].includes("data.bilibili.com/gol/postweb")) {
         return $.Deferred().resolve();
-      } else if ((SP_CONFIG.wear_medal_before_danmu || SP_CONFIG.AUTO_CHECK_DANMU) && arg[0].includes('//api.live.bilibili.com/msg/send')) {
-        danmuEmitter.emit('danmu', arg[1].data.msg);
-        if (medal_info.status.state() !== "resolved" || Live_info.medal === null || (SP_CONFIG.wear_medal_type === "ONLY_FIRST" && hasWornMedal)) return wfetch(...arg);
-        if (typeof Live_info.medal === "undefined") {
-          for (const m of medal_info.medal_list) {
-            if (m.roomid === Live_info.short_room_id) {
-              Live_info.medal = m;
-              break;
-            }
-          }
-        }
-        if (typeof Live_info.medal === "undefined") {
-          Live_info.medal = null; // 没有该勋章，之后无需再检查
-          return wfetch(...arg);
-        }
-        return BAPI.xlive.wearMedal(Live_info.medal.medal_id).then((response) => {
-          MYDEBUG('API.xlive.wearMedal', response);
-          if (response.code === 0) {
-            hasWornMedal = true;
-            try {
-              let medalJqItem = $(".dp-i-block.medal-item-margin");
-              if (medalJqItem === null) return;
-              let border = medalJqItem.find(".v-middle.fans-medal-item");
-              const medalColor = '#' + Live_info.medal.color.toString(16);
-              const medalLevel = Live_info.medal.medal_level;
-              const medalText = Live_info.medal.medal_name;
-              if (border.length !== 0) {
-                // 之前戴着勋章
-                let background = border.find('.fans-medal-label');
-                let level = border.find('.fans-medal-level');
-                let text = background.find('.fans-medal-content');
-                border.css('border-color', medalColor);
-                background.css('background-image', `linear-gradient(45deg, ${medalColor}, ${medalColor})`);
-                level.text(medalLevel);
-                text.text(medalText);
-              } else {
-                // 如果没戴勋章则需插入缺失的 html
-                $(".action-item.medal.wear-medal").remove(); // 移除提示水印
-                medalJqItem.html(`<div data-v-2c4630d2="" data-v-34b5b0e1="" class="v-middle fans-medal-item" style="border-color: ${medalColor}">
-                  <div data-v-2c4630d2="" class="fans-medal-label" style="background-image: linear-gradient(45deg, ${medalColor}, ${medalColor});">
-                    <span data-v-2c4630d2="" class="fans-medal-content">${medalText}</span>
-                  </div>
-                  <div data-v-2c4630d2="" class="fans-medal-level" style="color: ${medalColor};">${medalLevel}</div>
-                </div>`);
+      } else if (arg[0].includes('//api.live.bilibili.com/msg/send')) {
+        if (SP_CONFIG.AUTO_CHECK_DANMU) danmuEmitter.emit('danmu', arg[1].data.msg);
+        if (SP_CONFIG.wear_medal_before_danmu) {
+          if (medal_info.status.state() !== "resolved" || Live_info.medal === null || (SP_CONFIG.wear_medal_type === "ONLY_FIRST" && hasWornMedal)) return wfetch(...arg);
+          if (typeof Live_info.medal === "undefined") {
+            for (const m of medal_info.medal_list) {
+              if (m.roomid === Live_info.short_room_id) {
+                Live_info.medal = m;
+                break;
               }
-            } catch (e) {
-              MYERROR("修改弹幕框左侧粉丝牌样式出错", e);
             }
-          } else {
-            window.toast(`自动佩戴粉丝勋章出错 ${response.message}`, 'error');
           }
-          return wfetch(...arg);
-        }, () => {
-          window.toast('自动佩戴粉丝勋章失败，请检查网络', 'error');
-          return wfetch(...arg);
-        })
-      }
-      else {
+          if (typeof Live_info.medal === "undefined") {
+            Live_info.medal = null; // 没有该勋章，之后无需再检查
+            return wfetch(...arg);
+          }
+          return BAPI.xlive.wearMedal(Live_info.medal.medal_id).then((response) => {
+            MYDEBUG('API.xlive.wearMedal', response);
+            if (response.code === 0) {
+              hasWornMedal = true;
+              try {
+                let medalJqItem = $(".dp-i-block.medal-item-margin");
+                if (medalJqItem === null) return;
+                let border = medalJqItem.find(".v-middle.fans-medal-item");
+                const medalColor = '#' + Live_info.medal.medal_color_start.toString(16);
+                const medalLevel = Live_info.medal.medal_level;
+                const medalText = Live_info.medal.medal_name;
+                if (border.length !== 0) {
+                  // 之前戴着勋章
+                  let background = border.find('.fans-medal-label');
+                  let level = border.find('.fans-medal-level');
+                  let text = background.find('.fans-medal-content');
+                  border.css('border-color', medalColor);
+                  background.css('background-image', `linear-gradient(45deg, ${medalColor}, ${medalColor})`);
+                  level.text(medalLevel);
+                  text.text(medalText);
+                } else {
+                  // 如果没戴勋章则需插入缺失的 html
+                  $(".action-item.medal.wear-medal").remove(); // 移除提示水印
+                  medalJqItem.html(`<div data-v-2c4630d2="" data-v-34b5b0e1="" class="v-middle fans-medal-item" style="border-color: ${medalColor}">
+                    <div data-v-2c4630d2="" class="fans-medal-label" style="background-image: linear-gradient(45deg, ${medalColor}, ${medalColor});">
+                      <span data-v-2c4630d2="" class="fans-medal-content">${medalText}</span>
+                    </div>
+                    <div data-v-2c4630d2="" class="fans-medal-level" style="color: ${medalColor};">${medalLevel}</div>
+                  </div>`);
+                }
+              } catch (e) {
+                MYERROR("修改弹幕框左侧粉丝牌样式出错", e);
+              }
+            } else {
+              window.toast(`自动佩戴粉丝勋章出错 ${response.message}`, 'error');
+            }
+            return wfetch(...arg);
+          }, () => {
+            window.toast('自动佩戴粉丝勋章失败，请检查网络', 'error');
+            return wfetch(...arg);
+          })
+        }
+      } else {
         return wfetch(...arg);
       }
     }
@@ -607,6 +608,7 @@
         RESERVE_ACTIVITY_BLACKLIST_WORD: ['测试', '钓鱼'], // 预约抽奖屏蔽词
         SEND_ALL_GIFT: false, // 送满全部勋章
         SHARE: true, // 分享
+        SHARE_LIVEROOM: false, // 分享直播间
         SILVER2COIN: false, // 银瓜子换硬币
         ServerTurbo_NOTICE: false, // Server酱·Turbo版
         ServerTurbo_SendKey: "SendKey", // Server酱·Turbo版SendKey
@@ -1381,6 +1383,7 @@
           "SECONDS_NOTICE",
           "SEND_ALL_GIFT",
           "SHARE",
+          "SHARE_LIVEROOM",
           "SILVER2COIN",
           "ServerTurbo_NOTICE",
           "TIME_AREA_DISABLE",
@@ -2702,6 +2705,7 @@
         // 每日任务
         coin_exp: 0,
         login: () => {
+          if (!MY_API.CONFIG.LOGIN) return $.Deferred().resolve();
           return BAPI.DailyReward.login().then((response) => {
             MYDEBUG('DailyReward.login: API.DailyReward.login');
             if (response.code === 0) window.toast('[自动每日奖励][每日登录]完成', 'success');
@@ -2946,21 +2950,52 @@
             }
           });
         },
+        shareLiveRoom: async () => {
+          if (!MY_API.CONFIG.SHARE_LIVEROOM) return $.Deferred().resolve();
+          const shareTimes = 5;
+          const medal_list = medal_info.medal_list.filter(m => m.roomid && m.level <= 20);
+          if (medal_info.status.state() === "resolved") {
+            for (let i = 0; i < shareTimes; i++) {
+              for (const medal of medal_list) {
+                const realRoomId = await BAPI.room.get_info(medal.roomid).then((res) => {
+                  MYDEBUG(`API.room.get_info roomId=${medal.roomid} res`, res);
+                  if (res.code === 0) {
+                    return res.data.room_id;
+                  } else {
+                    window.toast(`[分享直播间]房间号【${medal.roomid}】信息获取失败 ${res.message}`, 'error');
+                    return medal.roomid;
+                  }
+                });
+                await BAPI.xlive.trigerInteract(realRoomId).then(response => {
+                  MYDEBUG('DailyReward.shareLiveRoom: API.xlive.trigerInteract', response);
+                  if (response.code !== 0) window.toast(`[分享直播间]分享直播间失败 ${response.message}`, 'caution');
+                });
+                await sleep(100);
+              }
+              await sleep(5000);
+            }
+          }
+          else {
+            window.toast('[分享直播间] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.DailyReward.shareLiveRoom());
+          }
+        },
         run: () => {
           try {
-            if (!MY_API.CONFIG.LIVE_SIGN || otherScriptsRunning) return $.Deferred().resolve();
+            if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.SHARE_LIVEROOM) || otherScriptsRunning) return $.Deferred().resolve();
             if (!checkNewDay(MY_API.CACHE.LiveReward_TS)) {
               // 同一天，不执行
-              runMidnight(() => MY_API.LiveReward.run(), '直播签到');
+              runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
               return $.Deferred().resolve();
             }
-            MY_API.LiveReward.dailySignIn()
+            //MY_API.LiveReward.dailySignIn();
+            MY_API.LiveReward.shareLiveRoom();
             MY_API.CACHE.LiveReward_TS = ts_ms();
             MY_API.saveCache();
-            runMidnight(() => MY_API.LiveReward.run(), '直播签到');
+            runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
           } catch (err) {
-            window.toast('[自动直播签到]运行时出现异常', 'error');
-            MYERROR(`自动直播签到出错`, err);
+            window.toast('[直播每日任务]运行时出现异常', 'error');
+            MYERROR(`直播每日任务出错`, err);
             return $.Deferred().reject();
           }
         }
@@ -6647,6 +6682,7 @@
       },
       test: {
         run: async (roomid = 22474988) => {
+          return;
           MYDEBUG('[TEST] 测试开始');
           let wst = await new DanmuWebSocket({ roomid: roomid, uid: Live_info.uid });
           wst.bind({

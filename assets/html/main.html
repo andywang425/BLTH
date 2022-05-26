@@ -95,13 +95,15 @@
                                         class="clickableText helpText">?</span></div>
                         <div data-toggle="LIVE_SIGN"><label><input type="checkbox">直播区签到 </label></div>
                         <div data-toggle="AUTO_GROUP_SIGN"><label><input type="checkbox">应援团签到 </label></div>
+                        <div data-toggle="SHARE_LIVEROOM"><label><input type="checkbox">分享直播间 </label></div>
                         <div data-toggle="MEDAL_DANMU" style="color:blueviolet"><label><input type="checkbox">粉丝勋章打卡弹幕
                                 </label><button class="blth_btn" data-action="edit_medalDanmu">编辑弹幕内容</button><span
                                         helpdata="MEDAL_DANMU" class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="MEDAL_DANMU_METHOD" class="lineStartSpace inline">打卡弹幕模式：
                                 <div data-toggle="MEDAL_DANMU_WHITE" class="inline"><input type="radio"
-                                                name="MEDAL_DANMU_METHOD">白名单 </div>
+                                                name="MEDAL_DANMU_METHOD">白名单
+                                </div>
                                 <div data-toggle="MEDAL_DANMU_BLACK" class="inline"><input type="radio"
                                                 name="MEDAL_DANMU_METHOD" class="smallInterval">黑名单
                                 </div><button class="blth_btn" data-action="edit_lightMedalList">编辑房间列表</button><span
@@ -138,7 +140,8 @@
                         </div>
                         <div data-toggle="AUTO_GIFT_ROOMID">优先送礼房间 <input class="num blth_input" style="width:150px;"
                                         type="text"><span helpdata="AUTO_GIFT_ROOMID"
-                                        class="clickableText helpText">?</span></div>
+                                        class="clickableText helpText">?</span>
+                        </div>
                         <div data-toggle="GIFT_SEND_METHOD" class="inline">自动送礼模式：
                                 <div data-toggle="GIFT_SEND_WHITE" class="inline"><input type="radio"
                                                 name="GIFT_SEND_METHOD">白名单
@@ -150,7 +153,8 @@
                         </div>
                         <div data-toggle="GIFT_ALLOW_TYPE">允许被送出的礼物类型 <input class="str blth_input" style="width:150px;"
                                         type="text"><span helpdata="GIFT_ALLOW_TYPE"
-                                        class="clickableText helpText">?</span></div>
+                                        class="clickableText helpText">?</span>
+                        </div>
                         <div data-toggle="GIFT_INTERVAL"><input type="radio" name="GIFT_METHOD">间隔
                                 <input class="num blth_input" style="width:30px;" type="text">分钟送礼
                         </div>
@@ -158,8 +162,9 @@
                                         style="color:blueviolet">定时送礼</span>
                                 <div class="lineStartSpace">送礼时间 <input class="Hour blth_input" style="width:20px;"
                                                 type="text">点 <input class="Minute blth_input" style="width:20px;"
-                                                type="text">分 <button class="blth_btn"
-                                                data-action="sendGiftNow">立刻开始送礼</button></div>
+                                                type="text">分
+                                        <button class="blth_btn" data-action="sendGiftNow">立刻开始送礼</button>
+                                </div>
                         </div>
                         <div data-toggle="GIFT_LIMIT">礼物到期时间 <input class="num blth_input" style="width:20px;"
                                         type="text">天
@@ -185,9 +190,9 @@
                         <div data-toggle="AUTO_DANMU_SETTINGS">弹幕内容 <input class="Danmu blth_input" style="width:330px;"
                                         type="text"><br>房间号 <input class="Roomid blth_input" style="width:330px;"
                                         type="text"><br>发送时间 <input class="Time blth_input" style="width:330px;"
-                                        type="text"></div><button class="blth_btn"
-                                data-action="sendDanmuNow">立刻发送弹幕</button><button class="blth_btn"
-                                data-action="clearDanmuCache">清除弹幕缓存</button>
+                                        type="text">
+                        </div><button class="blth_btn" data-action="sendDanmuNow">立刻发送弹幕</button><button
+                                class="blth_btn" data-action="clearDanmuCache">清除弹幕缓存</button>
                         <div data-toggle="DANMU_MODIFY"><input type="checkbox">弹幕修改 <span helpdata="DANMU_MODIFY"
                                         class="clickableText helpText">?</span><br>
                                 <div>1. 匹配弹幕</div>
@@ -255,8 +260,9 @@
                         </div>
                         <div>天选时刻数据获取方式</div>
                         <div data-toggle="ANCHOR_TYPE_POLLING" class="lineStartSpace"><input
-                                        type="checkbox">从高热度直播间获取天选时刻数据 <span helpdata="ANCHOR_TYPE_POLLING"
-                                        class="clickableText helpText">?</span></div>
+                                        type="checkbox">从高热度直播间获取天选时刻数据
+                                <span helpdata="ANCHOR_TYPE_POLLING" class="clickableText helpText">?</span>
+                        </div>
                         <div data-toggle="ANCHOR_TYPE_LIVEROOM" class="lineStartSpace"><input type="checkbox">从直播间
                                 <input class="num blth_input" style="width:100px;" type="text">的个人简介获取天选时刻数据 <span
                                         helpdata="ANCHOR_TYPE_LIVEROOM" class="clickableText helpText">?</span>
@@ -271,8 +277,8 @@
                                         class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="ANCHOR_TYPE_CUSTOM" class="lineStartSpace"><input
-                                        type="checkbox">从自定义直播间列表获取天选时刻数据 <button class="blth_btn"
-                                        data-action="edit_ANCHOR_CUSTOM_ROOMLIST">编辑直播间列表</button><span
+                                        type="checkbox">从自定义直播间列表获取天选时刻数据
+                                <button class="blth_btn" data-action="edit_ANCHOR_CUSTOM_ROOMLIST">编辑直播间列表</button><span
                                         helpdata="ANCHOR_TYPE_CUSTOM" class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="ANCHOR_MAXROOM"><label>检查房间最大数量 <input class="roomNum blth_input"
@@ -390,7 +396,8 @@
                         <div data-toggle="POPULARITY_REDPOCKET_LOTTERY"><label style="color:blueviolet"><input
                                                 type="checkbox">参加直播红包抽奖
                                 </label><span helpdata="POPULARITY_REDPOCKET_LOTTERY"
-                                        class="clickableText helpText">?</span></div>
+                                        class="clickableText helpText">?</span>
+                        </div>
                         <div data-toggle="ANCHOR_AWPUSH">
                                 <input type="checkbox">
                                 <label style="font-weight: bold;">启用 awpush</label>
