@@ -1519,6 +1519,16 @@ var BAPI = {
                 }
             });
         },
+        likeInteract: (roomid) => {
+            return BAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '/xlive/web-ucenter/v1/interact/likeInteract',
+                data: {
+                    roomid: roomid,
+                    ts: BAPI_ts_s()
+                }
+            });
+        },
         anchor: {
             check: (roomid) => {
                 return BAPI.ajax({

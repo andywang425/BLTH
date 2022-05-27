@@ -563,6 +563,7 @@
         IN_TIME_RELOAD_DISABLE: false, // 休眠时段是否禁止刷新直播间 false为刷新
         LIVE_SIGN: true, // 直播区签到
         LOGIN: true, // 主站登陆
+        LIKE_LIVEROOM: false, // 点赞直播间
         MEDAL_DANMU_ROOM: ["0"], // 打卡弹幕房间列表
         MEDAL_DANMU_METHOD: "MEDAL_DANMU_BLACK", // 打卡弹幕发送方式
         MEDAL_DANMU_INTERVAL: 2, // 打卡弹幕发送间隔（秒）
@@ -1373,7 +1374,8 @@
           "TIME_AREA_DISABLE",
           "TIME_RELOAD",
           "UPDATE_TIP",
-          "WATCH"
+          "WATCH",
+          "LIKE_LIVEROOM"
         ];
         const radioList = [
           /**
@@ -1504,7 +1506,8 @@
           POPULARITY_REDPOCKET_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的红包抽奖。",
           AUTO_CHECK_DANMU: "检查你在当前直播间发送的弹幕是否发送成功。脚本向其它直播间发送的弹幕不在检测范围内。<mul><mli>这里的发送成功指的是你发送的弹幕对其他人可见。有时候表面上弹幕发送成功了，但实际上只有你自己能看见那条弹幕。</mli><mli>若弹幕疑似发送失败，则在右上角显示一条提示信息。</mli></mul>",
           AUTO_CHECK_DANMU_TIMEOUT: "弹幕被发送出去后开始计时，如果没有在超时时间内从当前直播间的webSocket中接收到之前所发送的弹幕则认为发送失败。",
-          SHARE_LIVEROOM: "完成分享直播间5次的任务。<mul><mli>并不会真的分享到某处，只是调用接口直接完成任务。</mli></mul>"
+          SHARE_LIVEROOM: "完成分享直播间5次的任务。<mul><mli>并不会真的分享到某处，只是调用接口直接完成任务。</mli></mul>",
+          LIKE_LIVEROOM: "完成点赞直播间3次的任务"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1667,6 +1670,30 @@
                   }
                   return $.Deferred().resolve();
                 })
+              });
+              myDiv.find('button[data-action="edit_lightMedalList"]').click(() => {
+                // 编辑打卡弹幕房间列表
+                myprompt({
+                  formType: 2,
+                  value: String(MY_API.CONFIG.MEDAL_DANMU_ROOM),
+                  maxlength: Number.MAX_SAFE_INTEGER,
+                  title: '请输入粉丝勋章打卡弹幕房间列表',
+                  btn: ['保存', '取消']
+                },
+                  function (value, index) {
+                    let valArray = value.split(",");
+                    valArray = [...new Set(valArray)];
+                    for (let i = 0; i < valArray.length; i++) {
+                      if (!valArray[i]) valArray.splice(i, 1);
+                    };
+                    MY_API.CONFIG.MEDAL_DANMU_ROOM = [...valArray];
+                    MY_API.saveConfig(false);
+                    mymsg('粉丝勋章打卡弹幕房间列表保存成功', {
+                      time: 2500,
+                      icon: 1
+                    });
+                    layer.close(index);
+                  });
               });
               myDiv.find('button[data-action="test_ServerTurbo"]').click(() => {
                 // Server酱·Turbo版推送测试
@@ -2885,6 +2912,7 @@
       },
       LiveReward: {
         dailySignIn: () => {
+          if (!MY_API.CONFIG.LIVE_SIGN) return $.Deferred().resolve();
           return BAPI.xlive.dosign().then((response) => {
             MYDEBUG('LiveReward.dailySignIn: API.xlive.dosign', response);
             if (response.code === 0) {
@@ -2900,6 +2928,27 @@
             }
           });
         },
+        likeLiveRoom: async () => {
+          if (!MY_API.CONFIG.LIKE_LIVEROOM) return $.Deferred().resolve();
+          const likeTimes = 5;
+          window.toast('[点赞直播间] 开始点赞直播间', 'info');
+          if (medal_info.status.state() === "resolved") {
+            const fansMedalList = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
+            for (let i = 0; i < likeTimes; i++) {
+              for (const medal of fansMedalList) {
+                await BAPI.xlive.likeInteract(medal.real_roomid).then((response) => {
+                  if (response.code !== 0) window.toast(`[点赞直播间] 直播间${medal.real_roomid}点赞失败 ${response.message}`, 'caution');
+                });
+                await sleep(200)
+              }
+              if (i < likeTimes - 1) await sleep(3000);
+            }
+            window.toast('[点赞直播间] 今日点赞完成', 'success');
+          } else {
+            window.toast('[观看30分钟直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.LiveReward.Watch30min());
+          }
+        },
         shareLiveRoom: async () => {
           if (!MY_API.CONFIG.SHARE_LIVEROOM) return $.Deferred().resolve();
           const shareTimes = 5;
@@ -2907,18 +2956,9 @@
             const medal_list = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
             for (let i = 0; i < shareTimes; i++) {
               for (const medal of medal_list) {
-                const realRoomId = await BAPI.room.get_info(medal.roomid).then((res) => {
-                  MYDEBUG(`API.room.get_info roomId=${medal.roomid} res`, res);
-                  if (res.code === 0) {
-                    return res.data.room_id;
-                  } else {
-                    window.toast(`[分享直播间]房间号【${medal.roomid}】信息获取失败 ${res.message}`, 'error');
-                    return medal.roomid;
-                  }
-                });
-                await BAPI.xlive.trigerInteract(realRoomId).then(response => {
+                await BAPI.xlive.trigerInteract(medal.real_roomid).then(response => {
                   MYDEBUG('DailyReward.shareLiveRoom: API.xlive.trigerInteract', response);
-                  if (response.code !== 0) window.toast(`[分享直播间]分享直播间失败 ${response.message}`, 'caution');
+                  if (response.code !== 0) window.toast(`[分享直播间] 直播间${medal.real_roomid}分享直播间失败 ${response.message}`, 'caution');
                 });
                 await sleep(100);
               }
@@ -2932,16 +2972,16 @@
           }
         },
         Watch30min: async () => {
-          if (!MY_API.CONFIG.Watch30min || otherScriptsRunning) return $.Deferred().resolve();
+          if (!MY_API.CONFIG.Watch30min) return $.Deferred().resolve();
           window.toast('[观看30分钟直播] 开始模拟观看直播', 'info');
           if (medal_info.status.state() === "resolved") {
             let pReturn = $.Deferred();
             const fansMedalList = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
             for (let f = 0; f < fansMedalList.length; f++) {
               const funsMedalData = fansMedalList[f];
-              let RoomHeart = new RoomHeart(funsMedalData.roomid)
-              await RoomHeart.start()
-              if (f === fansMedalList.length - 1) RoomHeart.doneFunc = () => {
+              let roomHeart = new RoomHeart(funsMedalData.real_roomid)
+              await roomHeart.start()
+              if (f === fansMedalList.length - 1) roomHeart.doneFunc = () => {
                 window.toast('[观看30分钟直播] 今日观看任务已完成', 'success');
                 pReturn.resolve();
               }
@@ -2955,7 +2995,7 @@
         },
         run: () => {
           try {
-            if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.SHARE_LIVEROOM && !MY_API.CONFIG.Watch30min) || otherScriptsRunning) return $.Deferred().resolve();
+            if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.SHARE_LIVEROOM && !MY_API.CONFIG.Watch30min && !MY_API.CONFIG.LIKE_LIVEROOM) || otherScriptsRunning) return $.Deferred().resolve();
             if (!checkNewDay(MY_API.CACHE.LiveReward_TS)) {
               // 同一天，不执行
               runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
@@ -2964,7 +3004,8 @@
             const p1 = MY_API.LiveReward.dailySignIn();
             const p2 = MY_API.LiveReward.shareLiveRoom();
             const p3 = MY_API.LiveReward.Watch30min();
-            $.when(p1, p2, p3).then(() => {
+            const p4 = MY_API.LiveReward.likeLiveRoom();
+            $.when(p1, p2, p3, p4).then(() => {
               MY_API.CACHE.LiveReward_TS = ts_ms();
               MY_API.saveCache();
               runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
@@ -3550,20 +3591,8 @@
       MEDAL_DANMU: {
         medal_list: [],
         sendDanmu: async (danmuContent, roomId, medal_name) => {
-          let realRoomId = roomId;
-          if (Number(roomId) <= 10000) {
-            realRoomId = await BAPI.room.get_info(roomId).then((res) => {
-              MYDEBUG(`API.room.get_info roomId=${roomId} res`, res); // 可能是短号，要用长号发弹幕
-              if (res.code === 0) {
-                return res.data.room_id;
-              } else {
-                window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
-                return roomId;
-              }
-            })
-          }
-          return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
-            MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，真实房间号【${realRoomId}】，粉丝勋章【${medal_name}】`, response);
+          return BAPI.sendLiveDanmu(danmuContent, roomId).then((response) => {
+            MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，真实房间号【${roomId}】，粉丝勋章【${medal_name}】`, response);
             if (response.code === 0 && response.message.length === 0) {
               return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】发送成功，房间号【${roomId}】，粉丝勋章【${medal_name}】已点亮，当前亲密度+100`, 'success');
             } else {
@@ -3600,7 +3629,7 @@
           for (const up of lightMedalList) {
             if (danmuContentIndex >= configDanmuLength) danmuContentIndex = 0;
             const medal_name = up.medal_name,
-              roomid = up.roomid,
+              roomid = up.real_roomid,
               danmuContent = MY_API.CONFIG.MEDAL_DANMU_CONTENT[danmuContentIndex];
             await MY_API.MEDAL_DANMU.sendDanmu(danmuContent, roomid, medal_name);
             danmuContentIndex++;
@@ -6552,7 +6581,7 @@
     })
   }
   /**
-   * 获取粉丝勋章列表
+   * 获取粉丝勋章列表和真实直播间号
    * @param {Number} page 
    * @returns 
    */
@@ -6563,6 +6592,19 @@
       await BAPI.i.medal(page).then((response) => {
         MYDEBUG('before init() getMedalList: API.i.medal', response);
         if (response.code === 0) {
+          for (let i = 0; i < response.data.items.length; i++) {
+            if (response.data.items[i].roomid && response.data.items[i].roomid <= 100000) {
+              BAPI.room.get_info(response.data.items[i].roomid).then((res) => {
+                if (res.code === 0) {
+                  response.data.items[i].real_roomid = res.data.room_id;
+                } else {
+                  MYERROR(`获取直播间${response.data.items[i].roomid}的真实房间号出错`);
+                }
+              })
+            } else {
+              response.data.items[i].real_roomid = response.data.items[i].roomid;
+            }
+          }
           medal_info.medal_list = medal_info.medal_list.concat(response.data.items);
           if (response.data.page_info.cur_page < response.data.page_info.total_page) page++;
           else { medal_info.status.resolve(); end = true }
