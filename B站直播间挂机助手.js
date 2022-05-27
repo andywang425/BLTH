@@ -34,16 +34,16 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
 // @require        https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
-// @require        file:///D:\Documents\GitHub\BLTH\assets\js\library\BilibiliAPI_Mod.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@2b75c82c6e192f70dd67659b0b5195f8175cf35c/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
 // @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
-// @require        file:///D:/Documents/GitHub/BLTH/assets/js/library/DanmuWebSocket.js
-// @require        file:///D:\Documents\GitHub\BLTH\assets\js\library\BiliveHeart.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@fc6e16aca319fa0dc1c45c0fa9f1611da26d4f4c/assets/js/library/DanmuWebSocket.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.html
+// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@fc6e16aca319fa0dc1c45c0fa9f1611da26d4f4c/assets/html/main.min.html
 // @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -54,7 +54,7 @@
 // @grant          GM_setValue
 // @grant          GM_deleteValue
 // @grant          GM_addStyle
-// ==/UserScript==
+// ==/UserScript== 
 
 (function () {
   localstorage2gm();
@@ -290,7 +290,10 @@
       } else if (SP_CONFIG.blockliveDataUpdate && arg[0].includes("data.bilibili.com/gol/postweb")) {
         return $.Deferred().resolve();
       } else if (arg[0].includes('//api.live.bilibili.com/msg/send')) {
-        if (SP_CONFIG.AUTO_CHECK_DANMU) danmuEmitter.emit('danmu', arg[1].data.msg);
+        if (SP_CONFIG.AUTO_CHECK_DANMU) {
+          danmuEmitter.emit('danmu', arg[1].data.msg);
+          return wfetch(...arg);
+        }
         if (SP_CONFIG.wear_medal_before_danmu) {
           if (medal_info.status.state() !== "resolved" || Live_info.medal === null || (SP_CONFIG.wear_medal_type === "ONLY_FIRST" && hasWornMedal)) return wfetch(...arg);
           if (typeof Live_info.medal === "undefined") {
@@ -341,9 +344,6 @@
             } else {
               window.toast(`自动佩戴粉丝勋章出错 ${response.message}`, 'error');
             }
-            return wfetch(...arg);
-          }, () => {
-            window.toast('自动佩戴粉丝勋章失败，请检查网络', 'error');
             return wfetch(...arg);
           })
         }
@@ -2609,11 +2609,10 @@
           return BAPI.Group.my_groups().then((response) => {
             MYDEBUG('GroupSign.getGroups: API.Group.my_groups', response);
             if (response.code === 0) return $.Deferred().resolve(response.data.list);
-            window.toast(`[自动应援团签到]' ${response.msg}`, 'error');
-            return $.Deferred().reject();
-          }, () => {
-            window.toast('[自动应援团签到]获取应援团列表失败，请检查网络', 'error');
-            return delayCall(() => MY_API.GroupSign.getGroups());
+            else {
+              window.toast(`[自动应援团签到]获取应援团列表失败 ${response.msg}`, 'error');
+              return delayCall(() => MY_API.GroupSign.getGroups());
+            }
           });
         },
         signInList: (list, i = 0) => {
@@ -4029,8 +4028,6 @@
                 window.toast(`[取关BLTH天选分组内的UP] 获取关注列表出错 ${response.message}`, 'error');
                 return delayCall(() => getUpInTag(myuid, tagid, pn = 1, ps = 50));
               }
-            }, () => {
-              MY_API.chatLog(`[天选时刻] 获取Tag内UP列表出错，请检查网络`, 'error');
             })
           }
           function get_attention_list(mid) {
@@ -4635,9 +4632,6 @@
                           MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${defaultJoinData.roomid}<br>${res.msg}`, 'error');
                           getUid.reject();
                         }
-                      }, () => {
-                        MY_API.chatLog(`[天选时刻] 获取uid出错，请检查网络`, 'error');
-                        getUid.reject();
                       })
                     } else getUid.resolve();
                     getUid.then(() => {
@@ -4666,9 +4660,6 @@
                           });
                           p.reject()
                         }
-                      }, () => {
-                        MY_API.chatLog('[天选时刻] 购买粉丝勋章出错，请检查网络', 'error');
-                        p.reject()
                       });
                     });
                     break;
@@ -4690,8 +4681,6 @@
                         return MY_API.chatLog(`[天选时刻] 该天选已过期<br>roomid = ${linkMsg(liveRoomUrl + defaultJoinData.roomid, defaultJoinData.roomid)}, id = ${data.id}<br>奖品名：${data.award_name}`, 'info')
                       }
                     }
-                  }, () => {
-                    MY_API.chatLog(`[天选时刻] 获取天选开奖剩余时间失败，请检查网络`, 'error')
                   })
                 })
               });
@@ -4830,9 +4819,6 @@
                     MY_API.chatLog(`[天选时刻] 获取uid出错<br>${res.msg}`, 'error');
                     return false
                   }
-                }, () => {
-                  MY_API.chatLog(`[天选时刻] 获取uid出错，请检查网络`, 'error');
-                  return $.Deferred().resolve(false)
                 });
               }
               case 3: { // 大航海
@@ -4958,8 +4944,6 @@
                       else {
                         window.toast(`[天选自动取关] 取关UP(uid = ${anchorUid})出错  ${response.message}`, 'error');
                       }
-                    }, () => {
-                      MY_API.chatLog(`[天选自动取关] 取关UP(uid = ${anchorUid})出错，请检查网络`);
                     })
                   }
                 }
@@ -4988,8 +4972,6 @@
                       } else {
                         window.toast(`[天选自动私信] 私信UP(uid = ${anchorUid})失败 ${res.message}`, 'error');
                       }
-                    }, () => {
-                      MY_API.chatLog(`[天选自动私信] 私信UP(uid = ${anchorUid})出错，请检查网络`);
                     })
                   }, getRandomNum(5000, 8000));
                 }
@@ -5001,8 +4983,6 @@
                       MY_API.AnchorLottery.BLTHprizeList.push(anchorUid);
                       if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${anchorUid}）至分组【${anchorPrizeTagName}】成功`, 'success');
                       else window.toast(`[天选时刻] 移动UP（uid = ${anchorUid}）至分组【${anchorPrizeTagName}】失败 ${re.message}`, 'caution');
-                    }, () => {
-                      MY_API.chatLog(`[天选时刻] 移动UP（uid = ${anchorUid}）到分组【${anchorPrizeTagName}】出错，请检查网络`, 'error');
                     });
                   }
                 }
@@ -5134,9 +5114,6 @@
                     MY_API.chatLog(`[天选时刻] 获取uid出错，中断后续操作<br>roomid = ${linkMsg(liveRoomUrl + data.roomid, data.roomid)}, id = ${data.id}<br>${res.msg}`, 'error');
                     p.reject();
                   }
-                }, () => {
-                  MY_API.chatLog(`[天选时刻] 获取uid出错，中断后续操作<br>roomid = ${linkMsg(liveRoomUrl + data.roomid, data.roomid)}, id = ${data.id}<br>请检查网络`, 'error');
-                  p.reject();
                 });
               } else p.resolve();
               p.then(() => {
@@ -5153,8 +5130,6 @@
                         MY_API.AnchorLottery.BLTHfollowList.push(data.uid);
                         if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】成功`, 'success');
                         else window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】失败 ${re.message}`, 'caution');
-                      }, () => {
-                        MY_API.chatLog(`[天选时刻] 移动UP（uid = ${data.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`, 'error');
                       });
                     }
                   }, getRandomNum(5000, 8000));
@@ -6372,33 +6347,6 @@
           setTimeout(() => MY_API.PopularityRedpocketLottery.run(), MY_API.CONFIG.POPULARITY_REDPOCKET_CHECK_INTERVAL * 60 * 1000);
         }
       },
-      test: {
-        run: async (roomid = 22474988) => {
-          MYDEBUG('[TEST] 测试开始');
-          let wst = await new DanmuWebSocket({ roomid: roomid, uid: Live_info.uid });
-          wst.bind({
-            reconnect: (newWst) => {
-              wst = newWst;
-              MYDEBUG(`[TEST] 弹幕服务器连接断开，尝试重连`, wst);
-            },
-            heartbeat: (obj) => {
-              MYDEBUG(`[TEST] 弹幕服务器心跳`, obj);
-            },
-            login: (json) => {
-              MYDEBUG(`[TEST] 登录弹幕服务器成功`, json);
-            },
-            cmd: (obj) => {
-              MYDEBUG(`[TEST] 收到CMD消息 cmd = ${obj.cmd}`, obj);
-            },
-            unknownmsg: (obj) => {
-              MYDEBUG(`[TEST] 收到未知消息`, obj);
-            },
-            open: (event) => {
-              MYDEBUG(`[TEST] 弹幕服务器连接成功`, event);
-            }
-          })
-        }
-      }
     };
     MY_API.init().then(() => {
       try {
@@ -6483,7 +6431,6 @@
       API.GET_PRIVILEGE.run, // 领取大会员权益
       API.PopularityRedpocketLottery.run, // 直播红包抽奖
       API.AUTO_CHECK_DANMU.run, // 检查弹幕是否发送成功
-      API.test.run
     ];
     otherScriptsRunningCheck.then(() => runAllTasks(5000, 200, taskList));
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000);// 刷新直播间
