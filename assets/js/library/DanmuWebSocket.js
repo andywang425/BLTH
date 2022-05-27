@@ -1,3 +1,13 @@
+// ==UserScript==
+// @name         DanmuWebSocket
+// @namespace    https://github.com/andywang425
+// @version      0.1
+// @description  B站直播WebSocket弹幕库
+// @author       andywang425
+// @require      https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
+// @require      https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
+// @grant        none
+// ==/UserScript==
 class DanmuWebSocket extends WebSocket {
     HEADER_SIZE = 16;
     WS_BODY_PROTOCOL_VERSION_NORMAL = 0
@@ -282,10 +292,9 @@ class DanmuWebSocket extends WebSocket {
                 this.handlers[key].push(obj[key]);
             }
         })
-
     }
     /**
-     * 
+     * 发送数据
      * @param {JSON | string} data 
      * @param {int} protover 
      * @param {int} operation 
@@ -323,7 +332,6 @@ class DanmuWebSocket extends WebSocket {
      * @returns 
      */
     sendLoginPacket() {
-        // 总字节长度 int(4bytes) + 头字节长度 short(2bytes) + 00 01 + 00 00 00 07 + 00 00 00 01 + Data 登录数据包
         const data = {
             'uid': this.uid,
             'roomid': this.roomid,
@@ -340,7 +348,6 @@ class DanmuWebSocket extends WebSocket {
      * @returns 
      */
     sendHeartBeatPacket() {
-        // 总字节长度 int(4bytes) + 头字节长度 short(2bytes) + 00 01 + 00 00 00 02 + 00 00 00 01 + Data 心跳数据包
         return this.sendData('[object Object]', 1, 2, 1);
     }
 }

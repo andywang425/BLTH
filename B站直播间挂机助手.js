@@ -2683,7 +2683,7 @@
           if (!MY_API.CONFIG.LOGIN) return $.Deferred().resolve();
           return BAPI.DailyReward.login().then((response) => {
             MYDEBUG('DailyReward.login: API.DailyReward.login');
-            if (response.code === 0) window.toast('[自动每日奖励][每日登录]完成', 'success');
+            if (response.code === 0) return window.toast('[自动每日奖励][每日登录]完成', 'success');
             else {
               window.toast(`[自动每日奖励][每日登录]失败 ${response.message}`, 'error');
               return delayCall(() => MY_API.DailyReward.login());
@@ -6221,7 +6221,7 @@
           const resetTime = 20 * 60 * 1000;
           if (response.code === 0) {
             MYDEBUG('[红包抽奖] 服务器地址', response);
-            let wst = new BAPI.DanmuWebSocket(Live_info.uid, roomid, response.data.host_server_list, response.data.token);
+            let wst = await new DanmuWebSocket({ roomid: roomid, uid: Live_info.uid });
             let reset = (time = resetTime) => {
               clearTimeout(resetTimer);
               resetTimer = setTimeout(() => {
@@ -6229,51 +6229,52 @@
                 wst.close(1000);
               }, time)
             }
-            wst.setUnzip(pako.inflate);
-            wst.bind((newWst) => {
-              wst = newWst;
-              MYDEBUG(`[红包抽奖] 弹幕服务器连接断开，尝试重连 roomid = ${roomid}`, wst);
-              delVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid);
-            }, () => {
-              MYDEBUG(`[红包抽奖] 连接弹幕服务器成功 roomid = ${roomid}`, wst);
-              addVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid);
-              reset();
-            }, () => {
-              /* heartbeat */
-            }, async (obj) => {
-              switch (obj.cmd) {
-                case 'POPULARITY_RED_POCKET_WINNER_LIST':
-                  MYDEBUG(`[红包抽奖] 红包抽奖结果 lot_id = ${obj.data.lot_id}`, obj);
-                  reset();
-                  for (const i of obj.data.winner_info) {
-                    if (i.uid === Live_info.uid) {
-                      MY_API.chatLog(`[红包抽奖] 红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${obj.data.lot_id}中奖<br>获得${i.gift_num}个${i.award_name}，价值${i.award_price / 1000}电池`, 'prize');
-                      return;
+            wst.bind({
+              reconnect: (newWst) => {
+                wst = newWst;
+                MYDEBUG(`[红包抽奖] 弹幕服务器连接断开，尝试重连 roomid = ${roomid}`, wst);
+                delVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid);
+              },
+              login: (json) => {
+                MYDEBUG(`[红包抽奖] 登录弹幕服务器成功 roomid = ${roomid}`, json);
+                addVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid);
+                reset();
+              },
+              cmd: async (obj) => {
+                switch (obj.cmd) {
+                  case 'POPULARITY_RED_POCKET_WINNER_LIST':
+                    MYDEBUG(`[红包抽奖] 红包抽奖结果 lot_id = ${obj.data.lot_id}`, obj);
+                    reset();
+                    for (const i of obj.data.winner_info) {
+                      if (i.uid === Live_info.uid) {
+                        MY_API.chatLog(`[红包抽奖] 红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${obj.data.lot_id}中奖<br>获得${i.gift_num}个${i.award_name}，价值${i.award_price / 1000}电池`, 'prize');
+                        return;
+                      }
                     }
-                  }
-                  MY_API.chatLog(`[红包抽奖] 红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${obj.data.lot_id}未中奖`, 'info');
-                  break;
-                case 'POPULARITY_RED_POCKET_START':
-                  reset();
-                  MYDEBUG(`[红包抽奖] 准备参加websocket推送的红包抽奖 lot_id = ${obj.data.lot_id}`, obj);
-                  if (MY_API.CONFIG.ANCHOR_AWPUSH) {
-                    obj.data.uid = uid;
-                    obj.data.roomid = roomid;
-                    const update_data = {
-                      code: "UPDATE_POPULARITY_REDPOCKET_DATA",
-                      uid: Live_info.uid,
-                      secret: MY_API.AWPUSH.userInfo.secret,
-                      data: MY_API.PopularityRedpocketLottery.delUselessData(obj.data)
-                    };
-                    MYDEBUG('awpush 上传红包数据: ', update_data);
-                    MY_API.AWPUSH.desend(JSON.stringify(update_data));
-                  }
-                  await MY_API.PopularityRedpocketLottery.draw(uid, roomid, obj.data);
-                  break;
-                default:
-                // 其他消息，不做处理
+                    MY_API.chatLog(`[红包抽奖] 红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${obj.data.lot_id}未中奖`, 'info');
+                    break;
+                  case 'POPULARITY_RED_POCKET_START':
+                    reset();
+                    MYDEBUG(`[红包抽奖] 准备参加websocket推送的红包抽奖 lot_id = ${obj.data.lot_id}`, obj);
+                    if (MY_API.CONFIG.ANCHOR_AWPUSH) {
+                      obj.data.uid = uid;
+                      obj.data.roomid = roomid;
+                      const update_data = {
+                        code: "UPDATE_POPULARITY_REDPOCKET_DATA",
+                        uid: Live_info.uid,
+                        secret: MY_API.AWPUSH.userInfo.secret,
+                        data: MY_API.PopularityRedpocketLottery.delUselessData(obj.data)
+                      };
+                      MYDEBUG('awpush 上传红包数据: ', update_data);
+                      MY_API.AWPUSH.desend(JSON.stringify(update_data));
+                    }
+                    await MY_API.PopularityRedpocketLottery.draw(uid, roomid, obj.data);
+                    break;
+                  default:
+                  // 其他消息，不做处理
+                }
               }
-            });
+            })
           } else {
             MY_API.chatLog('[红包抽奖] 获取弹幕服务器地址错误', 'warning')
           }
@@ -6373,7 +6374,6 @@
       },
       test: {
         run: async (roomid = 22474988) => {
-          return;
           MYDEBUG('[TEST] 测试开始');
           let wst = await new DanmuWebSocket({ roomid: roomid, uid: Live_info.uid });
           wst.bind({
@@ -6397,25 +6397,6 @@
               MYDEBUG(`[TEST] 弹幕服务器连接成功`, event);
             }
           })
-          // ----------------------------------------------------
-          // let response = await BAPI.room.getConf(roomid);
-          // if (response.code === 0) {
-          //   MYDEBUG('[TEST] 服务器地址', response);
-          //   let wst = new BAPI.DanmuWebSocket(Live_info.uid, roomid, response.data.host_server_list, response.data.token);
-          //   wst.setUnzip(pako.inflate);
-          //   wst.bind((newWst) => {
-          //     wst = newWst;
-          //     MYDEBUG(`[TEST] 弹幕服务器连接断开，尝试重连 roomid = ${roomid}`, wst);
-          //   }, () => {
-          //     MYDEBUG(`[TEST] 连接弹幕服务器成功 roomid = ${roomid}`, wst);
-          //   }, () => {
-          //     /* heartbeat */
-          //   }, async (obj) => {
-          //     MYDEBUG(`[TEST] 收到CMD消息 cmd = ${obj.cmd}`, obj);
-          //   });
-          // } else {
-          //   MY_API.chatLog('[红包抽奖] 获取弹幕服务器地址错误', 'warning')
-          // }
         }
       }
     };
