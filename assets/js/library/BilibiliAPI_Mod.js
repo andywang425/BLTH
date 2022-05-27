@@ -1675,5 +1675,3 @@ var BAPI = {
         }
     }
 }
-
-BAPI.DanmuWebSocket.headerLength = 16;
