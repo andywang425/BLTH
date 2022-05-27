@@ -40,6 +40,7 @@
 // @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @require        file:///D:/Documents/GitHub/BLTH/assets/js/library/DanmuWebSocket.js
+// @require        file:///D:\Documents\GitHub\BLTH\assets\js\library\BiliveHeart.js
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
 // @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.html
@@ -222,7 +223,6 @@
     winPrizeTotalCount = 0,
     SEND_GIFT_NOW = false, // 立刻送出礼物
     SEND_DANMU_NOW = false, // 立刻发弹幕
-    LIGHT_MEDAL_NOW = false, // 立刻点亮勋章
     hideBtnClickable = false, // 隐藏/显示控制面板，面板加载后设为 true
     secondsSendBtnClickable = true, // seconds qq 推送
     getFollowBtnClickable = true,
@@ -237,7 +237,7 @@
       short_room_id: undefined,
       uid: undefined,
       ruid: undefined,
-      gift_list: [{ id: 6, price: 1e3 }, { id: 1, price: 100 }, { id: 30607, price: 5e3 }],
+      gift_list: [{ id: 6, price: 1e3 }, { id: 1, price: 100 }],
       rnd: undefined,
       visit_id: undefined,
       bili_jct: undefined,
@@ -549,14 +549,13 @@
         DANMU_MODIFY_POOL: [4], // 修改弹幕 弹幕池
         DANMU_MODIFY_COLOR: ["#f7335d"], // 修改弹幕 颜色
         DANMU_MODIFY_SIZE: [1.2], // 修改弹幕 大小
-        FORCE_LIGHT: false, // 点亮勋章时忽略亲密度上限
         GIFT_LIMIT: 1, // 礼物到期时间(天)
         GIFT_SEND_HOUR: 23, // 送礼小时
         GIFT_SEND_MINUTE: 59, // 送礼分钟
         GIFT_INTERVAL: 5, // 送礼间隔
         GIFT_METHOD: "GIFT_SEND_TIME", // 送礼时间策略
         GIFT_SORT: 'GIFT_SORT_HIGH', // 送礼优先高等级
-        GIFT_ALLOW_TYPE: ["1", "6", "30607"], // 允许送出的礼物类型，默认：辣条，亿圆, 小心心
+        GIFT_ALLOW_TYPE: ["1", "6"], // 允许送出的礼物类型，默认：辣条，亿圆
         GIFT_SEND_METHOD: "GIFT_SEND_BLACK", // 送礼黑白名单策略
         GIFT_SEND_ROOM: ["0"], // 送礼黑白名单策略 - 房间列表
         GM_NOTICE: false, // GM通知
@@ -564,9 +563,6 @@
         IN_TIME_RELOAD_DISABLE: false, // 休眠时段是否禁止刷新直播间 false为刷新
         LIVE_SIGN: true, // 直播区签到
         LOGIN: true, // 主站登陆
-        LITTLE_HEART: true, // 获取小心心
-        LIGHT_MEDALS: ["0"], // 点亮勋章
-        LIGHT_METHOD: "LIGHT_WHITE",
         MEDAL_DANMU_ROOM: ["0"], // 打卡弹幕房间列表
         MEDAL_DANMU_METHOD: "MEDAL_DANMU_BLACK", // 打卡弹幕发送方式
         MEDAL_DANMU_INTERVAL: 2, // 打卡弹幕发送间隔（秒）
@@ -621,7 +617,8 @@
         TIME_RELOAD: false, // 定时刷新直播间
         TIME_RELOAD_MINUTE: 120, // 直播间重载时间
         UPDATE_TIP: true, //更新提示
-        WATCH: true // 观看视频
+        WATCH: true, // 观看视频
+        Watch30min: false // 观看30分钟
       },
       CACHE_DEFAULT: {
         AUTO_SEND_DANMU_TS: [], // 弹幕发送
@@ -632,7 +629,6 @@
         Coin2Sliver_TS: 0, // 硬币换银瓜子
         Gift_TS: 0, // 自动送礼（定时）
         GiftInterval_TS: 0, // 自动送礼（间隔）
-        LittleHeart_TS: 0, // 小心心
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0, // 天选时刻
         last_aid: 881, // 实物抽奖最后一个有效aid
@@ -645,7 +641,6 @@
         COUNT: 0, // 辣条（目前没用）
         ANCHOR_COUNT: 0, // 天选
         MATERIAL_COUNT: 0, // 实物
-        LITTLE_HEART_COUNT: 0, // 小心心
         CLEAR_TS: 0, // 重置统计
       },
       CONFIG: {},
@@ -904,8 +899,7 @@
           MY_API.Exchange.runS2C, // 银瓜子换硬币
           MY_API.Exchange.runC2S, // 硬币换银瓜子
           MY_API.Gift.run, // 送礼物
-          MY_API.LITTLE_HEART.run, // 小心心
-          MY_API.AUTO_DANMU.run, // 发弹幕
+          MY_API.Watch30min.run, // 观看30分钟
           MY_API.MaterialObject.run, // 实物抽奖
           MY_API.AnchorLottery.run, // 天选时刻
           MY_API.MEDAL_DANMU.run, // 粉丝勋章打卡弹幕
@@ -1127,15 +1121,6 @@
             return window.toast("[送礼时间]时间错误", 'caution');
           MY_API.CONFIG.GIFT_SEND_HOUR = val1;
           MY_API.CONFIG.GIFT_SEND_MINUTE = val2;
-          // LIGHT_MEDALS
-          val = div.find('div[data-toggle="LIGHT_MEDALS"] .num').val();
-          valArray = val.split(",");
-          for (let i = 0; i < valArray.length; i++) {
-            if (valArray[i] === '') {
-              valArray[i] = 0;
-            }
-          };
-          MY_API.CONFIG.LIGHT_MEDALS = valArray;
           // SPARE_GIFT_ROOM
           val = div.find('div[data-toggle="SPARE_GIFT_ROOM"] .num').val();
           MY_API.CONFIG.SPARE_GIFT_ROOM = val;
@@ -1355,11 +1340,10 @@
           "AUTO_GROUP_SIGN",
           "COIN",
           "COIN2SILVER",
-          "FORCE_LIGHT",
           "GET_PRIVILEGE",
           "GM_NOTICE",
           "IN_TIME_RELOAD_DISABLE",
-          "LITTLE_HEART",
+          "Watch30min",
           "LIVE_SIGN",
           "LOGIN",
           "MATERIAL_LOTTERY",
@@ -1419,11 +1403,6 @@
             toggle2: 'MEDAL_DANMU_BLACK'
           },
           {
-            name: 'LIGHT_METHOD',
-            toggle1: 'LIGHT_WHITE',
-            toggle2: 'LIGHT_BLACK'
-          },
-          {
             name: 'GIFT_SEND_METHOD',
             toggle1: 'GIFT_SEND_WHITE',
             toggle2: 'GIFT_SEND_BLACK'
@@ -1451,7 +1430,7 @@
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "通过给UP充电，消耗5B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
-          LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，该功能可能会无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
+          Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，该功能可能会无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
           GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
@@ -1485,13 +1464,11 @@
           ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。 </mli></mul><mh3>注意：</mh3><mul><mli>检索天选抽奖的同时也可以检索到红包抽奖。</mli><mli>在不使用awpush的情况下，如果你想同时参与天选时刻和红包抽奖，建议<strong>不要</strong>同时勾选<code>天选时刻数据获取方式</code>和<code>红包抽奖数据获取方式</code>中的选项（即只勾选<code>天选时刻数据获取方式</code>或<code>红包抽奖数据获取方式</code>中的选项），否则极其容易触发风控。如果启用awpush的话就不必在意这个了，因为相关设置将由BLTH-server来决定。 </mli><mli>如果选择勾选<code>天选时刻数据获取方式</code>中的选项，触发风控后脚本会尝试切换备用API来获取天选数据，但在这种状态下无法获取红包抽奖数据。</mli></mul>",
           SHARE: "并不会真的分享视频，通过调用特定api直接完成任务。",
           ANCHOR_MONEY_ONLY: "仅参加能识别到金额的天选。<mul><mli>由于部分天选的奖品名较特殊，可能会遗漏或误判一些天选。</mli></mul>",
-          LIGHT_MEDALS: "根据点亮模式的不同，这些直播间的粉丝勋章将会被点亮或排除在外。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
-          LIGHT_METHOD: "通过给拥有粉丝勋章的直播间送一个小心心来点亮熄灭的勋章。<mul><mli>白名单：只点亮这些房间的粉丝勋章。</mli><mli>黑名单：点亮除了这些房间以外的直播间的粉丝勋章。</mli><mli>如果你不想启用本功能，把【勋章点亮模式】设为白名单，然后在【自动点亮勋章房间号】中填<code>0</code>即可。</mli><mli>脚本会在运行自动送礼前点亮勋章。如果未启用自动送礼，请点击【立刻点亮勋章】按钮。</mli><mli>优先送出快过期的小心心。</mli></mul>",
           ANCHOR_IGNORE_PWDROOM: "部分直播间需输入密码后才能进入。勾选此选项后将忽略这些直播间的天选。",
           COIN2SILVER: "普通用户每天兑换上限<code>25</code>硬币，老爷或大会员每天兑换上限<code>50</code>硬币。<mul><mli><code>1</code>硬币 = <code>450</code>银瓜子（老爷或大会员<code>500</code>银瓜子）。</mli></mul>",
           SILVER2COIN: "每日直播用户都可以将部分银瓜子转化为硬币，每天仅一次机会。<mul><mli><code>700</code>银瓜子 = <code>1</code>硬币。</mul></mli>",
           windowToast: `右上角的提示信息。相对来说不是那么重要，所以不放在日志窗口里。<mul style = "line-height:1em;"><div class="link-toast info fixed"><span class="toast-text">普通消息</span></div><br><br><br><div class="link-toast success fixed"><span class="toast-text">成功</span></div><br><br><br><div class="link-toast error fixed"><span class="toast-text">发生错误</span></div></mul>`,
-          GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。</mli><mli>在脚本中打开控制台日志后，在控制台(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和 id 的json。将data下的几项全部展开，再搜索礼物名即可找到 id 。</mli><mli>常用 id ：1: <code>辣条</code> 6: <code>亿圆</code> 30607: <code>小心心</code></mli></mul>",
+          GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。</mli><mli>在脚本中打开控制台日志后，在控制台(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和 id 的json。将data下的几项全部展开，再搜索礼物名即可找到 id 。</mli><mli>常用 id ：1: <code>辣条</code> 6: <code>亿圆</code></mli></mul>",
           ANCHOR_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的天选时刻。",
           SECONDS_NOTICE: "seconds是专门用来推送中奖信息的qqbot。使用前请先添加seconds（QQ: 2397433013）为好友，然后后点击【编辑QQ号】按钮输入你的QQ号。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的QQ私聊消息提醒你中奖了。</mli><mli>加好友时验证消息必须填写<code>BLTH</code>，否则不会通过。</mli><mli>seconds每天能加的好友数量有上限，如果加不上好友请第二天再试试。</mli></mul>",
           ServerTurbo_NOTICE: "<a href = 'https://sct.ftqq.com/' target = '_blank'>Server酱Turbo版（点我注册）</a>，是「<a href='http://sct.ftqq.com' target='_blank'>公众号版</a>」分离出来的一个版本，它为捐赠用户提供更多的推送渠道选择，除了方糖服务号（因为举报原因卡片不显示正文），它还包括了到微信官方提供的「<a href='https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login' target='_blank'>测试号</a>」、企业微信群、钉钉群、飞书群的推送。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信推送提醒你中奖了。</mli></mul>",
@@ -1526,7 +1503,8 @@
           POPULARITY_REDPOCKET_TYPE_POLLING: "高热度房间来源于各分区热门房间列表。",
           POPULARITY_REDPOCKET_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的红包抽奖。",
           AUTO_CHECK_DANMU: "检查你在当前直播间发送的弹幕是否发送成功。脚本向其它直播间发送的弹幕不在检测范围内。<mul><mli>这里的发送成功指的是你发送的弹幕对其他人可见。有时候表面上弹幕发送成功了，但实际上只有你自己能看见那条弹幕。</mli><mli>若弹幕疑似发送失败，则在右上角显示一条提示信息。</mli></mul>",
-          AUTO_CHECK_DANMU_TIMEOUT: "弹幕被发送出去后开始计时，如果没有在超时时间内从当前直播间的webSocket中接收到之前所发送的弹幕则认为发送失败。"
+          AUTO_CHECK_DANMU_TIMEOUT: "弹幕被发送出去后开始计时，如果没有在超时时间内从当前直播间的webSocket中接收到之前所发送的弹幕则认为发送失败。",
+          SHARE_LIVEROOM: "完成分享直播间5次的任务。<mul><mli>并不会真的分享到某处，只是调用接口直接完成任务。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1576,7 +1554,6 @@
               myDiv.find('div[data-toggle="ANCHOR_GOLD_JOIN_TIMES"] .num').val(MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES.toString());
               myDiv.find('div[data-toggle="GIFT_ALLOW_TYPE"] .str').val(MY_API.CONFIG.GIFT_ALLOW_TYPE.toString());
               myDiv.find('div[data-toggle="COIN2SILVER"] .coin_number').val(parseInt(MY_API.CONFIG.COIN2SILVER_NUM).toString());
-              myDiv.find('div[data-toggle="LIGHT_MEDALS"] .num').val(MY_API.CONFIG.LIGHT_MEDALS.toString());
               myDiv.find('div[data-toggle="MEDAL_DANMU_INTERVAL"] .num').val(parseFloat(MY_API.CONFIG.MEDAL_DANMU_INTERVAL).toString());
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_MONEY"] .num').val(parseFloat(MY_API.CONFIG.ANCHOR_IGNORE_MONEY).toString());
               myDiv.find('div[data-toggle="ANCHOR_MAXLIVEROOM_SAVE"] .roomNum').val(parseInt(MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE).toString());
@@ -1673,11 +1650,6 @@
               myDiv.find('button[data-action="about"]').click(() => {
                 // 关于
                 layerOpenAbout();
-              });
-              myDiv.find('button[data-action="lightMedalNow"]').click(() => {
-                // 立刻点亮勋章
-                LIGHT_MEDAL_NOW = true;
-                MY_API.Gift.run();
               });
               myDiv.find('button[data-action="test_PP"]').click(() => {
                 // 推送加推送测试
@@ -1821,30 +1793,6 @@
                       icon: 1
                     });
                     myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').html(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length + '个')
-                    layer.close(index);
-                  });
-              });
-              myDiv.find('button[data-action="edit_lightMedalList"]').click(() => {
-                // 编辑打卡弹幕房间列表
-                myprompt({
-                  formType: 2,
-                  value: String(MY_API.CONFIG.MEDAL_DANMU_ROOM),
-                  maxlength: Number.MAX_SAFE_INTEGER,
-                  title: '请输入粉丝勋章打卡弹幕房间列表',
-                  btn: ['保存', '取消']
-                },
-                  function (value, index) {
-                    let valArray = value.split(",");
-                    valArray = [...new Set(valArray)];
-                    for (let i = 0; i < valArray.length; i++) {
-                      if (!valArray[i]) valArray.splice(i, 1);
-                    };
-                    MY_API.CONFIG.MEDAL_DANMU_ROOM = [...valArray];
-                    MY_API.saveConfig(false);
-                    mymsg('粉丝勋章打卡弹幕房间列表保存成功', {
-                      time: 2500,
-                      icon: 1
-                    });
                     layer.close(index);
                   });
               });
@@ -2916,11 +2864,13 @@
               MYDEBUG('DailyReward.run: API.DailyReward.exp', response);
               if (response.code === 0) {
                 MY_API.DailyReward.coin_exp = response.number;
-                MY_API.DailyReward.login();
-                MY_API.DailyReward.dynamic();
-                MY_API.CACHE.DailyReward_TS = ts_ms();
-                MY_API.saveCache();
-                runMidnight(() => MY_API.DailyReward.run(), '每日任务');
+                const p1 = MY_API.DailyReward.login();
+                const p2 = MY_API.DailyReward.dynamic();
+                $.when(p1, p2).then(() => {
+                  MY_API.CACHE.DailyReward_TS = ts_ms();
+                  MY_API.saveCache();
+                  runMidnight(() => MY_API.DailyReward.run(), '每日任务');
+                });
               } else {
                 window.toast(`[自动每日奖励] 获取今日已获得的投币经验出错 ${response.message}`, 'caution');
                 return delayCall(() => MY_API.DailyReward.run());
@@ -2953,8 +2903,8 @@
         shareLiveRoom: async () => {
           if (!MY_API.CONFIG.SHARE_LIVEROOM) return $.Deferred().resolve();
           const shareTimes = 5;
-          const medal_list = medal_info.medal_list.filter(m => m.roomid && m.level <= 20);
           if (medal_info.status.state() === "resolved") {
+            const medal_list = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
             for (let i = 0; i < shareTimes; i++) {
               for (const medal of medal_list) {
                 const realRoomId = await BAPI.room.get_info(medal.roomid).then((res) => {
@@ -2972,27 +2922,53 @@
                 });
                 await sleep(100);
               }
-              await sleep(5000);
+              if (i < shareTimes - 1) await sleep(5000);
             }
+            window.toast(`[分享直播间] 今日分享直播间完成`, 'success');
           }
           else {
             window.toast('[分享直播间] 粉丝勋章列表未被完全获取，暂停运行', 'error');
-            return medal_info.status.then(() => MY_API.DailyReward.shareLiveRoom());
+            return medal_info.status.then(() => MY_API.LiveReward.shareLiveRoom());
+          }
+        },
+        Watch30min: async () => {
+          if (!MY_API.CONFIG.Watch30min || otherScriptsRunning) return $.Deferred().resolve();
+          window.toast('[观看30分钟直播] 开始模拟观看直播', 'info');
+          if (medal_info.status.state() === "resolved") {
+            let pReturn = $.Deferred();
+            const fansMedalList = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
+            for (let f = 0; f < fansMedalList.length; f++) {
+              const funsMedalData = fansMedalList[f];
+              let RoomHeart = new RoomHeart(funsMedalData.roomid)
+              await RoomHeart.start()
+              if (f === fansMedalList.length - 1) RoomHeart.doneFunc = () => {
+                window.toast('[观看30分钟直播] 今日观看任务已完成', 'success');
+                pReturn.resolve();
+              }
+              await sleep(500);
+            }
+            await pReturn;
+          } else {
+            window.toast('[观看30分钟直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.LiveReward.Watch30min());
           }
         },
         run: () => {
           try {
-            if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.SHARE_LIVEROOM) || otherScriptsRunning) return $.Deferred().resolve();
+            if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.SHARE_LIVEROOM && !MY_API.CONFIG.Watch30min) || otherScriptsRunning) return $.Deferred().resolve();
             if (!checkNewDay(MY_API.CACHE.LiveReward_TS)) {
               // 同一天，不执行
               runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
               return $.Deferred().resolve();
             }
-            //MY_API.LiveReward.dailySignIn();
-            MY_API.LiveReward.shareLiveRoom();
-            MY_API.CACHE.LiveReward_TS = ts_ms();
-            MY_API.saveCache();
-            runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
+            const p1 = MY_API.LiveReward.dailySignIn();
+            const p2 = MY_API.LiveReward.shareLiveRoom();
+            const p3 = MY_API.LiveReward.Watch30min();
+            $.when(p1, p2, p3).then(() => {
+              MY_API.CACHE.LiveReward_TS = ts_ms();
+              MY_API.saveCache();
+              runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
+            })
           } catch (err) {
             window.toast('[直播每日任务]运行时出现异常', 'error');
             MYERROR(`直播每日任务出错`, err);
@@ -3088,7 +3064,6 @@
          * @param {Number} gift_id 礼物id
          */
         getFeedByGiftID: (gift_id) => {
-          if (gift_id === 30607) return 50; // 小心心
           for (let i = Live_info.gift_list.length - 1; i >= 0; --i) {
             if (Live_info.gift_list[i].id === gift_id) {
               return Math.ceil(Live_info.gift_list[i].price / 100);
@@ -3129,58 +3104,6 @@
             }
           }
           return medals;
-        },
-        /**
-         * 送小心心点亮勋章
-         */
-        auto_light: async () => {
-          try {
-            const feed = MY_API.Gift.getFeedByGiftID(30607), // 小心心
-              light_roomid = MY_API.CONFIG.LIGHT_MEDALS; // 点亮勋章房间号
-            for (const m of MY_API.Gift.medal_list) {
-              let remain_feed = m.day_limit - m.today_feed;
-              if (MY_API.CONFIG.LIGHT_METHOD === 'LIGHT_WHITE') {
-                // 白名单
-                if (!(m.is_lighted === 0 && (remain_feed >= feed || MY_API.CONFIG.FORCE_LIGHT) &&
-                  light_roomid.findIndex(it => it == m.roomid) > -1)) continue;
-              } else {
-                // 黑名单
-                if (!(m.is_lighted === 0 && (remain_feed >= feed || MY_API.CONFIG.FORCE_LIGHT) &&
-                  light_roomid.findIndex(it => it == m.roomid) === -1)) continue;
-              }
-              for (const g of MY_API.Gift.bag_list) {
-                if (g.gift_id !== 30607 || g.gift_num <= 0) continue;
-                let response = await BAPI.room.room_init(parseInt(m.roomid, 10)).then(re => {
-                  MYDEBUG(`[自动送礼][自动点亮勋章] API.room.room_init(${m.roomid})`, re);
-                  if (re.code !== 0) throw re.msg;
-                  return re;
-                });
-                let send_room_id = parseInt(response.data.room_id, 10);
-                const feed_num = 1;
-                let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, m.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd).then(re => {
-                  MYDEBUG(`[自动送礼][自动点亮勋章] API.gift.bag_send ${Live_info.uid}, 30607, ${m.target_id}, ${feed_num}, ${g.bag_id}, ${send_room_id}, ${Live_info.rnd}`, re);
-                  if (re.code !== 0) throw re.msg;
-                  MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
-                  return re;
-                });
-                if (rsp.code === 0) {
-                  m.is_lighted = 1;
-                  g.gift_num -= feed_num;
-                  m.today_feed += feed_num * feed;
-                  remain_feed -= feed_num * feed;
-                  window.toast(`[自动送礼]勋章[${m.medal_name}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`, 'success');
-                  MYDEBUG('Gift.auto_light', `勋章[${m.medal_name}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`);
-                  break;
-                } else {
-                  window.toast(`[自动送礼]勋章[${m.medal_name}]点亮失败【${rsp.msg}】`, 'caution');
-                  break;
-                }
-              }
-            }
-          } catch (e) {
-            MYERROR('自动送礼点亮勋章出错', e);
-            window.toast(`[自动送礼]点亮勋章出错:${e}`, 'error');
-          }
         },
         run: async (noTimeCheck = false) => {
           /**
@@ -3296,20 +3219,20 @@
             return MY_API.Gift.bag_list.some(g => g.gift_num > 0) ? true : false;
           };
           try {
-            if ((!MY_API.CONFIG.AUTO_GIFT && !LIGHT_MEDAL_NOW) || otherScriptsRunning) return $.Deferred().resolve();
+            if ((!MY_API.CONFIG.AUTO_GIFT) || otherScriptsRunning) return $.Deferred().resolve();
             if (medalDanmuRunning) {
               // [自动送礼]【粉丝牌打卡】任务运行中
               return setTimeout(() => MY_API.Gift.run(), 3e3);
             }
             if (MY_API.Gift.run_timer) clearTimeout(MY_API.Gift.run_timer);
-            if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW && !noTimeCheck) {
+            if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && !SEND_GIFT_NOW && !noTimeCheck) {
               // 定时送礼
               let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
               MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(true), alternateTime);
               let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
               MYDEBUG("[自动送礼]", `将在${runTime}进行自动送礼`);
               return $.Deferred().resolve();
-            } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW && !noTimeCheck) {
+            } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && !SEND_GIFT_NOW && !noTimeCheck) {
               // 间隔__分钟送礼
               let GiftInterval = MY_API.CONFIG.GIFT_INTERVAL * 60e3;
               if (MY_API.CACHE.GiftInterval_TS) {
@@ -3340,11 +3263,6 @@
             if (MY_API.Gift.over) return waitForNextRun();
             if (MY_API.Gift.medal_list.length > 0) {
               handleMedalList();
-              await MY_API.Gift.auto_light(); // 点亮勋章
-              if (LIGHT_MEDAL_NOW) {
-                LIGHT_MEDAL_NOW = false;
-                return $.Deferred().resolve();
-              }
               handleBagList();
               if (MY_API.Gift.over) return waitForNextRun();
               for (const v of MY_API.Gift.medal_list) {
@@ -3395,7 +3313,6 @@
                   medal.today_feed += feed_num * feed;
                   MY_API.Gift.remain_feed -= feed_num * feed;
                   window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
-                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
                 } else if (response.code === 200028) {
                   // 当前直播间无法赠送礼物哦～
                   window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼失败：${response.msg}`, 'caution');
@@ -3433,7 +3350,6 @@
                 if (response.code === 0) {
                   v.gift_num -= feed_num;
                   window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼成功，送出${feed_num}个${v.gift_name}`, 'success');
-                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
                 } else if (response.code === 200028) {
                   // 当前直播间无法赠送礼物哦～
                   window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼失败：${response.msg}`, 'caution');
@@ -3443,260 +3359,6 @@
                 }
               });
             }
-          }
-        }
-      },
-      LITTLE_HEART: {
-        patchData: {},
-        failedRoomList: [],
-        RoomHeart: class {
-          constructor(inputRoomID) {
-            this.inputRoomID = inputRoomID;
-          }
-          areaID;
-          parentID;
-          seq = 0;
-          inputRoomID;
-          roomID;
-          get id() {
-            return [this.parentID, this.areaID, this.seq, this.roomID];
-          }
-          buvid = this.getItem('LIVE_BUVID');
-          uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, t => {
-            const e = 16 * Math.random() | 0;
-            return ('x' === t ? e : 3 & e | 8).toString(16);
-          });
-          device = [this.buvid, this.uuid];
-          get ts() {
-            return Date.now();
-          }
-          get patchData() {
-            const list = [];
-            for (const [_, data] of Object.entries(MY_API.LITTLE_HEART.patchData))
-              list.push(data);
-            return list;
-          }
-          isPatch = this.patchData.length === 0 ? 0 : 1;
-          ua = W && W.navigator ? W.navigator.userAgent : '';
-          csrf = this.getItem("bili_jct") || '';
-          nextInterval = Math.floor(5) + Math.floor(Math.random() * (60 - 5));
-          heartbeatInterval;
-          secretKey;
-          secretRule;
-          timestamp;
-          async start() {
-            return await this.getInfoByRoom(this.inputRoomID);
-          }
-          async getInfoByRoom(roomID) {
-            if (!roomID)
-              return $.Deferred().resolve(false);
-            const getInfoByRoom = await BAPI.xlive.getInfoByRoom(roomID);
-            if (getInfoByRoom.code === 0) {
-              const roomInfo = getInfoByRoom.data.room_info;
-              ({ area_id: this.areaID, parent_area_id: this.parentID, room_id: this.roomID } = roomInfo);
-              if (!this.areaID || !this.parentID)
-                return $.Deferred().resolve(false);
-              this.e();
-              return $.Deferred().resolve(true);
-            }
-            else {
-              console.error(GM_info.script.name, `未获取到房间 ${roomID} 信息`);
-              return $.Deferred().resolve(false);
-            }
-          }
-          async webHeartBeat() {
-            if (this.seq > 6)
-              return;
-            const arg = `${this.nextInterval}|${this.roomID}|1|0`;
-            const argUtf8 = CryptoJS.enc.Utf8.parse(arg);
-            const argBase64 = CryptoJS.enc.Base64.stringify(argUtf8);
-            const webHeartBeat = await fetch(`//live-trace.bilibili.com/xlive/rdata-interface/v1/heartbeat/webHeartBeat?hb=${encodeURIComponent(argBase64)}&pf=web`, {
-              mode: 'cors',
-              credentials: 'include',
-            }).then(res => res.json());
-            if (webHeartBeat.code === 0) {
-              this.nextInterval = webHeartBeat.data.next_interval;
-              setTimeout(() => this.webHeartBeat(), this.nextInterval * 1000);
-            }
-            else {
-              window.toast(`[小心心] 房间 ${this.roomID} 心跳webHeartBeat失败`, 'warning');
-              MYERROR('小心心', `房间 ${this.roomID} 心跳webHeartBeat失败`);
-            }
-          }
-          async e() {
-            const arg = {
-              id: JSON.stringify(this.id),
-              device: JSON.stringify(this.device),
-              ts: this.ts,
-              is_patch: this.isPatch,
-              heart_beat: JSON.stringify(this.patchData),
-              ua: this.ua,
-            };
-            const e = await fetch('//live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E', {
-              headers: {
-                "content-type": "application/x-www-form-urlencoded",
-              },
-              method: 'POST',
-              body: `${this.json2str(arg)}&csrf_token=${this.csrf}&csrf=${this.csrf}&visit_id=`,
-              mode: 'cors',
-              credentials: 'include',
-            }).then(res => res.json());
-            if (e.code === 0) {
-              MYDEBUG(`[小心心] 发送房间${this.roomID}的心跳包E`, e);
-              this.seq += 1;
-              ({ heartbeat_interval: this.heartbeatInterval, secret_key: this.secretKey, secret_rule: this.secretRule, timestamp: this.timestamp } = e.data);
-              setTimeout(() => this.x(), this.heartbeatInterval * 1000);
-            }
-            else {
-              window.toast(`[小心心] 房间 ${this.roomID} 心跳E失败 ${e.message}`, 'error');
-              MYERROR('小心心', `房间 ${this.roomID} 心跳E失败`, e);
-              addVal(MY_API.LITTLE_HEART.failedRoomList, this.roomID);
-            }
-          }
-          async x() {
-            if (this.seq > 6)
-              return;
-            const sypderData = {
-              id: JSON.stringify(this.id),
-              device: JSON.stringify(this.device),
-              ets: this.timestamp,
-              benchmark: this.secretKey,
-              time: this.heartbeatInterval,
-              ts: this.ts,
-              ua: this.ua,
-            };
-            const s = this.sypder(JSON.stringify(sypderData), this.secretRule);
-            const arg = Object.assign({ s }, sypderData);
-            MY_API.LITTLE_HEART.patchData[this.roomID] = arg;
-            const x = await fetch('//live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X', {
-              headers: {
-                "content-type": "application/x-www-form-urlencoded",
-              },
-              method: 'POST',
-              body: `${this.json2str(arg)}&csrf_token=${this.csrf}&csrf=${this.csrf}&visit_id=`,
-              mode: 'cors',
-              credentials: 'include',
-            }).then(res => res.json());
-            if (x.code === 0) {
-              MYDEBUG(`[小心心] 发送房间${this.roomID}的心跳包X`, x);
-              this.seq += 1;
-              ({ heartbeat_interval: this.heartbeatInterval, secret_key: this.secretKey, secret_rule: this.secretRule, timestamp: this.timestamp } = x.data);
-              setTimeout(() => this.x(), this.heartbeatInterval * 1000);
-            }
-            else {
-              window.toast(`[小心心] 房间 ${this.roomID} 心跳X失败 ${x.message}`, 'error');
-              MYERROR('小心心', `房间 ${this.roomID} 心跳X失败`, x);
-              addVal(MY_API.LITTLE_HEART.failedRoomList, this.roomID);
-            }
-          }
-          sypder(str, rule) {
-            const data = JSON.parse(str);
-            const [parent_id, area_id, seq_id, room_id] = JSON.parse(data.id);
-            const [buvid, uuid] = JSON.parse(data.device);
-            const key = data.benchmark;
-            const newData = {
-              platform: 'web',
-              parent_id,
-              area_id,
-              seq_id,
-              room_id,
-              buvid,
-              uuid,
-              ets: data.ets,
-              time: data.time,
-              ts: data.ts,
-            };
-            let s = JSON.stringify(newData);
-            for (const r of rule) {
-              switch (r) {
-                case 0:
-                  s = CryptoJS.HmacMD5(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 1:
-                  s = CryptoJS.HmacSHA1(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 2:
-                  s = CryptoJS.HmacSHA256(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 3:
-                  s = CryptoJS.HmacSHA224(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 4:
-                  s = CryptoJS.HmacSHA512(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 5:
-                  s = CryptoJS.HmacSHA384(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                default:
-                  break;
-              }
-            }
-            return s;
-          }
-          getItem(t) {
-            return decodeURIComponent(document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(t).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1')) || '';
-          }
-          json2str(arg) {
-            let str = '';
-            for (const name in arg)
-              str += `${name}=${encodeURIComponent(arg[name])}&`;
-            return str.slice(0, -1);
-          }
-        },
-        run: async () => {
-          if (!MY_API.CONFIG.LITTLE_HEART || otherScriptsRunning) return $.Deferred().resolve();
-          const bagList = await getBagList();
-          if (bagList.code !== 0) {
-            window.toast('[小心心] 未获取到包裹列表，停止运行', 'error');
-            return MYERROR('小心心', '未获取到包裹列表');
-          }
-          let giftNum = getGiftNum(bagList);
-          if (giftNum >= 24) return window.toast('[小心心] 已获取今日小心心', 'info');
-          window.toast('[小心心] 开始获取今日小心心', 'info');
-          const fansMedalList = medal_info.medal_list.filter(m => m.roomid && !MY_API.LITTLE_HEART.failedRoomList.includes(m.roomid));
-          const control = 24 - giftNum;
-          const loopNum = Math.ceil(control / fansMedalList.length);
-          for (let i = 0; i < loopNum; i++) {
-            let count = 0;
-            for (const funsMedalData of fansMedalList) {
-              if (count >= control)
-                break;
-              await new MY_API.LITTLE_HEART.RoomHeart(funsMedalData.roomid).start().then(heartStatus => {
-                if (heartStatus)
-                  count++;
-              });
-              await sleep(1000);
-            }
-            await sleep(6 * 60 * 1000);
-          }
-          const newBagList = await getBagList();
-          let newGiftNum = getGiftNum(newBagList);
-          if (newGiftNum < 24) {
-            window.toast('[小心心] 今日小心心未完全获取，再次获取', 'warning');
-            return MY_API.LITTLE_HEART.run();
-          } else window.toast('[小心心] 今日小心心已获取', 'success');
-
-          async function getBagList() {
-            const bagList = await fetch(`//api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=${Date.now()}&room_id=${W.BilibiliLive.ROOMID}`, {
-              mode: 'cors',
-              credentials: 'include',
-            }).then(res => res.json());
-            if (bagList.code != 0) window.toast(`[小心心] 获取包裹列表失败 ${bagList.message}`, "error");
-            MYDEBUG('[小心心] 获取包裹列表', bagList);
-            return bagList;
-          }
-          function getGiftNum(bagList) {
-            const list = bagList.data.list || [];
-            if (list.length === 0) return 0;
-            let giftNum = 0;
-            for (const gift of list) {
-              if (gift.gift_id === 30607) {
-                const expire = (gift.expire_at - Date.now() / 1000) / 60 / 60 / 24;
-                if (expire > 6 && expire <= 7)
-                  giftNum += gift.gift_num;
-              }
-            }
-            return giftNum;
           }
         }
       },
@@ -6803,7 +6465,6 @@
       API.Exchange.runC2S, // 硬币换银瓜子
       // 其它任务
       API.AUTO_DANMU.run, // 自动发弹幕
-      API.LITTLE_HEART.run, // 小心心
       API.Gift.run, // 送礼物
       API.MaterialObject.run, // 实物抽奖
       API.AnchorLottery.run, // 天选时刻
@@ -6818,8 +6479,8 @@
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000);// 刷新直播间
     function reset(delay) {
       let resetTimer = setTimeout(() => {
-        if (checkNewDay(API.CACHE.LittleHeart_TS)) {
-          MYDEBUG('[刷新直播间]', '正在获取小心心，10分钟后再次检查');
+        if (API.CONFIG.Watch30min && checkNewDay(API.CACHE.LiveReward_TS)) {
+          MYDEBUG('[刷新直播间]', '正在运行观看30分钟直播任务，10分钟后再次检查');
           clearTimeout(resetTimer);
           return reset(600e3);
         }
