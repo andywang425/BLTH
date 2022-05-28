@@ -826,7 +826,7 @@
               "【购买粉丝勋章】优化，脚本在充电前会检查该直播间是否有粉丝勋章。",
               "库文件 bliveproxy 升级，修复【弹幕修改】的一些问题。",
               "重写了 B 站弹幕库 DanmuWebSocket，连接其他直播间的弹幕 WebSocket 时可以获得更全面的信息。",
-              `新功能：检查弹幕是否发送失败、感谢${linkMsg('https://github.com/XiaoMiku01', XiaoMiku01)}提供的帮助。`,
+              `新功能：检查弹幕是否发送失败、感谢${linkMsg('https://github.com/XiaoMiku01', 'XiaoMiku01')}提供的帮助。`,
               "修复【手动发弹幕前自动佩戴当前房间勋章】无法正确显示勋章样式的问题。",
               "新功能：自动完成点赞、分享直播间，观看 30 分钟直播的任务。",
               "优化每日任务和直播间任务的缓存逻辑，因页面关闭中断后能在下次打开页面时再次运行。",
@@ -846,7 +846,6 @@
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
                 <mol>${createHtml(clientMliList)}</mol>
-                <mol>目前脚本中有不少功能是冗余的，从下个版本开始会逐步删除一些没用的功能来精简脚本。</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也欢迎进q群聊聊天：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
