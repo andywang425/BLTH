@@ -10,14 +10,14 @@
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH
 // @supportURL     https://github.com/andywang425/BLTH/issues
-// @icon           https://cdn.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png
+// @icon           https://fastly.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png
 // @copyright      2021, andywang425 (https://github.com/andywang425)
 // @license        MIT
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.8
+// @version        5.8.1
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -29,20 +29,22 @@
 // @connect        pushplus.plus
 // @connect        andywang.top
 // @connect        gitee.com
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
-// @require        https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
-// @require        https://cdn.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f50572d570ced20496cc77fe6a0853a1deed3671/assets/js/library/bliveproxy.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@5c63659de1ebf53d127309ccf04d2554b725c83e/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
-// @require        https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
-// @require        https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
-// @require        https://cdn.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
-// @resource       layerCss https://cdn.jsdelivr.net/gh/andywang425/BLTH@f9a554a9ea739ccde68918ae71bfd17936bae252/assets/css/layer.css
-// @resource       myCss    https://cdn.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://cdn.jsdelivr.net/gh/andywang425/BLTH@980351c4cddf9b86258e73cd49c374702b692f1b/assets/html/main.min.html
-// @resource       eula     https://cdn.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
+// @require        https://fastly.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
+// @require        https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@2b75c82c6e192f70dd67659b0b5195f8175cf35c/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
+// @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
+// @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@fc6e16aca319fa0dc1c45c0fa9f1611da26d4f4c/assets/js/library/DanmuWebSocket.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js
+// @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css
+// @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
+// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@fc6e16aca319fa0dc1c45c0fa9f1611da26d4f4c/assets/html/main.min.html
+// @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
@@ -52,7 +54,7 @@
 // @grant          GM_setValue
 // @grant          GM_deleteValue
 // @grant          GM_addStyle
-// ==/UserScript==
+// ==/UserScript== 
 
 (function () {
   localstorage2gm();
@@ -208,6 +210,7 @@
       banP2p: false, // 禁止p2p上传
       lastShowUpdateMsgVersion: "0", // 上次显示更新信息的版本
       DANMU_MODIFY: false, // 修改弹幕
+      AUTO_CHECK_DANMU: false, // 检查弹幕是否发送成功
       blockLiveStream: false, // 拦截直播流
       blockliveDataUpdate: false, // 拦截直播观看数据上报
       wear_medal_before_danmu: false, // 手动发弹幕前自动佩戴当前房间勋章
@@ -220,7 +223,6 @@
     winPrizeTotalCount = 0,
     SEND_GIFT_NOW = false, // 立刻送出礼物
     SEND_DANMU_NOW = false, // 立刻发弹幕
-    LIGHT_MEDAL_NOW = false, // 立刻点亮勋章
     hideBtnClickable = false, // 隐藏/显示控制面板，面板加载后设为 true
     secondsSendBtnClickable = true, // seconds qq 推送
     getFollowBtnClickable = true,
@@ -229,12 +231,13 @@
     danmuTaskRunning = false,
     medalDanmuRunning = false,
     hasWornMedal = false,
+    danmuEmitter = new Emitter(),
     Live_info = {
       room_id: undefined,
       short_room_id: undefined,
       uid: undefined,
       ruid: undefined,
-      gift_list: [{ id: 6, price: 1e3 }, { id: 1, price: 100 }, { id: 30607, price: 5e3 }],
+      gift_list: [{ id: 6, price: 1e3 }, { id: 1, price: 100 }],
       rnd: undefined,
       visit_id: undefined,
       bili_jct: undefined,
@@ -280,69 +283,71 @@
   mergeObject(SP_CONFIG, SP_CONFIG_DEFAULT);
 
   // 拦截直播流/数据上报，需要尽早
-  if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate || SP_CONFIG.wear_medal_before_danmu) {
+  if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate || SP_CONFIG.wear_medal_before_danmu || SP_CONFIG.AUTO_CHECK_DANMU) {
     W.fetch = (...arg) => {
       if (SP_CONFIG.blockLiveStream && arg[0].includes('bilivideo')) {
         return $.Deferred().resolve();
       } else if (SP_CONFIG.blockliveDataUpdate && arg[0].includes("data.bilibili.com/gol/postweb")) {
         return $.Deferred().resolve();
-      } else if (SP_CONFIG.wear_medal_before_danmu && arg[0].includes('//api.live.bilibili.com/msg/send')) {
-        if (medal_info.status.state() !== "resolved" || Live_info.medal === null || (SP_CONFIG.wear_medal_type === "ONLY_FIRST" && hasWornMedal)) return wfetch(...arg);
-        if (typeof Live_info.medal === "undefined") {
-          for (const m of medal_info.medal_list) {
-            if (m.roomid === Live_info.short_room_id) {
-              Live_info.medal = m;
-              break;
-            }
-          }
-        }
-        if (typeof Live_info.medal === "undefined") {
-          Live_info.medal = null; // 没有该勋章，之后无需再检查
+      } else if (arg[0].includes('//api.live.bilibili.com/msg/send')) {
+        if (SP_CONFIG.AUTO_CHECK_DANMU) {
+          danmuEmitter.emit('danmu', arg[1].data.msg);
           return wfetch(...arg);
         }
-        return BAPI.xlive.wearMedal(Live_info.medal.medal_id).then((response) => {
-          MYDEBUG('API.xlive.wearMedal', response);
-          if (response.code === 0) {
-            hasWornMedal = true;
-            try {
-              let medalJqItem = $(".dp-i-block.medal-item-margin");
-              if (medalJqItem === null) return;
-              let border = medalJqItem.find(".v-middle.fans-medal-item");
-              const medalColor = '#' + Live_info.medal.color.toString(16);
-              const medalLevel = Live_info.medal.medal_level;
-              const medalText = Live_info.medal.medal_name;
-              if (border.length !== 0) {
-                // 之前戴着勋章
-                let background = border.find('.fans-medal-label');
-                let level = border.find('.fans-medal-level');
-                let text = background.find('.fans-medal-content');
-                border.css('border-color', medalColor);
-                background.css('background-image', `linear-gradient(45deg, ${medalColor}, ${medalColor})`);
-                level.text(medalLevel);
-                text.text(medalText);
-              } else {
-                // 如果没戴勋章则需插入缺失的 html
-                $(".action-item.medal.wear-medal").remove(); // 移除提示水印
-                medalJqItem.html(`<div data-v-2c4630d2="" data-v-34b5b0e1="" class="v-middle fans-medal-item" style="border-color: ${medalColor}">
-                  <div data-v-2c4630d2="" class="fans-medal-label" style="background-image: linear-gradient(45deg, ${medalColor}, ${medalColor});">
-                    <span data-v-2c4630d2="" class="fans-medal-content">${medalText}</span>
-                  </div>
-                  <div data-v-2c4630d2="" class="fans-medal-level" style="color: ${medalColor};">${medalLevel}</div>
-                </div>`);
+        if (SP_CONFIG.wear_medal_before_danmu) {
+          if (medal_info.status.state() !== "resolved" || Live_info.medal === null || (SP_CONFIG.wear_medal_type === "ONLY_FIRST" && hasWornMedal)) return wfetch(...arg);
+          if (typeof Live_info.medal === "undefined") {
+            for (const m of medal_info.medal_list) {
+              if (m.roomid === Live_info.short_room_id) {
+                Live_info.medal = m;
+                break;
               }
-            } catch (e) {
-              MYERROR("修改弹幕框左侧粉丝牌样式出错", e);
             }
-          } else {
-            window.toast(`自动佩戴粉丝勋章出错 ${response.message}`, 'error');
           }
-          return wfetch(...arg);
-        }, () => {
-          window.toast('自动佩戴粉丝勋章失败，请检查网络', 'error');
-          return wfetch(...arg);
-        })
-      }
-      else {
+          if (typeof Live_info.medal === "undefined") {
+            Live_info.medal = null; // 没有该勋章，之后无需再检查
+            return wfetch(...arg);
+          }
+          return BAPI.xlive.wearMedal(Live_info.medal.medal_id).then((response) => {
+            MYDEBUG('API.xlive.wearMedal', response);
+            if (response.code === 0) {
+              hasWornMedal = true;
+              try {
+                let medalJqItem = $(".dp-i-block.medal-item-margin");
+                if (medalJqItem === null) return;
+                let border = medalJqItem.find(".v-middle.fans-medal-item");
+                const medalColor = '#' + Live_info.medal.medal_color_start.toString(16);
+                const medalLevel = Live_info.medal.medal_level;
+                const medalText = Live_info.medal.medal_name;
+                if (border.length !== 0) {
+                  // 之前戴着勋章
+                  let background = border.find('.fans-medal-label');
+                  let level = border.find('.fans-medal-level');
+                  let text = background.find('.fans-medal-content');
+                  border.css('border-color', medalColor);
+                  background.css('background-image', `linear-gradient(45deg, ${medalColor}, ${medalColor})`);
+                  level.text(medalLevel);
+                  text.text(medalText);
+                } else {
+                  // 如果没戴勋章则需插入缺失的 html
+                  $(".action-item.medal.wear-medal").remove(); // 移除提示水印
+                  medalJqItem.html(`<div data-v-2c4630d2="" data-v-34b5b0e1="" class="v-middle fans-medal-item" style="border-color: ${medalColor}">
+                    <div data-v-2c4630d2="" class="fans-medal-label" style="background-image: linear-gradient(45deg, ${medalColor}, ${medalColor});">
+                      <span data-v-2c4630d2="" class="fans-medal-content">${medalText}</span>
+                    </div>
+                    <div data-v-2c4630d2="" class="fans-medal-level" style="color: ${medalColor};">${medalLevel}</div>
+                  </div>`);
+                }
+              } catch (e) {
+                MYERROR("修改弹幕框左侧粉丝牌样式出错", e);
+              }
+            } else {
+              window.toast(`自动佩戴粉丝勋章出错 ${response.message}`, 'error');
+            }
+            return wfetch(...arg);
+          })
+        }
+      } else {
         return wfetch(...arg);
       }
     }
@@ -362,8 +367,8 @@
     }
     // 唯一运行检测
     onlyScriptCheck();
-    if (SP_CONFIG.DANMU_MODIFY) {
-      window.bliveproxy.hook();
+    if (SP_CONFIG.DANMU_MODIFY || SP_CONFIG.AUTO_CHECK_DANMU) {
+      W.bliveproxy.hook();
       MYDEBUG('bliveproxy hook complete', bliveproxy);
     }
     if (SP_CONFIG.nosleep) {
@@ -480,6 +485,7 @@
     const MY_API = {
       CONFIG_DEFAULT: {
         AUTO_DANMU: false, // 发送弹幕
+        AUTO_CHECK_DANMU_TIMEOUT: 3000, // 检测弹幕是否发送成功 超时时间
         AUTO_GIFT: false, // 自动送礼
         AUTO_GIFT_ROOMID: ["0"], // 送礼优先房间
         AUTO_GROUP_SIGN: true, // 应援团签到开关
@@ -543,14 +549,13 @@
         DANMU_MODIFY_POOL: [4], // 修改弹幕 弹幕池
         DANMU_MODIFY_COLOR: ["#f7335d"], // 修改弹幕 颜色
         DANMU_MODIFY_SIZE: [1.2], // 修改弹幕 大小
-        FORCE_LIGHT: false, // 点亮勋章时忽略亲密度上限
         GIFT_LIMIT: 1, // 礼物到期时间(天)
         GIFT_SEND_HOUR: 23, // 送礼小时
         GIFT_SEND_MINUTE: 59, // 送礼分钟
         GIFT_INTERVAL: 5, // 送礼间隔
         GIFT_METHOD: "GIFT_SEND_TIME", // 送礼时间策略
         GIFT_SORT: 'GIFT_SORT_HIGH', // 送礼优先高等级
-        GIFT_ALLOW_TYPE: ["1", "6", "30607"], // 允许送出的礼物类型，默认：辣条，亿圆, 小心心
+        GIFT_ALLOW_TYPE: ["1", "6"], // 允许送出的礼物类型，默认：辣条，亿圆
         GIFT_SEND_METHOD: "GIFT_SEND_BLACK", // 送礼黑白名单策略
         GIFT_SEND_ROOM: ["0"], // 送礼黑白名单策略 - 房间列表
         GM_NOTICE: false, // GM通知
@@ -558,9 +563,7 @@
         IN_TIME_RELOAD_DISABLE: false, // 休眠时段是否禁止刷新直播间 false为刷新
         LIVE_SIGN: true, // 直播区签到
         LOGIN: true, // 主站登陆
-        LITTLE_HEART: true, // 获取小心心
-        LIGHT_MEDALS: ["0"], // 点亮勋章
-        LIGHT_METHOD: "LIGHT_WHITE",
+        LIKE_LIVEROOM: false, // 点赞直播间
         MEDAL_DANMU_ROOM: ["0"], // 打卡弹幕房间列表
         MEDAL_DANMU_METHOD: "MEDAL_DANMU_BLACK", // 打卡弹幕发送方式
         MEDAL_DANMU_INTERVAL: 2, // 打卡弹幕发送间隔（秒）
@@ -602,6 +605,7 @@
         RESERVE_ACTIVITY_BLACKLIST_WORD: ['测试', '钓鱼'], // 预约抽奖屏蔽词
         SEND_ALL_GIFT: false, // 送满全部勋章
         SHARE: true, // 分享
+        SHARE_LIVEROOM: false, // 分享直播间
         SILVER2COIN: false, // 银瓜子换硬币
         ServerTurbo_NOTICE: false, // Server酱·Turbo版
         ServerTurbo_SendKey: "SendKey", // Server酱·Turbo版SendKey
@@ -614,7 +618,8 @@
         TIME_RELOAD: false, // 定时刷新直播间
         TIME_RELOAD_MINUTE: 120, // 直播间重载时间
         UPDATE_TIP: true, //更新提示
-        WATCH: true // 观看视频
+        WATCH: true, // 观看视频
+        Watch30min: false // 观看30分钟
       },
       CACHE_DEFAULT: {
         AUTO_SEND_DANMU_TS: [], // 弹幕发送
@@ -625,7 +630,6 @@
         Coin2Sliver_TS: 0, // 硬币换银瓜子
         Gift_TS: 0, // 自动送礼（定时）
         GiftInterval_TS: 0, // 自动送礼（间隔）
-        LittleHeart_TS: 0, // 小心心
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0, // 天选时刻
         last_aid: 881, // 实物抽奖最后一个有效aid
@@ -638,7 +642,6 @@
         COUNT: 0, // 辣条（目前没用）
         ANCHOR_COUNT: 0, // 天选
         MATERIAL_COUNT: 0, // 实物
-        LITTLE_HEART_COUNT: 0, // 小心心
         CLEAR_TS: 0, // 重置统计
       },
       CONFIG: {},
@@ -819,12 +822,16 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "修复获取部分粉丝勋章的小心心出错的Bug，跳过无法获取小心心的粉丝勋章。",
-              "优化自动送礼出错时的错误处理。",
-              "【红包抽奖】新增从已关注的开播直播间获取红包抽奖数据。",
-              "<strong>【awpush】awpush已支持红包抽奖。</strong>",
-              "检索天选时刻或红包抽奖时能获取到另一种抽奖的数据并参加。",
-              "优化了同时参与天选时刻和红包抽奖时容易风控的问题，采用新的抽奖数据检索策略，请点击【参与天选时刻抽奖】和【参与直播红包抽奖】后的小问号查看新的策略并调整您的脚本设置。",
+              "库文件 cdn 换源，解决部分用户无法加载依赖的问题。",
+              "【购买粉丝勋章】优化，脚本在充电前会检查该直播间是否有粉丝勋章。",
+              "库文件 bliveproxy 升级，修复【弹幕修改】的一些问题。",
+              "重写了 B 站弹幕库 DanmuWebSocket，连接其他直播间的弹幕 WebSocket 时可以获得更全面的信息。",
+              `新功能：检查弹幕是否发送失败、感谢${linkMsg('https://github.com/XiaoMiku01', 'XiaoMiku01')}提供的帮助。`,
+              "修复【手动发弹幕前自动佩戴当前房间勋章】无法正确显示勋章样式的问题。",
+              "新功能：自动完成点赞、分享直播间，观看 30 分钟直播的任务。",
+              "优化每日任务和直播间任务的缓存逻辑，因页面关闭中断后能在下次打开页面时再次运行。",
+              "修复 awpush 无法正常重连的 Bug；修复 awpush 会在 CONNECTING 状态发送消息导致报错的 Bug。",
+              `BLTH-server 完善了红包抽奖帮助文档。如果有兴趣做第三方接入的话可以看看${linkMsg('https://andywang.top:3001/docs/#/', 'API文档。')}`
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -839,7 +846,6 @@
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
                 <mol>${createHtml(clientMliList)}</mol>
-                <mol>目前脚本中有不少功能是冗余的，从下个版本开始会逐步删除一些没用的功能来精简脚本。</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也欢迎进q群聊聊天：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
@@ -897,8 +903,7 @@
           MY_API.Exchange.runS2C, // 银瓜子换硬币
           MY_API.Exchange.runC2S, // 硬币换银瓜子
           MY_API.Gift.run, // 送礼物
-          MY_API.LITTLE_HEART.run, // 小心心
-          MY_API.AUTO_DANMU.run, // 发弹幕
+          MY_API.Watch30min.run, // 观看30分钟
           MY_API.MaterialObject.run, // 实物抽奖
           MY_API.AnchorLottery.run, // 天选时刻
           MY_API.MEDAL_DANMU.run, // 粉丝勋章打卡弹幕
@@ -1010,30 +1015,43 @@
           if (response.code === 0 && response.data.info) {
             const uid = String(response.data.info.uid),
               uname = response.data.info.uname;
-            myconfirm(`<div style = "text-align:center">是否消耗5B币购买UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>的粉丝勋章？</div>`, {
-              title: `购买勋章 房间号：${room_id}`,
-              btn: ['是', '否']
-            }, function () {
-              BAPI.x.elec_pay_quick(response.data.info.uid).then((re) => {
-                MYDEBUG('API.x.elec_pay_quick re', re);
-                if (re.code === 0 && re.data.status === 4) {
-                  mymsg('购买成功', {
-                    time: 2000,
-                    icon: 1
-                  });
-                } else {
-                  mymsg(`购买失败 ${re.data.message}`, {
+            return BAPI.xlive.getInfoByUser(room_id).then(function (res) {
+              if (res.code === 0) {
+                if (!res.data.medal.up_medal) {
+                  return mymsg(`<div style = "text-align:center">UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>没有粉丝勋章，无法购买</div>`, {
                     time: 2500,
                     icon: 2
                   });
                 }
-              });
-            }, function () {
-              mymsg('已取消购买', {
-                time: 2000
-              });
+                myconfirm(`<div style = "text-align:center">是否消耗5B币购买UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>的粉丝勋章？</div>`, {
+                  title: `购买勋章 房间号：${room_id}`,
+                  btn: ['是', '否']
+                }, function () {
+                  BAPI.x.elec_pay_quick(response.data.info.uid).then((re) => {
+                    MYDEBUG('API.x.elec_pay_quick re', re);
+                    if (re.code === 0 && re.data.status === 4) {
+                      mymsg('购买成功', {
+                        time: 2000,
+                        icon: 1
+                      });
+                    } else {
+                      mymsg(`购买失败 ${re.data.message}`, {
+                        time: 2500,
+                        icon: 2
+                      });
+                    }
+                  });
+                }, function () {
+                  mymsg('已取消购买', {
+                    time: 2000
+                  });
+                });
+              } else {
+                return mymsg(`检查房间出错 ${response.message}`, {
+                  time: 2500
+                });
+              }
             });
-
           }
           else if (response.code === 0 && response.data.info === undefined) {
             mymsg(`房间不存在`, {
@@ -1107,15 +1125,6 @@
             return window.toast("[送礼时间]时间错误", 'caution');
           MY_API.CONFIG.GIFT_SEND_HOUR = val1;
           MY_API.CONFIG.GIFT_SEND_MINUTE = val2;
-          // LIGHT_MEDALS
-          val = div.find('div[data-toggle="LIGHT_MEDALS"] .num').val();
-          valArray = val.split(",");
-          for (let i = 0; i < valArray.length; i++) {
-            if (valArray[i] === '') {
-              valArray[i] = 0;
-            }
-          };
-          MY_API.CONFIG.LIGHT_MEDALS = valArray;
           // SPARE_GIFT_ROOM
           val = div.find('div[data-toggle="SPARE_GIFT_ROOM"] .num').val();
           MY_API.CONFIG.SPARE_GIFT_ROOM = val;
@@ -1298,6 +1307,10 @@
           val = parseInt(div.find('[data-toggle="POPULARITY_REDPOCKET_DELAY"] .max').val());
           if (isNaN(val) || val <= 0) return window.toast('[红包抽奖参与抽奖前延迟最大时间] 错误输入', 'caution');
           MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX = val;
+          // AUTO_CHECK_DANMU_TIMEOUT
+          val = parseInt(div.find('[data-toggle="AUTO_CHECK_DANMU_TIMEOUT"] .num').val());
+          if (isNaN(val) || val <= 0) return window.toast('[检查弹幕是否发送成功超时时间] 错误输入', 'caution');
+          MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT = val;
           return MY_API.saveConfig();
         };
         const checkList = [
@@ -1331,11 +1344,10 @@
           "AUTO_GROUP_SIGN",
           "COIN",
           "COIN2SILVER",
-          "FORCE_LIGHT",
           "GET_PRIVILEGE",
           "GM_NOTICE",
           "IN_TIME_RELOAD_DISABLE",
-          "LITTLE_HEART",
+          "Watch30min",
           "LIVE_SIGN",
           "LOGIN",
           "MATERIAL_LOTTERY",
@@ -1359,12 +1371,14 @@
           "SECONDS_NOTICE",
           "SEND_ALL_GIFT",
           "SHARE",
+          "SHARE_LIVEROOM",
           "SILVER2COIN",
           "ServerTurbo_NOTICE",
           "TIME_AREA_DISABLE",
           "TIME_RELOAD",
           "UPDATE_TIP",
-          "WATCH"
+          "WATCH",
+          "LIKE_LIVEROOM"
         ];
         const radioList = [
           /**
@@ -1394,11 +1408,6 @@
             toggle2: 'MEDAL_DANMU_BLACK'
           },
           {
-            name: 'LIGHT_METHOD',
-            toggle1: 'LIGHT_WHITE',
-            toggle2: 'LIGHT_BLACK'
-          },
-          {
             name: 'GIFT_SEND_METHOD',
             toggle1: 'GIFT_SEND_WHITE',
             toggle2: 'GIFT_SEND_BLACK'
@@ -1426,7 +1435,7 @@
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "通过给UP充电，消耗5B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
-          LITTLE_HEART: "通过发送客户端心跳包获取小心心（无论目标房间是否开播都能获取）。<mul><mli>检测到包裹内有24个7天的小心心后会停止。</mli><mli>在获取完所有小心心之前直播间不刷新。</mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
+          Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，该功能可能会无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>如果主播没有设置直播分区，该任务无法完成。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
           GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
@@ -1460,13 +1469,11 @@
           ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。 </mli></mul><mh3>注意：</mh3><mul><mli>检索天选抽奖的同时也可以检索到红包抽奖。</mli><mli>在不使用awpush的情况下，如果你想同时参与天选时刻和红包抽奖，建议<strong>不要</strong>同时勾选<code>天选时刻数据获取方式</code>和<code>红包抽奖数据获取方式</code>中的选项（即只勾选<code>天选时刻数据获取方式</code>或<code>红包抽奖数据获取方式</code>中的选项），否则极其容易触发风控。如果启用awpush的话就不必在意这个了，因为相关设置将由BLTH-server来决定。 </mli><mli>如果选择勾选<code>天选时刻数据获取方式</code>中的选项，触发风控后脚本会尝试切换备用API来获取天选数据，但在这种状态下无法获取红包抽奖数据。</mli></mul>",
           SHARE: "并不会真的分享视频，通过调用特定api直接完成任务。",
           ANCHOR_MONEY_ONLY: "仅参加能识别到金额的天选。<mul><mli>由于部分天选的奖品名较特殊，可能会遗漏或误判一些天选。</mli></mul>",
-          LIGHT_MEDALS: "根据点亮模式的不同，这些直播间的粉丝勋章将会被点亮或排除在外。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
-          LIGHT_METHOD: "通过给拥有粉丝勋章的直播间送一个小心心来点亮熄灭的勋章。<mul><mli>白名单：只点亮这些房间的粉丝勋章。</mli><mli>黑名单：点亮除了这些房间以外的直播间的粉丝勋章。</mli><mli>如果你不想启用本功能，把【勋章点亮模式】设为白名单，然后在【自动点亮勋章房间号】中填<code>0</code>即可。</mli><mli>脚本会在运行自动送礼前点亮勋章。如果未启用自动送礼，请点击【立刻点亮勋章】按钮。</mli><mli>优先送出快过期的小心心。</mli></mul>",
           ANCHOR_IGNORE_PWDROOM: "部分直播间需输入密码后才能进入。勾选此选项后将忽略这些直播间的天选。",
           COIN2SILVER: "普通用户每天兑换上限<code>25</code>硬币，老爷或大会员每天兑换上限<code>50</code>硬币。<mul><mli><code>1</code>硬币 = <code>450</code>银瓜子（老爷或大会员<code>500</code>银瓜子）。</mli></mul>",
           SILVER2COIN: "每日直播用户都可以将部分银瓜子转化为硬币，每天仅一次机会。<mul><mli><code>700</code>银瓜子 = <code>1</code>硬币。</mul></mli>",
           windowToast: `右上角的提示信息。相对来说不是那么重要，所以不放在日志窗口里。<mul style = "line-height:1em;"><div class="link-toast info fixed"><span class="toast-text">普通消息</span></div><br><br><br><div class="link-toast success fixed"><span class="toast-text">成功</span></div><br><br><br><div class="link-toast error fixed"><span class="toast-text">发生错误</span></div></mul>`,
-          GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。</mli><mli>在脚本中打开控制台日志后，在控制台(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和 id 的json。将data下的几项全部展开，再搜索礼物名即可找到 id 。</mli><mli>常用 id ：1: <code>辣条</code> 6: <code>亿圆</code> 30607: <code>小心心</code></mli></mul>",
+          GIFT_ALLOW_TYPE: "可以填写礼物的id或者礼物名称。<mul><mli>如果要填写多个，每两项之间请用半角逗号<code>,</code>隔开。</mli><mli>如果填写礼物名称，请确保所填写的名称与官方名称完全一致，否则将无法识别。</mli><mli>在脚本中打开控制台日志后，在控制台(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)中搜索<code>InitData: API.gift.gift_config</code>可以找到一个包含礼物名称和 id 的json。将data下的几项全部展开，再搜索礼物名即可找到 id 。</mli><mli>常用 id ：1: <code>辣条</code> 6: <code>亿圆</code></mli></mul>",
           ANCHOR_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的天选时刻。",
           SECONDS_NOTICE: "seconds是专门用来推送中奖信息的qqbot。使用前请先添加seconds（QQ: 2397433013）为好友，然后后点击【编辑QQ号】按钮输入你的QQ号。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的QQ私聊消息提醒你中奖了。</mli><mli>加好友时验证消息必须填写<code>BLTH</code>，否则不会通过。</mli><mli>seconds每天能加的好友数量有上限，如果加不上好友请第二天再试试。</mli></mul>",
           ServerTurbo_NOTICE: "<a href = 'https://sct.ftqq.com/' target = '_blank'>Server酱Turbo版（点我注册）</a>，是「<a href='http://sct.ftqq.com' target='_blank'>公众号版</a>」分离出来的一个版本，它为捐赠用户提供更多的推送渠道选择，除了方糖服务号（因为举报原因卡片不显示正文），它还包括了到微信官方提供的「<a href='https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login' target='_blank'>测试号</a>」、企业微信群、钉钉群、飞书群的推送。<mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信推送提醒你中奖了。</mli></mul>",
@@ -1499,7 +1506,11 @@
           POPULARITY_REDPOCKET_REQUEST_INTERVAL: "每两个请求之间的间隔时间。<mul><mli>若间隔时间过短可能会被风控。</mli></mul>",
           POPULARITY_REDPOCKET_DELAY: "参与抽奖前等待一段时间。",
           POPULARITY_REDPOCKET_TYPE_POLLING: "高热度房间来源于各分区热门房间列表。",
-          POPULARITY_REDPOCKET_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的红包抽奖。"
+          POPULARITY_REDPOCKET_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的红包抽奖。",
+          AUTO_CHECK_DANMU: "检查你在当前直播间发送的弹幕是否发送成功。脚本向其它直播间发送的弹幕不在检测范围内。<mul><mli>这里的发送成功指的是你发送的弹幕对其他人可见。有时候表面上弹幕发送成功了，但实际上只有你自己能看见那条弹幕。</mli><mli>若弹幕疑似发送失败，则在右上角显示一条提示信息。</mli></mul>",
+          AUTO_CHECK_DANMU_TIMEOUT: "弹幕被发送出去后开始计时，如果没有在超时时间内从当前直播间的webSocket中接收到之前所发送的弹幕则认为发送失败。",
+          SHARE_LIVEROOM: "完成分享直播间5次的任务。<mul><mli>并不会真的分享到某处，只是调用接口直接完成任务。</mli></mul>",
+          LIKE_LIVEROOM: "完成点赞直播间3次的任务"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1529,6 +1540,7 @@
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').text(String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length) + '个');
               myDiv.find('div[data-toggle="RESERVE_ACTIVITY_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD.length + '个');
               // 显示输入框的值
+              myDiv.find('div[data-toggle="AUTO_CHECK_DANMU_TIMEOUT"] .num').val(MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_DELAY"] .max').val(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_DELAY"] .min').val(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_IGNORE_BATTERY"] .num').val(MY_API.CONFIG.POPULARITY_REDPOCKET_IGNORE_BATTERY.toString());
@@ -1548,7 +1560,6 @@
               myDiv.find('div[data-toggle="ANCHOR_GOLD_JOIN_TIMES"] .num').val(MY_API.CONFIG.ANCHOR_GOLD_JOIN_TIMES.toString());
               myDiv.find('div[data-toggle="GIFT_ALLOW_TYPE"] .str').val(MY_API.CONFIG.GIFT_ALLOW_TYPE.toString());
               myDiv.find('div[data-toggle="COIN2SILVER"] .coin_number').val(parseInt(MY_API.CONFIG.COIN2SILVER_NUM).toString());
-              myDiv.find('div[data-toggle="LIGHT_MEDALS"] .num').val(MY_API.CONFIG.LIGHT_MEDALS.toString());
               myDiv.find('div[data-toggle="MEDAL_DANMU_INTERVAL"] .num').val(parseFloat(MY_API.CONFIG.MEDAL_DANMU_INTERVAL).toString());
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_MONEY"] .num').val(parseFloat(MY_API.CONFIG.ANCHOR_IGNORE_MONEY).toString());
               myDiv.find('div[data-toggle="ANCHOR_MAXLIVEROOM_SAVE"] .roomNum').val(parseInt(MY_API.CONFIG.ANCHOR_MAXLIVEROOM_SAVE).toString());
@@ -1646,11 +1657,6 @@
                 // 关于
                 layerOpenAbout();
               });
-              myDiv.find('button[data-action="lightMedalNow"]').click(() => {
-                // 立刻点亮勋章
-                LIGHT_MEDAL_NOW = true;
-                MY_API.Gift.run();
-              });
               myDiv.find('button[data-action="test_PP"]').click(() => {
                 // 推送加推送测试
                 const data = {
@@ -1667,6 +1673,30 @@
                   }
                   return $.Deferred().resolve();
                 })
+              });
+              myDiv.find('button[data-action="edit_lightMedalList"]').click(() => {
+                // 编辑打卡弹幕房间列表
+                myprompt({
+                  formType: 2,
+                  value: String(MY_API.CONFIG.MEDAL_DANMU_ROOM),
+                  maxlength: Number.MAX_SAFE_INTEGER,
+                  title: '请输入粉丝勋章打卡弹幕房间列表',
+                  btn: ['保存', '取消']
+                },
+                  function (value, index) {
+                    let valArray = value.split(",");
+                    valArray = [...new Set(valArray)];
+                    for (let i = 0; i < valArray.length; i++) {
+                      if (!valArray[i]) valArray.splice(i, 1);
+                    };
+                    MY_API.CONFIG.MEDAL_DANMU_ROOM = [...valArray];
+                    MY_API.saveConfig(false);
+                    mymsg('粉丝勋章打卡弹幕房间列表保存成功', {
+                      time: 2500,
+                      icon: 1
+                    });
+                    layer.close(index);
+                  });
               });
               myDiv.find('button[data-action="test_ServerTurbo"]').click(() => {
                 // Server酱·Turbo版推送测试
@@ -1793,30 +1823,6 @@
                       icon: 1
                     });
                     myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').html(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length + '个')
-                    layer.close(index);
-                  });
-              });
-              myDiv.find('button[data-action="edit_lightMedalList"]').click(() => {
-                // 编辑打卡弹幕房间列表
-                myprompt({
-                  formType: 2,
-                  value: String(MY_API.CONFIG.MEDAL_DANMU_ROOM),
-                  maxlength: Number.MAX_SAFE_INTEGER,
-                  title: '请输入粉丝勋章打卡弹幕房间列表',
-                  btn: ['保存', '取消']
-                },
-                  function (value, index) {
-                    let valArray = value.split(",");
-                    valArray = [...new Set(valArray)];
-                    for (let i = 0; i < valArray.length; i++) {
-                      if (!valArray[i]) valArray.splice(i, 1);
-                    };
-                    MY_API.CONFIG.MEDAL_DANMU_ROOM = [...valArray];
-                    MY_API.saveConfig(false);
-                    mymsg('粉丝勋章打卡弹幕房间列表保存成功', {
-                      time: 2500,
-                      icon: 1
-                    });
                     layer.close(index);
                   });
               });
@@ -2380,6 +2386,10 @@
                   name: 'WEAR_MEDAL_BEFORE_DANMU',
                   gmItem: `wear_medal_type`,
                   toastMsg: ["[自动佩戴勋章] 配置已保存", "info"]
+                }, {
+                  jqPath1: `div[data-toggle="AUTO_CHECK_DANMU"] input:checkbox`,
+                  gmItem: `AUTO_CHECK_DANMU`,
+                  toastMsg: ["[检测弹幕是否发送成功] 配置已保存", "info"]
                 }
               ];
               for (const i of specialSetting) {
@@ -2602,11 +2612,10 @@
           return BAPI.Group.my_groups().then((response) => {
             MYDEBUG('GroupSign.getGroups: API.Group.my_groups', response);
             if (response.code === 0) return $.Deferred().resolve(response.data.list);
-            window.toast(`[自动应援团签到]' ${response.msg}`, 'error');
-            return $.Deferred().reject();
-          }, () => {
-            window.toast('[自动应援团签到]获取应援团列表失败，请检查网络', 'error');
-            return delayCall(() => MY_API.GroupSign.getGroups());
+            else {
+              window.toast(`[自动应援团签到]获取应援团列表失败 ${response.msg}`, 'error');
+              return delayCall(() => MY_API.GroupSign.getGroups());
+            }
           });
         },
         signInList: (list, i = 0) => {
@@ -2673,9 +2682,10 @@
         // 每日任务
         coin_exp: 0,
         login: () => {
+          if (!MY_API.CONFIG.LOGIN) return $.Deferred().resolve();
           return BAPI.DailyReward.login().then((response) => {
             MYDEBUG('DailyReward.login: API.DailyReward.login');
-            if (response.code === 0) window.toast('[自动每日奖励][每日登录]完成', 'success');
+            if (response.code === 0) return window.toast('[自动每日奖励][每日登录]完成', 'success');
             else {
               window.toast(`[自动每日奖励][每日登录]失败 ${response.message}`, 'error');
               return delayCall(() => MY_API.DailyReward.login());
@@ -2883,11 +2893,13 @@
               MYDEBUG('DailyReward.run: API.DailyReward.exp', response);
               if (response.code === 0) {
                 MY_API.DailyReward.coin_exp = response.number;
-                MY_API.DailyReward.login();
-                MY_API.DailyReward.dynamic();
-                MY_API.CACHE.DailyReward_TS = ts_ms();
-                MY_API.saveCache();
-                runMidnight(() => MY_API.DailyReward.run(), '每日任务');
+                const p1 = MY_API.DailyReward.login();
+                const p2 = MY_API.DailyReward.dynamic();
+                $.when(p1, p2).then(() => {
+                  MY_API.CACHE.DailyReward_TS = ts_ms();
+                  MY_API.saveCache();
+                  runMidnight(() => MY_API.DailyReward.run(), '每日任务');
+                });
               } else {
                 window.toast(`[自动每日奖励] 获取今日已获得的投币经验出错 ${response.message}`, 'caution');
                 return delayCall(() => MY_API.DailyReward.run());
@@ -2902,6 +2914,7 @@
       },
       LiveReward: {
         dailySignIn: () => {
+          if (!MY_API.CONFIG.LIVE_SIGN) return $.Deferred().resolve();
           return BAPI.xlive.dosign().then((response) => {
             MYDEBUG('LiveReward.dailySignIn: API.xlive.dosign', response);
             if (response.code === 0) {
@@ -2917,21 +2930,92 @@
             }
           });
         },
+        likeLiveRoom: async () => {
+          if (!MY_API.CONFIG.LIKE_LIVEROOM) return $.Deferred().resolve();
+          const likeTimes = 5;
+          window.toast('[点赞直播间] 开始点赞直播间', 'info');
+          if (medal_info.status.state() === "resolved") {
+            const fansMedalList = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
+            for (let i = 0; i < likeTimes; i++) {
+              for (const medal of fansMedalList) {
+                await BAPI.xlive.likeInteract(medal.real_roomid).then((response) => {
+                  MYDEBUG(`API.xlive.likeInteract(${medal.real_roomid}) response`, response);
+                  if (response.code !== 0) window.toast(`[点赞直播间] 直播间${medal.real_roomid}点赞失败 ${response.message}`, 'caution');
+                });
+                await sleep(200)
+              }
+              if (i < likeTimes - 1) await sleep(3000);
+            }
+            window.toast('[点赞直播间] 今日点赞完成', 'success');
+          } else {
+            window.toast('[观看30分钟直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.LiveReward.Watch30min());
+          }
+        },
+        shareLiveRoom: async () => {
+          if (!MY_API.CONFIG.SHARE_LIVEROOM) return $.Deferred().resolve();
+          const shareTimes = 5;
+          if (medal_info.status.state() === "resolved") {
+            const medal_list = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
+            for (let i = 0; i < shareTimes; i++) {
+              for (const medal of medal_list) {
+                await BAPI.xlive.trigerInteract(medal.real_roomid).then(response => {
+                  MYDEBUG('DailyReward.shareLiveRoom: API.xlive.trigerInteract', response);
+                  if (response.code !== 0) window.toast(`[分享直播间] 直播间${medal.real_roomid}分享直播间失败 ${response.message}`, 'caution');
+                });
+                await sleep(100);
+              }
+              if (i < shareTimes - 1) await sleep(5000);
+            }
+            window.toast(`[分享直播间] 今日分享直播间完成`, 'success');
+          }
+          else {
+            window.toast('[分享直播间] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.LiveReward.shareLiveRoom());
+          }
+        },
+        Watch30min: async () => {
+          if (!MY_API.CONFIG.Watch30min) return $.Deferred().resolve();
+          window.toast('[观看30分钟直播] 开始模拟观看直播', 'info');
+          if (medal_info.status.state() === "resolved") {
+            let pReturn = $.Deferred();
+            const fansMedalList = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
+            for (let f = 0; f < fansMedalList.length; f++) {
+              const funsMedalData = fansMedalList[f];
+              let roomHeart = new RoomHeart(funsMedalData.real_roomid)
+              await roomHeart.start()
+              if (f === fansMedalList.length - 1) roomHeart.doneFunc = () => {
+                window.toast('[观看30分钟直播] 今日观看任务已完成', 'success');
+                pReturn.resolve();
+              }
+              await sleep(500);
+            }
+            await pReturn;
+          } else {
+            window.toast('[观看30分钟直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.LiveReward.Watch30min());
+          }
+        },
         run: () => {
           try {
-            if (!MY_API.CONFIG.LIVE_SIGN || otherScriptsRunning) return $.Deferred().resolve();
+            if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.SHARE_LIVEROOM && !MY_API.CONFIG.Watch30min && !MY_API.CONFIG.LIKE_LIVEROOM) || otherScriptsRunning) return $.Deferred().resolve();
             if (!checkNewDay(MY_API.CACHE.LiveReward_TS)) {
               // 同一天，不执行
-              runMidnight(() => MY_API.LiveReward.run(), '直播签到');
+              runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
               return $.Deferred().resolve();
             }
-            MY_API.LiveReward.dailySignIn()
-            MY_API.CACHE.LiveReward_TS = ts_ms();
-            MY_API.saveCache();
-            runMidnight(() => MY_API.LiveReward.run(), '直播签到');
+            const p1 = MY_API.LiveReward.dailySignIn();
+            const p2 = MY_API.LiveReward.shareLiveRoom();
+            const p3 = MY_API.LiveReward.Watch30min();
+            const p4 = MY_API.LiveReward.likeLiveRoom();
+            $.when(p1, p2, p3, p4).then(() => {
+              MY_API.CACHE.LiveReward_TS = ts_ms();
+              MY_API.saveCache();
+              runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
+            })
           } catch (err) {
-            window.toast('[自动直播签到]运行时出现异常', 'error');
-            MYERROR(`自动直播签到出错`, err);
+            window.toast('[直播每日任务]运行时出现异常', 'error');
+            MYERROR(`直播每日任务出错`, err);
             return $.Deferred().reject();
           }
         }
@@ -3024,7 +3108,6 @@
          * @param {Number} gift_id 礼物id
          */
         getFeedByGiftID: (gift_id) => {
-          if (gift_id === 30607) return 50; // 小心心
           for (let i = Live_info.gift_list.length - 1; i >= 0; --i) {
             if (Live_info.gift_list[i].id === gift_id) {
               return Math.ceil(Live_info.gift_list[i].price / 100);
@@ -3065,58 +3148,6 @@
             }
           }
           return medals;
-        },
-        /**
-         * 送小心心点亮勋章
-         */
-        auto_light: async () => {
-          try {
-            const feed = MY_API.Gift.getFeedByGiftID(30607), // 小心心
-              light_roomid = MY_API.CONFIG.LIGHT_MEDALS; // 点亮勋章房间号
-            for (const m of MY_API.Gift.medal_list) {
-              let remain_feed = m.day_limit - m.today_feed;
-              if (MY_API.CONFIG.LIGHT_METHOD === 'LIGHT_WHITE') {
-                // 白名单
-                if (!(m.is_lighted === 0 && (remain_feed >= feed || MY_API.CONFIG.FORCE_LIGHT) &&
-                  light_roomid.findIndex(it => it == m.roomid) > -1)) continue;
-              } else {
-                // 黑名单
-                if (!(m.is_lighted === 0 && (remain_feed >= feed || MY_API.CONFIG.FORCE_LIGHT) &&
-                  light_roomid.findIndex(it => it == m.roomid) === -1)) continue;
-              }
-              for (const g of MY_API.Gift.bag_list) {
-                if (g.gift_id !== 30607 || g.gift_num <= 0) continue;
-                let response = await BAPI.room.room_init(parseInt(m.roomid, 10)).then(re => {
-                  MYDEBUG(`[自动送礼][自动点亮勋章] API.room.room_init(${m.roomid})`, re);
-                  if (re.code !== 0) throw re.msg;
-                  return re;
-                });
-                let send_room_id = parseInt(response.data.room_id, 10);
-                const feed_num = 1;
-                let rsp = await BAPI.gift.bag_send(Live_info.uid, 30607, m.target_id, feed_num, g.bag_id, send_room_id, Live_info.rnd).then(re => {
-                  MYDEBUG(`[自动送礼][自动点亮勋章] API.gift.bag_send ${Live_info.uid}, 30607, ${m.target_id}, ${feed_num}, ${g.bag_id}, ${send_room_id}, ${Live_info.rnd}`, re);
-                  if (re.code !== 0) throw re.msg;
-                  MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
-                  return re;
-                });
-                if (rsp.code === 0) {
-                  m.is_lighted = 1;
-                  g.gift_num -= feed_num;
-                  m.today_feed += feed_num * feed;
-                  remain_feed -= feed_num * feed;
-                  window.toast(`[自动送礼]勋章[${m.medal_name}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`, 'success');
-                  MYDEBUG('Gift.auto_light', `勋章[${m.medal_name}]点亮成功，送出${feed_num}个${g.gift_name}，[${m.today_feed}/${m.day_limit}]`);
-                  break;
-                } else {
-                  window.toast(`[自动送礼]勋章[${m.medal_name}]点亮失败【${rsp.msg}】`, 'caution');
-                  break;
-                }
-              }
-            }
-          } catch (e) {
-            MYERROR('自动送礼点亮勋章出错', e);
-            window.toast(`[自动送礼]点亮勋章出错:${e}`, 'error');
-          }
         },
         run: async (noTimeCheck = false) => {
           /**
@@ -3232,20 +3263,20 @@
             return MY_API.Gift.bag_list.some(g => g.gift_num > 0) ? true : false;
           };
           try {
-            if ((!MY_API.CONFIG.AUTO_GIFT && !LIGHT_MEDAL_NOW) || otherScriptsRunning) return $.Deferred().resolve();
+            if ((!MY_API.CONFIG.AUTO_GIFT) || otherScriptsRunning) return $.Deferred().resolve();
             if (medalDanmuRunning) {
               // [自动送礼]【粉丝牌打卡】任务运行中
               return setTimeout(() => MY_API.Gift.run(), 3e3);
             }
             if (MY_API.Gift.run_timer) clearTimeout(MY_API.Gift.run_timer);
-            if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW && !noTimeCheck) {
+            if (MY_API.CONFIG.GIFT_METHOD == "GIFT_SEND_TIME" && !isTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE) && !SEND_GIFT_NOW && !noTimeCheck) {
               // 定时送礼
               let alternateTime = getIntervalTime(MY_API.CONFIG.GIFT_SEND_HOUR, MY_API.CONFIG.GIFT_SEND_MINUTE);
               MY_API.Gift.run_timer = setTimeout(() => MY_API.Gift.run(true), alternateTime);
               let runTime = new Date(ts_ms() + alternateTime).toLocaleString();
               MYDEBUG("[自动送礼]", `将在${runTime}进行自动送礼`);
               return $.Deferred().resolve();
-            } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && !SEND_GIFT_NOW && !LIGHT_MEDAL_NOW && !noTimeCheck) {
+            } else if (MY_API.CONFIG.GIFT_METHOD == "GIFT_INTERVAL" && !SEND_GIFT_NOW && !noTimeCheck) {
               // 间隔__分钟送礼
               let GiftInterval = MY_API.CONFIG.GIFT_INTERVAL * 60e3;
               if (MY_API.CACHE.GiftInterval_TS) {
@@ -3276,11 +3307,6 @@
             if (MY_API.Gift.over) return waitForNextRun();
             if (MY_API.Gift.medal_list.length > 0) {
               handleMedalList();
-              await MY_API.Gift.auto_light(); // 点亮勋章
-              if (LIGHT_MEDAL_NOW) {
-                LIGHT_MEDAL_NOW = false;
-                return $.Deferred().resolve();
-              }
               handleBagList();
               if (MY_API.Gift.over) return waitForNextRun();
               for (const v of MY_API.Gift.medal_list) {
@@ -3331,7 +3357,6 @@
                   medal.today_feed += feed_num * feed;
                   MY_API.Gift.remain_feed -= feed_num * feed;
                   window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼成功，送出${feed_num}个${v.gift_name}，[${medal.today_feed}/${medal.day_limit}]距离今日亲密度上限还需[${MY_API.Gift.remain_feed}]`, 'success');
-                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
                 } else if (response.code === 200028) {
                   // 当前直播间无法赠送礼物哦～
                   window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼失败：${response.msg}`, 'caution');
@@ -3369,7 +3394,6 @@
                 if (response.code === 0) {
                   v.gift_num -= feed_num;
                   window.toast(`[自动送礼]【剩余礼物】房间[${ROOM_ID}] 送礼成功，送出${feed_num}个${v.gift_name}`, 'success');
-                  if (v.gift_id == 30607) MY_API.GIFT_COUNT.LITTLE_HEART_COUNT += feed_num;
                 } else if (response.code === 200028) {
                   // 当前直播间无法赠送礼物哦～
                   window.toast(`[自动送礼]勋章[${medal.medal_name}] 送礼失败：${response.msg}`, 'caution');
@@ -3379,260 +3403,6 @@
                 }
               });
             }
-          }
-        }
-      },
-      LITTLE_HEART: {
-        patchData: {},
-        failedRoomList: [],
-        RoomHeart: class {
-          constructor(inputRoomID) {
-            this.inputRoomID = inputRoomID;
-          }
-          areaID;
-          parentID;
-          seq = 0;
-          inputRoomID;
-          roomID;
-          get id() {
-            return [this.parentID, this.areaID, this.seq, this.roomID];
-          }
-          buvid = this.getItem('LIVE_BUVID');
-          uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, t => {
-            const e = 16 * Math.random() | 0;
-            return ('x' === t ? e : 3 & e | 8).toString(16);
-          });
-          device = [this.buvid, this.uuid];
-          get ts() {
-            return Date.now();
-          }
-          get patchData() {
-            const list = [];
-            for (const [_, data] of Object.entries(MY_API.LITTLE_HEART.patchData))
-              list.push(data);
-            return list;
-          }
-          isPatch = this.patchData.length === 0 ? 0 : 1;
-          ua = W && W.navigator ? W.navigator.userAgent : '';
-          csrf = this.getItem("bili_jct") || '';
-          nextInterval = Math.floor(5) + Math.floor(Math.random() * (60 - 5));
-          heartbeatInterval;
-          secretKey;
-          secretRule;
-          timestamp;
-          async start() {
-            return await this.getInfoByRoom(this.inputRoomID);
-          }
-          async getInfoByRoom(roomID) {
-            if (!roomID)
-              return $.Deferred().resolve(false);
-            const getInfoByRoom = await BAPI.xlive.getInfoByRoom(roomID);
-            if (getInfoByRoom.code === 0) {
-              const roomInfo = getInfoByRoom.data.room_info;
-              ({ area_id: this.areaID, parent_area_id: this.parentID, room_id: this.roomID } = roomInfo);
-              if (!this.areaID || !this.parentID)
-                return $.Deferred().resolve(false);
-              this.e();
-              return $.Deferred().resolve(true);
-            }
-            else {
-              console.error(GM_info.script.name, `未获取到房间 ${roomID} 信息`);
-              return $.Deferred().resolve(false);
-            }
-          }
-          async webHeartBeat() {
-            if (this.seq > 6)
-              return;
-            const arg = `${this.nextInterval}|${this.roomID}|1|0`;
-            const argUtf8 = CryptoJS.enc.Utf8.parse(arg);
-            const argBase64 = CryptoJS.enc.Base64.stringify(argUtf8);
-            const webHeartBeat = await fetch(`//live-trace.bilibili.com/xlive/rdata-interface/v1/heartbeat/webHeartBeat?hb=${encodeURIComponent(argBase64)}&pf=web`, {
-              mode: 'cors',
-              credentials: 'include',
-            }).then(res => res.json());
-            if (webHeartBeat.code === 0) {
-              this.nextInterval = webHeartBeat.data.next_interval;
-              setTimeout(() => this.webHeartBeat(), this.nextInterval * 1000);
-            }
-            else {
-              window.toast(`[小心心] 房间 ${this.roomID} 心跳webHeartBeat失败`, 'warning');
-              MYERROR('小心心', `房间 ${this.roomID} 心跳webHeartBeat失败`);
-            }
-          }
-          async e() {
-            const arg = {
-              id: JSON.stringify(this.id),
-              device: JSON.stringify(this.device),
-              ts: this.ts,
-              is_patch: this.isPatch,
-              heart_beat: JSON.stringify(this.patchData),
-              ua: this.ua,
-            };
-            const e = await fetch('//live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E', {
-              headers: {
-                "content-type": "application/x-www-form-urlencoded",
-              },
-              method: 'POST',
-              body: `${this.json2str(arg)}&csrf_token=${this.csrf}&csrf=${this.csrf}&visit_id=`,
-              mode: 'cors',
-              credentials: 'include',
-            }).then(res => res.json());
-            if (e.code === 0) {
-              MYDEBUG(`[小心心] 发送房间${this.roomID}的心跳包E`, e);
-              this.seq += 1;
-              ({ heartbeat_interval: this.heartbeatInterval, secret_key: this.secretKey, secret_rule: this.secretRule, timestamp: this.timestamp } = e.data);
-              setTimeout(() => this.x(), this.heartbeatInterval * 1000);
-            }
-            else {
-              window.toast(`[小心心] 房间 ${this.roomID} 心跳E失败 ${e.message}`, 'error');
-              MYERROR('小心心', `房间 ${this.roomID} 心跳E失败`, e);
-              addVal(MY_API.LITTLE_HEART.failedRoomList, this.roomID);
-            }
-          }
-          async x() {
-            if (this.seq > 6)
-              return;
-            const sypderData = {
-              id: JSON.stringify(this.id),
-              device: JSON.stringify(this.device),
-              ets: this.timestamp,
-              benchmark: this.secretKey,
-              time: this.heartbeatInterval,
-              ts: this.ts,
-              ua: this.ua,
-            };
-            const s = this.sypder(JSON.stringify(sypderData), this.secretRule);
-            const arg = Object.assign({ s }, sypderData);
-            MY_API.LITTLE_HEART.patchData[this.roomID] = arg;
-            const x = await fetch('//live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X', {
-              headers: {
-                "content-type": "application/x-www-form-urlencoded",
-              },
-              method: 'POST',
-              body: `${this.json2str(arg)}&csrf_token=${this.csrf}&csrf=${this.csrf}&visit_id=`,
-              mode: 'cors',
-              credentials: 'include',
-            }).then(res => res.json());
-            if (x.code === 0) {
-              MYDEBUG(`[小心心] 发送房间${this.roomID}的心跳包X`, x);
-              this.seq += 1;
-              ({ heartbeat_interval: this.heartbeatInterval, secret_key: this.secretKey, secret_rule: this.secretRule, timestamp: this.timestamp } = x.data);
-              setTimeout(() => this.x(), this.heartbeatInterval * 1000);
-            }
-            else {
-              window.toast(`[小心心] 房间 ${this.roomID} 心跳X失败 ${x.message}`, 'error');
-              MYERROR('小心心', `房间 ${this.roomID} 心跳X失败`, x);
-              addVal(MY_API.LITTLE_HEART.failedRoomList, this.roomID);
-            }
-          }
-          sypder(str, rule) {
-            const data = JSON.parse(str);
-            const [parent_id, area_id, seq_id, room_id] = JSON.parse(data.id);
-            const [buvid, uuid] = JSON.parse(data.device);
-            const key = data.benchmark;
-            const newData = {
-              platform: 'web',
-              parent_id,
-              area_id,
-              seq_id,
-              room_id,
-              buvid,
-              uuid,
-              ets: data.ets,
-              time: data.time,
-              ts: data.ts,
-            };
-            let s = JSON.stringify(newData);
-            for (const r of rule) {
-              switch (r) {
-                case 0:
-                  s = CryptoJS.HmacMD5(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 1:
-                  s = CryptoJS.HmacSHA1(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 2:
-                  s = CryptoJS.HmacSHA256(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 3:
-                  s = CryptoJS.HmacSHA224(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 4:
-                  s = CryptoJS.HmacSHA512(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                case 5:
-                  s = CryptoJS.HmacSHA384(s, key).toString(CryptoJS.enc.Hex);
-                  break;
-                default:
-                  break;
-              }
-            }
-            return s;
-          }
-          getItem(t) {
-            return decodeURIComponent(document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(t).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1')) || '';
-          }
-          json2str(arg) {
-            let str = '';
-            for (const name in arg)
-              str += `${name}=${encodeURIComponent(arg[name])}&`;
-            return str.slice(0, -1);
-          }
-        },
-        run: async () => {
-          if (!MY_API.CONFIG.LITTLE_HEART || otherScriptsRunning) return $.Deferred().resolve();
-          const bagList = await getBagList();
-          if (bagList.code !== 0) {
-            window.toast('[小心心] 未获取到包裹列表，停止运行', 'error');
-            return MYERROR('小心心', '未获取到包裹列表');
-          }
-          let giftNum = getGiftNum(bagList);
-          if (giftNum >= 24) return window.toast('[小心心] 已获取今日小心心', 'info');
-          window.toast('[小心心] 开始获取今日小心心', 'info');
-          const fansMedalList = medal_info.medal_list.filter(m => m.roomid && !MY_API.LITTLE_HEART.failedRoomList.includes(m.roomid));
-          const control = 24 - giftNum;
-          const loopNum = Math.ceil(control / fansMedalList.length);
-          for (let i = 0; i < loopNum; i++) {
-            let count = 0;
-            for (const funsMedalData of fansMedalList) {
-              if (count >= control)
-                break;
-              await new MY_API.LITTLE_HEART.RoomHeart(funsMedalData.roomid).start().then(heartStatus => {
-                if (heartStatus)
-                  count++;
-              });
-              await sleep(1000);
-            }
-            await sleep(6 * 60 * 1000);
-          }
-          const newBagList = await getBagList();
-          let newGiftNum = getGiftNum(newBagList);
-          if (newGiftNum < 24) {
-            window.toast('[小心心] 今日小心心未完全获取，再次获取', 'warning');
-            return MY_API.LITTLE_HEART.run();
-          } else window.toast('[小心心] 今日小心心已获取', 'success');
-
-          async function getBagList() {
-            const bagList = await fetch(`//api.live.bilibili.com/xlive/web-room/v1/gift/bag_list?t=${Date.now()}&room_id=${W.BilibiliLive.ROOMID}`, {
-              mode: 'cors',
-              credentials: 'include',
-            }).then(res => res.json());
-            if (bagList.code != 0) window.toast(`[小心心] 获取包裹列表失败 ${bagList.message}`, "error");
-            MYDEBUG('[小心心] 获取包裹列表', bagList);
-            return bagList;
-          }
-          function getGiftNum(bagList) {
-            const list = bagList.data.list || [];
-            if (list.length === 0) return 0;
-            let giftNum = 0;
-            for (const gift of list) {
-              if (gift.gift_id === 30607) {
-                const expire = (gift.expire_at - Date.now() / 1000) / 60 / 60 / 24;
-                if (expire > 6 && expire <= 7)
-                  giftNum += gift.gift_num;
-              }
-            }
-            return giftNum;
           }
         }
       },
@@ -3792,23 +3562,40 @@
           danmuTaskRunning = false;
         }
       },
+      AUTO_CHECK_DANMU: {
+        sendDanmu: {},
+        initEmitter: () => {
+          danmuEmitter.on('danmu', (msg) => {
+            let timer = setTimeout(() => {
+              window.toast(`弹幕【${msg}】疑似发送失败`, 'caution');
+              delete MY_API.AUTO_CHECK_DANMU.sendDanmu[timer];
+            }, MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT);
+            MY_API.AUTO_CHECK_DANMU.sendDanmu[timer] = msg;
+          })
+        },
+        run: () => {
+          if (!SP_CONFIG.AUTO_CHECK_DANMU) return;
+          MY_API.AUTO_CHECK_DANMU.initEmitter();
+          bliveproxy.addCommandHandler("DANMU_MSG", (command) => {
+            if (MY_API.AUTO_CHECK_DANMU.sendDanmu === {}) return;
+            const info = command.info;
+            if (info[2][0] === Live_info.uid) {
+              for (const d in MY_API.AUTO_CHECK_DANMU.sendDanmu) {
+                if (MY_API.AUTO_CHECK_DANMU.sendDanmu[d] === info[1]) {
+                  MYDEBUG(`[检查弹幕是否发送成功] 已找到弹幕(timer = ${d})`, MY_API.AUTO_CHECK_DANMU.sendDanmu[d])
+                  clearTimeout(d);
+                  delete MY_API.AUTO_CHECK_DANMU.sendDanmu[d];
+                }
+              }
+            }
+          });
+        }
+      },
       MEDAL_DANMU: {
         medal_list: [],
         sendDanmu: async (danmuContent, roomId, medal_name) => {
-          let realRoomId = roomId;
-          if (Number(roomId) <= 10000) {
-            realRoomId = await BAPI.room.get_info(roomId).then((res) => {
-              MYDEBUG(`API.room.get_info roomId=${roomId} res`, res); // 可能是短号，要用长号发弹幕
-              if (res.code === 0) {
-                return res.data.room_id;
-              } else {
-                window.toast(`[粉丝牌打卡弹幕] 房间号【${roomId}】信息获取失败 ${res.message}`, 'error');
-                return roomId;
-              }
-            })
-          }
-          return BAPI.sendLiveDanmu(danmuContent, realRoomId).then((response) => {
-            MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，真实房间号【${realRoomId}】，粉丝勋章【${medal_name}】`, response);
+          return BAPI.sendLiveDanmu(danmuContent, roomId).then((response) => {
+            MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，真实房间号【${roomId}】，粉丝勋章【${medal_name}】`, response);
             if (response.code === 0 && response.message.length === 0) {
               return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】发送成功，房间号【${roomId}】，粉丝勋章【${medal_name}】已点亮，当前亲密度+100`, 'success');
             } else {
@@ -3845,7 +3632,7 @@
           for (const up of lightMedalList) {
             if (danmuContentIndex >= configDanmuLength) danmuContentIndex = 0;
             const medal_name = up.medal_name,
-              roomid = up.roomid,
+              roomid = up.real_roomid,
               danmuContent = MY_API.CONFIG.MEDAL_DANMU_CONTENT[danmuContentIndex];
             await MY_API.MEDAL_DANMU.sendDanmu(danmuContent, roomid, medal_name);
             danmuContentIndex++;
@@ -4245,8 +4032,6 @@
                 window.toast(`[取关BLTH天选分组内的UP] 获取关注列表出错 ${response.message}`, 'error');
                 return delayCall(() => getUpInTag(myuid, tagid, pn = 1, ps = 50));
               }
-            }, () => {
-              MY_API.chatLog(`[天选时刻] 获取Tag内UP列表出错，请检查网络`, 'error');
             })
           }
           function get_attention_list(mid) {
@@ -4851,9 +4636,6 @@
                           MY_API.chatLog(`[天选时刻] 获取uid出错<br>roomid = ${defaultJoinData.roomid}<br>${res.msg}`, 'error');
                           getUid.reject();
                         }
-                      }, () => {
-                        MY_API.chatLog(`[天选时刻] 获取uid出错，请检查网络`, 'error');
-                        getUid.reject();
                       })
                     } else getUid.resolve();
                     getUid.then(() => {
@@ -4882,9 +4664,6 @@
                           });
                           p.reject()
                         }
-                      }, () => {
-                        MY_API.chatLog('[天选时刻] 购买粉丝勋章出错，请检查网络', 'error');
-                        p.reject()
                       });
                     });
                     break;
@@ -4906,8 +4685,6 @@
                         return MY_API.chatLog(`[天选时刻] 该天选已过期<br>roomid = ${linkMsg(liveRoomUrl + defaultJoinData.roomid, defaultJoinData.roomid)}, id = ${data.id}<br>奖品名：${data.award_name}`, 'info')
                       }
                     }
-                  }, () => {
-                    MY_API.chatLog(`[天选时刻] 获取天选开奖剩余时间失败，请检查网络`, 'error')
                   })
                 })
               });
@@ -5046,9 +4823,6 @@
                     MY_API.chatLog(`[天选时刻] 获取uid出错<br>${res.msg}`, 'error');
                     return false
                   }
-                }, () => {
-                  MY_API.chatLog(`[天选时刻] 获取uid出错，请检查网络`, 'error');
-                  return $.Deferred().resolve(false)
                 });
               }
               case 3: { // 大航海
@@ -5174,8 +4948,6 @@
                       else {
                         window.toast(`[天选自动取关] 取关UP(uid = ${anchorUid})出错  ${response.message}`, 'error');
                       }
-                    }, () => {
-                      MY_API.chatLog(`[天选自动取关] 取关UP(uid = ${anchorUid})出错，请检查网络`);
                     })
                   }
                 }
@@ -5204,8 +4976,6 @@
                       } else {
                         window.toast(`[天选自动私信] 私信UP(uid = ${anchorUid})失败 ${res.message}`, 'error');
                       }
-                    }, () => {
-                      MY_API.chatLog(`[天选自动私信] 私信UP(uid = ${anchorUid})出错，请检查网络`);
                     })
                   }, getRandomNum(5000, 8000));
                 }
@@ -5217,8 +4987,6 @@
                       MY_API.AnchorLottery.BLTHprizeList.push(anchorUid);
                       if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${anchorUid}）至分组【${anchorPrizeTagName}】成功`, 'success');
                       else window.toast(`[天选时刻] 移动UP（uid = ${anchorUid}）至分组【${anchorPrizeTagName}】失败 ${re.message}`, 'caution');
-                    }, () => {
-                      MY_API.chatLog(`[天选时刻] 移动UP（uid = ${anchorUid}）到分组【${anchorPrizeTagName}】出错，请检查网络`, 'error');
                     });
                   }
                 }
@@ -5350,9 +5118,6 @@
                     MY_API.chatLog(`[天选时刻] 获取uid出错，中断后续操作<br>roomid = ${linkMsg(liveRoomUrl + data.roomid, data.roomid)}, id = ${data.id}<br>${res.msg}`, 'error');
                     p.reject();
                   }
-                }, () => {
-                  MY_API.chatLog(`[天选时刻] 获取uid出错，中断后续操作<br>roomid = ${linkMsg(liveRoomUrl + data.roomid, data.roomid)}, id = ${data.id}<br>请检查网络`, 'error');
-                  p.reject();
                 });
               } else p.resolve();
               p.then(() => {
@@ -5369,8 +5134,6 @@
                         MY_API.AnchorLottery.BLTHfollowList.push(data.uid);
                         if (re.code === 0) window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】成功`, 'success');
                         else window.toast(`[天选时刻] 移动UP（uid = ${data.uid}）至分组【${anchorFollowTagName}】失败 ${re.message}`, 'caution');
-                      }, () => {
-                        MY_API.chatLog(`[天选时刻] 移动UP（uid = ${data.uid}）到分组【${anchorFollowTagName}】出错，请检查网络`, 'error');
                       });
                     }
                   }, getRandomNum(5000, 8000));
@@ -5535,12 +5298,10 @@
                 await MY_API.AnchorLottery.getLiveUsers();
                 MY_API.AnchorLottery.liveRoomList = [];
                 for (const i of MY_API.AnchorLottery.liveUserList) {
-                  let realRoomId, roomid;
-                  const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
-                    uid = i.uid;
-                  if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+                  const uid = i.uid;
+                  let realRoomId, roomid = liveLink2Roomid(i.link);
                   if (!roomid) return MYERROR('[天选时刻] 获取已关注开播直播间号失败', roomidList);
-                  if (Number(roomid) <= 10000) {
+                  if (roomid <= 10000) {
                     realRoomId = await BAPI.room.get_info(roomid).then((res) => {
                       MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号发弹幕
                       if (res.code === 0) {
@@ -5592,7 +5353,6 @@
         } // run结束
       },
       AWPUSH: {
-        running: false,
         wsinit: function () {
           // 测试时用 localhost, 原为 andywang.top
           MY_API.AWPUSH.ws = new WebSocket('wss://andywang.top:3001/ws');
@@ -5627,8 +5387,7 @@
         },
         /** 自定义消息发送 - 压缩 */
         desend: function (...arg) {
-          let ws = MY_API.AWPUSH.ws;
-          if (ws) MY_API.AWPUSH.ws.send(pako.deflate(arg[0]));
+          if (MY_API.AWPUSH.status === 'open') MY_API.AWPUSH.ws.send(pako.deflate(arg[0]));
           else MYERROR('awpush 暂时无法发送消息, 等待重连...');
         },
         heartBeat: {
@@ -5668,7 +5427,7 @@
           let lastStatus = MY_API.AWPUSH.status;
           for (const room of MY_API.AnchorLottery.allRoomList) {
             // 如果重连成功则不执行之前的任务
-            if (lastStatus !== 'open' && MY_API.AWPUSH.status === 'open') return $.Deferred().resolve('return');
+            if (lastStatus !== 'open' && MY_API.AWPUSH.status === 'open') return $.Deferred().resolve();
             lastStatus = MY_API.AWPUSH.status;
             let p = $.Deferred();
             const uid = roomidAndUid.hasOwnProperty(room) ? roomidAndUid[room] : undefined;
@@ -5699,12 +5458,10 @@
               await MY_API.AnchorLottery.getLiveUsers();
               MY_API.AnchorLottery.liveRoomList = [];
               for (const i of MY_API.AnchorLottery.liveUserList) {
-                let realRoomId, roomid;
-                const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
-                  uid = i.uid;
-                if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+                const uid = i.uid;
+                let realRoomId, roomid = liveLink2Roomid(i.link);
                 if (!roomid) return MYERROR('[awpush] 获取已关注开播直播间号失败', roomidList);
-                if (Number(roomid) <= 10000) {
+                if (roomid <= 10000) {
                   realRoomId = await BAPI.room.get_info(roomid).then((res) => {
                     MYDEBUG(`API.room.get_info roomid=${roomid} res`, res);
                     if (res.code === 0) {
@@ -5773,8 +5530,6 @@
         },
         run: () => {
           // awpush 入口
-          if (MY_API.AWPUSH.running) return;
-          MY_API.AWPUSH.running = true;
           MY_API.AWPUSH.wsinit();
           let secret, task, area_data, sleep_time, interval, max_room;
           const config = {
@@ -6444,7 +6199,7 @@
           const resetTime = 20 * 60 * 1000;
           if (response.code === 0) {
             MYDEBUG('[红包抽奖] 服务器地址', response);
-            let wst = new BAPI.DanmuWebSocket(Live_info.uid, roomid, response.data.host_server_list, response.data.token);
+            let wst = await new DanmuWebSocket({ roomid: roomid, uid: Live_info.uid });
             let reset = (time = resetTime) => {
               clearTimeout(resetTimer);
               resetTimer = setTimeout(() => {
@@ -6452,51 +6207,52 @@
                 wst.close(1000);
               }, time)
             }
-            wst.setUnzip(pako.inflate);
-            wst.bind((newWst) => {
-              wst = newWst;
-              MYDEBUG(`[红包抽奖] 弹幕服务器连接断开，尝试重连 roomid = ${roomid}`, wst);
-              delVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid);
-            }, () => {
-              MYDEBUG(`[红包抽奖] 连接弹幕服务器成功 roomid = ${roomid}`, wst);
-              addVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid);
-              reset();
-            }, () => {
-              /* heartbeat */
-            }, async (obj) => {
-              switch (obj.cmd) {
-                case 'POPULARITY_RED_POCKET_WINNER_LIST':
-                  MYDEBUG(`[红包抽奖] 红包抽奖结果 lot_id = ${obj.data.lot_id}`, obj);
-                  reset();
-                  for (const i of obj.data.winner_info) {
-                    if (i.uid === Live_info.uid) {
-                      MY_API.chatLog(`[红包抽奖] 红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${obj.data.lot_id}中奖<br>获得${i.gift_num}个${i.award_name}，价值${i.award_price / 1000}电池`, 'prize');
-                      return;
+            wst.bind({
+              reconnect: (newWst) => {
+                wst = newWst;
+                MYDEBUG(`[红包抽奖] 弹幕服务器连接断开，尝试重连 roomid = ${roomid}`, wst);
+                delVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid);
+              },
+              login: (json) => {
+                MYDEBUG(`[红包抽奖] 登录弹幕服务器成功 roomid = ${roomid}`, json);
+                addVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid);
+                reset();
+              },
+              cmd: async (obj) => {
+                switch (obj.cmd) {
+                  case 'POPULARITY_RED_POCKET_WINNER_LIST':
+                    MYDEBUG(`[红包抽奖] 红包抽奖结果 lot_id = ${obj.data.lot_id}`, obj);
+                    reset();
+                    for (const i of obj.data.winner_info) {
+                      if (i.uid === Live_info.uid) {
+                        MY_API.chatLog(`[红包抽奖] 红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${obj.data.lot_id}中奖<br>获得${i.gift_num}个${i.award_name}，价值${i.award_price / 1000}电池`, 'prize');
+                        return;
+                      }
                     }
-                  }
-                  MY_API.chatLog(`[红包抽奖] 红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${obj.data.lot_id}未中奖`, 'info');
-                  break;
-                case 'POPULARITY_RED_POCKET_START':
-                  reset();
-                  MYDEBUG(`[红包抽奖] 准备参加websocket推送的红包抽奖 lot_id = ${obj.data.lot_id}`, obj);
-                  if (MY_API.CONFIG.ANCHOR_AWPUSH) {
-                    obj.data.uid = uid;
-                    obj.data.roomid = roomid;
-                    const update_data = {
-                      code: "UPDATE_POPULARITY_REDPOCKET_DATA",
-                      uid: Live_info.uid,
-                      secret: MY_API.AWPUSH.userInfo.secret,
-                      data: MY_API.PopularityRedpocketLottery.delUselessData(obj.data)
-                    };
-                    MYDEBUG('awpush 上传红包数据: ', update_data);
-                    MY_API.AWPUSH.desend(JSON.stringify(update_data));
-                  }
-                  await MY_API.PopularityRedpocketLottery.draw(uid, roomid, obj.data);
-                  break;
-                default:
-                // 其他消息，不做处理
+                    MY_API.chatLog(`[红包抽奖] 红包抽奖<br>roomid = ${linkMsg(liveRoomUrl + roomid, roomid)}, lot_id = ${obj.data.lot_id}未中奖`, 'info');
+                    break;
+                  case 'POPULARITY_RED_POCKET_START':
+                    reset();
+                    MYDEBUG(`[红包抽奖] 准备参加websocket推送的红包抽奖 lot_id = ${obj.data.lot_id}`, obj);
+                    if (MY_API.CONFIG.ANCHOR_AWPUSH) {
+                      obj.data.uid = uid;
+                      obj.data.roomid = roomid;
+                      const update_data = {
+                        code: "UPDATE_POPULARITY_REDPOCKET_DATA",
+                        uid: Live_info.uid,
+                        secret: MY_API.AWPUSH.userInfo.secret,
+                        data: MY_API.PopularityRedpocketLottery.delUselessData(obj.data)
+                      };
+                      MYDEBUG('awpush 上传红包数据: ', update_data);
+                      MY_API.AWPUSH.desend(JSON.stringify(update_data));
+                    }
+                    await MY_API.PopularityRedpocketLottery.draw(uid, roomid, obj.data);
+                    break;
+                  default:
+                  // 其他消息，不做处理
+                }
               }
-            });
+            })
           } else {
             MY_API.chatLog('[红包抽奖] 获取弹幕服务器地址错误', 'warning')
           }
@@ -6553,12 +6309,10 @@
           if (MY_API.CONFIG.POPULARITY_REDPOCKET_TYPE_FOLLOWING) {
             await MY_API.PopularityRedpocketLottery.getLiveUsers();
             for (const i of MY_API.PopularityRedpocketLottery.liveUserList) {
-              let realRoomId, roomid;
-              const roomidList = i.link.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/),
-                uid = i.uid;
-              if (Array.isArray(roomidList) && roomidList.length >= 2) roomid = roomidList[1];
+              const uid = i.uid;
+              let realRoomId, roomid = liveLink2Roomid(i.link);
               if (!roomid) return MYERROR('[红包抽奖] 获取已关注开播直播间号失败', roomidList);
-              if (Number(roomid) <= 10000) {
+              if (roomid <= 10000) {
                 realRoomId = await BAPI.room.get_info(roomid).then((res) => {
                   MYDEBUG(`API.room.get_info roomid=${roomid} res`, res); // 可能是短号，要用长号
                   if (res.code === 0) {
@@ -6583,17 +6337,6 @@
                 if (lot.lot_status === 1) {
                   const ruid = await MY_API.PopularityRedpocketLottery.getUidbyRoomid(roomid);
                   if (ruid) {
-                    if (MY_API.CONFIG.ANCHOR_AWPUSH) {
-                      lot.uid = ruid;
-                      const update_data = {
-                        code: "UPDATE_POPULARITY_REDPOCKET_DATA",
-                        uid: Live_info.uid,
-                        secret: MY_API.AWPUSH.userInfo.secret,
-                        data: MY_API.PopularityRedpocketLottery.delUselessData(lot)
-                      };
-                      MYDEBUG('awpush 上传红包数据: ', update_data);
-                      MY_API.AWPUSH.desend(JSON.stringify(update_data));
-                    }
                     await MY_API.PopularityRedpocketLottery.draw(ruid, roomid, lot);
                     if (findVal(MY_API.PopularityRedpocketLottery.wsConnectingList, roomid) === -1 && MY_API.PopularityRedpocketLottery.wsConnectingList.length < 64)
                       MY_API.PopularityRedpocketLottery.createWebsocket(roomid, ruid);
@@ -6606,7 +6349,7 @@
           MY_API.chatLog(`[红包抽奖] 本轮抽奖结束，10分钟后再次检查`, 'info');
           setTimeout(() => MY_API.PopularityRedpocketLottery.run(), MY_API.CONFIG.POPULARITY_REDPOCKET_CHECK_INTERVAL * 60 * 1000);
         }
-      }
+      },
     };
     MY_API.init().then(() => {
       try {
@@ -6683,7 +6426,6 @@
       API.Exchange.runC2S, // 硬币换银瓜子
       // 其它任务
       API.AUTO_DANMU.run, // 自动发弹幕
-      API.LITTLE_HEART.run, // 小心心
       API.Gift.run, // 送礼物
       API.MaterialObject.run, // 实物抽奖
       API.AnchorLottery.run, // 天选时刻
@@ -6691,13 +6433,14 @@
       API.RESERVE_ACTIVITY.run, // 预约抽奖
       API.GET_PRIVILEGE.run, // 领取大会员权益
       API.PopularityRedpocketLottery.run, // 直播红包抽奖
+      API.AUTO_CHECK_DANMU.run, // 检查弹幕是否发送成功
     ];
     otherScriptsRunningCheck.then(() => runAllTasks(5000, 200, taskList));
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000);// 刷新直播间
     function reset(delay) {
       let resetTimer = setTimeout(() => {
-        if (checkNewDay(API.CACHE.LittleHeart_TS)) {
-          MYDEBUG('[刷新直播间]', '正在获取小心心，10分钟后再次检查');
+        if (API.CONFIG.Watch30min && checkNewDay(API.CACHE.LiveReward_TS)) {
+          MYDEBUG('[刷新直播间]', '正在运行观看30分钟直播任务，10分钟后再次检查');
           clearTimeout(resetTimer);
           return reset(600e3);
         }
@@ -6769,7 +6512,7 @@
     })
   }
   /**
-   * 获取粉丝勋章列表
+   * 获取粉丝勋章列表和真实直播间号
    * @param {Number} page 
    * @returns 
    */
@@ -6780,6 +6523,19 @@
       await BAPI.i.medal(page).then((response) => {
         MYDEBUG('before init() getMedalList: API.i.medal', response);
         if (response.code === 0) {
+          for (let i = 0; i < response.data.items.length; i++) {
+            if (response.data.items[i].roomid && response.data.items[i].roomid <= 100000) {
+              BAPI.room.get_info(response.data.items[i].roomid).then((res) => {
+                if (res.code === 0) {
+                  response.data.items[i].real_roomid = res.data.room_id;
+                } else {
+                  MYERROR(`获取直播间${response.data.items[i].roomid}的真实房间号出错`);
+                }
+              })
+            } else {
+              response.data.items[i].real_roomid = response.data.items[i].roomid;
+            }
+          }
           medal_info.medal_list = medal_info.medal_list.concat(response.data.items);
           if (response.data.page_info.cur_page < response.data.page_info.total_page) page++;
           else { medal_info.status.resolve(); end = true }
@@ -6800,6 +6556,16 @@
       await sleep(200);
     }
   };
+  /**
+   * 从形如 https://live.bilibili.com/123 的字符串中提取房间号
+   * @param {*} liveLink 
+   * @returns roomid
+   */
+  function liveLink2Roomid(liveLink) {
+    let result = liveLink.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/);
+    if (Array.isArray(roomidList) && roomidList.length >= 2) return Number(result[1]);
+    else return false;
+  }
   /**
    * 跨模块推送和接收抽奖信息
    */

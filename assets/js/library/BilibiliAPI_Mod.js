@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.1.1
+// @version       3.1.2
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -1509,6 +1509,26 @@ var BAPI = {
                 }
             });
         },
+        trigerInteract: (roomid, interact_type = 3) => {
+            return BAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '/xlive/web-room/v1/index/TrigerInteract',
+                data: {
+                    roomid: roomid,
+                    interact_type: interact_type
+                }
+            });
+        },
+        likeInteract: (roomid) => {
+            return BAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '/xlive/web-ucenter/v1/interact/likeInteract',
+                data: {
+                    roomid: roomid,
+                    ts: BAPI_ts_s()
+                }
+            });
+        },
         anchor: {
             check: (roomid) => {
                 return BAPI.ajax({
@@ -1573,250 +1593,6 @@ var BAPI = {
             return BAPI.ajax({
                 url: 'YearWelfare/inviteUserList/1'
             });
-        }
-    },
-    DanmuWebSocket: class extends WebSocket {
-        static stringToUint(string) {
-            const charList = string.split('');
-            const uintArray = [];
-            for (var i = 0; i < charList.length; ++i) {
-                uintArray.push(charList[i].charCodeAt(0));
-            }
-            return new Uint8Array(uintArray);
-        }
-        static uintToString(uint8array) {
-            return new TextDecoder("utf-8").decode(uint8array);
-        }
-        constructor(uid, roomid, host_server_list, token) {
-            // 总字节长度 int(4bytes) + 头字节长度(16=4+2+2+4+4) short(2bytes) + protover(1,2) short(2bytes) + operation int(4bytes) + sequence(1,0) int(4bytes) + Data
-            let address = 'wss://broadcastlv.chat.bilibili.com/sub';
-            if (Array.isArray(host_server_list) && host_server_list.length > 0) {
-                let flag = false;
-                do {
-                    const chosen = host_server_list.shift();
-                    if (chosen.wss_port) address = `wss://${chosen.host}:${chosen.wss_port}/sub`;
-                    else flag = true;
-                } while (flag && host_server_list.length > 0);
-            } else if (typeof host_server_list === 'string' && host_server_list.length > 0) {
-                address = host_server_list;
-            }
-            super(address);
-            this.binaryType = 'arraybuffer';
-            this.handlers = {
-                reconnect: [],
-                login: [],
-                heartbeat: [],
-                cmd: [],
-                receive: []
-            };
-            this.host_server_list = host_server_list;
-            this.token = token;
-            this.closed = false;
-            this.addEventListener('open', () => {
-                this.sendLoginPacket(uid, roomid).sendHeartBeatPacket();
-                this.heartBeatHandler = setInterval(() => {
-                    this.sendHeartBeatPacket();
-                }, 30e3);
-            });
-            this.addEventListener('close', () => {
-                if (this.heartBeatHandler) clearInterval(this.heartBeatHandler);
-                if (this.closed) return;
-                // 自动重连
-                setTimeout(() => {
-                    const ws = new BAPI.DanmuWebSocket(uid, roomid, this.host_server_list, this.token);
-                    ws.handlers = this.handlers;
-                    ws.unzip = this.unzip;
-                    for (const key in this.handlers) {
-                        if (this.handlers.hasOwnProperty(key)) {
-                            this.handlers[key].forEach(handler => {
-                                switch (key) {
-                                    case 'reconnect':
-                                        ws.addEventListener('reconnect', (event) => {
-                                            handler.call(ws, event.detail.ws);
-                                        });
-                                        break;
-                                    case 'login':
-                                        ws.addEventListener('login', () => {
-                                            handler.call(ws);
-                                        });
-                                        break;
-                                    case 'heartbeat':
-                                        ws.addEventListener('heartbeat', (event) => {
-                                            handler.call(ws, event.detail.num);
-                                        });
-                                        break;
-                                    case 'cmd':
-                                        ws.addEventListener('cmd', (event) => {
-                                            handler.call(ws, event.detail.obj, event.detail.str);
-                                        });
-                                        break;
-                                    case 'receive':
-                                        ws.addEventListener('receive', (event) => {
-                                            handler.call(ws, event.detail.len, event.detail.headerLen, event.detail.protover, event.detail.operation, event.detail.sequence, event.detail.data);
-                                        });
-                                        break;
-                                }
-                            });
-                        }
-                    }
-                    this.dispatchEvent(new CustomEvent('reconnect', {
-                        detail: {
-                            ws: ws
-                        }
-                    }));
-                }, 10e3);
-            });
-            this.addEventListener('message', (event) => {
-                const dv = new DataView(event.data);
-                let len = 0;
-                for (let position = 0; position < event.data.byteLength; position += len) {
-                    /*
-                    登录 总字节长度 int(4bytes) + 头字节长度 short(2bytes) + 00 01 + 00 00 00 08 + 00 00 00 01
-                    心跳 总字节长度 int(4bytes) + 头字节长度 short(2bytes) + 00 01 + 00 00 00 03 + 00 00 00 01 + 直播间人气 int(4bytes)
-                    弹幕消息/系统消息/送礼 总字节长度 int(4bytes) + 头字节长度 short(2bytes) + 00 00 + 00 00 00 05 + 00 00 00 00 + Data
-                    */
-                    len = dv.getUint32(position);
-                    const headerLen = dv.getUint16(position + 4);
-                    const protover = dv.getUint16(position + 6);
-                    const operation = dv.getUint32(position + 8);
-                    const sequence = dv.getUint32(position + 10);
-                    let data = event.data.slice(position + headerLen, position + len);
-                    let body = data;
-                    if (protover === 2 && this.unzip) body = this.unzip(data);
-                    this.dispatchEvent(new CustomEvent('receive', {
-                        detail: {
-                            len: len,
-                            headerLen: headerLen,
-                            protover: protover,
-                            operation: operation,
-                            sequence: sequence,
-                            data: data
-                        }
-                    }));
-                    if (protover === 2 && !this.unzip) continue;
-                    const dataV = new DataView(data);
-                    switch (operation) {
-                        case 3:
-                            {
-                                const num = dataV.getUint32(0); // 在线人数
-                                this.dispatchEvent(new CustomEvent('heartbeat', {
-                                    detail: {
-                                        num: num
-                                    }
-                                }));
-                                break;
-                            }
-                        case 5:
-                            {
-                                let str = BAPI.DanmuWebSocket.uintToString(new Uint8Array(body));
-                                let cmdEvent = (obj, str) => {
-                                    this.dispatchEvent(new CustomEvent('cmd', {
-                                        detail: {
-                                            obj: obj,
-                                            str: str
-                                        }
-                                    }));
-                                }
-                                let strList = str.split(/[\x00-\x1f]+/);
-                                strList.forEach(s => { if (s.length >= 5) { cmdEvent(JSON.parse(s), s) } });
-                                break;
-                            }
-                        case 8:
-                            this.dispatchEvent(new CustomEvent('login'));
-                            break;
-                    }
-                }
-            });
-        }
-        close(code, reason) {
-            this.closed = true;
-            super.close(code, reason);
-        }
-        setUnzip(fn) {
-            this.unzip = fn;
-        }
-        bind(onreconnect = undefined, onlogin = undefined, onheartbeat = undefined, oncmd = undefined, onreceive = undefined) {
-            /*
-            参数说明
-            onreconnect(DanmuWebSocket) // 必要，DanmuWebSocket为新的
-            onlogin()
-            onheartbeat(number)
-            oncmd(object, string)
-            onreceive(number, number, number, number, number, arraybuffer)
-            */
-            if (typeof onreconnect === 'function') {
-                this.addEventListener('reconnect', (event) => {
-                    onreconnect.call(this, event.detail.ws);
-                });
-                this.handlers.reconnect.push(onreconnect);
-            }
-            if (typeof onlogin === 'function') {
-                this.addEventListener('login', () => {
-                    onlogin.call(this);
-                });
-                this.handlers.login.push(onlogin);
-            }
-            if (typeof onheartbeat === 'function') {
-                this.addEventListener('heartbeat', (event) => {
-                    onheartbeat.call(this, event.detail.num);
-                });
-                this.handlers.heartbeat.push(onheartbeat);
-            }
-            if (typeof oncmd === 'function') {
-                this.addEventListener('cmd', (event) => {
-                    oncmd.call(this, event.detail.obj, event.detail.str);
-                });
-                this.handlers.cmd.push(oncmd);
-            }
-            if (typeof onreceive === 'function') {
-                this.addEventListener('receive', (event) => {
-                    onreceive.call(this, event.detail.len, event.detail.headerLen, event.detail.protover, event.detail.operation, event.detail.sequence, event.detail.data);
-                });
-                this.handlers.receive.push(onreceive);
-            }
-        }
-        sendData(data, protover, operation, sequence) {
-            if (this.readyState !== WebSocket.OPEN) throw new Error('DanmuWebSocket未连接');
-            switch (Object.prototype.toString.call(data)) {
-                case '[object Object]':
-                    return this.sendData(JSON.stringify(data), protover, operation, sequence);
-                case '[object String]':
-                    {
-                        let dataUint8Array = BAPI.DanmuWebSocket.stringToUint(data);
-                        let buffer = new ArrayBuffer(BAPI.DanmuWebSocket.headerLength + dataUint8Array.byteLength);
-                        let dv = new DataView(buffer);
-                        dv.setUint32(0, BAPI.DanmuWebSocket.headerLength + dataUint8Array.byteLength);
-                        dv.setUint16(4, BAPI.DanmuWebSocket.headerLength);
-                        dv.setUint16(6, parseInt(protover, 10));
-                        dv.setUint32(8, parseInt(operation, 10));
-                        dv.setUint32(12, parseInt(sequence, 10));
-                        for (let i = 0; i < dataUint8Array.byteLength; ++i) {
-                            dv.setUint8(BAPI.DanmuWebSocket.headerLength + i, dataUint8Array[i]);
-                        }
-                        this.send(buffer);
-                    }
-                    return this;
-                default:
-                    this.send(data);
-            }
-            return this;
-        }
-        sendLoginPacket(uid, roomid) {
-            // 总字节长度 int(4bytes) + 头字节长度 short(2bytes) + 00 01 + 00 00 00 07 + 00 00 00 01 + Data 登录数据包
-            const data = {
-                'uid': parseInt(uid, 10),
-                'roomid': parseInt(roomid, 10),
-                'protover': 2,
-                'platform': 'web',
-                'clientver': '1.8.5',
-                'type': 2,
-                'key': this.token
-            };
-            return this.sendData(data, 1, 7, 1);
-        }
-        sendHeartBeatPacket() {
-            // 总字节长度 int(4bytes) + 头字节长度 short(2bytes) + 00 01 + 00 00 00 02 + 00 00 00 01 + Data 心跳数据包
-            return this.sendData('[object Object]', 1, 2, 1);
         }
     },
     sendLiveDanmu: (msg, roomid, color = '16777215', fontsize = '25', mode = '1', bubble = '0') => {
@@ -1899,5 +1675,3 @@ var BAPI = {
         }
     }
 }
-
-BAPI.DanmuWebSocket.headerLength = 16;
