@@ -822,12 +822,16 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "修复获取部分粉丝勋章的小心心出错的Bug，跳过无法获取小心心的粉丝勋章。",
-              "优化自动送礼出错时的错误处理。",
-              "【红包抽奖】新增从已关注的开播直播间获取红包抽奖数据。",
-              "<strong>【awpush】awpush已支持红包抽奖。</strong>",
-              "检索天选时刻或红包抽奖时能获取到另一种抽奖的数据并参加。",
-              "优化了同时参与天选时刻和红包抽奖时容易风控的问题，采用新的抽奖数据检索策略，请点击【参与天选时刻抽奖】和【参与直播红包抽奖】后的小问号查看新的策略并调整您的脚本设置。",
+              "库文件 cdn 换源，解决部分用户无法加载依赖的问题。",
+              "【购买粉丝勋章】优化，脚本在充电前会检查该直播间是否有粉丝勋章。",
+              "库文件 bliveproxy 升级，修复【弹幕修改】的一些问题。",
+              "重写了 B 站弹幕库 DanmuWebSocket，连接其他直播间的弹幕 WebSocket 时可以获得更全面的信息。",
+              `新功能：检查弹幕是否发送失败、感谢${linkMsg('https://github.com/XiaoMiku01', XiaoMiku01)}提供的帮助。`,
+              "修复【手动发弹幕前自动佩戴当前房间勋章】无法正确显示勋章样式的问题。",
+              "新功能：自动完成点赞、分享直播间，观看 30 分钟直播的任务。",
+              "优化每日任务和直播间任务的缓存逻辑，因页面关闭中断后能在下次打开页面时再次运行。",
+              "修复 awpush 无法正常重连的 Bug；修复 awpush 会在 CONNECTING 状态发送消息导致报错的 Bug。",
+              `BLTH-server 完善了红包抽奖帮助文档。如果有兴趣做第三方接入的话可以看看${linkMsg('https://andywang.top:3001/docs/#/', 'API文档。')}`
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -1432,7 +1436,7 @@
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "通过给UP充电，消耗5B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
-          Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，该功能可能会无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>B站随时可以通过热更新使该功能失效。</mli></mul>",
+          Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，该功能可能会无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>如果主播没有设置直播分区，该任务无法完成。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
           GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
@@ -2936,6 +2940,7 @@
             for (let i = 0; i < likeTimes; i++) {
               for (const medal of fansMedalList) {
                 await BAPI.xlive.likeInteract(medal.real_roomid).then((response) => {
+                  MYDEBUG(`API.xlive.likeInteract(${medal.real_roomid}) response`, response);
                   if (response.code !== 0) window.toast(`[点赞直播间] 直播间${medal.real_roomid}点赞失败 ${response.message}`, 'caution');
                 });
                 await sleep(200)
@@ -5383,8 +5388,7 @@
         },
         /** 自定义消息发送 - 压缩 */
         desend: function (...arg) {
-          let ws = MY_API.AWPUSH.ws;
-          if (ws) MY_API.AWPUSH.ws.send(pako.deflate(arg[0]));
+          if (MY_API.AWPUSH.status === 'open') MY_API.AWPUSH.ws.send(pako.deflate(arg[0]));
           else MYERROR('awpush 暂时无法发送消息, 等待重连...');
         },
         heartBeat: {

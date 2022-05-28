@@ -5,7 +5,7 @@ const { exec } = require('child_process');
 const iconv = require('iconv-lite');
 
 let str = "";
-process.stdout.write('【转换为数组字符串格式】\n请输入README中的更新内容字符串（1.xxx。2.xxx。3.xxx。）:\n');
+process.stdout.write('【转换为数组字符串格式】\n请输入update-log中的更新内容字符串（1.xxx。2.xxx。3.xxx。）:\n');
 process.stdin.setEncoding('utf8');
 process.stdin.on('readable', () => {
   let chunk = process.stdin.read();
