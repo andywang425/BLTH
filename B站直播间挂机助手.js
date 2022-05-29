@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.8.1
+// @version        5.8.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -39,11 +39,11 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
 // @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@fc6e16aca319fa0dc1c45c0fa9f1611da26d4f4c/assets/js/library/DanmuWebSocket.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@1cf399f9b6f93a842c8bae3097bae7c464a2c769/assets/js/library/DanmuWebSocket.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@fc6e16aca319fa0dc1c45c0fa9f1611da26d4f4c/assets/html/main.min.html
+// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@61966d45b7970b6c8971a050667937a11b04640f/assets/html/main.min.html
 // @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -227,7 +227,6 @@
     secondsSendBtnClickable = true, // seconds qq 推送
     getFollowBtnClickable = true,
     unFollowBtnClickable = true,
-    mainSiteTasksBtnClickable = true,
     danmuTaskRunning = false,
     medalDanmuRunning = false,
     hasWornMedal = false,
@@ -286,9 +285,9 @@
   if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate || SP_CONFIG.wear_medal_before_danmu || SP_CONFIG.AUTO_CHECK_DANMU) {
     W.fetch = (...arg) => {
       if (SP_CONFIG.blockLiveStream && arg[0].includes('bilivideo')) {
-        return $.Deferred().resolve();
+        return new Promise((resolve, reject) => { });
       } else if (SP_CONFIG.blockliveDataUpdate && arg[0].includes("data.bilibili.com/gol/postweb")) {
-        return $.Deferred().resolve();
+        return {};
       } else if (arg[0].includes('//api.live.bilibili.com/msg/send')) {
         if (SP_CONFIG.AUTO_CHECK_DANMU) {
           danmuEmitter.emit('danmu', arg[1].data.msg);
@@ -539,8 +538,6 @@
         COIN_UID: ['0'], // 投币up主
         COIN2SILVER: false, // 银币换银瓜子
         COIN2SILVER_NUM: 1, // 银币换银瓜子，硬币数量
-        SECONDS_NOTICE: false, // SECONDS QQ 推送
-        SECONDS_QQ: '请输入你的QQ号', // seconds qq号
         DANMU_CONTENT: ["这是一条弹幕"], // 弹幕内容
         DANMU_ROOMID: ["22474988"], // 发弹幕房间号
         DANMU_INTERVAL_TIME: ["10m"], // 弹幕发送时间
@@ -564,6 +561,7 @@
         LIVE_SIGN: true, // 直播区签到
         LOGIN: true, // 主站登陆
         LIKE_LIVEROOM: false, // 点赞直播间
+        LIKE_LIVEROOM_INTERVAL: 400, // 点赞间隔（毫秒）
         MEDAL_DANMU_ROOM: ["0"], // 打卡弹幕房间列表
         MEDAL_DANMU_METHOD: "MEDAL_DANMU_BLACK", // 打卡弹幕发送方式
         MEDAL_DANMU_INTERVAL: 2, // 打卡弹幕发送间隔（秒）
@@ -572,7 +570,7 @@
         MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: true, // 实物抽奖忽略存疑抽奖
         MEDAL_DANMU: false, // 粉丝勋章打卡弹幕
         MATERIAL_LOTTERY_REM: 10, // 每次检查aid数量
-        MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "(￣3￣)", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄", "←◡←"], // 粉丝勋章打卡弹幕内容
+        MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄", "←◡←"], // 粉丝勋章打卡弹幕内容
         PP_NOTICE: false, // 推送加开关
         PP_token: "token", // 推送加 token
         PLATE_ACTIVITY: false, // 转盘抽奖
@@ -604,8 +602,11 @@
         RESERVE_ACTIVITY_IGNORE_BLACKLIST: false, // 预约抽奖忽略关键字
         RESERVE_ACTIVITY_BLACKLIST_WORD: ['测试', '钓鱼'], // 预约抽奖屏蔽词
         SEND_ALL_GIFT: false, // 送满全部勋章
+        SECONDS_NOTICE: false, // SECONDS QQ 推送
+        SECONDS_QQ: '请输入你的QQ号', // seconds qq号
         SHARE: true, // 分享
         SHARE_LIVEROOM: false, // 分享直播间
+        SHARE_LIVEROOM_INTERVAL: 400, // 分享间隔（毫秒）
         SILVER2COIN: false, // 银瓜子换硬币
         ServerTurbo_NOTICE: false, // Server酱·Turbo版
         ServerTurbo_SendKey: "SendKey", // Server酱·Turbo版SendKey
@@ -619,13 +620,21 @@
         TIME_RELOAD_MINUTE: 120, // 直播间重载时间
         UPDATE_TIP: true, //更新提示
         WATCH: true, // 观看视频
-        Watch30min: false // 观看30分钟
+        Watch30min: false, // 观看30分钟
+        Watch30minInterval: 400, // 观看30分钟每两次心跳的间隔
       },
       CACHE_DEFAULT: {
         AUTO_SEND_DANMU_TS: [], // 弹幕发送
         AUTO_GROUP_SIGH_TS: 0, // 应援团签到
-        DailyReward_TS: 0, // 每日任务
-        LiveReward_TS: 0, // 直播每日任务
+        MainSite_login_TS: 0, // 登录
+        MainSite_watch_TS: 0, // 观看视频
+        MainSite_coin_TS: 0, // 投币
+        MainSite_share_TS: 0, // 分享视频
+        Live_sign_TS: 0, // 直播签到
+        Live_like_TS: 0, // 点赞
+        Live_share_TS: 0, // 分享
+        Live_watch_TS: 0, // 观看30分钟
+        Live_medalDanmu_TS: 0, // 粉丝勋章打卡弹幕
         Silver2Coin_TS: 0, // 银瓜子换硬币
         Coin2Sliver_TS: 0, // 硬币换银瓜子
         Gift_TS: 0, // 自动送礼（定时）
@@ -633,7 +642,6 @@
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0, // 天选时刻
         last_aid: 881, // 实物抽奖最后一个有效aid
-        MedalDanmu_TS: 0, //粉丝勋章打卡
         PlateActivity_TS: 0, // 转盘抽奖
         ReserveActivity_TS: 0, // 直播预约抽奖
         NextVipPrivilege_TS: 0 // 领取大会员权益
@@ -822,16 +830,14 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "库文件 cdn 换源，解决部分用户无法加载依赖的问题。",
-              "【购买粉丝勋章】优化，脚本在充电前会检查该直播间是否有粉丝勋章。",
-              "库文件 bliveproxy 升级，修复【弹幕修改】的一些问题。",
-              "重写了 B 站弹幕库 DanmuWebSocket，连接其他直播间的弹幕 WebSocket 时可以获得更全面的信息。",
-              `新功能：检查弹幕是否发送失败、感谢${linkMsg('https://github.com/XiaoMiku01', 'XiaoMiku01')}提供的帮助。`,
-              "修复【手动发弹幕前自动佩戴当前房间勋章】无法正确显示勋章样式的问题。",
-              "新功能：自动完成点赞、分享直播间，观看 30 分钟直播的任务。",
-              "优化每日任务和直播间任务的缓存逻辑，因页面关闭中断后能在下次打开页面时再次运行。",
-              "修复 awpush 无法正常重连的 Bug；修复 awpush 会在 CONNECTING 状态发送消息导致报错的 Bug。",
-              `BLTH-server 完善了红包抽奖帮助文档。如果有兴趣做第三方接入的话可以看看${linkMsg('https://andywang.top:3001/docs/#/', 'API文档。')}`
+              "解决了开启【拦截直播流】或者【拦截直播观看数据上报】后 B 站 js 反复重试导致控制台出现大量 B 站 js 报错的问题，减少资源消耗。",
+              "修复【红包抽奖】在重连 B 站直播弹幕 WebSocket 时会报错的 Bug。",
+              "调整了【每日任务设置】的 UI。",
+              "【每日任务设置】中每一项任务现在都拥有独立的缓存，勾选新的任务后刷新页面即可生效，也避免的重复运行的问题。",
+              "【每日任务设置】增加了各个任务板块的重置缓存功能。",
+              "更好地适配 B 站深色模式。",
+              "减少右上角提示信息的数量。",
+              "修复【天选时刻】【红包抽奖】从链接中提取房间号出错导致部分功能失效的Bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -888,29 +894,36 @@
         MY_API.CACHE = MY_API.CACHE_DEFAULT;
         MY_API.saveConfig();
         MY_API.saveCache();
-        mymsg('配置和CACHE已重置为默认。3秒后刷新页面', { icon: 1 });
-        setTimeout(() => {
-          W.location.reload()
-        }, 3000);
+        mymsg('配置和缓存已重置为默认，请刷新页面使配置生效。', { icon: 1 });
       },
-      ReDoAllTasks: () => {
-        window.toast('3秒后再次执行所有任务', 'info');
-        const taskList = [
-          function () { MY_API.CACHE = MY_API.CACHE_DEFAULT },
-          MY_API.GroupSign.run, // 应援团签到
-          MY_API.DailyReward.run, // 每日任务
-          MY_API.LiveReward.run, // 直播每日任务
-          MY_API.Exchange.runS2C, // 银瓜子换硬币
-          MY_API.Exchange.runC2S, // 硬币换银瓜子
-          MY_API.Gift.run, // 送礼物
-          MY_API.Watch30min.run, // 观看30分钟
-          MY_API.MaterialObject.run, // 实物抽奖
-          MY_API.AnchorLottery.run, // 天选时刻
-          MY_API.MEDAL_DANMU.run, // 粉丝勋章打卡弹幕
-          MY_API.PLATE_ACTIVITY.run, // 转盘抽奖
-          MY_API.RESERVE_ACTIVITY.run // 预约抽奖
-        ];
-        runAllTasks(3000, 200, taskList);
+      resetCache: () => {
+        MY_API.CACHE = MY_API.CACHE_DEFAULT;
+        MY_API.saveCache();
+        mymsg('缓存已重置为默认，请刷新页面使配置生效。', { icon: 1 });
+      },
+      resetMainSiteTasksCache: () => {
+        MY_API.CACHE.MainSite_login_TS = 0;
+        MY_API.CACHE.MainSite_watch_TS = 0;
+        MY_API.CACHE.MainSite_coin_TS = 0;
+        MY_API.CACHE.MainSite_share_TS = 0;
+        MY_API.saveCache();
+        mymsg('主站每日任务缓存已重置为默认，请刷新页面使配置生效。', { icon: 1 });
+      },
+      resetLiveTasksCache: () => {
+        MY_API.CACHE.Live_sign_TS = 0;
+        MY_API.CACHE.Live_like_TS = 0;
+        MY_API.CACHE.Live_share_TS = 0;
+        MY_API.CACHE.Live_watch_TS = 0;
+        MY_API.CACHE.Live_medalDanmu_TS = 0;
+        MY_API.saveCache();
+        mymsg('直播任务缓存已重置为默认，请刷新页面使配置生效。', { icon: 1 });
+      },
+      resetOtherTasksCache: () => {
+        MY_API.CACHE.Silver2Coin_TS = 0;
+        MY_API.CACHE.Coin2Sliver_TS = 0;
+        MY_API.CACHE.AUTO_GROUP_SIGH_TS = 0;
+        MY_API.saveCache();
+        mymsg('其它任务缓存已重置为默认，请刷新页面使配置生效。', { icon: 1 });
       },
       loadGiftCount: () => { // 读取统计数量
         try {
@@ -1311,6 +1324,18 @@
           val = parseInt(div.find('[data-toggle="AUTO_CHECK_DANMU_TIMEOUT"] .num').val());
           if (isNaN(val) || val <= 0) return window.toast('[检查弹幕是否发送成功超时时间] 错误输入', 'caution');
           MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT = val;
+          // LIKE_LIVEROOM_INTERVAL
+          val = parseInt(div.find('[data-toggle="LIKE_LIVEROOM_INTERVAL"] .num').val());
+          if (isNaN(val) || val < 0) return window.toast('[直播点赞请求间隔] 错误输入', 'caution');
+          MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL = val;
+          // SHARE_LIVEROOM_INTERVAL
+          val = parseInt(div.find('[data-toggle="SHARE_LIVEROOM_INTERVAL"] .num').val());
+          if (isNaN(val) || val < 0) return window.toast('[直播分享请求间隔] 错误输入', 'caution');
+          MY_API.CONFIG.SHARE_LIVEROOM_INTERVAL = val;
+          // Watch30minInterval
+          val = parseInt(div.find('[data-toggle="Watch30minInterval"] .num').val());
+          if (isNaN(val) || val < 0) return window.toast('[观看30分钟直播心跳请求间隔] 错误输入', 'caution');
+          MY_API.CONFIG.Watch30minInterval = val;
           return MY_API.saveConfig();
         };
         const checkList = [
@@ -1434,7 +1459,7 @@
           MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名/抽奖规则中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "通过给UP充电，消耗5B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
-          btnArea: "<mul><mli>重置所有为默认：指将设置和任务执行时间缓存重置为默认。</mli><mli>再次执行所有任务，再次执行主站任务会使相关缓存重置为默认，可以在勾选了新的任务设置后使用。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
+          btnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置所有为默认：指将设置和缓存重置为默认。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
           Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，该功能可能会无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>如果主播没有设置直播分区，该任务无法完成。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
@@ -1510,7 +1535,11 @@
           AUTO_CHECK_DANMU: "检查你在当前直播间发送的弹幕是否发送成功。脚本向其它直播间发送的弹幕不在检测范围内。<mul><mli>这里的发送成功指的是你发送的弹幕对其他人可见。有时候表面上弹幕发送成功了，但实际上只有你自己能看见那条弹幕。</mli><mli>若弹幕疑似发送失败，则在右上角显示一条提示信息。</mli></mul>",
           AUTO_CHECK_DANMU_TIMEOUT: "弹幕被发送出去后开始计时，如果没有在超时时间内从当前直播间的webSocket中接收到之前所发送的弹幕则认为发送失败。",
           SHARE_LIVEROOM: "完成分享直播间5次的任务。<mul><mli>并不会真的分享到某处，只是调用接口直接完成任务。</mli></mul>",
-          LIKE_LIVEROOM: "完成点赞直播间3次的任务"
+          LIKE_LIVEROOM: "完成点赞直播间3次的任务",
+          LIKE_LIVEROOM_INTERVAL: "每两次点赞之间的间隔时间。<mul><mli>脚本的点赞方式是依次给每个粉丝勋章对应的直播间点一次赞，然后重复以上过程。</mli><mli>若间隔时间过短，部分点赞可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的点赞CD时间（大约是几秒钟），短时间内反复给一个直播间点赞只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
+          SHARE_LIVEROOM_INTERVAL: "每两次分享之间的间隔时间。<mul><mli>脚本的分享方式是依次把每个粉丝勋章对应的直播间分享一次，然后重复以上过程。</mli><mli>若间隔时间过短，部分分享可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的分享CD时间（大约是几秒钟），短时间内反复分享一个直播间只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
+          Watch30minInterval: "每两次心跳的间隔时间。<mul><mli>脚本会依次给每个粉丝勋章对应的直播间发心跳包，然后重复数次直到观看时间满30分钟为止。</mli><mli>若间隔时间过短可能会出错。</mli></mul>",
+          DailyTasksBtnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置缓存并刷新页面可以让脚本再次执行今天已经执行过的任务。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1540,6 +1569,9 @@
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').text(String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length) + '个');
               myDiv.find('div[data-toggle="RESERVE_ACTIVITY_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD.length + '个');
               // 显示输入框的值
+              myDiv.find('div[data-toggle="Watch30minInterval"] .num').val(MY_API.CONFIG.Watch30minInterval);
+              myDiv.find('div[data-toggle="SHARE_LIVEROOM_INTERVAL"] .num').val(String(MY_API.CONFIG.SHARE_LIVEROOM_INTERVAL));
+              myDiv.find('div[data-toggle="LIKE_LIVEROOM_INTERVAL"] .num').val(MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL);
               myDiv.find('div[data-toggle="AUTO_CHECK_DANMU_TIMEOUT"] .num').val(MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_DELAY"] .max').val(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_DELAY"] .min').val(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN);
@@ -1649,9 +1681,53 @@
                   mymsg('已取消', { time: 2000 });
                 })
               });
-              myDiv.find('button[data-action="redoAllTasks"]').click(() => {
-                // 重置每日任务状态
-                MY_API.ReDoAllTasks();
+              myDiv.find('button[data-action="resetCache"]').click(() => {
+                // 重置缓存 CACHE
+                const index = myconfirm(`<div style = "text-align:center">是否重置缓存为默认？</div>`, {
+                  title: '重置缓存',
+                  btn: ['是', '否']
+                }, function () {
+                  layer.close(index);
+                  MY_API.resetCache();
+                }, function () {
+                  mymsg('已取消', { time: 2000 });
+                })
+              });
+              myDiv.find('button[data-action="resetMainSiteTasksCache"]').click(() => {
+                // 重置主站任务缓存
+                const index = myconfirm(`<div style = "text-align:center">是否重置主站每日任务缓存为默认？</div>`, {
+                  title: '重置缓存',
+                  btn: ['是', '否']
+                }, function () {
+                  layer.close(index);
+                  MY_API.resetMainSiteTasksCache();
+                }, function () {
+                  mymsg('已取消', { time: 2000 });
+                })
+              });
+              myDiv.find('button[data-action="resetLiveTasksCache"]').click(() => {
+                // 重置直播区任务缓存
+                const index = myconfirm(`<div style = "text-align:center">是否重置直播区任务缓存为默认？</div>`, {
+                  title: '重置缓存',
+                  btn: ['是', '否']
+                }, function () {
+                  layer.close(index);
+                  MY_API.resetLiveTasksCache();
+                }, function () {
+                  mymsg('已取消', { time: 2000 });
+                })
+              });
+              myDiv.find('button[data-action="resetOtherTasksCache"]').click(() => {
+                // 重置主站任务缓存
+                const index = myconfirm(`<div style = "text-align:center">是否重置其它任务缓存为默认？</div>`, {
+                  title: '重置缓存',
+                  btn: ['是', '否']
+                }, function () {
+                  layer.close(index);
+                  MY_API.resetOtherTasksCache();
+                }, function () {
+                  mymsg('已取消', { time: 2000 });
+                })
               });
               myDiv.find('button[data-action="about"]').click(() => {
                 // 关于
@@ -2108,14 +2184,6 @@
                     layer.close(index);
                   });
               });
-              myDiv.find('button[data-action="mainSiteTasks"]').click(() => {
-                // 再次执行主站任务
-                if (mainSiteTasksBtnClickable) {
-                  mainSiteTasksBtnClickable = false;
-                  setTimeout(() => mainSiteTasksBtnClickable = true, 2000);
-                  MY_API.DailyReward.run(true);
-                }
-              });
               myDiv.find('button[data-action="edit_PP_SCKEY"]').click(() => {
                 // 编辑推送加 token
                 myprompt({
@@ -2478,7 +2546,13 @@
         }
         if (SP_CONFIG.darkMode) {
           layer.style(mainIndex, {
-            'background-color': '#1c1c1c'
+            'background-color': '#1c1c1c',
+            'color': '#a2a7ae'
+          });
+        } else {
+          layer.style(mainIndex, {
+            'background-color': 'white',
+            'color': 'black'
           });
         }
         // 添加隐藏/显示窗口按钮
@@ -2540,7 +2614,8 @@
               'background-color': '#1c1c1c'
             });
             layer.style(mainIndex, {
-              'background-color': '#1c1c1c'
+              'background-color': '#1c1c1c',
+              'color': '#a2a7ae'
             });
           } else {
             SP_CONFIG.darkMode = false;
@@ -2548,14 +2623,15 @@
               'background-color': '#f2f3f5'
             });
             layer.style(mainIndex, {
-              'background-color': 'white'
+              'background-color': 'white',
+              'color': 'black'
             });
           }
         }
         let webHtmlMutationObserver = new MutationObserver(webHtmlPropertyChange);
         webHtmlMutationObserver.observe(webHtml[0], { attributes: true });
         // 初次运行时tips
-        if (!MY_API.CACHE.DailyReward_TS) {
+        if (!MY_API.CACHE.MainSite_login_TS) {
           mytips('点我隐藏/显示控制面板', '#hiderbtn', {
             tips: 1
           });
@@ -2629,7 +2705,7 @@
             let p = $.Deferred();
             if (response.code === 0) {
               if (response.data.add_num > 0) { // || response.data.status === 1
-                window.toast(`[自动应援团签到]应援团(group_id=${obj.group_id},owner_uid=${obj.owner_uid})签到成功，当前勋章亲密度+${response.data.add_num}`, 'success');
+                MYDEBUG(`[自动应援团签到] 应援团(group_id=${obj.group_id},owner_uid=${obj.owner_uid})签到成功，当前勋章亲密度+${response.data.add_num}`);
                 p.resolve();
               }
               else if (response.data.add_num == 0) {
@@ -2658,19 +2734,21 @@
               runToday(() => MY_API.GroupSign.run(), 8, 1, '应援团签到');
               return $.Deferred().resolve();
             }
+            window.toast(`[应援团签到] 开始签到`, 'info');
             return MY_API.GroupSign.getGroups().then((list) => {
               for (const i of medal_info.medal_list) {
                 if (i.medal_level === 20 || i.medal_level === 40)
                   MY_API.GroupSign.fullLevalMedalUidList.push(i.target_id)
               }
               return MY_API.GroupSign.signInList(list).then(() => {
+                window.toast(`[应援团签到] 今日签到已完成`, 'success');
                 MY_API.CACHE.AUTO_GROUP_SIGH_TS = ts_ms();
                 MY_API.saveCache();
                 runTomorrow(() => MY_API.GroupSign.run(), 8, 1, '应援团签到');
                 return $.Deferred().resolve();
-              }, () => delayCall(() => MY_API.GroupSign.run()));
+              });
 
-            }, () => delayCall(() => MY_API.GroupSign.run()));
+            });
           } catch (err) {
             window.toast('[自动应援团签到]运行时出现异常，已停止', 'error');
             MYERROR(`自动应援团签到出错`, err);
@@ -2683,9 +2761,18 @@
         coin_exp: 0,
         login: () => {
           if (!MY_API.CONFIG.LOGIN) return $.Deferred().resolve();
+          if (!checkNewDay(MY_API.CACHE.MainSite_login_TS)) {
+            runMidnight(() => MY_API.DailyReward.login(), '主站任务 - 登录');
+            return $.Deferred().resolve();
+          }
           return BAPI.DailyReward.login().then((response) => {
             MYDEBUG('DailyReward.login: API.DailyReward.login');
-            if (response.code === 0) return window.toast('[自动每日奖励][每日登录]完成', 'success');
+            if (response.code === 0) {
+              window.toast('[自动每日奖励][每日登录]完成', 'success');
+              MY_API.CACHE.MainSite_login_TS = ts_ms();
+              MY_API.saveCache();
+              runMidnight(() => MY_API.DailyReward.login(), '主站任务 - 登录');
+            }
             else {
               window.toast(`[自动每日奖励][每日登录]失败 ${response.message}`, 'error');
               return delayCall(() => MY_API.DailyReward.login());
@@ -2694,10 +2781,15 @@
         },
         watch: (aid, cid) => {
           if (!MY_API.CONFIG.WATCH) return $.Deferred().resolve();
+          if (!checkNewDay(MY_API.CACHE.MainSite_watch_TS)) {
+            return $.Deferred().resolve();
+          }
           return BAPI.DailyReward.watch(aid, cid, Live_info.uid, ts_s()).then((response) => {
             MYDEBUG('DailyReward.watch: API.DailyReward.watch', response);
             if (response.code === 0) {
               window.toast(`[自动每日奖励][每日观看]完成(av=${aid})`, 'success');
+              MY_API.CACHE.MainSite_watch_TS = ts_ms();
+              MY_API.saveCache();
             } else {
               window.toast(`[自动每日奖励][每日观看]失败 aid=${aid}, cid=${cid} ${response.msg}`, 'error');
               return delayCall(() => MY_API.DailyReward.watch(aid, cid));
@@ -2706,8 +2798,13 @@
         },
         coin: (cards, n, i = 0, one = false) => {
           if (!MY_API.CONFIG.COIN) return $.Deferred().resolve();
+          if (!checkNewDay(MY_API.CACHE.MainSite_coin_TS)) {
+            return $.Deferred().resolve();
+          }
           if (MY_API.DailyReward.coin_exp >= MY_API.CONFIG.COIN_NUMBER * 10) {
             window.toast('[自动每日奖励][每日投币]今日投币已完成', 'info');
+            MY_API.CACHE.MainSite_coin_TS = ts_ms();
+            MY_API.saveCache();
             return $.Deferred().resolve();
           }
           if (i >= cards.length) {
@@ -2760,6 +2857,8 @@
           if (!MY_API.CONFIG.COIN) return $.Deferred().resolve();
           if (MY_API.DailyReward.coin_exp >= MY_API.CONFIG.COIN_NUMBER * 10) {
             window.toast('[自动每日奖励][每日投币]今日投币已完成', 'info');
+            MY_API.CACHE.MainSite_coin_TS = ts_ms();
+            MY_API.saveCache();
             return $.Deferred().resolve();
           }
           if (i >= vlist.length) {
@@ -2813,6 +2912,9 @@
         },
         share: (aid) => {
           if (!MY_API.CONFIG.SHARE) return $.Deferred().resolve();
+          if (!checkNewDay(MY_API.CACHE.MainSite_share_TS)) {
+            return $.Deferred().resolve();
+          }
           return BAPI.DailyReward.share(aid).then((response) => {
             MYDEBUG('DailyReward.share: API.DailyReward.share', response);
             if (response.code === 0) {
@@ -2824,9 +2926,24 @@
               window.toast(`[自动每日奖励][每日分享] 出错 ${response.msg}`, 'caution');
               return delayCall(() => MY_API.DailyReward.share(aid));
             }
+            MY_API.CACHE.MainSite_share_TS = ts_ms();
+            MY_API.saveCache();
           });
         },
         dynamic: async () => {
+          if (!MY_API.CONFIG.COIN && !MY_API.CONFIG.WATCH && !MY_API.CONFIG.SHARE)
+            return $.Deferred().resolve();
+          if ((!MY_API.CONFIG.WATCH || (MY_API.CONFIG.WATCH && !checkNewDay(MY_API.CACHE.MainSite_watch_TS))) && (!MY_API.CONFIG.SHARE || (MY_API.CONFIG.SHARE && !checkNewDay(MY_API.CACHE.MainSite_share_TS))) && (!MY_API.CONFIG.COIN || (MY_API.CONFIG.COIN && !checkNewDay(MY_API.CACHE.MainSite_coin_TS))))
+            return runMidnight(() => MY_API.DailyReward.dynamic(), `主站任务 - ${MY_API.CONFIG.WATCH ? '观看视频' : ''} ${MY_API.CONFIG.SHARE ? '分享视频' : ''} ${MY_API.CONFIG.COIN ? '投币' : ''}`);
+          MY_API.DailyReward.coin_exp = await BAPI.DailyReward.exp().then((response) => {
+            MYDEBUG('DailyReward.run: API.DailyReward.exp', response);
+            if (response.code === 0) {
+              return response.number;
+            } else {
+              window.toast(`[自动每日奖励] 获取今日已获得的投币经验出错 ${response.message}`, 'caution');
+              return delayCall(() => MY_API.DailyReward.run());
+            }
+          });
           const coinNum = MY_API.CONFIG.COIN_NUMBER - MY_API.DailyReward.coin_exp / 10;
           const throwCoinNum = await BAPI.getuserinfo().then((re) => {
             MYDEBUG('DailyReward.dynamic: API.getuserinfo', re);
@@ -2851,7 +2968,7 @@
                   p2 = MY_API.DailyReward.UserSpace(0, 30, 0, 1, '', 'pubdate', 'jsonp');
                 }
                 const p3 = MY_API.DailyReward.share(obj.aid);
-                return $.when(p1, p2, p3);
+                return $.when(p1, p2, p3).then(() => runMidnight(() => MY_API.DailyReward.dynamic(), `主站任务 - ${MY_API.CONFIG.WATCH ? '观看视频' : ''} ${MY_API.CONFIG.SHARE ? '分享视频' : ''} ${MY_API.CONFIG.COIN ? '投币' : ''}`));
               } else {
                 window.toast('[自动每日奖励]"动态-投稿视频"中暂无动态', 'info');
               }
@@ -2862,6 +2979,9 @@
           });
         },
         UserSpace: (uidIndex, ps, tid, pn, keyword, order, jsonp) => {
+          if (!checkNewDay(MY_API.CACHE.MainSite_coin_TS)) {
+            return $.Deferred().resolve();
+          }
           return BAPI.x.getUserSpace(MY_API.CONFIG.COIN_UID[uidIndex], ps, tid, pn, keyword, order, jsonp).then((response) => {
             MYDEBUG('DailyReward.UserSpace: API.dynamic_svr.UserSpace', response);
             if (response.code === 0) {
@@ -2881,40 +3001,16 @@
             }
           });
         },
-        run: (forceRun = false) => {
-          try {
-            if ((!MY_API.CONFIG.LOGIN && !MY_API.CONFIG.COIN && !MY_API.CONFIG.WATCH) || otherScriptsRunning) return $.Deferred().resolve();
-            if (!checkNewDay(MY_API.CACHE.DailyReward_TS) && !forceRun) {
-              // 同一天，不执行每日任务
-              runMidnight(() => MY_API.DailyReward.run(), '每日任务');
-              return $.Deferred().resolve();
-            }
-            return BAPI.DailyReward.exp().then((response) => {
-              MYDEBUG('DailyReward.run: API.DailyReward.exp', response);
-              if (response.code === 0) {
-                MY_API.DailyReward.coin_exp = response.number;
-                const p1 = MY_API.DailyReward.login();
-                const p2 = MY_API.DailyReward.dynamic();
-                $.when(p1, p2).then(() => {
-                  MY_API.CACHE.DailyReward_TS = ts_ms();
-                  MY_API.saveCache();
-                  runMidnight(() => MY_API.DailyReward.run(), '每日任务');
-                });
-              } else {
-                window.toast(`[自动每日奖励] 获取今日已获得的投币经验出错 ${response.message}`, 'caution');
-                return delayCall(() => MY_API.DailyReward.run());
-              }
-            });
-          } catch (err) {
-            window.toast('[自动每日奖励]运行时出现异常', 'error');
-            MYERROR(`自动每日奖励出错`, err);
-            return $.Deferred().reject();
-          }
+        run: () => {
+          if ((!MY_API.CONFIG.LOGIN && !MY_API.CONFIG.COIN && !MY_API.CONFIG.WATCH && !MY_API.CONFIG.SHARE) || otherScriptsRunning) return $.Deferred().resolve();
+          MY_API.DailyReward.login();
+          MY_API.DailyReward.dynamic();
         }
       },
       LiveReward: {
         dailySignIn: () => {
           if (!MY_API.CONFIG.LIVE_SIGN) return $.Deferred().resolve();
+          if (!checkNewDay(MY_API.CACHE.Live_sign_TS)) return runMidnight(() => MY_API.LiveReward.dailySignIn(), '直播区 - 直播签到');
           return BAPI.xlive.dosign().then((response) => {
             MYDEBUG('LiveReward.dailySignIn: API.xlive.dosign', response);
             if (response.code === 0) {
@@ -2928,10 +3024,14 @@
               $('.checkin-btn').click();
               return delayCall(() => MY_API.LiveReward.dailySignIn());
             }
+            MY_API.CACHE.Live_sign_TS = ts_ms();
+            MY_API.saveCache();
+            runMidnight(() => MY_API.LiveReward.dailySignIn(), '直播区 - 直播签到');
           });
         },
         likeLiveRoom: async () => {
           if (!MY_API.CONFIG.LIKE_LIVEROOM) return $.Deferred().resolve();
+          if (!checkNewDay(MY_API.CACHE.Live_like_TS)) return runMidnight(() => MY_API.LiveReward.likeLiveRoom(), '直播区 - 点赞');
           const likeTimes = 5;
           window.toast('[点赞直播间] 开始点赞直播间', 'info');
           if (medal_info.status.state() === "resolved") {
@@ -2942,11 +3042,13 @@
                   MYDEBUG(`API.xlive.likeInteract(${medal.real_roomid}) response`, response);
                   if (response.code !== 0) window.toast(`[点赞直播间] 直播间${medal.real_roomid}点赞失败 ${response.message}`, 'caution');
                 });
-                await sleep(200)
+                await sleep(MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL);
               }
-              if (i < likeTimes - 1) await sleep(3000);
             }
             window.toast('[点赞直播间] 今日点赞完成', 'success');
+            MY_API.CACHE.Live_like_TS = ts_ms();
+            MY_API.saveCache();
+            runMidnight(() => MY_API.LiveReward.likeLiveRoom(), '直播区 - 点赞');
           } else {
             window.toast('[观看30分钟直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
             return medal_info.status.then(() => MY_API.LiveReward.Watch30min());
@@ -2954,20 +3056,24 @@
         },
         shareLiveRoom: async () => {
           if (!MY_API.CONFIG.SHARE_LIVEROOM) return $.Deferred().resolve();
+          if (!checkNewDay(MY_API.CACHE.Live_share_TS)) return runMidnight(() => MY_API.LiveReward.shareLiveRoom(), '直播区 - 分享');
+          window.toast('[分享直播间] 开始分享', 'info');
           const shareTimes = 5;
           if (medal_info.status.state() === "resolved") {
             const medal_list = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
             for (let i = 0; i < shareTimes; i++) {
               for (const medal of medal_list) {
                 await BAPI.xlive.trigerInteract(medal.real_roomid).then(response => {
-                  MYDEBUG('DailyReward.shareLiveRoom: API.xlive.trigerInteract', response);
+                  MYDEBUG(`DailyReward.shareLiveRoom: API.xlive.trigerInteract(${medal.real_roomid}) response`, response);
                   if (response.code !== 0) window.toast(`[分享直播间] 直播间${medal.real_roomid}分享直播间失败 ${response.message}`, 'caution');
                 });
-                await sleep(100);
+                await sleep(MY_API.CONFIG.SHARE_LIVEROOM_INTERVAL);
               }
-              if (i < shareTimes - 1) await sleep(5000);
             }
             window.toast(`[分享直播间] 今日分享直播间完成`, 'success');
+            MY_API.CACHE.Live_share_TS = ts_ms();
+            MY_API.saveCache();
+            runMidnight(() => MY_API.LiveReward.shareLiveRoom(), '直播区 - 分享');
           }
           else {
             window.toast('[分享直播间] 粉丝勋章列表未被完全获取，暂停运行', 'error');
@@ -2976,6 +3082,7 @@
         },
         Watch30min: async () => {
           if (!MY_API.CONFIG.Watch30min) return $.Deferred().resolve();
+          if (!checkNewDay(MY_API.CACHE.Live_watch_TS)) return runMidnight(() => MY_API.LiveReward.Watch30min(), '直播区 - 观看30分钟');
           window.toast('[观看30分钟直播] 开始模拟观看直播', 'info');
           if (medal_info.status.state() === "resolved") {
             let pReturn = $.Deferred();
@@ -2988,36 +3095,23 @@
                 window.toast('[观看30分钟直播] 今日观看任务已完成', 'success');
                 pReturn.resolve();
               }
-              await sleep(500);
+              await sleep(MY_API.CONFIG.Watch30minInterval);
             }
             await pReturn;
+            MY_API.CACHE.Live_watch_TS = ts_ms();
+            MY_API.saveCache();
+            runMidnight(() => MY_API.LiveReward.Watch30min(), '直播区 - 观看30分钟');
           } else {
             window.toast('[观看30分钟直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
             return medal_info.status.then(() => MY_API.LiveReward.Watch30min());
           }
         },
         run: () => {
-          try {
-            if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.SHARE_LIVEROOM && !MY_API.CONFIG.Watch30min && !MY_API.CONFIG.LIKE_LIVEROOM) || otherScriptsRunning) return $.Deferred().resolve();
-            if (!checkNewDay(MY_API.CACHE.LiveReward_TS)) {
-              // 同一天，不执行
-              runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
-              return $.Deferred().resolve();
-            }
-            const p1 = MY_API.LiveReward.dailySignIn();
-            const p2 = MY_API.LiveReward.shareLiveRoom();
-            const p3 = MY_API.LiveReward.Watch30min();
-            const p4 = MY_API.LiveReward.likeLiveRoom();
-            $.when(p1, p2, p3, p4).then(() => {
-              MY_API.CACHE.LiveReward_TS = ts_ms();
-              MY_API.saveCache();
-              runMidnight(() => MY_API.LiveReward.run(), '直播每日任务');
-            })
-          } catch (err) {
-            window.toast('[直播每日任务]运行时出现异常', 'error');
-            MYERROR(`直播每日任务出错`, err);
-            return $.Deferred().reject();
-          }
+          if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.SHARE_LIVEROOM && !MY_API.CONFIG.Watch30min && !MY_API.CONFIG.LIKE_LIVEROOM) || otherScriptsRunning) return $.Deferred().resolve();
+          MY_API.LiveReward.dailySignIn();
+          MY_API.LiveReward.shareLiveRoom();
+          MY_API.LiveReward.Watch30min();
+          MY_API.LiveReward.likeLiveRoom();
         }
       },
       Exchange: {
@@ -3595,9 +3689,9 @@
         medal_list: [],
         sendDanmu: async (danmuContent, roomId, medal_name) => {
           return BAPI.sendLiveDanmu(danmuContent, roomId).then((response) => {
-            MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，真实房间号【${roomId}】，粉丝勋章【${medal_name}】`, response);
-            if (response.code === 0 && response.message.length === 0) {
-              return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】发送成功，房间号【${roomId}】，粉丝勋章【${medal_name}】已点亮，当前亲密度+100`, 'success');
+            MYDEBUG(`API.sendLiveDanmu(弹幕 = ${danmuContent}, roomid = ${roomId})`, response);
+            if (response.code === 0) {
+              return MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，真实房间号【${roomId}】，粉丝勋章【${medal_name}】`, response);
             } else {
               return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】，粉丝勋章【${medal_name}】）出错 ${response.message}`, 'caution');
             }
@@ -3605,7 +3699,7 @@
         },
         run: async () => {
           if (!MY_API.CONFIG.MEDAL_DANMU || otherScriptsRunning) return $.Deferred().resolve();
-          if (!checkNewDay(MY_API.CACHE.MedalDanmu_TS)) {
+          if (!checkNewDay(MY_API.CACHE.Live_medalDanmu_TS)) {
             runMidnight(() => MY_API.MEDAL_DANMU.run(), '粉丝勋章打卡弹幕');
             return $.Deferred().resolve();
           }
@@ -3640,7 +3734,7 @@
           }
           medalDanmuRunning = false;
           window.toast('[粉丝牌打卡弹幕] 今日已完成', 'success');
-          MY_API.CACHE.MedalDanmu_TS = ts_ms();
+          MY_API.CACHE.Live_medalDanmu_TS = ts_ms();
           MY_API.saveCache();
           return runTomorrow(() => MY_API.MEDAL_DANMU.run(), 0, 2, '粉丝勋章打卡弹幕');
         }
@@ -6563,7 +6657,7 @@
    */
   function liveLink2Roomid(liveLink) {
     let result = liveLink.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/);
-    if (Array.isArray(roomidList) && roomidList.length >= 2) return Number(result[1]);
+    if (Array.isArray(result) && result.length >= 2) return Number(result[1]);
     else return false;
   }
   /**
@@ -7167,7 +7261,7 @@
    */
   function myprompt(obj, func) {
     if (SP_CONFIG.darkMode) {
-      if (obj.title) obj.title = '<span style="color:#f2f3f5;">' + obj.title + '</span>'
+      if (obj.title) obj.title = '<span style="color:#a2a7ae;">' + obj.title + '</span>'
     }
     let index = layer.prompt(obj, func);
     if (SP_CONFIG.darkMode) {
@@ -7187,7 +7281,8 @@
     let index = layer.msg(msg, obj);
     if (SP_CONFIG.darkMode) {
       layer.style(index, {
-        'background-color': '#1c1c1c'
+        'background-color': '#1c1c1c',
+        'color': '#a2a7ae'
       });
     }
     return index;
@@ -7199,12 +7294,13 @@
  */
   function myopen(obj) {
     if (SP_CONFIG.darkMode) {
-      if (obj.title) obj.title = '<span style="color:#f2f3f5;">' + obj.title + '</span>'
+      if (obj.title) obj.title = '<span style="color:#a2a7ae;">' + obj.title + '</span>'
     }
     let index = layer.open(obj);
     if (SP_CONFIG.darkMode) {
       layer.style(index, {
-        'background-color': '#1c1c1c'
+        'background-color': '#1c1c1c',
+        'color': '#a2a7ae'
       });
     }
     return index;
@@ -7218,12 +7314,13 @@
    */
   function myconfirm(msg, obj, ...func) {
     if (SP_CONFIG.darkMode) {
-      if (obj.title) obj.title = '<span style="color:#f2f3f5;">' + obj.title + '</span>'
+      if (obj.title) obj.title = '<span style="color:#a2a7ae;">' + obj.title + '</span>'
     }
     let index = layer.confirm(msg, obj, ...func);
     if (SP_CONFIG.darkMode) {
       layer.style(index, {
-        'background-color': '#1c1c1c'
+        'background-color': '#1c1c1c',
+        'color': '#a2a7ae'
       });
     }
     return index;
