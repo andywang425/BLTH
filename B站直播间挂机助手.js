@@ -43,7 +43,7 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.html
+// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@61966d45b7970b6c8971a050667937a11b04640f/assets/html/main.min.html
 // @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -830,16 +830,14 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "库文件 cdn 换源，解决部分用户无法加载依赖的问题。",
-              "【购买粉丝勋章】优化，脚本在充电前会检查该直播间是否有粉丝勋章。",
-              "库文件 bliveproxy 升级，修复【弹幕修改】的一些问题。",
-              "重写了 B 站弹幕库 DanmuWebSocket，连接其他直播间的弹幕 WebSocket 时可以获得更全面的信息。",
-              `新功能：检查弹幕是否发送失败、感谢${linkMsg('https://github.com/XiaoMiku01', 'XiaoMiku01')}提供的帮助。`,
-              "修复【手动发弹幕前自动佩戴当前房间勋章】无法正确显示勋章样式的问题。",
-              "新功能：自动完成点赞、分享直播间，观看 30 分钟直播的任务。",
-              "优化每日任务和直播间任务的缓存逻辑，因页面关闭中断后能在下次打开页面时再次运行。",
-              "修复 awpush 无法正常重连的 Bug；修复 awpush 会在 CONNECTING 状态发送消息导致报错的 Bug。",
-              `BLTH-server 完善了红包抽奖帮助文档。如果有兴趣做第三方接入的话可以看看${linkMsg('https://andywang.top:3001/docs/#/', 'API文档。')}`
+              "解决了开启【拦截直播流】或者【拦截直播观看数据上报】后 B 站 js 反复重试导致控制台出现大量 B 站 js 报错的问题，减少资源消耗。",
+              "修复【红包抽奖】在重连 B 站直播弹幕 WebScoket 时会报错的 Bug。",
+              "调整了【每日任务设置】的 UI。",
+              "【每日任务设置】中每一项任务现在都拥有独立的缓存，勾选新的任务后刷新页面即可生效，也避免的重复运行的问题。",
+              "【每日任务设置】增加了各个任务板块的重置缓存功能。",
+              "更好地适配 B 站深色模式。",
+              "减少右上角提示信息的数量。",
+              "修复【天选时刻】【红包抽奖】从链接中提取房间号出错导致部分功能失效的Bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -2736,19 +2734,21 @@
               runToday(() => MY_API.GroupSign.run(), 8, 1, '应援团签到');
               return $.Deferred().resolve();
             }
+            window.toast(`[应援团签到] 开始签到`, 'info');
             return MY_API.GroupSign.getGroups().then((list) => {
               for (const i of medal_info.medal_list) {
                 if (i.medal_level === 20 || i.medal_level === 40)
                   MY_API.GroupSign.fullLevalMedalUidList.push(i.target_id)
               }
               return MY_API.GroupSign.signInList(list).then(() => {
+                window.toast(`[应援团签到] 今日签到已完成`, 'success');
                 MY_API.CACHE.AUTO_GROUP_SIGH_TS = ts_ms();
                 MY_API.saveCache();
                 runTomorrow(() => MY_API.GroupSign.run(), 8, 1, '应援团签到');
                 return $.Deferred().resolve();
-              }, () => delayCall(() => MY_API.GroupSign.run()));
+              });
 
-            }, () => delayCall(() => MY_API.GroupSign.run()));
+            });
           } catch (err) {
             window.toast('[自动应援团签到]运行时出现异常，已停止', 'error');
             MYERROR(`自动应援团签到出错`, err);
@@ -6657,7 +6657,7 @@
    */
   function liveLink2Roomid(liveLink) {
     let result = liveLink.match(/^https?:\/\/live\.bilibili\.com\/(\d+)/);
-    if (Array.isArray(roomidList) && roomidList.length >= 2) return Number(result[1]);
+    if (Array.isArray(result) && result.length >= 2) return Number(result[1]);
     else return false;
   }
   /**
