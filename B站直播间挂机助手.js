@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.8.1
+// @version        5.8.2
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -39,7 +39,7 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
 // @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@fc6e16aca319fa0dc1c45c0fa9f1611da26d4f4c/assets/js/library/DanmuWebSocket.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@1cf399f9b6f93a842c8bae3097bae7c464a2c769/assets/js/library/DanmuWebSocket.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
@@ -227,7 +227,6 @@
     secondsSendBtnClickable = true, // seconds qq 推送
     getFollowBtnClickable = true,
     unFollowBtnClickable = true,
-    mainSiteTasksBtnClickable = true,
     danmuTaskRunning = false,
     medalDanmuRunning = false,
     hasWornMedal = false,
@@ -539,8 +538,6 @@
         COIN_UID: ['0'], // 投币up主
         COIN2SILVER: false, // 银币换银瓜子
         COIN2SILVER_NUM: 1, // 银币换银瓜子，硬币数量
-        SECONDS_NOTICE: false, // SECONDS QQ 推送
-        SECONDS_QQ: '请输入你的QQ号', // seconds qq号
         DANMU_CONTENT: ["这是一条弹幕"], // 弹幕内容
         DANMU_ROOMID: ["22474988"], // 发弹幕房间号
         DANMU_INTERVAL_TIME: ["10m"], // 弹幕发送时间
@@ -564,6 +561,7 @@
         LIVE_SIGN: true, // 直播区签到
         LOGIN: true, // 主站登陆
         LIKE_LIVEROOM: false, // 点赞直播间
+        LIKE_LIVEROOM_INTERVAL: 400, // 点赞间隔（毫秒）
         MEDAL_DANMU_ROOM: ["0"], // 打卡弹幕房间列表
         MEDAL_DANMU_METHOD: "MEDAL_DANMU_BLACK", // 打卡弹幕发送方式
         MEDAL_DANMU_INTERVAL: 2, // 打卡弹幕发送间隔（秒）
@@ -572,7 +570,7 @@
         MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: true, // 实物抽奖忽略存疑抽奖
         MEDAL_DANMU: false, // 粉丝勋章打卡弹幕
         MATERIAL_LOTTERY_REM: 10, // 每次检查aid数量
-        MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "(￣3￣)", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄", "←◡←"], // 粉丝勋章打卡弹幕内容
+        MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄", "←◡←"], // 粉丝勋章打卡弹幕内容
         PP_NOTICE: false, // 推送加开关
         PP_token: "token", // 推送加 token
         PLATE_ACTIVITY: false, // 转盘抽奖
@@ -604,8 +602,11 @@
         RESERVE_ACTIVITY_IGNORE_BLACKLIST: false, // 预约抽奖忽略关键字
         RESERVE_ACTIVITY_BLACKLIST_WORD: ['测试', '钓鱼'], // 预约抽奖屏蔽词
         SEND_ALL_GIFT: false, // 送满全部勋章
+        SECONDS_NOTICE: false, // SECONDS QQ 推送
+        SECONDS_QQ: '请输入你的QQ号', // seconds qq号
         SHARE: true, // 分享
         SHARE_LIVEROOM: false, // 分享直播间
+        SHARE_LIVEROOM_INTERVAL: 400, // 分享间隔（毫秒）
         SILVER2COIN: false, // 银瓜子换硬币
         ServerTurbo_NOTICE: false, // Server酱·Turbo版
         ServerTurbo_SendKey: "SendKey", // Server酱·Turbo版SendKey
@@ -619,7 +620,8 @@
         TIME_RELOAD_MINUTE: 120, // 直播间重载时间
         UPDATE_TIP: true, //更新提示
         WATCH: true, // 观看视频
-        Watch30min: false // 观看30分钟
+        Watch30min: false, // 观看30分钟
+        Watch30minInterval: 400, // 观看30分钟每两次心跳的间隔
       },
       CACHE_DEFAULT: {
         AUTO_SEND_DANMU_TS: [], // 弹幕发送
@@ -632,7 +634,7 @@
         Live_like_TS: 0, // 点赞
         Live_share_TS: 0, // 分享
         Live_watch_TS: 0, // 观看30分钟
-        Live_medalDanmu_TS: 0, // 打卡弹幕
+        Live_medalDanmu_TS: 0, // 粉丝勋章打卡弹幕
         Silver2Coin_TS: 0, // 银瓜子换硬币
         Coin2Sliver_TS: 0, // 硬币换银瓜子
         Gift_TS: 0, // 自动送礼（定时）
@@ -640,7 +642,6 @@
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0, // 天选时刻
         last_aid: 881, // 实物抽奖最后一个有效aid
-        MedalDanmu_TS: 0, //粉丝勋章打卡
         PlateActivity_TS: 0, // 转盘抽奖
         ReserveActivity_TS: 0, // 直播预约抽奖
         NextVipPrivilege_TS: 0 // 领取大会员权益
@@ -899,7 +900,32 @@
       },
       resetCache: () => {
         MY_API.CACHE = MY_API.CACHE_DEFAULT;
+        MY_API.saveCache();
         mymsg('缓存已重置为默认，请刷新页面使配置生效。', { icon: 1 });
+      },
+      resetMainSiteTasksCache: () => {
+        MY_API.CACHE.MainSite_login_TS = 0;
+        MY_API.CACHE.MainSite_watch_TS = 0;
+        MY_API.CACHE.MainSite_coin_TS = 0;
+        MY_API.CACHE.MainSite_share_TS = 0;
+        MY_API.saveCache();
+        mymsg('主站每日任务缓存已重置为默认，请刷新页面使配置生效。', { icon: 1 });
+      },
+      resetLiveTasksCache: () => {
+        MY_API.CACHE.Live_sign_TS = 0;
+        MY_API.CACHE.Live_like_TS = 0;
+        MY_API.CACHE.Live_share_TS = 0;
+        MY_API.CACHE.Live_watch_TS = 0;
+        MY_API.CACHE.Live_medalDanmu_TS = 0;
+        MY_API.saveCache();
+        mymsg('直播任务缓存已重置为默认，请刷新页面使配置生效。', { icon: 1 });
+      },
+      resetOtherTasksCache: () => {
+        MY_API.CACHE.Silver2Coin_TS = 0;
+        MY_API.CACHE.Coin2Sliver_TS = 0;
+        MY_API.CACHE.AUTO_GROUP_SIGH_TS = 0;
+        MY_API.saveCache();
+        mymsg('其它任务缓存已重置为默认，请刷新页面使配置生效。', { icon: 1 });
       },
       loadGiftCount: () => { // 读取统计数量
         try {
@@ -1300,6 +1326,18 @@
           val = parseInt(div.find('[data-toggle="AUTO_CHECK_DANMU_TIMEOUT"] .num').val());
           if (isNaN(val) || val <= 0) return window.toast('[检查弹幕是否发送成功超时时间] 错误输入', 'caution');
           MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT = val;
+          // LIKE_LIVEROOM_INTERVAL
+          val = parseInt(div.find('[data-toggle="LIKE_LIVEROOM_INTERVAL"] .num').val());
+          if (isNaN(val) || val < 0) return window.toast('[直播点赞请求间隔] 错误输入', 'caution');
+          MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL = val;
+          // SHARE_LIVEROOM_INTERVAL
+          val = parseInt(div.find('[data-toggle="SHARE_LIVEROOM_INTERVAL"] .num').val());
+          if (isNaN(val) || val < 0) return window.toast('[直播分享请求间隔] 错误输入', 'caution');
+          MY_API.CONFIG.SHARE_LIVEROOM_INTERVAL = val;
+          // Watch30minInterval
+          val = parseInt(div.find('[data-toggle="Watch30minInterval"] .num').val());
+          if (isNaN(val) || val < 0) return window.toast('[观看30分钟直播心跳请求间隔] 错误输入', 'caution');
+          MY_API.CONFIG.Watch30minInterval = val;
           return MY_API.saveConfig();
         };
         const checkList = [
@@ -1499,7 +1537,11 @@
           AUTO_CHECK_DANMU: "检查你在当前直播间发送的弹幕是否发送成功。脚本向其它直播间发送的弹幕不在检测范围内。<mul><mli>这里的发送成功指的是你发送的弹幕对其他人可见。有时候表面上弹幕发送成功了，但实际上只有你自己能看见那条弹幕。</mli><mli>若弹幕疑似发送失败，则在右上角显示一条提示信息。</mli></mul>",
           AUTO_CHECK_DANMU_TIMEOUT: "弹幕被发送出去后开始计时，如果没有在超时时间内从当前直播间的webSocket中接收到之前所发送的弹幕则认为发送失败。",
           SHARE_LIVEROOM: "完成分享直播间5次的任务。<mul><mli>并不会真的分享到某处，只是调用接口直接完成任务。</mli></mul>",
-          LIKE_LIVEROOM: "完成点赞直播间3次的任务"
+          LIKE_LIVEROOM: "完成点赞直播间3次的任务",
+          LIKE_LIVEROOM_INTERVAL: "每两次点赞之间的间隔时间。<mul><mli>脚本的点赞方式是依次给每个粉丝勋章对应的直播间点一次赞，然后重复以上过程。</mli><mli>若间隔时间过短，部分点赞可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的点赞CD时间（大约是几秒钟），短时间内反复给一个直播间点赞只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
+          SHARE_LIVEROOM_INTERVAL: "每两次分享之间的间隔时间。<mul><mli>脚本的分享方式是依次把每个粉丝勋章对应的直播间分享一次，然后重复以上过程。</mli><mli>若间隔时间过短，部分分享可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的分享CD时间（大约是几秒钟），短时间内反复分享一个直播间只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
+          Watch30minInterval: "每两次心跳的间隔时间。<mul><mli>脚本会依次给每个粉丝勋章对应的直播间发心跳包，然后重复数次直到观看时间满30分钟为止。</mli><mli>若间隔时间过短可能会出错。</mli></mul>",
+          DailyTasksBtnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置缓存并刷新页面可以让脚本再次执行今天已经执行过的任务。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1529,6 +1571,9 @@
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').text(String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length) + '个');
               myDiv.find('div[data-toggle="RESERVE_ACTIVITY_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD.length + '个');
               // 显示输入框的值
+              myDiv.find('div[data-toggle="Watch30minInterval"] .num').val(MY_API.CONFIG.Watch30minInterval);
+              myDiv.find('div[data-toggle="SHARE_LIVEROOM_INTERVAL"] .num').val(String(MY_API.CONFIG.SHARE_LIVEROOM_INTERVAL));
+              myDiv.find('div[data-toggle="LIKE_LIVEROOM_INTERVAL"] .num').val(MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL);
               myDiv.find('div[data-toggle="AUTO_CHECK_DANMU_TIMEOUT"] .num').val(MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_DELAY"] .max').val(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_DELAY"] .min').val(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MIN);
@@ -1646,6 +1691,42 @@
                 }, function () {
                   layer.close(index);
                   MY_API.resetCache();
+                }, function () {
+                  mymsg('已取消', { time: 2000 });
+                })
+              });
+              myDiv.find('button[data-action="resetMainSiteTasksCache"]').click(() => {
+                // 重置主站任务缓存
+                const index = myconfirm(`<div style = "text-align:center">是否重置主站每日任务缓存为默认？</div>`, {
+                  title: '重置缓存',
+                  btn: ['是', '否']
+                }, function () {
+                  layer.close(index);
+                  MY_API.resetMainSiteTasksCache();
+                }, function () {
+                  mymsg('已取消', { time: 2000 });
+                })
+              });
+              myDiv.find('button[data-action="resetLiveTasksCache"]').click(() => {
+                // 重置直播区任务缓存
+                const index = myconfirm(`<div style = "text-align:center">是否重置直播区任务缓存为默认？</div>`, {
+                  title: '重置缓存',
+                  btn: ['是', '否']
+                }, function () {
+                  layer.close(index);
+                  MY_API.resetLiveTasksCache();
+                }, function () {
+                  mymsg('已取消', { time: 2000 });
+                })
+              });
+              myDiv.find('button[data-action="resetOtherTasksCache"]').click(() => {
+                // 重置主站任务缓存
+                const index = myconfirm(`<div style = "text-align:center">是否重置其它任务缓存为默认？</div>`, {
+                  title: '重置缓存',
+                  btn: ['是', '否']
+                }, function () {
+                  layer.close(index);
+                  MY_API.resetOtherTasksCache();
                 }, function () {
                   mymsg('已取消', { time: 2000 });
                 })
@@ -2626,7 +2707,7 @@
             let p = $.Deferred();
             if (response.code === 0) {
               if (response.data.add_num > 0) { // || response.data.status === 1
-                window.toast(`[自动应援团签到]应援团(group_id=${obj.group_id},owner_uid=${obj.owner_uid})签到成功，当前勋章亲密度+${response.data.add_num}`, 'success');
+                MYDEBUG(`[自动应援团签到] 应援团(group_id=${obj.group_id},owner_uid=${obj.owner_uid})签到成功，当前勋章亲密度+${response.data.add_num}`);
                 p.resolve();
               }
               else if (response.data.add_num == 0) {
@@ -2850,7 +2931,6 @@
           });
         },
         dynamic: async () => {
-          // if ((!MY_API.CONFIG.WATCH || !checkNewDay(MY_API.CACHE.MainSite_watch_TS)) && (!MY_API.CONFIG.SHARE || !checkNewDay(MY_API.CACHE.MainSite_share_TS)) && (!MY_API.CONFIG.COIN || !checkNewDay(MY_API.CACHE.MainSite_coin_TS)))
           if (!MY_API.CONFIG.COIN && !MY_API.CONFIG.WATCH && !MY_API.CONFIG.SHARE)
             return $.Deferred().resolve();
           if ((!MY_API.CONFIG.WATCH || (MY_API.CONFIG.WATCH && !checkNewDay(MY_API.CACHE.MainSite_watch_TS))) && (!MY_API.CONFIG.SHARE || (MY_API.CONFIG.SHARE && !checkNewDay(MY_API.CACHE.MainSite_share_TS))) && (!MY_API.CONFIG.COIN || (MY_API.CONFIG.COIN && !checkNewDay(MY_API.CACHE.MainSite_coin_TS))))
@@ -2962,9 +3042,8 @@
                   MYDEBUG(`API.xlive.likeInteract(${medal.real_roomid}) response`, response);
                   if (response.code !== 0) window.toast(`[点赞直播间] 直播间${medal.real_roomid}点赞失败 ${response.message}`, 'caution');
                 });
-                await sleep(200)
+                await sleep(MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL);
               }
-              if (i < likeTimes - 1) await sleep(3000);
             }
             window.toast('[点赞直播间] 今日点赞完成', 'success');
             MY_API.CACHE.Live_like_TS = ts_ms();
@@ -2978,18 +3057,18 @@
         shareLiveRoom: async () => {
           if (!MY_API.CONFIG.SHARE_LIVEROOM) return $.Deferred().resolve();
           if (!checkNewDay(MY_API.CACHE.Live_share_TS)) return runMidnight(() => MY_API.LiveReward.shareLiveRoom(), '直播区 - 分享');
+          window.toast('[分享直播间] 开始分享', 'info');
           const shareTimes = 5;
           if (medal_info.status.state() === "resolved") {
             const medal_list = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
             for (let i = 0; i < shareTimes; i++) {
               for (const medal of medal_list) {
                 await BAPI.xlive.trigerInteract(medal.real_roomid).then(response => {
-                  MYDEBUG('DailyReward.shareLiveRoom: API.xlive.trigerInteract', response);
+                  MYDEBUG(`DailyReward.shareLiveRoom: API.xlive.trigerInteract(${medal.real_roomid}) response`, response);
                   if (response.code !== 0) window.toast(`[分享直播间] 直播间${medal.real_roomid}分享直播间失败 ${response.message}`, 'caution');
                 });
-                await sleep(100);
+                await sleep(MY_API.CONFIG.SHARE_LIVEROOM_INTERVAL);
               }
-              if (i < shareTimes - 1) await sleep(5000);
             }
             window.toast(`[分享直播间] 今日分享直播间完成`, 'success');
             MY_API.CACHE.Live_share_TS = ts_ms();
@@ -3016,7 +3095,7 @@
                 window.toast('[观看30分钟直播] 今日观看任务已完成', 'success');
                 pReturn.resolve();
               }
-              await sleep(500);
+              await sleep(MY_API.CONFIG.Watch30minInterval);
             }
             await pReturn;
             MY_API.CACHE.Live_watch_TS = ts_ms();
@@ -3610,9 +3689,9 @@
         medal_list: [],
         sendDanmu: async (danmuContent, roomId, medal_name) => {
           return BAPI.sendLiveDanmu(danmuContent, roomId).then((response) => {
-            MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，真实房间号【${roomId}】，粉丝勋章【${medal_name}】`, response);
-            if (response.code === 0 && response.message.length === 0) {
-              return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】发送成功，房间号【${roomId}】，粉丝勋章【${medal_name}】已点亮，当前亲密度+100`, 'success');
+            MYDEBUG(`API.sendLiveDanmu(弹幕 = ${danmuContent}, roomid = ${roomId})`, response);
+            if (response.code === 0) {
+              return MYDEBUG(`[粉丝牌打卡弹幕] 弹幕发送内容【${danmuContent}】，房间号【${roomId}】，真实房间号【${roomId}】，粉丝勋章【${medal_name}】`, response);
             } else {
               return window.toast(`[粉丝牌打卡弹幕] 弹幕【${danmuContent}】（房间号【${roomId}】，粉丝勋章【${medal_name}】）出错 ${response.message}`, 'caution');
             }
@@ -3620,7 +3699,7 @@
         },
         run: async () => {
           if (!MY_API.CONFIG.MEDAL_DANMU || otherScriptsRunning) return $.Deferred().resolve();
-          if (!checkNewDay(MY_API.CACHE.MedalDanmu_TS)) {
+          if (!checkNewDay(MY_API.CACHE.Live_medalDanmu_TS)) {
             runMidnight(() => MY_API.MEDAL_DANMU.run(), '粉丝勋章打卡弹幕');
             return $.Deferred().resolve();
           }
@@ -3655,7 +3734,7 @@
           }
           medalDanmuRunning = false;
           window.toast('[粉丝牌打卡弹幕] 今日已完成', 'success');
-          MY_API.CACHE.MedalDanmu_TS = ts_ms();
+          MY_API.CACHE.Live_medalDanmu_TS = ts_ms();
           MY_API.saveCache();
           return runTomorrow(() => MY_API.MEDAL_DANMU.run(), 0, 2, '粉丝勋章打卡弹幕');
         }

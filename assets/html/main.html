@@ -96,10 +96,22 @@
                                 <div data-toggle="LIVE_SIGN"><label><input type="checkbox">直播区签到 </label></div>
                                 <div data-toggle="LIKE_LIVEROOM"><label><input type="checkbox">点赞直播间 </label><span
                                                 helpdata="LIKE_LIVEROOM" class="clickableText helpText">?</span></div>
+                                <div data-toggle="LIKE_LIVEROOM_INTERVAL"><label class="lineStartSpace">点赞间隔
+                                                <input class="num blth_input" style="width:40px;" type="text">毫秒
+                                        </label><span helpdata="LIKE_LIVEROOM_INTERVAL"
+                                                class="clickableText helpText">?</span></div>
                                 <div data-toggle="SHARE_LIVEROOM"><label><input type="checkbox">分享直播间 </label><span
                                                 helpdata="SHARE_LIVEROOM" class="clickableText helpText">?</span></div>
+                                <div data-toggle="SHARE_LIVEROOM_INTERVAL"><label class="lineStartSpace">分享间隔
+                                                <input class="num blth_input" style="width:40px;" type="text">毫秒
+                                        </label><span helpdata="SHARE_LIVEROOM_INTERVAL"
+                                                class="clickableText helpText">?</span></div>
                                 <div data-toggle="Watch30min"><label><input type="checkbox">连续观看30分钟直播</label><span
                                                 helpdata="Watch30min" class="clickableText helpText">?</span></div>
+                                <div data-toggle="Watch30minInterval"><label class="lineStartSpace">心跳间隔
+                                                <input class="num blth_input" style="width:40px;" type="text">毫秒
+                                        </label><span helpdata="Watch30minInterval"
+                                                class="clickableText helpText">?</span></div>
                                 <div data-toggle="MEDAL_DANMU" style="color:blueviolet"><label><input
                                                         type="checkbox">粉丝勋章打卡弹幕
                                         </label><button class="blth_btn"
@@ -130,6 +142,12 @@
                                                 个(0-50) </label><span helpdata="COIN2SILVER"
                                                 class="clickableText helpText">?</span></div>
                                 <div data-toggle="AUTO_GROUP_SIGN"><label><input type="checkbox">应援团签到 </label></div>
+                        </div>
+                        <div>
+                                <button class="blth_btn" data-action="resetMainSiteTasksCache">重置主站任务缓存</button><button
+                                        class="blth_btn" data-action="resetLiveTasksCache">重置直播任务缓存</button><button
+                                        class="blth_btn" data-action="resetOtherTasksCache">重置其它任务缓存</button>
+                                <span helpdata="DailyTasksBtnArea" class="clickableText helpText">?</span>
                         </div>
                 </fieldset>
                 <fieldset class="blth_fs">
@@ -520,7 +538,7 @@
                         </div>
                         <div data-toggle="btnArea"><button data-action="reset" style="color:red;"
                                         class="blth_btn">重置所有为默认</button><button data-action="resetCache"
-                                        style="color:red;" class="blth_btn">重置缓存</button><br><button
+                                        style="color:red;" class="blth_btn">重置缓存</button><button
                                         data-action="exportConfig" class="blth_btn">导出配置</button><button
                                         data-action="importConfig" class="blth_btn">导入配置</button><input type="file"
                                         id="BLTH_config_file" style="display:none"><button class="blth_btn"
