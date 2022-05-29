@@ -71,52 +71,65 @@
                 </fieldset>
                 <fieldset class="blth_fs">
                         <legend>每日任务设置</legend>
-                        <div data-toggle="LOGIN"><label><input type="checkbox">登录 </label></div>
-                        <div data-toggle="WATCH"><label><input type="checkbox">观看视频 </label></div>
-                        <div data-toggle="COIN" style="color:blueviolet"><label><input type="checkbox">自动投币<input
-                                                class="coin_number blth_input" style="width:40px;" type="text">个(0-5)
-                                </label><span helpdata="COIN" class="clickableText helpText">?</span></div>
-                        <div data-toggle="COIN_TYPE">
-                                <div data-toggle="COIN_UID"><label class="lineStartSpace"><input type="radio"
-                                                        name="COIN_TYPE">给用户(UID:<input class="num blth_input"
-                                                        style="width:150px;" type="text">) 的视频投币</label>
-                                        <span helpdata="COIN_UID" class="clickableText helpText">?</span>
+                        <div><label>主站每日任务</label></div>
+                        <div class="lineStartSpace">
+                                <div data-toggle="LOGIN"><label><input type="checkbox">登录 </label></div>
+                                <div data-toggle="WATCH"><label><input type="checkbox">观看视频 </label></div>
+                                <div data-toggle="COIN" style="color:blueviolet"><label><input
+                                                        type="checkbox">自动投币<input class="coin_number blth_input"
+                                                        style="width:40px;" type="text">个(0-5)
+                                        </label><span helpdata="COIN" class="clickableText helpText">?</span></div>
+                                <div data-toggle="COIN_TYPE">
+                                        <div data-toggle="COIN_UID"><label class="lineStartSpace"><input type="radio"
+                                                                name="COIN_TYPE">给用户(UID:<input class="num blth_input"
+                                                                style="width:150px;" type="text">) 的视频投币</label>
+                                                <span helpdata="COIN_UID" class="clickableText helpText">?</span>
+                                        </div>
+                                        <div data-toggle="COIN_DYN"><label class="lineStartSpace"><input type="radio"
+                                                                name="COIN_TYPE">给动态中的的视频投币 </label></div>
                                 </div>
-                                <div data-toggle="COIN_DYN"><label class="lineStartSpace"><input type="radio"
-                                                        name="COIN_TYPE">给动态中的的视频投币 </label></div>
+                                <div data-toggle="SHARE"><label><input type="checkbox">分享视频 </label><span
+                                                helpdata="SHARE" class="clickableText helpText">?</span></div>
                         </div>
-                        <div data-toggle="SHARE"><label><input type="checkbox">分享视频 </label><span helpdata="SHARE"
-                                        class="clickableText helpText">?</span></div>
-                        <div data-toggle="SILVER2COIN"><label><input type="checkbox">银瓜子换硬币 </label><span
-                                        helpdata="SILVER2COIN" class="clickableText helpText">?</span></div>
-                        <div data-toggle="COIN2SILVER"><label><input type="checkbox">硬币换银瓜子
-                                        <input class="coin_number blth_input" style="width:40px;" type="text">
-                                        个(0-50) </label><span helpdata="COIN2SILVER"
-                                        class="clickableText helpText">?</span></div>
-                        <div data-toggle="LIVE_SIGN"><label><input type="checkbox">直播区签到 </label></div>
-                        <div data-toggle="AUTO_GROUP_SIGN"><label><input type="checkbox">应援团签到 </label></div>
-                        <div data-toggle="LIKE_LIVEROOM"><label><input type="checkbox">点赞直播间 </label><span
-                                helpdata="LIKE_LIVEROOM" class="clickableText helpText">?</span></div>
-                        <div data-toggle="SHARE_LIVEROOM"><label><input type="checkbox">分享直播间 </label><span
-                                        helpdata="SHARE_LIVEROOM" class="clickableText helpText">?</span></div>
-                        <div data-toggle="Watch30min"><label><input type="checkbox">连续观看30分钟直播</label><span
-                                        helpdata="Watch30min" class="clickableText helpText">?</span></div>
-                        <div data-toggle="MEDAL_DANMU" style="color:blueviolet"><label><input type="checkbox">粉丝勋章打卡弹幕
-                                </label><button class="blth_btn" data-action="edit_medalDanmu">编辑弹幕内容</button><span
-                                        helpdata="MEDAL_DANMU" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="MEDAL_DANMU_METHOD" class="lineStartSpace inline">打卡弹幕模式：
-                                <div data-toggle="MEDAL_DANMU_WHITE" class="inline"><input type="radio"
-                                                name="MEDAL_DANMU_METHOD">白名单
+                        <div><label>直播区任务</label></div>
+                        <div class="lineStartSpace">
+                                <div data-toggle="LIVE_SIGN"><label><input type="checkbox">直播区签到 </label></div>
+                                <div data-toggle="LIKE_LIVEROOM"><label><input type="checkbox">点赞直播间 </label><span
+                                                helpdata="LIKE_LIVEROOM" class="clickableText helpText">?</span></div>
+                                <div data-toggle="SHARE_LIVEROOM"><label><input type="checkbox">分享直播间 </label><span
+                                                helpdata="SHARE_LIVEROOM" class="clickableText helpText">?</span></div>
+                                <div data-toggle="Watch30min"><label><input type="checkbox">连续观看30分钟直播</label><span
+                                                helpdata="Watch30min" class="clickableText helpText">?</span></div>
+                                <div data-toggle="MEDAL_DANMU" style="color:blueviolet"><label><input
+                                                        type="checkbox">粉丝勋章打卡弹幕
+                                        </label><button class="blth_btn"
+                                                data-action="edit_medalDanmu">编辑弹幕内容</button><span
+                                                helpdata="MEDAL_DANMU" class="clickableText helpText">?</span>
                                 </div>
-                                <div data-toggle="MEDAL_DANMU_BLACK" class="inline"><input type="radio"
-                                                name="MEDAL_DANMU_METHOD" class="smallInterval">黑名单
-                                </div><button class="blth_btn" data-action="edit_lightMedalList">编辑房间列表</button><span
-                                        helpdata="MEDAL_DANMU_METHOD" class="clickableText helpText">?</span>
+                                <div data-toggle="MEDAL_DANMU_METHOD" class="lineStartSpace inline">打卡弹幕模式：
+                                        <div data-toggle="MEDAL_DANMU_WHITE" class="inline"><input type="radio"
+                                                        name="MEDAL_DANMU_METHOD">白名单
+                                        </div>
+                                        <div data-toggle="MEDAL_DANMU_BLACK" class="inline"><input type="radio"
+                                                        name="MEDAL_DANMU_METHOD" class="smallInterval">黑名单
+                                        </div><button class="blth_btn"
+                                                data-action="edit_lightMedalList">编辑房间列表</button><span
+                                                helpdata="MEDAL_DANMU_METHOD" class="clickableText helpText">?</span>
+                                </div>
+                                <div data-toggle="MEDAL_DANMU_INTERVAL" class="lineStartSpace">弹幕发送间隔 <input
+                                                class="num blth_input" style="width:25px;" type="text">秒
+                                        <span helpdata="MEDAL_DANMU_INTERVAL" class="clickableText helpText">?</span>
+                                </div>
                         </div>
-                        <div data-toggle="MEDAL_DANMU_INTERVAL" class="lineStartSpace">弹幕发送间隔 <input
-                                        class="num blth_input" style="width:25px;" type="text">秒
-                                <span helpdata="MEDAL_DANMU_INTERVAL" class="clickableText helpText">?</span>
+                        <div><label>其它任务</label></div>
+                        <div class="lineStartSpace">
+                                <div data-toggle="SILVER2COIN"><label><input type="checkbox">银瓜子换硬币 </label><span
+                                                helpdata="SILVER2COIN" class="clickableText helpText">?</span></div>
+                                <div data-toggle="COIN2SILVER"><label><input type="checkbox">硬币换银瓜子
+                                                <input class="coin_number blth_input" style="width:40px;" type="text">
+                                                个(0-50) </label><span helpdata="COIN2SILVER"
+                                                class="clickableText helpText">?</span></div>
+                                <div data-toggle="AUTO_GROUP_SIGN"><label><input type="checkbox">应援团签到 </label></div>
                         </div>
                 </fieldset>
                 <fieldset class="blth_fs">
@@ -506,9 +519,8 @@
                                 </label><span helpdata="SECONDS_NOTICE" class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="btnArea"><button data-action="reset" style="color:red;"
-                                        class="blth_btn">重置所有为默认</button><button data-action="redoAllTasks"
-                                        style="color:red;" class="blth_btn">再次执行所有任务</button><button
-                                        data-action="mainSiteTasks" class="blth_btn">再次执行主站任务</button><br><button
+                                        class="blth_btn">重置所有为默认</button><button data-action="resetCache"
+                                        style="color:red;" class="blth_btn">重置缓存</button><br><button
                                         data-action="exportConfig" class="blth_btn">导出配置</button><button
                                         data-action="importConfig" class="blth_btn">导入配置</button><input type="file"
                                         id="BLTH_config_file" style="display:none"><button class="blth_btn"

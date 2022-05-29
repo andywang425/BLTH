@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DanmuWebSocket
 // @namespace    https://github.com/andywang425
-// @version      0.1
+// @version      0.2
 // @description  B站直播WebSocket弹幕库
 // @author       andywang425
 // @require      https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
@@ -114,7 +114,7 @@ class DanmuWebSocket extends WebSocket {
             const ws = await new DanmuWebSocket(this.initObj);
             ws.handlers = this.handlers;
             Object.keys(ws.handlers).forEach(key => { ws.addEventListener(key, event => ws.handlers[key].call(ws, event)) });
-            if (ws.handlers.onreconnect.length > 0) this.emitEvent('reconnect', { detail: ws });
+            if (ws.handlers.reconnect.length > 0) this.emitEvent('reconnect', { detail: ws });
         }, this.reconnectInterval);
     }
     /**
