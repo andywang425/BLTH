@@ -291,7 +291,6 @@
       } else if (arg[0].includes('//api.live.bilibili.com/msg/send')) {
         if (SP_CONFIG.AUTO_CHECK_DANMU) {
           danmuEmitter.emit('danmu', arg[1].data.msg);
-          return wfetch(...arg);
         }
         if (SP_CONFIG.wear_medal_before_danmu) {
           if (medal_info.status.state() !== "resolved" || Live_info.medal === null || (SP_CONFIG.wear_medal_type === "ONLY_FIRST" && hasWornMedal)) return wfetch(...arg);
@@ -346,6 +345,7 @@
             return wfetch(...arg);
           })
         }
+        return wfetch(...arg);
       } else {
         return wfetch(...arg);
       }
