@@ -641,7 +641,7 @@
         GiftInterval_TS: 0, // 自动送礼（间隔）
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0, // 天选时刻
-        last_aid: 881, // 实物抽奖最后一个有效aid
+        last_aid: 909, // 实物抽奖最早的一个能参与抽奖的aid
         PlateActivity_TS: 0, // 转盘抽奖
         ReserveActivity_TS: 0, // 直播预约抽奖
         NextVipPrivilege_TS: 0 // 领取大会员权益
@@ -3740,6 +3740,7 @@
         }
       },
       MaterialObject: {
+        foundLastAid: false,
         run: () => {
           try {
             if (!MY_API.CONFIG.MATERIAL_LOTTERY || otherScriptsRunning) return $.Deferred().resolve();
@@ -3753,6 +3754,7 @@
               }
             };
             if (MY_API.CACHE.last_aid < noticeJson.material_last_aid) MY_API.CACHE.last_aid = noticeJson.material_last_aid;
+            MY_API.MaterialObject.foundLastAid = false;
             MY_API.chatLog('[实物抽奖] 开始寻找可参加的抽奖');
             return MY_API.MaterialObject.check().then(() => {
               MY_API.CACHE.MaterialObject_TS = ts_ms();
@@ -3769,13 +3771,13 @@
         check: async (aid, rem = MY_API.CONFIG.MATERIAL_LOTTERY_REM) => { // rem + 1检查次数
           if (rem <= 0) return $.Deferred().resolve();
           aid = aid || MY_API.CACHE.last_aid;
-          MYDEBUG('API.MaterialObject.check: aid=', aid);
           await sleep(200); // TODO: 改为设置项
           return BAPI.Lottery.MaterialObject.check(aid).then((response) => {
-            MYDEBUG('API.MaterialObject.check(getBoxInfo)', response);
+            MYDEBUG(`API.Lottery.MaterialObject.check(aid = ${aid})`, response);
             if (response.code === 0 && response.data) {
+              if (!MY_API.MaterialObject.foundLastAid)
+                MY_API.CACHE.last_aid = aid;
               rem = MY_API.CONFIG.MATERIAL_LOTTERY_REM;
-              MY_API.CACHE.last_aid = aid;
               if (MY_API.CONFIG.MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY) {
                 const checkList = [response.data.title, response.data.rule];
                 for (const str of MY_API.CONFIG.QUESTIONABLE_LOTTERY) {
@@ -3815,29 +3817,34 @@
             join_end_time: data.rounds[i].join_end_time,
             jpName: data.current_round_data.list[0].jp_name
           };
-          if (obj.join_end_time < ts_ms()) {
+          if (obj.join_end_time < ts_s()) {
             MYDEBUG(`[实物抽奖] aid = ${obj.aid} round = ${obj.round_num} i = ${i} 已结束`);
             return MY_API.MaterialObject.join(aid, data, i + 1);
           }
-          else if (obj.current_round_num === obj.round_num && obj.current_status !== 0) {
+          else if (obj.join_start_time < ts_s() && obj.current_round_num === obj.round_num && obj.current_status !== 0) {
             MYDEBUG(`[实物抽奖] 当前场次抽奖 aid = ${obj.aid} status = ${obj.current_status} round = ${obj.round_num} i = ${i} 无需参加`);
             return MY_API.MaterialObject.join(aid, data, i + 1);
           }
           else {
+            if (!MY_API.MaterialObject.foundLastAid) {
+              MY_API.CACHE.last_aid = aid;
+              MY_API.MaterialObject.foundLastAid = true;
+            }
             if (obj.join_start_time > ts_s()) {
               let randomDelay = getRandomNum(1, 3);
               MY_API.chatLog(`[实物抽奖] 将在<br>${new Date((obj.join_start_time + randomDelay) * 1000).toLocaleString()}参加抽奖<br>"${obj.title}"<br>aid = ${obj.aid}，第${i + 1}轮<br>奖品：${obj.jpName}`, 'info');
-              setTimeout(() => MY_API.MaterialObject.draw(obj), (obj.join_start_time - ts_s() + randomDelay) * 1e3)
+              setTimeout(() => MY_API.MaterialObject.draw(obj), (obj.join_start_time - ts_s() + randomDelay) * 1e3);
+              return MY_API.MaterialObject.join(aid, data, i + 1);
             } else {
               return MY_API.MaterialObject.draw(obj).then(() => {
-                return MY_API.MaterialObject.join(aid, title, typeB, i + 1);
+                return MY_API.MaterialObject.join(aid, data, i + 1);
               });
             }
           }
         },
         draw: (obj) => {
           return BAPI.Lottery.MaterialObject.draw(obj.aid, obj.round_num).then((response) => {
-            MYDEBUG('API.MaterialObject.check: API.MY_API.MaterialObject.draw',
+            MYDEBUG(`API.MaterialObject.check: API.MY_API.MaterialObject.draw (aid = ${obj.aid})`,
               response);
             if (response.code === 0) {
               MY_API.chatLog(`[实物抽奖] 成功参加抽奖<br>${obj.title}<br>aid = ${obj.aid}，第${obj.round_num}轮<br>奖品：${obj.jpName}`, 'success');
