@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.8.2
+// @version        5.8.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -43,7 +43,7 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@61966d45b7970b6c8971a050667937a11b04640f/assets/html/main.min.html
+// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@59b1a6588db26f31d8e7f9f07aa961e54429a5f6/assets/html/main.min.html
 // @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -176,6 +176,28 @@
                 }, 200);
               }, timeout);
             };
+            window.singleToast = (msg, type = 'info', timeout = 5e3, top, left) => {
+              switch (type) {
+                case 'success':
+                case 'info':
+                case 'caution':
+                case 'error':
+                  break;
+                default:
+                  type = 'info';
+              }
+              const a = $(`<div class="link-toast ${type} fixed" style="z-index:2001"><span class="toast-text">${msg}</span></div>`)[0];
+              document.body.appendChild(a);
+              MYDEBUG("singleToast-" + type, msg);
+              a.style.top = top;
+              a.style.left = left;
+              setTimeout(() => {
+                a.className += ' out';
+                setTimeout(() => {
+                  $(a).remove();
+                }, 200);
+              }, timeout);
+            }
             return $.Deferred().resolve();
           } catch (err) {
             MYERROR(`初始化浮动提示时出现异常`, err);
@@ -214,7 +236,8 @@
       blockLiveStream: false, // 拦截直播流
       blockliveDataUpdate: false, // 拦截直播观看数据上报
       wear_medal_before_danmu: false, // 手动发弹幕前自动佩戴当前房间勋章
-      wear_medal_type: 'ONLY_FIRST' // 自动佩戴勋章方式
+      wear_medal_type: 'ONLY_FIRST', // 自动佩戴勋章方式
+      add_like_button: true // 添加一个点赞按钮
     };
   let otherScriptsRunningCheck = $.Deferred(),
     otherScriptsRunning = false,
@@ -424,6 +447,24 @@
       for (const i of RTClist) {
         delete W[i];
       }
+    }
+    if (SP_CONFIG.add_like_button) {
+      const right_ctnr = $('.right-ctnr');
+      const share = right_ctnr.find('.v-middle.icon-font.icon-share').parent();
+      const like_button = $('<div data-v-6d89404b="" data-v-42ea937d="" title="" class="icon-ctnr live-skin-normal-a-text pointer" id = "blth_like_button" style="line-height: 16px;margin-left: 15px;"><i data-v-6d89404b="" class="v-middle icon-font icon-good" style="font-size: 16px;"></i><span data-v-6d89404b="" class="action-text v-middle" style="font-size: 12px;margin-left: 5px;">点赞</span></div>');
+      like_button.click(() => {
+        BAPI.xlive.likeInteract(Live_info.room_id).then((response) => {
+          MYDEBUG(`点击点赞按钮 likeInteract(${Live_info.room_id}) response`, response);
+          const offest = like_button.offset(),
+            width = like_button.width(),
+            height = like_button.height();
+          const top = parseInt(offest.top + height * 1.2) + 'px',
+            left = parseInt(offest.left + width * 1.2) + 'px';
+          if (response.code === 0) window.singleToast('点赞成功', 'success', 2e3, top, left);
+          else window.singleToast(`点赞失败`, 'caution', 2e3, top, left);
+        });
+      });
+      right_ctnr[0].insertBefore(like_button[0], share[0]);
     }
     const loadInfo = (delay = 0) => {
       return setTimeout(async () => {
@@ -1403,7 +1444,8 @@
           "TIME_RELOAD",
           "UPDATE_TIP",
           "WATCH",
-          "LIKE_LIVEROOM"
+          "LIKE_LIVEROOM",
+          "add_like_button"
         ];
         const radioList = [
           /**
@@ -1460,7 +1502,7 @@
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "通过给UP充电，消耗5B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置所有为默认：指将设置和缓存重置为默认。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
-          Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，该功能可能会无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>如果主播没有设置直播分区，该任务无法完成。</mli></mul>",
+          Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，可能会导致该功能无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>如果主播没有设置直播分区，该任务无法完成。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
           GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
@@ -1539,7 +1581,8 @@
           LIKE_LIVEROOM_INTERVAL: "每两次点赞之间的间隔时间。<mul><mli>脚本的点赞方式是依次给每个粉丝勋章对应的直播间点一次赞，然后重复以上过程。</mli><mli>若间隔时间过短，部分点赞可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的点赞CD时间（大约是几秒钟），短时间内反复给一个直播间点赞只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
           SHARE_LIVEROOM_INTERVAL: "每两次分享之间的间隔时间。<mul><mli>脚本的分享方式是依次把每个粉丝勋章对应的直播间分享一次，然后重复以上过程。</mli><mli>若间隔时间过短，部分分享可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的分享CD时间（大约是几秒钟），短时间内反复分享一个直播间只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
           Watch30minInterval: "每两次心跳的间隔时间。<mul><mli>脚本会依次给每个粉丝勋章对应的直播间发心跳包，然后重复数次直到观看时间满30分钟为止。</mli><mli>若间隔时间过短可能会出错。</mli></mul>",
-          DailyTasksBtnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置缓存并刷新页面可以让脚本再次执行今天已经执行过的任务。</mli></mul>"
+          DailyTasksBtnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置缓存并刷新页面可以让脚本再次执行今天已经执行过的任务。</mli></mul>",
+          add_like_button: "在直播画面上方，分享按钮左侧添加一个点赞按钮。<mul><mli>该按钮被按下后只会触发一次点赞事件（可用来完成点赞任务），不会发送点赞弹幕。如果想发送点赞弹幕请使用B站的原生功能。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
