@@ -1,5 +1,5 @@
 {
-    "version": "5.8.2",
+    "version": "5.8.3",
     "anchor_blacklist_word": [
         "测试",
         "钓鱼",
@@ -90,7 +90,7 @@
         "/^\\d+$/",
         "/没有?(礼物|奖品)/"
     ],
-    "material_last_aid": 881,
+    "material_last_aid": 909,
     "reserve_blacklist_word": [
         "测试",
         "钓鱼"

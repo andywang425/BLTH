@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.8.2
+// @version        5.8.3
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -43,7 +43,7 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@61966d45b7970b6c8971a050667937a11b04640f/assets/html/main.min.html
+// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@59b1a6588db26f31d8e7f9f07aa961e54429a5f6/assets/html/main.min.html
 // @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -176,6 +176,28 @@
                 }, 200);
               }, timeout);
             };
+            window.singleToast = (msg, type = 'info', timeout = 5e3, top, left) => {
+              switch (type) {
+                case 'success':
+                case 'info':
+                case 'caution':
+                case 'error':
+                  break;
+                default:
+                  type = 'info';
+              }
+              const a = $(`<div class="link-toast ${type} fixed" style="z-index:2001"><span class="toast-text">${msg}</span></div>`)[0];
+              document.body.appendChild(a);
+              MYDEBUG("singleToast-" + type, msg);
+              a.style.top = top;
+              a.style.left = left;
+              setTimeout(() => {
+                a.className += ' out';
+                setTimeout(() => {
+                  $(a).remove();
+                }, 200);
+              }, timeout);
+            }
             return $.Deferred().resolve();
           } catch (err) {
             MYERROR(`初始化浮动提示时出现异常`, err);
@@ -214,7 +236,8 @@
       blockLiveStream: false, // 拦截直播流
       blockliveDataUpdate: false, // 拦截直播观看数据上报
       wear_medal_before_danmu: false, // 手动发弹幕前自动佩戴当前房间勋章
-      wear_medal_type: 'ONLY_FIRST' // 自动佩戴勋章方式
+      wear_medal_type: 'ONLY_FIRST', // 自动佩戴勋章方式
+      add_like_button: true // 添加一个点赞按钮
     };
   let otherScriptsRunningCheck = $.Deferred(),
     otherScriptsRunning = false,
@@ -291,7 +314,6 @@
       } else if (arg[0].includes('//api.live.bilibili.com/msg/send')) {
         if (SP_CONFIG.AUTO_CHECK_DANMU) {
           danmuEmitter.emit('danmu', arg[1].data.msg);
-          return wfetch(...arg);
         }
         if (SP_CONFIG.wear_medal_before_danmu) {
           if (medal_info.status.state() !== "resolved" || Live_info.medal === null || (SP_CONFIG.wear_medal_type === "ONLY_FIRST" && hasWornMedal)) return wfetch(...arg);
@@ -346,6 +368,7 @@
             return wfetch(...arg);
           })
         }
+        return wfetch(...arg);
       } else {
         return wfetch(...arg);
       }
@@ -424,6 +447,24 @@
       for (const i of RTClist) {
         delete W[i];
       }
+    }
+    if (SP_CONFIG.add_like_button) {
+      const right_ctnr = $('.right-ctnr');
+      const share = right_ctnr.find('.v-middle.icon-font.icon-share').parent();
+      const like_button = $('<div data-v-6d89404b="" data-v-42ea937d="" title="" class="icon-ctnr live-skin-normal-a-text pointer" id = "blth_like_button" style="line-height: 16px;margin-left: 15px;"><i data-v-6d89404b="" class="v-middle icon-font icon-good" style="font-size: 16px;"></i><span data-v-6d89404b="" class="action-text v-middle" style="font-size: 12px;margin-left: 5px;">点赞</span></div>');
+      like_button.click(() => {
+        BAPI.xlive.likeInteract(Live_info.room_id).then((response) => {
+          MYDEBUG(`点击点赞按钮 likeInteract(${Live_info.room_id}) response`, response);
+          const offest = like_button.offset(),
+            width = like_button.width(),
+            height = like_button.height();
+          const top = parseInt(offest.top + height * 1.2) + 'px',
+            left = parseInt(offest.left + width * 1.2) + 'px';
+          if (response.code === 0) window.singleToast('点赞成功', 'success', 2e3, top, left);
+          else window.singleToast(`点赞失败`, 'caution', 2e3, top, left);
+        });
+      });
+      right_ctnr[0].insertBefore(like_button[0], share[0]);
     }
     const loadInfo = (delay = 0) => {
       return setTimeout(async () => {
@@ -641,7 +682,7 @@
         GiftInterval_TS: 0, // 自动送礼（间隔）
         MaterialObject_TS: 0, // 实物抽奖
         AnchorLottery_TS: 0, // 天选时刻
-        last_aid: 881, // 实物抽奖最后一个有效aid
+        last_aid: 909, // 实物抽奖最早的一个能参与抽奖的aid
         PlateActivity_TS: 0, // 转盘抽奖
         ReserveActivity_TS: 0, // 直播预约抽奖
         NextVipPrivilege_TS: 0 // 领取大会员权益
@@ -830,14 +871,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "解决了开启【拦截直播流】或者【拦截直播观看数据上报】后 B 站 js 反复重试导致控制台出现大量 B 站 js 报错的问题，减少资源消耗。",
-              "修复【红包抽奖】在重连 B 站直播弹幕 WebSocket 时会报错的 Bug。",
-              "调整了【每日任务设置】的 UI。",
-              "【每日任务设置】中每一项任务现在都拥有独立的缓存，勾选新的任务后刷新页面即可生效，也避免的重复运行的问题。",
-              "【每日任务设置】增加了各个任务板块的重置缓存功能。",
-              "更好地适配 B 站深色模式。",
-              "减少右上角提示信息的数量。",
-              "修复【天选时刻】【红包抽奖】从链接中提取房间号出错导致部分功能失效的Bug。"
+              "新功能：直播观看体验 - 添加点赞按钮。该按钮位于直播画面上方，分享按钮左侧，点击后可以给直播间点赞。",
+              "修复开启某些功能后无法发送弹幕的 Bug。",
+              "修复【实物抽奖】无法参与抽奖的 Bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -851,10 +887,13 @@
               title: `${version}更新提示`,
               area: [String($(window).width() * 0.382) + 'px', String($(window).height() * 0.618) + 'px'],
               content: `
+                <h2>更新内容</h2>
                 <mol>${createHtml(clientMliList)}</mol>
+                <h2>通知</h2>
+                <mol>原q群因有群友发布政治敏感内容遭举报被封禁，请大家加入新群${linkMsg("https://jq.qq.com/?_wv=1027&k=9refOc8c", '657763329')}。</mol>
                 <hr><em style="color:grey;">
                 如果使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
-                也欢迎进q群聊聊天：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}
+                也欢迎进q群聊天：${linkMsg("https://jq.qq.com/?_wv=1027&k=9refOc8c", '657763329')}
                 </em>
                 `
             });
@@ -1088,7 +1127,7 @@
         function layerOpenAbout() {
           return myopen({
             title: `版本${GM_info.script.version}`,
-            content: `<h3 style="text-align:center">B站直播间挂机助手</h3>作者：${linkMsg("https://github.com/andywang425/", "andywang425")}<br>许可证：${linkMsg("https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE", "MIT")}<br>github项目地址：${linkMsg("https://github.com/andywang425/BLTH", "BLTH")}<br>反馈：${linkMsg("https://github.com/andywang425/BLTH/issues", "BLTH/issues")}<br>交流qq群：${linkMsg("https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O", '1106094437')}<br>`
+            content: `<h3 style="text-align:center">B站直播间挂机助手</h3>作者：${linkMsg("https://github.com/andywang425/", "andywang425")}<br>许可证：${linkMsg("https://raw.githubusercontent.com/andywang425/BLTH/master/LICENSE", "MIT")}<br>github项目地址：${linkMsg("https://github.com/andywang425/BLTH", "BLTH")}<br>反馈：${linkMsg("https://github.com/andywang425/BLTH/issues", "BLTH/issues")}<br>交流qq群：${linkMsg("https://jq.qq.com/?_wv=1027&k=9refOc8c", '657763329')}<br>`
           });
         };
         const saveAction = (div) => {
@@ -1403,7 +1442,8 @@
           "TIME_RELOAD",
           "UPDATE_TIP",
           "WATCH",
-          "LIKE_LIVEROOM"
+          "LIKE_LIVEROOM",
+          "add_like_button"
         ];
         const radioList = [
           /**
@@ -1460,7 +1500,7 @@
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
           BUY_MEDAL: "通过给UP充电，消耗5B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置所有为默认：指将设置和缓存重置为默认。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
-          Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，该功能可能会无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>如果主播没有设置直播分区，该任务无法完成。</mli></mul>",
+          Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，可能会导致该功能无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>如果主播没有设置直播分区，该任务无法完成。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
           GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
@@ -1473,11 +1513,11 @@
           ANCHOR_AUTO_DEL_FOLLOW: "如果该UP在白名单内或一开始就在默认/特别关注分组则不会被取关。",
           anchorBtnArea: "参加天选时会关注很多UP。可以在参加天选前点击【保存当前关注列表为白名单】，参与完天选后再点【取关不在白名单内的UP主】来清理关注列表。<mul><mli>不建议频繁清理，可能会被风控。</mli><mli>【编辑白名单】每两个uid之间用半角逗号<code>,</code>隔开。</mli><mli>推荐大家使用【取关分组内的UP主】的功能来清理关注列表，【取关不在白名单内的UP主】可以作为一个备选方案。</mli></mul>",
           ANCHOR_TYPE_POLLING: "高热度房间来源于各分区热门房间列表。",
-          ANCHOR_UPLOAD_DATA: "使用这个功能前你必须先拥有自己的直播间。<mul><mli>【间隔__秒】：这个设置项若填<code>10</code>秒，则每<code>10</code>秒检查一次是否收集到了新的数据，若有才上传。</mli></mul>",
-          ANCHOR_UPLOAD_MSG: "在上传天选数据到直播间简介的同时可以上传一段附加信息。<mul><mli>如果想把附加信息设为空，请点击编辑界面上的<code>留空</code>按钮。</mli></mul>",
-          ANCHOR_MAXLIVEROOM_SAVE: "个人简介有长度限制（约为一万个字符），若【个人简介储存房间最大数量】太大会无法上传。",
+          ANCHOR_UPLOAD_DATA: "<h2>【Deprecated】该选项将被弃用。</h2>使用这个功能前你必须先拥有自己的直播间。<mul><mli>【间隔__秒】：这个设置项若填<code>10</code>秒，则每<code>10</code>秒检查一次是否收集到了新的数据，若有才上传。</mli></mul>",
+          ANCHOR_UPLOAD_MSG: "<h2>【Deprecated】该选项将被弃用。</h2>在上传天选数据到直播间简介的同时可以上传一段附加信息。<mul><mli>如果想把附加信息设为空，请点击编辑界面上的<code>留空</code>按钮。</mli></mul>",
+          ANCHOR_MAXLIVEROOM_SAVE: "<h2>【Deprecated】该选项将被弃用。</h2>个人简介有长度限制（约为一万个字符），若【个人简介储存房间最大数量】太大会无法上传。",
           ANCHOR_MAXROOM: "若收集的房间总数超过【检查房间最大数量】则会删除一部分最开始缓存的房间。<mh3>注意：</mh3><mul><mli>这一项并不是数值越大效率就越高。如果把这个值设置得过高会浪费很多时间去检查热度较低的，甚至已经下播的房间。【个人简介储存房间最大数量】同理。</mli></mul>",
-          ANCHOR_TYPE_LIVEROOM: "因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://live.bilibili.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<mul><mli>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</mli><mli>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</mli><mli><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</mli></mul>",
+          ANCHOR_TYPE_LIVEROOM: "<h2>【Deprecated】该选项将被弃用。</h2>因为在云上部署了脚本，<strong>默认值所填直播间(<a href = 'https://live.bilibili.com/22474988' target = '_blank'>22474988</a>)的个人简介可以持续提供天选数据</strong>（除非被风控或遇到一些突发情况）。<mul><mli>这个功能主要是为了减少请求数量，提高效率同时减少风控的概率。</mli><mli>使用本功能时建议把【天选获取数据间隔】调低一些减少遗漏的天选数量。</mli><mli><a href='https://jq.qq.com/?_wv=1027&amp;k=fCSfWf1O' target = '_blank'>q群（1106094437）</a>的群在线文档中有一些群友上传的能提供天选数据的直播间号。</mli></mul>",
           ANCHOR_PRIVATE_LETTER: "若中奖，会在开奖后10秒发送私信。<mul><mli>建议改一下私信内容，不要和默认值完全一样。</mli></mul>",
           ANCHOR_MOVETO_FOLLOW_TAG: `分组的名称为<code>${anchorFollowTagName}</code>。<mul><mli>在白名单内或天选功能运行前在默认/特别关注分组内的UP不会被移入该分组，即使后来出现在该分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           ANCHOR_CHECK_INTERVAL: "检查完一轮天选后等待的时间。<mul><mli>可以填小数。</mli></mul>",
@@ -1488,7 +1528,7 @@
           ANCHOR_MOVETO_PRIZE_TAG: `分组的名称为<code>${anchorPrizeTagName}</code>。<mul><mli>在白名单内或天选功能运行前在默认/特别关注分组内的UP不会被移入该分组，即使后来出现在该分组里也不会被取关。</mli><mli><strong>请勿修改该分组名称。</strong></mli></mul>`,
           debugSwitch: "开启或关闭控制台日志(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
           UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
-          ANCHOR_IGNORE_UPLOAD_MSG: "不显示获取到的附加信息。",
+          ANCHOR_IGNORE_UPLOAD_MSG: "<h2>【Deprecated】该选项将被弃用。</h2>不显示获取到的附加信息。",
           MEDAL_DANMU_INTERVAL: "每两条弹幕间所等待的时间。<mh3>注意：</mh3><mul><mli>由于B站服务器限制，间隔时间必须大于等于1秒，否则弹幕发送会出错。</mli></mul>",
           ANCHOR_IGNORE_ROOM: "不检查和参加这些直播间的天选。<mul><mli>如果要填写多个直播间，每两个直播间号之间请用半角逗号<code>,</code>隔开。</mli></mul>",
           ANCHOR_LOTTERY: "参加B站直播间的天选时刻抽奖。<mul><mli>这些抽奖通常是有参与条件的，如关注主播，投喂礼物，粉丝勋章等级，主站等级，直播用户等级，上舰等。</mli><mli>根据目前B站的规则，参加天选的同时会在发起抽奖的直播间发送一条弹幕（即弹幕口令，参加天选后自动发送）。</mli><mli>脚本会根据用户设置来决定是否要忽略某个天选，以下是判断的先后顺序，一旦检测到不符合要求则忽略该天选并中断后续判断流程：<br><code>忽略直播间</code>，<code>忽略已参加天选</code>，<code>忽略过期天选</code>，<code>忽略关键字</code>，<code>忽略金额</code>，<code>忽略非现金抽奖的天选</code>，<code>忽略付费天选</code>，<code>忽略不满足参加条件（粉丝勋章，大航海，直播用户等级，主站等级）的天选</code>。 </mli></mul><mh3>注意：</mh3><mul><mli>检索天选抽奖的同时也可以检索到红包抽奖。</mli><mli>在不使用awpush的情况下，如果你想同时参与天选时刻和红包抽奖，建议<strong>不要</strong>同时勾选<code>天选时刻数据获取方式</code>和<code>红包抽奖数据获取方式</code>中的选项（即只勾选<code>天选时刻数据获取方式</code>或<code>红包抽奖数据获取方式</code>中的选项），否则极其容易触发风控。如果启用awpush的话就不必在意这个了，因为相关设置将由BLTH-server来决定。 </mli><mli>如果选择勾选<code>天选时刻数据获取方式</code>中的选项，触发风控后脚本会尝试切换备用API来获取天选数据，但在这种状态下无法获取红包抽奖数据。</mli></mul>",
@@ -1539,7 +1579,8 @@
           LIKE_LIVEROOM_INTERVAL: "每两次点赞之间的间隔时间。<mul><mli>脚本的点赞方式是依次给每个粉丝勋章对应的直播间点一次赞，然后重复以上过程。</mli><mli>若间隔时间过短，部分点赞可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的点赞CD时间（大约是几秒钟），短时间内反复给一个直播间点赞只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
           SHARE_LIVEROOM_INTERVAL: "每两次分享之间的间隔时间。<mul><mli>脚本的分享方式是依次把每个粉丝勋章对应的直播间分享一次，然后重复以上过程。</mli><mli>若间隔时间过短，部分分享可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的分享CD时间（大约是几秒钟），短时间内反复分享一个直播间只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
           Watch30minInterval: "每两次心跳的间隔时间。<mul><mli>脚本会依次给每个粉丝勋章对应的直播间发心跳包，然后重复数次直到观看时间满30分钟为止。</mli><mli>若间隔时间过短可能会出错。</mli></mul>",
-          DailyTasksBtnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置缓存并刷新页面可以让脚本再次执行今天已经执行过的任务。</mli></mul>"
+          DailyTasksBtnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置缓存并刷新页面可以让脚本再次执行今天已经执行过的任务。</mli></mul>",
+          add_like_button: "在直播画面上方，分享按钮左侧添加一个点赞按钮。<mul><mli>该按钮被按下后只会触发一次点赞事件（可用来完成点赞任务），不会发送点赞弹幕。如果想发送点赞弹幕请使用B站的原生功能。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -3740,6 +3781,7 @@
         }
       },
       MaterialObject: {
+        foundLastAid: false,
         run: () => {
           try {
             if (!MY_API.CONFIG.MATERIAL_LOTTERY || otherScriptsRunning) return $.Deferred().resolve();
@@ -3753,6 +3795,7 @@
               }
             };
             if (MY_API.CACHE.last_aid < noticeJson.material_last_aid) MY_API.CACHE.last_aid = noticeJson.material_last_aid;
+            MY_API.MaterialObject.foundLastAid = false;
             MY_API.chatLog('[实物抽奖] 开始寻找可参加的抽奖');
             return MY_API.MaterialObject.check().then(() => {
               MY_API.CACHE.MaterialObject_TS = ts_ms();
@@ -3769,13 +3812,13 @@
         check: async (aid, rem = MY_API.CONFIG.MATERIAL_LOTTERY_REM) => { // rem + 1检查次数
           if (rem <= 0) return $.Deferred().resolve();
           aid = aid || MY_API.CACHE.last_aid;
-          MYDEBUG('API.MaterialObject.check: aid=', aid);
           await sleep(200); // TODO: 改为设置项
           return BAPI.Lottery.MaterialObject.check(aid).then((response) => {
-            MYDEBUG('API.MaterialObject.check(getBoxInfo)', response);
+            MYDEBUG(`API.Lottery.MaterialObject.check(aid = ${aid})`, response);
             if (response.code === 0 && response.data) {
+              if (!MY_API.MaterialObject.foundLastAid)
+                MY_API.CACHE.last_aid = aid;
               rem = MY_API.CONFIG.MATERIAL_LOTTERY_REM;
-              MY_API.CACHE.last_aid = aid;
               if (MY_API.CONFIG.MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY) {
                 const checkList = [response.data.title, response.data.rule];
                 for (const str of MY_API.CONFIG.QUESTIONABLE_LOTTERY) {
@@ -3815,29 +3858,34 @@
             join_end_time: data.rounds[i].join_end_time,
             jpName: data.current_round_data.list[0].jp_name
           };
-          if (obj.join_end_time < ts_ms()) {
+          if (obj.join_end_time < ts_s()) {
             MYDEBUG(`[实物抽奖] aid = ${obj.aid} round = ${obj.round_num} i = ${i} 已结束`);
             return MY_API.MaterialObject.join(aid, data, i + 1);
           }
-          else if (obj.current_round_num === obj.round_num && obj.current_status !== 0) {
+          else if (obj.join_start_time < ts_s() && obj.current_round_num === obj.round_num && obj.current_status !== 0) {
             MYDEBUG(`[实物抽奖] 当前场次抽奖 aid = ${obj.aid} status = ${obj.current_status} round = ${obj.round_num} i = ${i} 无需参加`);
             return MY_API.MaterialObject.join(aid, data, i + 1);
           }
           else {
+            if (!MY_API.MaterialObject.foundLastAid) {
+              MY_API.CACHE.last_aid = aid;
+              MY_API.MaterialObject.foundLastAid = true;
+            }
             if (obj.join_start_time > ts_s()) {
               let randomDelay = getRandomNum(1, 3);
               MY_API.chatLog(`[实物抽奖] 将在<br>${new Date((obj.join_start_time + randomDelay) * 1000).toLocaleString()}参加抽奖<br>"${obj.title}"<br>aid = ${obj.aid}，第${i + 1}轮<br>奖品：${obj.jpName}`, 'info');
-              setTimeout(() => MY_API.MaterialObject.draw(obj), (obj.join_start_time - ts_s() + randomDelay) * 1e3)
+              setTimeout(() => MY_API.MaterialObject.draw(obj), (obj.join_start_time - ts_s() + randomDelay) * 1e3);
+              return MY_API.MaterialObject.join(aid, data, i + 1);
             } else {
               return MY_API.MaterialObject.draw(obj).then(() => {
-                return MY_API.MaterialObject.join(aid, title, typeB, i + 1);
+                return MY_API.MaterialObject.join(aid, data, i + 1);
               });
             }
           }
         },
         draw: (obj) => {
           return BAPI.Lottery.MaterialObject.draw(obj.aid, obj.round_num).then((response) => {
-            MYDEBUG('API.MaterialObject.check: API.MY_API.MaterialObject.draw',
+            MYDEBUG(`API.MaterialObject.check: API.MY_API.MaterialObject.draw (aid = ${obj.aid})`,
               response);
             if (response.code === 0) {
               MY_API.chatLog(`[实物抽奖] 成功参加抽奖<br>${obj.title}<br>aid = ${obj.aid}，第${obj.round_num}轮<br>奖品：${obj.jpName}`, 'success');
