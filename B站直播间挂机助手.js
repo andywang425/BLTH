@@ -871,7 +871,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "新功能：直播观看体验 - 添加点赞按钮。该按钮位于直播画面上方，分享按钮左侧，点击后可以给直播间点赞。"
+              "新功能：直播观看体验 - 添加点赞按钮。该按钮位于直播画面上方，分享按钮左侧，点击后可以给直播间点赞。",
+              "修复开启某些功能后无法发送弹幕的 Bug。",
+              "修复【实物抽奖】无法参与抽奖的 Bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
