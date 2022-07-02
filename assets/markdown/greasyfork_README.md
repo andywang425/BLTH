@@ -105,6 +105,12 @@
 
 ---
 
+## 参与开发
+
+如果你想参与到本项目的开发中来，请阅读[开发规范](https://github.com/andywang425/BLTH/blob/master/CONTRIBUTING.md)。
+
+---
+
 # 许可证
 
 本项目以`MIT`许可证开源。
