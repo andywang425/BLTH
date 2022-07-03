@@ -464,6 +464,8 @@
           else window.singleToast(`点赞失败`, 'caution', 2e3, top, left);
         });
       });
+      if ($('.right-ctnr').length == 0)
+        return MYERROR('[添加点赞按钮] 无法找到元素 .right-ctnr');
       right_ctnr[0].insertBefore(like_button[0], share[0]);
     }
     const loadInfo = (delay = 0) => {
@@ -597,7 +599,7 @@
         GIFT_SEND_METHOD: "GIFT_SEND_BLACK", // 送礼黑白名单策略
         GIFT_SEND_ROOM: ["0"], // 送礼黑白名单策略 - 房间列表
         GM_NOTICE: false, // GM通知
-        GET_PRIVILEGE: true, // 自动领取大会员权益
+        GET_PRIVILEGE: false, // 自动领取大会员权益
         IN_TIME_RELOAD_DISABLE: false, // 休眠时段是否禁止刷新直播间 false为刷新
         LIVE_SIGN: true, // 直播区签到
         LOGIN: true, // 主站登陆
