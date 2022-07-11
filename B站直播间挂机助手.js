@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.8.3
+// @version        5.8.4
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -875,9 +875,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "新功能：直播观看体验 - 添加点赞按钮。该按钮位于直播画面上方，分享按钮左侧，点击后可以给直播间点赞。",
-              "修复开启某些功能后无法发送弹幕的 Bug。",
-              "修复【实物抽奖】无法参与抽奖的 Bug。"
+              "添加点赞按钮】找不到所需页面元素时不添加按钮。",
+              "自动领取大会员权益功能改为默认关闭。",
+              `修复在特殊直播间（如${linkMsg('https://live.bilibili.com/6')}等）脚本无法正常加载的Bug。`
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
