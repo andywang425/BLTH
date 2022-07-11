@@ -49,7 +49,10 @@ getMetaData();
                 headers: headers
             }
             const data = await reqFile(reqParams);
-            metaData[i].newValue = getURL(metaData[i].value).concat('#md5=', getMd5(data));
+            if (data !== 'FAILED')
+                metaData[i].newValue = getURL(metaData[i].value).concat('#md5=', getMd5(data));
+            else
+                metaData[i].newValue = getURL(metaData[i].value);
         }
     }
     let newRawMetaData = rawMetaData;
@@ -74,7 +77,7 @@ async function reqFile(requestParams, retry = 3) {
     }).catch(err => {
         console.error('请求资源时出错，将再次获取', requestParams.value)
         // console.error('axios error', err)
-        if (retry === 0) return '【已达到最大重试次数】';
+        if (retry === 0) return 'FAILED';
         retry--;
         return new Promise((resolve, reject) => {
             setTimeout(() => {
