@@ -29,22 +29,22 @@
 // @connect        pushplus.plus
 // @connect        andywang.top
 // @connect        gitee.com
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
-// @require        https://fastly.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
-// @require        https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@2b75c82c6e192f70dd67659b0b5195f8175cf35c/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
-// @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
-// @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@1cf399f9b6f93a842c8bae3097bae7c464a2c769/assets/js/library/DanmuWebSocket.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js
-// @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css
-// @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@59b1a6588db26f31d8e7f9f07aa961e54429a5f6/assets/html/main.min.html
-// @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js#md5=ec4d6d98fddaa92c9b11ec4e1fb46650
+// @require        https://fastly.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js#md5=c9f5aeeca3ad37bf2aa006139b935f0a
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js#md5=91b65f8172cd69434cda8a7d49403ded
+// @require        https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js#md5=64413eda72405dd1d28bbb64d900c778
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js#md5=22eb65d8466061f0c4e729d87ac5bacc
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@2b75c82c6e192f70dd67659b0b5195f8175cf35c/assets/js/library/BilibiliAPI_Mod.min.js#md5=8516a310ca607a98e10183f3bc390b89
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js#md5=c9eee13e7fbf9401e86231f8a3931c9b
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js#md5=01ea51eab049581a299a246c69e4b66b
+// @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js#md5=e7cf340f1098cca24ad1ee821ee6b372
+// @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js#md5=fd01252de7df68ba208c299e3aa12218
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@1cf399f9b6f93a842c8bae3097bae7c464a2c769/assets/js/library/DanmuWebSocket.min.js#md5=2a69b11e82e8cce53ed4423e1f03629c
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js#md5=9efb9bbad87286bff8728164d0d39013
+// @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css#md5=a32982128e505c09c378d508a9d33b8c
+// @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css#md5=74b4f32d7f488600b6b9225164c4c306
+// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@59b1a6588db26f31d8e7f9f07aa961e54429a5f6/assets/html/main.min.html#md5=070cc3f9b88bed8e86a8eb8a436f9500
+// @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html#md5=4b1e93ee4a32735d76ce23300096e9f3
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
@@ -54,7 +54,7 @@
 // @grant          GM_setValue
 // @grant          GM_deleteValue
 // @grant          GM_addStyle
-// ==/UserScript== 
+// ==/UserScript==
 
 (function () {
   localstorage2gm();
@@ -376,9 +376,11 @@
   }
 
   // DOM加载完成后运行
-  $(function () {
+  $(document).ready(function ready() {
     // 若 window 下无 BilibiliLive，则说明页面有 iframe，此时脚本在在 top 中运行 或 发生错误
     if (W.BilibiliLive === undefined) return;
+    // 等待BilibiliLive中数据加载完成
+    if (!W.BilibiliLive.UID) return setTimeout(ready, 100);
     // 初始化右上角提示信息弹窗
     newWindow.init();
     // 检查浏览器版本并显示提示信息
