@@ -21,7 +21,7 @@ process.stdin.on('readable', () => {
       if (i !== list.length - 1) txt += ",\n";
     }
     exec('clip').stdin.end(iconv.encode(txt, 'gbk'));
-    process.stdout.write("\n处理完成（已复制到剪切板）: \n\n" + txt + "\n");
+    process.stdout.write("\n处理完成 (已复制到剪切板): \n\n" + txt + "\n");
   }
 });
 
