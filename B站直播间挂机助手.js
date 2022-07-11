@@ -875,7 +875,7 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "添加点赞按钮】找不到所需页面元素时不添加按钮。",
+              "【添加点赞按钮】找不到所需页面元素时不添加按钮。",
               "自动领取大会员权益功能改为默认关闭。",
               `修复在特殊直播间（如${linkMsg('https://live.bilibili.com/6')}等）脚本无法正常加载的Bug。`
             ];
