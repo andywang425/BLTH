@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.1.2
+// @version       3.1.3
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -1276,7 +1276,7 @@ var BAPI = {
                 }
             })
         },
-        elec_pay_quick: (up_mid, bp_num = 5, otype = 'up', is_bp_remains_prior = true, oid = up_mid) => {
+        elec_pay_quick: (up_mid, bp_num = 1, otype = 'up', is_bp_remains_prior = true, oid = up_mid) => {
             // 给UP充电
             return BAPI.ajaxWithCommonArgs({
                 method: 'POST',

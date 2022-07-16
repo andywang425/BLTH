@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        BiliveHeart
 // @namespace   https://github.com/lzghzr/TampermonkeyJS
-// @version     0.0.5
+// @version     0.0.6
 // @author      lzghzr
 // @description B站直播心跳
 // @include     /^https?:\/\/live\.bilibili\.com\/(?:blanc\/)?\d/
@@ -11,12 +11,14 @@
 // @run-at      document-end
 // ==/UserScript==
 class RoomHeart {
-    constructor(roomID) {
+    constructor(roomID, seq_target = 65) {
         this.roomID = roomID;
+        this.seq_target = seq_target;
     }
     areaID;
     parentID;
     seq = 0;
+    seq_target = 0;
     roomID;
     get id() {
         return [this.parentID, this.areaID, this.seq, this.roomID];
@@ -76,7 +78,7 @@ class RoomHeart {
         }
     }
     async webHeartBeat() {
-        if (this.seq > 30)
+        if (this.seq > this.seq_target)
             return;
         const arg = `${this.nextInterval}|${this.roomID}|1|0`;
         const argUtf8 = CryptoJS.enc.Utf8.parse(arg);
@@ -93,7 +95,7 @@ class RoomHeart {
             console.error(GM_info.script.name, `房间 ${this.roomID} 心跳失败`);
     }
     async savePatchData() {
-        if (this.seq > 30)
+        if (this.seq > this.seq_target)
             return;
         const sypderData = {
             id: JSON.stringify(this.id),
@@ -136,7 +138,7 @@ class RoomHeart {
             console.error(GM_info.script.name, `房间 ${this.roomID} 获取小心心失败`);
     }
     async x() {
-        if (this.seq > 30)
+        if (this.seq > this.seq_target)
             return this.doneFunc();
         const sypderData = {
             id: JSON.stringify(this.id),
