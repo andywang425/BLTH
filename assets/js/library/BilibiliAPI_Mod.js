@@ -1276,7 +1276,7 @@ var BAPI = {
                 }
             })
         },
-        elec_pay_quick: (up_mid, bp_num = 1, otype = 'up', is_bp_remains_prior = true, oid = up_mid) => {
+        elec_pay_quick: (up_mid, bp_num = 2, otype = 'up', is_bp_remains_prior = true, oid = up_mid) => {
             // 给UP充电
             return BAPI.ajaxWithCommonArgs({
                 method: 'POST',
