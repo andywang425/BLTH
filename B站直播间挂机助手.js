@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.8.4
+// @version        5.8.5
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -34,16 +34,16 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js#md5=91b65f8172cd69434cda8a7d49403ded
 // @require        https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js#md5=64413eda72405dd1d28bbb64d900c778
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js#md5=22eb65d8466061f0c4e729d87ac5bacc
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@2b75c82c6e192f70dd67659b0b5195f8175cf35c/assets/js/library/BilibiliAPI_Mod.min.js#md5=8516a310ca607a98e10183f3bc390b89
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d1f68400ee93db4490e5747113a93378667ea0bc/assets/js/library/BilibiliAPI_Mod.min.js#md5=b1e2229b3bb11bfe7c32c8b64d20b0fa
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js#md5=c9eee13e7fbf9401e86231f8a3931c9b
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js#md5=01ea51eab049581a299a246c69e4b66b
 // @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js#md5=e7cf340f1098cca24ad1ee821ee6b372
 // @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js#md5=fd01252de7df68ba208c299e3aa12218
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@1cf399f9b6f93a842c8bae3097bae7c464a2c769/assets/js/library/DanmuWebSocket.min.js#md5=2a69b11e82e8cce53ed4423e1f03629c
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js#md5=9efb9bbad87286bff8728164d0d39013
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js#md5=63dc79be0d7f2019e5f970a4e1e052a2
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css#md5=a32982128e505c09c378d508a9d33b8c
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css#md5=74b4f32d7f488600b6b9225164c4c306
-// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@59b1a6588db26f31d8e7f9f07aa961e54429a5f6/assets/html/main.min.html#md5=070cc3f9b88bed8e86a8eb8a436f9500
+// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@d1f68400ee93db4490e5747113a93378667ea0bc/assets/html/main.min.html#md5=122fea6f00fd39e993596f68f2b3942b
 // @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html#md5=4b1e93ee4a32735d76ce23300096e9f3
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -650,8 +650,6 @@
         SECONDS_NOTICE: false, // SECONDS QQ 推送
         SECONDS_QQ: '请输入你的QQ号', // seconds qq号
         SHARE: true, // 分享
-        SHARE_LIVEROOM: false, // 分享直播间
-        SHARE_LIVEROOM_INTERVAL: 400, // 分享间隔（毫秒）
         SILVER2COIN: false, // 银瓜子换硬币
         ServerTurbo_NOTICE: false, // Server酱·Turbo版
         ServerTurbo_SendKey: "SendKey", // Server酱·Turbo版SendKey
@@ -665,8 +663,9 @@
         TIME_RELOAD_MINUTE: 120, // 直播间重载时间
         UPDATE_TIP: true, //更新提示
         WATCH: true, // 观看视频
-        Watch30min: false, // 观看30分钟
-        Watch30minInterval: 400, // 观看30分钟每两次心跳的间隔
+        WatchLive: false, // 观看直播
+        WatchLiveInterval: 400, // 观看直播每两次心跳的间隔
+        WatchLiveTime: 65, // 观看直播时间
       },
       CACHE_DEFAULT: {
         AUTO_SEND_DANMU_TS: [], // 弹幕发送
@@ -678,7 +677,7 @@
         Live_sign_TS: 0, // 直播签到
         Live_like_TS: 0, // 点赞
         Live_share_TS: 0, // 分享
-        Live_watch_TS: 0, // 观看30分钟
+        Live_watch_TS: 0, // 观看直播
         Live_medalDanmu_TS: 0, // 粉丝勋章打卡弹幕
         Silver2Coin_TS: 0, // 银瓜子换硬币
         Coin2Sliver_TS: 0, // 硬币换银瓜子
@@ -875,9 +874,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "【添加点赞按钮】找不到所需页面元素时不添加按钮。",
-              "自动领取大会员权益功能改为默认关闭。",
-              `修复在特殊直播间（如${linkMsg('https://live.bilibili.com/6')}等）脚本无法正常加载的Bug。`
+              "适配新版粉丝勋章亲密度规则。",
+              "购买粉丝勋章改为充电2B币。",
+              "修复【添加点赞按钮】设置失效的Bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -896,7 +895,7 @@
                 <h2>通知</h2>
                 <mol>原q群因有群友发布政治敏感内容遭举报被封禁，请大家加入新群${linkMsg("https://jq.qq.com/?_wv=1027&k=9refOc8c", '657763329')}。</mol>
                 <hr><em style="color:grey;">
-                如果使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
+                如果在使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也欢迎进q群聊天：${linkMsg("https://jq.qq.com/?_wv=1027&k=9refOc8c", '657763329')}
                 </em>
                 `
@@ -1079,7 +1078,7 @@
                     icon: 2
                   });
                 }
-                myconfirm(`<div style = "text-align:center">是否消耗5B币购买UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>的粉丝勋章？</div>`, {
+                myconfirm(`<div style = "text-align:center">是否消耗2B币购买UP主<br>${linkMsg("https://space.bilibili.com/" + uid, uname)}<br>的粉丝勋章？</div>`, {
                   title: `购买勋章 房间号：${room_id}`,
                   btn: ['是', '否']
                 }, function () {
@@ -1091,7 +1090,7 @@
                         icon: 1
                       });
                     } else {
-                      mymsg(`购买失败 ${re.data.message}`, {
+                      mymsg(`购买失败 ${re.data.msg}`, {
                         time: 2500,
                         icon: 2
                       });
@@ -1371,14 +1370,14 @@
           val = parseInt(div.find('[data-toggle="LIKE_LIVEROOM_INTERVAL"] .num').val());
           if (isNaN(val) || val < 0) return window.toast('[直播点赞请求间隔] 错误输入', 'caution');
           MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL = val;
-          // SHARE_LIVEROOM_INTERVAL
-          val = parseInt(div.find('[data-toggle="SHARE_LIVEROOM_INTERVAL"] .num').val());
-          if (isNaN(val) || val < 0) return window.toast('[直播分享请求间隔] 错误输入', 'caution');
-          MY_API.CONFIG.SHARE_LIVEROOM_INTERVAL = val;
-          // Watch30minInterval
-          val = parseInt(div.find('[data-toggle="Watch30minInterval"] .num').val());
-          if (isNaN(val) || val < 0) return window.toast('[观看30分钟直播心跳请求间隔] 错误输入', 'caution');
-          MY_API.CONFIG.Watch30minInterval = val;
+          // WatchLiveInterval
+          val = parseInt(div.find('[data-toggle="WatchLiveInterval"] .num').val());
+          if (isNaN(val) || val < 0) return window.toast('[观看直播心跳请求间隔] 错误输入', 'caution');
+          MY_API.CONFIG.WatchLiveInterval = val;
+          // WatchLiveTime
+          val = parseInt(div.find('[data-toggle="WatchLiveTime"] .num').val());
+          if (isNaN(val) || val < 0) return window.toast('[观看直播心跳请求间隔] 错误输入', 'caution');
+          MY_API.CONFIG.WatchLiveTime = val;
           return MY_API.saveConfig();
         };
         const checkList = [
@@ -1415,7 +1414,7 @@
           "GET_PRIVILEGE",
           "GM_NOTICE",
           "IN_TIME_RELOAD_DISABLE",
-          "Watch30min",
+          "WatchLive",
           "LIVE_SIGN",
           "LOGIN",
           "MATERIAL_LOTTERY",
@@ -1439,15 +1438,13 @@
           "SECONDS_NOTICE",
           "SEND_ALL_GIFT",
           "SHARE",
-          "SHARE_LIVEROOM",
           "SILVER2COIN",
           "ServerTurbo_NOTICE",
           "TIME_AREA_DISABLE",
           "TIME_RELOAD",
           "UPDATE_TIP",
           "WATCH",
-          "LIKE_LIVEROOM",
-          "add_like_button"
+          "LIKE_LIVEROOM"
         ];
         const radioList = [
           /**
@@ -1502,9 +1499,9 @@
           ANCHOR_IGNORE_BLACKLIST: "忽略奖品名中含特定关键字或匹配特定正则表达式的存疑天选。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY: "忽略奖品名/抽奖规则中含特定关键字或匹配特定正则表达式的存疑抽奖。<mh3>注意：</mh3><mul><mli>若要填写多个，每一项之间用半角逗号<code>,</code>隔开。</mli><mli>可以填<a href='https://www.runoob.com/js/js-regexp.html' target='_blank'>JavaScript正则表达式</a>。格式为<code>/【正则】/【修饰符】（可选）</code>，如<code>/cards/i</code>。</mli><mli>关键字对大小写不敏感，而正则在没有添加修饰符<code>i</code>的情况下会区分大小写。</mli><mli>欢迎大家在Github Discussion的<a href='https://github.com/andywang425/BLTH/discussions/80' target='_blank'>信息收集贴</a>分享你的关键字。</mli></mul>",
           PP_NOTICE: "<a href = 'http://www.pushplus.plus/' target = '_blank'>推送加（点我注册）</a>，即「pushplus」，一个很好用的消息推送平台。<br><br><blockquote>“ 我们的所做的一切只是为了让推送变的更简单。”</blockquote><br>使用前请先前往推送加官网完成注册，然后回到脚本界面填写token。<br><mul><mli>检测到实物/天选中奖后会发一条包含中奖具体信息的微信公众号推送提醒你中奖了。</mli></mul>",
-          BUY_MEDAL: "通过给UP充电，消耗5B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
+          BUY_MEDAL: "通过给UP充电，消耗2B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
           btnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置所有为默认：指将设置和缓存重置为默认。</mli><mli>导出配置：导出一个包含当前脚本设置的json到浏览器的默认下载路径，文件名为<code>BLTH_CONFIG.json</code>。</mli><mli>导入配置：从一个json文件导入脚本配置，导入成功后脚本会自动刷新页面使配置生效。</mli></mul>",
-          Watch30min: "通过模拟心跳完成连续观看30分钟直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，可能会导致该功能无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>如果主播没有设置直播分区，该任务无法完成。</mli></mul>",
+          WatchLive: "通过模拟心跳完成连续观看直播的任务（无论目标房间是否开播都能完成任务）。<mul><mli>本任务运行时不会自动刷新页面。</mli><mli>如果你使用了带有广告拦截功能的浏览器拓展，可能会导致该功能无法使用。请自行将以下两个URL（或者合适的拦截规则）添加到拓展程序的白名单中：<br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/E</code><br><code>https://live-trace.bilibili.com/xlive/data-interface/v1/x25Kn/X</code></mli><mli>如果主播没有设置直播分区，该任务无法完成。</mli></mul>",
           SEND_ALL_GIFT: "若不勾选该项，自动送礼只会送出在【允许被送出的礼物类型】中的礼物。",
           AUTO_GIFT_ROOMID: "送礼时优先给这些房间送礼，送到对应粉丝牌亲密度上限后再送其它的。<mul><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。如<code>666,777,888</code>。</mli></mul>",
           GIFT_LIMIT: "将要在这个时间段里过期的礼物会被送出。<mh3>注意：</mh3><mul><mli>勾选【无视礼物类型和到期时间限制】时无论礼物是否将要过期都会被送出。</mli></mul>",
@@ -1578,13 +1575,12 @@
           POPULARITY_REDPOCKET_TYPE_FOLLOWING: "搜寻已关注且开播的直播间的红包抽奖。",
           AUTO_CHECK_DANMU: "检查你在当前直播间发送的弹幕是否发送成功。脚本向其它直播间发送的弹幕不在检测范围内。<mul><mli>这里的发送成功指的是你发送的弹幕对其他人可见。有时候表面上弹幕发送成功了，但实际上只有你自己能看见那条弹幕。</mli><mli>若弹幕疑似发送失败，则在右上角显示一条提示信息。</mli></mul>",
           AUTO_CHECK_DANMU_TIMEOUT: "弹幕被发送出去后开始计时，如果没有在超时时间内从当前直播间的webSocket中接收到之前所发送的弹幕则认为发送失败。",
-          SHARE_LIVEROOM: "完成分享直播间5次的任务。<mul><mli>并不会真的分享到某处，只是调用接口直接完成任务。</mli></mul>",
-          LIKE_LIVEROOM: "完成点赞直播间3次的任务",
-          LIKE_LIVEROOM_INTERVAL: "每两次点赞之间的间隔时间。<mul><mli>脚本的点赞方式是依次给每个粉丝勋章对应的直播间点一次赞，然后重复以上过程。</mli><mli>若间隔时间过短，部分点赞可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的点赞CD时间（大约是几秒钟），短时间内反复给一个直播间点赞只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
-          SHARE_LIVEROOM_INTERVAL: "每两次分享之间的间隔时间。<mul><mli>脚本的分享方式是依次把每个粉丝勋章对应的直播间分享一次，然后重复以上过程。</mli><mli>若间隔时间过短，部分分享可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli><mli>如果你的粉丝勋章很少，建议把间隔时间设置的稍大一些，因为每个直播间都存在一个独有的分享CD时间（大约是几秒钟），短时间内反复分享一个直播间只有第一次会生效。请根据自身粉丝勋章数量计算后填写。</mli></mul>",
-          Watch30minInterval: "每两次心跳的间隔时间。<mul><mli>脚本会依次给每个粉丝勋章对应的直播间发心跳包，然后重复数次直到观看时间满30分钟为止。</mli><mli>若间隔时间过短可能会出错。</mli></mul>",
+          LIKE_LIVEROOM: "完成点赞直播间1次的任务",
+          LIKE_LIVEROOM_INTERVAL: "每两次点赞之间的间隔时间。<mul><mli>若间隔时间过短，部分点赞可能会无效，即不加亲密度。请自行调整到一个合适的间隔时间。</mli></mul>",
+          WatchLiveInterval: "每两次心跳的间隔时间。<mul><mli>脚本会依次给每个粉丝勋章对应的直播间发心跳包，然后重复数次直到观看时间达标为止。</mli><mli>若间隔时间过短可能会出错。</mli></mul>",
           DailyTasksBtnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置缓存并刷新页面可以让脚本再次执行今天已经执行过的任务。</mli></mul>",
-          add_like_button: "在直播画面上方，分享按钮左侧添加一个点赞按钮。<mul><mli>该按钮被按下后只会触发一次点赞事件（可用来完成点赞任务），不会发送点赞弹幕。如果想发送点赞弹幕请使用B站的原生功能。</mli></mul>"
+          add_like_button: "在直播画面上方，分享按钮左侧添加一个点赞按钮。<mul><mli>该按钮被按下后只会触发一次点赞事件（可用来完成点赞任务），不会发送点赞弹幕。如果想发送点赞弹幕请使用B站的原生功能。</mli></mul>",
+          WatchLiveTime: `观看直播时长。单位分钟，必须填写整数。<mul><mli>每观看五分钟可获得100亲密度。如果完成了点赞和发弹幕任务，观看65分钟即可挂满亲密度。请根据自身情况调整观看时间。</mli><mli>具体规则请查阅B站官方公告${linkMsg('https://link.bilibili.com/p/eden/news#/newsdetail?id=2886')}。</mli></mul>`
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1614,8 +1610,8 @@
               myDiv.find('div[data-toggle="ANCHOR_IGNORE_ROOM"] label.str').text(String(MY_API.CONFIG.ANCHOR_IGNORE_ROOMLIST.length) + '个');
               myDiv.find('div[data-toggle="RESERVE_ACTIVITY_IGNORE_BLACKLIST"] label.str').html(MY_API.CONFIG.RESERVE_ACTIVITY_BLACKLIST_WORD.length + '个');
               // 显示输入框的值
-              myDiv.find('div[data-toggle="Watch30minInterval"] .num').val(MY_API.CONFIG.Watch30minInterval);
-              myDiv.find('div[data-toggle="SHARE_LIVEROOM_INTERVAL"] .num').val(String(MY_API.CONFIG.SHARE_LIVEROOM_INTERVAL));
+              myDiv.find('div[data-toggle="WatchLiveTime"] .num').val(MY_API.CONFIG.WatchLiveTime);
+              myDiv.find('div[data-toggle="WatchLiveInterval"] .num').val(MY_API.CONFIG.WatchLiveInterval);
               myDiv.find('div[data-toggle="LIKE_LIVEROOM_INTERVAL"] .num').val(MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL);
               myDiv.find('div[data-toggle="AUTO_CHECK_DANMU_TIMEOUT"] .num').val(MY_API.CONFIG.AUTO_CHECK_DANMU_TIMEOUT);
               myDiv.find('div[data-toggle="POPULARITY_REDPOCKET_DELAY"] .max').val(MY_API.CONFIG.POPULARITY_REDPOCKET_DELAY_MAX);
@@ -2503,6 +2499,10 @@
                   jqPath1: `div[data-toggle="AUTO_CHECK_DANMU"] input:checkbox`,
                   gmItem: `AUTO_CHECK_DANMU`,
                   toastMsg: ["[检测弹幕是否发送成功] 配置已保存", "info"]
+                }, {
+                  jqPath1: `div[data-toggle="add_like_button"] input:checkbox`,
+                  gmItem: `add_like_button`,
+                  toastMsg: ["[添加点赞按钮] 配置已保存", "info"]
                 }
               ];
               for (const i of specialSetting) {
@@ -3077,7 +3077,7 @@
         likeLiveRoom: async () => {
           if (!MY_API.CONFIG.LIKE_LIVEROOM) return $.Deferred().resolve();
           if (!checkNewDay(MY_API.CACHE.Live_like_TS)) return runMidnight(() => MY_API.LiveReward.likeLiveRoom(), '直播区 - 点赞');
-          const likeTimes = 5;
+          const likeTimes = 1;
           window.toast('[点赞直播间] 开始点赞直播间', 'info');
           if (medal_info.status.state() === "resolved") {
             const fansMedalList = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
@@ -3095,67 +3095,40 @@
             MY_API.saveCache();
             runMidnight(() => MY_API.LiveReward.likeLiveRoom(), '直播区 - 点赞');
           } else {
-            window.toast('[观看30分钟直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
-            return medal_info.status.then(() => MY_API.LiveReward.Watch30min());
+            window.toast('[观看直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.LiveReward.WatchLive());
           }
         },
-        shareLiveRoom: async () => {
-          if (!MY_API.CONFIG.SHARE_LIVEROOM) return $.Deferred().resolve();
-          if (!checkNewDay(MY_API.CACHE.Live_share_TS)) return runMidnight(() => MY_API.LiveReward.shareLiveRoom(), '直播区 - 分享');
-          window.toast('[分享直播间] 开始分享', 'info');
-          const shareTimes = 5;
-          if (medal_info.status.state() === "resolved") {
-            const medal_list = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
-            for (let i = 0; i < shareTimes; i++) {
-              for (const medal of medal_list) {
-                await BAPI.xlive.trigerInteract(medal.real_roomid).then(response => {
-                  MYDEBUG(`DailyReward.shareLiveRoom: API.xlive.trigerInteract(${medal.real_roomid}) response`, response);
-                  if (response.code !== 0) window.toast(`[分享直播间] 直播间${medal.real_roomid}分享直播间失败 ${response.message}`, 'caution');
-                });
-                await sleep(MY_API.CONFIG.SHARE_LIVEROOM_INTERVAL);
-              }
-            }
-            window.toast(`[分享直播间] 今日分享直播间完成`, 'success');
-            MY_API.CACHE.Live_share_TS = ts_ms();
-            MY_API.saveCache();
-            runMidnight(() => MY_API.LiveReward.shareLiveRoom(), '直播区 - 分享');
-          }
-          else {
-            window.toast('[分享直播间] 粉丝勋章列表未被完全获取，暂停运行', 'error');
-            return medal_info.status.then(() => MY_API.LiveReward.shareLiveRoom());
-          }
-        },
-        Watch30min: async () => {
-          if (!MY_API.CONFIG.Watch30min) return $.Deferred().resolve();
-          if (!checkNewDay(MY_API.CACHE.Live_watch_TS)) return runMidnight(() => MY_API.LiveReward.Watch30min(), '直播区 - 观看30分钟');
-          window.toast('[观看30分钟直播] 开始模拟观看直播', 'info');
+        WatchLive: async () => {
+          if (!MY_API.CONFIG.WatchLive) return $.Deferred().resolve();
+          if (!checkNewDay(MY_API.CACHE.Live_watch_TS)) return runMidnight(() => MY_API.LiveReward.WatchLive(), '直播区 - 观看直播');
+          window.toast('[观看直播] 开始模拟观看直播', 'info');
           if (medal_info.status.state() === "resolved") {
             let pReturn = $.Deferred();
             const fansMedalList = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
             for (let f = 0; f < fansMedalList.length; f++) {
               const funsMedalData = fansMedalList[f];
-              let roomHeart = new RoomHeart(funsMedalData.real_roomid)
+              let roomHeart = new RoomHeart(funsMedalData.real_roomid, MY_API.CONFIG.WatchLiveTime)
               await roomHeart.start()
               if (f === fansMedalList.length - 1) roomHeart.doneFunc = () => {
-                window.toast('[观看30分钟直播] 今日观看任务已完成', 'success');
+                window.toast('[观看直播] 今日观看任务已完成', 'success');
                 pReturn.resolve();
               }
-              await sleep(MY_API.CONFIG.Watch30minInterval);
+              await sleep(MY_API.CONFIG.WatchLiveInterval);
             }
             await pReturn;
             MY_API.CACHE.Live_watch_TS = ts_ms();
             MY_API.saveCache();
-            runMidnight(() => MY_API.LiveReward.Watch30min(), '直播区 - 观看30分钟');
+            runMidnight(() => MY_API.LiveReward.WatchLive(), '直播区 - 观看直播');
           } else {
-            window.toast('[观看30分钟直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
-            return medal_info.status.then(() => MY_API.LiveReward.Watch30min());
+            window.toast('[观看直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => MY_API.LiveReward.WatchLive());
           }
         },
         run: () => {
-          if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.SHARE_LIVEROOM && !MY_API.CONFIG.Watch30min && !MY_API.CONFIG.LIKE_LIVEROOM) || otherScriptsRunning) return $.Deferred().resolve();
+          if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.WatchLive && !MY_API.CONFIG.LIKE_LIVEROOM) || otherScriptsRunning) return $.Deferred().resolve();
           MY_API.LiveReward.dailySignIn();
-          MY_API.LiveReward.shareLiveRoom();
-          MY_API.LiveReward.Watch30min();
+          MY_API.LiveReward.WatchLive();
           MY_API.LiveReward.likeLiveRoom();
         }
       },
@@ -4936,11 +4909,11 @@
                         return BAPI.x.elec_pay_quick(defaultJoinData.uid).then((re) => {
                           MYDEBUG('API.x.elec_pay_quick 自动充电买一级牌子 re', re);
                           if (re.code === 0 && re.data.status === 4) {
-                            window.toast(`[天选时刻] 自动用5B币购买UP【${medalJson.anchorInfo.uname}】的1级粉丝牌（uid=${medalJson.anchorInfo.uid}）成功`, 'success');
+                            window.toast(`[天选时刻] 自动用2B币购买UP【${medalJson.anchorInfo.uname}】的1级粉丝牌（uid=${medalJson.anchorInfo.uid}）成功`, 'success');
                             MY_API.AnchorLottery.medal_list.push(medalJson);
                             return defaultJoinData;
                           } else {
-                            window.toast(`[天选时刻] 自动用5B币购买UP【${medalJson.anchorInfo.uname}】的1级粉丝牌（uid=${medalJson.anchorInfo.uid}）失败<br>${re.data.msg}`, 'warning');
+                            window.toast(`[天选时刻] 自动用2B币购买UP【${medalJson.anchorInfo.uname}】的1级粉丝牌（uid=${medalJson.anchorInfo.uid}）失败<br>${re.data.msg}`, 'warning');
                           }
                         });
                       } else {
@@ -6585,8 +6558,8 @@
     if (API.CONFIG.TIME_RELOAD) reset(API.CONFIG.TIME_RELOAD_MINUTE * 60000);// 刷新直播间
     function reset(delay) {
       let resetTimer = setTimeout(() => {
-        if (API.CONFIG.Watch30min && checkNewDay(API.CACHE.LiveReward_TS)) {
-          MYDEBUG('[刷新直播间]', '正在运行观看30分钟直播任务，10分钟后再次检查');
+        if (API.CONFIG.WatchLive && checkNewDay(API.CACHE.LiveReward_TS)) {
+          MYDEBUG('[刷新直播间]', '正在运行观看直播任务，10分钟后再次检查');
           clearTimeout(resetTimer);
           return reset(600e3);
         }

@@ -1,10 +1,17 @@
 const fs = require('fs')
-const axios = require('axios')
+const Axios = require('axios')
 const path = require('path')
 const crypto = require('crypto');
 const { exec } = require('child_process');
 const iconv = require('iconv-lite');
 const { setTimeout } = require('timers/promises');
+const HttpsProxyAgent = require("https-proxy-agent");
+// 请根据自身需求修改代理设置
+const httpsAgent = new HttpsProxyAgent(`http://127.0.0.1:10809`);
+const axios = Axios.create({
+    proxy: false,
+    httpsAgent
+})
 
 console.log("【给资源文件添加用于校验子资源完整性的md5值】");
 console.log("开始获取资源文件并计算md5值，请耐心等待...\n");
@@ -46,7 +53,8 @@ getMetaData();
             const reqParams = {
                 method: 'GET',
                 url: getURL(obj.value),
-                headers: headers
+                headers: headers,
+                timeout: 5000,
             }
             const data = await reqFile(reqParams);
             if (data !== 'FAILED')
@@ -74,17 +82,13 @@ getMetaData();
 async function reqFile(requestParams, retry = 3) {
     return await axios(requestParams).then(res => {
         return res.data;
-    }).catch(err => {
-        console.error('请求资源时出错，将再次获取', requestParams.value)
+    }).catch(async err => {
+        console.error('请求资源时出错，将再次获取', err.code, requestParams.url)
         // console.error('axios error', err)
         if (retry === 0) return 'FAILED';
         retry--;
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                reqFile(requestParams, retry);
-                resolve();
-            }, 1000)
-        })
+        return await setTimeout(1000, reqFile(requestParams, retry));
+        //return reqFile(requestParams, retry);
     })
 }
 
@@ -107,7 +111,6 @@ function getMd5(data) {
 function getURL(url) {
     return url.split('#')[0]
 }
-
 /**
  * 获取 metaData
  * [{ key: ..., value: ...}, { key: ..., value: ...}, ...]
