@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        5.8.4
+// @version        5.8.5
 // @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
 // @run-at         document-start
 // @connect        passport.bilibili.com
@@ -34,19 +34,16 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js#md5=91b65f8172cd69434cda8a7d49403ded
 // @require        https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js#md5=64413eda72405dd1d28bbb64d900c778
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js#md5=22eb65d8466061f0c4e729d87ac5bacc
-/// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@2b75c82c6e192f70dd67659b0b5195f8175cf35c/assets/js/library/BilibiliAPI_Mod.min.js#md5=8516a310ca607a98e10183f3bc390b89
-// @require        file:///D:\Documents\GitHub\BLTH\assets\js\library\BilibiliAPI_Mod.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d1f68400ee93db4490e5747113a93378667ea0bc/assets/js/library/BilibiliAPI_Mod.min.js#md5=b1e2229b3bb11bfe7c32c8b64d20b0fa
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js#md5=c9eee13e7fbf9401e86231f8a3931c9b
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js#md5=01ea51eab049581a299a246c69e4b66b
 // @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js#md5=e7cf340f1098cca24ad1ee821ee6b372
 // @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js#md5=fd01252de7df68ba208c299e3aa12218
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@1cf399f9b6f93a842c8bae3097bae7c464a2c769/assets/js/library/DanmuWebSocket.min.js#md5=2a69b11e82e8cce53ed4423e1f03629c
-/// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js#md5=9efb9bbad87286bff8728164d0d39013
-// @require        file:///D:\Documents\GitHub\BLTH\assets\js\library\BiliveHeart.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js#md5=63dc79be0d7f2019e5f970a4e1e052a2
 // @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css#md5=a32982128e505c09c378d508a9d33b8c
 // @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css#md5=74b4f32d7f488600b6b9225164c4c306
-/// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@59b1a6588db26f31d8e7f9f07aa961e54429a5f6/assets/html/main.min.html#md5=070cc3f9b88bed8e86a8eb8a436f9500
-// @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.html
+// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@d1f68400ee93db4490e5747113a93378667ea0bc/assets/html/main.min.html#md5=122fea6f00fd39e993596f68f2b3942b
 // @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html#md5=4b1e93ee4a32735d76ce23300096e9f3
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -877,9 +874,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "【添加点赞按钮】找不到所需页面元素时不添加按钮。",
-              "自动领取大会员权益功能改为默认关闭。",
-              `修复在特殊直播间（如${linkMsg('https://live.bilibili.com/6')}等）脚本无法正常加载的Bug。`
+              "适配新版粉丝勋章亲密度规则。",
+              "购买粉丝勋章改为充电2B币。",
+              "修复【添加点赞按钮】设置失效的Bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -898,7 +895,7 @@
                 <h2>通知</h2>
                 <mol>原q群因有群友发布政治敏感内容遭举报被封禁，请大家加入新群${linkMsg("https://jq.qq.com/?_wv=1027&k=9refOc8c", '657763329')}。</mol>
                 <hr><em style="color:grey;">
-                如果使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
+                如果在使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也欢迎进q群聊天：${linkMsg("https://jq.qq.com/?_wv=1027&k=9refOc8c", '657763329')}
                 </em>
                 `
