@@ -94,7 +94,11 @@
 
 - 如果使用脚本过程中遇到问题，可以先按上述步骤[开启控制台日志](#控制台日志)，然后关掉无关功能再次运行脚本并在控制台中寻找相关错误信息。若能找到请在反馈 bug 时附上这些控制台日志。
 - 反馈 bug 请点击[bug_report](https://github.com/andywang425/BLTH/issues/new?assignees=dong-jpg&labels=bug&template=bug_report.yaml)。
-- 交流 qq 群：[657763329](https://jq.qq.com/?_wv=1027&k=9refOc8c)。欢迎进来聊天或者提点建议~
+
+### 用户交流群
+
+- QQ 频道：[点我加入 aw 的频道](https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=1W7eVLs&businessType=9&from=181074&biz=ka&shareSource=5)。
+- 非官方电报群：[LaTiao01](https://t.me/LaTiao01)。
 
 ---
 
