@@ -6,13 +6,13 @@ const { exec } = require('child_process');
 const iconv = require('iconv-lite');
 const { setTimeout } = require('timers/promises');
 const HttpsProxyAgent = require("https-proxy-agent");
+const { resolve } = require('path');
 // 请根据自身需求修改代理设置
 const httpsAgent = new HttpsProxyAgent(`http://127.0.0.1:10809`);
 const axios = Axios.create({
     proxy: false,
-    httpsAgent
+    //httpsAgent
 })
-
 console.log("【给资源文件添加用于校验子资源完整性的md5值】");
 console.log("开始获取资源文件并计算md5值，请耐心等待...\n");
 
@@ -61,6 +61,7 @@ getMetaData();
                 metaData[i].newValue = getURL(metaData[i].value).concat('#md5=', getMd5(data));
             else
                 metaData[i].newValue = getURL(metaData[i].value);
+            await sleep(3000);
         }
     }
     let newRawMetaData = rawMetaData;
@@ -87,6 +88,7 @@ async function reqFile(requestParams, retry = 3) {
         // console.error('axios error', err)
         if (retry === 0) return 'FAILED';
         retry--;
+        await sleep(3000);
         return await setTimeout(1000, reqFile(requestParams, retry));
         //return reqFile(requestParams, retry);
     })
@@ -131,6 +133,9 @@ function getMetaData() {
     }
 }
 
+function sleep(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
 /*
 本地文件的处理方法
 const splitSlash = getURL(obj.value).split('/');
