@@ -30,19 +30,19 @@
 // @connect        pushplus.plus
 // @connect        andywang.top
 // @connect        gitee.com
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js#md5=cc101879d48e9ecb9355b59210dc1156
-// @require        https://gcore.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js#md5=76990e4f00ede940f52dfa47b8b28d09
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js#md5=51fb5bb6769bf8726d6764e0104449f4
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@d1f68400ee93db4490e5747113a93378667ea0bc/assets/js/library/BilibiliAPI_Mod.min.js#md5=b7e5218680fe5c4c533b00ae2f9f5fcc
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js#md5=ed79a752bc92976231b133b720191672
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js#md5=78ce33308691fd4ac164ebe3db7ee9fb
-// @require        https://gcore.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js#md5=ace2823360b991b0bdb267d78cac3016
-// @require        https://gcore.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js#md5=5d4192836d3213d1043556345caf3640
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js#md5=d2be56be495e6e86dadc0c435d71cf2c
-// @resource       layerCss https://gcore.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css#md5=e1bd733bd5cda50056ea0588c9ff12cd
-// @resource       myCss    https://gcore.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css#md5=7d84779f5bfc1b346c3bb337f85f17aa
-// @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@9184f99eb673e766999401eb963787d5c72e39c9/assets/html/main.min.html#md5=437498ac71622a188f6cd2c67470bdce
-// @resource       eula     https://gcore.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html#md5=afa9f4c7286c7b16bdcbab222aed8fa1
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
+// @require        https://gcore.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@d1f68400ee93db4490e5747113a93378667ea0bc/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
+// @require        https://gcore.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
+// @require        https://gcore.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js
+// @resource       layerCss https://gcore.jsdelivr.net/gh/andywang425/BLTH@d25aa353c8c5b2d73d2217b1b43433a80100c61e/assets/css/layer.css
+// @resource       myCss    https://gcore.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
+// @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@9184f99eb673e766999401eb963787d5c72e39c9/assets/html/main.min.html
+// @resource       eula     https://gcore.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
