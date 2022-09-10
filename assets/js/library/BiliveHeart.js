@@ -5,7 +5,7 @@
 // @author      lzghzr
 // @description B站直播心跳
 // @include     /^https?:\/\/live\.bilibili\.com\/(?:blanc\/)?\d/
-// @require     https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js
+// @require     https://gcore.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js
 // @license     MIT
 // @grant       none
 // @run-at      document-end

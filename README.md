@@ -1,4 +1,4 @@
-<p align ="center"><img src="https://fastly.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"></p>
+<p align ="center"><img src="https://gcore.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"></p>
 <p align="center"><img src="https://img.shields.io/badge/TamperMonkey_4.12-pass-green.svg" alt="TamperMonkey 4.12"> <img src="https://img.shields.io/badge/Violentmonkey_2.12.14-pass-green.svg" alt="Violentmonkey 2.12.14"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"> <a href="https://jq.qq.com/?_wv=1027&k=fCSfWf1O"> <a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a></p>
 <p align="center"><a href="https://jq.qq.com/?_wv=1027&k=9refOc8c"><img src="https://img.shields.io/badge/QQ%20Group-657763329-yellow" alt="QQ Group"></a></p>
 <h1 align="center">B站直播间挂机助手</h1>
@@ -25,7 +25,7 @@
 
 ## 一些建议
 
-- 请确保能正常访问 `fastly.jsdelivr.net` 这个网站，脚本每次安装后初次运行时会从该网站获取依赖。[可以点我](https://fastly.jsdelivr.net/npm/lodash@4.17.10/core.min.js)测试你能否正常访问。若不能，请在脚本每次安装后初次运行时想办法让依赖被获取到，之后即可正常使用。
+- 请确保能正常访问 `gcore.jsdelivr.net` 这个网站，脚本每次安装后初次运行时会从该网站获取依赖。[可以点我](https://gcore.jsdelivr.net/npm/lodash@4.17.10/core.min.js)测试你能否正常访问。若不能，请在脚本每次安装后初次运行时想办法让依赖被获取到，之后即可正常使用。
 - 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新(`ctrl+F5`)页面。
 - 部分设置更改后需要刷新页面才能生效。
 - 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如 cookie 权限，脚本拦截)否则该脚本可能无法正常运行。
@@ -145,11 +145,8 @@
 - [layer](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web 弹层组件。
 - [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器 XMLHttpRequest 的库。
 - [bliveproxy](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B 站直播 websocket hook 框架。
-- [pako](https://github.com/nodeca/pako) (MIT)：javascript 压缩/解压缩库。
-- [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli 项目中的 javascript 解码库。
 - [hotkeys](https://github.com/jaywcjlove/hotkeys) (MIT)：一个强健的 Javascript 库，用于捕获键盘输入和输入的组合键。
 - [emitter](https://github.com/component/emitter) (MIT): 事件触发器组件。
-- [DanmuWebSocket](https://github.com/andywang425/BLTH/blob/master/assets/js/library/DanmuWebSocket.js) (MIT)：B 站直播 Websocket 弹幕库。
 - [BiliveHeart](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveHeart/BiliveHeart.user.js) (MIT)：B 站直播心跳库。
 
 本脚本引用的外部资源：

@@ -20,68 +20,7 @@
 
 ### 推荐方式
 
-复制以下代码到 Tampermonkey 中，把其中最后一个`@require`的`<B站直播间挂机助手.js的路径>`改为脚本的路径，这样每次修改完代码后只需刷新网页即可生效。如果你需要修改其它`@require`或`@resource`中的文件，也可以用这种方法。
-
-```js
-// ==UserScript==
-// @name           B站直播间挂机助手 (dev)
-// @name:zh        B站直播间挂机助手 (dev)
-// @name:en        Bilibili Live Helper (dev)
-// @namespace      https://github.com/andywang425
-// @author         andywang425
-// @description    优化直播观看体验
-// @description:en Improve live viewing experience
-// @updateURL      https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
-// @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
-// @homepageURL    https://github.com/andywang425/BLTH
-// @supportURL     https://github.com/andywang425/BLTH/issues
-// @icon           https://fastly.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png
-// @copyright      2021, andywang425 (https://github.com/andywang425)
-// @license        MIT
-// @compatible     chrome 80 or later
-// @compatible     firefox 77 or later
-// @compatible     opera 69 or later
-// @compatible     safari 13.1 or later
-// @version        2233
-// @include        /https?:\/\/live\.bilibili\.com\/[blanc\/]?[^?]*?\d+\??.*/
-// @run-at         document-start
-// @connect        passport.bilibili.com
-// @connect        api.live.bilibili.com
-// @connect        api.bilibili.com
-// @connect        api.vc.bilibili.com
-// @connect        live-trace.bilibili.com
-// @connect        sctapi.ftqq.com
-// @connect        pushplus.plus
-// @connect        andywang.top
-// @connect        gitee.com
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
-// @require        https://fastly.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
-// @require        https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@2b75c82c6e192f70dd67659b0b5195f8175cf35c/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
-// @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
-// @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@1cf399f9b6f93a842c8bae3097bae7c464a2c769/assets/js/library/DanmuWebSocket.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@e958223fc93e0d55e89524619a97ceeb5f75a19f/assets/js/library/BiliveHeart.min.js
-// @require        file:///<B站直播间挂机助手.js的路径>
-// @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@7eb6c0c66dd21e6e833ed88b1ec6bf5d92113ab2/assets/css/layer.css
-// @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@59b1a6588db26f31d8e7f9f07aa961e54429a5f6/assets/html/main.min.html
-// @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
-// @grant          unsafeWindow
-// @grant          GM_xmlhttpRequest
-// @grant          GM_getResourceText
-// @grant          GM_notification
-// @grant          GM_openInTab
-// @grant          GM_getValue
-// @grant          GM_setValue
-// @grant          GM_deleteValue
-// @grant          GM_addStyle
-// ==/UserScript==
-```
+把脚本头部复制到 Tampermonkey 中，在元数据的最后加上一行`// @require        file:///<B站直播间挂机助手.js的路径>`，这样每次修改完代码后只需刷新网页即可生效。如果你需要修改其它`@require`或`@resource`中的文件，也可以用这种方法。
 
 ## 项目概览
 
@@ -166,7 +105,7 @@ BLTH
 
 - 删除在代码中临时添加的日志输出语句 (`console.log`等)。
 - 如果你调试了 [BLTH-server](https://github.com/andywang425/BLTH-server) 相关的功能，记得删除元数据中的`// @connect localhost`。
-- 如果你更新了`@require`或`@resource`中的文件，记得先将这些文件的修改提交到仓库，然后把文件地址`file:///<...>`替换为 cdn 链接`https://fastly.jsdelivr.net/gh/<你的github用户名>/BLTH@<...>`。请不要删除你 fork 的仓库，这可能会导致用户无法正常获取这些依赖。
+- 如果你更新了`@require`或`@resource`中的文件，记得先将这些文件的修改提交到仓库，然后把文件地址`file:///<...>`替换为 cdn 链接`https://gcore.jsdelivr.net/gh/<你的github用户名>/BLTH@<...>`。请不要删除你 fork 的仓库，这可能会导致用户无法正常获取这些依赖。
 - 更新脚本元数据中的版本号`// @version`。通常来说在最后一位+1 即可，满 10 则向前进位。
 - 更新位于`/assets/json/`目录下的`notice.json`中的版本号，然后压缩该 json 文件得到`notice.min.json`。
 - 攥写更新日志`update-log.md`，格式仿照先前的日志写即可。写完后复制更新内容，之后会用到。

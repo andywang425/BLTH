@@ -4,8 +4,8 @@
 // @version      0.2
 // @description  B站直播WebSocket弹幕库
 // @author       andywang425
-// @require      https://fastly.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
-// @require      https://fastly.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
+// @require      https://gcore.jsdelivr.net/gh/andywang425/BLTH@d810c0c54546b88addc612522c76ba481285298d/assets/js/library/decode.min.js
+// @require      https://gcore.jsdelivr.net/npm/pako@1.0.10/dist/pako.min.js
 // @grant        none
 // ==/UserScript==
 class DanmuWebSocket extends WebSocket {
