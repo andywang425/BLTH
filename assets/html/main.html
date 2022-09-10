@@ -1,74 +1,5 @@
 <div id="allsettings" class="blth_main">
-        <div id="top_fieldset">
-                <fieldset class="blth_fs">
-                        <legend>今日统计</legend>
-                        <div data-toggle="topArea"><span id="giftCount"
-                                        style="font-size:large; font-weight:bold; color:blueviolet;"><span
-                                                class="anchor">参与天选时刻<span class="statNum">0</span>次
-                                        </span><span class="material">参与实物抽奖<span class="statNum">0</span>次
-                                        </span><button class="blth_btn" data-action="save">保存所有设置</button></span><span
-                                        helpdata="topArea" class="clickableText helpText">?</span></div>
-                </fieldset>
-        </div>
-        <div id="bottom_fieldset" class="fieldset">
-                <fieldset class="blth_fs">
-                        <legend>抽奖设置</legend>
-                        <div data-toggle="PLATE_ACTIVITY"><label style="color:blueviolet;"><input
-                                                type="checkbox">参与转盘抽奖</label>
-                                <span helpdata="PLATE_ACTIVITY" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="PLATE_ACTIVITY_GETTIMES_INTERVAL"><label class="lineStartSpace">获取抽奖次数请求间隔
-                                        <input class="num blth_input" style="width:30px;" type="text">毫秒
-                                        <span helpdata="PLATE_ACTIVITY_GETTIMES_INTERVAL"
-                                                class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="PLATE_ACTIVITY_LOTTERY_INTERVAL"><label class="lineStartSpace">参与抽奖请求间隔
-                                        <input class="num blth_input" style="width:30px;" type="text">秒
-                                        <span helpdata="PLATE_ACTIVITY_LOTTERY_INTERVAL"
-                                                class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="PLATE_ACTIVITY_CHECK_INTERVAL"><label class="lineStartSpace">检查间隔
-                                        <input class="num blth_input" style="width:30px;" type="text">分钟
-                        </div>
-                        <div data-toggle="RESERVE_ACTIVITY"><label style="color:blueviolet;"><input
-                                                type="checkbox">参与直播预约抽奖</label>
-                                <span helpdata="RESERVE_ACTIVITY" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="RESERVE_ACTIVITY_INTERVAL"><label class="lineStartSpace">请求间隔
-                                        <input class="num blth_input" style="width:30px;" type="text">毫秒
-                                        <span helpdata="RESERVE_ACTIVITY_INTERVAL"
-                                                class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="RESERVE_ACTIVITY_CHECK_INTERVAL"><label class="lineStartSpace">检查间隔
-                                        <input class="num blth_input" style="width:30px;" type="text">分钟
-                        </div>
-                        <div data-toggle="RESERVE_ACTIVITY_IGNORE_BLACKLIST"><label class="lineStartSpace"><input
-                                                type="checkbox">忽略关键字 <label class="str"
-                                                style="font-weight:bold">1个</label><button class="blth_btn"
-                                                data-action="edit_RESERVE_ACTIVITY_BLACKLIST_WORD">编辑关键字</button>
-                                        <button class="blth_btn"
-                                                data-action="addCloud_RESERVE_ACTIVITY_BLACKLIST_WORD">添加云端关键字</button></label><span
-                                        helpdata="RESERVE_ACTIVITY_IGNORE_BLACKLIST"
-                                        class="clickableText helpText">?</span></div>
-                        <div data-toggle="MATERIAL_LOTTERY"><label style="color:blueviolet;"><input
-                                                type="checkbox">参与实物抽奖
-                                </label><span helpdata="MATERIAL_LOTTERY" class="clickableText helpText">?</span></div>
-                        <div data-toggle="MATERIAL_LOTTERY_CHECK_INTERVAL"><label class="lineStartSpace">检查间隔 <input
-                                                class="num blth_input" style="width:30px;" type="text">分钟 </label>
-                        </div>
-                        <div data-toggle="MATERIAL_LOTTERY_REM"><label class="lineStartSpace">检测到 <input
-                                                class="num blth_input" style="width:30px;" type="text">个不存在活动的aid后停止检测
-                                </label><span helpdata="MATERIAL_LOTTERY_REM" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"><label
-                                        class="lineStartSpace"><input type="checkbox">忽略关键字 <label class="str"
-                                                style="font-weight:bold">1个</label><button class="blth_btn"
-                                                data-action="edit_QUESTIONABLE_LOTTERY">编辑关键字</button>
-                                        <button class="blth_btn"
-                                                data-action="addCloud_MATERIAL_BLACKLIST_WORD">添加云端关键字</button></label><span
-                                        helpdata="MATERIAL_LOTTERY_IGNORE_QUESTIONABLE_LOTTERY"
-                                        class="clickableText helpText">?</span></div>
-                </fieldset>
+        <div class="fieldset">
                 <fieldset class="blth_fs">
                         <legend>每日任务设置</legend>
                         <div><label>主站每日任务</label></div>
@@ -104,8 +35,8 @@
                                                 helpdata="WatchLive" class="clickableText helpText">?</span></div>
                                 <div data-toggle="WatchLiveTime"><label class="lineStartSpace">观看时间
                                                 <input class="num blth_input" style="width:40px;" type="text">分钟
-                                        </label><span helpdata="WatchLiveTime"
-                                                class="clickableText helpText">?</span></div>
+                                        </label><span helpdata="WatchLiveTime" class="clickableText helpText">?</span>
+                                </div>
                                 <div data-toggle="WatchLiveInterval"><label class="lineStartSpace">心跳间隔
                                                 <input class="num blth_input" style="width:40px;" type="text">毫秒
                                         </label><span helpdata="WatchLiveInterval"
@@ -263,192 +194,6 @@
                         </div>
                 </fieldset>
                 <fieldset class="blth_fs">
-                        <legend>天选时刻</legend>
-                        <div data-toggle="ANCHOR_LOTTERY"><label style="color:blueviolet"><input
-                                                type="checkbox">参加天选时刻抽奖
-                                </label><span helpdata="ANCHOR_LOTTERY" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_AWPUSH">
-                                <input type="checkbox">
-                                <label style="font-weight: bold;">启用 awpush</label>
-                                <button class="blth_btn" data-action="edit_ANCHOR_SERVER_APIKEY">编辑apikey</button>
-                                <span helpdata="ANCHOR_AWPUSH" class="clickableText helpText">?</span>
-                        </div>
-                        <div>天选时刻数据获取方式</div>
-                        <div data-toggle="ANCHOR_TYPE_POLLING" class="lineStartSpace"><input
-                                        type="checkbox">从高热度直播间获取天选时刻数据
-                                <span helpdata="ANCHOR_TYPE_POLLING" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_TYPE_LIVEROOM" class="lineStartSpace"><input type="checkbox">从直播间
-                                <input class="num blth_input" style="width:100px;" type="text">的个人简介获取天选时刻数据 <span
-                                        helpdata="ANCHOR_TYPE_LIVEROOM" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_TYPE_SERVER" class="lineStartSpace"><input type="checkbox"><span>从
-                                        BLTH-server 获取天选时刻数据</span>
-                                <button class="blth_btn" data-action="edit_ANCHOR_SERVER_APIKEY">编辑apikey</button>
-                                <span helpdata="ANCHOR_TYPE_SERVER" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_TYPE_FOLLOWING" class="lineStartSpace"><input
-                                        type="checkbox">从已关注且正在直播的直播间获取天选时刻数据 <span helpdata="ANCHOR_TYPE_FOLLOWING"
-                                        class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_TYPE_CUSTOM" class="lineStartSpace"><input
-                                        type="checkbox">从自定义直播间列表获取天选时刻数据
-                                <button class="blth_btn" data-action="edit_ANCHOR_CUSTOM_ROOMLIST">编辑直播间列表</button><span
-                                        helpdata="ANCHOR_TYPE_CUSTOM" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_MAXROOM"><label>检查房间最大数量 <input class="roomNum blth_input"
-                                                style="width:50px;" type="text"></label><span helpdata="ANCHOR_MAXROOM"
-                                        class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_UPLOAD_DATA"><label><input type="checkbox">上传天选数据至直播间个人简介(间隔
-                                        <input class="num blth_input" style="width:30px;" type="text">秒)
-                                </label><span helpdata="ANCHOR_UPLOAD_DATA" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_UPLOAD_ROOMLIST"><label><input
-                                                type="checkbox"><span>上传天选数据至BLTH-server</span>
-                                </label><button class="blth_btn"
-                                        data-action="edit_ANCHOR_SERVER_APIKEY">编辑apikey</button><span
-                                        helpdata="ANCHOR_UPLOAD_ROOMLIST" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_MAXLIVEROOM_SAVE"><label>个人简介储存房间最大数量 <input class="roomNum blth_input"
-                                                style="width:50px;" type="text"></label><span
-                                        helpdata="ANCHOR_MAXLIVEROOM_SAVE" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_UPLOAD_MSG"><label><input type="checkbox">上传附加信息
-                                        <button class="blth_btn"
-                                                data-action="edit_ANCHOR_UPLOAD_MSG">编辑附加信息</button></label><span
-                                        helpdata="ANCHOR_UPLOAD_MSG" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_IGNORE_UPLOAD_MSG"><label><input type="checkbox">忽略附加信息 </label><span
-                                        helpdata="ANCHOR_IGNORE_UPLOAD_MSG" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_CHECK_INTERVAL"><label>天选获取数据间隔 <input class="num blth_input"
-                                                style="width:25px;" type="text">分钟 </label><span
-                                        helpdata="ANCHOR_CHECK_INTERVAL" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_NEED_GOLD"><label>忽略所需电池大于 <input class="num blth_input"
-                                                style="width:50px;" type="text">的天选 </label></div>
-                        <div data-toggle="ANCHOR_GOLD_JOIN_TIMES"><label>每个付费天选参加 <input class="num blth_input"
-                                                style="width:50px;" type="text">次 </label><span
-                                        helpdata="ANCHOR_GOLD_JOIN_TIMES" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_IGNORE_AREA">
-                                <label>
-                                        <input type="checkbox">忽略指定分区
-                                        <button class="blth_btn" data-action="edit_ANCHOR_IGNORE_AREA">编辑分区</button>
-                                </label><span helpdata="ANCHOR_IGNORE_AREA" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_IGNORE_BLACKLIST"><label><input type="checkbox">忽略关键字
-                                        <label class="str" style="font-weight:bold">1个</label><button class="blth_btn"
-                                                data-action="edit_ANCHOR_BLACKLIST_WORD">编辑关键字</button>
-                                        <button class="blth_btn"
-                                                data-action="addCloud_ANCHOR_BLACKLIST_WORD">添加云端关键字</button>
-                                </label><span helpdata="ANCHOR_IGNORE_BLACKLIST" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_IGNORE_ROOM"><label><input type="checkbox">忽略直播间
-                                        <label class="str" style="font-weight:bold">1个</label><button class="blth_btn"
-                                                data-action="edit_ANCHOR_IGNORE_ROOMLIST">编辑直播间</button>
-                                        <button class="blth_btn"
-                                                data-action="addCloud_ANCHOR_IGNORE_ROOMLIST">添加云端直播间</button></label><span
-                                        helpdata="ANCHOR_IGNORE_ROOM" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_FANS_CHECK"><label><input type="checkbox">忽略粉丝数小于 <input
-                                                class="num blth_input" style="width:60px;"
-                                                type="text">的UP的天选</label><span helpdata="ANCHOR_FANS_CHECK"
-                                        class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_IGNORE_MONEY"><label>忽略金额小于 <input class="num blth_input"
-                                                style="width:30px;" type="text">元的天选 </label><span
-                                        helpdata="ANCHOR_IGNORE_MONEY" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_MONEY_ONLY"><label><input type="checkbox">仅参加现金抽奖
-                                </label><span helpdata="ANCHOR_MONEY_ONLY" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_AUTO_BUY_LV1_MEDAL"><label><input
-                                                type="checkbox">检测到有1级粉丝牌要求的天选后自动购买勋章再参加
-                                </label><span helpdata="ANCHOR_AUTO_BUY_LV1_MEDAL"
-                                        class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_AUTO_BUY_LV1_MEDAL_TYPE" class="lineStartSpace">
-                                <div data-toggle="B_COIN"><input type="radio"
-                                                name="ANCHOR_AUTO_BUY_LV1_MEDAL_TYPE">使用2B币 </div>
-                                <div data-toggle="B_KELA"><input type="radio" name="ANCHOR_AUTO_BUY_LV1_MEDAL_TYPE"
-                                                class="smallInterval">使用包裹中的B坷垃
-                                </div>
-                        </div>
-                        <div data-toggle="ANCHOR_INTERVAL"><label>请求间隔 <input class="num blth_input" style="width:30px;"
-                                                type="text">毫秒 </label><span helpdata="ANCHOR_INTERVAL"
-                                        class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_WAIT_REPLY"><label><input type="checkbox">发出请求后等待回复
-                                </label><span helpdata="ANCHOR_WAIT_REPLY" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_IGNORE_PWDROOM"><label><input type="checkbox">不参与加密直播间的天选 </label><span
-                                        helpdata="ANCHOR_IGNORE_PWDROOM" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_MOVETO_FOLLOW_TAG"><label><input type="checkbox">把参与天选时关注的UP移到新分组
-                                        <button style="font-size:small;color:red;" class="blth_btn"
-                                                data-action="removeAnchorFollowingInTag">取关该分组内的UP主</button></label><span
-                                        helpdata="ANCHOR_MOVETO_FOLLOW_TAG" class="clickableText helpText">?</span>
-                        </div>检测到<strong style="color:blueviolet">未中奖</strong>后<br>
-                        <div data-toggle="ANCHOR_AUTO_DEL_FOLLOW"><label class="lineStartSpace"><input
-                                                type="checkbox">自动取关发起抽奖的UP </label><span
-                                        helpdata="ANCHOR_AUTO_DEL_FOLLOW" class="clickableText helpText">?</span></div>
-                        检测到<strong style="color:blueviolet">中奖</strong>后<br>
-                        <div data-toggle="ANCHOR_PRIVATE_LETTER"><label class="lineStartSpace"><input
-                                                type="checkbox">给发起抽奖的UP发一条私信 <button class="blth_btn"
-                                                data-action="edit_ANCHOR_LETTER_CONTENT">编辑私信内容</button></label><span
-                                        helpdata="ANCHOR_PRIVATE_LETTER" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_DANMU"><label class="lineStartSpace"><input type="checkbox">在对应直播间发一条弹幕
-                                        <button class="blth_btn"
-                                                data-action="edit_ANCHOR_DANMU_CONTENT">编辑弹幕内容</button></label><span
-                                        helpdata="ANCHOR_DANMU" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_MOVETO_PRIZE_TAG"><label class="lineStartSpace"><input
-                                                type="checkbox">把发起抽奖的UP移到新分组 <button style="font-size:small;color:red;"
-                                                class="blth_btn"
-                                                data-action="removeAnchorPrizeInTag">取关该分组内的UP主</button></label><span
-                                        helpdata="ANCHOR_MOVETO_PRIZE_TAG" class="clickableText helpText">?</span></div>
-                        <div data-toggle="ANCHOR_ADD_TO_WHITELIST"><label class="lineStartSpace"><input
-                                                type="checkbox">把发起抽奖的UP加入白名单 </label></div>
-                        <div data-toggle="anchorBtnArea"><button data-action="saveFollowingList"
-                                        class="blth_btn">保存当前关注列表为白名单</button><button
-                                        data-action="removeAnchorFollowing" class="blth_btn"
-                                        style="color:red;">取关不在白名单内的UP主</button><button data-action="editWhiteList"
-                                        class="blth_btn">编辑白名单</button><span helpdata="anchorBtnArea"
-                                        class="clickableText helpText">?</span>
-                        </div>
-                </fieldset>
-                <fieldset class="blth_fs">
-                        <legend>直播红包抽奖</legend>
-                        <div data-toggle="POPULARITY_REDPOCKET_LOTTERY"><label style="color:blueviolet"><input
-                                                type="checkbox">参加直播红包抽奖
-                                </label><span helpdata="POPULARITY_REDPOCKET_LOTTERY"
-                                        class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ANCHOR_AWPUSH">
-                                <input type="checkbox">
-                                <label style="font-weight: bold;">启用 awpush</label>
-                                <button class="blth_btn" data-action="edit_ANCHOR_SERVER_APIKEY">编辑apikey</button>
-                                <span helpdata="ANCHOR_AWPUSH" class="clickableText helpText">?</span>
-                        </div>
-                        <div>红包抽奖数据获取方式</div>
-                        <div data-toggle="POPULARITY_REDPOCKET_TYPE_POLLING" class="lineStartSpace"><input
-                                        type="checkbox">从高热度直播间获取红包抽奖数据 <span
-                                        helpdata="POPULARITY_REDPOCKET_TYPE_POLLING"
-                                        class="clickableText helpText">?</span></div>
-                        <div data-toggle="POPULARITY_REDPOCKET_TYPE_FOLLOWING" class="lineStartSpace"><input
-                                        type="checkbox">从已关注且正在直播的直播间获取红包抽奖数据 <span
-                                        helpdata="POPULARITY_REDPOCKET_TYPE_FOLLOWING"
-                                        class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="POPULARITY_REDPOCKET_IGNORE_BATTERY"><label>忽略奖品总价值小于 <input
-                                                class="num blth_input" style="width:45px;" type="text">电池的红包
-                                </label></div>
-                        <div data-toggle="POPULARITY_REDPOCKET_CHECK_INTERVAL"><label>获取红包数据间隔 <input
-                                                class="num blth_input" style="width:25px;" type="text">分钟 </label><span
-                                        helpdata="POPULARITY_REDPOCKET_CHECK_INTERVAL"
-                                        class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="POPULARITY_REDPOCKET_REQUEST_INTERVAL"><label>请求间隔 <input
-                                                class="num blth_input" style="width:30px;" type="text">毫秒
-                                </label><span helpdata="POPULARITY_REDPOCKET_REQUEST_INTERVAL"
-                                        class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="POPULARITY_REDPOCKET_DELAY">
-                                <label>参与抽奖前随机延迟 <input class="min num blth_input" style="width:40px;" type="text"> ~
-                                        <input class="max num blth_input" style="width:40px;" type="text"> 毫秒</label>
-                                <span helpdata="POPULARITY_REDPOCKET_DELAY" class="clickableText helpText">?</span>
-                        </div>
-                </fieldset>
-                <fieldset class="blth_fs">
                         <legend>直播观看体验</legend>
                         <div data-toggle="REMOVE_ELEMENT_2233"><label><input type="checkbox">移除2233模型
                                 </label></div>
@@ -492,16 +237,8 @@
                 </fieldset>
                 <fieldset class="blth_fs">
                         <legend>其他设置</legend>
-                        <div data-toggle="TIME_AREA_DISABLE"><label style="color:darkgreen"><input type="checkbox">休眠时段：
-                                        <input class="startHour blth_input" style="width:20px;" type="text">点 <input
-                                                class="startMinute blth_input" style="width:20px;" type="text">分至
-                                        <input class="endHour blth_input" style="width:20px;" type="text">点 <input
-                                                class="endMinute blth_input" style="width:20px;" type="text">分
-                                </label><span helpdata="TIME_AREA_DISABLE" class="clickableText helpText">?</span></div>
                         <div data-toggle="TIME_RELOAD"><input type="checkbox">每 <input class="delay-seconds blth_input"
                                         type="text" style="width:30px;">分钟刷新一次页面
-                        </div>
-                        <div data-toggle="IN_TIME_RELOAD_DISABLE"><label><input type="checkbox">不抽奖时段不刷新直播间 </label>
                         </div>
                         <div data-toggle="debugSwitch"><label><input type="checkbox">控制台日志
                                 </label><span helpdata="debugSwitch" class="clickableText helpText">?</span>
@@ -511,30 +248,6 @@
                         </div>
                         <div data-toggle="UPDATE_TIP"><label><input type="checkbox">更新内容提示
                                 </label><span helpdata="UPDATE_TIP" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="GM_NOTICE"><label><input type="checkbox">实物/天选中奖后系统通知 </label>
-                        </div>
-                        实物/天选中奖后消息推送
-                        <div data-toggle="PP_NOTICE"><label class="lineStartSpace" style="color:darkgreen"><input
-                                                type="checkbox">通过<a href="http://www.pushplus.plus/"
-                                                target="_blank">推送加</a>推送微信通知 <button class="blth_btn"
-                                                data-action="edit_PP_SCKEY">编辑推送加token</button>
-                                        <button class="blth_btn" data-action="test_PP">推送测试</button></label><span
-                                        helpdata="PP_NOTICE" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="ServerTurbo_NOTICE"><label class="lineStartSpace"
-                                        style="color:darkgreen"><input type="checkbox">通过<a href="https://sct.ftqq.com"
-                                                target="_blank">Server酱·Turbo版</a>推送微信通知 <button class="blth_btn"
-                                                data-action="edit_ServerTurbo_SendKey">编辑Turbo版Sendkey</button>
-                                        <button class="blth_btn"
-                                                data-action="test_ServerTurbo">推送测试</button></label><span
-                                        helpdata="ServerTurbo_NOTICE" class="clickableText helpText">?</span>
-                        </div>
-                        <div data-toggle="SECONDS_NOTICE"><label class="lineStartSpace" style="color:darkgreen"><input
-                                                type="checkbox">通过seconds推送QQ消息通知 <button class="blth_btn"
-                                                data-action="edit_seconds_qq">编辑QQ号</button>
-                                        <button class="blth_btn" data-action="test_seconds">推送测试</button>
-                                </label><span helpdata="SECONDS_NOTICE" class="clickableText helpText">?</span>
                         </div>
                         <div data-toggle="btnArea"><button data-action="reset" style="color:red;"
                                         class="blth_btn">重置所有为默认</button><button data-action="resetCache"
