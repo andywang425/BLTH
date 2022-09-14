@@ -10,14 +10,14 @@
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH
 // @supportURL     https://github.com/andywang425/BLTH/issues
-// @icon           https://gcore.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png
+// @icon           https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png@80w_80h_1e_1c.webp
 // @copyright      2021, andywang425 (https://github.com/andywang425)
 // @license        MIT
 // @compatible     chrome 80 or later
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.0
+// @version        6.0.1
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -41,7 +41,7 @@
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js
 // @resource       layerCss https://gcore.jsdelivr.net/gh/andywang425/BLTH@d25aa353c8c5b2d73d2217b1b43433a80100c61e/assets/css/layer.css
 // @resource       myCss    https://gcore.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@9184f99eb673e766999401eb963787d5c72e39c9/assets/html/main.min.html
+// @resource       main     file:///D:/Documents/GitHub/BLTH/assets/html/main.html
 // @resource       eula     https://gcore.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -546,8 +546,8 @@
         LOGIN: true, // 主站登陆
         LIKE_LIVEROOM: false, // 点赞直播间
         LIKE_LIVEROOM_INTERVAL: 400, // 点赞间隔（毫秒）
-        MEDAL_DANMU_ROOM: ["0"], // 打卡弹幕房间列表
-        MEDAL_DANMU_METHOD: "MEDAL_DANMU_BLACK", // 打卡弹幕发送方式
+        LIVE_TASKS_ROOM: ["0"], // 直播区任务房间列表
+        LIVE_TASKS_METHOD: "BLACK", // 直播区任务执行方式
         MEDAL_DANMU_INTERVAL: 2, // 打卡弹幕发送间隔（秒）
         MEDAL_DANMU: false, // 粉丝勋章打卡弹幕
         MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄", "←◡←"], // 粉丝勋章打卡弹幕内容
@@ -756,7 +756,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "<strong>删除所有和抽奖有关的功能。</strong>"
+              "修复【检查弹幕是否发送成功】和【弹幕修改】不生效的 Bug。",
+              "【直播区任务】中的粉丝勋章相关任务（点赞直播间，连续观看直播，粉丝勋章打卡弹幕）统一采用黑白名单机制。",
+              "自动保存设置：在控制面板上的文本框中输入内容后脚本会自动保存设置。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -1187,9 +1189,9 @@
             toggle2: 'GIFT_SORT_LOW'
           },
           {
-            name: 'MEDAL_DANMU_METHOD',
-            toggle1: 'MEDAL_DANMU_WHITE',
-            toggle2: 'MEDAL_DANMU_BLACK'
+            name: 'LIVE_TASKS_METHOD',
+            toggle1: 'LIVE_TASKS_WHITE',
+            toggle2: 'LIVE_TASKS_BLACK'
           },
           {
             name: 'GIFT_SEND_METHOD',
@@ -1214,8 +1216,7 @@
           SPARE_GIFT_ROOM: "【剩余礼物】指送满了所有粉丝牌，但仍有剩余的将在1天内过期的礼物。<mul><mli>该项填<code>0</code>则不送剩余礼物。</mli></mul>",
           COIN: "自动给视频投币，每天最多投5个。<mul><mli>脚本会根据今日你已获得的投币经验值判断你已经投了多少个币，然后自动投剩余没投的币。<blockquote>如今日已获得投币经验20，脚本投币数量设置为4，则会投2个币。</blockquote></mli></mul>",
           COIN_UID: "该项若填<code>0</code>则给动态中的视频依次投币(不存在UID为0的用户)。<mul><mli>可以填写多个uid，每两个uid间用半角逗号<code>,</code>隔开。</mli><mli>如果填了多个uid，则会依次检查这些UP是否有可投币的视频。</mli></mul>",
-          MEDAL_DANMU_METHOD: "发送粉丝勋章打卡弹幕的逻辑，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间发弹幕。</mli><mli>黑名单：给房间列表以外的直播间发弹幕。</mli><mli>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</mli></mul>",
-          topArea: "这里会显示一些统计信息。点击【保存所有设置】按钮即可保存当前设置。<mul><mli>统计信息实时更新，北京时间0点时重置。</mli><mli><strong>支持输入框回车保存。</strong></mli><mli>单选框和多选框设置发生变化时会自动保存设置。</mli></mul>",
+          LIVE_TASKS_METHOD: "执行以下三个任务（点赞直播间，连续观看直播，粉丝勋章打卡弹幕）的任务模式，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅在房间列表内的直播间执行任务。</mli><mli>黑名单：在房间列表以外的直播间执行任务。</mli><mli>若要填写多个直播间，每两个直播间号之间用半角逗号<code>,</code>隔开。</mli></mul>",
           debugSwitch: "开启或关闭控制台日志(Chrome可通过<code>ctrl + shift + i</code>，再点击<code>Console</code>打开控制台)。<mul><mli>平时建议关闭，减少资源占用。</mli><mli>该设置只会影响日志(<code>console.log</code>)，不会影响报错(<code>console.error</code>)。</mli></mul>",
           UPDATE_TIP: "每次更新后第一次运行脚本时显示关于更新内容的弹窗。",
           MEDAL_DANMU_INTERVAL: "每两条弹幕间所等待的时间。<mh3>注意：</mh3><mul><mli>由于B站服务器限制，间隔时间必须大于等于1秒，否则弹幕发送会出错。</mli></mul>",
@@ -1297,11 +1298,8 @@
               myDiv[0].onselectstart = function () {
                 return false;
               }
-              // 绑定按钮
-              myDiv.find('button[data-action="save"]').click(() => {
-                // 保存按钮
-                saveAction(myDiv);
-              });
+              // 输入后自动保存
+              myDiv.find('.blth_input').bind('input', debounce(() => saveAction(myDiv), 1000));
               myDiv.find('button[data-action="exportConfig"]').click(() => {
                 // 导出配置按钮
                 exportConfig(MY_API.CONFIG, SP_CONFIG)
@@ -1399,13 +1397,13 @@
                 // 关于
                 layerOpenAbout();
               });
-              myDiv.find('button[data-action="edit_lightMedalList"]').click(() => {
-                // 编辑打卡弹幕房间列表
+              myDiv.find('button[data-action="edit_liveTasksRoomList"]').click(() => {
+                // 编辑直播区任务房间列表
                 myprompt({
                   formType: 2,
-                  value: String(MY_API.CONFIG.MEDAL_DANMU_ROOM),
+                  value: String(MY_API.CONFIG.LIVE_TASKS_ROOM),
                   maxlength: Number.MAX_SAFE_INTEGER,
-                  title: '请输入粉丝勋章打卡弹幕房间列表',
+                  title: '请输入直播区任务房间列表',
                   btn: ['保存', '取消']
                 },
                   function (value, index) {
@@ -1414,9 +1412,9 @@
                     for (let i = 0; i < valArray.length; i++) {
                       if (!valArray[i]) valArray.splice(i, 1);
                     };
-                    MY_API.CONFIG.MEDAL_DANMU_ROOM = [...valArray];
+                    MY_API.CONFIG.LIVE_TASKS_ROOM = [...valArray];
                     MY_API.saveConfig(false);
-                    mymsg('粉丝勋章打卡弹幕房间列表保存成功', {
+                    mymsg('直播区任务房间列表保存成功', {
                       time: 2500,
                       icon: 1
                     });
@@ -1597,12 +1595,6 @@
                   if (i.hasOwnProperty('toastMsg')) window.toast(i.toastMsg[0], i.toastMsg[1]);
                 })
               }
-              // 绑定回车保存
-              $('input:text').bind('keydown', function (event) {
-                if (event.keyCode == 13) {
-                  saveAction(myDiv);
-                }
-              });
               // 绑定多选框事件
               for (const i of radioList) {
                 for (let count = 1; true; count++) {
@@ -1610,6 +1602,7 @@
                   if (!i.hasOwnProperty(toggleName)) break;
                   if (MY_API.CONFIG[i.name] === i[toggleName]) {
                     $(`div[data-toggle= ${i[toggleName]}] input:radio`).attr('checked', '');
+                    break;
                   }
                 }
                 $(`input:radio[name= ${i.name} ]`).change(function () {
@@ -2125,62 +2118,61 @@
             runMidnight(() => MY_API.LiveReward.dailySignIn(), '直播区 - 直播签到');
           });
         },
-        likeLiveRoom: async () => {
+        likeLiveRoom: async (medal_list) => {
           if (!MY_API.CONFIG.LIKE_LIVEROOM) return $.Deferred().resolve();
           if (!checkNewDay(MY_API.CACHE.Live_like_TS)) return runMidnight(() => MY_API.LiveReward.likeLiveRoom(), '直播区 - 点赞');
           const likeTimes = 1;
           window.toast('[点赞直播间] 开始点赞直播间', 'info');
-          if (medal_info.status.state() === "resolved") {
-            const fansMedalList = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
-            for (let i = 0; i < likeTimes; i++) {
-              for (const medal of fansMedalList) {
-                await BAPI.xlive.likeInteract(medal.real_roomid).then((response) => {
-                  MYDEBUG(`API.xlive.likeInteract(${medal.real_roomid}) response`, response);
-                  if (response.code !== 0) window.toast(`[点赞直播间] 直播间${medal.real_roomid}点赞失败 ${response.message}`, 'caution');
-                });
-                await sleep(MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL);
-              }
+          for (let i = 0; i < likeTimes; i++) {
+            for (const medal of medal_list) {
+              await BAPI.xlive.likeInteract(medal.real_roomid).then((response) => {
+                MYDEBUG(`API.xlive.likeInteract(${medal.real_roomid}) response`, response);
+                if (response.code !== 0) window.toast(`[点赞直播间] 直播间${medal.real_roomid}点赞失败 ${response.message}`, 'caution');
+              });
+              await sleep(MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL);
             }
-            window.toast('[点赞直播间] 今日点赞完成', 'success');
-            MY_API.CACHE.Live_like_TS = ts_ms();
-            MY_API.saveCache();
-            runMidnight(() => MY_API.LiveReward.likeLiveRoom(), '直播区 - 点赞');
-          } else {
-            window.toast('[观看直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
-            return medal_info.status.then(() => MY_API.LiveReward.WatchLive());
           }
+          window.toast('[点赞直播间] 今日点赞完成', 'success');
+          MY_API.CACHE.Live_like_TS = ts_ms();
+          MY_API.saveCache();
+          runMidnight(() => MY_API.LiveReward.likeLiveRoom(), '直播区 - 点赞');
         },
-        WatchLive: async () => {
+        WatchLive: async (medal_list) => {
           if (!MY_API.CONFIG.WatchLive) return $.Deferred().resolve();
           if (!checkNewDay(MY_API.CACHE.Live_watch_TS)) return runMidnight(() => MY_API.LiveReward.WatchLive(), '直播区 - 观看直播');
           window.toast('[观看直播] 开始模拟观看直播', 'info');
-          if (medal_info.status.state() === "resolved") {
-            let pReturn = $.Deferred();
-            const fansMedalList = medal_info.medal_list.filter(m => m.roomid && m.level < 20);
-            for (let f = 0; f < fansMedalList.length; f++) {
-              const funsMedalData = fansMedalList[f];
-              let roomHeart = new RoomHeart(funsMedalData.real_roomid, MY_API.CONFIG.WatchLiveTime)
-              await roomHeart.start()
-              if (f === fansMedalList.length - 1) roomHeart.doneFunc = () => {
-                window.toast('[观看直播] 今日观看任务已完成', 'success');
-                pReturn.resolve();
-              }
-              await sleep(MY_API.CONFIG.WatchLiveInterval);
+          let pReturn = $.Deferred();
+          for (let f = 0; f < medal_list.length; f++) {
+            const funsMedalData = medal_list[f];
+            let roomHeart = new RoomHeart(funsMedalData.real_roomid, MY_API.CONFIG.WatchLiveTime)
+            await roomHeart.start()
+            if (f === medal_list.length - 1) roomHeart.doneFunc = () => {
+              window.toast('[观看直播] 今日观看任务已完成', 'success');
+              pReturn.resolve();
             }
-            await pReturn;
-            MY_API.CACHE.Live_watch_TS = ts_ms();
-            MY_API.saveCache();
-            runMidnight(() => MY_API.LiveReward.WatchLive(), '直播区 - 观看直播');
-          } else {
-            window.toast('[观看直播] 粉丝勋章列表未被完全获取，暂停运行', 'error');
-            return medal_info.status.then(() => MY_API.LiveReward.WatchLive());
+            await sleep(MY_API.CONFIG.WatchLiveInterval);
           }
+          await pReturn;
+          MY_API.CACHE.Live_watch_TS = ts_ms();
+          MY_API.saveCache();
+          runMidnight(() => MY_API.LiveReward.WatchLive(), '直播区 - 观看直播');
         },
         run: () => {
           if ((!MY_API.CONFIG.LIVE_SIGN && !MY_API.CONFIG.WatchLive && !MY_API.CONFIG.LIKE_LIVEROOM) || otherScriptsRunning) return $.Deferred().resolve();
+          let runTasksMedalList;
+          if (medal_info.status.state() === "resolved") {
+            if (MY_API.CONFIG.LIVE_TASKS_METHOD === 'LIVE_TASKS_WHITE')
+              runTasksMedalList = medal_info.medal_list.filter(r => MY_API.CONFIG.LIVE_TASKS_ROOM.findIndex(m => m == r.roomid) > -1 && r.roomid && r.level < 20);
+            else {
+              runTasksMedalList = medal_info.medal_list.filter(r => MY_API.CONFIG.LIVE_TASKS_ROOM.findIndex(m => m == r.roomid) === -1 && r.roomid && r.level < 20);
+            }
+          } else {
+            window.toast('[观看直播] [点赞直播间] 粉丝勋章列表未被完全获取，暂停运行', 'error');
+            return medal_info.status.then(() => { MY_API.LiveReward.WatchLive(); MY_API.LiveReward.likeLiveRoom(); });
+          }
           MY_API.LiveReward.dailySignIn();
-          MY_API.LiveReward.WatchLive();
-          MY_API.LiveReward.likeLiveRoom();
+          MY_API.LiveReward.WatchLive(runTasksMedalList);
+          MY_API.LiveReward.likeLiveRoom(runTasksMedalList);
         }
       },
       Exchange: {
@@ -2739,7 +2731,7 @@
         run: () => {
           if (!SP_CONFIG.AUTO_CHECK_DANMU) return;
           MY_API.AUTO_CHECK_DANMU.initEmitter();
-          bliveproxy.addCommandHandler("DANMU_MSG", (command) => {
+          W.bliveproxy.addCommandHandler("DANMU_MSG", (command) => {
             if (MY_API.AUTO_CHECK_DANMU.sendDanmu === {}) return;
             const info = command.info;
             if (info[2][0] === Live_info.uid) {
@@ -2783,10 +2775,10 @@
           }
           medalDanmuRunning = true;
           let lightMedalList;
-          if (MY_API.CONFIG.MEDAL_DANMU_METHOD === 'MEDAL_DANMU_WHITE')
-            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) > -1 && r.roomid);
+          if (MY_API.CONFIG.LIVE_TASKS_METHOD === 'LIVE_TASKS_WHITE')
+            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.LIVE_TASKS_ROOM.findIndex(m => m == r.roomid) > -1 && r.roomid);
           else {
-            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.MEDAL_DANMU_ROOM.findIndex(m => m == r.roomid) === -1 && r.roomid);
+            lightMedalList = MY_API.MEDAL_DANMU.medal_list.filter(r => MY_API.CONFIG.LIVE_TASKS_ROOM.findIndex(m => m == r.roomid) === -1 && r.roomid);
           }
           MYDEBUG('[粉丝牌打卡] 过滤后的粉丝勋章房间列表', lightMedalList);
           let danmuContentIndex = 0;
@@ -2849,7 +2841,7 @@
           if (!SP_CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
           MY_API.DANMU_MODIFY.handleConfig();
           // MYDEBUG('MY_API.DANMU_MODIFY.configJson', MY_API.DANMU_MODIFY.configJson);
-          bliveproxy.addCommandHandler('DANMU_MSG', command => {
+          W.bliveproxy.addCommandHandler('DANMU_MSG', command => {
             if (!SP_CONFIG.DANMU_MODIFY) return $.Deferred().resolve();
             let info = command.info;
             MYDEBUG('bliveproxy DANMU_MSG', info);
@@ -3164,7 +3156,7 @@
    */
   function fixVersionDifferences(API, version) {
     // 添加新的修复后需修改版本号
-    if (versionStringCompare(SP_CONFIG.storageLastFixVersion, "5.7.9") >= 0) return;
+    if (versionStringCompare(SP_CONFIG.storageLastFixVersion, "6.0.1") >= 0) return;
     // 修复变量类型错误
     const configFixList = ['AUTO_GIFT_ROOMID', 'COIN_UID'];
     if (!configFixList.every(i => Array.isArray(API.CONFIG[i]))) {
@@ -3175,30 +3167,14 @@
       }
     }
     // 修复变量值差异
-    if (API.CONFIG.ANCHOR_TYPE == 'ANCHOR_LIVEROOM') {
-      API.CONFIG.ANCHOR_TYPE_LIVEROOM = true;
-      API.CONFIG.ANCHOR_TYPE_POLLING = false;
-    }
     if (API.CONFIG.GIFT_SORT == 'high') API.CONFIG.GIFT_SORT = 'GIFT_SORT_HIGH';
     else if (API.CONFIG.GIFT_SORT == 'low') API.CONFIG.GIFT_SORT = 'GIFT_SORT_LOW'
-    // 修复CACHE
-    const cache = GM_getValue(`CACHE`) || {};
-    const cacheFixList = [['materialobject_ts', 'MaterialObject_TS'], ['medalDanmu_TS', 'MedalDanmu_TS']];
-    for (const i of cacheFixList) {
-      if (cache.hasOwnProperty(i[0])) API.CACHE[i[1]] = cache[i[0]];
-    }
+    if (API.CONFIG.MEDAL_DANMU_ROOM)
+      API.CONFIG.LIVE_TASKS_ROOM = API.CONFIG.MEDAL_DANMU_ROOM;
+    if (API.CONFIG.MEDAL_DANMU_METHOD)
+      API.CONFIG.LIVE_TASKS_METHOD = 'LIVE_TASKS_' + API.CONFIG.MEDAL_DANMU_METHOD.split('_').pop();
     // localStorage fix
     localStorage.removeItem("im_deviceid_IGIFTMSG");
-    // GM storage fix
-    const gmDeleteList = ['AnchorRoomidList', 'im_deviceid_', 'blnvConfig', 'UNIQUE_CHECK_CACHE', 'Token'];
-    for (const i of gmDeleteList) {
-      GM_deleteValue(i);
-    }
-    const apikey = API.CONFIG.ANCHOR_SERVER_APIKEY;
-    if (typeof apikey === "string") {
-      API.CONFIG.ANCHOR_SERVER_APIKEY = {};
-      API.CONFIG.ANCHOR_SERVER_APIKEY[Live_info.uid] = apikey;
-    }
     // save settings
     SP_CONFIG.storageLastFixVersion = version;
     API.saveConfig(false);
@@ -3493,6 +3469,23 @@
       return otherScriptsRunningCheck.reject();
     }
   }
+  /**
+   * 防抖
+   * @param {function} func 
+   * @param {number} wait 
+   * @returns {function}
+   */
+  function debounce(func, wait) {
+    var timeout;
+    return function () {
+      var context = this;
+      var args = arguments;
+      clearTimeout(timeout)
+      timeout = setTimeout(function () {
+        func.apply(context, args)
+      }, wait);
+    };
+  };
   /**
    * 发起xmlhttpRequest请求（GM函数和浏览器原生）
    * @param XHROptions
