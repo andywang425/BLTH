@@ -10,7 +10,7 @@
 // @downloadURL    https://raw.githubusercontent.com/andywang425/BLTH/master/B%E7%AB%99%E7%9B%B4%E6%92%AD%E9%97%B4%E6%8C%82%E6%9C%BA%E5%8A%A9%E6%89%8B.user.js
 // @homepageURL    https://github.com/andywang425/BLTH
 // @supportURL     https://github.com/andywang425/BLTH/issues
-// @icon           https://s1.hdslb.com/bfs/live/d57afb7c5596359970eb430655c6aef501a268ab.png@80w_80h_1e_1c.webp
+// @icon           https://z4a.net/images/2022/09/15/script-icon.png
 // @copyright      2021, andywang425 (https://github.com/andywang425)
 // @license        MIT
 // @compatible     chrome 80 or later
@@ -758,7 +758,8 @@
             const clientMliList = [
               "修复【检查弹幕是否发送成功】和【弹幕修改】不生效的 Bug。",
               "【直播区任务】中的粉丝勋章相关任务（点赞直播间，连续观看直播，粉丝勋章打卡弹幕）统一采用黑白名单机制。",
-              "自动保存设置：在控制面板上的文本框中输入内容后脚本会自动保存设置。"
+              "自动保存设置：在控制面板上的文本框中输入内容后脚本会自动保存设置。",
+              "减缓了【自动投币】的速度，降低被风控的可能。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -1903,8 +1904,9 @@
           const obj = JSON.parse(cards[i].card);
           let num = Math.min(2, n);
           if (one) num = 1;
-          return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
+          return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then(async (re) => {
             if (re.code === 0) {
+              await sleep(500);
               if (re.data.multiply === 2) {
                 MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
                 return MY_API.DailyReward.coin(vlist, n, i + 1);
@@ -1960,8 +1962,9 @@
           }
           let num = Math.min(2, n);
           if (one) num = 1;
-          return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then((re) => {
+          return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then(async (re) => {
             if (re.code === 0) {
+              await sleep(500);
               if (re.data.multiply === 2) {
                 MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
                 return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
