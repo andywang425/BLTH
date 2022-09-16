@@ -2369,14 +2369,14 @@
             if (!MY_API.CONFIG.SEND_ALL_GIFT && filter) {
               // 送之前查一次有没有可送的
               bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
-                Number(r.corner_mark.substring(0, r.corner_mark.indexOf("天"))) <= MY_API.CONFIG.GIFT_LIMIT);
+                new Date(r.expire_at * 1000 - ts_ms()).getDate() <= MY_API.CONFIG.GIFT_LIMIT);
               MYDEBUG("[自动送礼] if分支 过滤后的礼物", bag_list);
               if (bag_list.length === 0) {
                 MY_API.Gift.over = true;
                 return;
               }
             } else {
-              bag_list = MY_API.Gift.bag_list.filter(r => r.gift_num > 0 && r.corner_mark != '永久');
+              bag_list = MY_API.Gift.bag_list.filter(r => r.gift_num > 0 && r.expire_at != 0);
               MYDEBUG("[自动送礼] else分支 过滤后的礼物", bag_list);
               if (bag_list.length === 0) {
                 MY_API.Gift.over = true;
@@ -2539,7 +2539,7 @@
             }
           })
           let bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
-            r.corner_mark == '1天');
+            new Date(r.expire_at * 1000 - ts_ms()).getDate() <= 1);
           if (bag_list.length === 0) return;
           MYDEBUG('[自动送礼]【剩余礼物】bag_list', bag_list);
           for (const v of bag_list) {
