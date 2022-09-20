@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.0.2
+// @version        6.0.3
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -359,9 +359,43 @@
       }
     }
   }
-
+  // 隐身入场，拦截观看数据上报，需要尽早
+  if (SP_CONFIG.invisibleEnter || SP_CONFIG.blockliveDataUpdate) {
+    try {
+      ah.proxy({
+        onRequest: (XHRconfig, handler) => {
+          if (SP_CONFIG.invisibleEnter && XHRconfig.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
+            MYDEBUG('getInfoByUser request', XHRconfig);
+            XHRconfig.url = '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser?room_id=22474988&from=0';
+            handler.next(XHRconfig);
+          } else if (SP_CONFIG.blockliveDataUpdate && XHRconfig.url.includes('//data.bilibili.com/log')) {
+            handler.resolve("ok");
+          } else {
+            handler.next(XHRconfig);
+          }
+        },
+        onResponse: async (response, handler) => {
+          if (response.config.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
+            MYDEBUG('getInfoByUser response', response);
+            if (!response.response.includes('"code":0')) {
+              MYDEBUG('隐身入场出错，取消隐身入场并以当前房间号再次获取用户数据');
+              response.response = await BAPI.xlive.getInfoByUser(W.BilibiliLive.ROOMID).then((re) => {
+                MYDEBUG('API.xlive.getInfoByUser(W.BilibiliLive.ROOMID)', re);
+                if (re.code === 0) return JSON.stringify(re);
+                else return window.toast(`获取房间基础信息失败 ${re.message}`, 'error')
+              });
+            }
+            response.response = response.response.replace('"is_room_admin":false', '"is_room_admin":true');
+            const json_response = JSON.parse(response.response);
+            Live_info.danmu_length = json_response.data.property.danmu.length;
+          }
+          handler.next(response);
+        }
+      })
+    } catch (e) { MYDEBUG('ah.proxy Ajax-hook代理运行出错', e) }
+  }
   // DOM加载完成后运行
-  $(document).ready(function ready() {
+  $(function ready() {
     // 若 window 下无 BilibiliLive，则说明页面有 iframe，此时脚本在在 top 中运行 或 发生错误
     if (W.BilibiliLive === undefined) return;
     // 等待BilibiliLive中数据加载完成
@@ -394,40 +428,6 @@
         if (String(func).indexOf('triggerSleepCallback') !== -1) return _setTimeout.call(this, function () { }, ...args)
         else return _setInterval.call(this, func, ...args)
       }
-    }
-    if (SP_CONFIG.invisibleEnter || SP_CONFIG.blockliveDataUpdate) {
-      try {
-        ah.proxy({
-          onRequest: (XHRconfig, handler) => {
-            if (SP_CONFIG.invisibleEnter && XHRconfig.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
-              MYDEBUG('getInfoByUser request', XHRconfig);
-              XHRconfig.url = '//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser?room_id=22474988&from=0';
-              handler.next(XHRconfig);
-            } else if (SP_CONFIG.blockliveDataUpdate && XHRconfig.url.includes('//data.bilibili.com/log')) {
-              handler.resolve("ok");
-            } else {
-              handler.next(XHRconfig);
-            }
-          },
-          onResponse: async (response, handler) => {
-            if (response.config.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')) {
-              MYDEBUG('getInfoByUser response', response);
-              if (!response.response.includes('"code":0')) {
-                MYDEBUG('隐身入场出错，取消隐身入场并以当前房间号再次获取用户数据');
-                response.response = await BAPI.xlive.getInfoByUser(W.BilibiliLive.ROOMID).then((re) => {
-                  MYDEBUG('API.xlive.getInfoByUser(W.BilibiliLive.ROOMID)', re);
-                  if (re.code === 0) return JSON.stringify(re);
-                  else return window.toast(`获取房间基础信息失败 ${re.message}`, 'error')
-                });
-              }
-              response.response = response.response.replace('"is_room_admin":false', '"is_room_admin":true');
-              const json_response = JSON.parse(response.response);
-              Live_info.danmu_length = json_response.data.property.danmu.length;
-            }
-            handler.next(response);
-          }
-        })
-      } catch (e) { MYDEBUG('ah.proxy Ajax-hook代理运行出错', e) }
     }
     if (SP_CONFIG.banP2p) {
       const RTClist = ["RTCPeerConnection", "RTCDataChannel", "mozRTCPeerConnection", "webkitRTCPeerConnection", "DataChannel"];
@@ -547,7 +547,7 @@
         LIKE_LIVEROOM: false, // 点赞直播间
         LIKE_LIVEROOM_INTERVAL: 400, // 点赞间隔（毫秒）
         LIVE_TASKS_ROOM: ["0"], // 直播区任务房间列表
-        LIVE_TASKS_METHOD: "BLACK", // 直播区任务执行方式
+        LIVE_TASKS_METHOD: "LIVE_TASKS_BLACK", // 直播区任务执行方式
         MEDAL_DANMU_INTERVAL: 2, // 打卡弹幕发送间隔（秒）
         MEDAL_DANMU: false, // 粉丝勋章打卡弹幕
         MEDAL_DANMU_CONTENT: ["(⌒▽⌒)", "（￣▽￣）", "(=・ω・=)", "(｀・ω・´)", "(〜￣△￣)〜", "(･∀･)", "(°∀°)ﾉ", "╮(￣▽￣)╭", "_(:3」∠)_", "(^・ω・^ )", "(●￣(ｴ)￣●)", "ε=ε=(ノ≧∇≦)ノ", "⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄", "←◡←"], // 粉丝勋章打卡弹幕内容
@@ -756,10 +756,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "修复【检查弹幕是否发送成功】和【弹幕修改】不生效的 Bug。",
-              "【直播区任务】中的粉丝勋章相关任务（点赞直播间，连续观看直播，粉丝勋章打卡弹幕）统一采用黑白名单机制。",
-              "自动保存设置：在控制面板上的文本框中输入内容后脚本会自动保存设置。",
-              "减缓了【自动投币】的速度，降低被风控的可能。"
+              "修复【自动送礼】无法送出当天过期的礼物的 Bug。",
+              "修复直播区任务执行方式中黑白名单显示不正确的 Bug（仅针对新用户）。",
+              "修复【隐身入场】失效的 Bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -775,11 +774,6 @@
               content: `
                 <h2>更新内容</h2>
                 <mol>${createHtml(clientMliList)}</mol>
-                <h2>通知</h2>
-                <mol>经过慎重考虑，我决定将脚本中所有和抽奖有关的功能删除，请各位谅解。日后会将工作重心放到其他功能上。
-                在被封了两个QQ群后我决定建一个QQ频道${linkMsg('https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=1W7eVLs&businessType=9&from=181074&biz=ka&shareSource=5', '（点我加入）')}，
-                也可以加入非官方电报群：${linkMsg('https://t.me/LaTiao01', 'LaTiao01')}。
-                </mol>
                 <hr><em style="color:grey;">
                 如果在使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也欢迎加入${linkMsg('https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=1W7eVLs&businessType=9&from=181074&biz=ka&shareSource=5', '官方QQ频道')}（聊天、反馈问题、提出建议）和${linkMsg('https://t.me/LaTiao01', '非官方电报群')}（纯聊天）。
@@ -3016,7 +3010,7 @@
       responseType: "json"
     }).then(response => {
       MYDEBUG("检查更新 checkUpdate", response);
-      if (response.response.status !== 200)
+      if (response && response.response.status !== 200)
         return window.toast(`[检查更新] 获取notice.json出错 ${response.response.statusText}`, 'caution');
       noticeJson = response.body.data;
       noticeJson.lastCheckUpdateTs = ts_ms();
