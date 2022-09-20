@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.0.3
+// @version        6.0.4
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -758,7 +758,8 @@
             const clientMliList = [
               "修复【自动送礼】无法送出当天过期的礼物的 Bug。",
               "修复直播区任务执行方式中黑白名单显示不正确的 Bug（仅针对新用户）。",
-              "修复【隐身入场】失效的 Bug。"
+              "修复【隐身入场】失效的 Bug。",
+              "修复【自动投币】失效的 Bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -1898,40 +1899,45 @@
           const obj = JSON.parse(cards[i].card);
           let num = Math.min(2, n);
           if (one) num = 1;
-          return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then(async (re) => {
+          console.log('before req')
+          return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then(re => {
+            MYDEBUG(`API.x.getCoinInfo aid = ${obj.aid}`, re);
             if (re.code === 0) {
-              await sleep(500);
-              if (re.data.multiply === 2) {
-                MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
-                return MY_API.DailyReward.coin(vlist, n, i + 1);
-              }
-              else {
-                if (re.data.multiply === 1) num = 1;
-                return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
-                  MYDEBUG('DailyReward.coin: API.DailyReward.coin', response);
-                  if (response.code === 0) {
-                    MY_API.DailyReward.coin_exp += num * 10;
-                    window.toast(`[自动每日奖励][每日投币]投币成功(av=${obj.aid},num=${num})`, 'success');
-                    return MY_API.DailyReward.coin(cards, n - num, i + 1);
-                  } else if (response.code === -110) {
-                    window.toast('[自动每日奖励][每日投币]未绑定手机，已停止', 'error');
-                    return $.Deferred().reject();
-                  } else if (response.code === 34003) {
-                    // 非法的投币数量
-                    if (one) return MY_API.DailyReward.coin(cards, n, i + 1);
-                    return MY_API.DailyReward.coin(cards, n, i, true);
-                  } else if (response.code === 34005) {
-                    // 塞满啦！先看看库存吧~
-                    return MY_API.DailyReward.coin(cards, n, i + 1);
-                  } else if (response.code === -104) {
-                    //硬币余额不足
-                    window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
-                    return $.Deferred().reject();
-                  }
-                  window.toast(`[自动每日奖励][每日投币]出错 ${response.msg}`, 'error');
-                  return delayCall(() => MY_API.DailyReward.coin(cards, n, i))
-                });
-              }
+              let p = $.Deferred();
+              setTimeout(() => p.resolve(), 500);
+              return p.then(() => {
+                if (re.data.multiply === 2) {
+                  MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
+                  return MY_API.DailyReward.coin(vlist, n, i + 1);
+                }
+                else {
+                  if (re.data.multiply === 1) num = 1;
+                  return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
+                    MYDEBUG('DailyReward.coin: API.DailyReward.coin', response);
+                    if (response.code === 0) {
+                      MY_API.DailyReward.coin_exp += num * 10;
+                      window.toast(`[自动每日奖励][每日投币]投币成功(av=${obj.aid},num=${num})`, 'success');
+                      return MY_API.DailyReward.coin(cards, n - num, i + 1);
+                    } else if (response.code === -110) {
+                      window.toast('[自动每日奖励][每日投币]未绑定手机，已停止', 'error');
+                      return $.Deferred().reject();
+                    } else if (response.code === 34003) {
+                      // 非法的投币数量
+                      if (one) return MY_API.DailyReward.coin(cards, n, i + 1);
+                      return MY_API.DailyReward.coin(cards, n, i, true);
+                    } else if (response.code === 34005) {
+                      // 塞满啦！先看看库存吧~
+                      return MY_API.DailyReward.coin(cards, n, i + 1);
+                    } else if (response.code === -104) {
+                      //硬币余额不足
+                      window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
+                      return $.Deferred().reject();
+                    }
+                    window.toast(`[自动每日奖励][每日投币]出错 ${response.msg}`, 'error');
+                    return delayCall(() => MY_API.DailyReward.coin(cards, n, i))
+                  });
+                }
+              });
             } else {
               window.toast(`[自动每日奖励][每日投币]获取视频(aid=${obj.aid})投币状态出错 ${response.msg}`, 'error');
               return delayCall(() => MY_API.DailyReward.coin(cards, n, i))
@@ -1956,40 +1962,43 @@
           }
           let num = Math.min(2, n);
           if (one) num = 1;
-          return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then(async (re) => {
+          return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then(re => {
             if (re.code === 0) {
-              await sleep(500);
-              if (re.data.multiply === 2) {
-                MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
-                return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
-              }
-              else {
-                if (re.data.multiply === 1) num = 1;
-                return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
-                  MYDEBUG('DailyReward.coin_uid: API.DailyReward.coin_uid', response);
-                  if (response.code === 0) {
-                    MY_API.DailyReward.coin_exp += num * 10;
-                    window.toast(`[自动每日奖励][每日投币]投币成功(av=${obj.aid},num=${num})`, 'success');
-                    return MY_API.DailyReward.coin_uid(vlist, n - num, pagenum, uidIndex, i + 1);
-                  } else if (response.code === -110) {
-                    window.toast('[自动每日奖励][每日投币]未绑定手机，已停止', 'error');
-                    return $.Deferred().reject();
-                  } else if (response.code === 34003) {
-                    // 非法的投币数量
-                    if (one) return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
-                    return MY_API.DailyReward.coin_uid(vlist, n, i, pagenum, uidIndex, true);
-                  } else if (response.code === 34005) {
-                    // 塞满啦！先看看库存吧~
-                    return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
-                  } else if (response.code === -104) {
-                    // 硬币余额不足
-                    window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
-                    return $.Deferred().reject();
-                  }
-                  window.toast(`[自动每日奖励][每日投币] 出错 ${response.msg}`, 'caution');
-                  return delayCall(() => MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i))
-                });
-              }
+              let p = $.Deferred();
+              setTimeout(() => p.resolve(), 500);
+              return p.then(() => {
+                if (re.data.multiply === 2) {
+                  MYDEBUG('API.x.getCoinInfo', `已投币两个 aid = ${obj.aid}`)
+                  return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
+                }
+                else {
+                  if (re.data.multiply === 1) num = 1;
+                  return BAPI.DailyReward.coin(obj.aid, num).then((response) => {
+                    MYDEBUG('DailyReward.coin_uid: API.DailyReward.coin_uid', response);
+                    if (response.code === 0) {
+                      MY_API.DailyReward.coin_exp += num * 10;
+                      window.toast(`[自动每日奖励][每日投币]投币成功(av=${obj.aid},num=${num})`, 'success');
+                      return MY_API.DailyReward.coin_uid(vlist, n - num, pagenum, uidIndex, i + 1);
+                    } else if (response.code === -110) {
+                      window.toast('[自动每日奖励][每日投币]未绑定手机，已停止', 'error');
+                      return $.Deferred().reject();
+                    } else if (response.code === 34003) {
+                      // 非法的投币数量
+                      if (one) return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
+                      return MY_API.DailyReward.coin_uid(vlist, n, i, pagenum, uidIndex, true);
+                    } else if (response.code === 34005) {
+                      // 塞满啦！先看看库存吧~
+                      return MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i + 1);
+                    } else if (response.code === -104) {
+                      // 硬币余额不足
+                      window.toast('[自动每日奖励][每日投币]剩余硬币不足，已停止', 'warning');
+                      return $.Deferred().reject();
+                    }
+                    window.toast(`[自动每日奖励][每日投币] 出错 ${response.msg}`, 'caution');
+                    return delayCall(() => MY_API.DailyReward.coin_uid(vlist, n, pagenum, uidIndex, i))
+                  });
+                }
+              });
             } else {
               window.toast(`[自动每日奖励][每日投币]获取视频(aid=${obj.aid})投币状态出错 ${response.msg}`, 'error');
               return delayCall(() => MY_API.DailyReward.coin(cards, n, i))
@@ -2049,8 +2058,10 @@
                 const p1 = MY_API.DailyReward.watch(obj.aid, obj.cid);
                 let p2;
                 if (MY_API.CONFIG.COIN_UID == 0 || MY_API.CONFIG.COIN_TYPE == 'COIN_DYN') {
+                  console.log('if')
                   p2 = MY_API.DailyReward.coin(response.data.cards, Math.max(throwCoinNum, 0));
                 } else {
+                  console.log('else')
                   p2 = MY_API.DailyReward.UserSpace(0, 30, 0, 1, '', 'pubdate', 'jsonp');
                 }
                 const p3 = MY_API.DailyReward.share(obj.aid);
