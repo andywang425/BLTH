@@ -3020,7 +3020,7 @@
     }).then(response => {
       MYDEBUG("检查更新 checkUpdate", response);
       if (!response || response.response.status !== 200)
-        return window.toast(`[检查更新] 获取notice.json出错 ${response.response.statusText}`, 'caution');
+        return MYERROR(`[检查更新] 获取notice.json出错`);
       noticeJson = response.body.data;
       noticeJson.lastCheckUpdateTs = ts_ms();
       GM_setValue(`noticeJson`, noticeJson);
