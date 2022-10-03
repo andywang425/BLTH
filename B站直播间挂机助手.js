@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.0.4
+// @version        6.0.5
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -30,7 +30,7 @@
 // @connect        pushplus.plus
 // @connect        andywang.top
 // @connect        gitee.com
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@dac0d115a45450e6d3f3e17acd4328ab581d0514/assets/js/library/Ajax-hook.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@bca9261faa84ffd8f804c85c1a5153d3aa27a9a3/assets/js/library/Ajax-hook.min.js
 // @require        https://gcore.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@d1f68400ee93db4490e5747113a93378667ea0bc/assets/js/library/BilibiliAPI_Mod.min.js
@@ -41,7 +41,7 @@
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js
 // @resource       layerCss https://gcore.jsdelivr.net/gh/andywang425/BLTH@d25aa353c8c5b2d73d2217b1b43433a80100c61e/assets/css/layer.css
 // @resource       myCss    https://gcore.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@bd2b26eddac514781fbbe2f6cd7eb58963a14aa5/assets/html/main.min.html
+// @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@bca9261faa84ffd8f804c85c1a5153d3aa27a9a3/assets/html/main.min.html
 // @resource       eula     https://gcore.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -55,7 +55,6 @@
 // ==/UserScript==
 
 (function () {
-  localstorage2gm();
   const NAME = 'BLTH',
     W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow,
     eventListener = W.addEventListener,
@@ -554,7 +553,7 @@
         REMOVE_ELEMENT_2233: false, // 移除2233
         REMOVE_ELEMENT_pkBanner: true, // 移除大乱斗入口
         REMOVE_ELEMENT_rank: true, // 移除排行榜入口
-        REMOVE_ELEMENT_followSideBar: false, // 移除右侧关注按钮及弹窗
+        REMOVE_ELEMENT_rightSideBar: false, // 移除右侧边栏
         REMOVE_ELEMENT_flipView: true, // 移除移除礼物栏下方广告
         REMOVE_ELEMENT_anchor: false, // 移除天选时刻弹窗及图标
         REMOVE_ELEMENT_pk: false, // 移除PK弹窗及进度条
@@ -756,10 +755,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "修复【自动送礼】无法送出当天过期的礼物的 Bug。",
-              "修复直播区任务执行方式中黑白名单显示不正确的 Bug（仅针对新用户）。",
-              "修复【隐身入场】失效的 Bug。",
-              "修复【自动投币】失效的 Bug。"
+              "【直播观看体验】中的【屏蔽关注按钮和弹窗】改为【屏蔽右侧边栏】。",
+              "修复【隐身入场】和【拦截直播观看数据上报】会导致特殊直播间直播画面不显示的 bug。",
+              "修复非东八区【自动送礼】礼物到期时间计算不正确的 bug。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -867,9 +865,9 @@
             rmJQpath: ['.activity-gather-entry', '.activity-rank', '.rank-item']
           },
           {
-            // 关注按钮及弹窗
-            settingName: 'REMOVE_ELEMENT_followSideBar',
-            rmJQpath: ['div[data-upgrade-intro="Follow"]', '.side-bar-popup-cntr.ts-dot-4']
+            // 右侧边栏
+            settingName: 'REMOVE_ELEMENT_rightSideBar',
+            rmJQpath: ['.side-bar-cntr']
           },
           {
             // 礼物栏下方广告
@@ -1149,7 +1147,7 @@
           "REMOVE_ELEMENT_2233",
           "REMOVE_ELEMENT_anchor",
           "REMOVE_ELEMENT_flipView",
-          "REMOVE_ELEMENT_followSideBar",
+          "REMOVE_ELEMENT_rightSideBar",
           "REMOVE_ELEMENT_pk",
           "REMOVE_ELEMENT_pkBanner",
           "REMOVE_ELEMENT_playerIcon",
@@ -1229,7 +1227,6 @@
           blockLiveStream: `拦截直播流。开启本功能后将无法观看直播。<mh3>原理：</mh3><mul>劫持页面上的fetch，通过判断url是否含有<code>bilivideo</code>拦截所有直播流请求。</mul><mh3>注意：</mh3><mul><mli>开启本功能后控制台中会出现大量报错，如<code style='color:red;'>id 38: player core NetworkError, {"code":11001,"errInfo":{"url":"https://d1--cn-gotcha204.bilivideo.com/live-bvc/284219/live_50333369_2753084_4000/index.m3u8?expires=1618677399&len=0&oi=1700331273&pt=web&qn=0&trid=9cc4c8772c0543999b03360f513dd1fa&sigparams=cdn,expires,len,oi,pt,qn,trid&cdn=cn-gotcha04&sign=bd05d848ebf2c7a815e0242ac1477187&p2p_type=1&src=9&sl=4&sk=59b4112a8c653bb","info":"TypeError: Cannot read property 'then' of undefined"}}</code>，此类报错均为b站js的报错，无视即可。</mli></mul>`,
           blockliveDataUpdate: "拦截直播观看数据上报。<mh3>原理：</mh3><mul>劫持页面上的fetch和XMLHttpRequest，拦截所有url中含有<code>data.bilibili.com/gol/postweb</code>的fetch请求和url中含有<code>data.bilibili.com/log</code>的xhr请求。</mul><mh3>注意：</mh3><mul><mli>开启本功能后控制台中会出现大量警告，如<code style='color:rgb(255 131 0);'>jQuexry.Deferred exception: Cannot read property 'status' of undefined TypeError: Cannot read property 'status' of undefined</code>，此类报错均为b站js的报错，无视即可。 </mli></mul><mh3>说明：</mh3><mul><mli>根据观察，目前上报的数据有：p2p种类，直播画质，直播流编码方式，直播流地址，直播流名称，直播流协议，窗口大小，观看时长，请求花费时长， 请求成功/失败数量，通过p2p下载的有效直播流大小，通过p2p上传的直播流大小，当前直播间地址，当前时间戳等等。 </mli></mul>",
           WEAR_MEDAL_BEFORE_DANMU: "手动发送弹幕前自动佩戴当前房间的粉丝勋章再发弹幕。<mul><mli>如果没有当前直播间的粉丝勋章则不进行任何操作。</mli><mli>【一直自动佩戴】比较适合需要同时在多个直播间发弹幕的情况。如果只想在某一个直播间发弹幕勾选【仅在首次发弹幕时自动佩戴】即可。</mli><mli>佩戴成功后会把弹幕框左侧的粉丝牌替换为当前直播间的粉丝牌。</mli></mul>",
-          REMOVE_ELEMENT_followSideBar: "开启本功能后会导致【实验室】按钮点击后无法出现弹窗。",
           REMOVE_ELEMENT_pkBanner: "移除位于直播画面上方的大乱斗入口。",
           REMOVE_ELEMENT_rank: "移除位于直播画面上方的排行榜（？）入口。<mul><mli>这个位置有时候会变成某个活动的入口。如果你不是主播也不是喜欢给主播送礼物的观众，那么这些活动通常和你没关系。</mli></mul>",
           GET_PRIVILEGE: "每个月领取一次大会员权益。<mul><mli>目前仅支持领取B币券和会员购优惠券。</mli></mul>",
@@ -2355,10 +2352,10 @@
            * 获取礼物列表中的每种礼物所对应的亲密度，把结果保存至 giftFeed_list。
            * 格式：{ id1: feed1, id2: feed2, ... }
            */
-          const getGiftFeed = async () => {
+          const getGiftFeed = () => {
             for (const i of MY_API.Gift.bag_list) {
               if (!MY_API.Gift.giftFeed_list.hasOwnProperty(i.gift_id)) {
-                MY_API.Gift.giftFeed_list[i.gift_id] = await MY_API.Gift.getFeedByGiftID(i.gift_id);
+                MY_API.Gift.giftFeed_list[i.gift_id] = MY_API.Gift.getFeedByGiftID(i.gift_id);
               }
             }
           }
@@ -2374,7 +2371,7 @@
             if (!MY_API.CONFIG.SEND_ALL_GIFT && filter) {
               // 送之前查一次有没有可送的
               bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
-                new Date(r.expire_at * 1000 - ts_ms()).getDate() <= MY_API.CONFIG.GIFT_LIMIT);
+                (r.expire_at * 1000 - ts_ms()) / 86400000 <= MY_API.CONFIG.GIFT_LIMIT);
               MYDEBUG("[自动送礼] if分支 过滤后的礼物", bag_list);
               if (bag_list.length === 0) {
                 MY_API.Gift.over = true;
@@ -2544,7 +2541,7 @@
             }
           })
           let bag_list = MY_API.Gift.bag_list.filter(r => MY_API.Gift.allowGiftList.includes(String(r.gift_id)) && r.gift_num > 0 &&
-            new Date(r.expire_at * 1000 - ts_ms()).getDate() <= 1);
+            (r.expire_at * 1000 - ts_ms()) / 86400000 <= 1);
           if (bag_list.length === 0) return;
           MYDEBUG('[自动送礼]【剩余礼物】bag_list', bag_list);
           for (const v of bag_list) {
@@ -3188,29 +3185,6 @@
     API.saveConfig(false);
     API.saveCache();
     saveSpConfig();
-  }
-  /**
-   * 把localstorage中的设置迁移到GM储存
-   * 对版本小于5.6.6.4时保存的设置项进行修复
-   */
-  function localstorage2gm() {
-    if (!localStorage.getItem("IGIFTMSG_CONFIG")) return;
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (/IGIFTMSG.*/.test(key)) {
-        let val = localStorage.getItem(key);
-        try {
-          val = JSON.parse(val);
-          let length = 0;
-          for (const i in val) { length++ }
-          if (val.hasOwnProperty("list") && length === 1) val = val.list;
-        } catch (e) { }
-        const jumpList = ["AnchorRoomidList"]
-        if (jumpList.indexOf(key) === -1) GM_setValue(key.replace(/IGIFTMSG_|IGIFTMSG/, ""), val);
-        localStorage.removeItem(key); i--;
-      }
-    }
-    W.location.reload();
   }
   /**
    * 保存特殊设置
