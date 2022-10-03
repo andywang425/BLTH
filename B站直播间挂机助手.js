@@ -1687,7 +1687,8 @@
         // 监听播放器全屏变化
         function bodyPropertyChange() {
           let attr = body.attr('class'), tabOffSet = tabContent.offset(), top = tabOffSet.top, left = tabOffSet.left;
-          if (/[player\-full\-win]|[fullscreen\-fix]/.test(attr)) {
+          if (/(player\-full\-win)|(fullscreen\-fix)/.test(attr)) {
+            console.log('attr', attr)
             if (SP_CONFIG.mainDisplay === 'show') { // 显示 -> 隐藏
               SP_CONFIG.mainDisplay = 'hide';
               saveSpConfig(false);
@@ -3018,7 +3019,7 @@
       responseType: "json"
     }).then(response => {
       MYDEBUG("检查更新 checkUpdate", response);
-      if (response && response.response.status !== 200)
+      if (!response || response.response.status !== 200)
         return window.toast(`[检查更新] 获取notice.json出错 ${response.response.statusText}`, 'caution');
       noticeJson = response.body.data;
       noticeJson.lastCheckUpdateTs = ts_ms();
