@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.0.5
+// @version        6.0.6
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -41,7 +41,7 @@
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js
 // @resource       layerCss https://gcore.jsdelivr.net/gh/andywang425/BLTH@d25aa353c8c5b2d73d2217b1b43433a80100c61e/assets/css/layer.css
 // @resource       myCss    https://gcore.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@bca9261faa84ffd8f804c85c1a5153d3aa27a9a3/assets/html/main.min.html
+// @resource       main     file:///D:\Documents\GitHub\BLTH\assets\html\main.min.html
 // @resource       eula     https://gcore.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -558,6 +558,7 @@
         REMOVE_ELEMENT_anchor: false, // 移除天选时刻弹窗及图标
         REMOVE_ELEMENT_pk: false, // 移除PK弹窗及进度条
         REMOVE_ELEMENT_playerIcon: true, // 移除直播水印
+        REMOVE_ELEMENT_ecommerce: false, // 移除小橙车相关内容
         RND_DELAY_END: 5, // 延迟最大值
         RND_DELAY_START: 2, // 延迟最小值
         SEND_ALL_GIFT: false, // 送满全部勋章
@@ -890,6 +891,11 @@
             // 直播水印
             settingName: 'REMOVE_ELEMENT_playerIcon',
             rmJQpath: ['.web-player-icon-roomStatus']
+          },
+          {
+            // 小橙车
+            settingName: 'REMOVE_ELEMENT_ecommerce',
+            rmJQpath: ['#shop-popover-vm', '.ecommerce-entry']
           }
         ];
 
@@ -1152,6 +1158,7 @@
           "REMOVE_ELEMENT_pkBanner",
           "REMOVE_ELEMENT_playerIcon",
           "REMOVE_ELEMENT_rank",
+          "REMOVE_ELEMENT_ecommerce",
           "SEND_ALL_GIFT",
           "SHARE",
           "SILVER2COIN",
