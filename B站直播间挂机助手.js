@@ -39,7 +39,7 @@
 // @require        https://gcore.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @require        https://gcore.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@de9d21e07097b432ee80de489b35b16d689d3f8e/assets/js/library/libBilibiliToken.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@89c77b3892c77159219bb782e667b801f1cf5cf7/assets/js/library/libBilibiliToken.min.js
 // @resource       layerCss https://gcore.jsdelivr.net/gh/andywang425/BLTH@d25aa353c8c5b2d73d2217b1b43433a80100c61e/assets/css/layer.css
 // @resource       myCss    https://gcore.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
 // @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@de9d21e07097b432ee80de489b35b16d689d3f8e/assets/html/main.min.html
@@ -67,7 +67,7 @@
     tz_offset = new Date().getTimezoneOffset() + 480, // 本地时间与东八区差的分钟数
     appToken = new BilibiliToken(),
     setToken = async () => {
-      if (tokenData.hasOwnProperty(Live_info.uid) && tokenData[Live_info.uid]['expires_in'] > ts_s()) {
+      if (tokenData.hasOwnProperty(Live_info.uid) && tokenData[Live_info.uid]['expires_at'] > ts_s()) {
         userToken = tokenData[Live_info.uid];
       } else {
         tokenData[Live_info.uid] = await appToken.getToken();
@@ -2976,6 +2976,12 @@
             await sleep(5000);
           }
         },
+        test: async () => {
+          if (await setToken() === undefined)
+            return;
+          MYDEBUG('appToken userToken.access_token.length', userToken.access_token.length);
+          let remainProgress = MY_API.AppUserTask.getRemainProgress();
+        },
         run: async () => {
           if (!MY_API.CONFIG.APP_TASK || otherScriptsRunning) return $.Deferred().resolve();
           if (!checkNewDay(MY_API.CACHE.AppTaskRewards)) return runMidnight(() => MY_API.LiveReward.WatchLive(), 'APP用户任务');
@@ -3057,7 +3063,7 @@
       API.GroupSign.run, // 应援团签到
       API.DailyReward.run, // 每日任务
       API.LiveReward.run, // 直播每日任务
-      API.AppUserTask.run, // APP用户任务（发5条弹幕领1电池）
+      API.AppUserTask.test, // APP用户任务（发5条弹幕领1电池）
       API.Exchange.runS2C, // 银瓜子换硬币
       API.Exchange.runC2S, // 硬币换银瓜子
       // 其它任务
