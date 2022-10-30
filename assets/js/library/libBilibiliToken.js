@@ -8,6 +8,7 @@
 // @connect     passport.bilibili.com
 // @license     MIT
 // @grant       GM_xmlhttpRequest
+// @grant       unsafeWindow
 // @run-at      document-start
 // ==/UserScript==
 class BilibiliToken {
@@ -16,7 +17,7 @@ class BilibiliToken {
     static loginAppKey = '783bbb7264451d82';
     static __secretKey = '560c52ccd288fed045859ed18bffd973';
     static appKey = '1d8b6e7d45233436';
-    build = '7030300';
+    build = '6720300';
     buvid = BilibiliToken.buvidXX;
     Clocale = 'zh-Hans_CN';
     channel = 'website';
@@ -44,7 +45,6 @@ class BilibiliToken {
         paramsSort = paramsSort.split('&').sort().join('&');
         const paramsSecret = paramsSort + secretKey;
         const paramsHash = this.md5(paramsSecret);
-        console.log('ph', paramsHash)
         return `${paramsSort}&sign=${paramsHash}`;
     }
     signLoginQuery(params) {
@@ -341,4 +341,4 @@ class BilibiliToken {
             }
         });
     }
-}
+};
