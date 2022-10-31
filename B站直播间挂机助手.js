@@ -33,13 +33,13 @@
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@bca9261faa84ffd8f804c85c1a5153d3aa27a9a3/assets/js/library/Ajax-hook.min.js
 // @require        https://gcore.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@de9d21e07097b432ee80de489b35b16d689d3f8e/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4c2e8bc541656a8ea6d62d6055e8fd149caa4210/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
 // @require        https://gcore.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
 // @require        https://gcore.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@89c77b3892c77159219bb782e667b801f1cf5cf7/assets/js/library/libBilibiliToken.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4c2e8bc541656a8ea6d62d6055e8fd149caa4210/assets/js/library/libBilibiliToken.min.js
 // @resource       layerCss https://gcore.jsdelivr.net/gh/andywang425/BLTH@d25aa353c8c5b2d73d2217b1b43433a80100c61e/assets/css/layer.css
 // @resource       myCss    https://gcore.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
 // @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@de9d21e07097b432ee80de489b35b16d689d3f8e/assets/html/main.min.html
@@ -773,9 +773,9 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "【直播观看体验】中的【屏蔽关注按钮和弹窗】改为【屏蔽右侧边栏】。",
-              "修复【隐身入场】和【拦截直播观看数据上报】会导致特殊直播间直播画面不显示的 bug。",
-              "修复非东八区【自动送礼】礼物到期时间计算不正确的 bug。"
+              "【直播观看体验】中新增【移除小橙车相关内容】。",
+              "【直播区任务】中新增【APP 用户任务】功能，目前该功能支持自动完成发五条弹幕领一电池的 APP 任务。",
+              "暂时移除需要服务器的功能，续不起费。",
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -1263,7 +1263,7 @@
           DailyTasksBtnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置缓存并刷新页面可以让脚本再次执行今天已经执行过的任务。</mli></mul>",
           add_like_button: "在直播画面上方，分享按钮左侧添加一个点赞按钮。<mul><mli>该按钮被按下后只会触发一次点赞事件（可用来完成点赞任务），不会发送点赞弹幕。如果想发送点赞弹幕请使用B站的原生功能。</mli></mul>",
           WatchLiveTime: `观看直播时长。单位分钟，必须填写整数。<mul><mli>每观看五分钟可获得100亲密度。如果完成了点赞和发弹幕任务，观看65分钟即可挂满亲密度。请根据自身情况调整观看时间。</mli><mli>具体规则请查阅B站官方公告${linkMsg('https://link.bilibili.com/p/eden/news#/newsdetail?id=2886')}。</mli></mul>`,
-          APP_TASK: "自动完成APP用户任务并领取奖励。<h3>注意：</h3><mul><mli>本功能运行时【自动发弹幕】将延后运行。</mli></mul>目前脚本支持的任务有：<mul><mli>自动发五条弹幕，领取1电池奖励。默认会在直播间22474988模拟APP发弹幕并领取奖励。</mli></mul>"
+          APP_TASK: "自动完成APP用户任务并领取奖励。<h3>注意：</h3><mul><mli>本功能运行时【自动发弹幕】将延后运行，并且会等待【粉丝勋章打卡弹幕】任务完成后再运行。</mli><mli>本功能的日志显示在日志窗口。</mli></mul>目前脚本支持的任务有：<mul><mli><strong>发5条弹幕领取1电池奖励</strong><br>如果本功能运行时任务还未完成，会自动在直播间22474988发弹幕来完成任务并领取奖励。弹幕内容会从【粉丝勋章打卡弹幕】配置的弹幕列表里抽取，若数量不够则使用“打卡+数字”作为弹幕内容。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
@@ -1508,7 +1508,7 @@
               myDiv.find('button[data-action="clearDanmuCache"]').click(() => {
                 // 清除弹幕缓存
                 MY_API.CACHE.AUTO_SEND_DANMU_TS = [];
-                if (MY_API.saveCache()) MY_API.chatLog('清除弹幕缓存成功', 'success');
+                if (MY_API.saveCache()) window.toast('清除弹幕缓存成功', 'success');
               });
               // 绑定所有checkbox事件
               for (const i of checkList) {
@@ -1714,7 +1714,6 @@
         function bodyPropertyChange() {
           let attr = body.attr('class'), tabOffSet = tabContent.offset(), top = tabOffSet.top, left = tabOffSet.left;
           if (/(player\-full\-win)|(fullscreen\-fix)/.test(attr)) {
-            console.log('attr', attr)
             if (SP_CONFIG.mainDisplay === 'show') { // 显示 -> 隐藏
               SP_CONFIG.mainDisplay = 'hide';
               saveSpConfig(false);
@@ -1923,7 +1922,6 @@
           const obj = JSON.parse(cards[i].card);
           let num = Math.min(2, n);
           if (one) num = 1;
-          console.log('before req')
           return BAPI.x.getCoinInfo('', 'jsonp', obj.aid, ts_ms()).then(re => {
             MYDEBUG(`API.x.getCoinInfo aid = ${obj.aid}`, re);
             if (re.code === 0) {
@@ -2082,10 +2080,8 @@
                 const p1 = MY_API.DailyReward.watch(obj.aid, obj.cid);
                 let p2;
                 if (MY_API.CONFIG.COIN_UID == 0 || MY_API.CONFIG.COIN_TYPE == 'COIN_DYN') {
-                  console.log('if')
                   p2 = MY_API.DailyReward.coin(response.data.cards, Math.max(throwCoinNum, 0));
                 } else {
-                  console.log('else')
                   p2 = MY_API.DailyReward.UserSpace(0, 30, 0, 1, '', 'pubdate', 'jsonp');
                 }
                 const p3 = MY_API.DailyReward.share(obj.aid);
@@ -2936,7 +2932,7 @@
       },
       AppUserTask: {
         isRunning: false,
-        getRemainProgress: () => {
+        getRemainProgress: async () => {
           return BAPI.xlive.app.getUserTaskProgress(userToken.access_token).then(response => {
             MYDEBUG('API.xlive.app.getUserTaskProgress', response);
             if (response.code === 0) {
@@ -2949,24 +2945,24 @@
             }
           })
         },
-        getUserTaskRewards: () => {
+        getUserTaskRewards: async () => {
           return BAPI.xlive.app.userTaskReceiveRewards(userToken.access_token).then(response => {
             MYDEBUG('API.xlive.app.userTaskReceiveRewards', response);
             if (response.code === 0) {
-              return MY_API.chatLog('[APP用户任务] 领取奖励成功', 'success')
+              return MY_API.chatLog(`[APP用户任务] 领取奖励成功<br>获得${response.data.num}个电池`, 'success')
             } else {
               return MY_API.chatLog(`[APP用户任务] 领取奖励失败<br>${response.message}`, 'error')
             }
           })
         },
         sendDanmu: async (remainProgress) => {
-          const content = '打卡' + remainProgress;
+          const content = remainProgress < MY_API.CONFIG.MEDAL_DANMU_CONTENT.length ? MY_API.CONFIG.MEDAL_DANMU_CONTENT[remainProgress] : ('打卡' + remainProgress);
           return BAPI.xlive.app.sendmsg(userToken.access_token, content, 22474988, Live_info.uid).then(response => {
             MYDEBUG(`API.sendLiveDanmu(弹幕 = ${content}, roomid = 22474988,)`, response);
             if (response.code === 0) {
               return MYDEBUG(`[APP用户任务] 弹幕发送内容【${content}】，房间号【22474988,】`, response);
             } else {
-              return window.toast(`[APP用户任务] 弹幕【${content}】（房间号【22474988,】）出错 ${response.message}`, 'caution');
+              return MY_API.chatLog(`[APP用户任务] 弹幕【${content}】（房间号【22474988,】）出错 ${response.message}`, 'error');
             }
           });
         },
@@ -2975,12 +2971,6 @@
             await MY_API.AppUserTask.sendDanmu(remainProgress--);
             await sleep(5000);
           }
-        },
-        test: async () => {
-          if (await setToken() === undefined)
-            return;
-          MYDEBUG('appToken userToken.access_token.length', userToken.access_token.length);
-          let remainProgress = MY_API.AppUserTask.getRemainProgress();
         },
         run: async () => {
           if (!MY_API.CONFIG.APP_TASK || otherScriptsRunning) return $.Deferred().resolve();
@@ -2993,7 +2983,7 @@
             return;
           MY_API.AppUserTask.isRunning = true;
           MYDEBUG('appToken userToken.access_token.length', userToken.access_token.length);
-          let remainProgress = MY_API.AppUserTask.getRemainProgress();
+          let remainProgress = await MY_API.AppUserTask.getRemainProgress();
           if (remainProgress === -1) return MY_API.AppUserTask.isRunning = false;
           await MY_API.AppUserTask.completeTask(remainProgress);
           await MY_API.AppUserTask.getUserTaskRewards();
@@ -3050,7 +3040,7 @@
 
   async function main(API) {
     // 检查更新
-    checkUpdate(GM_info.script.version);
+    // checkUpdate(GM_info.script.version);
     // 修复版本更新产生的兼容性问题
     fixVersionDifferences(API, GM_info.script.version);
     runExactMidnight(() => clearStat(), '重置统计');
@@ -3063,7 +3053,7 @@
       API.GroupSign.run, // 应援团签到
       API.DailyReward.run, // 每日任务
       API.LiveReward.run, // 直播每日任务
-      API.AppUserTask.test, // APP用户任务（发5条弹幕领1电池）
+      API.AppUserTask.run, // APP用户任务（发5条弹幕领1电池）
       API.Exchange.runS2C, // 银瓜子换硬币
       API.Exchange.runC2S, // 硬币换银瓜子
       // 其它任务
