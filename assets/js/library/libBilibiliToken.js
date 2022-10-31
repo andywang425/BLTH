@@ -36,7 +36,7 @@ class BilibiliToken {
     };
     get loginQuery() {
         return `appkey=${BilibiliToken.loginAppKey}&build=${this.build}&c_locale=${this.Clocale}&channel=${this.channel}&local_id=${this.localId}\
-  &mobi_app=${this.mobiApp}&platform=${this.platform}&s_locale=${this.Slocale}`;
+&mobi_app=${this.mobiApp}&platform=${this.platform}&s_locale=${this.Slocale}`;
     }
     static signQuery(params, ts = true, secretKey = this.__secretKey) {
         let paramsSort = params;
@@ -341,4 +341,4 @@ class BilibiliToken {
             }
         });
     }
-};
+}

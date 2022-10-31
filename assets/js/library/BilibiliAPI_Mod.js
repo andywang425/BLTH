@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.1.3
+// @version       3.1.4
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -17,8 +17,8 @@ let BAPI_csrf_token, BAPI_visit_id,
         return {
             access_key: access_token,
             actionKey: 'appkey',
-            appkey: BilibiliToken.appKey,
-            build: BilibiliToken.build,
+            appkey: '1d8b6e7d45233436',
+            build: '6720300',
             c_locale: 'zh_CN',
             channel: 'bili',
             device: 'android',
@@ -32,16 +32,17 @@ let BAPI_csrf_token, BAPI_visit_id,
         }
     },
     getAppHeaders = (uid) => {
-        const fp = BilibiliToken.md5(Math.random().toString()) + BilibiliToken.md5(Math.random().toString());
+        const md5_1 = BilibiliToken.md5(Math.random().toString()), md5_2 = BilibiliToken.md5(Math.random().toString());
+        const fp = md5_1 + md5_2;
         return {
             buvid: BilibiliToken.buvidXX,
             fp_local: fp,
             fp_remote: fp,
-            session_id: BilibiliToken.md5(Math.random().toString()).substring(0, 8),
+            session_id: md5_1.substring(0, 8),
             env: 'prod',
             'app-key': 'android64',
-            'user-agent': 'Mozilla/5.0 BiliDroid/7.3.0 (bbcallen@gmail.com) os/android model/MuMu mobi_app/android build/7030300 channel/bili innerVer/7030310 osVer/6.0.1 network/2',
-            'x-bili-trace-id': BilibiliToken.md5(Math.random().toString()).concat(':', BilibiliToken.md5(Math.random().toString()).substring(0, 16), ':0:0'),
+            'user-agent': 'Mozilla/5.0 BiliDroid/6.72.0 (bbcallen@gmail.com) os/android model/XQ-CT72 mobi_app/android build/6720300 channel/bilih5 innerVer/6720310 osVer/12 network/2',
+            'x-bili-trace-id': md5_1.concat(':', md5_2.substring(0, 16), ':0:0'),
             'x-bili-aurora-eid': 'VFwJQVkEBFYH',
             'x-bili-mid': uid,
             'x-bili-aurora-zone': '',
