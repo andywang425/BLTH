@@ -9,7 +9,7 @@
 - 安装 [Chrome](https://www.google.cn/chrome/)，[Tampermonkey](https://www.tampermonkey.net/)，[Node.js](http://nodejs.cn/) (version >= 16), [Visual Studio Code](https://code.visualstudio.com/)。
 - Fork 本项目，然后 Clone 至本地。
 - 安装依赖 `npm install -D`。
-- 安装 vscode 插件 [MinifyAll](https://marketplace.visualstudio.com/items?itemName=josee9988.minifyall)。
+- 安装 vscode 拓展 [MinifyAll](https://marketplace.visualstudio.com/items?itemName=josee9988.minifyall)。
 
 ## 脚本调试方式
 
@@ -110,6 +110,6 @@ BLTH
 - 更新位于`/assets/json/`目录下的`notice.json`中的版本号，然后压缩该 json 文件得到`notice.min.json`。
 - 攥写更新日志`update-log.md`，格式仿照先前的日志写即可。写完后复制更新内容，之后会用到。
 - 更新脚本内置的更新说明（每次更新后第一次运行时弹窗的内容）。运行`/assets/js/development/`目录下的`updateLog2ArrayString.js`，粘贴你刚刚写的更新内容，回车，将剪切板的内容复制到脚本内置更新说明的位置（在代码中搜索`${version}更新提示`可快速定位，数组`clientMliList`是储存更新说明的）。
-- （本步骤可忽略。部分情况下添加 md5 会导致 Tampermonkey 无法正常获取依赖，原因未知。）给资源文件添加用于校验子资源完整性的 md5 值。运行`/assets/js/development/`目录下的`addRequireMd5.js`得到新的脚本元数据，结果会被保存到剪切板。用剪切板中的内容覆盖脚本的头部元数据即可。注意，如果部分 md5 计算失败而你想要手动加上 md5 的话，需计算从 cdn 获取到的内容的 md5，不能直接计算本地文件的 md5，因为上传到 cdn 之后文件的 md5 可能会变化（但是内容不会变，可能是换行符之类的导致的）。
+- （本步骤可忽略）给资源文件添加用于校验子资源完整性的 md5 值。运行`/assets/js/development/`目录下的`addRequireMd5.js`得到新的脚本元数据，结果会被保存到剪切板。用剪切板中的内容覆盖脚本的头部元数据即可。注意，如果部分 md5 计算失败而你想要手动加上 md5 的话，需计算从 cdn 获取到的内容的 md5，不能直接计算本地文件的 md5，因为上传到 cdn 之后文件的 md5 可能会变化（但是内容不会变，可能是换行符之类的导致的）。
 - 压缩脚本，得到`B站直播间挂机助手.user.js`。如果你使用的是[MinifyAll](https://marketplace.visualstudio.com/items?itemName=josee9988.minifyall)插件，元数据会被保留下来（详见`/.vscode/settings.json/`的`MinifyAll.terserMinifyOptions`字段）。如果你用的是其它压缩手段，记得把脚本头部的元数据补上。
 - 发起 PR(你的仓库的 dev 分支 -> 主仓库的 dev 分支)。标题写版本号，描述写更新内容。复制你之前在`update-log.md`里写的更新内容，运行`/assets/js/development/`目录下的`updateLogAddLineBreaks.js`，粘贴，即可快速添加换行符。由项目成员进行最后的检查和修改后，主仓库的 dev 分支会被合并到 master 分支，之后用户便可以通过各种途径更新最新版的脚本了。

@@ -1,14 +1,8 @@
 <p><img src="https://gcore.jsdelivr.net/gh/andywang425/BLTH@7d7ca494edd314806460e24c6b59be8ae1bd7dc6/img/script-icon.png"><h1>B站直播间挂机助手</h1></p>
 <p><img src="https://img.shields.io/badge/TamperMonkey_4.12-pass-green.svg" alt="TamperMonkey 4.12"> <img src="https://img.shields.io/badge/Violentmonkey_2.12.14-pass-green.svg" alt="Violentmonkey 2.12.14"> <a href="https://github.com/andywang425/BLTH/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License"></a></p>
 <p><img src="https://palerock.cn/node-service/images/greasyfork/views-info/406048" alt="Total Views"> <img src="https://palerock.cn/node-service/images/greasyfork/stats/total-installs/406048" alt="Total Installs"> <img src="https://palerock.cn/node-service/images/greasyfork/stats/daily-installs/406048" alt="Daily Installs"> <img src="https://palerock.cn/node-service/images/greasyfork/stats/daily-updates/406048" alt="Daily Updates"> <img src="https://palerock.cn/node-service/images/greasyfork/info/good_ratings/406048?name=%E5%A5%BD%E8%AF%84&amp;rcolor=darkcyan" alt="Good Ratings"> <img src="https://palerock.cn/node-service/images/greasyfork/info/fan_score/406048?name=%E5%BE%97%E5%88%86&amp;rcolor=orange" alt="Rating"></p>
-<p><a href="https://jq.qq.com/?_wv=1027&k=9refOc8c"><img src="https://img.shields.io/badge/QQ%20Group-657763329-yellow" alt="QQ Group"></a></p>
 
 ---
-
-### github 项目地址
-
-[github.com/andywang425/BLTH](https://github.com/andywang425/BLTH)
-&nbsp;<a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Github stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a>
 
 ## 使用方法
 
@@ -97,6 +91,11 @@
 - QQ 频道：[点我加入 aw 的频道](https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=1W7eVLs&businessType=9&from=181074&biz=ka&shareSource=5)。
 - 非官方电报群：[LaTiao01](https://t.me/LaTiao01)。
 
+### github 项目地址
+
+[andywang425/BLTH](https://github.com/andywang425/BLTH)
+&nbsp;<a href="https://github.com/andywang425/BLTH/stargazers"><img src="https://img.shields.io/github/stars/andywang425/BLTH?style=flat" alt="Github stars"></a> <a href="https://github.com/andywang425/BLTH/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/andywang425/BLTH"></a>
+
 ---
 
 ## 已知问题
@@ -140,18 +139,16 @@
 
 本脚本使用的库：
 
-- [jQuery](https://github.com/jquery/jquery) (MIT)
-- [BilibiliAPI_Mod](https://github.com/andywang425/BLTH/blob/master/assets/js/library/BilibiliAPI_Mod.js) (MIT)：各种 B 站 API。
-- [crypto-js](https://github.com/brix/crypto-js) (MIT)：crypto 标准的 JavaScript 库。
-- [layer](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web 弹层组件。
 - [Ajax-hook](https://github.com/wendux/Ajax-hook) (MIT)：用于拦截浏览器 XMLHttpRequest 的库。
+- [jQuery](https://github.com/jquery/jquery) (MIT)
 - [bliveproxy](https://github.com/xfgryujk/bliveproxy/blob/master/bliveproxy.user.js) (MIT)：B 站直播 websocket hook 框架。
-- [pako](https://github.com/nodeca/pako) (MIT)：javascript 压缩/解压缩库。
-- [decode](https://github.com/google/brotli/blob/master/js/decode.js) (MIT)：brotli 项目中的 javascript 解码库。
-- [hotkeys](https://github.com/jaywcjlove/hotkeys) (MIT)：一个强健的 Javascript 库，用于捕获键盘输入和输入的组合键。
+- [BilibiliAPI_Mod](https://github.com/andywang425/BLTH/blob/master/assets/js/library/BilibiliAPI_Mod.js) (MIT)：各种 B 站 API。
+- [layer](https://github.com/sentsin/layer/blob/master/dist/layer.js) (MIT)：web 弹层组件。
 - [emitter](https://github.com/component/emitter) (MIT): 事件触发器组件。
-- [DanmuWebSocket](https://github.com/andywang425/BLTH/blob/master/assets/js/library/DanmuWebSocket.js) (MIT)：B 站直播 Websocket 弹幕库。
+- [hotkeys](https://github.com/jaywcjlove/hotkeys) (MIT)：一个强健的 Javascript 库，用于捕获键盘输入和输入的组合键。
+- [crypto-js](https://github.com/brix/crypto-js) (MIT)：crypto 标准的 JavaScript 库。
 - [BiliveHeart](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiliveHeart/BiliveHeart.user.js) (MIT)：B 站直播心跳库。
+- [libBilibiliToken](https://github.com/lzghzr/TampermonkeyJS/blob/master/libBilibiliToken/libBilibiliToken.js) (MIT)：哔哩哔哩通过 web 端 cookie 获取 app 端 token。
 
 本脚本引用的外部资源：
 
@@ -167,13 +164,13 @@
 - [十六夜](https://greasyfork.org/en/users/289469-%E5%8D%81%E5%85%AD%E5%A4%9C)：本脚本初期大部分代码都来自于十六夜。
 - [SeaLoong](https://github.com/SeaLoong)：参考了部分功能实现；B 站 API 库的原作者。
 - [pjy612](https://github.com/pjy612)：参考了部分功能实现。
-- [lzghzr](https://github.com/lzghzr)：提供了油猴脚本的小心心 heartbeat 解决方案。
+- [lzghzr](https://github.com/lzghzr)：提供了 web 端心跳和获取 app 端 token 的解决方案。
 - [sentsin](https://github.com/sentsin)：弹出层组件库作者。
 - [wendux](https://github.com/wendux)：ajax 拦截库作者。
 - [风绫丨钰袖](https://space.bilibili.com/20842051)：参考了部分功能实现。
-- [Server 酱](https://sct.ftqq.com)，[推送加](https://pushplus.plus)：本脚本使用的微信推送平台。
+- [Server 酱](https://sct.ftqq.com)，[推送加](https://pushplus.plus)：本脚本曾经使用的微信推送平台。
 - [酷推](https://cp.xuthus.cc)：本脚本曾经使用的 qq 推送平台。
-- [无尾玦的小尾巴](https://space.bilibili.com/234368216)：贡献了一个舰长账号。
+- [无尾玦的小尾巴](https://space.bilibili.com/234368216)：贡献了一个舰长账号用于测试。
 - [冰冰羊](https://space.bilibili.com/261593393)：q 群内新手使用教程和屏蔽词库的作者。
 - [xfgryujk](https://github.com/xfgryujk)：B 站直播 websocket hook 框架作者。
 - [spiritLHL](https://github.com/spiritLHL)：协助搭建本脚本的私有化 qq 推送平台。

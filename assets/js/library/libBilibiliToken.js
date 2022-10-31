@@ -1,80 +1,42 @@
 // ==UserScript==
 // @name        libBilibiliToken
 // @namespace   https://github.com/lzghzr/TampermonkeyJS
-// @version     0.0.4
+// @version     1.0.0
 // @author      lzghzr
 // @description 哔哩哔哩cookie获取token
 // @match       *://*.bilibili.com/*
 // @connect     passport.bilibili.com
 // @license     MIT
 // @grant       GM_xmlhttpRequest
+// @grant       unsafeWindow
 // @run-at      document-start
 // ==/UserScript==
 class BilibiliToken {
-    constructor() {
-        this._W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
-        this.biliLocalId = BilibiliToken.biliLocalId;
-        this.buvid = BilibiliToken.buvid;
-        this.deviceId = this.biliLocalId;
-        this.fingerprint = BilibiliToken.fingerprint;
-        this.guid = this.buvid;
-        this.localFingerprint = this.fingerprint;
-        this.localId = this.buvid;
-        this.headers = {
-            'User-Agent': 'Mozilla/5.0 BiliTV/1.2.4.1 (bbcallen@gmail.com)',
-            'APP-KEY': BilibiliToken.mobiApp,
-            'Buvid': this.buvid,
-            'env': 'prod'
-        };
+    static _W = typeof unsafeWindow === 'undefined' ? window : unsafeWindow;
+    static __loginSecretKey = '2653583c8873dea268ab9386918b1d65';
+    static loginAppKey = '783bbb7264451d82';
+    static __secretKey = '560c52ccd288fed045859ed18bffd973';
+    static appKey = '1d8b6e7d45233436';
+    build = '6720300';
+    buvid = BilibiliToken.buvidXX;
+    Clocale = 'zh-Hans_CN';
+    channel = 'website';
+    localId = this.buvid;
+    mobiApp = 'android';
+    platform = 'android';
+    Slocale = 'zh-Hans_CN';
+    static get buvidXX() {
+        const buvid = this.md5(Math.random().toString()).toUpperCase();
+        return 'XX' + buvid[2] + buvid[12] + buvid[22] + buvid;
     }
-    static get biliLocalId() { return this.RandomID(20); }
-    static get buvid() { return this.RandomID(37).toLocaleUpperCase(); }
-    static get deviceId() { return this.biliLocalId; }
-    static get fingerprint() { return this.RandomID(62); }
-    static get guid() { return this.buvid; }
-    static get localFingerprint() { return this.fingerprint; }
-    static get localId() { return this.buvid; }
     static get TS() { return Math.floor(Date.now() / 1000); }
-    static get RND() { return this.RandomNum(9); }
-    static RandomNum(length) {
-        const words = '0123456789';
-        let randomNum = '';
-        randomNum += words[Math.floor(Math.random() * 9) + 1];
-        for (let i = 0; i < length - 1; i++)
-            randomNum += words[Math.floor(Math.random() * 10)];
-        return +randomNum;
-    }
-    static RandomID(length) {
-        const words = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-        let randomID = '';
-        randomID += words[Math.floor(Math.random() * 61) + 1];
-        for (let i = 0; i < length - 1; i++)
-            randomID += words[Math.floor(Math.random() * 62)];
-        return randomID;
-    }
-    static get headers() {
-        return {
-            'User-Agent': 'Mozilla/5.0 BiliTV/1.2.4.1 (bbcallen@gmail.com)',
-            'APP-KEY': this.mobiApp,
-            'Buvid': this.buvid,
-            'env': 'prod'
-        };
-    }
-    static get loginQuery() {
-        const biliLocalId = this.biliLocalId;
-        const buvid = this.buvid;
-        const fingerprint = this.fingerprint;
-        return `appkey=${this.loginAppKey}&bili_local_id=${biliLocalId}&build=${this.build}&buvid=${buvid}&channel=${this.channel}&device=${biliLocalId}\
-&device_id=${this.deviceId}&device_name=${this.deviceName}&device_platform=${this.devicePlatform}&fingerprint=${fingerprint}&guid=${buvid}\
-&local_fingerprint=${fingerprint}&local_id=${buvid}&mobi_app=${this.mobiApp}&networkstate=${this.networkstate}&platform=${this.platform}`;
-    }
+    headers = {
+        'user-agent': 'Mozilla/5.0 BiliDroid/6.72.0 (bbcallen@gmail.com) os/android model/XQ-CT72 mobi_app/android build/6720300 channel/bilih5 innerVer/6720310 osVer/12 network/2',
+        'buvid': this.buvid
+    };
     get loginQuery() {
-        const biliLocalId = this.biliLocalId;
-        const buvid = this.buvid;
-        const fingerprint = this.fingerprint;
-        return `appkey=${BilibiliToken.loginAppKey}&bili_local_id=${biliLocalId}&build=${BilibiliToken.build}&buvid=${buvid}&channel=${BilibiliToken.channel}&device=${biliLocalId}\
-&device_id=${this.deviceId}&device_name=${BilibiliToken.deviceName}&device_platform=${BilibiliToken.devicePlatform}&fingerprint=${fingerprint}&guid=${buvid}\
-&local_fingerprint=${fingerprint}&local_id=${buvid}&mobi_app=${BilibiliToken.mobiApp}&networkstate=${BilibiliToken.networkstate}&platform=${BilibiliToken.platform}`;
+        return `appkey=${BilibiliToken.loginAppKey}&build=${this.build}&c_locale=${this.Clocale}&channel=${this.channel}&local_id=${this.localId}\
+&mobi_app=${this.mobiApp}&platform=${this.platform}&s_locale=${this.Slocale}`;
     }
     static signQuery(params, ts = true, secretKey = this.__secretKey) {
         let paramsSort = params;
@@ -84,10 +46,6 @@ class BilibiliToken {
         const paramsSecret = paramsSort + secretKey;
         const paramsHash = this.md5(paramsSecret);
         return `${paramsSort}&sign=${paramsHash}`;
-    }
-    static signLoginQuery(params) {
-        const paramsBase = params === undefined ? this.loginQuery : `${params}&${this.loginQuery}`;
-        return this.signQuery(paramsBase, true, this.__loginSecretKey);
     }
     signLoginQuery(params) {
         const paramsBase = params === undefined ? this.loginQuery : `${params}&${this.loginQuery}`;
@@ -105,20 +63,20 @@ class BilibiliToken {
         });
         if (authCode !== undefined && authCode.response.status === 200 && authCode.body.code === 0)
             return authCode.body.data.auth_code;
-        return console.error('getAuthCode', authCode);
+        return console.error(GM_info.script.name, 'getAuthCode', authCode);
     }
     async qrcodeConfirm(authCode, csrf) {
         const confirm = await BilibiliToken.XHR({
             GM: true,
             method: 'POST',
             url: 'https://passport.bilibili.com/x/passport-tv-login/h5/qrcode/confirm',
-            data: `auth_code=${authCode}&csrf=${csrf}`,
+            data: `auth_code=${authCode}&csrf=${csrf}&scanning_type=1`,
             responseType: 'json',
             headers: this.headers
         });
         if (confirm !== undefined && confirm.response.status === 200 && confirm.body.code === 0)
             return confirm.body.data.gourl;
-        return console.error('qrcodeConfirm', confirm);
+        return console.error(GM_info.script.name, 'qrcodeConfirm', confirm);
     }
     async qrcodePoll(authCode) {
         const poll = await BilibiliToken.XHR({
@@ -132,12 +90,12 @@ class BilibiliToken {
         });
         if (poll !== undefined && poll.response.status === 200 && poll.body.code === 0)
             return poll.body.data;
-        return console.error('qrcodePoll', poll);
+        return console.error(GM_info.script.name, 'qrcodePoll', poll);
     }
     async getToken() {
-        const cookie = this._W.document.cookie.match(/bili_jct=(?<csrf>.*?);/);
+        const cookie = BilibiliToken._W.document.cookie.match(/bili_jct=(?<csrf>.*?);/);
         if (cookie === null || cookie.groups === undefined)
-            return console.error('getToken', 'cookie获取失败');
+            return console.error(GM_info.script.name, 'getToken', 'cookie获取失败');
         const csrf = cookie.groups['csrf'];
         const authCode = await this.getAuthCode();
         if (authCode === undefined)
@@ -368,7 +326,7 @@ class BilibiliToken {
                 xhr.open(XHROptions.method, XHROptions.url);
                 if (XHROptions.method === 'POST' && xhr.getResponseHeader('Content-Type') === null)
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8');
-                if (XHROptions.cookie)
+                if (XHROptions.withCredentials)
                     xhr.withCredentials = true;
                 if (XHROptions.responseType !== undefined)
                     xhr.responseType = XHROptions.responseType;
@@ -384,15 +342,3 @@ class BilibiliToken {
         });
     }
 }
-BilibiliToken.__loginSecretKey = '59b43e04ad6965f34319062b478f83dd';
-BilibiliToken.loginAppKey = '4409e2ce8ffd12b8';
-BilibiliToken.__secretKey = '560c52ccd288fed045859ed18bffd973';
-BilibiliToken.appKey = '1d8b6e7d45233436';
-BilibiliToken.build = '102401';
-BilibiliToken.channel = 'master';
-BilibiliToken.device = 'Sony';
-BilibiliToken.deviceName = 'J9110';
-BilibiliToken.devicePlatform = 'Android10SonyJ9110';
-BilibiliToken.mobiApp = 'android_tv_yst';
-BilibiliToken.networkstate = 'wifi';
-BilibiliToken.platform = 'android';

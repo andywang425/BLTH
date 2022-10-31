@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.1.3
+// @version       3.1.4
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -12,7 +12,44 @@
 
 let BAPI_csrf_token, BAPI_visit_id,
     BAPI_ts_ms = () => Date.now(),// 当前毫秒
-    BAPI_ts_s = () => Math.round(BAPI_ts_ms() / 1000);// 当前秒
+    BAPI_ts_s = () => Math.round(BAPI_ts_ms() / 1000),// 当前秒
+    getAppCommonRequestJson = (access_token) => {
+        return {
+            access_key: access_token,
+            actionKey: 'appkey',
+            appkey: '1d8b6e7d45233436',
+            build: '6720300',
+            c_locale: 'zh_CN',
+            channel: 'bili',
+            device: 'android',
+            disable_rcmd: 0,
+            mobi_app: 'android',
+            platform: 'android',
+            s_locale: 'zh_CN',
+            statistics: `{"appId":1,"platform":3,"version":"7.3.0","abtest":""}`,
+            sign: BilibiliToken.md5(Math.random().toString()),
+            ts: BAPI_ts_s()
+        }
+    },
+    getAppHeaders = (uid) => {
+        const md5_1 = BilibiliToken.md5(Math.random().toString()), md5_2 = BilibiliToken.md5(Math.random().toString());
+        const fp = md5_1 + md5_2;
+        return {
+            buvid: BilibiliToken.buvidXX,
+            fp_local: fp,
+            fp_remote: fp,
+            session_id: md5_1.substring(0, 8),
+            env: 'prod',
+            'app-key': 'android64',
+            'user-agent': 'Mozilla/5.0 BiliDroid/6.72.0 (bbcallen@gmail.com) os/android model/XQ-CT72 mobi_app/android build/6720300 channel/bilih5 innerVer/6720310 osVer/12 network/2',
+            'x-bili-trace-id': md5_1.concat(':', md5_2.substring(0, 16), ':0:0'),
+            'x-bili-aurora-eid': 'VFwJQVkEBFYH',
+            'x-bili-mid': uid,
+            'x-bili-aurora-zone': '',
+            'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+            'accept-encoding': 'gzip'
+        }
+    };
 var BAPI = {
     setCommonArgs: (csrfToken = '', visitId = '') => {
         BAPI_csrf_token = csrfToken;
@@ -548,16 +585,6 @@ var BAPI = {
         liveinfo: () => {
             return BAPI.ajax({
                 url: 'i/api/liveinfo'
-            });
-        },
-        medal: (page = 1, pageSize = 10) => {
-            // 获取勋章列表信息
-            return BAPI.ajax({
-                url: 'xlive/app-ucenter/v1/user/GetMyMedals',
-                data: {
-                    page: page,
-                    page_size: pageSize
-                }
             });
         },
         operation: (page = 1) => {
@@ -1556,8 +1583,7 @@ var BAPI = {
                 })
             }
         },
-        popularityRedPocket:
-        {
+        popularityRedPocket: {
             followRelation: (uid, target_uid) => {
                 return BAPI.ajax({
                     url: 'xlive/lottery-interface/v1/popularityRedPocket/FollowRelation',
@@ -1580,6 +1606,70 @@ var BAPI = {
                         jump_from: jump_from
                     }
                 })
+            }
+        },
+        app: {
+            medal: (page = 1, pageSize = 10) => {
+                // 获取勋章列表信息
+                return BAPI.ajax({
+                    url: 'xlive/app-ucenter/v1/user/GetMyMedals',
+                    data: {
+                        page: page,
+                        page_size: pageSize
+                    }
+                });
+            },
+            getUserTaskProgress: async (access_token, target_id = 358483030) => {
+                let query = getAppCommonRequestJson(access_token);
+                query.target_id = target_id;
+                const r = await BAPI.GMR({
+                    url: 'xlive/app-ucenter/v1/userTask/GetUserTaskProgress',
+                    query: query,
+                    headers: getAppHeaders(target_id)
+                });
+                return r.response;
+            },
+            userTaskReceiveRewards: async (access_token, target_id = 358483030) => {
+                let data = getAppCommonRequestJson(access_token);
+                data.target_id = target_id;
+                const r = await BAPI.GMR({
+                    method: 'POST',
+                    url: 'xlive/app-ucenter/v1/userTask/UserTaskReceiveRewards',
+                    data: data,
+                    headers: getAppHeaders(target_id)
+                });
+                return r.response;
+            },
+            sendmsg: async (access_token, msg, roomid, uid) => {
+                const queryObj = getAppCommonRequestJson(access_token);
+                let url = 'xlive/app-room/v1/dM/sendmsg'
+                const r = await BAPI.GMR({
+                    method: 'POST',
+                    url: url,
+                    query: queryObj,
+                    data: {
+                        bubble: 0,
+                        live_status: 'live',
+                        cid: roomid,
+                        mid: uid,
+                        msg: msg,
+                        rnd: -Math.round(Math.random() * 1e10),
+                        mode: 1,
+                        pool: 0,
+                        type: 'json',
+                        av_id: '-99998',
+                        color: 16777215,
+                        fontsize: 25,
+                        bussiness_extend: `{"broadcast_type":"0","stream_scale":"2","watch_ui_type":"2"}`,
+                        flow_extend: `{"position":"1","s_position":"1","slide_direction":"-99998"}`,
+                        jumpfrom_extend: '-99998',
+                        screen_status: 2,
+                        dm_type: 0,
+                        playTime: '0.0',
+                    },
+                    headers: getAppHeaders(uid)
+                });
+                return r.response;
             }
         }
     },
@@ -1660,18 +1750,41 @@ var BAPI = {
         }
     },
     /**
-    * 合并请求参数
-    * @param obj
-    * @returns {string}
+    * 发起 GM_xmlhttpRequest 请求
+    * @param {*} config 
+    * @returns {Promise}
     */
-    KeySign: {
-        sort: (obj) => {
-            let keys = Object.keys(obj).sort();
-            let p = [];
-            for (let key of keys) {
-                p.push(`${key}=${obj[key]}`);
+    GMR: (config) => {
+        return new Promise(resolve => {
+            if (typeof (config.data) === 'object' && !(config.data instanceof FormData) && !(config.data instanceof Blob)) {
+                config.data = new URLSearchParams(config.data).toString();
             }
-            return p.join('&');
-        }
+            if (typeof (config.query) === 'object') {
+                config.url = config.url.concat('?', new URLSearchParams(config.query).toString());
+            }
+            config.url = (config.url.substr(0, 2) === '//' || config.url.substr(0, 4) === 'http' ? '' : 'https://api.live.bilibili.com/') + config.url;
+            config.method = config.method || 'GET';
+            config.responseType = config.responseType || 'json';
+            config._ontimeout = config.ontimeout ?? function () { };
+            config._onerror = config.onerror ?? function () { };
+            config._onload = config.onload ?? function () { };
+            config.ontimeout = function (e) {
+                config._ontimeout(e);
+                config.onerror(e)
+            };
+            config.onerror = function (e) {
+                config._onerror(e);
+                console.error('XHR出错', config, e);
+                resolve(undefined);
+            };
+            config.onload = function (res) {
+                config._onload(res);
+                if (res.status === 200)
+                    resolve(res);
+                else
+                    resolve({ code: res.status, message: statusText })
+            }
+            GM_xmlhttpRequest(config);
+        })
     }
 }
