@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.0.6
+// @version        6.0.7
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -527,7 +527,7 @@
   function init() { // 初始化各项功能
     const MY_API = {
       CONFIG_DEFAULT: {
-        APP_TASK: true, // APP用户任务（发5条弹幕领1电池）
+        APP_TASK: false, // APP用户任务（发5条弹幕领1电池）
         AUTO_DANMU: false, // 发送弹幕
         AUTO_CHECK_DANMU_TIMEOUT: 3000, // 检测弹幕是否发送成功 超时时间
         AUTO_GIFT: false, // 自动送礼
@@ -773,9 +773,8 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              "【直播观看体验】中新增【移除小橙车相关内容】。",
-              "【直播区任务】中新增【APP 用户任务】功能，目前该功能支持自动完成发五条弹幕领一电池的 APP 任务。",
-              "暂时移除需要服务器的功能，续不起费。",
+              "【APP 用户任务】改为默认不开启。",
+              "新增了一些脚本内置说明。"
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return "无";
@@ -1222,7 +1221,7 @@
           // 帮助信息
           GIFT_SEND_METHOD: "自动送礼策略，有白名单和黑名单两种。后文中的<code>直播间</code>指拥有粉丝勋章的直播间。<mul><mli>白名单：仅给房间列表内的直播间送礼。</mli><mli>黑名单：给房间列表以外的直播间送礼。</mli><mli>如果要填写多个房间，每两个房间号之间需用半角逗号<code>,</code>隔开。</mli></mul>",
           MEDAL_DANMU: '在拥有粉丝勋章的直播间内，每天发送的首条弹幕将点亮对应勋章并给该勋章+100亲密度。<mh3>注意：</mh3><mul><mli>如果要填写多条弹幕，每条弹幕间请用半角逗号<code>,</code>隔开，发弹幕时将依次选取弹幕进行发送（若弹幕数量不足则循环选取）。</mli><mli>本功能运行时【自动发弹幕】，【自动送礼】和【APP用户任务】将延后运行。</mli></mul>',
-          AUTO_DANMU: '发送直播间弹幕。</mli><mli><mp>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</mp></mli><mli><mp>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</mp></mli><mli><mp>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。</mp></mli><mli><mp>可以用默认值所填的房间号来测试本功能，但是请不要一直发。</mp></mli><mli><mp>发送时间有两种填写方法</mp><mp>1.【小时】h【分钟】m【秒】s</mp><mul><mli>每隔一段时间发送一条弹幕</mli><mli>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></mli><mli>可以填小数</mli><mli>可以只填写其中一项或两项</mli></mul><mp>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</mp><mp><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></mp><mp>2.【小时】:【分钟】:【秒】</mp><mul><mli>在特定时间点（本地时间）发一条弹幕</mli><mli>例子： <code>10:30:10</code>, <code>0:40</code></mli><mli>只能填整数</mli><mli>小时分钟必须填写，秒数可以不填</mli></mul><mp>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</mp></mli></mul>',
+          AUTO_DANMU: '发送直播间弹幕。<mul><mli><mp>弹幕内容，房间号，发送时间可填多个，数据之间用半角逗号<code>,</code>隔开(数组格式)。脚本会按顺序将这三个值一一对应，发送弹幕。</mp></mli><mli><mp>由于B站服务器限制，每秒最多只能发1条弹幕。若在某一时刻有多条弹幕需要发送，脚本会在每条弹幕间加上1.5秒间隔时间（对在特定时间点发送的弹幕无效）。</mp></mli><mli><mp>如果数据没对齐，缺失的数据会自动向前对齐。如填写<code>弹幕内容 lalala</code>，<code>房间号 3,4</code>，<code>发送时间 5m,10:30</code>，少填一个弹幕内容。那么在发送第二条弹幕时，第二条弹幕的弹幕内容会自动向前对齐（即第二条弹幕的弹幕内容是lalala）。 </mp></mli><mli><mp>可以用默认值所填的房间号来测试本功能，但是请不要一直发。</mp></mli><mli><mp>发送时间有两种填写方法</mp><mp>1.【小时】h【分钟】m【秒】s</mp><mul><mli>每隔一段时间发送一条弹幕</mli><mli>例子：<code>1h2m3s</code>, <code>300m</code>, <code>30s</code>, <code>1h50s</code>, <code>2m6s</code>, <code>0.5h</code></mli><mli>可以填小数</mli><mli>可以只填写其中一项或两项</mli></mul><mp>脚本会根据输入数据计算出间隔时间，每隔一个间隔时间就会发送一条弹幕。如果不加单位，如填写<code>10</code>则默认单位是分钟（等同于<code>10m</code>）。</mp><mp><em>注意：必须按顺序填小时，分钟，秒，否则会出错(如<code>3s5h</code>就是错误的写法)</em></mp><mp>2.【小时】:【分钟】:【秒】</mp><mul><mli>在特定时间点（本地时间）发一条弹幕</mli><mli>例子： <code>10:30:10</code>, <code>0:40</code></mli><mli>只能填整数</mli><mli>小时分钟必须填写，秒数可以不填</mli></mul><mp>脚本会在该时间点发一条弹幕（如<code>13:30:10</code>就是在下午1点30分10秒的时候发弹幕）。</mp></mli></mul>',
           NOSLEEP: '屏蔽B站的挂机检测。不开启本功能时，标签页后台或长时间无操作就会触发B站的挂机检测。<mh3>原理：</mh3><mul><mli>劫持页面上的<code>addEventListener</code>绕过页面可见性检测，每5分钟触发一次鼠标移动事件规避鼠标移动检测。同时劫持页面上的setTimeout和setInterval避免暂停直播的函数被调用。</mli><mul>',
           INVISIBLE_ENTER: '开启后进任意直播间其他人都不会看到你进直播间的提示【xxx 进入直播间】（只有你自己能看到）。<mh3>缺点：</mh3><mul><mli>开启后无法获取自己是否是当前直播间房管的数据，关注按钮状态均为未关注。所以开启本功能后进任意直播间都会有【禁言】按钮（如果不是房管操作后会显示你没有权限），发弹幕时弹幕旁边会有房管标识（如果不是房管则只有你能看到此标识）。</mli><mli>无法打开页面下拉后出现的动态的评论区。</mli></mul>',
           BUY_MEDAL: "通过给UP充电，消耗2B币购买某位UP的粉丝勋章。<mul><mli>默认值为当前房间号。点击购买按钮后有确认界面，无需担心误触。</mli></mul>",
@@ -1263,7 +1262,7 @@
           DailyTasksBtnArea: "缓存中存放的是各个任务上次运行的时间，脚本通过缓存来判断某些周期性执行的任务需不需要执行（比如每天一次的分享视频任务）。<mul><mli>重置缓存并刷新页面可以让脚本再次执行今天已经执行过的任务。</mli></mul>",
           add_like_button: "在直播画面上方，分享按钮左侧添加一个点赞按钮。<mul><mli>该按钮被按下后只会触发一次点赞事件（可用来完成点赞任务），不会发送点赞弹幕。如果想发送点赞弹幕请使用B站的原生功能。</mli></mul>",
           WatchLiveTime: `观看直播时长。单位分钟，必须填写整数。<mul><mli>每观看五分钟可获得100亲密度。如果完成了点赞和发弹幕任务，观看65分钟即可挂满亲密度。请根据自身情况调整观看时间。</mli><mli>具体规则请查阅B站官方公告${linkMsg('https://link.bilibili.com/p/eden/news#/newsdetail?id=2886')}。</mli></mul>`,
-          APP_TASK: "自动完成APP用户任务并领取奖励。<h3>注意：</h3><mul><mli>本功能运行时【自动发弹幕】将延后运行，并且会等待【粉丝勋章打卡弹幕】任务完成后再运行。</mli><mli>本功能的日志显示在日志窗口。</mli></mul>目前脚本支持的任务有：<mul><mli><strong>发5条弹幕领取1电池奖励</strong><br>如果本功能运行时任务还未完成，会自动在直播间22474988发弹幕来完成任务并领取奖励。弹幕内容会从【粉丝勋章打卡弹幕】配置的弹幕列表里抽取，若数量不够则使用“打卡+数字”作为弹幕内容。</mli></mul>"
+          APP_TASK: "自动完成APP用户任务并领取奖励。<h3>注意：</h3><mul><mli>本功能运行时【自动发弹幕】将延后运行，并且会等待【粉丝勋章打卡弹幕】任务完成后再运行。</mli><mli>初次运行本功能时可能会导致B站变为未登录状态，但如果每次运行时都会导致登出，请停用本功能。</mli><mli>本功能的日志显示在日志窗口。</mli></mul>目前脚本支持的任务有：<mul><mli><strong>发5条弹幕领取1电池奖励</strong><br>如果本功能运行时任务还未完成，会自动在直播间22474988发弹幕来完成任务并领取奖励。弹幕内容会从【粉丝勋章打卡弹幕】配置的弹幕列表里抽取，若数量不够则使用“打卡+数字”作为弹幕内容。</mli></mul>"
         };
         const openMainWindow = () => {
           let settingTableoffset = $('.live-player-mounter').offset(),
