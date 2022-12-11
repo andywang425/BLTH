@@ -1556,6 +1556,17 @@ var BAPI = {
                 }
             });
         },
+        likeReportV3: (roomid, anchor_id ) => {
+            return BAPI.ajaxWithCommonArgs({
+                method: 'POST',
+                url: '/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3',
+                data: {
+                    room_id: roomid,
+                    anchor_id: anchor_id,
+                    ts: BAPI_ts_s()
+                }
+            });
+        },
         anchor: {
             check: (roomid) => {
                 return BAPI.ajax({
