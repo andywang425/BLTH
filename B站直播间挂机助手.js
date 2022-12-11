@@ -461,8 +461,8 @@
         '<div data-v-6d89404b="" data-v-42ea937d="" title="" class="icon-ctnr live-skin-normal-a-text pointer" id = "blth_like_button" style="line-height: 16px;margin-left: 15px;"><i data-v-6d89404b="" class="v-middle icon-font icon-good" style="font-size: 16px;"></i><span data-v-6d89404b="" class="action-text v-middle" style="font-size: 12px;margin-left: 5px;">点赞</span></div>'
       );
       like_button.click(() => {
-        BAPI.xlive.likeInteract(Live_info.room_id).then((response) => {
-          MYDEBUG(`点击点赞按钮 likeInteract(${Live_info.room_id}) response`, response);
+        BAPI.xlive.likeReportV3(Live_info.room_id, Live_info.uid).then((response) => {
+          MYDEBUG(`点击点赞按钮 likeReportV3(${Live_info.room_id}) response`, response);
           const offest = like_button.offset(),
             width = like_button.width(),
             height = like_button.height();
@@ -2262,8 +2262,8 @@
           window.toast('[点赞直播间] 开始点赞直播间', 'info');
           for (let i = 0; i < likeTimes; i++) {
             for (const medal of medal_list) {
-              await BAPI.xlive.likeInteract(medal.real_roomid).then((response) => {
-                MYDEBUG(`API.xlive.likeInteract(${medal.real_roomid}) response`, response);
+              await BAPI.xlive.likeReportV3(medal.real_roomid,medal.target_id).then((response) => {
+                MYDEBUG(`API.xlive.likeReportV3(${medal.real_roomid}) response`, response);
                 if (response.code !== 0) window.toast(`[点赞直播间] 直播间${medal.real_roomid}点赞失败 ${response.message}`, 'caution');
               });
               await sleep(MY_API.CONFIG.LIKE_LIVEROOM_INTERVAL);
