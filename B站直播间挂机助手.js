@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.0.7
+// @version        6.0.8
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -33,7 +33,7 @@
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@bca9261faa84ffd8f804c85c1a5153d3aa27a9a3/assets/js/library/Ajax-hook.min.js
 // @require        https://gcore.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
-// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4c2e8bc541656a8ea6d62d6055e8fd149caa4210/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4235a14b9dd4d0d498ee89068a5916b95b65ab27/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
 // @require        https://gcore.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
@@ -310,7 +310,7 @@
   if (SP_CONFIG.blockLiveStream || SP_CONFIG.blockliveDataUpdate || SP_CONFIG.wear_medal_before_danmu || SP_CONFIG.AUTO_CHECK_DANMU) {
     W.fetch = (...arg) => {
       if (SP_CONFIG.blockLiveStream && arg[0].includes('bilivideo')) {
-        return new Promise((resolve, reject) => {});
+        return new Promise((resolve, reject) => { });
       } else if (SP_CONFIG.blockliveDataUpdate && arg[0].includes('data.bilibili.com/gol/postweb')) {
         return {};
       } else if (arg[0].includes('//api.live.bilibili.com/msg/send')) {
@@ -440,11 +440,11 @@
         else return eventListener(...arg);
       };
       W.setTimeout = function (func, ...args) {
-        if (String(func).indexOf('triggerSleepCallback') !== -1) return _setTimeout.call(this, function () {}, ...args);
+        if (String(func).indexOf('triggerSleepCallback') !== -1) return _setTimeout.call(this, function () { }, ...args);
         else return _setTimeout.call(this, func, ...args);
       };
       W.setInterval = function (func, ...args) {
-        if (String(func).indexOf('triggerSleepCallback') !== -1) return _setTimeout.call(this, function () {}, ...args);
+        if (String(func).indexOf('triggerSleepCallback') !== -1) return _setTimeout.call(this, function () { }, ...args);
         else return _setInterval.call(this, func, ...args);
       };
     }
@@ -799,7 +799,7 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
-            const clientMliList = ['【APP 用户任务】改为默认不开启。', '新增了一些脚本内置说明。'];
+            const clientMliList = [`适配B站改动，修复点赞功能（感谢${linkMsg('https://github.com/XiaoMiku01', 'XiaoMiku01')}的帮助）`];
             function createHtml(mliList) {
               if (mliList.length === 0) return '无';
               let mliHtml = '';
@@ -817,9 +817,9 @@
                 <hr><em style="color:grey;">
                 如果在使用过程中遇到问题，请到 ${linkMsg('https://github.com/andywang425/BLTH/issues', 'github')}反馈。
                 也欢迎加入${linkMsg(
-                  'https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=1W7eVLs&businessType=9&from=181074&biz=ka&shareSource=5',
-                  '官方QQ频道'
-                )}（聊天、反馈问题、提出建议）和${linkMsg('https://t.me/LaTiao01', '非官方电报群')}（纯聊天）。
+                'https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=1W7eVLs&businessType=9&from=181074&biz=ka&shareSource=5',
+                '官方QQ频道'
+              )}（聊天、反馈问题、提出建议）和${linkMsg('https://t.me/LaTiao01', '非官方电报群')}（纯聊天）。
                 </em>
                 `,
             });
@@ -2262,7 +2262,7 @@
           window.toast('[点赞直播间] 开始点赞直播间', 'info');
           for (let i = 0; i < likeTimes; i++) {
             for (const medal of medal_list) {
-              await BAPI.xlive.likeReportV3(medal.real_roomid,medal.target_id).then((response) => {
+              await BAPI.xlive.likeReportV3(medal.real_roomid, medal.target_id).then((response) => {
                 MYDEBUG(`API.xlive.likeReportV3(${medal.real_roomid}) response`, response);
                 if (response.code !== 0) window.toast(`[点赞直播间] 直播间${medal.real_roomid}点赞失败 ${response.message}`, 'caution');
               });
