@@ -66,8 +66,8 @@
     ts_s = () => Math.round(ts_ms() / 1000), // 当前秒
     tz_offset = new Date().getTimezoneOffset() + 480, // 本地时间与东八区差的分钟数
     appToken = new BilibiliToken(),
-    setToken = async () => {
-      if (tokenData.hasOwnProperty(Live_info.uid) && tokenData[Live_info.uid]['expires_at'] > ts_s()) {
+    setToken = async (refresh = false) => {
+      if (!refresh && tokenData.hasOwnProperty(Live_info.uid) && tokenData[Live_info.uid]['expires_at'] > ts_s()) {
         userToken = tokenData[Live_info.uid];
       } else {
         tokenData[Live_info.uid] = await appToken.getToken();
@@ -76,7 +76,7 @@
         GM_setValue(`appToken`, tokenData);
         userToken = tokenData[Live_info.uid];
       }
-      MYDEBUG(`appToken`, tokenData);
+      MYDEBUG(`[setToken] appToken`, tokenData);
       return 'OK';
     },
     getCHSdate = () => {
@@ -1898,6 +1898,7 @@
         }
         JQmenuWindow.append(div);
         if (layerLogWindow_ScrollY >= layerLogWindow_ScrollHeight) layerLogWindow.scrollTop(layerLogWindow.prop('scrollHeight'));
+        MYDEBUG('chatLog', text);
       },
       GroupSign: {
         fullLevalMedalUidList: [],
@@ -3067,12 +3068,14 @@
           return BAPI.xlive.app.getUserTaskProgress(userToken.access_token).then((response) => {
             MYDEBUG('API.xlive.app.getUserTaskProgress', response);
             if (response.code === 0) {
-              const progress = response.data.progress;
+              const is_surplus = response.data.is_surplus;
               const target = response.data.target;
+              if (is_surplus === -1 || target === 0) return -1;
+              const progress = response.data.progress;
               return target - progress;
             } else {
               MYERROR('[APP用户任务] 获取进度失败', response.message);
-              return -1;
+              return -2;
             }
           });
         },
@@ -3114,9 +3117,15 @@
           MY_API.AppUserTask.isRunning = true;
           MYDEBUG('appToken userToken.access_token.length', userToken.access_token.length);
           let remainProgress = await MY_API.AppUserTask.getRemainProgress();
-          if (remainProgress === -1) return (MY_API.AppUserTask.isRunning = false);
-          await MY_API.AppUserTask.completeTask(remainProgress);
-          await MY_API.AppUserTask.getUserTaskRewards();
+          if (remainProgress >= 0) {
+            await MY_API.AppUserTask.completeTask(remainProgress);
+            await MY_API.AppUserTask.getUserTaskRewards();
+          } else if (remainProgress === -1) {
+            MY_API.chatLog('[APP用户任务] 你的账号可能无法参与该任务', 'warning');
+          } else {
+            MY_API.chatLog('[APP用户任务] 失败，尝试重置token<br>刷新页面后会再次重试该任务', 'info');
+            return await setToken(true);
+          }
           MY_API.CACHE.AppTaskRewards = ts_ms();
           MY_API.saveCache();
           MY_API.AppUserTask.isRunning = false;
