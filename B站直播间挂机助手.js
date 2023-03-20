@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.0.9
+// @version        6.1.0
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -820,7 +820,7 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
-            const clientMliList = [`【APP用户任务】发现token不可用时，自动重新获取token。如果账号不支持该任务，不执行。`];
+            const clientMliList = [`【直播观看体验】增加自动切换最高清晰度设置，默认不勾选。`];
             function createHtml(mliList) {
               if (mliList.length === 0) return '无';
               let mliHtml = '';
