@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.0.9
+// @version        6.1.0
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -42,7 +42,7 @@
 // @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4c2e8bc541656a8ea6d62d6055e8fd149caa4210/assets/js/library/libBilibiliToken.min.js
 // @resource       layerCss https://gcore.jsdelivr.net/gh/andywang425/BLTH@d25aa353c8c5b2d73d2217b1b43433a80100c61e/assets/css/layer.css
 // @resource       myCss    https://gcore.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@de9d21e07097b432ee80de489b35b16d689d3f8e/assets/html/main.min.html
+// @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@16ad988dce34491d8479416911a2ac4691df45c3/assets/html/main.min.html
 // @resource       eula     https://gcore.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
@@ -227,6 +227,23 @@
       y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop,
     }),
     linkMsg = (link, msg = link) => '<a href="' + link + '"target="_blank" style="color:">' + msg + '</a>',
+    autoMaxQuality = () => {
+      let autoMaxQualityTimer = setInterval(() => {
+        try {
+          let videoDom = document.querySelector("#live-player");
+          videoDom.dispatchEvent(new Event("mousemove"));
+          let quality = document.querySelector(".quality-wrap");
+          quality.dispatchEvent(new Event("mouseenter"));
+          document.querySelector(".quality-it.selected")
+          if (document.querySelector(".quality-it.selected").innerText !== "原画") {
+            let list = document.querySelectorAll(".quality-it");
+            list[0].click();
+            quality.dispatchEvent(new Event("mouseleave"));
+          }
+          clearInterval(autoMaxQualityTimer);
+        } catch {}
+      }, 1000);
+    },
     SP_CONFIG_DEFAULT = {
       showEula: true, // 显示EULA
       storageLastFixVersion: '0', // 上次修复设置的版本
@@ -245,6 +262,7 @@
       wear_medal_before_danmu: false, // 手动发弹幕前自动佩戴当前房间勋章
       wear_medal_type: 'ONLY_FIRST', // 自动佩戴勋章方式
       add_like_button: true, // 添加一个点赞按钮
+      auto_max_quality: false, // 自动最高清晰度
     };
   let otherScriptsRunningCheck = $.Deferred(),
     otherScriptsRunning = false,
@@ -474,6 +492,9 @@
       });
       if ($('.right-ctnr').length == 0) return MYERROR('[添加点赞按钮] 无法找到元素 .right-ctnr');
       right_ctnr[0].insertBefore(like_button[0], share[0]);
+    }
+    if (SP_CONFIG.auto_max_quality) {
+      autoMaxQuality();
     }
     const loadInfo = (delay = 0) => {
       return setTimeout(async () => {
@@ -799,7 +820,7 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
-            const clientMliList = [`【APP用户任务】发现token不可用时，自动重新获取token。如果账号不支持该任务，不执行。`];
+            const clientMliList = [`【直播观看体验】增加自动切换最高清晰度设置，默认不勾选。`];
             function createHtml(mliList) {
               if (mliList.length === 0) return '无';
               let mliHtml = '';
@@ -1690,6 +1711,11 @@
                   jqPath1: `div[data-toggle="add_like_button"] input:checkbox`,
                   gmItem: `add_like_button`,
                   toastMsg: ['[添加点赞按钮] 配置已保存', 'info'],
+                },
+                {
+                  jqPath1: `div[data-toggle="AUTO_MAX_QUALITY"] input:checkbox`,
+                  gmItem: `auto_max_quality`,
+                  toastMsg: ['[自动切换最高清晰度] 配置已保存', 'info'],
                 },
               ];
               for (const i of specialSetting) {
