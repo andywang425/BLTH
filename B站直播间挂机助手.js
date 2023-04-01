@@ -234,16 +234,18 @@
           videoDom.dispatchEvent(new Event("mousemove"));
           let quality = document.querySelector(".quality-wrap");
           quality.dispatchEvent(new Event("mouseenter"));
-          document.querySelector(".quality-it.selected")
-          if (document.querySelector(".quality-it.selected").innerText !== "原画") {
-            let list = document.querySelectorAll(".quality-it");
-            list[0].click();
+          
+          let qualityItems = document.querySelectorAll(".quality-it");
+          let originalQualityItem = Array.from(qualityItems).find((item) => item.innerText === "原画");
+      
+          if (originalQualityItem) {
+            originalQualityItem.click();
             quality.dispatchEvent(new Event("mouseleave"));
+            clearInterval(autoMaxQualityTimer);
           }
-          clearInterval(autoMaxQualityTimer);
-        } catch {}
+        }     catch {}
       }, 1000);
-    },
+    };
     SP_CONFIG_DEFAULT = {
       showEula: true, // 显示EULA
       storageLastFixVersion: '0', // 上次修复设置的版本
