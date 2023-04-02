@@ -26,10 +26,6 @@
 // @connect        api.bilibili.com
 // @connect        api.vc.bilibili.com
 // @connect        live-trace.bilibili.com
-// @connect        sctapi.ftqq.com
-// @connect        pushplus.plus
-// @connect        andywang.top
-// @connect        gitee.com
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@bca9261faa84ffd8f804c85c1a5153d3aa27a9a3/assets/js/library/Ajax-hook.min.js
 // @require        https://fastly.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
@@ -234,38 +230,36 @@
           videoDom.dispatchEvent(new Event("mousemove"));
           let quality = document.querySelector(".quality-wrap");
           quality.dispatchEvent(new Event("mouseenter"));
-          
           let qualityItems = document.querySelectorAll(".quality-it");
           let originalQualityItem = Array.from(qualityItems).find((item) => item.innerText === "原画");
-      
           if (originalQualityItem) {
             originalQualityItem.click();
             quality.dispatchEvent(new Event("mouseleave"));
             clearInterval(autoMaxQualityTimer);
           }
-        }     catch {}
-      }, 1000);
+        } catch { }
+      }, 500);
     };
-    SP_CONFIG_DEFAULT = {
-      showEula: true, // 显示EULA
-      storageLastFixVersion: '0', // 上次修复设置的版本
-      mainDisplay: 'show', // UI隐藏开关
-      darkMode: false, // 深色模式
-      debugSwitch: false, // 控制台日志开关
-      windowToast: true, // 右上提示信息
-      nosleep: true, // 屏蔽挂机检测
-      invisibleEnter: false, // 隐身入场
-      banP2p: false, // 禁止p2p上传
-      lastShowUpdateMsgVersion: '0', // 上次显示更新信息的版本
-      DANMU_MODIFY: false, // 修改弹幕
-      AUTO_CHECK_DANMU: false, // 检查弹幕是否发送成功
-      blockLiveStream: false, // 拦截直播流
-      blockliveDataUpdate: false, // 拦截直播观看数据上报
-      wear_medal_before_danmu: false, // 手动发弹幕前自动佩戴当前房间勋章
-      wear_medal_type: 'ONLY_FIRST', // 自动佩戴勋章方式
-      add_like_button: true, // 添加一个点赞按钮
-      auto_max_quality: false, // 自动最高清晰度
-    };
+  SP_CONFIG_DEFAULT = {
+    showEula: true, // 显示EULA
+    storageLastFixVersion: '0', // 上次修复设置的版本
+    mainDisplay: 'show', // UI隐藏开关
+    darkMode: false, // 深色模式
+    debugSwitch: false, // 控制台日志开关
+    windowToast: true, // 右上提示信息
+    nosleep: true, // 屏蔽挂机检测
+    invisibleEnter: false, // 隐身入场
+    banP2p: false, // 禁止p2p上传
+    lastShowUpdateMsgVersion: '0', // 上次显示更新信息的版本
+    DANMU_MODIFY: false, // 修改弹幕
+    AUTO_CHECK_DANMU: false, // 检查弹幕是否发送成功
+    blockLiveStream: false, // 拦截直播流
+    blockliveDataUpdate: false, // 拦截直播观看数据上报
+    wear_medal_before_danmu: false, // 手动发弹幕前自动佩戴当前房间勋章
+    wear_medal_type: 'ONLY_FIRST', // 自动佩戴勋章方式
+    add_like_button: true, // 添加一个点赞按钮
+    auto_max_quality: false, // 自动最高清晰度
+  };
   let otherScriptsRunningCheck = $.Deferred(),
     otherScriptsRunning = false,
     SP_CONFIG = GM_getValue('SP_CONFIG') || {},
@@ -822,7 +816,7 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
-            const clientMliList = [`把获取依赖的cdn从gcore.jsdelivr.net改为fastly.jsdelivr.net。`];
+            const clientMliList = [`【自动切换最高清晰度】出于性能和兼容性考虑改为选择<code>原画</code>。`];
             function createHtml(mliList) {
               if (mliList.length === 0) return '无';
               let mliHtml = '';
