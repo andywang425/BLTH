@@ -513,26 +513,37 @@
               return window.toast(`直播间礼物数据获取失败 ${response.message}\n使用默认数据`, 'warning');
             }
           });
-          await BAPI.getuserinfo().then((re) => {
-            MYDEBUG('InitData: API.getuserinfo', re);
-            if (re.code === 'REPONSE_OK') {
-              Live_info.uname = re.data.uname;
-              Live_info.user_level = re.data.user_level;
-            } else {
-              window.toast(`API.getuserinfo 获取用户信息失败 ${re.message}`, 'error');
-              return delayCall(() => loadInfo());
-            }
-          });
-          await BAPI.x.getAccInfo(Live_info.uid).then((re) => {
-            MYDEBUG('InitData: API.x.getAccInfo', re);
-            if (re.code === 0) {
-              Live_info.level = re.data.level;
-              Live_info.vipStatus = re.data.vip.status;
-            } else {
-              window.toast(`API.x.getAccInfo 获取账号信息失败 ${re.message}`, 'error');
-              return delayCall(() => loadInfo());
-            }
-          });
+          while (true) {
+            let successed = await BAPI.getuserinfo().then((re) => {
+              MYDEBUG('InitData: API.getuserinfo', re);
+              if (re.code === 'REPONSE_OK') {
+                Live_info.uname = re.data.uname;
+                Live_info.user_level = re.data.user_level;
+                return true
+              } else {
+                window.toast(`API.getuserinfo 获取用户信息失败 ${re.message}`, 'error');
+                return false;
+              }
+            });
+            if (successed) break;
+            await sleep(Math.round(Math.random() * 115 + 5) * 1000); // 5~120秒随机重试时间
+          }
+          await sleep(5000); // {"code":-509,"message":"请求过于频繁，请稍后再试","ttl":1}
+          while (true) {
+            let successed = await BAPI.x.getAccInfo(Live_info.uid).then((re) => {
+              MYDEBUG('InitData: API.x.getAccInfo', re);
+              if (re.code === 0) {
+                Live_info.level = re.data.level;
+                Live_info.vipStatus = re.data.vip.status;
+                return true;
+              } else {
+                window.toast(`API.x.getAccInfo 获取账号信息失败 ${re.message}`, 'error');
+                return false;
+              }
+            });
+            if (successed) break;
+            await sleep(Math.round(Math.random() * 115 + 5) * 1000); // 5~120秒随机重试时间
+          }
           Live_info.bili_jct = BAPI.getCookie('bili_jct');
           Live_info.ruid = W.BilibiliLive.ANCHOR_UID;
           Live_info.rnd = W.BilibiliLive.RND;
