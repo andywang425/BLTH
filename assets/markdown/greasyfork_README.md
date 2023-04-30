@@ -16,7 +16,7 @@
 
 ## 一些建议
 
-- 请确保能正常访问 `gcore.jsdelivr.net` 这个网站，脚本每次安装后初次运行时会从该网站获取依赖。[可以点我](https://gcore.jsdelivr.net/npm/lodash@4.17.10/core.min.js)测试你能否正常访问。若不能，请在脚本每次安装后初次运行时想办法让依赖被获取到，之后即可正常使用。
+- 请确保能正常访问 `fastly.jsdelivr.net` 这个网站，脚本每次安装后初次运行时会从该网站获取依赖。[可以点我](https://fastly.jsdelivr.net/npm/lodash@4.17.10/core.min.js)测试你能否正常访问。若不能，请在脚本每次安装后初次运行时想办法让依赖被获取到，之后即可正常使用。
 - 初次使用时若出现看不到控制面板的情况，请等待一会或尝试刷新(`ctrl+F5`)页面。
 - 部分设置更改后需要刷新页面才能生效。
 - 使用前建议先关闭广告拦截插件，并确认相关浏览器设置(如 cookie 权限，脚本拦截)否则该脚本可能无法正常运行。
@@ -77,7 +77,7 @@
 
 #### 控制台日志
 
-- 打开控制台(Chrome 可以按`F12`或`ctrl + shift + i`，再点击`Console`)在 Filter 中输入`BLTH`即可过滤出本脚本的控制台日志。  
+- 打开控制台(Chrome 可以按`F12`或`ctrl + shift + i`，再点击`Console`)在 Filter 中输入`BLTH`即可过滤出本脚本的控制台日志。
   _注：某些意料之外的报错不会带有`BLTH`字样，反馈 bug 时请多加注意。_
 - 脚本默认关闭控制台日志。勾选控制面板上的`其他设置 - 控制台日志`即可开启。
 
@@ -100,8 +100,8 @@
 
 ## 已知问题
 
-1. [#12](https://github.com/andywang425/BLTH/issues/12)  
-   本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在 Bilibili-Evolved 设置-其它中，将`加载模式`设置为延后。  
+1. [#12](https://github.com/andywang425/BLTH/issues/12)
+   本脚本可能与[Bilibili-Evolved](https://github.com/the1812/Bilibili-Evolved)存在兼容性问题导致脚本窗口无法正确加载。若出现此问题，请尝试在 Bilibili-Evolved 设置-其它中，将`加载模式`设置为延后。
    开启`简化直播间`功能后聊天栏顶部的日志文字无法正确地被隐藏/显示成黄色，不过不影响使用。
 2. 脚本每次更新后第一次运行可能会不工作，`shift+F5`刷新一下页面即可。
 3. 可能和[SteamWebIntegration](https://github.com/Revadike/SteamWebIntegration)存在冲突导致同时运行时页面无响应。可以在 SteamWebIntegration 的设置中把 B 站直播间添加到黑名单。
