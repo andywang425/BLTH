@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.1.2
+// @version        6.1.3
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -29,7 +29,7 @@
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@bca9261faa84ffd8f804c85c1a5153d3aa27a9a3/assets/js/library/Ajax-hook.min.js
 // @require        https://fastly.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4235a14b9dd4d0d498ee89068a5916b95b65ab27/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@3405976768951e35af4433ed0f563cbf26aece9f/assets/js/library/BilibiliAPI_Mod.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
 // @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
 // @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
@@ -513,6 +513,7 @@
               return window.toast(`直播间礼物数据获取失败 ${response.message}\n使用默认数据`, 'warning');
             }
           });
+          let reqFailed = false;
           await BAPI.getuserinfo().then((re) => {
             MYDEBUG('InitData: API.getuserinfo', re);
             if (re.code === 'REPONSE_OK') {
@@ -520,7 +521,7 @@
               Live_info.user_level = re.data.user_level;
             } else {
               window.toast(`API.getuserinfo 获取用户信息失败 ${re.message}`, 'error');
-              return delayCall(() => loadInfo());
+              reqFailed = true;
             }
           });
           await BAPI.x.getAccInfo(Live_info.uid).then((re) => {
@@ -530,9 +531,11 @@
               Live_info.vipStatus = re.data.vip.status;
             } else {
               window.toast(`API.x.getAccInfo 获取账号信息失败 ${re.message}`, 'error');
-              return delayCall(() => loadInfo());
+              reqFailed = true;
             }
           });
+          if (reqFailed)
+            return window.toast(`缺少必要的数据，挂机助手停止运行`, 'error')
           Live_info.bili_jct = BAPI.getCookie('bili_jct');
           Live_info.ruid = W.BilibiliLive.ANCHOR_UID;
           Live_info.rnd = W.BilibiliLive.RND;
@@ -816,7 +819,10 @@
           const cache = SP_CONFIG.lastShowUpdateMsgVersion || '0';
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
-            const clientMliList = [`【自动切换最高清晰度】出于性能和兼容性考虑改为选择<code>原画</code>。`];
+            const clientMliList = [
+              `适配B站更新：使用新版API，修复脚本一直报错"API.x.getAccinfo获取账号信息失败 状态码200"以及出现多个控制按钮/面板的问题。`,
+              `调整了部分运行逻辑，在加载阶段如果脚本发生致命错误将直接停止运行而不是无限重试。`
+            ];
             function createHtml(mliList) {
               if (mliList.length === 0) return '无';
               let mliHtml = '';
