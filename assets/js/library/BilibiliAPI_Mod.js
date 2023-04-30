@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.1.5
+// @version       3.1.6
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
@@ -1192,12 +1192,25 @@ var BAPI = {
                 }
             });
         },
-        getAccInfo: (mid, jsonp = 'jsonp') => {
+        getAccInfoOld: (mid, jsonp = 'jsonp') => {
             return BAPI.ajax({
                 url: '//api.bilibili.com/x/space/acc/info',
                 data: {
                     mid: mid,  //uid
                     jsonp: jsonp
+                }
+            })
+        },
+        getAccInfo: (mid, token = '', platform = 'web', web_location = '1550101') => {
+            return BAPI.ajax({
+                url: '//api.bilibili.com/x/space/wbi/acc/info',
+                data: {
+                    mid: mid,
+                    platform: platform,
+                    token: token,
+                    web_location: web_location,
+                    wts: BAPI_ts_s(),
+                    w_rid: CryptoJS.MD5(BAPI_ts_ms()).toString() // fake w_rid
                 }
             })
         },
@@ -1556,7 +1569,7 @@ var BAPI = {
                 }
             });
         },
-        likeReportV3: (roomid, anchor_id ) => {
+        likeReportV3: (roomid, anchor_id) => {
             return BAPI.ajaxWithCommonArgs({
                 method: 'POST',
                 url: '/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3',
@@ -1715,7 +1728,7 @@ var BAPI = {
     /**
      * 发私信
      * @param
-        { 
+        {
             {
                 sender_uid: number,
                 receiver_id: number,
@@ -1762,7 +1775,7 @@ var BAPI = {
     },
     /**
     * 发起 GM_xmlhttpRequest 请求
-    * @param {*} config 
+    * @param {*} config
     * @returns {Promise}
     */
     GMR: (config) => {
