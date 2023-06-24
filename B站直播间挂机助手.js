@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.1.3
+// @version        6.1.4
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -26,20 +26,21 @@
 // @connect        api.bilibili.com
 // @connect        api.vc.bilibili.com
 // @connect        live-trace.bilibili.com
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@bca9261faa84ffd8f804c85c1a5153d3aa27a9a3/assets/js/library/Ajax-hook.min.js
-// @require        https://fastly.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@3405976768951e35af4433ed0f563cbf26aece9f/assets/js/library/BilibiliAPI_Mod.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
-// @require        https://fastly.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
-// @require        https://fastly.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js
-// @require        https://fastly.jsdelivr.net/gh/andywang425/BLTH@4c2e8bc541656a8ea6d62d6055e8fd149caa4210/assets/js/library/libBilibiliToken.min.js
-// @resource       layerCss https://fastly.jsdelivr.net/gh/andywang425/BLTH@d25aa353c8c5b2d73d2217b1b43433a80100c61e/assets/css/layer.css
-// @resource       myCss    https://fastly.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
-// @resource       main     https://fastly.jsdelivr.net/gh/andywang425/BLTH@16ad988dce34491d8479416911a2ac4691df45c3/assets/html/main.min.html
-// @resource       eula     https://fastly.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@bca9261faa84ffd8f804c85c1a5153d3aa27a9a3/assets/js/library/Ajax-hook.min.js
+// @require        https://gcore.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4dbe95160c430bc64757580f07489bb11e766fcb/assets/js/library/bliveproxy.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@8ac823ac669ad87fb39a63b6bfe02c01c0c30f89/assets/js/library/libWbiSign.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@8ac823ac669ad87fb39a63b6bfe02c01c0c30f89/assets/js/library/BilibiliAPI_Mod.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4368883c643af57c07117e43785cd28adcb0cb3e/assets/js/library/layer.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@f9fc6466ae78ead12ddcd2909e53fcdcc7528f78/assets/js/library/Emitter.min.js
+// @require        https://gcore.jsdelivr.net/npm/hotkeys-js@3.8.7/dist/hotkeys.min.js
+// @require        https://gcore.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@c117d15784f92f478196de0129c8e5653a9cb32e/assets/js/library/BiliveHeart.min.js
+// @require        https://gcore.jsdelivr.net/gh/andywang425/BLTH@4c2e8bc541656a8ea6d62d6055e8fd149caa4210/assets/js/library/libBilibiliToken.min.js
+// @resource       layerCss https://gcore.jsdelivr.net/gh/andywang425/BLTH@d25aa353c8c5b2d73d2217b1b43433a80100c61e/assets/css/layer.css
+// @resource       myCss    https://gcore.jsdelivr.net/gh/andywang425/BLTH@5bcc31da7fb98eeae8443ff7aec06e882b9391a8/assets/css/myCss.min.css
+// @resource       main     https://gcore.jsdelivr.net/gh/andywang425/BLTH@16ad988dce34491d8479416911a2ac4691df45c3/assets/html/main.min.html
+// @resource       eula     https://gcore.jsdelivr.net/gh/andywang425/BLTH@da3d8ce68cde57f3752fbf6cf071763c34341640/assets/html/eula.min.html
 // @grant          unsafeWindow
 // @grant          GM_xmlhttpRequest
 // @grant          GM_getResourceText
@@ -219,8 +220,8 @@
       return GM_addStyle(allCss);
     },
     getScrollPosition = (el = window) => ({
-      x: el.pageXOffset !== undefined ? el.pageXOffset : el.scrollLeft,
-      y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop,
+      x: el.scrollX !== undefined ? el.scrollX : el.scrollLeft,
+      y: el.scrollY !== undefined ? el.scrollY : el.scrollTop,
     }),
     linkMsg = (link, msg = link) => '<a href="' + link + '"target="_blank" style="color:">' + msg + '</a>',
     autoMaxQuality = () => {
@@ -283,7 +284,7 @@
       tid: undefined,
       uname: undefined,
       user_level: undefined, // 直播等级
-      level: undefined, // 主站等级
+      // level: undefined, // 主站等级
       danmu_length: undefined, // 直播弹幕长度限制
       medal: undefined, // 当前直播间勋章的 target_id
       vipStatus: undefined, // 大会员状态 (0:无, 1:有)
@@ -524,13 +525,13 @@
               reqFailed = true;
             }
           });
-          await BAPI.x.getAccInfo(Live_info.uid).then((re) => {
-            MYDEBUG('InitData: API.x.getAccInfo', re);
+          await BAPI.x.myinfo().then((re) => {
+            MYDEBUG('InitData: API.x.myinfo', re);
             if (re.code === 0) {
-              Live_info.level = re.data.level;
-              Live_info.vipStatus = re.data.vip.status;
+              // Live_info.level = re.data.level;
+              Live_info.vipStatus = re.data.profile.vip.status;
             } else {
-              window.toast(`API.x.getAccInfo 获取账号信息失败 ${re.message}`, 'error');
+              window.toast(`API.x.myinfo 获取账号信息失败 ${re.message}`, 'error');
               reqFailed = true;
             }
           });
@@ -820,8 +821,7 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              `适配B站更新：使用新版API，修复脚本一直报错"API.x.getAccinfo获取账号信息失败 状态码200"以及出现多个控制按钮/面板的问题。`,
-              `调整了部分运行逻辑，在加载阶段如果脚本发生致命错误将直接停止运行而不是无限重试。`
+              `修复因为获取账号信息失败导致脚本无法运行的问题。`,
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return '无';
