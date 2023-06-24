@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name          BilibiliAPI_mod
 // @namespace     https://github.com/SeaLoong
-// @version       3.1.6
+// @version       3.1.7
 // @description   BilibiliAPI，PC端抓包研究所得，原作者是SeaLoong。我在此基础上补充新的API。
 // @author        SeaLoong, andywang425
 // @require       https://code.jquery.com/jquery-3.6.0.min.js
+// @require       ./libWbiSign.js
 // @grant         none
 // @include       *
 // @license       MIT
@@ -13,25 +14,22 @@
 let BAPI_csrf_token, BAPI_visit_id,
     BAPI_ts_ms = () => Date.now(),// 当前毫秒
     BAPI_WBI_SIGN = () => {
-        return new Promise((resolve, reject) => {
-          BAPI.x.getWbiSign().then(resp =>{
-            console.log(resp)
+        return BAPI.x.getWbiSign().then(resp => {
             if (resp.code === 0) {
-              const {
-                img_url,
-                sub_url
-              } = resp.data.wbi_img
-              const sign = {
-                img_key: img_url.substring(img_url.lastIndexOf('/') + 1, img_url.length).split('.')[0],
-                sub_key: sub_url.substring(sub_url.lastIndexOf('/') + 1, sub_url.length).split('.')[0]
-              }
-              resolve(sign)
-            }else{
-              reject(resp.message)
+                const {
+                    img_url,
+                    sub_url
+                } = resp.data.wbi_img
+                const sign = {
+                    img_key: img_url.substring(img_url.lastIndexOf('/') + 1, img_url.length).split('.')[0],
+                    sub_key: sub_url.substring(sub_url.lastIndexOf('/') + 1, sub_url.length).split('.')[0]
+                }
+                return sign;
+            } else {
+                return null;
             }
-          }).catch(err => reject(err))
         })
-    }
+    },
     BAPI_ts_s = () => Math.round(BAPI_ts_ms() / 1000),// 当前秒
     getAppCommonRequestJson = (access_token) => {
         return {
@@ -1200,10 +1198,8 @@ var BAPI = {
     x: {
         getWbiSign: () => {
             return BAPI.ajax({
-                url: '//api.bilibili.com/x/web-interface/nav',
-                method: 'get',
-                responseType: 'json'
-            })
+                url: '//api.bilibili.com/x/web-interface/nav'
+            });
         },
         getUserSpace: (mid, ps, tid, pn, keyword, order, jsonp) => { //查看用户动态
             return BAPI.ajax({
@@ -1229,19 +1225,24 @@ var BAPI = {
             })
         },
         getAccInfo: (mid, token = '', platform = 'web', web_location = '1550101') => {
-          return new Promise((resolve, reject) => {
-            BAPI_WBI_SIGN().then(resp => {
-              BAPI.ajax({
-                url: '//api.bilibili.com/x/space/wbi/acc/info?' + encWbi({
-                  mid: mid,
-                  platform: platform,
-                  token: token,
-                  web_location: web_location,
-                  wts: BAPI_ts_s(),
-                }, resp.img_key, resp.sub_key)
-              }).then(resp2 => resolve(resp2))
-            })
-          })
+            return BAPI_WBI_SIGN().then(resp => {
+                if (resp) {
+                    return BAPI.ajax({
+                        url: '//api.bilibili.com/x/space/wbi/acc/info?' + Wbi.encWbi({
+                            mid: mid,
+                            platform: platform,
+                            token: token,
+                            web_location: web_location,
+                            wts: BAPI_ts_s(),
+                        }, resp.img_key, resp.sub_key)
+                    });
+                }
+            });
+        },
+        myinfo: () => {
+            return BAPI.ajax({
+                url: '//api.bilibili.com/x/space/v2/myinfo'
+            });
         },
         getCoinInfo: (callback, jsonp, aid, _) => { //获取视频投币状态
             return BAPI.ajax({
