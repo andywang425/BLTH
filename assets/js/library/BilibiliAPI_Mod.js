@@ -12,6 +12,26 @@
 
 let BAPI_csrf_token, BAPI_visit_id,
     BAPI_ts_ms = () => Date.now(),// 当前毫秒
+    BAPI_WBI_SIGN = () => {
+        return new Promise((resolve, reject) => {
+          BAPI.x.getWbiSign().then(resp =>{
+            console.log(resp)
+            if (resp.code === 0) {
+              const {
+                img_url,
+                sub_url
+              } = resp.data.wbi_img
+              const sign = {
+                img_key: img_url.substring(img_url.lastIndexOf('/') + 1, img_url.length).split('.')[0],
+                sub_key: sub_url.substring(sub_url.lastIndexOf('/') + 1, sub_url.length).split('.')[0]
+              }
+              resolve(sign)
+            }else{
+              reject(resp.message)
+            }
+          }).catch(err => reject(err))
+        })
+    }
     BAPI_ts_s = () => Math.round(BAPI_ts_ms() / 1000),// 当前秒
     getAppCommonRequestJson = (access_token) => {
         return {
@@ -1178,6 +1198,13 @@ var BAPI = {
         }
     },
     x: {
+        getWbiSign: () => {
+            return BAPI.ajax({
+                url: '//api.bilibili.com/x/web-interface/nav',
+                method: 'get',
+                responseType: 'json'
+            })
+        },
         getUserSpace: (mid, ps, tid, pn, keyword, order, jsonp) => { //查看用户动态
             return BAPI.ajax({
                 url: '//api.bilibili.com/x/space/arc/search',
@@ -1202,17 +1229,19 @@ var BAPI = {
             })
         },
         getAccInfo: (mid, token = '', platform = 'web', web_location = '1550101') => {
-            return BAPI.ajax({
-                url: '//api.bilibili.com/x/space/wbi/acc/info',
-                data: {
-                    mid: mid,
-                    platform: platform,
-                    token: token,
-                    web_location: web_location,
-                    wts: BAPI_ts_s(),
-                    w_rid: CryptoJS.MD5(BAPI_ts_ms()).toString() // fake w_rid
-                }
+          return new Promise((resolve, reject) => {
+            BAPI_WBI_SIGN().then(resp => {
+              BAPI.ajax({
+                url: '//api.bilibili.com/x/space/wbi/acc/info?' + encWbi({
+                  mid: mid,
+                  platform: platform,
+                  token: token,
+                  web_location: web_location,
+                  wts: BAPI_ts_s(),
+                }, resp.img_key, resp.sub_key)
+              }).then(resp2 => resolve(resp2))
             })
+          })
         },
         getCoinInfo: (callback, jsonp, aid, _) => { //获取视频投币状态
             return BAPI.ajax({
