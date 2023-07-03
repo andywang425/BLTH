@@ -924,7 +924,7 @@
           {
             // 大乱斗入口
             settingName: 'REMOVE_ELEMENT_pkBanner',
-            rmJQpath: ['.chaos-pk-banner'],
+            rmJQpath: ['.awesome-pk-box'],
           },
           {
             // 排行榜（活动？）
