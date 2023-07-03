@@ -17,7 +17,7 @@
 // @compatible     firefox 77 or later
 // @compatible     opera 69 or later
 // @compatible     safari 13.1 or later
-// @version        6.1.4
+// @version        6.1.5
 // @match          *://live.bilibili.com/*
 // @exclude        *://live.bilibili.com/?*
 // @run-at         document-start
@@ -821,7 +821,7 @@
           if (versionStringCompare(cache, version) === -1) {
             // cache < version
             const clientMliList = [
-              `修复因为获取账号信息失败导致脚本无法运行的问题。`,
+              `修复屏蔽大乱斗弹窗和进度条功能失效的Bug。`,
             ];
             function createHtml(mliList) {
               if (mliList.length === 0) return '无';
