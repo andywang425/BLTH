@@ -1,9 +1,6 @@
 # Dependency directories
 node_modules
 
-# build output
-dist
-
 # vscode directories and files
 .vscode/*
 !.vscode/extensions.json
