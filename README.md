@@ -2,7 +2,7 @@
     <img alt="BLTH logo" src="https://raw.githubusercontent.com/andywang425/BLTH/master/images/logo.min.svg" width="150">
 </div>
 
-<h1 align="center" style="color:#409eff; font-family: 'Comic Sans MS';">Bilibili Live Tasks Helper</h1>
+<h1 align="center">Bilibili Live Tasks Helper</h1>
 
 # 环境要求
 
