@@ -90,7 +90,7 @@
 
 # 贡献者公约
 
-请查看[CODE_OF_CONDUCT](https://github.com/andywang425/BLTH/blob/master/CODE_OF_CONDUCT.md)。
+请查看[CODE OF CONDUCT](https://github.com/andywang425/BLTH/blob/master/CODE_OF_CONDUCT.md)。
 
 # 相关推荐
 
