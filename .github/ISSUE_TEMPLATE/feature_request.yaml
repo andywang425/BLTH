@@ -1,5 +1,5 @@
 name: 新功能请求
-description: 提出你想要的功能或你的建议
+description: 提出你想要的功能。
 labels: ["enhancement"]
 assignees: andywang425
 
@@ -7,9 +7,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## 欢迎
+        # 欢迎
         请确保你所提出的功能脚本的确没有。
-        <br />
 
   - id: describe
     type: textarea
@@ -18,4 +17,4 @@ body:
     attributes:
       label: "描述"
       description: |
-        请清晰而简明地描述你想要的功能或你的建议。
+        请清晰而简明地描述你想要的功能。

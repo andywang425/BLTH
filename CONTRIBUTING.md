@@ -2,114 +2,146 @@
 
 ## 欢迎
 
-很高兴能有更多人参与到本项目的开发中，无论是添加新功能，修复 Bug 还是改进文案都是可以的。由于本项目涉及的范围比较广，再加上 B 站经常做出各方面的改动，脚本需要被不断地修改以适应 B 站的变化。如果你想为本项目贡献一份力量，请认真阅读以下指南。
+很高兴能有更多人参与到本项目的开发中，无论是添加新功能，修复 Bug 还是改进文案都是可以的。由于B站的改动很频繁，脚本需要被不断地修改以适应B站的变化。如果你想为本项目贡献一份力量，请认真阅读以下指南。
+
+## 技术栈
+
+BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [vite-plugin-monkey](https://github.com/lisonge/vite-plugin-monkey) 和 Typescript 的用户脚本。
+如果想要贡献代码，你至少需要有 [Vue3](https://cn.vuejs.org) 和 Typescript 基础。
 
 ## 环境搭建
 
-- 安装 [Chrome](https://www.google.cn/chrome/)，[Tampermonkey](https://www.tampermonkey.net/)，[Node.js](http://nodejs.cn/) (version >= 16), [Visual Studio Code](https://code.visualstudio.com/)。
+- 安装 [Node.js](https://nodejs.org/), [Visual Studio Code](https://code.visualstudio.com/)。
 - Fork 本项目，然后 Clone 至本地。
-- 安装依赖 `npm install -D`。
-- 安装 vscode 拓展 [MinifyAll](https://marketplace.visualstudio.com/items?itemName=josee9988.minifyall)。
+- 切换到项目根目录，安装依赖 `npm install`。
+- 安装以下几个 vscode 拓展：[Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。同时为了更好的开发体验推荐启用 Volar 的 [Take Over Mode](https://cn.vuejs.org/guide/typescript/overview.html#volar-takeover-mode)。
 
-## 脚本调试方式
+## 开始
 
-### 传统方式
+使用以下命令在浏览器中安装脚本并启动 [Vite](https://cn.vitejs.dev)，然后你就可以开始写代码啦。
 
-对脚本做出修改后，把代码复制到 Tampermonkey 中，刷新网页。
-这样做的缺点就是太麻烦，每修改一点东西就要复制一次代码，所以推荐用以下方法：
+```sh
+npm run dev
+```
 
-### 推荐方式
+得益于 Vite 的模块热更新（HMR）功能，修改代码后可以直接在浏览器中看到结果， Vite 会自动帮你刷新页面（如果仅修改了 UI 连刷新页面都不需要）。但是在部分情况下仍需手动刷新页面。
 
-把脚本头部复制到 Tampermonkey 中，在元数据的最后加上一行`// @require file:///<B站直播间挂机助手.js的路径>`，这样每次修改完代码后只需刷新网页即可生效。如果你需要修改其它`@require`或`@resource`中的文件，也可以用这种方法。
+脚本运行过程中会调用B站API，过于频繁地刷新页面从而让脚本反复调用API可能导致你的B站账号被风控。如果你写代码的时候经常保存请注意这一点。
 
 ## 项目概览
 
 ### 分支
 
-`master`分支是主分支，贡献代码时不需要使用。主仓库最终合并分支时会把`dev`分支合并到`master`分支。
+- **master**: `master`分支是主分支，贡献代码时不需要使用。主仓库最终合并分支时会把`dev`分支合并到`master`分支。
 
-`dev`分支是开发用分支，开发时以此分支为基础。`dev`分支永远都不会落后于`master`分支。
+- **dev**: `dev`分支是开发用分支，发起PR时以该分支为合并的目标。
 
 ### 目录结构
 
 ```
 BLTH
-│  B站直播间挂机助手.js          原格式脚本，开发用，也是从greasyfork和openuserjs安装的脚本
-│  B站直播间挂机助手.user.js     压缩后脚本，从github安装的脚本
-│  README.md                    README
-│
-├─.github                       github文件夹
-│  └─ISSUE_TEMPLATE             issue模板
-├─.vscode                       vscode文件夹，存放配置文件和调试登录信息
-└─assets                        资源文件夹
-   ├─css                        CSS
-   ├─html                       HTML
-   ├─img                        图片
-   ├─js                         JS
-   │  ├─development             用于方便开发的JS文件
-   │  └─library                 脚本需要的JS库文件
-   ├─json                       脚本需要的JSON文件
-   └─markdown                   MARKDOWN文件，存放非github平台的脚本介绍和更新日志
+├─.vscode
+├─dist                     存放build生成的用户脚本
+├─node_modules
+├─notes                    用来记录些东西，提交时会被忽略
+├─scripts                  一些npm scripts，通过 npm run ... 调用
+└─src
+    ├─assets               资源文件
+    │  └─css
+    ├─components           vue组件
+    │  └─icons             图标组件
+    ├─library              库文件
+    │  ├─...               每个文件夹代表一个库，此处省略
+    ├─modules              功能模块
+    │  ├─...               这里有很多模块，此处省略
+    │  └─default           默认模块，性质较特殊
+    ├─stores               Pinia store
+    └─types                typescript 类型定义
 ```
 
-## 挂机助手代码浅析
+## 示例
 
-### 代码结构
+如果你还是不太清楚怎么做，下面是新增一个功能模块的简单流程。
 
-由于一些历史原因，代码结构和风格略显凌乱，以下对代码结构做一个简单的总结：
+假设现在B站给主站每日任务新添加了一个任务：给视频点赞。
 
-```js
-// ==UserScript==
-// @name           B站直播间挂机助手
-// ...
-// ==/UserScript==
-(function () {
-    localstorage2gm();
-    const NAME = 'BLTH',
-    // 声明各种常用的变量，简单函数...
-    // 处理一些需要尽早处理的事务，比如拦截直播流...
-    // DOM加载完成后运行
-    $(function () {
-        // 初始化脚本...
-        init();
-    });
-    // 初始化函数
-    function init() {
-        // 由于历史原因，这个函数特别大
-        // 里面有设置项，有各项功能的具体实现
-        const MY_API = {
-            // ...
-        }
-        // ...
-    };
-    // 主函数
-    async function main(API) {
-        checkUpdate(GM_info.script.version);
-        // 调用 MY_API 里的各项功能等...
-    };
-    // 一些相对独立的功能性函数...
-})();
+首先打开 modules 文件夹，你会发现已经有了 dailyTasks/mainSiteTasks 这个文件夹，那么你只需在这个文件夹下新建一个 ts 文件即可。内容大概如下：
+
+```ts
+import BaseModule from '../../BaseModule'
+// import ...
+
+class LikeTask extends BaseModule {
+  // ...
+}
+
+export default LikeTask
 ```
 
-### 代码风格
+可以参考已经写好的模块，尤其是 dailyTasks/mainSiteTasks 中的那几个，注释写得很详细。
 
-缩进请用`2`个空格（遵循`/.vscode`目录下的`settings.json`中的`prettier.tabWidth`字段）。如果你不是用 vscode 开发的话请注意这一点。
+点赞涉及到对B站API的请求。在 library/bili-api 中找找看有没有给视频点赞的API，如果没有得自己添加。参考已有的API即可。
 
-### JS 特性
+点赞的视频从哪来？如果仔细阅读代码你会发现 useBiliStore 的 dynamicVideos 里已经存储了许多动态视频，你可以直接用。如果有特殊需求，自己获取视频当然也是可以的。
 
-不建议使用特别新的语言特性，ES6 及之前的特性可以随意使用。可以上 [caniuse.com](https://caniuse.com/) 这个网站查一下你想要使用的特性的支持情况。很多用户还在使用国产浏览器，这些浏览器的 chromium 内核版本普遍不是很高，尽可能地兼容一下。
+完成模块的编写后，记得在 dailyTasks/mainSiteTasks/index.ts 中添加新模块的导出。
 
-## 收尾工作
+## 代码风格
 
-完成代码编写后仍有一些工作要做，请务必认真对待，漏掉一项可能就意味着需要再更新一个版本来迭代掉有问题的版本：
+编写的代码需要能够通过 ESlint 检查。在你编写代码的过程中 [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) 拓展会实时地检查打开的代码文件。
 
-- 删除在代码中临时添加的日志输出语句 (`console.log`等)。
-- 如果你调试了 [BLTH-server](https://github.com/andywang425/BLTH-server) 相关的功能，记得删除元数据中的`// @connect localhost`。
-- 如果你更新了`@require`或`@resource`中的文件，记得先将这些文件的修改提交到仓库，然后把文件地址`file:///<...>`替换为 cdn 链接`https://gcore.jsdelivr.net/gh/<你的github用户名>/BLTH@<...>`。请不要删除你 fork 的仓库，这可能会导致用户无法正常获取这些依赖。
-- 更新脚本元数据中的版本号`// @version`。通常来说在最后一位+1 即可，满 10 则向前进位。
-- 更新位于`/assets/json/`目录下的`notice.json`中的版本号，然后压缩该 json 文件得到`notice.min.json`。
-- 攥写更新日志`update-log.md`，格式仿照先前的日志写即可。写完后复制更新内容，之后会用到。
-- 更新脚本内置的更新说明（每次更新后第一次运行时弹窗的内容）。运行`/assets/js/development/`目录下的`updateLog2ArrayString.js`，粘贴你刚刚写的更新内容，回车，将剪切板的内容复制到脚本内置更新说明的位置（在代码中搜索`${version}更新提示`可快速定位，数组`clientMliList`是储存更新说明的）。
-- （本步骤可忽略）给资源文件添加用于校验子资源完整性的 md5 值。运行`/assets/js/development/`目录下的`addRequireMd5.js`得到新的脚本元数据，结果会被保存到剪切板。用剪切板中的内容覆盖脚本的头部元数据即可。注意，如果部分 md5 计算失败而你想要手动加上 md5 的话，需计算从 cdn 获取到的内容的 md5，不能直接计算本地文件的 md5，因为上传到 cdn 之后文件的 md5 可能会变化（但是内容不会变，可能是换行符之类的导致的）。
-- 压缩脚本，得到`B站直播间挂机助手.user.js`。如果你使用的是[MinifyAll](https://marketplace.visualstudio.com/items?itemName=josee9988.minifyall)插件，元数据会被保留下来（详见`/.vscode/settings.json/`的`MinifyAll.terserMinifyOptions`字段）。如果你用的是其它压缩手段，记得把脚本头部的元数据补上。
-- 发起 PR(你的仓库的 dev 分支 -> 主仓库的 dev 分支)。标题写版本号，描述写更新内容。复制你之前在`update-log.md`里写的更新内容，运行`/assets/js/development/`目录下的`updateLogAddLineBreaks.js`，粘贴，即可快速添加换行符。由项目成员进行最后的检查和修改后，主仓库的 dev 分支会被合并到 master 分支，之后用户便可以通过各种途径更新最新版的脚本了。
+你也可以使用以下命令检查所有文件：
+
+```sh
+npm run lint
+```
+
+在你完成代码编写前，请运行以下命令格式化所有代码：
+
+```sh
+npm run format
+```
+
+## 编码准则
+
+### 强制性
+
+- 对于`src/library/bili-api`中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](ttps://github.com/ritz078/transform) 这个工具或许会有帮助。
+- 如果添加了新的第三方库或资源文件，请修改`vite.config.ts`使其通过`@require`或`@resource`引入。
+
+### 建议性
+
+- 尽可能详细地写类型定义，必要时才使用`any`/`unknown`。
+- 为逻辑复杂的代码编写注释。
+
+## 编译
+
+开发完成后记得编译并测试一下最终的成品。使用以下命令编译脚本：
+
+```sh
+npm run build
+```
+
+这会在`build`文件夹下生成一个后缀为`.user.js`的文件。然后你可以使用以下命令压缩脚本：
+
+```sh
+npm run minify
+```
+
+这会在`build`文件夹下生成一个后缀为`.min.user.js`的文件。
+
+最后输入以下命令把编译后的脚本安装到浏览器：
+
+```sh
+npm run preview
+```
+
+如果你之前压缩了脚本，此时用户脚本管理器会尝试安装两个脚本，选择一个安装即可。
+
+## commit 规范
+
+请在 commit message 中简单阐述一下改动内容，建议使用类似[约定式提交](https://www.conventionalcommits.org/zh-hans/v1.0.0)的格式。
+
+## 发起 PR
+
+把你的分支合并到主仓库的`dev`分支即可。
