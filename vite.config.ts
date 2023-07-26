@@ -17,9 +17,9 @@ export default defineConfig({
         namespace: 'https://github.com/andywang425',
         author: 'andywang425',
         description: {
-          '': 'Enhancing the exprerience of watching bilibili Bilibili live streaming.',
-          en: 'Enhancing the exprerience of watching bilibili Bilibili live streaming.',
-          zh: 'Enhancing the exprerience of watching bilibili Bilibili live streaming.'
+          '': 'Enhancing the exprerience of watching Bilibili live streaming.',
+          en: 'Enhancing the exprerience of watching Bilibili live streaming.',
+          zh: 'Enhancing the exprerience of watching Bilibili live streaming.'
         },
         homepageURL: 'https://github.com/andywang425/BLTH',
         supportURL: 'https://github.com/andywang425/BLTH/issues',
