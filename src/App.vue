@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useUIStore } from './stores/useUIStore'
 import { useModuleStore } from './stores/useModuleStore'
+import { useCacheStore } from './stores/useCacheStore'
 import PanelHeader from './components/PanelHeader.vue'
 import PanelAside from './components/PanelAside.vue'
 import PanelMain from './components/PanelMain.vue'
@@ -8,9 +9,20 @@ import { dce, dq, pollingQuery } from './library/dom'
 import hotkeys from 'hotkeys-js'
 import _ from 'lodash'
 import { isSelfTopFrame, topFrameDocuemnt } from './library/dom'
+import Logger from './library/logger'
 
 const uiStore = useUIStore()
 const moduleStore = useModuleStore()
+const cacheStore = useCacheStore()
+
+const logger = new Logger('App.vue')
+
+if (cacheStore.checkIfOtherScriptsRunning()) {
+  logger.log('其它页面上的BLTH正在运行，当前脚本停止运行')
+  await new Promise(() => { })
+}
+cacheStore.starttAliveHeartBeat()
+
 // 临时存储一下是否显示控制面板
 let isShowPanel = uiStore.uiConfig.isShowPanel
 // 先设置为不显示，等准备工作完成了再显示（如果原来的配置是显示的话）
@@ -40,8 +52,10 @@ function buttonOnClick() {
 }
 // 节流，防止点击过快，减小渲染压力
 const throttleButtoOnClick = _.throttle(buttonOnClick, 300)
-// 加载模组，可以放在 window.onload 之前
+
+// 加载功能模块，可以放在 window.onload 之前
 moduleStore.loadModules()
+
 
 window.onload = () => {
   livePlayer = dq('#live-player-ctnr')
@@ -70,7 +84,7 @@ window.onload = () => {
         }
         hotkeys('alt+b', throttleButtoOnClick)
       })
-      .catch(() => console.error("Can't find playerHeaderLeft in time"))
+      .catch(() => logger.error("Can't find playerHeaderLeft in time"))
     // 监听页面缩放，调整控制面板大小
     // 因为这个操作频率不高就不节流或防抖了
     window.onresize = setPanelSize
@@ -85,7 +99,7 @@ window.onload = () => {
       uiStore.uiConfig.isShowPanel = true
     }
   } else {
-    console.error('livePlayer not found')
+    logger.error('livePlayer not found')
   }
 }
 </script>

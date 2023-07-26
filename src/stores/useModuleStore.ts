@@ -75,7 +75,7 @@ export const useModuleStore = defineStore('module', () => {
   // 监听模块配置信息的变化，使用防抖降低油猴写配置信息频率
   watch(
     moduleConfig,
-    _.debounce((newModuleConfig) => Storage.setModuleConfig(newModuleConfig), 250, {
+    _.debounce((newModuleConfig: ImoduleConfig) => Storage.setModuleConfig(newModuleConfig), 250, {
       leading: true,
       trailing: true
     })

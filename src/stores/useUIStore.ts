@@ -70,7 +70,7 @@ export const useUIStore = defineStore('ui', () => {
   // 监听UI配置信息的变化，使用防抖降低油猴写配置信息频率
   watch(
     uiConfig,
-    _.debounce((newUiConfig) => Storage.setUiConfig(newUiConfig), 350)
+    _.debounce((newUiConfig: IuiConfig) => Storage.setUiConfig(newUiConfig), 350)
   )
 
   return {
