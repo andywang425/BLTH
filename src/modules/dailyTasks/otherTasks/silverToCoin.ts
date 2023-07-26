@@ -15,7 +15,7 @@ class SilverToCoin extends BaseModule {
       const response = await BAPI.live.silver2coin()
       this.logger.log(`BAPI.live.silver2coin response`, response)
       if (response.code === 0) {
-        this.logger.log('银瓜子换硬币已完成，获得硬币1个')
+        this.logger.log(`银瓜子换硬币已完成，获得硬币:`, response.data.coin)
         this.config._lastCompleteTime = tsm()
         this.status = 'done'
       } else if (response.code === 403) {
