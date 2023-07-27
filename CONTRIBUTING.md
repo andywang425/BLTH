@@ -32,7 +32,7 @@ npm run dev
 
 ### 分支
 
-- **master**: `master`分支是主分支，贡献代码时不需要使用。主仓库最终合并分支时会把`dev`分支合并到`master`分支。
+- **master**: `master`分支是主分支，主仓库在发布新版本前会把`dev`分支合并到`master`分支。
 
 - **dev**: `dev`分支是开发用分支，发起PR时以该分支为合并的目标。
 
@@ -106,7 +106,7 @@ npm run format
 
 ### 强制性
 
-- 对于`src/library/bili-api`中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](ttps://github.com/ritz078/transform) 这个工具或许会有帮助。
+- 对于`src/library/bili-api`中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](https://github.com/ritz078/transform) 这个工具或许会有帮助。
 - 如果添加了新的第三方库或资源文件，请修改`vite.config.ts`使其通过`@require`或`@resource`引入。
 
 ### 建议性
