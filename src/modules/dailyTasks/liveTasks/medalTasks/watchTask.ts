@@ -1,14 +1,14 @@
-import BaseModule from '../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
-import BAPI from '../../../library/bili-api'
-import { useBiliStore } from '../../../stores/useBiliStore'
-import Logger from '../../../library/logger'
+import BaseModule from '../../../BaseModule'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../../library/luxon'
+import BAPI from '../../../../library/bili-api'
+import { useBiliStore } from '../../../../stores/useBiliStore'
+import Logger from '../../../../library/logger'
 import CryptoJS from 'crypto-js'
-import { uuid, sleep } from '../../../library/utils'
-import { getCookie } from '../../../library/cookie'
-import { useModuleStore } from '../../../stores/useModuleStore'
-import { ImoduleConfig } from '../../../types'
-import { Istatus } from '../../../types/moduleStatus'
+import { uuid, sleep } from '../../../../library/utils'
+import { getCookie } from '../../../../library/cookie'
+import { useModuleStore } from '../../../../stores/useModuleStore'
+import { ImoduleConfig } from '../../../../types'
+import { Istatus } from '../../../../types/moduleStatus'
 
 interface sypderData {
   benchmark: string
@@ -36,14 +36,14 @@ class RoomHeart {
     this.watchedSeconds = watchedSeconds
     this.isLast = isLast
 
-    this.config = useModuleStore().moduleConfig.DailyTasks.LiveTasks.watch
+    this.config = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks.watch
   }
 
   private logger = new Logger('RoomHeart')
 
-  private config: ImoduleConfig['DailyTasks']['LiveTasks']['watch']
+  private config: ImoduleConfig['DailyTasks']['LiveTasks']['medalTasks']['watch']
   set status(s: Istatus) {
-    useModuleStore().moduleStatus.DailyTasks.LiveTasks.watch = s
+    useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
   /** 是不是最后一个心跳任务 */
   private isLast: boolean
@@ -251,10 +251,10 @@ class RoomHeart {
 }
 
 class WatchTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.watch
+  config = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks.watch
 
   set status(s: Istatus) {
-    this.moduleStore.moduleStatus.DailyTasks.LiveTasks.watch = s
+    this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
 
   /**

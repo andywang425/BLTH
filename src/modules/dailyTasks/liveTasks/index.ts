@@ -1,5 +1,3 @@
 export { default as DailyTask_LiveTask_SignTask } from './signTask'
-export { default as DailyTask_LiveTask_DanmuTask } from './danmuTask'
-export { default as DailyTask_LiveTask_LikeTask } from './likeTask'
-export { default as DailyTask_LiveTask_WatchTask } from './watchTask'
 export { default as DailyTask_LiveTask_AppUserTask } from './appUserTask'
+export * from './medalTasks'

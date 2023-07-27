@@ -1,15 +1,15 @@
-import BaseModule from '../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
-import BAPI from '../../../library/bili-api'
-import { useBiliStore } from '../../../stores/useBiliStore'
-import { sleep } from '../../../library/utils'
-import { Istatus } from '../../../types/moduleStatus'
+import BaseModule from '../../../BaseModule'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../../library/luxon'
+import BAPI from '../../../../library/bili-api'
+import { useBiliStore } from '../../../../stores/useBiliStore'
+import { sleep } from '../../../../library/utils'
+import { Istatus } from '../../../../types/moduleStatus'
 
 class LikeTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.like
+  config = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks.like
 
   set status(s: Istatus) {
-    this.moduleStore.moduleStatus.DailyTasks.LiveTasks.like = s
+    this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.like = s
   }
 
   /**

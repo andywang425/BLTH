@@ -13,7 +13,7 @@ const status = moduleStore.moduleStatus.DailyTasks.LiveTasks
 const medalDanmuPanelVisible = ref<boolean>(false)
 
 const danmuTableData = computed(() =>
-  config.danmu.list.map((danmu) => {
+  config.medalTasks.danmu.list.map((danmu) => {
     return { content: danmu }
   })
 )
@@ -28,20 +28,20 @@ const handleEdit = (index: number, row: { content: string }) => {
     lockScroll: false
   })
     .then(({ value }) => {
-      config.danmu.list[index] = value
+      config.medalTasks.danmu.list[index] = value
     })
-    .catch(() => {})
+    .catch(() => { })
 }
 
 const handleDelete = (index: number) => {
-  if (config.danmu.list.length === 1) {
+  if (config.medalTasks.danmu.list.length === 1) {
     ElMessage.warning({
       message: '至少要有一条弹幕',
       appendTo: '.el-dialog'
     })
     return
   }
-  config.danmu.list.splice(index, 1)
+  config.medalTasks.danmu.list.splice(index, 1)
 }
 
 const handleAdd = () => {
@@ -53,9 +53,9 @@ const handleAdd = () => {
     lockScroll: false
   })
     .then(({ value }) => {
-      config.danmu.list.push(value)
+      config.medalTasks.danmu.list.push(value)
     })
-    .catch(() => {})
+    .catch(() => { })
 }
 </script>
 
@@ -70,55 +70,54 @@ const handleAdd = () => {
     </el-row>
     <el-row>
       <el-space wrap>
-        <el-switch v-model="config.like.enabled" active-text="给主播点赞" />
-        <Info id="DailyTasks.LiveTasks.like" />
-        <TaskStatus :status="status.like" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap>
-        <el-switch v-model="config.danmu.enabled" active-text="发送弹幕" />
-        <el-button
-          type="primary"
-          size="small"
-          :icon="Edit"
-          @click="medalDanmuPanelVisible = !medalDanmuPanelVisible"
-          >编辑弹幕</el-button
-        >
-        <Info id="DailyTasks.LiveTasks.danmu" />
-        <TaskStatus :status="status.danmu" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap>
-        <el-switch v-model="config.watch.enabled" active-text="观看直播" />
-        <el-select v-model="config.watch.time" placeholder="Select" style="width: 64px">
-          <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
-        </el-select>
-        <el-text>分钟</el-text>
-        <Info id="DailyTasks.LiveTasks.watch" />
-        <TaskStatus :status="status.watch" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap>
         <el-switch v-model="config.appUser.enabled" active-text="APP用户任务" />
         <Info id="DailyTasks.LiveTasks.appUser" />
         <TaskStatus :status="status.appUser" />
       </el-space>
     </el-row>
     <el-divider />
+    <!-- 粉丝勋章相关任务 -->
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.medalTasks.like.enabled" active-text="给主播点赞" />
+        <Info id="DailyTasks.LiveTasks.like" />
+        <TaskStatus :status="status.medalTasks.like" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.medalTasks.danmu.enabled" active-text="发送弹幕" />
+        <el-button type="primary" size="small" :icon="Edit"
+          @click="medalDanmuPanelVisible = !medalDanmuPanelVisible">编辑弹幕</el-button>
+        <Info id="DailyTasks.LiveTasks.danmu" />
+        <TaskStatus :status="status.medalTasks.danmu" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.medalTasks.watch.enabled" active-text="观看直播" />
+        <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 64px">
+          <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
+        </el-select>
+        <el-text>分钟</el-text>
+        <Info id="DailyTasks.LiveTasks.watch" />
+        <TaskStatus :status="status.medalTasks.watch" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.medalTasks.isWhiteList" active-text="白名单" inactive-text="黑名单" />
+        <el-button type="primary" size="small" :icon="Edit"
+          @click="medalDanmuPanelVisible = !medalDanmuPanelVisible">编辑名单</el-button>
+        <Info id="DailyTasks.LiveTasks.appUser" />
+      </el-space>
+    </el-row>
+    <el-divider />
     <!-- 说明 -->
     <el-row>
       <el-text>直播任务相关信息可在</el-text>
-      <el-link
-        class="el-link-va-baseline"
-        rel="noreferrer"
-        type="primary"
-        href="https://link.bilibili.com/p/help/index#/audience-fans-medal"
-        target="_blank"
-        >帮助中心</el-link
-      >
+      <el-link class="el-link-va-baseline" rel="noreferrer" type="primary"
+        href="https://link.bilibili.com/p/help/index#/audience-fans-medal" target="_blank">帮助中心</el-link>
       <el-text>查看。</el-text>
     </el-row>
     <br />
@@ -126,17 +125,10 @@ const handleAdd = () => {
       <el-text tag="b">注意：</el-text>
     </el-row>
     <el-row>
-      <el-text
-        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，目前脚本仅尝试为前100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。</el-text
-      >
+      <el-text>&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，目前脚本仅尝试为前100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。</el-text>
     </el-row>
     <!-- 弹窗 -->
-    <el-dialog
-      v-model="medalDanmuPanelVisible"
-      title="编辑弹幕内容"
-      :lock-scroll="false"
-      width="40%"
-    >
+    <el-dialog v-model="medalDanmuPanelVisible" title="编辑弹幕内容" :lock-scroll="false" width="40%">
       <el-table ref="singleTableRef" :data="danmuTableData" max-height="500">
         <el-table-column type="index" width="50" />
         <el-table-column prop="content" label="弹幕内容" />

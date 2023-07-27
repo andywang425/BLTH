@@ -17,7 +17,7 @@
 
 | Github min（推荐）                                                                                            | Github                                                                                                    | GreasyFork                                                                         |
 | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [安装](https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.min.user.js) | [安装](https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.user.js) | [前往安装](https://greasyfork.org/zh-CN/scripts/406048-Bilibili-Live-Tasks-Helper) |
+| [安装](https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.min.user.js) | [安装](https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.user.js) | [前往安装](https://greasyfork.org/zh-CN/scripts/406048-bilibili-live-tasks-helper) |
 
 - Github min: Github 源，代码经过压缩，运行效率最高。以后脚本也会从 Github 更新（可能存在网络问题）。
 - Github: 同上，唯一的区别是代码没经过压缩。而且更新后代码会变成压缩的。

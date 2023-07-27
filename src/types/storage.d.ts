@@ -24,25 +24,29 @@ interface ImoduleConfig {
         enabled: boolean
         _lastCompleteTime: number
       }
-      danmu: {
-        enabled: boolean
-        list: string[]
-        _lastCompleteTime: number
-      }
-      like: {
-        enabled: boolean
-        _lastCompleteTime: number
-      }
-      watch: {
-        enabled: boolean
-        time: number
-        _watchedSecondsToday: number
-        _lastWatchTime: number
-        _lastCompleteTime: number
-      }
       appUser: {
         enabled: boolean
         _lastCompleteTime: number
+      }
+      medalTasks: {
+        danmu: {
+          enabled: boolean
+          list: string[]
+          _lastCompleteTime: number
+        }
+        like: {
+          enabled: boolean
+          _lastCompleteTime: number
+        }
+        watch: {
+          enabled: boolean
+          time: number
+          _watchedSecondsToday: number
+          _lastWatchTime: number
+          _lastCompleteTime: number
+        }
+        isWhiteList: boolean
+        roomidList: number[]
       }
     }
     OtherTasks: {

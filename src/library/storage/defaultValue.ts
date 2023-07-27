@@ -38,41 +38,45 @@ const defaultValues: IdefaultValues = {
           enabled: false,
           _lastCompleteTime: 0
         },
-        danmu: {
-          enabled: false,
-          list: [
-            '(⌒▽⌒)',
-            '（￣▽￣）',
-            '(=・ω・=)',
-            '(｀・ω・´)',
-            '(〜￣△￣)〜',
-            '(･∀･)',
-            '(°∀°)ﾉ',
-            '╮(￣▽￣)╭',
-            '_(:3」∠)_',
-            '(^・ω・^ )',
-            '(●￣(ｴ)￣●)',
-            'ε=ε=(ノ≧∇≦)ノ',
-            '⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄',
-            '←◡←',
-            `(●'◡'●)ﾉ♥`
-          ],
-          _lastCompleteTime: 0
-        },
-        like: {
-          enabled: false,
-          _lastCompleteTime: 0
-        },
-        watch: {
-          enabled: false,
-          time: 70,
-          _watchedSecondsToday: 0,
-          _lastWatchTime: 0,
-          _lastCompleteTime: 0
-        },
         appUser: {
           enabled: false,
           _lastCompleteTime: 0
+        },
+        medalTasks: {
+          danmu: {
+            enabled: false,
+            list: [
+              '(⌒▽⌒)',
+              '（￣▽￣）',
+              '(=・ω・=)',
+              '(｀・ω・´)',
+              '(〜￣△￣)〜',
+              '(･∀･)',
+              '(°∀°)ﾉ',
+              '╮(￣▽￣)╭',
+              '_(:3」∠)_',
+              '(^・ω・^ )',
+              '(●￣(ｴ)￣●)',
+              'ε=ε=(ノ≧∇≦)ノ',
+              '⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄',
+              '←◡←',
+              `(●'◡'●)ﾉ♥`
+            ],
+            _lastCompleteTime: 0
+          },
+          like: {
+            enabled: false,
+            _lastCompleteTime: 0
+          },
+          watch: {
+            enabled: false,
+            time: 70,
+            _watchedSecondsToday: 0,
+            _lastWatchTime: 0,
+            _lastCompleteTime: 0
+          },
+          isWhiteList: false,
+          roomidList: []
         }
       },
       OtherTasks: {
