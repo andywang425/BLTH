@@ -5,12 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vue-tsc --noEmit && vite build && node scripts/minifyUserscript.js",
     "preview": "vite preview",
     "lint": "eslint src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
-    "svg2vue": "node scripts/convertSvgToVue.js",
-    "minify": "node scripts/minifyUserscript.js"
+    "svg2vue": "node scripts/convertSvgToVue.js"
   },
   "dependencies": {
     "crypto-js": "^4.1.1",
