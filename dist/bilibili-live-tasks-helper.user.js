@@ -13,12 +13,14 @@
 // @icon            data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuMDY1IiBoZWlnaHQ9IjEyNy43NDciIHZpZXdCb3g9IjAgMCAzNy4zMjQgMzMuOCI+PHBhdGggZmlsbD0iIzIwYjBlMyIgZD0iTTg2Ljk2MiAxMTIuMzMyYTIuNjYxIDIuNjYxIDAgMCAxIDIuMjYyIDAgNS41MzYgNS41MzYgMCAwIDEgMS4zODQgMS4wMTFsNS4zMjMgNC42NThoMy44MDVsNS4zMjMtNC42NThhNS41ODkgNS41ODkgMCAwIDEgMS4zODQtMS4wMTEgMi42NjEgMi42NjEgMCAwIDEgMy41NCAyLjIwOSAyLjY2MSAyLjY2MSAwIDAgMS0uNTg2IDEuNzgzIDE0Ljg3NyAxNC44NzcgMCAwIDEtMS4xNzEgMS4wNjUgNy42OTEgNy42OTEgMCAwIDEtLjc0NS42MTJoMy4zMjZhNS42NDIgNS42NDIgMCAwIDEgMy45MTIgMS43NTYgNS42NjkgNS42NjkgMCAwIDEgMS43ODQgMy45MTJ2MTUuMzAzYTEwLjc3OCAxMC43NzggMCAwIDEtLjEzNCAyLjMxNSA1LjkwOCA1LjkwOCAwIDAgMS0yLjY2IDMuNzI2IDUuNzIyIDUuNzIyIDAgMCAxLTMuMDYxLjg1Mkg4Ni4yMTdhMTEuMjg0IDExLjI4NCAwIDAgMS0yLjM5Ni0uMTMzIDUuODgyIDUuODgyIDAgMCAxLTMuNjcyLTIuNjYyIDUuNjk1IDUuNjk1IDAgMCAxLS45MDUtMy4wNnYtMTUuMTQzYTExLjkyMyAxMS45MjMgMCAwIDEgMC0yLjIwOSA1Ljg1NSA1Ljg1NSAwIDAgMSA1LjMyMy00LjczN2gzLjQ4NmMtLjU1OS0uNC0xLjAzOC0uODc4LTEuNTQ0LTEuMzA0YTIuNjYxIDIuNjYxIDAgMCAxLS44NTEtMi4xODMgMi42NjEgMi42NjEgMCAwIDEgMS4zMDQtMi4xMDJtLS42MTIgMTAuMzI2YTIuNjYxIDIuNjYxIDAgMCAwLTIuMTAzIDEuOTE2IDMuNTkzIDMuNTkzIDAgMCAwIDAgMS4wMTF2MTIuNTg4YTIuNjYxIDIuNjYxIDAgMCAwIDEuODM3IDIuNjYyIDMuNTEzIDMuNTEzIDAgMCAwIDEuMTQ0LjE4NmgyMS42MzdhMi42NjEgMi42NjEgMCAwIDAgMi41MjgtMS41NyAzLjcyNiAzLjcyNiAwIDAgMCAuMjY2LTEuNzU3di0xMS43MWE0LjQ3MSA0LjQ3MSAwIDAgMCAwLTEuMjc3IDIuNjYxIDIuNjYxIDAgMCAwLTEuNzMtMS44MSA0LjI4NSA0LjI4NSAwIDAgMC0xLjY1LS4yMzlIODcuNjAxYTguODg5IDguODg5IDAgMCAwLTEuMjUxIDB6bTAgMCIgc3R5bGU9InN0cm9rZS13aWR0aDouMDMzMDcyOSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTc5LjE5MyAtMTEyLjA4KSIvPjxwYXRoIGQ9Ik04OC45NyAxMjguNjM2Yy4zNjMuMzc3Ljc0NS43NDcgMS4wODggMS4xNDIuNTk3LjY4NyAxLjExOCAxLjE5NyAxLjY2NiAxLjgwOS0uMTI5LTEuMTE3IDEuMzA0LTEuMTk4LjA3NC0xLjc1Ny0uNDA4LjQxNy0uOTQxLjg4NC0xLjM2IDEuMjIzLS4zOTIuMzE2LS44NjMuNjctMS4yMzUuOTUyLTEuOTA3IDEuNDQzLjIyNiA0LjA1MyAyLjEzIDIuNjA3IDAgMCAyLTEuNTM1IDIuODA3LTIuMzAxLjQ0LS40MTcuNjgtLjk1Ni43Mi0xLjU5Mi4wNC0uNjU0LS41MzUtMS4yNC0uNzk0LTEuNDk4LS45Mi0uOTE0LTEuNzQzLTEuOTY4LTIuNTUtMi44MTItMS41NzUtMS44LTQuMTIuNDI4LTIuNTQ2IDIuMjI3ek0xMDYuOTc5IDEyOC42MzZjLS4zNjMuMzc3LS43NDUuNzQ3LTEuMDg4IDEuMTQyLS41OTcuNjg3LTEuMTE4IDEuMTk3LTEuNjY2IDEuODA5LjEyOS0xLjExNy0xLjMwNC0xLjE5OC0uMDc0LTEuNzU3LjQwOC40MTcuOTQxLjg4NCAxLjM2IDEuMjIzLjM5Mi4zMTYuODYzLjY3IDEuMjM1Ljk1MiAxLjkwNyAxLjQ0My0uMjI2IDQuMDUzLTIuMTMgMi42MDcgMCAwLTItMS41MzUtMi44MDctMi4zMDEtLjQ0LS40MTctLjY4LS45NTYtLjcyLTEuNTkyLS4wNC0uNjU0LjUzNS0xLjI0Ljc5NC0xLjQ5OC45Mi0uOTE0IDEuNzQzLTEuOTY4IDIuNTUtMi44MTIgMS41NzUtMS44IDQuMTIuNDI4IDIuNTQ2IDIuMjI3eiIgc3R5bGU9ImZpbGw6IzIwYjBlMztmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6LjUyNDE1OTtzdHJva2UtZGFzaGFycmF5Om5vbmUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC03OS4xOTMgLTExMi4wOCkiLz48L3N2Zz4NCg==
 // @homepageURL     https://github.com/andywang425/BLTH
 // @supportURL      https://github.com/andywang425/BLTH/issues
+// @downloadURL     https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.min.user.js
+// @updateURL       https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.min.user.js
 // @include         /^https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*$/
 // @require         https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js
 // @require         data:application/javascript,window.Vue%3DVue%2Cwindow.VueDemi%3DVue%3B
 // @require         https://unpkg.com/element-plus@2.3.8/dist/index.full.min.js
 // @require         https://unpkg.com/@element-plus/icons-vue@2.1.0/dist/index.iife.min.js
-// @require         https://unpkg.com/pinia@2.1.4/dist/pinia.iife.prod.js
+// @require         https://unpkg.com/pinia@2.1.6/dist/pinia.iife.prod.js
 // @require         https://unpkg.com/lodash@4.17.21/lodash.min.js
 // @require         https://unpkg.com/hotkeys-js@3.11.2/dist/hotkeys.min.js
 // @require         https://unpkg.com/luxon@3.3.0/build/global/luxon.min.js
@@ -38,7 +40,7 @@
 // @run-at          document-start
 // ==/UserScript==
 
-(t=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=t,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.base[data-v-64fce103]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-64fce103]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-64fce103]{width:auto}.aside #aside-el-menu[data-v-64fce103]:not(.el-menu--collapse){width:150px}.main[data-v-64fce103]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-64fce103],.fade-leave-active[data-v-64fce103]{transition:opacity .1s ease}.fade-enter-from[data-v-64fce103],.fade-leave-to[data-v-64fce103]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-2f9d6050]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-link-va-baseline{vertical-align:baseline} ");
+(a=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=a,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.base[data-v-4aed17ff]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-4aed17ff]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-4aed17ff]{width:auto}.aside #aside-el-menu[data-v-4aed17ff]:not(.el-menu--collapse){width:150px}.main[data-v-4aed17ff]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-4aed17ff],.fade-leave-active[data-v-4aed17ff]{transition:opacity .1s ease}.fade-enter-from[data-v-4aed17ff],.fade-leave-to[data-v-4aed17ff]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-2f9d6050]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-link-va-baseline{vertical-align:baseline} ");
 
 (function (vue, pinia, _, luxon, CryptoJS, ElementPlusIconsVue, ElementPlus, hotkeys) {
   'use strict';
@@ -157,6 +159,9 @@
           }
         }
       }
+    },
+    cache: {
+      lastAliveHeartBeatTime: 0
     }
   };
   class Storage {
@@ -207,6 +212,12 @@
     }
     static getModuleConfig() {
       return this.mergeConfigs(_GM_getValue("modules", {}), defaultValues.modules);
+    }
+    static setCache(cache) {
+      _GM_setValue("cache", cache);
+    }
+    static getCache() {
+      return this.mergeConfigs(_GM_getValue("cache", {}), defaultValues.cache);
     }
   }
   const useUIStore = pinia.defineStore("ui", () => {
@@ -2000,7 +2011,7 @@
         const response = await BAPI.live.silver2coin();
         this.logger.log(`BAPI.live.silver2coin response`, response);
         if (response.code === 0) {
-          this.logger.log("银瓜子换硬币已完成，获得硬币1个");
+          this.logger.log(`银瓜子换硬币已完成，获得硬币:`, response.data.coin);
           this.config._lastCompleteTime = tsm();
           this.status = "done";
         } else if (response.code === 403) {
@@ -2136,27 +2147,21 @@
   };
   const useModuleStore = pinia.defineStore("module", () => {
     const moduleConfig = vue.reactive(Storage.getModuleConfig());
-    const runningModules = [];
     const emitter = mitt();
     const moduleStatus = vue.reactive(defaultModuleStatus);
     async function loadModules() {
       for (const [name, Module] of Object.entries(defaultModules).sort(
         (a, b) => a[1].sequence - b[1].sequence
       )) {
-        const m = new Module(name);
-        runningModules.push(m);
         try {
-          await m.run();
+          await new Module(name).run();
         } catch (err) {
-          const logger = new Logger("loadModules");
-          logger.error("加载默认模块时发生错误，挂机助手停止运行:", err);
+          new Logger("loadModules").error("加载默认模块时发生致命错误，挂机助手停止运行:", err);
           return;
         }
       }
       for (const [name, Module] of Object.entries(otherModules)) {
-        const m = new Module(name);
-        runningModules.push(m);
-        m.run();
+        new Module(name).run();
       }
     }
     vue.watch(
@@ -2176,7 +2181,6 @@
     })();
     return {
       moduleConfig,
-      runningModules,
       emitter,
       moduleStatus,
       loadModules
@@ -2928,6 +2932,7 @@
     setup(__props) {
       const uiStore = useUIStore();
       const moduleStore = useModuleStore();
+      const logger = new Logger("App.vue");
       let isShowPanel = uiStore.uiConfig.isShowPanel;
       uiStore.uiConfig.isShowPanel = false;
       let livePlayer;
@@ -2965,7 +2970,7 @@
               );
             }
             hotkeys("alt+b", throttleButtoOnClick);
-          }).catch(() => console.error("Can't find playerHeaderLeft in time"));
+          }).catch(() => logger.error("Can't find playerHeaderLeft in time"));
           window.onresize = setPanelSize;
           const observer = new MutationObserver(() => setPanelSize());
           observer.observe(document.documentElement, { attributes: true });
@@ -2974,7 +2979,7 @@
             uiStore.uiConfig.isShowPanel = true;
           }
         } else {
-          console.error("livePlayer not found");
+          logger.error("livePlayer not found");
         }
       };
       return (_ctx, _cache) => {
@@ -3044,12 +3049,36 @@
       };
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-64fce103"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-4aed17ff"]]);
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;
   };
   cssLoader("element-plus/dist/index.css");
+  const useCacheStore = pinia.defineStore("cache", () => {
+    const cache = vue.reactive(Storage.getCache());
+    function starttAliveHeartBeat() {
+      cache.lastAliveHeartBeatTime = Date.now();
+      const timer = setInterval(() => cache.lastAliveHeartBeatTime = Date.now(), 5e3);
+      window.onunload = () => {
+        clearInterval(timer);
+        cache.lastAliveHeartBeatTime = 0;
+      };
+    }
+    function checkIfOtherScriptsRunning() {
+      if (cache.lastAliveHeartBeatTime !== 0 && Date.now() - cache.lastAliveHeartBeatTime < 8e3) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    vue.watch(cache, (newCache) => Storage.setCache(newCache));
+    return {
+      cache,
+      starttAliveHeartBeat,
+      checkIfOtherScriptsRunning
+    };
+  });
   const _sfc_main$2 = {};
   const _hoisted_1$1 = {
     xmlns: "http://www.w3.org/2000/svg",
@@ -3289,25 +3318,33 @@
     TaskStatus: TaskStatusIcon,
     Tasks: TasksIcon
   }, Symbol.toStringTag, { value: "Module" }));
-  if (isTargetFrame()) {
-    const app = vue.createApp(App);
-    const pinia$1 = pinia.createPinia();
-    app.use(ElementPlus);
-    app.use(pinia$1);
-    for (const [key, component] of Object.entries(ElementPlusIconsVue__namespace)) {
-      app.component(key, component);
+  (function() {
+    if (isTargetFrame()) {
+      const app = vue.createApp(App);
+      const pinia$1 = pinia.createPinia();
+      app.use(ElementPlus);
+      app.use(pinia$1);
+      const cacheStore = useCacheStore();
+      if (cacheStore.checkIfOtherScriptsRunning()) {
+        new Logger("main.ts").log("其它页面上的BLTH正在运行，当前脚本停止运行");
+        return;
+      }
+      cacheStore.starttAliveHeartBeat();
+      for (const [key, component] of Object.entries(ElementPlusIconsVue__namespace)) {
+        app.component(key, component);
+      }
+      for (const [key, component] of Object.entries(MyIconsVue)) {
+        app.component(key, component);
+      }
+      app.mount(
+        (() => {
+          const app2 = dce("div");
+          app2.id = "BLTH";
+          document.body.append(app2);
+          return app2;
+        })()
+      );
     }
-    for (const [key, component] of Object.entries(MyIconsVue)) {
-      app.component(key, component);
-    }
-    app.mount(
-      (() => {
-        const app2 = dce("div");
-        app2.id = "BLTH";
-        document.body.append(app2);
-        return app2;
-      })()
-    );
-  }
+  })();
 
 })(Vue, Pinia, _, luxon, CryptoJS, ElementPlusIconsVue, ElementPlus, hotkeys);

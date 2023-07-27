@@ -69,4 +69,8 @@ interface IuiConfig {
   activeMenuIndex: string
 }
 
-export { ImoduleConfig, IuiConfig }
+interface Icache {
+  lastAliveHeartBeatTime: number
+}
+
+export { ImoduleConfig, IuiConfig, Icache }

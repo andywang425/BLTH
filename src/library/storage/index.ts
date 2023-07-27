@@ -1,6 +1,6 @@
 import { GM_getValue, GM_setValue } from '$'
 import defaultValues from './defaultValue'
-import { IuiConfig, ImoduleConfig } from '../../types'
+import { IuiConfig, ImoduleConfig, Icache } from '../../types'
 import _ from 'lodash'
 
 class Storage {
@@ -62,6 +62,14 @@ class Storage {
 
   public static getModuleConfig(): ImoduleConfig {
     return this.mergeConfigs(GM_getValue('modules', {}), defaultValues.modules)
+  }
+
+  public static setCache(cache: Icache) {
+    GM_setValue('cache', cache)
+  }
+
+  public static getCache(): Icache {
+    return this.mergeConfigs(GM_getValue('cache', {}), defaultValues.cache)
   }
 }
 

@@ -1,8 +1,9 @@
-import { IuiConfig, ImoduleConfig } from '../../types'
+import { IuiConfig, ImoduleConfig, Icache } from '../../types'
 
 interface IdefaultValues {
   ui: IuiConfig
   modules: ImoduleConfig
+  cache: Icache
 }
 
 const defaultValues: IdefaultValues = {
@@ -90,6 +91,9 @@ const defaultValues: IdefaultValues = {
         }
       }
     }
+  },
+  cache: {
+    lastAliveHeartBeatTime: 0
   }
 }
 
