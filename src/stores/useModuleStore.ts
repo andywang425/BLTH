@@ -39,8 +39,6 @@ const defaultModuleStatus: ImoduleStatus = {
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
   const moduleConfig: ImoduleConfig = reactive(Storage.getModuleConfig())
-  // 正在运行的模块的数组
-  const runningModules: BaseModule[] = []
   // Emitter 实例，用于模块间信息传递和 wait 函数
   const emitter = mitt()
   // 模块状态，用于显示状态图标
@@ -54,21 +52,16 @@ export const useModuleStore = defineStore('module', () => {
     for (const [name, Module] of Object.entries(defaultModules).sort(
       (a, b) => a[1].sequence - b[1].sequence
     )) {
-      const m = new (Module as new (name: string) => DefaultBaseModule)(name)
-      runningModules.push(m)
       try {
-        await m.run()
+        await new (Module as new (name: string) => DefaultBaseModule)(name).run()
       } catch (err) {
-        const logger = new Logger('loadModules')
-        logger.error('加载默认模块时发生错误，挂机助手停止运行:', err)
+        new Logger('loadModules').error('加载默认模块时发生致命错误，挂机助手停止运行:', err)
         return
       }
     }
     // 运行其它模块
     for (const [name, Module] of Object.entries(otherModules)) {
-      const m = new (Module as new (name: string) => BaseModule)(name)
-      runningModules.push(m)
-      m.run()
+      new (Module as new (name: string) => BaseModule)(name).run()
     }
   }
 
@@ -95,7 +88,6 @@ export const useModuleStore = defineStore('module', () => {
 
   return {
     moduleConfig,
-    runningModules,
     emitter,
     moduleStatus,
     loadModules

@@ -23,6 +23,7 @@ import Logger from './library/logger'
       return
     }
     cacheStore.starttAliveHeartBeat()
+
     for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
       app.component(key, component)
     }
