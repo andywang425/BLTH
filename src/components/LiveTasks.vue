@@ -1,24 +1,32 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useModuleStore } from '../stores/useModuleStore'
 import { Edit, Delete } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
+import { useBiliStore } from '../stores/useBiliStore';
+
+interface ImedalInfoRow {
+  avatar: string,
+  nick_name: string,
+  medal_name: string,
+  medal_level: number,
+  roomid: number
+}
 
 const moduleStore = useModuleStore()
+const biliStore = useBiliStore()
 
 const config = moduleStore.moduleConfig.DailyTasks.LiveTasks
-
 const status = moduleStore.moduleStatus.DailyTasks.LiveTasks
 
 const medalDanmuPanelVisible = ref<boolean>(false)
-
 const danmuTableData = computed(() =>
   config.medalTasks.danmu.list.map((danmu) => {
     return { content: danmu }
   })
 )
 
-const handleEdit = (index: number, row: { content: string }) => {
+const handleEditDanmu = (index: number, row: { content: string }) => {
   ElMessageBox.prompt('请输入新的弹幕内容', '修改弹幕', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
@@ -33,7 +41,7 @@ const handleEdit = (index: number, row: { content: string }) => {
     .catch(() => { })
 }
 
-const handleDelete = (index: number) => {
+const handleDeleteDanmu = (index: number) => {
   if (config.medalTasks.danmu.list.length === 1) {
     ElMessage.warning({
       message: '至少要有一条弹幕',
@@ -44,7 +52,7 @@ const handleDelete = (index: number) => {
   config.medalTasks.danmu.list.splice(index, 1)
 }
 
-const handleAdd = () => {
+const handleAddDanmu = () => {
   ElMessageBox.prompt('请输入新增的弹幕内容', '新增弹幕', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
@@ -56,6 +64,59 @@ const handleAdd = () => {
       config.medalTasks.danmu.list.push(value)
     })
     .catch(() => { })
+}
+
+const medalInfoPanelVisible = ref<boolean>(false)
+const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(() =>
+  biliStore.filteredFansMedals?.map((medal) => ({
+    avatar: medal.anchor_info.avatar,
+    nick_name: medal.anchor_info.nick_name,
+    medal_name: medal.medal.medal_name,
+    medal_level: medal.medal.level,
+    roomid: medal.room_info.room_id
+  })))
+
+const medalInfoLoading = ref<boolean>(false)
+
+/**
+ * 编辑名单
+ */
+const handleEditList = async () => {
+  if (!biliStore.fansMedals) {
+    // 如果没有粉丝勋章信息，先获取
+    medalInfoLoading.value = true
+    const unwatch = watch(medalInfoTableData, (newData) => {
+      if (newData) {
+        unwatch()
+        initSelection(medalInfoTableData.value)
+        medalInfoLoading.value = false
+      }
+    })
+    moduleStore.emitter.emit('BiliInfo', {
+      target: 'getFansMetals'
+    })
+  }
+  initSelection(medalInfoTableData.value)
+  medalInfoPanelVisible.value = !medalInfoPanelVisible.value
+}
+/** 用来管理多选框状态的表格Ref */
+const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
+/** 是否锁住配置 */
+const lockConfig = ref<boolean>(false)
+/** 初始化多选框选择状态 */
+const initSelection = (rows?: ImedalInfoRow[]) => {
+  lockConfig.value = true
+  if (rows) {
+    config.medalTasks.roomidList.forEach(roomid =>
+      medalInfoTableRef.value?.toggleRowSelection(rows?.find(row => row.roomid === roomid), true)
+    )
+  }
+  lockConfig.value = false
+}
+function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
+  if (!lockConfig.value) {
+    config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
+  }
 }
 </script>
 
@@ -80,7 +141,7 @@ const handleAdd = () => {
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.medalTasks.like.enabled" active-text="给主播点赞" />
-        <Info id="DailyTasks.LiveTasks.like" />
+        <Info id="DailyTasks.LiveTasks.medalTasks.like" />
         <TaskStatus :status="status.medalTasks.like" />
       </el-space>
     </el-row>
@@ -89,7 +150,7 @@ const handleAdd = () => {
         <el-switch v-model="config.medalTasks.danmu.enabled" active-text="发送弹幕" />
         <el-button type="primary" size="small" :icon="Edit"
           @click="medalDanmuPanelVisible = !medalDanmuPanelVisible">编辑弹幕</el-button>
-        <Info id="DailyTasks.LiveTasks.danmu" />
+        <Info id="DailyTasks.LiveTasks.medalTasks.danmu" />
         <TaskStatus :status="status.medalTasks.danmu" />
       </el-space>
     </el-row>
@@ -100,16 +161,15 @@ const handleAdd = () => {
           <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
         </el-select>
         <el-text>分钟</el-text>
-        <Info id="DailyTasks.LiveTasks.watch" />
+        <Info id="DailyTasks.LiveTasks.medalTasks.watch" />
         <TaskStatus :status="status.medalTasks.watch" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.medalTasks.isWhiteList" active-text="白名单" inactive-text="黑名单" />
-        <el-button type="primary" size="small" :icon="Edit"
-          @click="medalDanmuPanelVisible = !medalDanmuPanelVisible">编辑名单</el-button>
-        <Info id="DailyTasks.LiveTasks.appUser" />
+        <el-button type="primary" size="small" :icon="Edit" @click="handleEditList">编辑名单</el-button>
+        <Info id="DailyTasks.LiveTasks.medalTasks.list" />
       </el-space>
     </el-row>
     <el-divider />
@@ -129,23 +189,65 @@ const handleAdd = () => {
     </el-row>
     <!-- 弹窗 -->
     <el-dialog v-model="medalDanmuPanelVisible" title="编辑弹幕内容" :lock-scroll="false" width="40%">
-      <el-table ref="singleTableRef" :data="danmuTableData" max-height="500">
+      <el-table :data="danmuTableData" max-height="500">
         <el-table-column type="index" width="50" />
         <el-table-column prop="content" label="弹幕内容" />
         <el-table-column label="操作" width="220" align="center">
           <template #default="scope">
-            <el-button text :icon="Edit" @click="handleEdit(scope.$index, scope.row)">
+            <el-button text :icon="Edit" @click="handleEditDanmu(scope.$index, scope.row)">
               修改
             </el-button>
-            <el-button text :icon="Delete" type="danger" @click="handleDelete(scope.$index)">
+            <el-button text :icon="Delete" type="danger" @click="handleDeleteDanmu(scope.$index)">
               删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <template #footer>
-        <el-button type="primary" @click="handleAdd">新增弹幕</el-button>
+        <el-button type="primary" @click="handleAddDanmu">新增弹幕</el-button>
       </template>
+    </el-dialog>
+    <el-dialog v-model="medalInfoPanelVisible" title="编辑粉丝勋章名单" :lock-scroll="false" width="40%">
+      <el-table ref="medalInfoTableRef" v-loading="medalInfoLoading" :data="medalInfoTableData" max-height="500"
+        empty-text="没有粉丝勋章" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" align="center" width="55" />
+        <el-table-column prop="avatar" label="头像">
+          <template v-slot:default="scope">
+            <div class="avatar-wrap">
+              <el-image :src="scope.row.avatar" loading="lazy" referrerpolicy="origin" class="avatar">
+                <template #error>
+                  <el-image src="//i0.hdslb.com/bfs/face/member/noface.jpg" referrerpolicy="origin" class="avatar" />
+                </template>
+              </el-image>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column prop="nick_name" label="昵称" />
+        <el-table-column prop="medal_name" label="粉丝勋章" />
+        <el-table-column prop="medal_level" label="等级" sortable />
+        <el-table-column prop="roomid" label="房间号">
+          <template v-slot:default="scope">
+            <el-link :href="'https://live.bilibili.com/' + scope.row.roomid + '?visit_id='" rel="noreferrer"
+              type="primary" target="_blank">
+              {{ scope.row.roomid }}
+            </el-link>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-dialog>
   </div>
 </template>
+
+<style scoped>
+.avatar-wrap {
+  width: 80px;
+  height: 80px;
+}
+
+.avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+</style>
