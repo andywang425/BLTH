@@ -6,20 +6,28 @@ import { sleep } from '../../../../library/utils'
 import { Istatus } from '../../../../types/moduleStatus'
 
 class DanmuTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks.danmu
+  medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
+  config = this.medalTasksConfig.danmu
 
   set status(s: Istatus) {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.danmu = s
   }
 
   /**
-   * 获取粉丝勋章的房间号，过滤等级大于等于20的粉丝勋章
+   * 获取粉丝勋章的房间号，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
    */
   private getRoomidList() {
     const biliStore = useBiliStore()
     if (biliStore.filteredFansMedals) {
       return biliStore.filteredFansMedals
-        .filter((medal) => medal.medal.level < 20 && medal.room_info.room_id != 910884)
+        .filter(
+          (medal) =>
+            medal.medal.level < 20 &&
+            medal.room_info.room_id != 910884 &&
+            (this.medalTasksConfig.isWhiteList
+              ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
+              : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
+        )
         .map((medal) => medal.room_info.room_id)
         .slice(0, 100)
     } else {
