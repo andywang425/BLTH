@@ -77,27 +77,34 @@ const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(() =>
   })))
 
 const medalInfoLoading = ref<boolean>(false)
-
+const firstClickEditList = ref<boolean>(true)
 /**
  * 编辑名单
  */
 const handleEditList = async () => {
+  medalInfoPanelVisible.value = !medalInfoPanelVisible.value
   if (!biliStore.fansMedals) {
     // 如果没有粉丝勋章信息，先获取
     medalInfoLoading.value = true
     const unwatch = watch(medalInfoTableData, (newData) => {
       if (newData) {
         unwatch()
-        initSelection(medalInfoTableData.value)
+        if (firstClickEditList.value) {
+          firstClickEditList.value = false
+          initSelection(medalInfoTableData.value)
+        }
         medalInfoLoading.value = false
       }
     })
     moduleStore.emitter.emit('BiliInfo', {
       target: 'getFansMetals'
     })
+  } else {
+    if (firstClickEditList.value) {
+      firstClickEditList.value = false
+      initSelection(medalInfoTableData.value)
+    }
   }
-  initSelection(medalInfoTableData.value)
-  medalInfoPanelVisible.value = !medalInfoPanelVisible.value
 }
 /** 用来管理多选框状态的表格Ref */
 const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
