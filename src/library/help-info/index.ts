@@ -44,21 +44,27 @@ const help_info: IhelpInfo = {
           h('div', '完成APP用户任务并领取奖励。'),
           h('div', [
             h(
-              'span',
-              '在APP中观看直播时右下角可能会有个电池图标，点击即可查看APP用户任务内容。并非所有账号都可以参加该任务。\
-如果开启了发送弹幕功能，该功能会在发送弹幕功能运行完毕后再运行。如果之前发送的弹幕数量不够，会先在直播间'
+              'strong',
+              '由于曾经的APP用户任务下架已久，目前的新任务（观看新主播直播并发弹幕）又没有对全部用户开放，故改功能暂时被禁用。'
             ),
-            h(
-              'a',
-              {
-                class: 'el-link el-link--primary is-underline el-link-va-baseline',
-                href: 'https://live.bilibili.com/22474988',
-                rel: 'noreferrer',
-                target: '_blank'
-              },
-              '22474988'
-            ),
-            h('span', '发送弹幕再领取奖励。')
+            h('div', [
+              h(
+                'span',
+                '在APP中观看直播时右下角可能会有个电池图标，点击即可查看APP用户任务内容。并非所有账号都可以参加该任务。\
+  如果开启了发送弹幕功能，该功能会在发送弹幕功能运行完毕后再运行。如果之前发送的弹幕数量不够，会先在直播间'
+              ),
+              h(
+                'a',
+                {
+                  class: 'el-link el-link--primary is-underline el-link-va-baseline',
+                  href: 'https://live.bilibili.com/22474988',
+                  rel: 'noreferrer',
+                  target: '_blank'
+                },
+                '22474988'
+              ),
+              h('span', '发送弹幕再领取奖励。')
+            ])
           ])
         ])
       },

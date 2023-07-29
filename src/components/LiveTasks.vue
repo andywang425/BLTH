@@ -38,7 +38,7 @@ const handleEditDanmu = (index: number, row: { content: string }) => {
     .then(({ value }) => {
       config.medalTasks.danmu.list[index] = value
     })
-    .catch(() => { })
+    .catch(() => {})
 }
 
 const handleDeleteDanmu = (index: number) => {
@@ -63,7 +63,7 @@ const handleAddDanmu = () => {
     .then(({ value }) => {
       config.medalTasks.danmu.list.push(value)
     })
-    .catch(() => { })
+    .catch(() => {})
 }
 
 const medalInfoPanelVisible = ref<boolean>(false)
@@ -154,7 +154,7 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     </el-row>
     <el-row>
       <el-space wrap>
-        <el-switch v-model="config.appUser.enabled" active-text="APP用户任务" />
+        <el-switch v-model="config.appUser.enabled" disabled active-text="APP用户任务" />
         <Info id="DailyTasks.LiveTasks.appUser" />
         <TaskStatus :status="status.appUser" />
       </el-space>
@@ -171,8 +171,13 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.medalTasks.danmu.enabled" active-text="发送弹幕" />
-        <el-button type="primary" size="small" :icon="Edit"
-          @click="medalDanmuPanelVisible = !medalDanmuPanelVisible">编辑弹幕</el-button>
+        <el-button
+          type="primary"
+          size="small"
+          :icon="Edit"
+          @click="medalDanmuPanelVisible = !medalDanmuPanelVisible"
+          >编辑弹幕</el-button
+        >
         <Info id="DailyTasks.LiveTasks.medalTasks.danmu" />
         <TaskStatus :status="status.medalTasks.danmu" />
       </el-space>
@@ -190,8 +195,14 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     </el-row>
     <el-row>
       <el-space wrap>
-        <el-switch v-model="config.medalTasks.isWhiteList" active-text="白名单" inactive-text="黑名单" />
-        <el-button type="primary" size="small" :icon="Edit" @click="handleEditList">编辑名单</el-button>
+        <el-switch
+          v-model="config.medalTasks.isWhiteList"
+          active-text="白名单"
+          inactive-text="黑名单"
+        />
+        <el-button type="primary" size="small" :icon="Edit" @click="handleEditList"
+          >编辑名单</el-button
+        >
         <Info id="DailyTasks.LiveTasks.medalTasks.list" />
       </el-space>
     </el-row>
@@ -199,8 +210,14 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     <!-- 说明 -->
     <el-row>
       <el-text>直播任务相关信息可在</el-text>
-      <el-link class="el-link-va-baseline" rel="noreferrer" type="primary"
-        href="https://link.bilibili.com/p/help/index#/audience-fans-medal" target="_blank">帮助中心</el-link>
+      <el-link
+        class="el-link-va-baseline"
+        rel="noreferrer"
+        type="primary"
+        href="https://link.bilibili.com/p/help/index#/audience-fans-medal"
+        target="_blank"
+        >帮助中心</el-link
+      >
       <el-text>查看。</el-text>
     </el-row>
     <br />
@@ -208,10 +225,17 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
       <el-text tag="b">注意：</el-text>
     </el-row>
     <el-row>
-      <el-text>&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，目前脚本仅尝试为前100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。</el-text>
+      <el-text
+        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，目前脚本仅为最多100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。</el-text
+      >
     </el-row>
     <!-- 弹窗 -->
-    <el-dialog v-model="medalDanmuPanelVisible" title="编辑弹幕内容" :lock-scroll="false" width="40%">
+    <el-dialog
+      v-model="medalDanmuPanelVisible"
+      title="编辑弹幕内容"
+      :lock-scroll="false"
+      width="40%"
+    >
       <el-table :data="danmuTableData" max-height="500">
         <el-table-column type="index" width="50" />
         <el-table-column prop="content" label="弹幕内容" />
@@ -230,16 +254,36 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
         <el-button type="primary" @click="handleAddDanmu">新增弹幕</el-button>
       </template>
     </el-dialog>
-    <el-dialog v-model="medalInfoPanelVisible" title="编辑粉丝勋章名单" :lock-scroll="false" width="40%">
-      <el-table ref="medalInfoTableRef" v-loading="medalInfoLoading" :data="medalInfoTableData" max-height="500"
-        empty-text="没有粉丝勋章" @selection-change="handleSelectionChange">
+    <el-dialog
+      v-model="medalInfoPanelVisible"
+      title="编辑粉丝勋章名单"
+      :lock-scroll="false"
+      width="40%"
+    >
+      <el-table
+        ref="medalInfoTableRef"
+        v-loading="medalInfoLoading"
+        :data="medalInfoTableData"
+        max-height="500"
+        empty-text="没有粉丝勋章"
+        @selection-change="handleSelectionChange"
+      >
         <el-table-column type="selection" align="center" width="55" />
         <el-table-column prop="avatar" label="头像">
           <template v-slot:default="scope">
             <div class="avatar-wrap">
-              <el-image :src="scope.row.avatar" loading="lazy" referrerpolicy="origin" class="avatar">
+              <el-image
+                :src="scope.row.avatar"
+                loading="lazy"
+                referrerpolicy="origin"
+                class="avatar"
+              >
                 <template #error>
-                  <el-image src="//i0.hdslb.com/bfs/face/member/noface.jpg" referrerpolicy="origin" class="avatar" />
+                  <el-image
+                    src="//i0.hdslb.com/bfs/face/member/noface.jpg"
+                    referrerpolicy="origin"
+                    class="avatar"
+                  />
                 </template>
               </el-image>
             </div>
@@ -250,8 +294,12 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
         <el-table-column prop="medal_level" label="等级" sortable />
         <el-table-column prop="roomid" label="房间号">
           <template v-slot:default="scope">
-            <el-link :href="'https://live.bilibili.com/' + scope.row.roomid + '?visit_id='" rel="noreferrer"
-              type="primary" target="_blank">
+            <el-link
+              :href="'https://live.bilibili.com/' + scope.row.roomid + '?visit_id='"
+              rel="noreferrer"
+              type="primary"
+              target="_blank"
+            >
               {{ scope.row.roomid }}
             </el-link>
           </template>
