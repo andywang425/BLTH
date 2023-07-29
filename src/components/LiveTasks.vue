@@ -3,13 +3,13 @@ import { computed, ref, watch } from 'vue'
 import { useModuleStore } from '../stores/useModuleStore'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
-import { useBiliStore } from '../stores/useBiliStore';
+import { useBiliStore } from '../stores/useBiliStore'
 
 interface ImedalInfoRow {
-  avatar: string,
-  nick_name: string,
-  medal_name: string,
-  medal_level: number,
+  avatar: string
+  nick_name: string
+  medal_name: string
+  medal_level: number
   roomid: number
 }
 
@@ -67,41 +67,43 @@ const handleAddDanmu = () => {
 }
 
 const medalInfoPanelVisible = ref<boolean>(false)
-const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(() =>
-  biliStore.filteredFansMedals?.map((medal) => ({
-    avatar: medal.anchor_info.avatar,
-    nick_name: medal.anchor_info.nick_name,
-    medal_name: medal.medal.medal_name,
-    medal_level: medal.medal.level,
-    roomid: medal.room_info.room_id
-  })))
-
+const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(
+  () =>
+    biliStore.filteredFansMedals?.map((medal) => ({
+      avatar: medal.anchor_info.avatar,
+      nick_name: medal.anchor_info.nick_name,
+      medal_name: medal.medal.medal_name,
+      medal_level: medal.medal.level,
+      roomid: medal.room_info.room_id
+    }))
+)
+/** 是否显示加载中图标 */
 const medalInfoLoading = ref<boolean>(false)
-const firstClickEditList = ref<boolean>(true)
+/** 是否是第一次点击编辑名单按钮 */
+let firstClickEditList = true
 /**
  * 编辑名单
  */
-const handleEditList = async () => {
+const handleEditList = () => {
   medalInfoPanelVisible.value = !medalInfoPanelVisible.value
-  if (!biliStore.fansMedals) {
-    // 如果没有粉丝勋章信息，先获取
-    medalInfoLoading.value = true
-    const unwatch = watch(medalInfoTableData, (newData) => {
-      if (newData) {
-        unwatch()
-        if (firstClickEditList.value) {
-          firstClickEditList.value = false
+  // 如果没有粉丝勋章信息，先获取
+  if (firstClickEditList) {
+    if (!biliStore.fansMedals) {
+      medalInfoLoading.value = true
+      // 等待数据被获取到
+      const unwatch = watch(medalInfoTableData, (newData) => {
+        if (newData) {
+          unwatch()
+          firstClickEditList = false
           initSelection(medalInfoTableData.value)
+          medalInfoLoading.value = false
         }
-        medalInfoLoading.value = false
-      }
-    })
-    moduleStore.emitter.emit('BiliInfo', {
-      target: 'getFansMetals'
-    })
-  } else {
-    if (firstClickEditList.value) {
-      firstClickEditList.value = false
+      })
+      // 利用 emitter 通知 BiliInfo 模块去获取数据
+      moduleStore.emitter.emit('BiliInfo', {
+        target: 'getFansMetals'
+      })
+    } else {
       initSelection(medalInfoTableData.value)
     }
   }
@@ -109,19 +111,33 @@ const handleEditList = async () => {
 /** 用来管理多选框状态的表格Ref */
 const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
 /** 是否锁住配置 */
-const lockConfig = ref<boolean>(false)
+let lockConfig = false
 /** 初始化多选框选择状态 */
 const initSelection = (rows?: ImedalInfoRow[]) => {
-  lockConfig.value = true
+  lockConfig = true
   if (rows) {
-    config.medalTasks.roomidList.forEach(roomid =>
-      medalInfoTableRef.value?.toggleRowSelection(rows?.find(row => row.roomid === roomid), true)
+    // 如果直接使用 medalInfoTableRef.value，medalInfoTableRef.value 可能为 undefined
+    const unwatch = watch(
+      () => medalInfoTableRef.value,
+      (newValue) => {
+        // unwatch 可能还未初始化，延迟到下一个空闲时间点执行
+        setTimeout(() => unwatch(), 0)
+        if (newValue) {
+          config.medalTasks.roomidList.forEach((roomid) =>
+            newValue.toggleRowSelection(
+              rows.find((row) => row.roomid === roomid),
+              true
+            )
+          )
+        }
+      },
+      { immediate: true }
     )
   }
-  lockConfig.value = false
+  lockConfig = false
 }
 function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
-  if (!lockConfig.value) {
+  if (!lockConfig) {
     config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
   }
 }
