@@ -23,10 +23,12 @@ const defaultModuleStatus: ImoduleStatus = {
     },
     LiveTasks: {
       sign: '',
-      danmu: '',
-      like: '',
-      watch: '',
-      appUser: ''
+      appUser: '',
+      medalTasks: {
+        danmu: '',
+        like: '',
+        watch: ''
+      }
     },
     OtherTasks: {
       groupSign: '',

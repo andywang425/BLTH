@@ -7,6 +7,7 @@ import { getCookies } from '../../library/cookie'
 import { IbiliCookies } from '../../types'
 import { delayToNextMoment, isTimestampToday } from '../../library/luxon'
 import { sleep } from '../../library/utils'
+import { useModuleStore } from '../../stores/useModuleStore'
 
 class BiliInfo extends DefaultBaseModule {
   public static sequence = 0
@@ -131,14 +132,20 @@ class BiliInfo extends DefaultBaseModule {
    * 获取粉丝勋章
    *
    * @param pages 获取的页数
+   * @param force 是否无视配置强制获取，默认fasle
    */
-  private async getFansMetals(pages = 10): Promise<LiveData.FansMedalPanel.List[]> {
-    const LiveTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks
-    // 开启了任意一项除了签到以外的直播区功能且该功能今天没完成过
+  private async getFansMetals(pages = 10, force = false): Promise<LiveData.FansMedalPanel.List[]> {
+    const medalTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
+    // 开启了任意一项粉丝勋章相关功能且该功能今天没完成过
     if (
-      Object.entries(LiveTasks)
+      force ||
+      Object.entries(medalTasks)
         .filter(([key]) => ['danmu', 'like', 'watch'].includes(key))
-        .some((keyValue) => keyValue[1].enabled && !isTimestampToday(keyValue[1]._lastCompleteTime))
+        .some(
+          (keyValue) =>
+            (keyValue[1] as any).enabled &&
+            !isTimestampToday((keyValue[1] as any)._lastCompleteTime)
+        )
     ) {
       const fansMetalList: LiveData.FansMedalPanel.List[] = []
       let total_page = 1
@@ -224,6 +231,12 @@ class BiliInfo extends DefaultBaseModule {
     setTimeout(async () => {
       biliStore.fansMedals = await this.getFansMetals()
     }, delayToNextMoment(0, 4).ms)
+
+    useModuleStore().emitter.on(this.moduleName, async (event) => {
+      if ((event as any).target === 'getFansMetals') {
+        biliStore.fansMedals = await this.getFansMetals(10, true)
+      }
+    })
   }
 }
 

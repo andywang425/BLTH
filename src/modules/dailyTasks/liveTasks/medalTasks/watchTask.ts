@@ -1,14 +1,14 @@
-import BaseModule from '../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
-import BAPI from '../../../library/bili-api'
-import { useBiliStore } from '../../../stores/useBiliStore'
-import Logger from '../../../library/logger'
+import BaseModule from '../../../BaseModule'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../../library/luxon'
+import BAPI from '../../../../library/bili-api'
+import { useBiliStore } from '../../../../stores/useBiliStore'
+import Logger from '../../../../library/logger'
 import CryptoJS from 'crypto-js'
-import { uuid, sleep } from '../../../library/utils'
-import { getCookie } from '../../../library/cookie'
-import { useModuleStore } from '../../../stores/useModuleStore'
-import { ImoduleConfig } from '../../../types'
-import { Istatus } from '../../../types/moduleStatus'
+import { uuid, sleep } from '../../../../library/utils'
+import { getCookie } from '../../../../library/cookie'
+import { useModuleStore } from '../../../../stores/useModuleStore'
+import { ImoduleConfig } from '../../../../types'
+import { Istatus } from '../../../../types/moduleStatus'
 
 interface sypderData {
   benchmark: string
@@ -36,14 +36,14 @@ class RoomHeart {
     this.watchedSeconds = watchedSeconds
     this.isLast = isLast
 
-    this.config = useModuleStore().moduleConfig.DailyTasks.LiveTasks.watch
+    this.config = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks.watch
   }
 
   private logger = new Logger('RoomHeart')
 
-  private config: ImoduleConfig['DailyTasks']['LiveTasks']['watch']
+  private config: ImoduleConfig['DailyTasks']['LiveTasks']['medalTasks']['watch']
   set status(s: Istatus) {
-    useModuleStore().moduleStatus.DailyTasks.LiveTasks.watch = s
+    useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
   /** 是不是最后一个心跳任务 */
   private isLast: boolean
@@ -251,21 +251,28 @@ class RoomHeart {
 }
 
 class WatchTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.watch
+  medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
+  config = this.medalTasksConfig.watch
 
   set status(s: Istatus) {
-    this.moduleStore.moduleStatus.DailyTasks.LiveTasks.watch = s
+    this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
 
   /**
-   * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20的粉丝勋章
+   * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
    * @returns 数组，每个元素都是数组：[房间号，主播uid]
    */
   private getRoomidUidList() {
     const biliStore = useBiliStore()
     if (biliStore.filteredFansMedals) {
       return biliStore.filteredFansMedals
-        .filter((medal) => medal.medal.level < 20)
+        .filter(
+          (medal) =>
+            medal.medal.level < 20 &&
+            (this.medalTasksConfig.isWhiteList
+              ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
+              : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
+        )
         .map((medal) => [medal.room_info.room_id, medal.medal.target_id])
         .slice(0, 100)
     } else {
@@ -313,22 +320,27 @@ class WatchTask extends BaseModule {
         this.config._lastWatchTime = tsm()
         const idList = this.getRoomidUidList()
         if (idList) {
-          for (let i = 0; i < idList.length; i++) {
-            const [roomid, uid] = idList[i]
-            const areaInfo = await this.getAreaInfo(roomid)
-            // area_id 和 parent_area_id 都必须存在且大于 0
-            if (areaInfo && areaInfo.every((id) => id > 0)) {
-              new RoomHeart(
-                roomid,
-                areaInfo[0],
-                areaInfo[1],
-                uid,
-                this.config._watchedSecondsToday,
-                i === idList.length - 1 ? true : false
-              ).start()
+          if (idList.length === 0) {
+            this.status = 'done'
+            this.config._lastCompleteTime = tsm()
+          } else {
+            for (let i = 0; i < idList.length; i++) {
+              const [roomid, uid] = idList[i]
+              const areaInfo = await this.getAreaInfo(roomid)
+              // area_id 和 parent_area_id 都必须存在且大于 0
+              if (areaInfo && areaInfo.every((id) => id > 0)) {
+                new RoomHeart(
+                  roomid,
+                  areaInfo[0],
+                  areaInfo[1],
+                  uid,
+                  this.config._watchedSecondsToday,
+                  i === idList.length - 1 ? true : false
+                ).start()
+              }
+              // 延时防风控
+              await sleep(3000)
             }
-            // 延时防风控
-            await sleep(3000)
           }
         }
       } else {

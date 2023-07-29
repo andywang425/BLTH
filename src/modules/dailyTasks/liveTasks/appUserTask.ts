@@ -63,10 +63,14 @@ class AppUserTask extends BaseModule {
 
   public async run() {
     this.logger.log('APP用户任务模块开始运行')
+    // 暂时不启用 APP 用户任务模块
+    this.logger.warn('APP用户任务暂时没有，该模块不运行')
+    this.config.enabled = false
+
     if (this.config.enabled) {
       if (!isTimestampToday(this.config._lastCompleteTime)) {
         this.status = 'running'
-        const danmuConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.danmu
+        const danmuConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks.danmu
         if (danmuConfig.enabled && !isTimestampToday(danmuConfig._lastCompleteTime)) {
           // 如果开启了发送弹幕功能且今天还没完成，等发送弹幕功能完成了或者达到超时时间了再运行
           await wait(this.moduleName, 300e3)

@@ -10,10 +10,12 @@ interface ImoduleStatus {
     }
     LiveTasks: {
       sign: Istatus
-      danmu: Istatus
-      like: Istatus
-      watch: Istatus
       appUser: Istatus
+      medalTasks: {
+        danmu: Istatus
+        like: Istatus
+        watch: Istatus
+      }
     }
     OtherTasks: {
       groupSign: Istatus

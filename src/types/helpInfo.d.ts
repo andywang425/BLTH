@@ -15,10 +15,13 @@ interface IhelpInfo {
     }
     LiveTasks: {
       sign: IhelpInfoItem
-      like: IhelpInfoItem
-      danmu: IhelpInfoItem
-      watch: IhelpInfoItem
       appUser: IhelpInfoItem
+      medalTasks: {
+        list: IhelpInfoItem
+        like: IhelpInfoItem
+        danmu: IhelpInfoItem
+        watch: IhelpInfoItem
+      }
     }
     OtherTasks: {
       groupSign: IhelpInfoItem
