@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.0.2
+// @version         7.0.3
 // @author          andywang425
 // @description     Enhancing the exprerience of watching Bilibili live streaming.
 // @description:en  Enhancing the exprerience of watching Bilibili live streaming.
@@ -37,7 +37,7 @@
 // @grant           GM_setValue
 // @grant           GM_xmlhttpRequest
 // @grant           unsafeWindow
-// @run-at          document-start
+// @run-at          document-end
 // ==/UserScript==
 
 (a=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=a,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-eac67691]{width:80px;height:80px}.avatar[data-v-eac67691]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-4aed17ff]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-4aed17ff]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-4aed17ff]{width:auto}.aside #aside-el-menu[data-v-4aed17ff]:not(.el-menu--collapse){width:150px}.main[data-v-4aed17ff]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-4aed17ff],.fade-leave-active[data-v-4aed17ff]{transition:opacity .1s ease}.fade-enter-from[data-v-4aed17ff],.fade-leave-to[data-v-4aed17ff]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-2f9d6050]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-link-va-baseline{vertical-align:baseline} ");
@@ -290,9 +290,7 @@
     const filteredFansMedals = vue.computed(() => {
       if (!fansMedals.value)
         return null;
-      return fansMedals.value.filter(
-        (m) => m.anchor_info.nick_name !== "账号已注销" && m.room_info.room_id !== 0
-      );
+      return fansMedals.value.filter((m) => m.room_info.room_id !== 0);
     });
     return {
       BilibiliLive,
@@ -3272,7 +3270,7 @@
   cssLoader("element-plus/dist/index.css");
   const useCacheStore = pinia.defineStore("cache", () => {
     const cache = vue.reactive(Storage.getCache());
-    function starttAliveHeartBeat() {
+    function startAliveHeartBeat() {
       cache.lastAliveHeartBeatTime = Date.now();
       const timer = setInterval(() => cache.lastAliveHeartBeatTime = Date.now(), 5e3);
       window.onunload = () => {
@@ -3290,7 +3288,7 @@
     vue.watch(cache, (newCache) => Storage.setCache(newCache));
     return {
       cache,
-      starttAliveHeartBeat,
+      startAliveHeartBeat,
       checkIfOtherScriptsRunning
     };
   });
@@ -3571,7 +3569,7 @@
         new Logger("main.ts").log("其它页面上的BLTH正在运行，当前脚本停止运行");
         return;
       }
-      cacheStore.starttAliveHeartBeat();
+      cacheStore.startAliveHeartBeat();
       for (const [key, component] of Object.entries(ElementPlusIconsVue__namespace)) {
         app.component(key, component);
       }
