@@ -18,12 +18,10 @@ export const useBiliStore = defineStore('bili', () => {
   const dynamicVideos = ref<MainData.DynamicAll.Item[] | null>()
   // 粉丝勋章列表
   const fansMedals = ref<LiveData.FansMedalPanel.List[] | null>()
-  // 过滤了不存在的直播间和已注销用户的粉丝勋章
+  // 过滤了不存在直播间的粉丝勋章
   const filteredFansMedals = computed<LiveData.FansMedalPanel.List[] | null>(() => {
     if (!fansMedals.value) return null
-    return fansMedals.value.filter(
-      (m) => m.anchor_info.nick_name !== '账号已注销' && m.room_info.room_id !== 0
-    )
+    return fansMedals.value.filter((m) => m.room_info.room_id !== 0)
   })
 
   return {

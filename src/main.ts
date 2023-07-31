@@ -22,7 +22,7 @@ import Logger from './library/logger'
       new Logger('main.ts').log('其它页面上的BLTH正在运行，当前脚本停止运行')
       return
     }
-    cacheStore.starttAliveHeartBeat()
+    cacheStore.startAliveHeartBeat()
 
     for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
       app.component(key, component)

@@ -10,7 +10,7 @@ export const useCacheStore = defineStore('cache', () => {
   /**
    * 脚本存活心跳
    */
-  function starttAliveHeartBeat(): void {
+  function startAliveHeartBeat(): void {
     cache.lastAliveHeartBeatTime = Date.now()
     // 每隔5秒写一次时间戳，表示有一个BLTH正在运行
     // 之所以写时间戳而不是布尔值，是因为出现类似于浏览器崩溃的情况时 window.onunload 不会触发
@@ -41,7 +41,7 @@ export const useCacheStore = defineStore('cache', () => {
 
   return {
     cache,
-    starttAliveHeartBeat,
+    startAliveHeartBeat,
     checkIfOtherScriptsRunning
   }
 })

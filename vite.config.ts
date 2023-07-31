@@ -33,7 +33,7 @@ export default defineConfig({
         copyright: '2023, andywang425 (https://github.com/andywang425)',
         license: 'MIT',
         include: [/^https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*$/],
-        'run-at': 'document-start',
+        'run-at': 'document-end',
         connect: [
           'api.bilibili.com',
           'api.live.bilibili.com',
