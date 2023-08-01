@@ -106,7 +106,7 @@ npm run format
 
 ### 强制性
 
-- 对于`src/library/bili-api`中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](https://github.com/ritz078/transform) 这个工具或许会有帮助。
+- 对于`src/library/bili-api`中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](https://github.com/ritz078/transform)和[quicktype](https://github.com/quicktype/quicktype)或许会有帮助。
 - 如果添加了新的第三方库或资源文件，请修改`vite.config.ts`使其通过`@require`或`@resource`引入。
 
 ### 建议性
