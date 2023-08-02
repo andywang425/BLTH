@@ -46,8 +46,8 @@ function packFormData(json: Record<string, any>): FormData {
 /**
  * 遍历一个对象最深层的属性
  * @param obj 要遍历的对象
- * @param fn 回调函数，参数是最深层属性的值
- * @param path 遍历对象的路径
+ * @param fn 回调函数，参数是最深层属性的值和当前路径
+ * @param path 遍历对象的路径，默认从最外层开始遍历
  */
 function deepestIterate(obj: any, fn: (value: any, path: string) => void, path?: string) {
   _.forOwn(obj, function (value, key) {
