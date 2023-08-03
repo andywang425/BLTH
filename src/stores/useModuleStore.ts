@@ -12,6 +12,7 @@ import mitt from 'mitt'
 import { delayToNextMoment } from '../library/luxon'
 import { ImoduleStatus, Istatus } from '../types/moduleStatus'
 import { deepestIterate } from '../library/utils'
+import { useCacheStore } from './useCacheStore'
 
 const defaultModuleStatus: ImoduleStatus = {
   DailyTasks: {
@@ -50,12 +51,15 @@ export const useModuleStore = defineStore('module', () => {
    * 加载（运行）所有模块
    */
   async function loadModules() {
+    const cacheStore = useCacheStore()
     // 按优先级顺序逐个运行默认模块
     for (const [name, Module] of Object.entries(defaultModules).sort(
       (a, b) => a[1].sequence - b[1].sequence
     )) {
       try {
-        await new (Module as new (name: string) => DefaultBaseModule)(name).run()
+        if (Module.runMultiple || !cacheStore.isOtherBLTHRunning) {
+          await new (Module as new (name: string) => DefaultBaseModule)(name).run()
+        }
       } catch (err) {
         new Logger('loadModules').error('加载默认模块时发生致命错误，挂机助手停止运行:', err)
         return
@@ -63,7 +67,9 @@ export const useModuleStore = defineStore('module', () => {
     }
     // 运行其它模块
     for (const [name, Module] of Object.entries(otherModules)) {
-      new (Module as new (name: string) => BaseModule)(name).run()
+      if (Module.runMultiple || !cacheStore.isOtherBLTHRunning) {
+        new (Module as new (name: string) => BaseModule)(name).run()
+      }
     }
   }
 

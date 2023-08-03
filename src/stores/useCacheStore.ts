@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
-import { reactive, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import Storage from '../library/storage'
 import { Icache } from '../types'
 
 export const useCacheStore = defineStore('cache', () => {
   // 缓存
   const cache: Icache = reactive(Storage.getCache())
+  // 是否有其它BLTH在运行
+  const isOtherBLTHRunning = ref<boolean>(false)
 
   /**
    * 脚本存活心跳
@@ -27,12 +29,12 @@ export const useCacheStore = defineStore('cache', () => {
   /**
    * 检查是否有别的BLTH正在其它页面上运行
    */
-  function checkIfOtherScriptsRunning(): boolean {
+  function checkIfOtherScriptsRunning(): void {
     // 允许最多3秒的误差
     if (cache.lastAliveHeartBeatTime !== 0 && Date.now() - cache.lastAliveHeartBeatTime < 8000) {
-      return true
+      isOtherBLTHRunning.value = true
     } else {
-      return false
+      isOtherBLTHRunning.value = false
     }
   }
 
@@ -41,6 +43,7 @@ export const useCacheStore = defineStore('cache', () => {
 
   return {
     cache,
+    isOtherBLTHRunning,
     startAliveHeartBeat,
     checkIfOtherScriptsRunning
   }

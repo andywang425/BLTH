@@ -17,12 +17,15 @@ import Logger from './library/logger'
     app.use(ElementPlus)
     app.use(pinia)
 
+    const logger = new Logger('main.ts')
     const cacheStore = useCacheStore()
-    if (cacheStore.checkIfOtherScriptsRunning()) {
-      new Logger('main.ts').log('其它页面上的BLTH正在运行，当前脚本停止运行')
-      return
+    cacheStore.checkIfOtherScriptsRunning()
+    if (!cacheStore.isOtherBLTHRunning) {
+      logger.log('没有其它页面上的BLTH正在运行，开始存活心跳')
+      cacheStore.startAliveHeartBeat()
+    } else {
+      logger.log('其它页面上存在正在运行的BLTH')
     }
-    cacheStore.startAliveHeartBeat()
 
     for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
       app.component(key, component)
@@ -34,10 +37,15 @@ import Logger from './library/logger'
 
     app.mount(
       (() => {
-        const app = dce('div')
-        app.id = 'BLTH'
-        document.body.append(app)
-        return app
+        try {
+          const app = dce('div')
+          app.id = 'BLTH'
+          document.body.append(app)
+          return app
+        } catch (e) {
+          logger.error('挂载Vue app时发送错误', e)
+          return 'Error'
+        }
       })()
     )
   }
