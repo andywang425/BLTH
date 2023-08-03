@@ -19,12 +19,12 @@ import Logger from './library/logger'
 
     const logger = new Logger('main.ts')
     const cacheStore = useCacheStore()
-    cacheStore.checkIfOtherScriptsRunning()
-    if (!cacheStore.isOtherBLTHRunning) {
-      logger.log('没有其它页面上的BLTH正在运行，开始存活心跳')
+    cacheStore.checkIfMainBLTHRunning()
+    if (!cacheStore.isMainBLTHRunning) {
+      logger.log('当前脚本是Main BLTH，开始存活心跳')
       cacheStore.startAliveHeartBeat()
     } else {
-      logger.log('其它页面上存在正在运行的BLTH')
+      logger.log('其它页面上存在正在运行的Main BLTH')
     }
 
     for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

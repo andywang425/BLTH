@@ -57,7 +57,7 @@ export const useModuleStore = defineStore('module', () => {
       (a, b) => a[1].sequence - b[1].sequence
     )) {
       try {
-        if (Module.runMultiple || !cacheStore.isOtherBLTHRunning) {
+        if (Module.runMultiple || !cacheStore.isMainBLTHRunning) {
           await new (Module as new (name: string) => DefaultBaseModule)(name).run()
         }
       } catch (err) {
@@ -67,7 +67,7 @@ export const useModuleStore = defineStore('module', () => {
     }
     // 运行其它模块
     for (const [name, Module] of Object.entries(otherModules)) {
-      if (Module.runMultiple || !cacheStore.isOtherBLTHRunning) {
+      if (Module.runMultiple || !cacheStore.isMainBLTHRunning) {
         new (Module as new (name: string) => BaseModule)(name).run()
       }
     }
