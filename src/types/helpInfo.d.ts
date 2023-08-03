@@ -28,6 +28,9 @@ interface IhelpInfo {
       silverToCoin: IhelpInfoItem
       coinToSilver: IhelpInfoItem
     }
+  },
+  EnhanceExperience: {
+    switchLiveStreamQuality: IhelpInfoItem
   }
 }
 
