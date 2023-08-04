@@ -10,6 +10,12 @@ class BaseModule {
    */
   moduleName: string
   /**
+   * 当脚本在多个页面上运行的时候，该模块是否要在每个页面上运行
+   *
+   * 默认false，即只在Main BLTH运行的页面上运行
+   */
+  static runMultiple: boolean = false
+  /**
    * 用于在控制台中输出日志信息
    */
   logger: Logger
@@ -31,7 +37,6 @@ class BaseModule {
    *    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
    * }
    */
-
   set status(_s: Istatus) {
     throw new Error('Method not implemented.')
   }

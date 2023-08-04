@@ -19,9 +19,9 @@ export default defineConfig({
         author: 'andywang425',
         description: {
           // 确保能通过 GreasyFork 的语言类型检查
-          '': 'Enhancing the exprerience of watching Bilibili live streaming.',
-          en: 'Enhancing the exprerience of watching Bilibili live streaming.',
-          zh: 'Enhancing the exprerience of watching Bilibili live streaming.'
+          '': 'Enhancing the experience of watching Bilibili live streaming.',
+          en: 'Enhancing the experience of watching Bilibili live streaming.',
+          zh: 'Enhancing the experience of watching Bilibili live streaming.'
         },
         homepageURL: 'https://github.com/andywang425/BLTH',
         supportURL: 'https://github.com/andywang425/BLTH/issues',

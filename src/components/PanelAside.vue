@@ -34,6 +34,11 @@ const items: menuItem[] = [
         index: 'OtherTasks'
       }
     ]
+  },
+  {
+    icon: 'Monitor',
+    title: '体验优化',
+    index: 'EnhanceExperience'
   }
 ]
 </script>

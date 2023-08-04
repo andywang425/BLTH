@@ -2,13 +2,15 @@
 import MainSiteTasks from './MainSiteTasks.vue'
 import LiveTasks from './LiveTasks.vue'
 import OtherTasks from './OtherTasks.vue'
+import EnhanceExperience from './EnhanceExperience.vue'
 
 // 注册对当前组件实例可用的组件
 export default {
   components: {
     MainSiteTasks,
     LiveTasks,
-    OtherTasks
+    OtherTasks,
+    EnhanceExperience
   }
 }
 </script>

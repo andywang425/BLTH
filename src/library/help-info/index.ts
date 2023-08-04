@@ -148,6 +148,12 @@ const help_info: IhelpInfo = {
         ])
       }
     }
+  },
+  EnhanceExperience: {
+    switchLiveStreamQuality: {
+      title: '自动切换画质',
+      message: '打开直播间后自动把播放器切换到指定画质。'
+    }
   }
 }
 

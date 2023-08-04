@@ -65,6 +65,12 @@ interface ImoduleConfig {
       }
     }
   }
+  EnhanceExperience: {
+    switchLiveStreamQuality: {
+      enabled: boolean
+      qualityDesc: string
+    }
+  }
 }
 
 interface IuiConfig {

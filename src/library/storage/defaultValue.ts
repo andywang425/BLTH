@@ -94,6 +94,12 @@ const defaultValues: IdefaultValues = {
           _lastCompleteTime: 0
         }
       }
+    },
+    EnhanceExperience: {
+      switchLiveStreamQuality: {
+        enabled: false,
+        qualityDesc: '原画'
+      }
     }
   },
   cache: {
