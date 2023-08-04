@@ -1,6 +1,7 @@
 import { unsafeWindow } from '$'
 import _ from 'lodash'
 import BaseModule from '../BaseModule'
+import { sleep } from '../../library/utils'
 
 class SwitchLiveStreamQuality extends BaseModule {
   static runMultiple = true
@@ -51,6 +52,8 @@ class SwitchLiveStreamQuality extends BaseModule {
     if (this.config.enabled) {
       try {
         const livePlayer = await this.waitForPlayer()
+        // 切太快可能会导致有个加载图标一直转圈
+        await sleep(1000)
         this.switchQuality(livePlayer)
       } catch (e) {
         this.logger.error('等待播放器超时')
