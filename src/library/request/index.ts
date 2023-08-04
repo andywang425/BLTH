@@ -1,4 +1,4 @@
-import { GM_xmlhttpRequest, XhrRequest } from '$'
+import { GM_xmlhttpRequest, GmXhrRequest } from '$'
 import _ from 'lodash'
 
 class Request {
@@ -23,7 +23,7 @@ class Request {
    */
   public get(url: string, params?: Record<string, any>, otherDetails?: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      const defaultDetails: XhrRequest = {
+      const defaultDetails: GmXhrRequest<never, any> = {
         method: 'GET',
         url: this.url_prefix + url + (params ? '?' + new URLSearchParams(params).toString() : ''),
         responseType: 'json',
@@ -54,7 +54,7 @@ class Request {
    */
   public post(url: string, data?: Record<string, any>, otherDetails?: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      const defaultDetails: XhrRequest = {
+      const defaultDetails: GmXhrRequest<never, any> = {
         method: 'POST',
         url: this.url_prefix.concat(url),
         data: new URLSearchParams(data).toString(),
