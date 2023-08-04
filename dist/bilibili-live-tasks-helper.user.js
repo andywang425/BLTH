@@ -3,11 +3,11 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.0.3
+// @version         7.0.4
 // @author          andywang425
-// @description     Enhancing the exprerience of watching Bilibili live streaming.
-// @description:en  Enhancing the exprerience of watching Bilibili live streaming.
-// @description:zh  Enhancing the exprerience of watching Bilibili live streaming.
+// @description     Enhancing the experience of watching Bilibili live streaming.
+// @description:en  Enhancing the experience of watching Bilibili live streaming.
+// @description:zh  Enhancing the experience of watching Bilibili live streaming.
 // @license         MIT
 // @copyright       2023, andywang425 (https://github.com/andywang425)
 // @icon            data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuMDY1IiBoZWlnaHQ9IjEyNy43NDciIHZpZXdCb3g9IjAgMCAzNy4zMjQgMzMuOCI+PHBhdGggZmlsbD0iIzIwYjBlMyIgZD0iTTg2Ljk2MiAxMTIuMzMyYTIuNjYxIDIuNjYxIDAgMCAxIDIuMjYyIDAgNS41MzYgNS41MzYgMCAwIDEgMS4zODQgMS4wMTFsNS4zMjMgNC42NThoMy44MDVsNS4zMjMtNC42NThhNS41ODkgNS41ODkgMCAwIDEgMS4zODQtMS4wMTEgMi42NjEgMi42NjEgMCAwIDEgMy41NCAyLjIwOSAyLjY2MSAyLjY2MSAwIDAgMS0uNTg2IDEuNzgzIDE0Ljg3NyAxNC44NzcgMCAwIDEtMS4xNzEgMS4wNjUgNy42OTEgNy42OTEgMCAwIDEtLjc0NS42MTJoMy4zMjZhNS42NDIgNS42NDIgMCAwIDEgMy45MTIgMS43NTYgNS42NjkgNS42NjkgMCAwIDEgMS43ODQgMy45MTJ2MTUuMzAzYTEwLjc3OCAxMC43NzggMCAwIDEtLjEzNCAyLjMxNSA1LjkwOCA1LjkwOCAwIDAgMS0yLjY2IDMuNzI2IDUuNzIyIDUuNzIyIDAgMCAxLTMuMDYxLjg1Mkg4Ni4yMTdhMTEuMjg0IDExLjI4NCAwIDAgMS0yLjM5Ni0uMTMzIDUuODgyIDUuODgyIDAgMCAxLTMuNjcyLTIuNjYyIDUuNjk1IDUuNjk1IDAgMCAxLS45MDUtMy4wNnYtMTUuMTQzYTExLjkyMyAxMS45MjMgMCAwIDEgMC0yLjIwOSA1Ljg1NSA1Ljg1NSAwIDAgMSA1LjMyMy00LjczN2gzLjQ4NmMtLjU1OS0uNC0xLjAzOC0uODc4LTEuNTQ0LTEuMzA0YTIuNjYxIDIuNjYxIDAgMCAxLS44NTEtMi4xODMgMi42NjEgMi42NjEgMCAwIDEgMS4zMDQtMi4xMDJtLS42MTIgMTAuMzI2YTIuNjYxIDIuNjYxIDAgMCAwLTIuMTAzIDEuOTE2IDMuNTkzIDMuNTkzIDAgMCAwIDAgMS4wMTF2MTIuNTg4YTIuNjYxIDIuNjYxIDAgMCAwIDEuODM3IDIuNjYyIDMuNTEzIDMuNTEzIDAgMCAwIDEuMTQ0LjE4NmgyMS42MzdhMi42NjEgMi42NjEgMCAwIDAgMi41MjgtMS41NyAzLjcyNiAzLjcyNiAwIDAgMCAuMjY2LTEuNzU3di0xMS43MWE0LjQ3MSA0LjQ3MSAwIDAgMCAwLTEuMjc3IDIuNjYxIDIuNjYxIDAgMCAwLTEuNzMtMS44MSA0LjI4NSA0LjI4NSAwIDAgMC0xLjY1LS4yMzlIODcuNjAxYTguODg5IDguODg5IDAgMCAwLTEuMjUxIDB6bTAgMCIgc3R5bGU9InN0cm9rZS13aWR0aDouMDMzMDcyOSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTc5LjE5MyAtMTEyLjA4KSIvPjxwYXRoIGQ9Ik04OC45NyAxMjguNjM2Yy4zNjMuMzc3Ljc0NS43NDcgMS4wODggMS4xNDIuNTk3LjY4NyAxLjExOCAxLjE5NyAxLjY2NiAxLjgwOS0uMTI5LTEuMTE3IDEuMzA0LTEuMTk4LjA3NC0xLjc1Ny0uNDA4LjQxNy0uOTQxLjg4NC0xLjM2IDEuMjIzLS4zOTIuMzE2LS44NjMuNjctMS4yMzUuOTUyLTEuOTA3IDEuNDQzLjIyNiA0LjA1MyAyLjEzIDIuNjA3IDAgMCAyLTEuNTM1IDIuODA3LTIuMzAxLjQ0LS40MTcuNjgtLjk1Ni43Mi0xLjU5Mi4wNC0uNjU0LS41MzUtMS4yNC0uNzk0LTEuNDk4LS45Mi0uOTE0LTEuNzQzLTEuOTY4LTIuNTUtMi44MTItMS41NzUtMS44LTQuMTIuNDI4LTIuNTQ2IDIuMjI3ek0xMDYuOTc5IDEyOC42MzZjLS4zNjMuMzc3LS43NDUuNzQ3LTEuMDg4IDEuMTQyLS41OTcuNjg3LTEuMTE4IDEuMTk3LTEuNjY2IDEuODA5LjEyOS0xLjExNy0xLjMwNC0xLjE5OC0uMDc0LTEuNzU3LjQwOC40MTcuOTQxLjg4NCAxLjM2IDEuMjIzLjM5Mi4zMTYuODYzLjY3IDEuMjM1Ljk1MiAxLjkwNyAxLjQ0My0uMjI2IDQuMDUzLTIuMTMgMi42MDcgMCAwLTItMS41MzUtMi44MDctMi4zMDEtLjQ0LS40MTctLjY4LS45NTYtLjcyLTEuNTkyLS4wNC0uNjU0LjUzNS0xLjI0Ljc5NC0xLjQ5OC45Mi0uOTE0IDEuNzQzLTEuOTY4IDIuNTUtMi44MTIgMS41NzUtMS44IDQuMTIuNDI4IDIuNTQ2IDIuMjI3eiIgc3R5bGU9ImZpbGw6IzIwYjBlMztmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6LjUyNDE1OTtzdHJva2UtZGFzaGFycmF5Om5vbmUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC03OS4xOTMgLTExMi4wOCkiLz48L3N2Zz4NCg==
@@ -22,7 +22,7 @@
 // @require         https://unpkg.com/@element-plus/icons-vue@2.1.0/dist/index.iife.min.js
 // @require         https://unpkg.com/pinia@2.1.6/dist/pinia.iife.prod.js
 // @require         https://unpkg.com/lodash@4.17.21/lodash.min.js
-// @require         https://unpkg.com/hotkeys-js@3.11.2/dist/hotkeys.min.js
+// @require         https://unpkg.com/hotkeys-js@3.12.0/dist/hotkeys.min.js
 // @require         https://unpkg.com/luxon@3.3.0/build/global/luxon.min.js
 // @require         https://unpkg.com/crypto-js@4.1.1/crypto-js.js
 // @resource        element-plus/dist/index.css  https://unpkg.com/element-plus@2.3.8/dist/index.css
@@ -161,6 +161,12 @@
             num: 1,
             _lastCompleteTime: 0
           }
+        }
+      },
+      EnhanceExperience: {
+        switchLiveStreamQuality: {
+          enabled: false,
+          qualityDesc: "原画"
         }
       }
     },
@@ -760,6 +766,12 @@
       throw new Error("Method not implemented.");
     }
   }
+  /**
+   * 当脚本在多个页面上运行的时候，该模块是否要在每个页面上运行
+   *
+   * 默认false，即只在Main BLTH运行的页面上运行
+   */
+  __publicField(BaseModule, "runMultiple", false);
   class DefaultBaseModule extends BaseModule {
     /**
      * 默认模块按顺序逐个运行，所以必须返回一个 Promise
@@ -2118,6 +2130,58 @@
       this.logger.log("硬币换银瓜子模块下次运行时间:", diff.str);
     }
   }
+  class SwitchLiveStreamQuality extends BaseModule {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.switchLiveStreamQuality);
+    }
+    async waitForPlayer() {
+      return new Promise((resolve, reject) => {
+        const topWindow = _unsafeWindow.top ? _unsafeWindow.top : _unsafeWindow;
+        const findPlayertimer = setInterval(() => {
+          if (topWindow.livePlayer && _.has(topWindow.livePlayer, "getPlayerInfo") && _.has(topWindow.livePlayer, "switchQuality")) {
+            clearInterval(findPlayertimer);
+            clearTimeout(timeoutTimer);
+            resolve(topWindow.livePlayer);
+          }
+        }, 200);
+        const timeoutTimer = setTimeout(() => {
+          clearInterval(findPlayertimer);
+          clearTimeout(timeoutTimer);
+          reject();
+        }, 1e4);
+      });
+    }
+    switchQuality(livePlayer) {
+      const playerInfo = livePlayer.getPlayerInfo();
+      if (playerInfo.liveStatus === 0) {
+        this.logger.log("当前直播间未开播");
+      } else if (playerInfo.qualityCandidates.length === 0) {
+        this.logger.warn("当前直播间没有画质选项");
+      } else {
+        const targetQuality = playerInfo.qualityCandidates.find(
+          ({ desc }) => desc === this.config.qualityDesc
+        );
+        if (targetQuality && playerInfo.quality !== targetQuality.qn) {
+          livePlayer.switchQuality(targetQuality.qn);
+          this.logger.log(`已将画质切换为${this.config.qualityDesc}`, targetQuality);
+        }
+      }
+    }
+    async run() {
+      this.logger.log("自动切换画质模块开始运行");
+      if (this.config.enabled) {
+        try {
+          const livePlayer = await this.waitForPlayer();
+          await sleep(1e3);
+          this.switchQuality(livePlayer);
+        } catch (e) {
+          this.logger.error("等待播放器超时");
+        }
+      }
+    }
+  }
+  __publicField(SwitchLiveStreamQuality, "runMultiple", true);
   const otherModules = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     DailyTask_LiveTask_AppUserTask: AppUserTask,
@@ -2131,7 +2195,8 @@
     DailyTask_MainSiteTask_WatchTask: WatchTask$1,
     DailyTask_OtherTask_CoinToSilver: CoinToSilver,
     DailyTask_OtherTask_GroupSignTask: GroupSignTask,
-    DailyTask_OtherTask_SilverToCoin: SilverToCoin
+    DailyTask_OtherTask_SilverToCoin: SilverToCoin,
+    EnhanceExperience_SwitchLiveStreamQuality: SwitchLiveStreamQuality
   }, Symbol.toStringTag, { value: "Module" }));
   function mitt(n) {
     return { all: n = n || /* @__PURE__ */ new Map(), on: function(t, e) {
@@ -2149,6 +2214,32 @@
       });
     } };
   }
+  const useCacheStore = pinia.defineStore("cache", () => {
+    const cache = vue.reactive(Storage.getCache());
+    const isMainBLTHRunning = vue.ref(false);
+    function startAliveHeartBeat() {
+      cache.lastAliveHeartBeatTime = Date.now();
+      const timer = setInterval(() => cache.lastAliveHeartBeatTime = Date.now(), 5e3);
+      window.onunload = () => {
+        clearInterval(timer);
+        cache.lastAliveHeartBeatTime = 0;
+      };
+    }
+    function checkIfMainBLTHRunning() {
+      if (cache.lastAliveHeartBeatTime !== 0 && Date.now() - cache.lastAliveHeartBeatTime < 8e3) {
+        isMainBLTHRunning.value = true;
+      } else {
+        isMainBLTHRunning.value = false;
+      }
+    }
+    vue.watch(cache, (newCache) => Storage.setCache(newCache));
+    return {
+      cache,
+      isMainBLTHRunning,
+      startAliveHeartBeat,
+      checkIfMainBLTHRunning
+    };
+  });
   const defaultModuleStatus = {
     DailyTasks: {
       MainSiteTasks: {
@@ -2178,18 +2269,23 @@
     const emitter = mitt();
     const moduleStatus = vue.reactive(defaultModuleStatus);
     async function loadModules() {
+      const cacheStore = useCacheStore();
       for (const [name, Module] of Object.entries(defaultModules).sort(
         (a, b) => a[1].sequence - b[1].sequence
       )) {
         try {
-          await new Module(name).run();
+          if (Module.runMultiple || !cacheStore.isMainBLTHRunning) {
+            await new Module(name).run();
+          }
         } catch (err) {
           new Logger("loadModules").error("加载默认模块时发生致命错误，挂机助手停止运行:", err);
           return;
         }
       }
       for (const [name, Module] of Object.entries(otherModules)) {
-        new Module(name).run();
+        if (Module.runMultiple || !cacheStore.isMainBLTHRunning) {
+          new Module(name).run();
+        }
       }
     }
     vue.watch(
@@ -2215,7 +2311,7 @@
     };
   });
   const _hoisted_1$3 = { class: "title" };
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "PanelHeader",
     setup(__props) {
       const uiStore = useUIStore();
@@ -2267,8 +2363,8 @@
     }
     return target;
   };
-  const PanelHeader = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["__scopeId", "data-v-dda95e10"]]);
-  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
+  const PanelHeader = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["__scopeId", "data-v-dda95e10"]]);
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
     __name: "PanelAside",
     setup(__props) {
       const uiStore = useUIStore();
@@ -2293,6 +2389,11 @@
               index: "OtherTasks"
             }
           ]
+        },
+        {
+          icon: "Monitor",
+          title: "体验优化",
+          index: "EnhanceExperience"
         }
       ];
       return (_ctx, _cache) => {
@@ -2363,7 +2464,7 @@
       };
     }
   });
-  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "MainSiteTasks",
     setup(__props) {
       const moduleStore = useModuleStore();
@@ -2514,7 +2615,7 @@
   const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-eac67691"), n = n(), vue.popScopeId(), n);
   const _hoisted_1$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ vue.createElementVNode("br", null, null, -1));
   const _hoisted_2$1 = { class: "avatar-wrap" };
-  const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "LiveTasks",
     setup(__props) {
       const moduleStore = useModuleStore();
@@ -3014,8 +3115,8 @@
       };
     }
   });
-  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["__scopeId", "data-v-eac67691"]]);
-  const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
+  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["__scopeId", "data-v-eac67691"]]);
+  const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "OtherTasks",
     setup(__props) {
       const moduleStore = useModuleStore();
@@ -3123,11 +3224,65 @@
       };
     }
   });
+  const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
+    __name: "EnhanceExperience",
+    setup(__props) {
+      const moduleStore = useModuleStore();
+      const config = moduleStore.moduleConfig.EnhanceExperience;
+      const qualityDescList = ["原画", "蓝光PRO", "蓝光", "超清PRO", "超清", "高清"];
+      return (_ctx, _cache) => {
+        const _component_el_switch = vue.resolveComponent("el-switch");
+        const _component_el_option = vue.resolveComponent("el-option");
+        const _component_el_select = vue.resolveComponent("el-select");
+        const _component_Info = vue.resolveComponent("Info");
+        const _component_el_space = vue.resolveComponent("el-space");
+        const _component_el_row = vue.resolveComponent("el-row");
+        const _component_el_divider = vue.resolveComponent("el-divider");
+        return vue.openBlock(), vue.createElementBlock("div", null, [
+          vue.createVNode(_component_el_row, null, {
+            default: vue.withCtx(() => [
+              vue.createVNode(_component_el_space, { wrap: "" }, {
+                default: vue.withCtx(() => [
+                  vue.createVNode(_component_el_switch, {
+                    modelValue: vue.unref(config).switchLiveStreamQuality.enabled,
+                    "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => vue.unref(config).switchLiveStreamQuality.enabled = $event),
+                    "active-text": "自动切换画质"
+                  }, null, 8, ["modelValue"]),
+                  vue.createVNode(_component_el_select, {
+                    modelValue: vue.unref(config).switchLiveStreamQuality.qualityDesc,
+                    "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => vue.unref(config).switchLiveStreamQuality.qualityDesc = $event),
+                    placeholder: "Select",
+                    style: { "width": "110px" }
+                  }, {
+                    default: vue.withCtx(() => [
+                      (vue.openBlock(), vue.createElementBlock(vue.Fragment, null, vue.renderList(qualityDescList, (i) => {
+                        return vue.createVNode(_component_el_option, {
+                          key: i,
+                          label: i,
+                          value: i
+                        }, null, 8, ["label", "value"]);
+                      }), 64))
+                    ]),
+                    _: 1
+                  }, 8, ["modelValue"]),
+                  vue.createVNode(_component_Info, { id: "EnhanceExperience.switchLiveStreamQuality" })
+                ]),
+                _: 1
+              })
+            ]),
+            _: 1
+          }),
+          vue.createVNode(_component_el_divider)
+        ]);
+      };
+    }
+  });
   const __default__ = {
     components: {
-      MainSiteTasks: _sfc_main$7,
+      MainSiteTasks: _sfc_main$8,
       LiveTasks,
-      OtherTasks: _sfc_main$5
+      OtherTasks: _sfc_main$6,
+      EnhanceExperience: _sfc_main$5
     }
   };
   const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
@@ -3224,7 +3379,7 @@
                         default: vue.withCtx(() => [
                           vue.createVNode(_component_el_aside, { class: "aside" }, {
                             default: vue.withCtx(() => [
-                              vue.createVNode(_sfc_main$8)
+                              vue.createVNode(_sfc_main$9)
                             ]),
                             _: 1
                           }),
@@ -3268,30 +3423,6 @@
     return o.innerText = t, document.head.append(o), t;
   };
   cssLoader("element-plus/dist/index.css");
-  const useCacheStore = pinia.defineStore("cache", () => {
-    const cache = vue.reactive(Storage.getCache());
-    function startAliveHeartBeat() {
-      cache.lastAliveHeartBeatTime = Date.now();
-      const timer = setInterval(() => cache.lastAliveHeartBeatTime = Date.now(), 5e3);
-      window.onunload = () => {
-        clearInterval(timer);
-        cache.lastAliveHeartBeatTime = 0;
-      };
-    }
-    function checkIfOtherScriptsRunning() {
-      if (cache.lastAliveHeartBeatTime !== 0 && Date.now() - cache.lastAliveHeartBeatTime < 8e3) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-    vue.watch(cache, (newCache) => Storage.setCache(newCache));
-    return {
-      cache,
-      startAliveHeartBeat,
-      checkIfOtherScriptsRunning
-    };
-  });
   const _sfc_main$2 = {};
   const _hoisted_1$1 = {
     xmlns: "http://www.w3.org/2000/svg",
@@ -3456,6 +3587,12 @@
           ])
         }
       }
+    },
+    EnhanceExperience: {
+      switchLiveStreamQuality: {
+        title: "自动切换画质",
+        message: "打开直播间后自动把播放器切换到指定画质。"
+      }
     }
   };
   const _withScopeId = (n) => (vue.pushScopeId("data-v-c1d8df5e"), n = n(), vue.popScopeId(), n);
@@ -3564,12 +3701,15 @@
       const pinia$1 = pinia.createPinia();
       app.use(ElementPlus);
       app.use(pinia$1);
+      const logger = new Logger("main.ts");
       const cacheStore = useCacheStore();
-      if (cacheStore.checkIfOtherScriptsRunning()) {
-        new Logger("main.ts").log("其它页面上的BLTH正在运行，当前脚本停止运行");
-        return;
+      cacheStore.checkIfMainBLTHRunning();
+      if (!cacheStore.isMainBLTHRunning) {
+        logger.log("当前脚本是Main BLTH，开始存活心跳");
+        cacheStore.startAliveHeartBeat();
+      } else {
+        logger.log("其它页面上存在正在运行的Main BLTH");
       }
-      cacheStore.startAliveHeartBeat();
       for (const [key, component] of Object.entries(ElementPlusIconsVue__namespace)) {
         app.component(key, component);
       }
@@ -3578,10 +3718,15 @@
       }
       app.mount(
         (() => {
-          const app2 = dce("div");
-          app2.id = "BLTH";
-          document.body.append(app2);
-          return app2;
+          try {
+            const app2 = dce("div");
+            app2.id = "BLTH";
+            document.body.append(app2);
+            return app2;
+          } catch (e) {
+            logger.error("挂载Vue app时发送错误", e);
+            return "Error";
+          }
         })()
       );
     }
