@@ -67,7 +67,7 @@ interface ImoduleConfig {
   }
   EnhanceExperience: {
     switchLiveStreamQuality: {
-      enabled: boolean,
+      enabled: boolean
       qualityDesc: string
     }
   }
