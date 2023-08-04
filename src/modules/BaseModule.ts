@@ -12,7 +12,7 @@ class BaseModule {
   /**
    * 当脚本在多个页面上运行的时候，该模块是否要在每个页面上运行
    *
-   * 默认false，即只在第一个脚本运行的页面上运行
+   * 默认false，即只在Main BLTH运行的页面上运行
    */
   static runMultiple: boolean = false
   /**
