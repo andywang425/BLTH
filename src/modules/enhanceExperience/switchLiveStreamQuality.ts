@@ -17,6 +17,7 @@ class SwitchLiveStreamQuality extends BaseModule {
           _.has(topWindow.livePlayer, 'switchQuality')
         ) {
           clearInterval(findPlayertimer)
+          clearTimeout(timeoutTimer)
           resolve(topWindow.livePlayer)
         }
       }, 200)
@@ -46,7 +47,7 @@ class SwitchLiveStreamQuality extends BaseModule {
   }
 
   public async run() {
-    this.logger.log('自动选择画质模块开始运行')
+    this.logger.log('自动切换画质模块开始运行')
     if (this.config.enabled) {
       try {
         const livePlayer = await this.waitForPlayer()
