@@ -167,6 +167,9 @@
         switchLiveStreamQuality: {
           enabled: false,
           qualityDesc: "原画"
+        },
+        banp2p: {
+          enabled: false
         }
       }
     },
@@ -2182,6 +2185,38 @@
     }
   }
   __publicField(SwitchLiveStreamQuality, "runMultiple", true);
+  class BanP2P extends BaseModule {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.banp2p);
+    }
+    async banP2P() {
+      var _a;
+      const RTClist = [
+        "RTCPeerConnection",
+        "RTCDataChannel",
+        "mozRTCPeerConnection",
+        "webkitRTCPeerConnection",
+        "DataChannel"
+      ];
+      for (const i of RTClist) {
+        if (i in _unsafeWindow && _unsafeWindow.hasOwnProperty.call(_unsafeWindow, i) && ((_a = Object.getOwnPropertyDescriptor(_unsafeWindow, i)) == null ? void 0 : _a.configurable)) {
+          delete _unsafeWindow[i];
+        }
+      }
+    }
+    async run() {
+      this.logger.log("禁用P2P上传模块开始运行");
+      if (this.config.enabled) {
+        try {
+          await this.banP2P();
+        } catch (e) {
+          this.logger.error("禁用P2P上传失败", e);
+        }
+      }
+    }
+  }
+  __publicField(BanP2P, "runMultiple", true);
   const otherModules = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     DailyTask_LiveTask_AppUserTask: AppUserTask,
@@ -2196,6 +2231,7 @@
     DailyTask_OtherTask_CoinToSilver: CoinToSilver,
     DailyTask_OtherTask_GroupSignTask: GroupSignTask,
     DailyTask_OtherTask_SilverToCoin: SilverToCoin,
+    EnhanceExperience_BanP2P: BanP2P,
     EnhanceExperience_SwitchLiveStreamQuality: SwitchLiveStreamQuality
   }, Symbol.toStringTag, { value: "Module" }));
   function mitt(n) {
@@ -3272,6 +3308,22 @@
             ]),
             _: 1
           }),
+          vue.createVNode(_component_el_row, null, {
+            default: vue.withCtx(() => [
+              vue.createVNode(_component_el_space, { wrap: "" }, {
+                default: vue.withCtx(() => [
+                  vue.createVNode(_component_el_switch, {
+                    modelValue: vue.unref(config).banp2p.enabled,
+                    "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => vue.unref(config).banp2p.enabled = $event),
+                    "active-text": "禁用P2P上传"
+                  }, null, 8, ["modelValue"]),
+                  vue.createVNode(_component_Info, { id: "EnhanceExperience.banp2p" })
+                ]),
+                _: 1
+              })
+            ]),
+            _: 1
+          }),
           vue.createVNode(_component_el_divider)
         ]);
       };
@@ -3592,6 +3644,10 @@
       switchLiveStreamQuality: {
         title: "自动切换画质",
         message: "打开直播间后自动把播放器切换到指定画质。"
+      },
+      banp2p: {
+        title: "禁用P2P上传",
+        message: "禁用直播间的P2P上传，防止B站白嫖宽带。"
       }
     }
   };

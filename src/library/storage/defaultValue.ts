@@ -99,6 +99,9 @@ const defaultValues: IdefaultValues = {
       switchLiveStreamQuality: {
         enabled: false,
         qualityDesc: '原画'
+      },
+      banp2p: {
+        enabled: false
       }
     }
   },
