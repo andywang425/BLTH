@@ -6,7 +6,7 @@
 
 # 环境要求
 
-- 浏览器：推荐使用 Chrome，Edge, Firefox, Safari 或 Opera 并及时更新。
+- 浏览器：推荐使用 Chrome，Edge, Firefox, Safari 或 Opera。
 - 用户脚本管理器：推荐使用 [Tampermonkey](https://www.tampermonkey.net) 或 [Violentmonkey](https://violentmonkey.github.io)。
 
 # 安装

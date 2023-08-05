@@ -1,3 +1,6 @@
+/**
+ * @description 压缩编译后的用户脚本
+ */
 import { promises as fs } from 'fs'
 import { minify } from 'terser'
 
