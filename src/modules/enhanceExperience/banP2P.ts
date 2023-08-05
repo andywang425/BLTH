@@ -7,11 +7,7 @@ class BanP2P extends BaseModule {
   config = this.moduleStore.moduleConfig.EnhanceExperience.banp2p
 
   private async banP2P() {
-    const RTClist: string[] = [
-      'RTCPeerConnection',
-      'mozRTCPeerConnection',
-      'webkitRTCPeerConnection'
-    ]
+    const RTClist = ['RTCPeerConnection', 'mozRTCPeerConnection', 'webkitRTCPeerConnection']
     for (const i of RTClist) {
       // 判断属性是否存在并且是否可配置
       if (
