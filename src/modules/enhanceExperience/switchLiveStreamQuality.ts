@@ -1,7 +1,5 @@
 import { unsafeWindow } from '$'
-import _ from 'lodash'
 import BaseModule from '../BaseModule'
-import { sleep } from '../../library/utils'
 
 class SwitchLiveStreamQuality extends BaseModule {
   static runMultiple = true
