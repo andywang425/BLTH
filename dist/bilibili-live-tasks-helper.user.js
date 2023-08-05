@@ -2192,8 +2192,7 @@
       const RTClist = [
         "RTCPeerConnection",
         "mozRTCPeerConnection",
-        "webkitRTCPeerConnection",
-        "test"
+        "webkitRTCPeerConnection"
       ];
       for (const i of RTClist) {
         if (Object.prototype.hasOwnProperty.call(_unsafeWindow, i) && ((_a = Object.getOwnPropertyDescriptor(_unsafeWindow, i)) == null ? void 0 : _a.configurable)) {
