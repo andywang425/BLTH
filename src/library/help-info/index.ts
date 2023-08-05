@@ -153,6 +153,10 @@ const help_info: IhelpInfo = {
     switchLiveStreamQuality: {
       title: '自动切换画质',
       message: '打开直播间后自动把播放器切换到指定画质。'
+    },
+    banp2p: {
+      title: '禁用P2P上传',
+      message: '禁用直播间的P2P上传，防止B站白嫖宽带。'
     }
   }
 }

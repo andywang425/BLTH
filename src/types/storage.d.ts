@@ -70,6 +70,9 @@ interface ImoduleConfig {
       enabled: boolean
       qualityDesc: string
     }
+    banp2p: {
+      enabled: boolean
+    }
   }
 }
 
