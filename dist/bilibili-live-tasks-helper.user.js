@@ -2189,7 +2189,11 @@
     }
     async banP2P() {
       var _a;
-      const RTClist = ["RTCPeerConnection", "mozRTCPeerConnection", "webkitRTCPeerConnection"];
+      const RTClist = [
+        "RTCPeerConnection",
+        "mozRTCPeerConnection",
+        "webkitRTCPeerConnection"
+      ];
       for (const i of RTClist) {
         if (Object.prototype.hasOwnProperty.call(_unsafeWindow, i) && ((_a = Object.getOwnPropertyDescriptor(_unsafeWindow, i)) == null ? void 0 : _a.configurable)) {
           Object.defineProperty(_unsafeWindow, i, {
