@@ -24,7 +24,7 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
     </el-row>
     <el-row>
       <el-space wrap>
-        <el-switch v-model="config.banp2p.enabled" active-text="禁用P2P上传" />
+        <el-switch v-model="config.banp2p.enabled" active-text="禁用P2P" />
         <Info id="EnhanceExperience.banp2p" />
       </el-space>
     </el-row>
