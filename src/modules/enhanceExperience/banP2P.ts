@@ -10,7 +10,8 @@ class BanP2P extends BaseModule {
     const RTClist: string[] = [
       'RTCPeerConnection',
       'mozRTCPeerConnection',
-      'webkitRTCPeerConnection'
+      'webkitRTCPeerConnection',
+      'test'
     ]
     for (const i of RTClist) {
       // 判断属性是否存在并且是否可配置
