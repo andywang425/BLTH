@@ -6,11 +6,6 @@ on:
       - master
     paths:
       - "src/**"
-  pull_request:
-    branches:
-      - master
-    paths:
-      - "src/**"
 
 jobs:
   build:
@@ -19,8 +14,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          ref: "dev"
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -33,13 +26,12 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Remove 'dist' from .gitignore
-        run: sed -i '/dist/d' .gitignore
+      - name: Remove .gitignore
+        run: rm -f .gitignore
 
       - name: Commit and push if there are changes
         run: |
           git config --local user.email "actions@users.noreply.github.com"
           git config --local user.name "GitHub Action"
           git add dist/*
-          git diff --quiet && git diff --staged --quiet || git commit -m "Automated build"
           git push
