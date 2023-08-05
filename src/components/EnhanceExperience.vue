@@ -22,6 +22,12 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
         <Info id="EnhanceExperience.switchLiveStreamQuality" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.banp2p.enabled" active-text="禁用P2P" />
+        <Info id="EnhanceExperience.banp2p" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>

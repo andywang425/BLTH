@@ -152,7 +152,20 @@ const help_info: IhelpInfo = {
   EnhanceExperience: {
     switchLiveStreamQuality: {
       title: '自动切换画质',
-      message: '打开直播间后自动把播放器切换到指定画质。'
+      message: h('p', [
+        h('div', '打开直播间后自动把播放器切换到指定画质。'),
+        h('div', '如果指定画质不存在，则还是使用B站的默认画质。')
+      ])
+    },
+    banp2p: {
+      title: '禁用P2P',
+      message: h('p', [
+        h('div', '禁用直播流的P2P上传/下载'),
+        h(
+          'div',
+          'B站使用WebRTC技术把许多浏览器点对点（P2P）地连接起来，实现视频流和音频流的传输。这样做是为了减轻B站服务器的压力，但是会占用你一定的上行带宽（大约几百kb每秒）。如果你不想被占用上行带宽，可以开启该功能。若开启后发现观看直播时有明显卡顿，请关闭。'
+        )
+      ])
     }
   }
 }

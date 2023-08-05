@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "src"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "src"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: "dev"
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.16.1"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Temporarily remove 'dist' from .gitignore
+        run: sed -i '/dist/d' .gitignore
+
+      - name: Commit and push if there are changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add dist/*
+          git diff --quiet && git diff --staged --quiet || git commit -m "Automated build"
+          git push
+
+      - name: Restore .gitignore
+        run: echo "dist" >> .gitignore
