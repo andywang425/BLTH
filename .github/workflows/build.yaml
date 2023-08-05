@@ -5,12 +5,12 @@ on:
     branches:
       - master
     paths:
-      - "src"
+      - "src/**"
   pull_request:
     branches:
       - master
     paths:
-      - "src"
+      - "src/**"
 
 jobs:
   build:
