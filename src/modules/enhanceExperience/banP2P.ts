@@ -18,7 +18,7 @@ class BanP2P extends BaseModule {
       // 判断属性是否存在并且是否可配置
       if (
         i in unsafeWindow &&
-        unsafeWindow.hasOwnProperty.call(unsafeWindow, i) &&
+        Object.prototype.hasOwnProperty.call(unsafeWindow, i) &&
         Object.getOwnPropertyDescriptor(unsafeWindow, i)?.configurable
       ) {
         delete (unsafeWindow as any)[i]
