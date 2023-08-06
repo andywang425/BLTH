@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.0.5
+// @version         7.0.6
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
@@ -40,7 +40,7 @@
 // @run-at          document-end
 // ==/UserScript==
 
-(a=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=a,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-eac67691]{width:80px;height:80px}.avatar[data-v-eac67691]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-4aed17ff]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-4aed17ff]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-4aed17ff]{width:auto}.aside #aside-el-menu[data-v-4aed17ff]:not(.el-menu--collapse){width:150px}.main[data-v-4aed17ff]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-4aed17ff],.fade-leave-active[data-v-4aed17ff]{transition:opacity .1s ease}.fade-enter-from[data-v-4aed17ff],.fade-leave-to[data-v-4aed17ff]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-2f9d6050]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-link-va-baseline{vertical-align:baseline} ");
+(a=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=a,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-f7944e85]{width:80px;height:80px}.avatar[data-v-f7944e85]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-4aed17ff]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-4aed17ff]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-4aed17ff]{width:auto}.aside #aside-el-menu[data-v-4aed17ff]:not(.el-menu--collapse){width:150px}.main[data-v-4aed17ff]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-4aed17ff],.fade-leave-active[data-v-4aed17ff]{transition:opacity .1s ease}.fade-enter-from[data-v-4aed17ff],.fade-leave-to[data-v-4aed17ff]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-2f9d6050]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-link-va-baseline{vertical-align:baseline} ");
 
 (function (vue, pinia, _, luxon, CryptoJS, ElementPlusIconsVue, ElementPlus, hotkeys) {
   'use strict';
@@ -134,6 +134,7 @@
             },
             like: {
               enabled: false,
+              includeHighLevelMedals: false,
               _lastCompleteTime: 0
             },
             watch: {
@@ -1543,7 +1544,7 @@
       const biliStore = useBiliStore();
       if (biliStore.filteredFansMedals) {
         return biliStore.filteredFansMedals.filter(
-          (medal) => medal.medal.level < 20 && (this.medalTasksConfig.isWhiteList ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id) : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
+          (medal) => (this.config.includeHighLevelMedals ? true : medal.medal.level < 20) && (this.medalTasksConfig.isWhiteList ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id) : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
         ).map((medal) => [medal.room_info.room_id, medal.medal.target_id]).slice(0, 100);
       } else {
         this.status = "error";
@@ -2665,7 +2666,7 @@
       };
     }
   });
-  const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-eac67691"), n = n(), vue.popScopeId(), n);
+  const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-f7944e85"), n = n(), vue.popScopeId(), n);
   const _hoisted_1$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ vue.createElementVNode("br", null, null, -1));
   const _hoisted_2$1 = { class: "avatar-wrap" };
   const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
@@ -2787,6 +2788,8 @@
         const _component_el_space = vue.resolveComponent("el-space");
         const _component_el_row = vue.resolveComponent("el-row");
         const _component_el_divider = vue.resolveComponent("el-divider");
+        const _component_SemiSelect = vue.resolveComponent("SemiSelect");
+        const _component_el_icon = vue.resolveComponent("el-icon");
         const _component_el_button = vue.resolveComponent("el-button");
         const _component_el_option = vue.resolveComponent("el-option");
         const _component_el_select = vue.resolveComponent("el-select");
@@ -2860,16 +2863,37 @@
             default: vue.withCtx(() => [
               vue.createVNode(_component_el_space, { wrap: "" }, {
                 default: vue.withCtx(() => [
+                  vue.createVNode(_component_el_icon, null, {
+                    default: vue.withCtx(() => [
+                      vue.createVNode(_component_SemiSelect)
+                    ]),
+                    _: 1
+                  }),
+                  vue.createVNode(_component_el_switch, {
+                    modelValue: vue.unref(config).medalTasks.like.includeHighLevelMedals,
+                    "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => vue.unref(config).medalTasks.like.includeHighLevelMedals = $event),
+                    "active-text": "包含等级≥20的粉丝勋章"
+                  }, null, 8, ["modelValue"])
+                ]),
+                _: 1
+              })
+            ]),
+            _: 1
+          }),
+          vue.createVNode(_component_el_row, null, {
+            default: vue.withCtx(() => [
+              vue.createVNode(_component_el_space, { wrap: "" }, {
+                default: vue.withCtx(() => [
                   vue.createVNode(_component_el_switch, {
                     modelValue: vue.unref(config).medalTasks.danmu.enabled,
-                    "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => vue.unref(config).medalTasks.danmu.enabled = $event),
+                    "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => vue.unref(config).medalTasks.danmu.enabled = $event),
                     "active-text": "发送弹幕"
                   }, null, 8, ["modelValue"]),
                   vue.createVNode(_component_el_button, {
                     type: "primary",
                     size: "small",
                     icon: vue.unref(ElementPlusIconsVue.Edit),
-                    onClick: _cache[4] || (_cache[4] = ($event) => medalDanmuPanelVisible.value = !medalDanmuPanelVisible.value)
+                    onClick: _cache[5] || (_cache[5] = ($event) => medalDanmuPanelVisible.value = !medalDanmuPanelVisible.value)
                   }, {
                     default: vue.withCtx(() => [
                       vue.createTextVNode("编辑弹幕")
@@ -2892,12 +2916,12 @@
                 default: vue.withCtx(() => [
                   vue.createVNode(_component_el_switch, {
                     modelValue: vue.unref(config).medalTasks.watch.enabled,
-                    "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => vue.unref(config).medalTasks.watch.enabled = $event),
+                    "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => vue.unref(config).medalTasks.watch.enabled = $event),
                     "active-text": "观看直播"
                   }, null, 8, ["modelValue"]),
                   vue.createVNode(_component_el_select, {
                     modelValue: vue.unref(config).medalTasks.watch.time,
-                    "onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => vue.unref(config).medalTasks.watch.time = $event),
+                    "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => vue.unref(config).medalTasks.watch.time = $event),
                     placeholder: "Select",
                     style: { "width": "64px" }
                   }, {
@@ -2934,7 +2958,7 @@
                 default: vue.withCtx(() => [
                   vue.createVNode(_component_el_switch, {
                     modelValue: vue.unref(config).medalTasks.isWhiteList,
-                    "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => vue.unref(config).medalTasks.isWhiteList = $event),
+                    "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => vue.unref(config).medalTasks.isWhiteList = $event),
                     "active-text": "白名单",
                     "inactive-text": "黑名单"
                   }, null, 8, ["modelValue"]),
@@ -3002,7 +3026,7 @@
             default: vue.withCtx(() => [
               vue.createVNode(_component_el_text, null, {
                 default: vue.withCtx(() => [
-                  vue.createTextVNode("  由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，目前脚本仅为最多100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。")
+                  vue.createTextVNode("  由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。")
                 ]),
                 _: 1
               })
@@ -3011,7 +3035,7 @@
           }),
           vue.createVNode(_component_el_dialog, {
             modelValue: medalDanmuPanelVisible.value,
-            "onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => medalDanmuPanelVisible.value = $event),
+            "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => medalDanmuPanelVisible.value = $event),
             title: "编辑弹幕内容",
             "lock-scroll": false,
             width: "40%"
@@ -3079,7 +3103,7 @@
           }, 8, ["modelValue"]),
           vue.createVNode(_component_el_dialog, {
             modelValue: medalInfoPanelVisible.value,
-            "onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => medalInfoPanelVisible.value = $event),
+            "onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => medalInfoPanelVisible.value = $event),
             title: "编辑粉丝勋章名单",
             "lock-scroll": false,
             width: "40%"
@@ -3168,7 +3192,7 @@
       };
     }
   });
-  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["__scopeId", "data-v-eac67691"]]);
+  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["__scopeId", "data-v-f7944e85"]]);
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "OtherTasks",
     setup(__props) {
@@ -3600,6 +3624,7 @@
             title: "给主播点赞",
             message: vue.h("p", [
               vue.h("div", "在你的每个粉丝勋章对应的直播间给主播点赞。"),
+              vue.h("div", "如果你不希望等级≥20的粉丝勋章熄灭，可以勾选下面的“包含等级≥20的粉丝勋章”。"),
               vue.h("div", "部分直播间无法完成该任务，原因未知。")
             ])
           },
