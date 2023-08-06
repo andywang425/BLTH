@@ -66,6 +66,7 @@ const defaultValues: IdefaultValues = {
           },
           like: {
             enabled: false,
+            includeHighLevelMedals: false,
             _lastCompleteTime: 0
           },
           watch: {

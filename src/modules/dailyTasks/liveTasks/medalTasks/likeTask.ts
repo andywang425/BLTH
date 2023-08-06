@@ -23,7 +23,7 @@ class LikeTask extends BaseModule {
       return biliStore.filteredFansMedals
         .filter(
           (medal) =>
-            medal.medal.level < 20 &&
+            (this.config.includeHighLevelMedals ? true : medal.medal.level < 20) &&
             (this.medalTasksConfig.isWhiteList
               ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
               : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))

@@ -170,6 +170,17 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     </el-row>
     <el-row>
       <el-space wrap>
+        <el-icon>
+          <SemiSelect />
+        </el-icon>
+        <el-switch
+          v-model="config.medalTasks.like.includeHighLevelMedals"
+          active-text="包含等级≥20的粉丝勋章"
+        />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap>
         <el-switch v-model="config.medalTasks.danmu.enabled" active-text="发送弹幕" />
         <el-button
           type="primary"
@@ -226,7 +237,7 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     </el-row>
     <el-row>
       <el-text
-        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，目前脚本仅为最多100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。</el-text
+        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。</el-text
       >
     </el-row>
     <!-- 弹窗 -->
