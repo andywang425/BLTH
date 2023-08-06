@@ -32,7 +32,7 @@ npm run dev
 
 ### 分支
 
-- **master**: `master`分支是主分支，主仓库在发布新版本前会把`dev`分支合并到`master`分支。
+- **master**: `master`分支是主分支，主仓库在发布新版本前会把`dev`分支合并到`master`分支。最终供用户安装的用户脚本由Github Actions自动编译。
 
 - **dev**: `dev`分支是开发用分支，发起PR时以该分支为合并的目标。
 
@@ -41,7 +41,7 @@ npm run dev
 ```
 BLTH
 ├─.vscode
-├─dist                     存放build生成的用户脚本
+├─dist                     仅存在于master分支，存放Github Actions编译得到的用户脚本
 ├─node_modules
 ├─notes                    用来记录些东西，提交时会被忽略
 ├─scripts                  一些npm scripts，通过 npm run ... 调用
@@ -80,6 +80,10 @@ export default LikeTask
 
 可以参考已经写好的模块，尤其是 dailyTasks/mainSiteTasks 中的那几个，注释写得很详细。
 
+你写的这个模块肯定会有相关的配置项（至少得有一个开启/关闭的选项吧），打开 types/storage.d.ts，加上该模块配置信息的类型声明。
+
+接着打开 library/storage/defaultValue.ts，加上该模块配置信息的默认值。
+
 点赞涉及到对B站API的请求。在 library/bili-api 中找找看有没有给视频点赞的API，如果没有得自己添加。参考已有的API即可。
 
 点赞的视频从哪来？如果仔细阅读代码你会发现 useBiliStore 的 dynamicVideos 里已经存储了许多动态视频，你可以直接用。如果有特殊需求，自己获取视频当然也是可以的。
@@ -96,7 +100,7 @@ export default LikeTask
 npm run lint
 ```
 
-在你完成代码编写前，请运行以下命令格式化所有代码：
+在你完成代码编写后，请运行以下命令格式化所有代码：
 
 ```sh
 npm run format
