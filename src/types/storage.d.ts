@@ -36,6 +36,7 @@ interface ImoduleConfig {
         }
         like: {
           enabled: boolean
+          includeHighLevelMedals: boolean
           _lastCompleteTime: number
         }
         watch: {
