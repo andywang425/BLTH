@@ -34,7 +34,8 @@ const defaultModuleStatus: ImoduleStatus = {
     OtherTasks: {
       groupSign: '',
       silverToCoin: '',
-      coinToSilver: ''
+      coinToSilver: '',
+      getYearVipPrivilege: ''
     }
   }
 }

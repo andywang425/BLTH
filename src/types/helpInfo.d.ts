@@ -27,6 +27,7 @@ interface IhelpInfo {
       groupSign: IhelpInfoItem
       silverToCoin: IhelpInfoItem
       coinToSilver: IhelpInfoItem
+      getYearVipPrivilege: IhelpInfoItem
     }
   }
   EnhanceExperience: {

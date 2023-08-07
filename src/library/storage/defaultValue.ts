@@ -93,6 +93,10 @@ const defaultValues: IdefaultValues = {
           enabled: false,
           num: 1,
           _lastCompleteTime: 0
+        },
+        getYearVipPrivilege: {
+          enabled: false,
+          _nextReceiveTime: 0
         }
       }
     },
