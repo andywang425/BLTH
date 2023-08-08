@@ -3,7 +3,7 @@ import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../libr
 import BAPI from '../../../library/bili-api'
 import { Istatus } from '../../../types/moduleStatus'
 
-class CoinToSilver extends BaseModule {
+class CoinToSilverTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.coinToSilver
 
   set status(s: Istatus) {
@@ -50,4 +50,4 @@ class CoinToSilver extends BaseModule {
   }
 }
 
-export default CoinToSilver
+export default CoinToSilverTask

@@ -36,6 +36,13 @@ const status = moduleStore.moduleStatus.DailyTasks.OtherTasks
         <TaskStatus :status="status.coinToSilver" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.getYearVipPrivilege.enabled" active-text="领取年度大会员权益" />
+        <Info id="DailyTasks.OtherTasks.getYearVipPrivilege" />
+        <TaskStatus :status="status.getYearVipPrivilege" />
+      </el-space>
+    </el-row>
     <el-divider />
     <!-- 说明 -->
   </div>

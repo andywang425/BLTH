@@ -1,3 +1,3 @@
 export { default as DailyTask_OtherTask_GroupSignTask } from './groupSignTask'
-export { default as DailyTask_OtherTask_SilverToCoin } from './silverToCoin'
-export { default as DailyTask_OtherTask_CoinToSilver } from './coinToSilver'
+export { default as DailyTask_OtherTask_SilverToCoinTask } from './silverToCoinTask'
+export { default as DailyTask_OtherTask_CoinToSilverTask } from './coinToSilverTask'
