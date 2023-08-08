@@ -105,6 +105,10 @@ interface IbapiMethods {
       ga?: number
     ) => Promise<Main.CoinAdd>
     videoRelation: (aid: string, bvid?: string) => Promise<Main.VideoRelation>
+    vip: {
+      myPrivilege: () => Promise<Main.Vip.MyPrivilege>
+      receivePrivilege: (type: number, platform?: string) => Promise<Main.Vip.ReceivePrivilege>
+    }
   }
   vc: {
     myGroups: (build?: numeber, mobi_app?: string) => Promise<Vc.MyGroups>
