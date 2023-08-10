@@ -71,6 +71,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
       if (this.isYearVip()) {
         if (ts() >= this.config._nextReceiveTime) {
           // 当前时间已经超过了上次记录的下次领取时间，领取权益
+          this.status = 'running'
           const list = await this.myPrivilege()
           if (list) {
             for (const i of list) {
@@ -84,7 +85,9 @@ class GetYearVipPrivilegeTask extends BaseModule {
                 this.logger.warn('发现不属于年度大会员的权益', i)
               }
             }
+            this.status = 'done'
             this.config._nextReceiveTime = Math.max(...list.map((i) => i.period_end_unix))
+            // 此时刚领完，距离下次领取还有一个月，不用计划下次运行
           }
         } else {
           // 否则等待下次运行或什么都不做
