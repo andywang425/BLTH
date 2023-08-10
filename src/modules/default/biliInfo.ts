@@ -154,7 +154,7 @@ class BiliInfo extends DefaultBaseModule {
         this.logger.log('BAPI.live.fansMedalPanel(1) response', firstPageResponse)
         if (firstPageResponse.code === 0) {
           total_page = firstPageResponse.data.page_info.total_page
-          // 第一页的 list 缺少当前佩戴和最卷获得BAPI.main.share的勋章，需通过 special_list 获取
+          // 第一页的 list 缺少当前佩戴和最近获得的勋章，需通过 special_list 获取
           fansMetalList.push(...firstPageResponse.data.special_list, ...firstPageResponse.data.list)
         } else {
           this.logger.error('获取粉丝勋章列表第1页失败', firstPageResponse.message)
