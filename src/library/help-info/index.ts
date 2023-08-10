@@ -147,6 +147,25 @@ const help_info: IhelpInfo = {
           h('div', '把硬币兑换为银瓜子。'),
           h('div', '具体兑换规则请点击直播间页面的“立即充值→银瓜子商店”查看。')
         ])
+      },
+      getYearVipPrivilege: {
+        title: '领取年度大会员权益',
+        message: h('p', [
+          h('div', '自动领取年度大会员权益。'),
+          h('div', [
+            h('span', '具体权益请前往'),
+            h(
+              'a',
+              {
+                href: 'https://account.bilibili.com/account/big/myPackage',
+                rel: 'noreferrer',
+                target: '_blank'
+              },
+              '卡券包'
+            ),
+            h('span', '查看。')
+          ])
+        ])
       }
     }
   },
