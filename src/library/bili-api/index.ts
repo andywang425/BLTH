@@ -268,6 +268,40 @@ const BAPI: IbapiMethods = {
         aid,
         bvid
       })
+    },
+    vip: {
+      myPrivilege: () => {
+        const bili_jct = (useBiliStore().cookies as IbiliCookies).bili_jct as string
+        return request.main.get(
+          '/x/vip/privilege/my',
+          {
+            csrf: bili_jct
+          },
+          {
+            headers: {
+              Referer: 'https://account.bilibili.com/account/big/myPackage',
+              Origin: 'https://account.bilibili.com/account/big/myPackage'
+            }
+          }
+        )
+      },
+      receivePrivilege: (type, platform = 'web') => {
+        const bili_jct = (useBiliStore().cookies as IbiliCookies).bili_jct as string
+        return request.main.post(
+          '/x/vip/privilege/receive',
+          {
+            type,
+            platform,
+            csrf: bili_jct
+          },
+          {
+            headers: {
+              Referer: 'https://account.bilibili.com/account/big/myPackage',
+              Origin: 'https://account.bilibili.com/account/big/myPackage'
+            }
+          }
+        )
+      }
     }
   },
   vc: {

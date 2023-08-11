@@ -64,6 +64,10 @@ interface ImoduleConfig {
         num: number
         _lastCompleteTime: number
       }
+      getYearVipPrivilege: {
+        enabled: boolean
+        _nextReceiveTime: number
+      }
     }
   }
   EnhanceExperience: {

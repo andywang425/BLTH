@@ -21,6 +21,7 @@ interface ImoduleStatus {
       groupSign: Istatus
       silverToCoin: Istatus
       coinToSilver: Istatus
+      getYearVipPrivilege: Istatus
     }
   }
 }

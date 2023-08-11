@@ -1427,6 +1427,25 @@ declare namespace MainData {
       coin: number
     }
   }
+
+  namespace Vip {
+    namespace MyPrivilege {
+      interface Data {
+        list: List[]
+        is_short_vip: boolean
+        is_freight_open: boolean
+      }
+
+      interface List {
+        type: number
+        state: number
+        expire_time: number
+        vip_type: number
+        next_receive_days: number
+        period_end_unix: number
+      }
+    }
+  }
 }
 
 declare namespace VcData {

@@ -141,6 +141,21 @@ declare namespace Main {
     ttl: number
     data: MainData.VideoRelation.Data
   }
+
+  namespace Vip {
+    interface MyPrivilege {
+      code: number
+      message: string
+      ttl: number
+      data: MainData.Vip.MyPrivilege.Data
+    }
+
+    interface ReceivePrivilege {
+      code: number
+      message: string
+      ttl: number
+    }
+  }
 }
 
 declare namespace Vc {
