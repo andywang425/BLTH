@@ -12,6 +12,7 @@
     "svg2vue": "node scripts/convertSvgToVue.js"
   },
   "dependencies": {
+    "ajax-hook": "^3.0.1",
     "crypto-js": "^4.1.1",
     "element-plus": "^2.3.7",
     "hotkeys-js": "^3.10.4",

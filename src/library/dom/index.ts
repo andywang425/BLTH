@@ -11,14 +11,23 @@ const dce = document.createElement.bind(document)
  * @param selectors 选择器
  * @param intervel 轮询查找间隔
  * @param timeout 超时时间
+ * @param immediate 是否立即查找一次
  */
 const pollingQuery = (
   element: Document | Element,
   selectors: string,
   intervel: number,
-  timeout: number
+  timeout: number,
+  immediate: boolean = true
 ): Promise<Element> => {
   return new Promise((resolve, reject) => {
+    if (immediate) {
+      const ele = element.querySelector(selectors)
+      if (ele) {
+        resolve(ele)
+        return
+      }
+    }
     const timerPolling = setInterval(() => {
       const ele: Element | null = element.querySelector(selectors)
       if (ele) {

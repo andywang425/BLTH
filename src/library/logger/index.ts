@@ -27,6 +27,10 @@ class Logger {
     console.warn(...this.prefix, ...data)
   }
 
+  public debug(...data: any) {
+    console.debug(...this.prefix, ...data)
+  }
+
   constructor(title: string) {
     this._title = title
     this.prefix_title_str = title.split('_').join('][')
