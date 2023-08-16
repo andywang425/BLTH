@@ -77,6 +77,23 @@ const fproxy = (proxy: Iproxy) => {
   if (proxy.onResponse) {
     onResponseHandlers.push(proxy.onResponse)
   }
+  return {
+    unHook: () => {
+      if (proxy.onRequest) {
+        onRequestHandlers.splice(
+          onRequestHandlers.findIndex((handler) => handler === proxy.onRequest),
+          1
+        )
+      }
+      if (proxy.onResponse) {
+        onResponseHandlers.splice(
+          onResponseHandlers.findIndex((handler) => handler === proxy.onRequest),
+          1
+        )
+      }
+    },
+    originFetch: _fetch
+  }
 }
 
 export { fproxy }
