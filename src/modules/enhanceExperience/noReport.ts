@@ -32,7 +32,6 @@ class NoReport extends BaseModule {
               response: 'ok'
             })
           } else {
-            console.log('no handle ajax', config)
             handler.next(config)
           }
         }
@@ -47,8 +46,8 @@ class NoReport extends BaseModule {
           console.log('fetch', config, handler)
           handler.resolve(new Response('ok'))
         } else {
-          console.log('no handle fetch', config, handler)
-          handler.next()
+          console.log('fetch next', config, handler)
+          handler.next(config)
         }
       }
     })
