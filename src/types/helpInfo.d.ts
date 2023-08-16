@@ -34,6 +34,7 @@ interface IhelpInfo {
     switchLiveStreamQuality: IhelpInfoItem
     banp2p: IhelpInfoItem
     noReport: IhelpInfoItem
+    removePKBox: IhelpInfoItem
   }
 }
 
