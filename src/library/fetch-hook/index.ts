@@ -70,7 +70,7 @@ unsafeWindow.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   return response
 }
 
-const fproxy = (proxy: Iproxy) => {
+const fproxy = (proxy: Iproxy): { unHook: () => void; originFetch: typeof fetch } => {
   if (proxy.onRequest) {
     onRequestHandlers.push(proxy.onRequest)
   }
@@ -87,7 +87,7 @@ const fproxy = (proxy: Iproxy) => {
       }
       if (proxy.onResponse) {
         onResponseHandlers.splice(
-          onResponseHandlers.findIndex((handler) => handler === proxy.onRequest),
+          onResponseHandlers.findIndex((handler) => handler === proxy.onResponse),
           1
         )
       }

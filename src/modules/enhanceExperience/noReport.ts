@@ -40,24 +40,16 @@ class NoReport extends BaseModule {
       unsafeWindow
     )
 
-    const obj = fproxy({
+    fproxy({
       onRequest(config, handler) {
         const url = getUrlFromFetchInput(config.input)
         if (NoReport.isTargetURL(url)) {
-          console.log('fetch1', config, handler)
+          console.log('fetch', config, handler)
           handler.resolve(new Response('ok'))
         } else {
-          console.log('no handle fetch1', config, handler)
+          console.log('no handle fetch', config, handler)
           handler.next()
         }
-      }
-    })
-
-
-    const { unHook, originFetch } = fproxy({
-      onResponse(response, handler) {
-        console.log('no handle fetch2', response)
-        handler.next()
       }
     })
   }
