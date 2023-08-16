@@ -9,43 +9,12 @@ import { dce, isTargetFrame } from './library/dom'
 import * as MyIconsVue from './components/icons'
 import './assets/css/base.css'
 import Logger from './library/logger'
-import { proxy } from 'ajax-hook'
-import { unsafeWindow } from '$'
 import { useModuleStore } from './stores/useModuleStore'
-
-try {
-  // 编译的时候 if 条件会变成 true
-  // @ts-ignore
-  if (process.env.NODE_ENV !== 'development') {
-    Logger.prototype.debug = () => {}
-  }
-} catch (error) {
-  // 保险起见捕获一下错误
-  Logger.prototype.debug = () => {}
-}
 
 const logger = new Logger('main.ts')
 
 logger.log('document.readyState', document.readyState)
 
-// proxy(
-//   {
-//     onRequest: (config, handler) => {
-//       console.log(config.url)
-//       handler.next(config)
-//     }
-//   },
-//   unsafeWindow
-// )
-// proxy(
-//   {
-//     onResponse: (response, handler) => {
-//       console.log(response.response)
-//       handler.next(response)
-//     }
-//   },
-//   unsafeWindow
-// )
 if (isTargetFrame()) {
   const app = createApp(App)
   const pinia = createPinia()

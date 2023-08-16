@@ -49,7 +49,6 @@ if (livePlayer) {
   // 查找播放器上面的 header
   pollingQuery(document, '.left-ctnr.left-header-area', 300, 3000, true)
     .then((playerHeaderLeft) => {
-      console.log('pl', playerHeaderLeft)
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
       button.setAttribute('class', 'blth_btn')

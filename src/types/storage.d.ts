@@ -78,6 +78,9 @@ interface ImoduleConfig {
     banp2p: {
       enabled: boolean
     }
+    noReport: {
+      enabled: boolean
+    }
   }
 }
 
