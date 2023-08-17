@@ -6,14 +6,14 @@ interface IrequestConfig {
 }
 
 interface IrequestHandler {
-  resolve: (response: any) => void
-  reject: (error: any) => void
+  resolve: (response: Response) => void
+  error: (error: Error) => void
   next: (config: IrequestConfig) => void
 }
 
 interface IresponseHandler {
-  resolve: (response: any) => void
-  reject: (error: any) => void
+  resolve: (response: Response) => void
+  error: (error: Error) => void
   next: (response: Response) => void
 }
 
@@ -28,64 +28,94 @@ interface Iproxy {
 
 const _fetch = window.fetch
 
+class RequestHandler {
+  _resolve: Promise<Response> | undefined
+  _error: Error | undefined
+  _next: boolean = false
+  _input: IrequestConfig['input'] | undefined
+  _init: IrequestConfig['init'] | undefined
+
+  public resolve(response: Response) {
+    this._resolve = Promise.resolve(response)
+  }
+  public error(error: Error) {
+    this._error = error
+  }
+  public next(config: IrequestConfig) {
+    this._next = true
+    this._input = config.input
+    this._init = config.init
+  }
+}
+
+class ResponseHandler {
+  _resolve: Promise<Response> | undefined
+  _error: Error | undefined
+  _next: boolean = false
+  _response: Response | undefined
+
+  public resolve(response: Response) {
+    this._resolve = Promise.resolve(response)
+  }
+  public error(error: Error) {
+    this._error = error
+  }
+  public next(response: Response) {
+    this._next = true
+    this._response = response
+  }
+}
+
 const onRequestHandlers: onRequestHandler[] = []
 const onResponseHandlers: onResponseHandler[] = []
 
 unsafeWindow.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // 发起请求前
-  let requestHandlerResolve: Promise<Response> | undefined = undefined,
-    requestHandlerReject: Promise<Response> | undefined = undefined,
-    requestHandlerNext: boolean = false
-  const requestHandler: IrequestHandler = {
-    resolve: (response: Response) => (requestHandlerResolve = Promise.resolve(response)),
-    reject: (response: Response) => (requestHandlerReject = Promise.reject(response)),
-    next: (config: IrequestConfig) => {
-      requestHandlerNext = true
-      input = config.input
-      init = config.init
-    }
-  }
+  const requestHandler = new RequestHandler()
   for (const handler of onRequestHandlers) {
     handler.apply(unsafeWindow, [{ input, init }, requestHandler])
-    if (requestHandlerResolve) {
-      return requestHandlerResolve
-    } else if (requestHandlerReject) {
-      return requestHandlerReject
-    } else if (requestHandlerNext) {
-      continue
-    } else {
+    if (requestHandler._resolve) {
+      return requestHandler._resolve
+    }
+    if (requestHandler._error) {
+      throw requestHandler._error
+    }
+    if (!requestHandler._next) {
       break
     }
+
+    input = requestHandler._input as IrequestConfig['input']
+    init = requestHandler._init as IrequestConfig['init']
+    requestHandler._next = false
   }
+  // 发起请求
+  let response = await _fetch.apply(unsafeWindow, [input, init])
   // 收到响应后
-  let res = await _fetch.apply(unsafeWindow, [input, init])
-  let responseHandlerResolve: Promise<Response> | undefined = undefined,
-    responseHandlerReject: Promise<Response> | undefined = undefined,
-    responseHandlerNext: boolean = false
-  const responseHandler: IresponseHandler = {
-    resolve: (response: any) => (responseHandlerResolve = Promise.resolve(response)),
-    reject: (error: any) => (responseHandlerReject = Promise.reject(error)),
-    next: (response: Response) => {
-      responseHandlerNext = true
-      res = response
-    }
-  }
+  const responseHandler = new ResponseHandler()
   for (const handler of onResponseHandlers) {
-    handler.apply(unsafeWindow, [res, responseHandler])
-    if (responseHandlerResolve) {
-      return responseHandlerResolve
-    } else if (responseHandlerReject) {
-      return responseHandlerReject
-    } else if (responseHandlerNext) {
-      continue
-    } else {
+    handler.apply(unsafeWindow, [response, responseHandler])
+    if (responseHandler._resolve) {
+      return responseHandler._resolve
+    }
+    if (responseHandler._error) {
+      throw responseHandler._error
+    }
+    if (!responseHandler._next) {
       break
     }
+
+    response = responseHandler._response as Response
+    responseHandler._next = false
   }
-  return res
+  return response
 }
 
-const fproxy = (proxy: Iproxy): { unHook: () => void; originFetch: typeof fetch } => {
+const fproxy = (
+  proxy: Iproxy
+): {
+  unHook: () => void
+  originFetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+} => {
   if (proxy.onRequest) {
     onRequestHandlers.push(proxy.onRequest)
   }

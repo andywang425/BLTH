@@ -22,7 +22,6 @@ class NoReport extends BaseModule {
       {
         onRequest: (config, handler) => {
           if (NoReport.isTargetURL(config.url)) {
-            console.log('ajax', config)
             handler.resolve({
               config: config,
               status: 200,
@@ -49,6 +48,10 @@ class NoReport extends BaseModule {
           console.log('fetch next', config, handler)
           handler.next(config)
         }
+      },
+      onResponse(response, handler) {
+        console.log('fetch onresponse', response, handler)
+        handler.next(response)
       }
     })
   }
