@@ -200,6 +200,10 @@ const help_info: IhelpInfo = {
     removePKBox: {
       title: '移除大乱斗元素',
       message: h('p', [h('div', '移除直播间的大乱斗元素')])
+    },
+    removeLiveWaterMark: {
+      title: '移除直播间水印',
+      message: h('p', [h('div', '移除直播间左上角的水印')])
     }
   }
 }

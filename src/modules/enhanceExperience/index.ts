@@ -2,3 +2,4 @@ export { default as EnhanceExperience_SwitchLiveStreamQuality } from './switchLi
 export { default as EnhanceExperience_BanP2P } from './banP2P'
 export { default as EnhanceExperience_NoRepoet } from './noReport'
 export { default as EnhanceExperience_RemovePKBox } from './removePKBox'
+export { default as EnhanceExperience_RemoveLiveWaterMark } from './removeLiveWaterMark'
