@@ -71,8 +71,8 @@ const onResponseHandlers: onResponseHandler[] = []
 
 unsafeWindow.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // 发起请求前
-  const requestHandler = new RequestHandler()
   for (const handler of onRequestHandlers) {
+    const requestHandler = new RequestHandler()
     handler.apply(unsafeWindow, [{ input, init }, requestHandler])
     if (requestHandler._resolve) {
       return requestHandler._resolve
@@ -86,13 +86,12 @@ unsafeWindow.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 
     input = requestHandler._input as IrequestConfig['input']
     init = requestHandler._init as IrequestConfig['init']
-    requestHandler._next = false
   }
   // 发起请求
   let response = await _fetch.apply(unsafeWindow, [input, init])
   // 收到响应后
-  const responseHandler = new ResponseHandler()
   for (const handler of onResponseHandlers) {
+    const responseHandler = new ResponseHandler()
     handler.apply(unsafeWindow, [response, responseHandler])
     if (responseHandler._resolve) {
       return responseHandler._resolve
@@ -105,7 +104,6 @@ unsafeWindow.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     }
 
     response = responseHandler._response as Response
-    responseHandler._next = false
   }
   return response
 }
