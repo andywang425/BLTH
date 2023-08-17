@@ -113,6 +113,9 @@ const defaultValues: IdefaultValues = {
       },
       removePKBox: {
         enabled: false
+      },
+      removeLiveWaterMark: {
+        enabled: false
       }
     }
   },

@@ -35,6 +35,7 @@ interface IhelpInfo {
     banp2p: IhelpInfoItem
     noReport: IhelpInfoItem
     removePKBox: IhelpInfoItem
+    removeLiveWaterMark: IhelpInfoItem
   }
 }
 

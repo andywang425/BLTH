@@ -84,6 +84,9 @@ interface ImoduleConfig {
     removePKBox: {
       enabled: boolean
     }
+    removeLiveWaterMark: {
+      enabled: boolean
+    }
   }
 }
 
