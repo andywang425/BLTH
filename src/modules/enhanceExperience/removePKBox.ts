@@ -6,17 +6,20 @@ class RemovePKBox extends BaseModule {
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.removePKBox
 
-  private async removePKEnter() {
-    const getPKEnter = dq('#awesome-pk-vm')
-    if (getPKEnter) {
-      getPKEnter.remove()
-    } else {
-      this.logger.warn('未找到大乱斗入口')
+  private removePKNode() {
+    const blackElementList = ['#pk-vm', 'awesome-pk-vm']
+    for (const selector of blackElementList) {
+      const ele = dq(selector)
+      if (ele) {
+        ele.remove()
+      } else {
+        this.logger.warn('未找到大乱斗相关节点', selector)
+      }
     }
   }
 
-  private async removePKToast() {
-    const body = document.body
+  private removePKToast() {
+    const blackWordList = ['主播即将结束PK', '连线断开中']
 
     const pkOB = new MutationObserver((mutationsList) => {
       for (const mutation of mutationsList) {
@@ -25,29 +28,22 @@ class RemovePKBox extends BaseModule {
           if (
             addedNode instanceof HTMLElement &&
             addedNode.classList.contains('link-toast') &&
-            addedNode.innerHTML.includes('主播即将结束PK')
+            blackWordList.some((word) => addedNode.textContent?.includes(word))
           ) {
-            addedNode.remove()
+            addedNode.style.display = 'none'
           }
         })
       }
     })
-    pkOB.observe(body, { childList: true })
-  }
 
-  private async removePKBox() {
-    this.removePKEnter()
-    this.removePKToast()
+    pkOB.observe(document.body, { childList: true })
   }
 
   public async run() {
     this.logger.log('移除大乱斗元素模块开始运行')
     if (this.config.enabled) {
-      try {
-        await this.removePKBox()
-      } catch (e) {
-        this.logger.error('移除大乱斗元素失败', e)
-      }
+      this.removePKNode()
+      this.removePKToast()
     }
   }
 }
