@@ -1,3 +1,4 @@
+import { dq } from '../../library/dom'
 import BaseModule from '../BaseModule'
 
 class RemovePKBox extends BaseModule {
@@ -6,11 +7,11 @@ class RemovePKBox extends BaseModule {
   config = this.moduleStore.moduleConfig.EnhanceExperience.removePKBox
 
   private async removePKEnter() {
-    const getPKEnter = document.getElementById('awesome-pk-vm')
+    const getPKEnter = dq('#awesome-pk-vm')
     if (getPKEnter) {
       getPKEnter.remove()
     } else {
-      this.logger.error('未找到大乱斗入口')
+      this.logger.warn('未找到大乱斗入口')
     }
   }
 
@@ -19,18 +20,19 @@ class RemovePKBox extends BaseModule {
 
     const pkOB = new MutationObserver((mutationsList) => {
       for (const mutation of mutationsList) {
-        if (mutation.addedNodes.length > 0) {
-          const addedNode = mutation.addedNodes[0] as HTMLElement
-          if (addedNode.innerText && addedNode.innerText.includes('10秒后主播即将结束PK')) {
-            const getPKToast = document.querySelector('.link-toast.info.center-animation')
-            if (getPKToast) {
-              getPKToast.remove()
-            }
+        console.log('mutation', mutation)
+        mutation.addedNodes.forEach((addedNode) => {
+          if (
+            addedNode instanceof HTMLElement &&
+            addedNode.classList.contains('link-toast') &&
+            addedNode.innerHTML.includes('主播即将结束PK')
+          ) {
+            addedNode.remove()
           }
-        }
+        })
       }
     })
-    pkOB.observe(body, { childList: true, subtree: true })
+    pkOB.observe(body, { childList: true })
   }
 
   private async removePKBox() {
