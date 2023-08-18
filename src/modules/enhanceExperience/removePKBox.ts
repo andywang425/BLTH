@@ -1,4 +1,4 @@
-import { dq } from '../../library/dom'
+import { GM_addStyle } from '$'
 import BaseModule from '../BaseModule'
 
 class RemovePKBox extends BaseModule {
@@ -7,15 +7,7 @@ class RemovePKBox extends BaseModule {
   config = this.moduleStore.moduleConfig.EnhanceExperience.removePKBox
 
   private removePKNode() {
-    const blackElementList = ['#pk-vm', 'awesome-pk-vm']
-    for (const selector of blackElementList) {
-      const ele = dq(selector)
-      if (ele) {
-        ele.remove()
-      } else {
-        this.logger.warn('未找到大乱斗相关节点', selector)
-      }
-    }
+    GM_addStyle('#pk-vm, #awesome-pk-vm { display: none !important }')
   }
 
   private removePKToast() {
