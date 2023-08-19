@@ -15,6 +15,7 @@ class BiliInfo extends DefaultBaseModule {
   private getBilibiliLive(): Window['BilibiliLive'] {
     this.logger.log('unsafeWindow.BilibiliLive', unsafeWindow.BilibiliLive)
     // 返回一个 BilibiliLive 的引用
+    // 需要注意的是 BilibiliLive 里的部分属性需要等一会才会被初始化（window.onload 触发后可正常使用）
     return unsafeWindow.BilibiliLive
   }
 

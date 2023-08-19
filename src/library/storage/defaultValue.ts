@@ -107,6 +107,15 @@ const defaultValues: IdefaultValues = {
       },
       banp2p: {
         enabled: false
+      },
+      noReport: {
+        enabled: false
+      },
+      removePKBox: {
+        enabled: false
+      },
+      removeLiveWaterMark: {
+        enabled: false
       }
     }
   },

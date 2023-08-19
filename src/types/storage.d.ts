@@ -78,6 +78,15 @@ interface ImoduleConfig {
     banp2p: {
       enabled: boolean
     }
+    noReport: {
+      enabled: boolean
+    }
+    removePKBox: {
+      enabled: boolean
+    }
+    removeLiveWaterMark: {
+      enabled: boolean
+    }
   }
 }
 

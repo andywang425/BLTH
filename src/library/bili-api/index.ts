@@ -207,7 +207,7 @@ const BAPI: IbapiMethods = {
       const biliStore = useBiliStore()
       return request.main.post('/x/click-interface/web/heartbeat', {
         start_ts: ts(),
-        mid: (useBiliStore().BilibiliLive as Window['BilibiliLive']).UID,
+        mid: useBiliStore().userInfo?.mid,
         aid,
         cid,
         type,

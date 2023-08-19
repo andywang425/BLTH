@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useUIStore } from './stores/useUIStore'
-import { useModuleStore } from './stores/useModuleStore'
 import PanelHeader from './components/PanelHeader.vue'
 import PanelAside from './components/PanelAside.vue'
 import PanelMain from './components/PanelMain.vue'
@@ -11,7 +10,6 @@ import { isSelfTopFrame, topFrameDocuemnt } from './library/dom'
 import Logger from './library/logger'
 
 const uiStore = useUIStore()
-const moduleStore = useModuleStore()
 
 const logger = new Logger('App.vue')
 
@@ -45,53 +43,48 @@ function buttonOnClick() {
 // 节流，防止点击过快，减小渲染压力
 const throttleButtoOnClick = _.throttle(buttonOnClick, 300)
 
-// 加载功能模块，可以放在 window.onload 之前
-moduleStore.loadModules()
+livePlayer = dq('#live-player-ctnr')
+if (livePlayer) {
+  setPanelSize()
+  // 查找播放器上面的 header
+  pollingQuery(document, '.left-ctnr.left-header-area', 300, 3000, true)
+    .then((playerHeaderLeft) => {
+      // 创建显示/隐藏控制面板按钮
+      button = dce('button')
+      button.setAttribute('class', 'blth_btn')
+      button.onclick = throttleButtoOnClick
+      button.innerText = uiStore.isShowPanelButtonText
+      playerHeaderLeft.append(button)
+      if (!isSelfTopFrame()) {
+        // 在特殊直播间，脚本所在的 TargetFrame 只占屏幕中间一块地方
+        // 如果焦点不在里面，快捷键会失效
+        // 所以这里额外把 hotkeys 注入到顶层 frame 确保快捷键总是可用
+        hotkeys(
+          'alt+b',
+          {
+            element: topFrameDocuemnt() as any
+          },
+          throttleButtoOnClick
+        )
+      }
+      hotkeys('alt+b', throttleButtoOnClick)
+    })
+    .catch(() => logger.error("Can't find playerHeaderLeft in time"))
+  // 监听页面缩放，调整控制面板大小
+  // 因为这个操作频率不高就不节流或防抖了
+  window.onresize = setPanelSize
+  // 监听 html 根节点个 body 节点
+  // 主要是为了适配滚动条的显示/隐藏和实验室中的功能
+  const observer = new MutationObserver(() => setPanelSize())
+  observer.observe(document.documentElement, { attributes: true })
+  observer.observe(document.body, { attributes: true })
 
-window.onload = () => {
-  livePlayer = dq('#live-player-ctnr')
-  if (livePlayer) {
-    setPanelSize()
-    // 查找播放器上面的 header
-    pollingQuery(document, '.left-ctnr.left-header-area', 300, 3000)
-      .then((playerHeaderLeft) => {
-        // 创建显示/隐藏控制面板按钮
-        button = dce('button')
-        button.setAttribute('class', 'blth_btn')
-        button.onclick = throttleButtoOnClick
-        button.innerText = uiStore.isShowPanelButtonText
-        playerHeaderLeft.append(button)
-        if (!isSelfTopFrame()) {
-          // 在特殊直播间，脚本所在的 TargetFrame 只占屏幕中间一块地方
-          // 如果焦点不在里面，快捷键会失效
-          // 所以这里额外把 hotkeys 注入到顶层 frame 确保快捷键总是可用
-          hotkeys(
-            'alt+b',
-            {
-              element: topFrameDocuemnt() as any
-            },
-            throttleButtoOnClick
-          )
-        }
-        hotkeys('alt+b', throttleButtoOnClick)
-      })
-      .catch(() => logger.error("Can't find playerHeaderLeft in time"))
-    // 监听页面缩放，调整控制面板大小
-    // 因为这个操作频率不高就不节流或防抖了
-    window.onresize = setPanelSize
-    // 监听 html 根节点个 body 节点
-    // 主要是为了适配滚动条的显示/隐藏和实验室中的功能
-    const observer = new MutationObserver(() => setPanelSize())
-    observer.observe(document.documentElement, { attributes: true })
-    observer.observe(document.body, { attributes: true })
-
-    // 准备完毕，显示控制面板
-    if (isShowPanel) {
-      uiStore.uiConfig.isShowPanel = true
-    }
-  } else {
-    logger.error('livePlayer not found')
+  // 准备完毕，显示控制面板
+  if (isShowPanel) {
+    uiStore.uiConfig.isShowPanel = true
   }
+} else {
+  logger.error('livePlayer not found')
 }
 </script>
 

@@ -60,4 +60,16 @@ function deepestIterate(obj: any, fn: (value: any, path: string) => void, path?:
   })
 }
 
-export { uuid, sleep, wait, packFormData, deepestIterate }
+function getUrlFromFetchInput(input: RequestInfo | URL): string {
+  if (typeof input === 'string') {
+    return input
+  } else if (input instanceof URL) {
+    return input.toString()
+  } else if (input instanceof Request) {
+    return input.url
+  } else {
+    return 'Incorrect input'
+  }
+}
+
+export { uuid, sleep, wait, packFormData, deepestIterate, getUrlFromFetchInput }
