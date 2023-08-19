@@ -44,17 +44,15 @@ const status = moduleStore.moduleStatus.DailyTasks.MainSiteTasks
     </el-row>
     <el-divider />
     <!-- 说明 -->
-    <div>
-      <el-text>&emsp;&emsp;主站每日任务的完成情况可在</el-text>
-      <el-link
-        class="el-link-va-baseline"
-        rel="noreferrer"
-        type="primary"
-        href="https://account.bilibili.com/account/home"
-        target="_blank"
-        >个人中心</el-link
-      >
-      <el-text>查看。数据更新可能有一定的延时。</el-text>
-    </div>
+    <el-text>&emsp;&emsp;主站每日任务的完成情况可在</el-text>
+    <el-link
+      class="el-link-va-baseline"
+      rel="noreferrer"
+      type="primary"
+      href="https://account.bilibili.com/account/home"
+      target="_blank"
+      >个人中心</el-link
+    >
+    <el-text>查看。数据更新可能有一定的延时。</el-text>
   </div>
 </template>
