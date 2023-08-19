@@ -191,10 +191,22 @@ const help_info: IhelpInfo = {
       title: '拦截日志数据上报',
       message: h('p', [
         h('div', '禁止B站上报日志数据。'),
-        h(
-          'div',
-          'B站会实时地上报大量日志信息，比如直播观看情况、代码报错等等。开启本功能后绝大多数日志上报都会被拦截并返回一个成功的响应，如果追求更好的效果和性能表现建议使用广告拦截相关的浏览器拓展，比如uBlock。'
-        )
+        h('div', [
+          h(
+            'span',
+            'B站会实时地上报大量日志信息，比如直播观看情况、代码报错等等。开启本功能后绝大多数日志上报都会被拦截并返回一个成功的响应。如果追求更好的效果和性能表现建议使用带有广告拦截功能的浏览器拓展，比如'
+          ),
+          h(
+            'a',
+            {
+              href: 'https://github.com/gorhill/uBlock',
+              rel: 'noreferrer',
+              target: '_blank'
+            },
+            'uBlock Origin'
+          ),
+          h('span', '。')
+        ])
       ])
     },
     removePKBox: {
