@@ -1,7 +1,7 @@
 {
   "name": "bilibili-live-tasks-helper",
   "private": true,
-  "version": "7.0.7",
+  "version": "7.0.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
