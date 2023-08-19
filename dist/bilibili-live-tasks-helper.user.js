@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.0.7
+// @version         7.0.8
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
@@ -32,17 +32,18 @@
 // @connect         passport.bilibili.com
 // @connect         live.bilibili.com
 // @connect         live-trace.bilibili.com
+// @grant           GM_addStyle
 // @grant           GM_getResourceText
 // @grant           GM_getValue
 // @grant           GM_setValue
 // @grant           GM_xmlhttpRequest
 // @grant           unsafeWindow
-// @run-at          document-end
+// @run-at          document-start
 // ==/UserScript==
 
-(a=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=a,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-f7944e85]{width:80px;height:80px}.avatar[data-v-f7944e85]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-4aed17ff]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-4aed17ff]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-4aed17ff]{width:auto}.aside #aside-el-menu[data-v-4aed17ff]:not(.el-menu--collapse){width:150px}.main[data-v-4aed17ff]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-4aed17ff],.fade-leave-active[data-v-4aed17ff]{transition:opacity .1s ease}.fade-enter-from[data-v-4aed17ff],.fade-leave-to[data-v-4aed17ff]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-2f9d6050]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-link-va-baseline{vertical-align:baseline} ");
+(a=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=a,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-f7944e85]{width:80px;height:80px}.avatar[data-v-f7944e85]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-4234c94a]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-4234c94a]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-4234c94a]{width:auto}.aside #aside-el-menu[data-v-4234c94a]:not(.el-menu--collapse){width:150px}.main[data-v-4234c94a]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-4234c94a],.fade-leave-active[data-v-4234c94a]{transition:opacity .1s ease}.fade-enter-from[data-v-4234c94a],.fade-leave-to[data-v-4234c94a]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-2f9d6050]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-link-va-baseline{vertical-align:baseline} ");
 
-(function (vue, pinia, _, luxon, CryptoJS, ElementPlusIconsVue, ElementPlus, hotkeys) {
+(function (vue, pinia, _, ElementPlusIconsVue, luxon, CryptoJS, ElementPlus, hotkeys) {
   'use strict';
 
   function _interopNamespaceDefault(e) {
@@ -70,6 +71,7 @@
     __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
     return value;
   };
+  var _GM_addStyle = /* @__PURE__ */ (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
   var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
   var _GM_xmlhttpRequest = /* @__PURE__ */ (() => typeof GM_xmlhttpRequest != "undefined" ? GM_xmlhttpRequest : void 0)();
@@ -174,6 +176,15 @@
           qualityDesc: "原画"
         },
         banp2p: {
+          enabled: false
+        },
+        noReport: {
+          enabled: false
+        },
+        removePKBox: {
+          enabled: false
+        },
+        removeLiveWaterMark: {
           enabled: false
         }
       }
@@ -293,6 +304,160 @@
       setActiveMenuIndex
     };
   });
+  const _hoisted_1$3 = { class: "title" };
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+    __name: "PanelHeader",
+    setup(__props) {
+      const uiStore = useUIStore();
+      return (_ctx, _cache) => {
+        const _component_el_icon = vue.resolveComponent("el-icon");
+        const _component_el_text = vue.resolveComponent("el-text");
+        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+          vue.createElementVNode("div", {
+            class: "collapse-btn",
+            onClick: _cache[0] || (_cache[0] = ($event) => vue.unref(uiStore).changeCollapse())
+          }, [
+            vue.unref(uiStore).uiConfig.isCollapse ? (vue.openBlock(), vue.createBlock(_component_el_icon, { key: 0 }, {
+              default: vue.withCtx(() => [
+                vue.createVNode(vue.unref(ElementPlusIconsVue.Expand))
+              ]),
+              _: 1
+            })) : (vue.openBlock(), vue.createBlock(_component_el_icon, { key: 1 }, {
+              default: vue.withCtx(() => [
+                vue.createVNode(vue.unref(ElementPlusIconsVue.Fold))
+              ]),
+              _: 1
+            }))
+          ]),
+          vue.createElementVNode("div", _hoisted_1$3, [
+            vue.createVNode(_component_el_text, {
+              tag: "b",
+              class: "header-big-text"
+            }, {
+              default: vue.withCtx(() => [
+                vue.createTextVNode("控制面板")
+              ]),
+              _: 1
+            }),
+            vue.createVNode(_component_el_text, { class: "header-small-text" }, {
+              default: vue.withCtx(() => [
+                vue.createTextVNode(vue.toDisplayString(vue.unref(uiStore).activeMenuName), 1)
+              ]),
+              _: 1
+            })
+          ])
+        ], 64);
+      };
+    }
+  });
+  const _export_sfc = (sfc, props) => {
+    const target = sfc.__vccOpts || sfc;
+    for (const [key, val] of props) {
+      target[key] = val;
+    }
+    return target;
+  };
+  const PanelHeader = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["__scopeId", "data-v-dda95e10"]]);
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+    __name: "PanelAside",
+    setup(__props) {
+      const uiStore = useUIStore();
+      const items = [
+        {
+          icon: "Tasks",
+          title: "每日任务",
+          index: "DailyTasks",
+          // 有子菜单，index 无所谓
+          subs: [
+            {
+              title: "主站任务",
+              index: "MainSiteTasks"
+              // index 是组件名
+            },
+            {
+              title: "直播任务",
+              index: "LiveTasks"
+            },
+            {
+              title: "其它任务",
+              index: "OtherTasks"
+            }
+          ]
+        },
+        {
+          icon: "Monitor",
+          title: "体验优化",
+          index: "EnhanceExperience"
+        }
+      ];
+      return (_ctx, _cache) => {
+        const _component_el_icon = vue.resolveComponent("el-icon");
+        const _component_el_menu_item = vue.resolveComponent("el-menu-item");
+        const _component_el_sub_menu = vue.resolveComponent("el-sub-menu");
+        const _component_el_menu = vue.resolveComponent("el-menu");
+        return vue.openBlock(), vue.createBlock(_component_el_menu, {
+          "default-active": vue.unref(uiStore).uiConfig.activeMenuIndex,
+          style: vue.normalizeStyle({ "min-height": vue.unref(uiStore).scrollBarHeight }),
+          collapse: vue.unref(uiStore).uiConfig.isCollapse,
+          "unique-opened": "",
+          onSelect: vue.unref(uiStore).setActiveMenuIndex,
+          id: "aside-el-menu"
+        }, {
+          default: vue.withCtx(() => [
+            (vue.openBlock(), vue.createElementBlock(vue.Fragment, null, vue.renderList(items, (item) => {
+              return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
+                item.subs ? (vue.openBlock(), vue.createBlock(_component_el_sub_menu, {
+                  index: item.index,
+                  key: item.index
+                }, {
+                  title: vue.withCtx(() => [
+                    vue.createVNode(_component_el_icon, null, {
+                      default: vue.withCtx(() => [
+                        (vue.openBlock(), vue.createBlock(vue.resolveDynamicComponent(item.icon)))
+                      ]),
+                      _: 2
+                    }, 1024),
+                    vue.createElementVNode("span", null, vue.toDisplayString(item.title), 1)
+                  ]),
+                  default: vue.withCtx(() => [
+                    (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(item.subs, (subItem) => {
+                      return vue.openBlock(), vue.createBlock(_component_el_menu_item, {
+                        key: subItem.index,
+                        index: subItem.index
+                      }, {
+                        default: vue.withCtx(() => [
+                          vue.createTextVNode(vue.toDisplayString(subItem.title), 1)
+                        ]),
+                        _: 2
+                      }, 1032, ["index"]);
+                    }), 128))
+                  ]),
+                  _: 2
+                }, 1032, ["index"])) : (vue.openBlock(), vue.createBlock(_component_el_menu_item, {
+                  index: item.index,
+                  key: item.index
+                }, {
+                  title: vue.withCtx(() => [
+                    vue.createTextVNode(vue.toDisplayString(item.title), 1)
+                  ]),
+                  default: vue.withCtx(() => [
+                    vue.createVNode(_component_el_icon, null, {
+                      default: vue.withCtx(() => [
+                        (vue.openBlock(), vue.createBlock(vue.resolveDynamicComponent(item.icon)))
+                      ]),
+                      _: 2
+                    }, 1024)
+                  ]),
+                  _: 2
+                }, 1032, ["index"]))
+              ], 64);
+            }), 64))
+          ]),
+          _: 1
+        }, 8, ["default-active", "style", "collapse", "onSelect"]);
+      };
+    }
+  });
   const useBiliStore = pinia.defineStore("bili", () => {
     const BilibiliLive = vue.ref();
     const cookies = vue.ref();
@@ -317,7 +482,7 @@
       filteredFansMedals
     };
   });
-  class Request {
+  let Request$1 = class Request2 {
     constructor(url_prefix, orgin) {
       /** 请求 URL 的前缀 */
       __publicField(this, "url_prefix");
@@ -336,7 +501,7 @@
      * @returns Promise
      */
     get(url, params, otherDetails) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve2, reject2) => {
         const defaultDetails = {
           method: "GET",
           url: this.url_prefix + url + (params ? "?" + new URLSearchParams(params).toString() : ""),
@@ -348,10 +513,10 @@
             "Sec-Fetch-Site": "same-site"
           },
           onload: function(response) {
-            resolve(response.response);
+            resolve2(response.response);
           },
           onerror: function(err) {
-            reject(err);
+            reject2(err);
           }
         };
         const details = _.defaultsDeep(otherDetails, defaultDetails);
@@ -366,7 +531,7 @@
      * @returns Promise
      */
     post(url, data, otherDetails) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve2, reject2) => {
         const defaultDetails = {
           method: "POST",
           url: this.url_prefix.concat(url),
@@ -380,10 +545,10 @@
             "Content-Type": "application/x-www-form-urlencoded"
           },
           onload: function(response) {
-            resolve(response.response);
+            resolve2(response.response);
           },
           onerror: function(err) {
-            reject(err);
+            reject2(err);
           }
         };
         const details = _.defaultsDeep(otherDetails, defaultDetails);
@@ -393,7 +558,7 @@
         _GM_xmlhttpRequest(details);
       });
     }
-  }
+  };
   function uuid() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(char) {
       const randomInt = 16 * Math.random() | 0;
@@ -401,13 +566,13 @@
     });
   }
   function sleep(miliseconds) {
-    return new Promise((resolve) => setTimeout(resolve, miliseconds));
+    return new Promise((resolve2) => setTimeout(resolve2, miliseconds));
   }
   function wait(type, timeout = -1) {
-    return new Promise((resolve) => {
-      useModuleStore().emitter.on(type, (event) => resolve(event));
+    return new Promise((resolve2) => {
+      useModuleStore().emitter.on(type, (event) => resolve2(event));
       if (timeout !== -1)
-        setTimeout(resolve, timeout);
+        setTimeout(resolve2, timeout);
     });
   }
   function packFormData(json) {
@@ -424,6 +589,17 @@
         fn(value, newPath);
       }
     });
+  }
+  function getUrlFromFetchInput(input) {
+    if (typeof input === "string") {
+      return input;
+    } else if (input instanceof URL) {
+      return input.toString();
+    } else if (input instanceof Request) {
+      return input.url;
+    } else {
+      return "Incorrect input";
+    }
   }
   luxon.Settings.defaultZone = "Asia/Shanghai";
   function isTimestampToday(timestamp, hour = 0, minute = 5) {
@@ -469,12 +645,12 @@
     return luxon.DateTime.now().toMillis();
   }
   const request = {
-    live: new Request("https://api.live.bilibili.com", "https://live.bilibili.com"),
-    liveTrace: new Request("https://live-trace.bilibili.com", "https://live.bilibili.com"),
-    passport: new Request("https://passport.bilibili.com", "https://passport.bilibili.com/"),
-    main: new Request("https://api.bilibili.com", "https://www.bilibili.com"),
-    vc: new Request("https://api.vc.bilibili.com", "https://message.bilibili.com/"),
-    raw: new Request()
+    live: new Request$1("https://api.live.bilibili.com", "https://live.bilibili.com"),
+    liveTrace: new Request$1("https://live-trace.bilibili.com", "https://live.bilibili.com"),
+    passport: new Request$1("https://passport.bilibili.com", "https://passport.bilibili.com/"),
+    main: new Request$1("https://api.bilibili.com", "https://www.bilibili.com"),
+    vc: new Request$1("https://api.vc.bilibili.com", "https://message.bilibili.com/"),
+    raw: new Request$1()
   };
   const BAPI = {
     live: {
@@ -636,10 +812,11 @@
         });
       },
       videoHeartbeat: (aid, cid = "", realtime = 0, played_time = 0, real_played_time = 0, refer_url = "https://t.bilibili.com/?spm_id_from=444.3.0.0", quality = 116, video_duration = 100, type = 3, sub_type = 0, play_type = 0, dt = 2, last_play_progress_time = 0, max_play_progress_time = 0, spmid = "333.488.0.0", from_spmid = "333.31.list.card_archive.click", extra = '{"player_version":"4.1.21-rc.1727.0"}') => {
+        var _a;
         const biliStore = useBiliStore();
         return request.main.post("/x/click-interface/web/heartbeat", {
           start_ts: ts(),
-          mid: useBiliStore().BilibiliLive.UID,
+          mid: (_a = useBiliStore().userInfo) == null ? void 0 : _a.mid,
           aid,
           cid,
           type,
@@ -1339,19 +1516,26 @@
   const dq = document.querySelector.bind(document);
   document.querySelectorAll.bind(document);
   const dce = document.createElement.bind(document);
-  const pollingQuery = (element, selectors, intervel, timeout) => {
-    return new Promise((resolve, reject) => {
+  const pollingQuery = (element, selectors, intervel, timeout, immediate = true) => {
+    return new Promise((resolve2, reject2) => {
+      if (immediate) {
+        const ele = element.querySelector(selectors);
+        if (ele) {
+          resolve2(ele);
+          return;
+        }
+      }
       const timerPolling = setInterval(() => {
         const ele = element.querySelector(selectors);
         if (ele) {
           clearTimeout(timerPolling);
-          resolve(ele);
+          resolve2(ele);
         }
       }, intervel);
       const timerTimeout = setTimeout(() => {
         clearTimeout(timerPolling);
         clearTimeout(timerTimeout);
-        reject();
+        reject2();
       }, timeout);
     });
   };
@@ -2277,19 +2461,19 @@
       __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.switchLiveStreamQuality);
     }
     async waitForPlayer() {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve2, reject2) => {
         const topWindow = _unsafeWindow.top ? _unsafeWindow.top : _unsafeWindow;
         const findPlayertimer = setInterval(() => {
           if (topWindow.livePlayer && Object.prototype.hasOwnProperty.call(topWindow.livePlayer, "switchQuality") && Object.prototype.hasOwnProperty.call(topWindow.livePlayer, "getPlayerInfo")) {
             clearInterval(findPlayertimer);
             clearTimeout(timeoutTimer);
-            resolve(topWindow.livePlayer);
+            resolve2(topWindow.livePlayer);
           }
         }, 200);
         const timeoutTimer = setTimeout(() => {
           clearInterval(findPlayertimer);
           clearTimeout(timeoutTimer);
-          reject();
+          reject2();
         }, 1e4);
       });
     }
@@ -2372,6 +2556,505 @@
     }
   }
   __publicField(BanP2P, "runMultiple", true);
+  var events = ["load", "loadend", "timeout", "error", "readystatechange", "abort"];
+  var OriginXhr = "__origin_xhr";
+  function configEvent(event, xhrProxy) {
+    var e = {};
+    for (var attr in event)
+      e[attr] = event[attr];
+    e.target = e.currentTarget = xhrProxy;
+    return e;
+  }
+  function hook(proxy2, win) {
+    win = win || window;
+    var originXhr = win.XMLHttpRequest;
+    win.XMLHttpRequest = function() {
+      var xhr = new originXhr();
+      for (var i = 0; i < events.length; ++i) {
+        var key = "on" + events[i];
+        if (xhr[key] === void 0)
+          xhr[key] = null;
+      }
+      for (var attr in xhr) {
+        var type = "";
+        try {
+          type = typeof xhr[attr];
+        } catch (e) {
+        }
+        if (type === "function") {
+          this[attr] = hookFunction(attr);
+        } else if (attr !== OriginXhr) {
+          Object.defineProperty(this, attr, {
+            get: getterFactory(attr),
+            set: setterFactory(attr),
+            enumerable: true
+          });
+        }
+      }
+      var that = this;
+      xhr.getProxy = function() {
+        return that;
+      };
+      this[OriginXhr] = xhr;
+    };
+    Object.assign(win.XMLHttpRequest, { UNSENT: 0, OPENED: 1, HEADERS_RECEIVED: 2, LOADING: 3, DONE: 4 });
+    function getterFactory(attr) {
+      return function() {
+        var v = this.hasOwnProperty(attr + "_") ? this[attr + "_"] : this[OriginXhr][attr];
+        var attrGetterHook = (proxy2[attr] || {})["getter"];
+        return attrGetterHook && attrGetterHook(v, this) || v;
+      };
+    }
+    function setterFactory(attr) {
+      return function(v) {
+        var xhr = this[OriginXhr];
+        var that = this;
+        var hook2 = proxy2[attr];
+        if (attr.substring(0, 2) === "on") {
+          that[attr + "_"] = v;
+          xhr[attr] = function(e) {
+            e = configEvent(e, that);
+            var ret = proxy2[attr] && proxy2[attr].call(that, xhr, e);
+            ret || v.call(that, e);
+          };
+        } else {
+          var attrSetterHook = (hook2 || {})["setter"];
+          v = attrSetterHook && attrSetterHook(v, that) || v;
+          this[attr + "_"] = v;
+          try {
+            xhr[attr] = v;
+          } catch (e) {
+          }
+        }
+      };
+    }
+    function hookFunction(fun) {
+      return function() {
+        var args = [].slice.call(arguments);
+        if (proxy2[fun]) {
+          var ret = proxy2[fun].call(this, args, this[OriginXhr]);
+          if (ret)
+            return ret;
+        }
+        return this[OriginXhr][fun].apply(this[OriginXhr], args);
+      };
+    }
+    function unHook() {
+      win.XMLHttpRequest = originXhr;
+      originXhr = void 0;
+    }
+    return { originXhr, unHook };
+  }
+  var eventLoad = events[0], eventLoadEnd = events[1], eventTimeout = events[2], eventError = events[3], eventReadyStateChange = events[4], eventAbort = events[5];
+  var prototype = "prototype";
+  function proxy(proxy2, win) {
+    win = win || window;
+    return proxyAjax(proxy2, win);
+  }
+  function trim(str) {
+    return str.replace(/^\s+|\s+$/g, "");
+  }
+  function getEventTarget(xhr) {
+    return xhr.watcher || (xhr.watcher = document.createElement("a"));
+  }
+  function triggerListener(xhr, name) {
+    var xhrProxy = xhr.getProxy();
+    var callback = "on" + name + "_";
+    var event = configEvent({ type: name }, xhrProxy);
+    xhrProxy[callback] && xhrProxy[callback](event);
+    var evt;
+    if (typeof Event === "function") {
+      evt = new Event(name, { bubbles: false });
+    } else {
+      evt = document.createEvent("Event");
+      evt.initEvent(name, false, true);
+    }
+    getEventTarget(xhr).dispatchEvent(evt);
+  }
+  function Handler(xhr) {
+    this.xhr = xhr;
+    this.xhrProxy = xhr.getProxy();
+  }
+  Handler[prototype] = /* @__PURE__ */ Object.create({
+    resolve: function resolve(response) {
+      var xhrProxy = this.xhrProxy;
+      var xhr = this.xhr;
+      xhrProxy.readyState = 4;
+      xhr.resHeader = response.headers;
+      xhrProxy.response = xhrProxy.responseText = response.response;
+      xhrProxy.statusText = response.statusText;
+      xhrProxy.status = response.status;
+      triggerListener(xhr, eventReadyStateChange);
+      triggerListener(xhr, eventLoad);
+      triggerListener(xhr, eventLoadEnd);
+    },
+    reject: function reject(error) {
+      this.xhrProxy.status = 0;
+      triggerListener(this.xhr, error.type);
+      triggerListener(this.xhr, eventLoadEnd);
+    }
+  });
+  function makeHandler(next) {
+    function sub(xhr) {
+      Handler.call(this, xhr);
+    }
+    sub[prototype] = Object.create(Handler[prototype]);
+    sub[prototype].next = next;
+    return sub;
+  }
+  var RequestHandler$1 = makeHandler(function(rq) {
+    var xhr = this.xhr;
+    rq = rq || xhr.config;
+    xhr.withCredentials = rq.withCredentials;
+    xhr.open(rq.method, rq.url, rq.async !== false, rq.user, rq.password);
+    for (var key in rq.headers) {
+      xhr.setRequestHeader(key, rq.headers[key]);
+    }
+    xhr.send(rq.body);
+  });
+  var ResponseHandler$1 = makeHandler(function(response) {
+    this.resolve(response);
+  });
+  var ErrorHandler = makeHandler(function(error) {
+    this.reject(error);
+  });
+  function proxyAjax(proxy2, win) {
+    var onRequest = proxy2.onRequest, onResponse = proxy2.onResponse, onError = proxy2.onError;
+    function handleResponse(xhr, xhrProxy) {
+      var handler = new ResponseHandler$1(xhr);
+      var responseType = xhrProxy.responseType;
+      var responseData = !responseType || responseType === "text" || responseType === "json" ? xhrProxy.responseText : xhrProxy.response;
+      var ret = {
+        response: responseData,
+        //ie9
+        status: xhrProxy.status,
+        statusText: xhrProxy.statusText,
+        config: xhr.config,
+        headers: xhr.resHeader || xhr.getAllResponseHeaders().split("\r\n").reduce(function(ob, str) {
+          if (str === "")
+            return ob;
+          var m = str.split(":");
+          ob[m.shift()] = trim(m.join(":"));
+          return ob;
+        }, {})
+      };
+      if (!onResponse)
+        return handler.resolve(ret);
+      onResponse(ret, handler);
+    }
+    function onerror(xhr, xhrProxy, error, errorType) {
+      var handler = new ErrorHandler(xhr);
+      error = { config: xhr.config, error, type: errorType };
+      if (onError) {
+        onError(error, handler);
+      } else {
+        handler.next(error);
+      }
+    }
+    function preventXhrProxyCallback() {
+      return true;
+    }
+    function errorCallback(errorType) {
+      return function(xhr, e) {
+        onerror(xhr, this, e, errorType);
+        return true;
+      };
+    }
+    function stateChangeCallback(xhr, xhrProxy) {
+      if (xhr.readyState === 4 && xhr.status !== 0) {
+        handleResponse(xhr, xhrProxy);
+      } else if (xhr.readyState !== 4) {
+        triggerListener(xhr, eventReadyStateChange);
+      }
+      return true;
+    }
+    var { originXhr, unHook } = hook({
+      onload: preventXhrProxyCallback,
+      onloadend: preventXhrProxyCallback,
+      onerror: errorCallback(eventError),
+      ontimeout: errorCallback(eventTimeout),
+      onabort: errorCallback(eventAbort),
+      onreadystatechange: function(xhr) {
+        return stateChangeCallback(xhr, this);
+      },
+      open: function open(args, xhr) {
+        var _this = this;
+        var config = xhr.config = { headers: {} };
+        config.method = args[0];
+        config.url = args[1];
+        config.async = args[2];
+        config.user = args[3];
+        config.password = args[4];
+        config.xhr = xhr;
+        var evName = "on" + eventReadyStateChange;
+        if (!xhr[evName]) {
+          xhr[evName] = function() {
+            return stateChangeCallback(xhr, _this);
+          };
+        }
+        if (onRequest)
+          return true;
+      },
+      send: function(args, xhr) {
+        var config = xhr.config;
+        config.withCredentials = xhr.withCredentials;
+        config.body = args[0];
+        if (onRequest) {
+          var req = function() {
+            onRequest(config, new RequestHandler$1(xhr));
+          };
+          config.async === false ? req() : setTimeout(req);
+          return true;
+        }
+      },
+      setRequestHeader: function(args, xhr) {
+        xhr.config.headers[args[0].toLowerCase()] = args[1];
+        if (onRequest)
+          return true;
+      },
+      addEventListener: function(args, xhr) {
+        var _this = this;
+        if (events.indexOf(args[0]) !== -1) {
+          var handler = args[1];
+          getEventTarget(xhr).addEventListener(args[0], function(e) {
+            var event = configEvent(e, _this);
+            event.type = args[0];
+            event.isTrusted = true;
+            handler.call(_this, event);
+          });
+          return true;
+        }
+      },
+      getAllResponseHeaders: function(_2, xhr) {
+        var headers = xhr.resHeader;
+        if (headers) {
+          var header = "";
+          for (var key in headers) {
+            header += key + ": " + headers[key] + "\r\n";
+          }
+          return header;
+        }
+      },
+      getResponseHeader: function(args, xhr) {
+        var headers = xhr.resHeader;
+        if (headers) {
+          return headers[(args[0] || "").toLowerCase()];
+        }
+      }
+    }, win);
+    return {
+      originXhr,
+      unProxy: unHook
+    };
+  }
+  const _fetch = window.fetch;
+  class RequestHandler {
+    constructor() {
+      __publicField(this, "_resolve");
+      __publicField(this, "_error");
+      __publicField(this, "_next", false);
+      __publicField(this, "_input");
+      __publicField(this, "_init");
+    }
+    resolve(response) {
+      this._resolve = Promise.resolve(response);
+    }
+    error(error) {
+      this._error = error;
+    }
+    next(config) {
+      this._next = true;
+      this._input = config.input;
+      this._init = config.init;
+    }
+  }
+  class ResponseHandler {
+    constructor() {
+      __publicField(this, "_resolve");
+      __publicField(this, "_error");
+      __publicField(this, "_next", false);
+      __publicField(this, "_response");
+    }
+    resolve(response) {
+      this._resolve = Promise.resolve(response);
+    }
+    error(error) {
+      this._error = error;
+    }
+    next(response) {
+      this._next = true;
+      this._response = response;
+    }
+  }
+  const onRequestHandlers = [];
+  const onResponseHandlers = [];
+  _unsafeWindow.fetch = async (input, init) => {
+    for (const handler of onRequestHandlers) {
+      const requestHandler = new RequestHandler();
+      handler.apply(_unsafeWindow, [{ input, init }, requestHandler]);
+      if (requestHandler._resolve) {
+        return requestHandler._resolve;
+      }
+      if (requestHandler._error) {
+        throw requestHandler._error;
+      }
+      if (!requestHandler._next) {
+        break;
+      }
+      input = requestHandler._input;
+      init = requestHandler._init;
+    }
+    let response = await _fetch.apply(_unsafeWindow, [input, init]);
+    for (const handler of onResponseHandlers) {
+      const responseHandler = new ResponseHandler();
+      handler.apply(_unsafeWindow, [response, responseHandler]);
+      if (responseHandler._resolve) {
+        return responseHandler._resolve;
+      }
+      if (responseHandler._error) {
+        throw responseHandler._error;
+      }
+      if (!responseHandler._next) {
+        break;
+      }
+      response = responseHandler._response;
+    }
+    return response;
+  };
+  const fproxy = (proxy2) => {
+    if (proxy2.onRequest) {
+      onRequestHandlers.push(proxy2.onRequest);
+    }
+    if (proxy2.onResponse) {
+      onResponseHandlers.push(proxy2.onResponse);
+    }
+    return {
+      unHook: () => {
+        if (proxy2.onRequest) {
+          onRequestHandlers.splice(
+            onRequestHandlers.findIndex((handler) => handler === proxy2.onRequest),
+            1
+          );
+        }
+        if (proxy2.onResponse) {
+          onResponseHandlers.splice(
+            onResponseHandlers.findIndex((handler) => handler === proxy2.onResponse),
+            1
+          );
+        }
+      },
+      originFetch: _fetch
+    };
+  };
+  const _NoReport = class _NoReport extends BaseModule {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.noReport);
+    }
+    static isTargetURL(url) {
+      if (url.includes("//data.bilibili.com") || url.includes("//data.bilivideo.com")) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    async ajaxHook() {
+      proxy(
+        {
+          onRequest: (config, handler) => {
+            if (_NoReport.isTargetURL(config.url)) {
+              handler.resolve({
+                config,
+                status: 200,
+                headers: {
+                  "Content-Type": "text/plain; charset=utf-8"
+                },
+                response: "ok"
+              });
+            } else {
+              handler.next(config);
+            }
+          }
+        },
+        _unsafeWindow
+      );
+      fproxy({
+        onRequest(config, handler) {
+          const url = getUrlFromFetchInput(config.input);
+          if (_NoReport.isTargetURL(url)) {
+            console.log("fetch", config, handler);
+            handler.resolve(new Response("ok"));
+          } else {
+            console.log("fetch next", config, handler);
+            handler.next(config);
+          }
+        },
+        onResponse(response, handler) {
+          console.log("fetch onresponse", response, handler);
+          handler.next(response);
+        }
+      });
+    }
+    async run() {
+      this.logger.log("拦截日志数据上报模块开始运行");
+      if (this.config.enabled) {
+        try {
+          await this.ajaxHook();
+        } catch (e) {
+          this.logger.error("拦截日志数据上报失败", e);
+        }
+      }
+    }
+  };
+  __publicField(_NoReport, "runMultiple", true);
+  let NoReport = _NoReport;
+  class RemovePKBox extends BaseModule {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.removePKBox);
+    }
+    removePKNode() {
+      _GM_addStyle("#pk-vm, #awesome-pk-vm { display: none !important }");
+    }
+    removePKToast() {
+      const blackWordList = ["主播即将结束PK", "连线断开中"];
+      const pkOB = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          console.log("mutation", mutation);
+          mutation.addedNodes.forEach((addedNode) => {
+            if (addedNode instanceof HTMLElement && addedNode.classList.contains("link-toast") && blackWordList.some((word) => {
+              var _a;
+              return (_a = addedNode.textContent) == null ? void 0 : _a.includes(word);
+            })) {
+              addedNode.style.display = "none";
+            }
+          });
+        }
+      });
+      pkOB.observe(document.body, { childList: true });
+    }
+    async run() {
+      this.logger.log("移除大乱斗元素模块开始运行");
+      if (this.config.enabled) {
+        this.removePKNode();
+        this.removePKToast();
+      }
+    }
+  }
+  __publicField(RemovePKBox, "runMultiple", true);
+  class RemoveLiveWaterMark extends BaseModule {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.removeLiveWaterMark);
+    }
+    async run() {
+      this.logger.log("移除直播间水印模块开始运行");
+      if (this.config.enabled) {
+        _GM_addStyle(".web-player-icon-roomStatus { display: none !important }");
+      }
+    }
+  }
+  __publicField(RemoveLiveWaterMark, "runMultiple", true);
   const otherModules = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     DailyTask_LiveTask_AppUserTask: AppUserTask,
@@ -2388,6 +3071,9 @@
     DailyTask_OtherTask_GroupSignTask: GroupSignTask,
     DailyTask_OtherTask_SilverToCoinTask: SilverToCoinTask,
     EnhanceExperience_BanP2P: BanP2P,
+    EnhanceExperience_NoRepoet: NoReport,
+    EnhanceExperience_RemoveLiveWaterMark: RemoveLiveWaterMark,
+    EnhanceExperience_RemovePKBox: RemovePKBox,
     EnhanceExperience_SwitchLiveStreamQuality: SwitchLiveStreamQuality
   }, Symbol.toStringTag, { value: "Module" }));
   function mitt(n) {
@@ -2502,160 +3188,6 @@
       moduleStatus,
       loadModules
     };
-  });
-  const _hoisted_1$3 = { class: "title" };
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
-    __name: "PanelHeader",
-    setup(__props) {
-      const uiStore = useUIStore();
-      return (_ctx, _cache) => {
-        const _component_el_icon = vue.resolveComponent("el-icon");
-        const _component_el_text = vue.resolveComponent("el-text");
-        return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-          vue.createElementVNode("div", {
-            class: "collapse-btn",
-            onClick: _cache[0] || (_cache[0] = ($event) => vue.unref(uiStore).changeCollapse())
-          }, [
-            vue.unref(uiStore).uiConfig.isCollapse ? (vue.openBlock(), vue.createBlock(_component_el_icon, { key: 0 }, {
-              default: vue.withCtx(() => [
-                vue.createVNode(vue.unref(ElementPlusIconsVue.Expand))
-              ]),
-              _: 1
-            })) : (vue.openBlock(), vue.createBlock(_component_el_icon, { key: 1 }, {
-              default: vue.withCtx(() => [
-                vue.createVNode(vue.unref(ElementPlusIconsVue.Fold))
-              ]),
-              _: 1
-            }))
-          ]),
-          vue.createElementVNode("div", _hoisted_1$3, [
-            vue.createVNode(_component_el_text, {
-              tag: "b",
-              class: "header-big-text"
-            }, {
-              default: vue.withCtx(() => [
-                vue.createTextVNode("控制面板")
-              ]),
-              _: 1
-            }),
-            vue.createVNode(_component_el_text, { class: "header-small-text" }, {
-              default: vue.withCtx(() => [
-                vue.createTextVNode(vue.toDisplayString(vue.unref(uiStore).activeMenuName), 1)
-              ]),
-              _: 1
-            })
-          ])
-        ], 64);
-      };
-    }
-  });
-  const _export_sfc = (sfc, props) => {
-    const target = sfc.__vccOpts || sfc;
-    for (const [key, val] of props) {
-      target[key] = val;
-    }
-    return target;
-  };
-  const PanelHeader = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["__scopeId", "data-v-dda95e10"]]);
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
-    __name: "PanelAside",
-    setup(__props) {
-      const uiStore = useUIStore();
-      const items = [
-        {
-          icon: "Tasks",
-          title: "每日任务",
-          index: "DailyTasks",
-          // 有子菜单，index 无所谓
-          subs: [
-            {
-              title: "主站任务",
-              index: "MainSiteTasks"
-              // index 是组件名
-            },
-            {
-              title: "直播任务",
-              index: "LiveTasks"
-            },
-            {
-              title: "其它任务",
-              index: "OtherTasks"
-            }
-          ]
-        },
-        {
-          icon: "Monitor",
-          title: "体验优化",
-          index: "EnhanceExperience"
-        }
-      ];
-      return (_ctx, _cache) => {
-        const _component_el_icon = vue.resolveComponent("el-icon");
-        const _component_el_menu_item = vue.resolveComponent("el-menu-item");
-        const _component_el_sub_menu = vue.resolveComponent("el-sub-menu");
-        const _component_el_menu = vue.resolveComponent("el-menu");
-        return vue.openBlock(), vue.createBlock(_component_el_menu, {
-          "default-active": vue.unref(uiStore).uiConfig.activeMenuIndex,
-          style: vue.normalizeStyle({ "min-height": vue.unref(uiStore).scrollBarHeight }),
-          collapse: vue.unref(uiStore).uiConfig.isCollapse,
-          "unique-opened": "",
-          onSelect: vue.unref(uiStore).setActiveMenuIndex,
-          id: "aside-el-menu"
-        }, {
-          default: vue.withCtx(() => [
-            (vue.openBlock(), vue.createElementBlock(vue.Fragment, null, vue.renderList(items, (item) => {
-              return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
-                item.subs ? (vue.openBlock(), vue.createBlock(_component_el_sub_menu, {
-                  index: item.index,
-                  key: item.index
-                }, {
-                  title: vue.withCtx(() => [
-                    vue.createVNode(_component_el_icon, null, {
-                      default: vue.withCtx(() => [
-                        (vue.openBlock(), vue.createBlock(vue.resolveDynamicComponent(item.icon)))
-                      ]),
-                      _: 2
-                    }, 1024),
-                    vue.createElementVNode("span", null, vue.toDisplayString(item.title), 1)
-                  ]),
-                  default: vue.withCtx(() => [
-                    (vue.openBlock(true), vue.createElementBlock(vue.Fragment, null, vue.renderList(item.subs, (subItem) => {
-                      return vue.openBlock(), vue.createBlock(_component_el_menu_item, {
-                        key: subItem.index,
-                        index: subItem.index
-                      }, {
-                        default: vue.withCtx(() => [
-                          vue.createTextVNode(vue.toDisplayString(subItem.title), 1)
-                        ]),
-                        _: 2
-                      }, 1032, ["index"]);
-                    }), 128))
-                  ]),
-                  _: 2
-                }, 1032, ["index"])) : (vue.openBlock(), vue.createBlock(_component_el_menu_item, {
-                  index: item.index,
-                  key: item.index
-                }, {
-                  title: vue.withCtx(() => [
-                    vue.createTextVNode(vue.toDisplayString(item.title), 1)
-                  ]),
-                  default: vue.withCtx(() => [
-                    vue.createVNode(_component_el_icon, null, {
-                      default: vue.withCtx(() => [
-                        (vue.openBlock(), vue.createBlock(vue.resolveDynamicComponent(item.icon)))
-                      ]),
-                      _: 2
-                    }, 1024)
-                  ]),
-                  _: 2
-                }, 1032, ["index"]))
-              ], 64);
-            }), 64))
-          ]),
-          _: 1
-        }, 8, ["default-active", "style", "collapse", "onSelect"]);
-      };
-    }
   });
   const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "MainSiteTasks",
@@ -2775,32 +3307,30 @@
             _: 1
           }),
           vue.createVNode(_component_el_divider),
-          vue.createElementVNode("div", null, [
-            vue.createVNode(_component_el_text, null, {
-              default: vue.withCtx(() => [
-                vue.createTextVNode("  主站每日任务的完成情况可在")
-              ]),
-              _: 1
-            }),
-            vue.createVNode(_component_el_link, {
-              class: "el-link-va-baseline",
-              rel: "noreferrer",
-              type: "primary",
-              href: "https://account.bilibili.com/account/home",
-              target: "_blank"
-            }, {
-              default: vue.withCtx(() => [
-                vue.createTextVNode("个人中心")
-              ]),
-              _: 1
-            }),
-            vue.createVNode(_component_el_text, null, {
-              default: vue.withCtx(() => [
-                vue.createTextVNode("查看。数据更新可能有一定的延时。")
-              ]),
-              _: 1
-            })
-          ])
+          vue.createVNode(_component_el_text, null, {
+            default: vue.withCtx(() => [
+              vue.createTextVNode("  主站每日任务的完成情况可在")
+            ]),
+            _: 1
+          }),
+          vue.createVNode(_component_el_link, {
+            class: "el-link-va-baseline",
+            rel: "noreferrer",
+            type: "primary",
+            href: "https://account.bilibili.com/account/home",
+            target: "_blank"
+          }, {
+            default: vue.withCtx(() => [
+              vue.createTextVNode("个人中心")
+            ]),
+            _: 1
+          }),
+          vue.createVNode(_component_el_text, null, {
+            default: vue.withCtx(() => [
+              vue.createTextVNode("查看。数据更新可能有一定的延时。")
+            ]),
+            _: 1
+          })
         ]);
       };
     }
@@ -3523,6 +4053,54 @@
             ]),
             _: 1
           }),
+          vue.createVNode(_component_el_row, null, {
+            default: vue.withCtx(() => [
+              vue.createVNode(_component_el_space, { wrap: "" }, {
+                default: vue.withCtx(() => [
+                  vue.createVNode(_component_el_switch, {
+                    modelValue: vue.unref(config).noReport.enabled,
+                    "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => vue.unref(config).noReport.enabled = $event),
+                    "active-text": "拦截日志数据上报"
+                  }, null, 8, ["modelValue"]),
+                  vue.createVNode(_component_Info, { id: "EnhanceExperience.noReport" })
+                ]),
+                _: 1
+              })
+            ]),
+            _: 1
+          }),
+          vue.createVNode(_component_el_row, null, {
+            default: vue.withCtx(() => [
+              vue.createVNode(_component_el_space, { wrap: "" }, {
+                default: vue.withCtx(() => [
+                  vue.createVNode(_component_el_switch, {
+                    modelValue: vue.unref(config).removePKBox.enabled,
+                    "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => vue.unref(config).removePKBox.enabled = $event),
+                    "active-text": "移除大乱斗元素"
+                  }, null, 8, ["modelValue"]),
+                  vue.createVNode(_component_Info, { id: "EnhanceExperience.removePKBox" })
+                ]),
+                _: 1
+              })
+            ]),
+            _: 1
+          }),
+          vue.createVNode(_component_el_row, null, {
+            default: vue.withCtx(() => [
+              vue.createVNode(_component_el_space, { wrap: "" }, {
+                default: vue.withCtx(() => [
+                  vue.createVNode(_component_el_switch, {
+                    modelValue: vue.unref(config).removeLiveWaterMark.enabled,
+                    "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => vue.unref(config).removeLiveWaterMark.enabled = $event),
+                    "active-text": "移除直播间水印"
+                  }, null, 8, ["modelValue"]),
+                  vue.createVNode(_component_Info, { id: "EnhanceExperience.removeLiveWaterMark" })
+                ]),
+                _: 1
+              })
+            ]),
+            _: 1
+          }),
           vue.createVNode(_component_el_divider)
         ]);
       };
@@ -3550,8 +4128,7 @@
     __name: "App",
     setup(__props) {
       const uiStore = useUIStore();
-      const moduleStore = useModuleStore();
-      const logger = new Logger("App.vue");
+      const logger2 = new Logger("App.vue");
       let isShowPanel = uiStore.uiConfig.isShowPanel;
       uiStore.uiConfig.isShowPanel = false;
       let livePlayer;
@@ -3568,39 +4145,36 @@
         button.innerText = uiStore.isShowPanelButtonText;
       }
       const throttleButtoOnClick = _.throttle(buttonOnClick, 300);
-      moduleStore.loadModules();
-      window.onload = () => {
-        livePlayer = dq("#live-player-ctnr");
-        if (livePlayer) {
-          setPanelSize();
-          pollingQuery(document, ".left-ctnr.left-header-area", 300, 3e3).then((playerHeaderLeft) => {
-            button = dce("button");
-            button.setAttribute("class", "blth_btn");
-            button.onclick = throttleButtoOnClick;
-            button.innerText = uiStore.isShowPanelButtonText;
-            playerHeaderLeft.append(button);
-            if (!isSelfTopFrame()) {
-              hotkeys(
-                "alt+b",
-                {
-                  element: topFrameDocuemnt()
-                },
-                throttleButtoOnClick
-              );
-            }
-            hotkeys("alt+b", throttleButtoOnClick);
-          }).catch(() => logger.error("Can't find playerHeaderLeft in time"));
-          window.onresize = setPanelSize;
-          const observer = new MutationObserver(() => setPanelSize());
-          observer.observe(document.documentElement, { attributes: true });
-          observer.observe(document.body, { attributes: true });
-          if (isShowPanel) {
-            uiStore.uiConfig.isShowPanel = true;
+      livePlayer = dq("#live-player-ctnr");
+      if (livePlayer) {
+        setPanelSize();
+        pollingQuery(document, ".left-ctnr.left-header-area", 300, 3e3, true).then((playerHeaderLeft) => {
+          button = dce("button");
+          button.setAttribute("class", "blth_btn");
+          button.onclick = throttleButtoOnClick;
+          button.innerText = uiStore.isShowPanelButtonText;
+          playerHeaderLeft.append(button);
+          if (!isSelfTopFrame()) {
+            hotkeys(
+              "alt+b",
+              {
+                element: topFrameDocuemnt()
+              },
+              throttleButtoOnClick
+            );
           }
-        } else {
-          logger.error("livePlayer not found");
+          hotkeys("alt+b", throttleButtoOnClick);
+        }).catch(() => logger2.error("Can't find playerHeaderLeft in time"));
+        window.onresize = setPanelSize;
+        const observer = new MutationObserver(() => setPanelSize());
+        observer.observe(document.documentElement, { attributes: true });
+        observer.observe(document.body, { attributes: true });
+        if (isShowPanel) {
+          uiStore.uiConfig.isShowPanel = true;
         }
-      };
+      } else {
+        logger2.error("livePlayer not found");
+      }
       return (_ctx, _cache) => {
         const _component_el_header = vue.resolveComponent("el-header");
         const _component_el_aside = vue.resolveComponent("el-aside");
@@ -3668,7 +4242,7 @@
       };
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-4aed17ff"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-4234c94a"]]);
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;
@@ -3736,7 +4310,7 @@
             vue.h("div", [
               vue.h(
                 "strong",
-                "由于曾经的APP用户任务下架已久，目前的新任务（观看新主播直播并发弹幕）又没有对全部用户开放，故改功能暂时被禁用。"
+                "由于曾经的APP用户任务下架已久，目前的新任务（观看新主播直播并发弹幕）又没有对全部用户开放，故该功能暂时被禁用。"
               ),
               vue.h("div", [
                 vue.h(
@@ -3782,7 +4356,14 @@
             title: "给主播点赞",
             message: vue.h("p", [
               vue.h("div", "在你的每个粉丝勋章对应的直播间给主播点赞。"),
-              vue.h("div", "如果你不希望等级≥20的粉丝勋章熄灭，可以勾选下面的“包含等级≥20的粉丝勋章”。"),
+              vue.h("div", [
+                vue.h("span", "如果你不希望等级≥20的粉丝勋章熄灭，可以勾选下面的“包含等级≥20的粉丝勋章”"),
+                vue.h(
+                  "strong",
+                  "（虽然B站的帮助中心说点赞可以点亮粉丝勋章但现在似乎不行了，所以该选项以后可能会被删除）"
+                ),
+                vue.h("span", "。")
+              ]),
               vue.h("div", "部分直播间无法完成该任务，原因未知。")
             ])
           },
@@ -3876,6 +4457,36 @@
             "B站使用WebRTC技术把许多浏览器点对点（P2P）地连接起来，实现视频流和音频流的传输。这样做是为了减轻B站服务器的压力，但是会占用你一定的上行带宽（大约几百kb每秒）。如果你不想被占用上行带宽，可以开启该功能。若开启后发现观看直播时有明显卡顿，请关闭。"
           )
         ])
+      },
+      noReport: {
+        title: "拦截日志数据上报",
+        message: vue.h("p", [
+          vue.h("div", "禁止B站上报日志数据。"),
+          vue.h("div", [
+            vue.h(
+              "span",
+              "B站会实时地上报大量日志信息，比如直播观看情况、代码报错等等。开启本功能后绝大多数日志上报都会被拦截并返回一个成功的响应。如果追求更好的效果和性能表现建议使用带有广告拦截功能的浏览器拓展，比如"
+            ),
+            vue.h(
+              "a",
+              {
+                href: "https://github.com/gorhill/uBlock",
+                rel: "noreferrer",
+                target: "_blank"
+              },
+              "uBlock Origin"
+            ),
+            vue.h("span", "。")
+          ])
+        ])
+      },
+      removePKBox: {
+        title: "移除大乱斗元素",
+        message: "移除直播间的大乱斗元素（进度条，弹出的提示等）。"
+      },
+      removeLiveWaterMark: {
+        title: "移除直播间水印",
+        message: "移除直播画面左上角的水印。"
       }
     }
   };
@@ -3979,41 +4590,35 @@
     TaskStatus: TaskStatusIcon,
     Tasks: TasksIcon
   }, Symbol.toStringTag, { value: "Module" }));
-  (function() {
-    if (isTargetFrame()) {
-      const app = vue.createApp(App);
-      const pinia$1 = pinia.createPinia();
-      app.use(ElementPlus);
-      app.use(pinia$1);
-      const logger = new Logger("main.ts");
-      const cacheStore = useCacheStore();
-      cacheStore.checkIfMainBLTHRunning();
-      if (!cacheStore.isMainBLTHRunning) {
-        logger.log("当前脚本是Main BLTH，开始存活心跳");
-        cacheStore.startAliveHeartBeat();
-      } else {
-        logger.log("其它页面上存在正在运行的Main BLTH");
-      }
-      for (const [key, component] of Object.entries(ElementPlusIconsVue__namespace)) {
-        app.component(key, component);
-      }
-      for (const [key, component] of Object.entries(MyIconsVue)) {
-        app.component(key, component);
-      }
-      app.mount(
-        (() => {
-          try {
-            const app2 = dce("div");
-            app2.id = "BLTH";
-            document.body.append(app2);
-            return app2;
-          } catch (e) {
-            logger.error("挂载Vue app时发送错误", e);
-            return "Error";
-          }
-        })()
-      );
+  const logger = new Logger("main.ts");
+  logger.log("document.readyState", document.readyState);
+  if (isTargetFrame()) {
+    const app = vue.createApp(App);
+    const pinia$1 = pinia.createPinia();
+    app.use(ElementPlus);
+    app.use(pinia$1);
+    const cacheStore = useCacheStore();
+    cacheStore.checkIfMainBLTHRunning();
+    if (!cacheStore.isMainBLTHRunning) {
+      logger.log("当前脚本是Main BLTH，开始存活心跳");
+      cacheStore.startAliveHeartBeat();
+    } else {
+      logger.log("其它页面上存在正在运行的Main BLTH");
     }
-  })();
+    for (const [key, component] of Object.entries(ElementPlusIconsVue__namespace)) {
+      app.component(key, component);
+    }
+    for (const [key, component] of Object.entries(MyIconsVue)) {
+      app.component(key, component);
+    }
+    const moduleStore = useModuleStore();
+    moduleStore.loadModules();
+    window.onload = () => {
+      const div = dce("div");
+      div.id = "BLTH";
+      document.body.append(div);
+      app.mount(div);
+    };
+  }
 
-})(Vue, Pinia, _, luxon, CryptoJS, ElementPlusIconsVue, ElementPlus, hotkeys);
+})(Vue, Pinia, _, ElementPlusIconsVue, luxon, CryptoJS, ElementPlus, hotkeys);
