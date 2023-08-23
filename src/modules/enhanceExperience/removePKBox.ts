@@ -15,7 +15,6 @@ class RemovePKBox extends BaseModule {
 
     const pkOB = new MutationObserver((mutationsList) => {
       for (const mutation of mutationsList) {
-        console.log('mutation', mutation)
         mutation.addedNodes.forEach((addedNode) => {
           if (
             addedNode instanceof HTMLElement &&
