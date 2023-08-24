@@ -23,11 +23,10 @@ export const useCacheStore = defineStore('cache', () => {
     // 那样就会留下一个永久的有脚本在运行的标记
     const timer = setInterval(() => (cache.lastAliveHeartBeatTime = Date.now()), 5000)
 
-    window.onunload = () => {
-      // 页面被关闭时重置时间戳为0
+    window.addEventListener('unload', function () {
       clearInterval(timer)
       cache.lastAliveHeartBeatTime = 0
-    }
+    })
   }
 
   /**
