@@ -41,7 +41,7 @@ if (isTargetFrame()) {
   const moduleStore = useModuleStore()
   moduleStore.loadModules()
 
-  const mounApp = () => {
+  const mountApp = () => {
     const div = dce('div')
     div.id = 'BLTH'
     document.body.append(div)
@@ -51,8 +51,8 @@ if (isTargetFrame()) {
   logger.log('document.readyState', document.readyState)
 
   if (document.readyState !== 'loading') {
-    mounApp()
+    mountApp()
   } else {
-    document.addEventListener('DOMContentLoaded', () => mounApp())
+    document.addEventListener('DOMContentLoaded', () => mountApp())
   }
 }

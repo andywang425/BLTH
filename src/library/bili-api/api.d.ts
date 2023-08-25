@@ -31,7 +31,7 @@ interface IbapiMethods {
       color?: number,
       bubble?: number
     ) => Promise<Live.SendMsg>
-    likeReport: (room_id: number, anchor_id: number) => Promise<Live.LikeReport>
+    likeReport: (room_id: number, anchor_id: number, click_time?: number) => Promise<Live.LikeReport>
     getInfoByRoom: (room_id: number) => Promise<Live.GetInfoByRoom>
     getUserTaskProgress: (target_id?: number) => Promise<Live.GetUserTaskProgress>
     userTaskReceiveRewards: (target_id?: number) => Promise<Live.UserTaskReceiveRewards>
