@@ -42,15 +42,12 @@ class NoReport extends BaseModule {
       onRequest(config, handler) {
         const url = getUrlFromFetchInput(config.input)
         if (NoReport.isTargetURL(url)) {
-          console.log('fetch', config, handler)
           handler.resolve(new Response('ok'))
         } else {
-          console.log('fetch next', config, handler)
           handler.next(config)
         }
       },
       onResponse(response, handler) {
-        console.log('fetch onresponse', response, handler)
         handler.next(response)
       }
     })

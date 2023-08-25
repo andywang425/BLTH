@@ -13,8 +13,6 @@ import { useModuleStore } from './stores/useModuleStore'
 
 const logger = new Logger('main.ts')
 
-logger.log('document.readyState', document.readyState)
-
 if (isTargetFrame()) {
   const app = createApp(App)
   const pinia = createPinia()
@@ -43,10 +41,18 @@ if (isTargetFrame()) {
   const moduleStore = useModuleStore()
   moduleStore.loadModules()
 
-  window.onload = () => {
+  const mountApp = () => {
     const div = dce('div')
     div.id = 'BLTH'
     document.body.append(div)
     app.mount(div)
+  }
+
+  logger.log('document.readyState', document.readyState)
+
+  if (document.readyState !== 'loading') {
+    mountApp()
+  } else {
+    document.addEventListener('DOMContentLoaded', () => mountApp())
   }
 }

@@ -280,7 +280,7 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" align="center" width="55" />
-        <el-table-column prop="avatar" label="头像">
+        <el-table-column prop="avatar" label="头像" width="100">
           <template v-slot:default="scope">
             <div class="avatar-wrap">
               <el-image
@@ -302,7 +302,7 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
         </el-table-column>
         <el-table-column prop="nick_name" label="昵称" />
         <el-table-column prop="medal_name" label="粉丝勋章" />
-        <el-table-column prop="medal_level" label="等级" sortable />
+        <el-table-column prop="medal_level" label="等级" width="80" sortable />
         <el-table-column prop="roomid" label="房间号">
           <template v-slot:default="scope">
             <el-link
