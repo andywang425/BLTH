@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.0.8
+// @version         7.0.9
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
