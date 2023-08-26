@@ -1,0 +1,24 @@
+<script setup lang="ts">
+import { useModuleStore } from '../stores/useModuleStore'
+
+const moduleStore = useModuleStore()
+const config = moduleStore.moduleConfig.RemoveElement
+</script>
+
+<template>
+  <div>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.removePKBox.enabled" active-text="移除大乱斗元素" />
+        <Info id="RemoveElement.removePKBox" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.removeLiveWaterMark.enabled" active-text="移除直播间水印" />
+        <Info id="RemoveElement.removeLiveWaterMark" />
+      </el-space>
+    </el-row>
+    <el-divider />
+  </div>
+</template>

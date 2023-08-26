@@ -81,6 +81,8 @@ interface ImoduleConfig {
     noReport: {
       enabled: boolean
     }
+  }
+  RemoveElement: {
     removePKBox: {
       enabled: boolean
     }

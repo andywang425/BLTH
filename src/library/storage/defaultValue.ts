@@ -110,7 +110,9 @@ const defaultValues: IdefaultValues = {
       },
       noReport: {
         enabled: false
-      },
+      }
+    },
+    RemoveElement: {
       removePKBox: {
         enabled: false
       },

@@ -4,7 +4,7 @@ import BaseModule from '../BaseModule'
 class RemovePKBox extends BaseModule {
   static runMultiple = true
 
-  config = this.moduleStore.moduleConfig.EnhanceExperience.removePKBox
+  config = this.moduleStore.moduleConfig.RemoveElement.removePKBox
 
   private removePKNode() {
     GM_addStyle('#pk-vm, #awesome-pk-vm { display: none !important }')

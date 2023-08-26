@@ -39,6 +39,11 @@ const items: menuItem[] = [
     icon: 'Monitor',
     title: '体验优化',
     index: 'EnhanceExperience'
+  },
+  {
+    icon: 'Scissor',
+    title: '移除元素',
+    index: 'RemoveElement'
   }
 ]
 </script>

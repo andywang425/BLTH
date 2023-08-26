@@ -215,7 +215,9 @@ const help_info: IhelpInfo = {
           h('span', '。')
         ])
       ])
-    },
+    }
+  },
+  RemoveElement: {
     removePKBox: {
       title: '移除大乱斗元素',
       message: '移除直播间的大乱斗元素（进度条，弹出的提示等）。'
