@@ -225,6 +225,10 @@ const help_info: IhelpInfo = {
     removeLiveWaterMark: {
       title: '移除直播间水印',
       message: '移除直播画面左上角的水印。'
+    },
+    removeShopPopover: {
+      title: '移除直播间小黄车弹窗',
+      message: '移除直播间左上角的小黄车弹窗。'
     }
   }
 }

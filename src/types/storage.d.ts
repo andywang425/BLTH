@@ -89,6 +89,9 @@ interface ImoduleConfig {
     removeLiveWaterMark: {
       enabled: boolean
     }
+    removeShopPopover: {
+      enabled: boolean
+    }
   }
 }
 

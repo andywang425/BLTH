@@ -19,6 +19,12 @@ const config = moduleStore.moduleConfig.RemoveElement
         <Info id="RemoveElement.removeLiveWaterMark" />
       </el-space>
     </el-row>
+    <el-row>
+    <el-space wrap>
+        <el-switch v-model="config.removeShopPopover.enabled" active-text="移除直播间小黄车弹窗" />
+        <Info id="RemoveElement.removeShopPopover" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>

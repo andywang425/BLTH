@@ -118,6 +118,9 @@ const defaultValues: IdefaultValues = {
       },
       removeLiveWaterMark: {
         enabled: false
+      },
+      removeShopPopover: {
+        enabled: false
       }
     }
   },

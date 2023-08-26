@@ -38,6 +38,7 @@ interface IhelpInfo {
   RemoveElement: {
     removePKBox: IhelpInfoItem
     removeLiveWaterMark: IhelpInfoItem
+    removeShopPopover: IhelpInfoItem
   }
 }
 

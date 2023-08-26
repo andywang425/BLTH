@@ -7,7 +7,7 @@ class RemovePKBox extends BaseModule {
   config = this.moduleStore.moduleConfig.RemoveElement.removePKBox
 
   private removePKNode() {
-    GM_addStyle('#pk-vm, #awesome-pk-vm { display: none !important }')
+    GM_addStyle('#awesome-pk-vm { display: none !important }')
   }
 
   private removePKToast() {
