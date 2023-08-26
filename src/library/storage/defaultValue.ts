@@ -121,6 +121,9 @@ const defaultValues: IdefaultValues = {
       },
       removeShopPopover: {
         enabled: false
+      },
+      removeGameParty: {
+        enabled: false
       }
     }
   },

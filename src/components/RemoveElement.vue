@@ -25,6 +25,12 @@ const config = moduleStore.moduleConfig.RemoveElement
         <Info id="RemoveElement.removeShopPopover" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.removeGameParty.enabled" active-text="移除直播间幻星派对标志" />
+        <Info id="RemoveElement.removeGameParty" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>

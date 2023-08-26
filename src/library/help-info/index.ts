@@ -229,6 +229,10 @@ const help_info: IhelpInfo = {
     removeShopPopover: {
       title: '移除直播间小黄车弹窗',
       message: '移除直播间左上角的小黄车弹窗。'
+    },
+    removeGameParty: {
+      title: '移除直播间幻星派对标志',
+      message: '移除直播间右下角的幻星派对标志。'
     }
   }
 }

@@ -92,6 +92,9 @@ interface ImoduleConfig {
     removeShopPopover: {
       enabled: boolean
     }
+    removeGameParty: {
+      enabled: boolean
+    }
   }
 }
 
