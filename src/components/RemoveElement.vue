@@ -20,7 +20,7 @@ const config = moduleStore.moduleConfig.RemoveElement
       </el-space>
     </el-row>
     <el-row>
-    <el-space wrap>
+      <el-space wrap>
         <el-switch v-model="config.removeShopPopover.enabled" active-text="移除直播间小黄车弹窗" />
         <Info id="RemoveElement.removeShopPopover" />
       </el-space>
