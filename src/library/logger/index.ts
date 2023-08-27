@@ -3,7 +3,7 @@ class Logger {
 
   private prefix_title_str: string
 
-  public _title: string
+  public title: string
 
   private get prefix(): string[] {
     return [
@@ -28,7 +28,7 @@ class Logger {
   }
 
   constructor(title: string) {
-    this._title = title
+    this.title = title
     this.prefix_title_str = title.split('_').join('][')
   }
 }
