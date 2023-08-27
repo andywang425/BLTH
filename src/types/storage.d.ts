@@ -81,10 +81,18 @@ interface ImoduleConfig {
     noReport: {
       enabled: boolean
     }
+  }
+  RemoveElement: {
     removePKBox: {
       enabled: boolean
     }
     removeLiveWaterMark: {
+      enabled: boolean
+    }
+    removeShopPopover: {
+      enabled: boolean
+    }
+    removeGameParty: {
       enabled: boolean
     }
   }

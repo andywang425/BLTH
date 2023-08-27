@@ -110,11 +110,19 @@ const defaultValues: IdefaultValues = {
       },
       noReport: {
         enabled: false
-      },
+      }
+    },
+    RemoveElement: {
       removePKBox: {
         enabled: false
       },
       removeLiveWaterMark: {
+        enabled: false
+      },
+      removeShopPopover: {
+        enabled: false
+      },
+      removeGameParty: {
         enabled: false
       }
     }
