@@ -51,7 +51,7 @@ const pollingQuery = (
  * 特殊的直播间（背景很好看的那种）有两个iframe，共三个frame
  */
 const isTargetFrame = (): boolean => {
-  if (unsafeWindow.BilibiliLive) {
+  if (unsafeWindow.document.head.innerHTML.includes('BilibiliLive')) {
     return true
   } else {
     return false
