@@ -3,13 +3,13 @@ import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../../l
 import BAPI from '../../../../library/bili-api'
 import { useBiliStore } from '../../../../stores/useBiliStore'
 import { sleep } from '../../../../library/utils'
-import { Istatus } from '../../../../types/moduleStatus'
+import { moduleStatus } from '../../../../types/module'
 
 class LikeTask extends BaseModule {
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.like
 
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.like = s
   }
 

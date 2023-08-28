@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Istatus } from '../../types/moduleStatus'
+import { moduleStatus } from '../../types/module'
 
 defineProps<{
-  status: Istatus
+  status: moduleStatus
 }>()
 </script>
 
@@ -34,3 +34,4 @@ defineProps<{
   font-size: var(--el-font-size-base);
 }
 </style>
+../../types/module

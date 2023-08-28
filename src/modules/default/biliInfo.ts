@@ -233,8 +233,8 @@ class BiliInfo extends DefaultBaseModule {
       biliStore.fansMedals = await this.getFansMetals()
     }, delayToNextMoment(0, 4).ms)
 
-    useModuleStore().emitter.on(this.moduleName, async (event) => {
-      if ((event as any).target === 'getFansMetals') {
+    useModuleStore().emitter.on('BiliInfo', async (event) => {
+      if (event.target === 'getFansMetals') {
         biliStore.fansMedals = await this.getFansMetals(10, true)
       }
     })

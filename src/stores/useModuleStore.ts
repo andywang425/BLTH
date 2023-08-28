@@ -8,9 +8,9 @@ import BaseModule from '../modules/BaseModule'
 import * as defaultModules from '../modules/default'
 import * as otherModules from '../modules'
 import Logger from '../library/logger'
-import mitt from 'mitt'
+import mitt from '../library/mitt'
 import { delayToNextMoment } from '../library/luxon'
-import { ImoduleStatus, Istatus } from '../types/moduleStatus'
+import { ImoduleStatus, moduleEmitterEvents, moduleStatus } from '../types/module'
 import { deepestIterate } from '../library/utils'
 import { useCacheStore } from './useCacheStore'
 
@@ -44,7 +44,8 @@ export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
   const moduleConfig: ImoduleConfig = reactive(Storage.getModuleConfig())
   // Emitter 实例，用于模块间信息传递和 wait 函数
-  const emitter = mitt()
+  // 建议使用模块名称作为 Emitter 方法的 type 参数
+  const emitter = mitt<moduleEmitterEvents>()
   // 模块状态，用于显示状态图标
   const moduleStatus: ImoduleStatus = reactive(defaultModuleStatus)
 
@@ -54,12 +55,12 @@ export const useModuleStore = defineStore('module', () => {
   async function loadModules() {
     const cacheStore = useCacheStore()
     // 按优先级顺序逐个运行默认模块
-    for (const [name, Module] of Object.entries(defaultModules).sort(
+    for (const [name, module] of Object.entries(defaultModules).sort(
       (a, b) => a[1].sequence - b[1].sequence
     )) {
       try {
-        if (Module.runMultiple || !cacheStore.isMainBLTHRunning) {
-          await new (Module as new (name: string) => DefaultBaseModule)(name).run()
+        if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
+          await new (module as new (moduleName: string) => DefaultBaseModule)(name).run()
         }
       } catch (err) {
         new Logger('loadModules').error('加载默认模块时发生致命错误，挂机助手停止运行:', err)
@@ -67,9 +68,34 @@ export const useModuleStore = defineStore('module', () => {
       }
     }
     // 运行其它模块
-    for (const [name, Module] of Object.entries(otherModules)) {
-      if (Module.runMultiple || !cacheStore.isMainBLTHRunning) {
-        new (Module as new (name: string) => BaseModule)(name).run()
+    for (const [name, module] of Object.entries(otherModules)) {
+      if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
+        const m = new (module as new (moduleName: string) => BaseModule)(name)
+        if (module.runAt === 'document-start') {
+          m.run()
+        } else {
+          const handler = (event: moduleEmitterEvents['Main']) => {
+            if (event.moment === module.runAt) {
+              m.run()
+              emitter.off('Main', handler)
+            }
+          }
+          emitter.on('Main', handler)
+        }
+
+        // else if (module.runAt === 'document-end') {
+        //   emitter.once('Main', (event: any) => {
+        //     if (event.moment === 'document-end') {
+        //       m.run()
+        //     }
+        //   })
+        // } else {
+        //   emitter.once('Main', (event: any) => {
+        //     if (event.moment === 'window-load') {
+        //       m.run()
+        //     }
+        //   })
+        // }
       }
     }
   }
@@ -88,7 +114,7 @@ export const useModuleStore = defineStore('module', () => {
    */
   ;(function clearStatus() {
     setTimeout(() => {
-      deepestIterate(moduleStatus, (_value: Istatus, path: string) => {
+      deepestIterate(moduleStatus, (_value: moduleStatus, path: string) => {
         _.set(moduleStatus, path, '')
       })
       clearStatus()

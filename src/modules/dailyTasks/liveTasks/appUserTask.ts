@@ -2,12 +2,12 @@ import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
 import BAPI from '../../../library/bili-api'
 import { sleep, wait } from '../../../library/utils'
-import { Istatus } from '../../../types/moduleStatus'
+import { moduleStatus } from '../../../types/module'
 
 class AppUserTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.appUser
 
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.appUser = s
   }
 
@@ -73,7 +73,7 @@ class AppUserTask extends BaseModule {
         const danmuConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks.danmu
         if (danmuConfig.enabled && !isTimestampToday(danmuConfig._lastCompleteTime)) {
           // 如果开启了发送弹幕功能且今天还没完成，等发送弹幕功能完成了或者达到超时时间了再运行
-          await wait(this.moduleName, 300e3)
+          await wait('DailyTask_LiveTask_AppUserTask', 300e3)
         }
         const progressResponse = await this.getUserTaskProgress()
         if (progressResponse) {

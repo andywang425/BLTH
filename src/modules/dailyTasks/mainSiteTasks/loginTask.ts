@@ -1,12 +1,12 @@
 import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
 import { useBiliStore } from '../../../stores/useBiliStore'
-import { Istatus } from '../../../types/moduleStatus'
+import { moduleStatus } from '../../../types/module'
 
 class LoginTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
 
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
   }
 

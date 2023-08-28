@@ -1,12 +1,12 @@
 import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
 import BAPI from '../../../library/bili-api'
-import { Istatus } from '../../../types/moduleStatus'
+import { moduleStatus } from '../../../types/module'
 
 class CoinToSilverTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.coinToSilver
 
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     this.moduleStore.moduleStatus.DailyTasks.OtherTasks.coinToSilver = s
   }
 

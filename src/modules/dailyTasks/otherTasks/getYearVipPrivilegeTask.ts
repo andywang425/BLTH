@@ -1,7 +1,7 @@
 import BaseModule from '../../BaseModule'
 import { delayToNextMoment, ts } from '../../../library/luxon'
 import BAPI from '../../../library/bili-api'
-import { Istatus } from '../../../types/moduleStatus'
+import { moduleStatus } from '../../../types/module'
 import { useBiliStore } from '../../../stores/useBiliStore'
 import { MainData } from '../../../library/bili-api/data'
 import { DateTime } from 'luxon'
@@ -9,7 +9,7 @@ import { DateTime } from 'luxon'
 class GetYearVipPrivilegeTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.getYearVipPrivilege
 
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     this.moduleStore.moduleStatus.DailyTasks.OtherTasks.getYearVipPrivilege = s
   }
 

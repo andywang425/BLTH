@@ -8,7 +8,7 @@ import { uuid, sleep } from '../../../../library/utils'
 import { getCookie } from '../../../../library/cookie'
 import { useModuleStore } from '../../../../stores/useModuleStore'
 import { ImoduleConfig } from '../../../../types'
-import { Istatus } from '../../../../types/moduleStatus'
+import { moduleStatus } from '../../../../types/module'
 
 interface sypderData {
   benchmark: string
@@ -42,7 +42,7 @@ class RoomHeart {
   private logger = new Logger('RoomHeart')
 
   private config: ImoduleConfig['DailyTasks']['LiveTasks']['medalTasks']['watch']
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
   /** 是不是最后一个心跳任务 */
@@ -254,7 +254,7 @@ class WatchTask extends BaseModule {
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.watch
 
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
 

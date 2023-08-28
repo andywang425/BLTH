@@ -11,7 +11,7 @@ import './assets/css/base.css'
 import Logger from './library/logger'
 import { useModuleStore } from './stores/useModuleStore'
 
-const logger = new Logger('main.ts')
+const logger = new Logger('Main')
 
 if (isTargetFrame()) {
   const app = createApp(App)
@@ -46,6 +46,9 @@ if (isTargetFrame()) {
     div.id = 'BLTH'
     document.body.append(div)
     app.mount(div)
+    moduleStore.emitter.emit('Main', {
+      moment: 'document-end'
+    })
   }
 
   logger.log('document.readyState', document.readyState)
@@ -54,6 +57,18 @@ if (isTargetFrame()) {
     mountApp()
   } else {
     document.addEventListener('DOMContentLoaded', () => mountApp())
+  }
+
+  if (document.readyState === 'complete') {
+    moduleStore.emitter.emit('Main', {
+      moment: 'window-onload'
+    })
+  } else {
+    window.addEventListener('load', () =>
+      moduleStore.emitter.emit('Main', {
+        moment: 'window-onload'
+      })
+    )
   }
 }
 

@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { useModuleStore } from '../../stores/useModuleStore'
+import { moduleEmitterEvents } from '../../types/module'
 
 /**
  * 生成一个 version 4 uuid
@@ -25,9 +26,9 @@ function sleep(miliseconds: number): Promise<any> {
  * @param type mitt 的 type 参数
  * @param timeout 超时时间
  */
-function wait(type: string | symbol, timeout: number = -1): Promise<any> {
+function wait(type: keyof moduleEmitterEvents, timeout: number = -1): Promise<any> {
   return new Promise((resolve) => {
-    useModuleStore().emitter.on(type, (event) => resolve(event))
+    useModuleStore().emitter.once(type, (event) => resolve(event))
     if (timeout !== -1) setTimeout(resolve, timeout)
   })
 }

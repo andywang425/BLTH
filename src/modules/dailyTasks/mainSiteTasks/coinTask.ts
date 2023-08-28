@@ -4,12 +4,12 @@ import { useBiliStore } from '../../../stores/useBiliStore'
 import { MainData } from '../../../library/bili-api/data'
 import BAPI from '../../../library/bili-api'
 import _ from 'lodash'
-import { Istatus } from '../../../types/moduleStatus'
+import { moduleStatus } from '../../../types/module'
 
 class CoinTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.coin
 
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.coin = s
   }
 
