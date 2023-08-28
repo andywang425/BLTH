@@ -1,8 +1,10 @@
 import { unsafeWindow } from '$'
+import { runAtMoment } from '../../types/module'
 import BaseModule from '../BaseModule'
 
 class SwitchLiveStreamQuality extends BaseModule {
-  static runMultiple = true
+  static runMultiple: boolean = true
+  static runAt: runAtMoment = 'window-load'
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.switchLiveStreamQuality
 

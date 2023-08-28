@@ -14,6 +14,8 @@ import { useModuleStore } from './stores/useModuleStore'
 const logger = new Logger('Main')
 
 if (isTargetFrame()) {
+  logger.log('document.readyState', document.readyState)
+
   const app = createApp(App)
   const pinia = createPinia()
 
@@ -51,8 +53,6 @@ if (isTargetFrame()) {
     })
   }
 
-  logger.log('document.readyState', document.readyState)
-
   if (document.readyState !== 'loading') {
     mountApp()
   } else {
@@ -61,15 +61,13 @@ if (isTargetFrame()) {
 
   if (document.readyState === 'complete') {
     moduleStore.emitter.emit('Main', {
-      moment: 'window-onload'
+      moment: 'window-load'
     })
   } else {
-    window.addEventListener('load', () =>
+    window.addEventListener('load', () => {
       moduleStore.emitter.emit('Main', {
-        moment: 'window-onload'
+        moment: 'window-load'
       })
-    )
+    })
   }
 }
-
-// trigger workflow

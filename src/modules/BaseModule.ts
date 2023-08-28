@@ -20,9 +20,9 @@ class BaseModule {
    *
    * `document-start`: 尽可能早，与脚本注入时机相同
    *
-   * `document-end`: `DOMContentLoaded`事件触发后
+   * `document-end`: `document`的`DOMContentLoaded`事件触发后
    *
-   * `window-onload`: `window.onload`触发后
+   * `window-load`: `window`的`load`事件触发后
    */
   static runAt: runAtMoment = 'document-start'
   /**

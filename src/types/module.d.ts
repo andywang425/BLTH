@@ -26,7 +26,7 @@ interface ImoduleStatus {
   }
 }
 
-type runAtMoment = 'document-start' | 'document-end' | 'window-onload'
+type runAtMoment = 'document-start' | 'document-end' | 'window-load'
 
 type moduleEmitterEvents = {
   Main: {

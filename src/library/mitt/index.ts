@@ -1,15 +1,21 @@
 import mitt, { Emitter, EventHandlerMap, EventType, Handler } from 'mitt'
+export interface EmitterOnce<Events extends Record<EventType, unknown>> extends Emitter<Events> {
+  once<Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>): void
+}
 
-export default function mittWithOnce<Events extends Record<EventType, unknown>>(
+export default function mittOnce<Events extends Record<EventType, unknown>>(
   all?: EventHandlerMap<Events>
-) {
-  const inst: any = mitt(all)
+): EmitterOnce<Events> {
+  const emitter = mitt<Events>(all)
 
-  inst.once = (type: any, handler: any) => {
-    inst.on(type, handler)
-    inst.on(type, inst.off.bind(inst, type, handler))
+  return {
+    ...emitter,
+
+    once<Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>) {
+      emitter.on(type, function fn(evt: Events[Key]) {
+        emitter.off(type, fn)
+        handler(evt)
+      })
+    }
   }
-  return inst as unknown as {
-    once<Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>): void
-  } & Emitter<Events>
 }

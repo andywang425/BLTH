@@ -73,29 +73,29 @@ export const useModuleStore = defineStore('module', () => {
         const m = new (module as new (moduleName: string) => BaseModule)(name)
         if (module.runAt === 'document-start') {
           m.run()
-        } else {
-          const handler = (event: moduleEmitterEvents['Main']) => {
-            if (event.moment === module.runAt) {
-              m.run()
-              emitter.off('Main', handler)
-            }
+        } else if (module.runAt === 'document-end') {
+          if (document.readyState !== 'loading') {
+            m.run()
+          } else {
+            emitter.on('Main', function fn(event: moduleEmitterEvents['Main']) {
+              if (event.moment === 'document-end') {
+                emitter.off('Main', fn)
+                m.run()
+              }
+            })
           }
-          emitter.on('Main', handler)
+        } else {
+          if (document.readyState === 'complete') {
+            m.run()
+          } else {
+            emitter.on('Main', function fn(event: moduleEmitterEvents['Main']) {
+              if (event.moment === 'window-load') {
+                emitter.off('Main', fn)
+                m.run()
+              }
+            })
+          }
         }
-
-        // else if (module.runAt === 'document-end') {
-        //   emitter.once('Main', (event: any) => {
-        //     if (event.moment === 'document-end') {
-        //       m.run()
-        //     }
-        //   })
-        // } else {
-        //   emitter.once('Main', (event: any) => {
-        //     if (event.moment === 'window-load') {
-        //       m.run()
-        //     }
-        //   })
-        // }
       }
     }
   }
