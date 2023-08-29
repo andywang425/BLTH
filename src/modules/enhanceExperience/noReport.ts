@@ -4,7 +4,6 @@ import { Iproxy, fproxy } from '../../library/fetch-hook'
 import BaseModule from '../BaseModule'
 import { getUrlFromFetchInput } from '../../library/utils'
 import { isSelfTopFrame } from '../../library/dom'
-import { set } from 'lodash'
 
 class NoReport extends BaseModule {
   static runMultiple = true
