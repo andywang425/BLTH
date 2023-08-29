@@ -29,9 +29,6 @@ interface ImoduleStatus {
 type runAtMoment = 'document-start' | 'document-end' | 'window-load'
 
 type moduleEmitterEvents = {
-  Main: {
-    moment: runAtMoment
-  }
   BiliInfo: {
     target: string
   }

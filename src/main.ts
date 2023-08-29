@@ -10,6 +10,7 @@ import * as MyIconsVue from './components/icons'
 import './assets/css/base.css'
 import Logger from './library/logger'
 import { useModuleStore } from './stores/useModuleStore'
+import { waitForMoment } from './library/utils'
 
 const logger = new Logger('Main')
 
@@ -48,26 +49,7 @@ if (isTargetFrame()) {
     div.id = 'BLTH'
     document.body.append(div)
     app.mount(div)
-    moduleStore.emitter.emit('Main', {
-      moment: 'document-end'
-    })
   }
 
-  if (document.readyState !== 'loading') {
-    mountApp()
-  } else {
-    document.addEventListener('DOMContentLoaded', () => mountApp())
-  }
-
-  if (document.readyState === 'complete') {
-    moduleStore.emitter.emit('Main', {
-      moment: 'window-load'
-    })
-  } else {
-    window.addEventListener('load', () => {
-      moduleStore.emitter.emit('Main', {
-        moment: 'window-load'
-      })
-    })
-  }
+  waitForMoment('document-end').then(() => mountApp())
 }

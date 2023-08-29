@@ -64,7 +64,7 @@ const isTargetFrame = (): boolean => {
 const isSelfTopFrame = (): boolean => unsafeWindow.self === unsafeWindow.top
 
 /**
- * 获取顶层 frame
+ * 获取顶层 frame 的 document
  */
 const topFrameDocuemnt = (): Document | undefined => unsafeWindow.top?.document
 

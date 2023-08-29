@@ -11,7 +11,7 @@ import Logger from '../library/logger'
 import mitt from '../library/mitt'
 import { delayToNextMoment } from '../library/luxon'
 import { ImoduleStatus, moduleEmitterEvents, moduleStatus } from '../types/module'
-import { deepestIterate } from '../library/utils'
+import { deepestIterate, waitForMoment } from '../library/utils'
 import { useCacheStore } from './useCacheStore'
 
 const defaultModuleStatus: ImoduleStatus = {
@@ -70,32 +70,9 @@ export const useModuleStore = defineStore('module', () => {
     // 运行其它模块
     for (const [name, module] of Object.entries(otherModules)) {
       if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
-        const m = new (module as new (moduleName: string) => BaseModule)(name)
-        if (module.runAt === 'document-start') {
-          m.run()
-        } else if (module.runAt === 'document-end') {
-          if (document.readyState !== 'loading') {
-            m.run()
-          } else {
-            emitter.on('Main', function fn(event: moduleEmitterEvents['Main']) {
-              if (event.moment === 'document-end') {
-                emitter.off('Main', fn)
-                m.run()
-              }
-            })
-          }
-        } else {
-          if (document.readyState === 'complete') {
-            m.run()
-          } else {
-            emitter.on('Main', function fn(event: moduleEmitterEvents['Main']) {
-              if (event.moment === 'window-load') {
-                emitter.off('Main', fn)
-                m.run()
-              }
-            })
-          }
-        }
+        waitForMoment(module.runAt).then(() =>
+          new (module as new (moduleName: string) => BaseModule)(name).run()
+        )
       }
     }
   }
