@@ -18,11 +18,33 @@ class NoReport extends BaseModule {
     }
   }
 
+  private hookProperties(win: Window) {
+    Object.defineProperty(win.navigator, 'sendBeacon', {
+      value: () => {
+        return true
+      }
+    })
+
+    Object.defineProperties(win, {
+      reportObserver: {
+        get() {
+          return {}
+        },
+        set() {}
+      },
+      reportConfig: {
+        get() {
+          return {}
+        },
+        set() {}
+      }
+    })
+  }
+
   private async ajaxHook() {
     const ajaxHookProxyConfig = {
       onRequest: (config: XhrRequestConfig, handler: XhrRequestHandler) => {
         if (NoReport.isTargetURL(config.url)) {
-          console.log('ajax-hook', config)
           handler.resolve({
             config: config,
             status: 200,
@@ -40,7 +62,6 @@ class NoReport extends BaseModule {
       onRequest(config, handler) {
         const url = getUrlFromFetchInput(config.input)
         if (NoReport.isTargetURL(url)) {
-          console.log('fetch-hook', config)
           handler.resolve(new Response('ok'))
         } else {
           handler.next(config)
@@ -51,50 +72,15 @@ class NoReport extends BaseModule {
       }
     }
 
-    Object.defineProperty(unsafeWindow.navigator, 'sendBeacon', {
-      value: () => {
-        return true
-      }
-    })
-
-    Object.defineProperty(unsafeWindow, 'reportObserver', {
-      get() {
-        return {}
-      },
-      set() {}
-    })
-
-    Object.defineProperty(unsafeWindow, 'reportConfig', {
-      get() {
-        return {}
-      },
-      set() {}
-    })
-
+    this.hookProperties(unsafeWindow)
     proxy(ajaxHookProxyConfig, unsafeWindow)
     fproxy(fetchHookConfig, unsafeWindow)
 
     if (!isSelfTopFrame()) {
-      Object.defineProperty(unsafeWindow.top!.navigator, 'sendBeacon', {
-        value: () => {
-          return true
-        }
-      })
-
-      Object.defineProperty(unsafeWindow.top, 'reportObserver', {
-        get() {
-          return {}
-        },
-        set() {}
-      })
-
-      Object.defineProperty(unsafeWindow.top, 'reportConfig', {
-        get() {
-          return {}
-        },
-        set() {}
-      })
-
+      // 如果处于特殊直播间（有多个frame），也拦截顶层frame的日志上报
+      // 但由于注入时机的关系，初期的一些日志报上拦截不到
+      // 要优化这一点的话可能要调整模块运行逻辑，允许模块在初期的时候就能在多个frame上允许
+      this.hookProperties(unsafeWindow.top as Window)
       proxy(ajaxHookProxyConfig, unsafeWindow.top as Window)
       fproxy(fetchHookConfig, unsafeWindow.top as Window)
     }

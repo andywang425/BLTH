@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { useModuleStore } from '../../stores/useModuleStore'
 import { moduleEmitterEvents, runAtMoment } from '../../types/module'
+import { unsafeWindow } from '$'
 
 /**
  * 生成一个 version 4 uuid

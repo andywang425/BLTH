@@ -22,8 +22,3 @@
   position: relative;
   top: 1px;
 }
-
-/* 解决 <el-link> 和 <el-text> 一起使用时无法垂直对齐的问题 */
-.el-link-va-baseline {
-  vertical-align: baseline;
-}
