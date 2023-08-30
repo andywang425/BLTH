@@ -8,7 +8,7 @@ import { uuid, sleep } from '../../../../library/utils'
 import { getCookie } from '../../../../library/cookie'
 import { useModuleStore } from '../../../../stores/useModuleStore'
 import { ImoduleConfig } from '../../../../types'
-import { moduleStatus } from '../../../../types/module'
+import { moduleStatus, runAtMoment } from '../../../../types/module'
 
 interface sypderData {
   benchmark: string
@@ -251,6 +251,8 @@ class RoomHeart {
 }
 
 class WatchTask extends BaseModule {
+  static runAt: runAtMoment = 'document-end'
+
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.watch
 
