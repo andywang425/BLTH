@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.0.9
+// @version         7.1.0
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
@@ -15,17 +15,17 @@
 // @supportURL      https://github.com/andywang425/BLTH/issues
 // @downloadURL     https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.min.user.js
 // @updateURL       https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.min.user.js
-// @include         /^https?:\/\/live\.bilibili\.com\/(blanc\/)?\d+\??.*$/
+// @match           *://live.bilibili.com/*
 // @require         https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js
 // @require         data:application/javascript,window.Vue%3DVue%2Cwindow.VueDemi%3DVue%3B
-// @require         https://unpkg.com/element-plus@2.3.9/dist/index.full.min.js
+// @require         https://unpkg.com/element-plus@2.3.12/dist/index.full.min.js
 // @require         https://unpkg.com/@element-plus/icons-vue@2.1.0/dist/index.iife.min.js
 // @require         https://unpkg.com/pinia@2.1.6/dist/pinia.iife.prod.js
 // @require         https://unpkg.com/lodash@4.17.21/lodash.min.js
 // @require         https://unpkg.com/hotkeys-js@3.12.0/dist/hotkeys.min.js
-// @require         https://unpkg.com/luxon@3.4.0/build/global/luxon.min.js
+// @require         https://unpkg.com/luxon@3.4.2/build/global/luxon.min.js
 // @require         https://unpkg.com/crypto-js@4.1.1/crypto-js.js
-// @resource        element-plus/dist/index.css  https://unpkg.com/element-plus@2.3.9/dist/index.css
+// @resource        element-plus/dist/index.css  https://unpkg.com/element-plus@2.3.12/dist/index.css
 // @connect         api.bilibili.com
 // @connect         api.live.bilibili.com
 // @connect         api.vc.bilibili.com
@@ -41,7 +41,7 @@
 // @run-at          document-start
 // ==/UserScript==
 
-(a=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=a,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-725f1e99]{width:80px;height:80px}.avatar[data-v-725f1e99]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-4234c94a]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-4234c94a]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-4234c94a]{width:auto}.aside #aside-el-menu[data-v-4234c94a]:not(.el-menu--collapse){width:150px}.main[data-v-4234c94a]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-4234c94a],.fade-leave-active[data-v-4234c94a]{transition:opacity .1s ease}.fade-enter-from[data-v-4234c94a],.fade-leave-to[data-v-4234c94a]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-2f9d6050]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-link-va-baseline{vertical-align:baseline} ");
+(t=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=t,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-725f1e99]{width:80px;height:80px}.avatar[data-v-725f1e99]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-934516e9]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-934516e9]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-934516e9]{width:auto}.aside #aside-el-menu[data-v-934516e9]:not(.el-menu--collapse){width:150px}.main[data-v-934516e9]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-934516e9],.fade-leave-active[data-v-934516e9]{transition:opacity .1s ease}.fade-enter-from[data-v-934516e9],.fade-leave-to[data-v-934516e9]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-72d53133]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px} ");
 
 (function (vue, pinia, _, ElementPlusIconsVue, luxon, CryptoJS, ElementPlus, hotkeys) {
   'use strict';
@@ -180,11 +180,19 @@
         },
         noReport: {
           enabled: false
-        },
+        }
+      },
+      RemoveElement: {
         removePKBox: {
           enabled: false
         },
         removeLiveWaterMark: {
+          enabled: false
+        },
+        removeShopPopover: {
+          enabled: false
+        },
+        removeGameParty: {
           enabled: false
         }
       }
@@ -305,7 +313,7 @@
     };
   });
   const _hoisted_1$3 = { class: "title" };
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
     __name: "PanelHeader",
     setup(__props) {
       const uiStore = useUIStore();
@@ -357,8 +365,8 @@
     }
     return target;
   };
-  const PanelHeader = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["__scopeId", "data-v-dda95e10"]]);
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const PanelHeader = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["__scopeId", "data-v-dda95e10"]]);
+  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "PanelAside",
     setup(__props) {
       const uiStore = useUIStore();
@@ -388,6 +396,11 @@
           icon: "Monitor",
           title: "体验优化",
           index: "EnhanceExperience"
+        },
+        {
+          icon: "Scissor",
+          title: "移除元素",
+          index: "RemoveElement"
         }
       ];
       return (_ctx, _cache) => {
@@ -570,7 +583,7 @@
   }
   function wait(type, timeout = -1) {
     return new Promise((resolve2) => {
-      useModuleStore().emitter.on(type, (event) => resolve2(event));
+      useModuleStore().emitter.once(type, (event) => resolve2(event));
       if (timeout !== -1)
         setTimeout(resolve2, timeout);
     });
@@ -599,6 +612,31 @@
       return input.url;
     } else {
       return "Incorrect input";
+    }
+  }
+  function waitForMoment(moment) {
+    switch (moment) {
+      case "document-end": {
+        return new Promise((resolve2) => {
+          if (document.readyState !== "loading") {
+            resolve2();
+          } else {
+            document.addEventListener("DOMContentLoaded", () => resolve2());
+          }
+        });
+      }
+      case "window-load": {
+        return new Promise((resolve2) => {
+          if (document.readyState === "complete") {
+            resolve2();
+          } else {
+            window.addEventListener("load", () => resolve2());
+          }
+        });
+      }
+      default: {
+        return Promise.resolve();
+      }
     }
   }
   luxon.Settings.defaultZone = "Asia/Shanghai";
@@ -923,8 +961,8 @@
     constructor(title) {
       __publicField(this, "NAME", "BLTH");
       __publicField(this, "prefix_title_str");
-      __publicField(this, "_title");
-      this._title = title;
+      __publicField(this, "title");
+      this.title = title;
       this.prefix_title_str = title.split("_").join("][");
     }
     get prefix() {
@@ -975,7 +1013,7 @@
      * 如果需要在控制面板上显示模块状态，推荐添加一个 status setter 用来设置模块状态
      *
      * @example
-     * public set status(s: Istatus) {
+     * public set status(s: moduleStatus) {
      *    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
      * }
      */
@@ -992,6 +1030,16 @@
    * 默认false，即只在Main BLTH运行的页面上运行
    */
   __publicField(BaseModule, "runMultiple", false);
+  /**
+   * 模块运行时机
+   *
+   * `document-start`: 尽可能早，与脚本注入时机相同
+   *
+   * `document-end`: `document`的`DOMContentLoaded`事件触发后
+   *
+   * `window-load`: `window`的`load`事件触发后
+   */
+  __publicField(BaseModule, "runAt", "document-start");
   class DefaultBaseModule extends BaseModule {
     /**
      * 默认模块按顺序逐个运行，所以必须返回一个 Promise
@@ -1044,10 +1092,10 @@
      * 获取 Cookies
      *
      * bili_jct: 常作为参数 csrf 在请求中出现
-     * LIVE_BUVID 不能在此处获取，还没生成
+     * LIVE_BUVID: 如果用户以前从来没看过直播，此时可能为 null
      */
     getCookies() {
-      return getCookies(["bili_jct"]);
+      return getCookies(["bili_jct", "LIVE_BUVID"]);
     }
     /**
      * 通过 BAPI.main.nav 获取用户基本信息
@@ -1213,7 +1261,7 @@
       setTimeout(async () => {
         biliStore.fansMedals = await this.getFansMetals();
       }, delayToNextMoment(0, 4).ms);
-      useModuleStore().emitter.on(this.moduleName, async (event) => {
+      useModuleStore().emitter.on("BiliInfo", async (event) => {
         if (event.target === "getFansMetals") {
           biliStore.fansMedals = await this.getFansMetals(10, true);
         }
@@ -1541,7 +1589,7 @@
     });
   };
   const isTargetFrame = () => {
-    if (_unsafeWindow.BilibiliLive) {
+    if (_unsafeWindow.document.head.innerHTML.includes("BilibiliLive")) {
       return true;
     } else {
       return false;
@@ -1691,7 +1739,7 @@
           this.status = "running";
           const danmuConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks.danmu;
           if (danmuConfig.enabled && !isTimestampToday(danmuConfig._lastCompleteTime)) {
-            await wait(this.moduleName, 3e5);
+            await wait("DailyTask_LiveTask_AppUserTask", 3e5);
           }
           const progressResponse = await this.getUserTaskProgress();
           if (progressResponse) {
@@ -1866,8 +1914,10 @@
      * 开始心跳
      */
     start() {
-      if (!this.buvid)
+      if (!this.buvid) {
+        this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务，请尝试刷新页面`);
         return;
+      }
       this.timer = setTimeout(() => this.stop = true, delayToNextMoment(0, 0).ms);
       return this.E();
     }
@@ -2119,6 +2169,7 @@
       this.logger.log("距离观看直播模块下次运行时间:", diff.str);
     }
   }
+  __publicField(WatchTask2, "runAt", "document-end");
   class DanmuTask extends BaseModule {
     constructor() {
       super(...arguments);
@@ -2478,18 +2529,34 @@
         }, 1e4);
       });
     }
-    switchQuality(livePlayer) {
+    async switchQuality(livePlayer) {
       const playerInfo = livePlayer.getPlayerInfo();
       if (playerInfo.liveStatus === 0) {
         this.logger.log("当前直播间未开播");
       } else {
-        const targetQuality = playerInfo.qualityCandidates.find(
-          ({ desc }) => desc === this.config.qualityDesc
+        const switchFn = () => {
+          const targetQuality = playerInfo.qualityCandidates.find(
+            ({ desc }) => desc === this.config.qualityDesc
+          );
+          if (targetQuality && playerInfo.quality !== targetQuality.qn) {
+            livePlayer.switchQuality(targetQuality.qn);
+            this.logger.log(`已将画质切换为${this.config.qualityDesc}`, targetQuality);
+          }
+        };
+        const iframes = document.querySelectorAll("iframe");
+        const lastIframe = iframes.item(iframes.length - 1);
+        const timer = setTimeout(
+          () => {
+            this.logger.log("等待最后一个iframe的load事件超时，立即切换画质");
+            lastIframe.onload = null;
+            switchFn();
+          },
+          !isSelfTopFrame() ? 3e3 : 1500
         );
-        if (targetQuality && playerInfo.quality !== targetQuality.qn) {
-          livePlayer.switchQuality(targetQuality.qn);
-          this.logger.log(`已将画质切换为${this.config.qualityDesc}`, targetQuality);
-        }
+        lastIframe.onload = () => {
+          clearTimeout(timer);
+          switchFn();
+        };
       }
     }
     async run() {
@@ -2505,6 +2572,7 @@
     }
   }
   __publicField(SwitchLiveStreamQuality, "runMultiple", true);
+  __publicField(SwitchLiveStreamQuality, "runAt", "window-load");
   class BanP2P extends BaseModule {
     constructor() {
       super(...arguments);
@@ -2523,17 +2591,22 @@
             value: function() {
               this.addEventListener = function() {
               };
+              this.removeEventListener = function() {
+              };
               this.createDataChannel = function() {
                 return { close: function() {
                 } };
               };
               this.createOffer = function() {
+                return Promise.resolve();
               };
               this.setLocalDescription = function() {
+                return Promise.resolve();
               };
               this.close = function() {
               };
               this.setRemoteDescription = function() {
+                return Promise.resolve();
               };
               this.createAnswer = function() {
               };
@@ -2566,10 +2639,10 @@
     e.target = e.currentTarget = xhrProxy;
     return e;
   }
-  function hook(proxy2, win) {
+  function hook$1(proxy2, win) {
     win = win || window;
     var originXhr = win.XMLHttpRequest;
-    win.XMLHttpRequest = function() {
+    var HookXMLHttpRequest = function() {
       var xhr = new originXhr();
       for (var i = 0; i < events.length; ++i) {
         var key = "on" + events[i];
@@ -2598,6 +2671,9 @@
       };
       this[OriginXhr] = xhr;
     };
+    HookXMLHttpRequest.prototype = originXhr.prototype;
+    HookXMLHttpRequest.prototype.constructor = HookXMLHttpRequest;
+    win.XMLHttpRequest = HookXMLHttpRequest;
     Object.assign(win.XMLHttpRequest, { UNSENT: 0, OPENED: 1, HEADERS_RECEIVED: 2, LOADING: 3, DONE: 4 });
     function getterFactory(attr) {
       return function() {
@@ -2642,6 +2718,7 @@
     }
     function unHook() {
       win.XMLHttpRequest = originXhr;
+      HookXMLHttpRequest.prototype.constructor = originXhr;
       originXhr = void 0;
     }
     return { originXhr, unHook };
@@ -2769,7 +2846,7 @@
       }
       return true;
     }
-    var { originXhr, unHook } = hook({
+    var { originXhr, unHook } = hook$1({
       onload: preventXhrProxyCallback,
       onloadend: preventXhrProxyCallback,
       onerror: errorCallback(eventError),
@@ -2887,50 +2964,53 @@
       this._response = response;
     }
   }
-  const onRequestHandlers = [];
-  const onResponseHandlers = [];
-  _unsafeWindow.fetch = async (input, init) => {
-    for (const handler of onRequestHandlers) {
-      const requestHandler = new RequestHandler();
-      handler.apply(_unsafeWindow, [{ input, init }, requestHandler]);
-      if (requestHandler._resolve) {
-        return requestHandler._resolve;
-      }
-      if (requestHandler._error) {
-        throw requestHandler._error;
-      }
-      if (!requestHandler._next) {
-        break;
-      }
-      input = requestHandler._input;
-      init = requestHandler._init;
-    }
-    let response = await _fetch.apply(_unsafeWindow, [input, init]);
-    for (const handler of onResponseHandlers) {
-      const responseHandler = new ResponseHandler();
-      handler.apply(_unsafeWindow, [response, responseHandler]);
-      if (responseHandler._resolve) {
-        return responseHandler._resolve;
-      }
-      if (responseHandler._error) {
-        throw responseHandler._error;
-      }
-      if (!responseHandler._next) {
-        break;
-      }
-      response = responseHandler._response;
-    }
-    return response;
-  };
-  const fproxy = (proxy2) => {
+  let onRequestHandlers = [];
+  let onResponseHandlers = [];
+  const hook = (proxy2, win) => {
     if (proxy2.onRequest) {
       onRequestHandlers.push(proxy2.onRequest);
     }
     if (proxy2.onResponse) {
       onResponseHandlers.push(proxy2.onResponse);
     }
+    win.fetch = async (input, init) => {
+      for (const handler of onRequestHandlers) {
+        const requestHandler = new RequestHandler();
+        handler.apply(_unsafeWindow, [{ input, init }, requestHandler]);
+        if (requestHandler._resolve) {
+          return requestHandler._resolve;
+        }
+        if (requestHandler._error) {
+          throw requestHandler._error;
+        }
+        if (!requestHandler._next) {
+          break;
+        }
+        input = requestHandler._input;
+        init = requestHandler._init;
+      }
+      let response = await _fetch.apply(_unsafeWindow, [input, init]);
+      for (const handler of onResponseHandlers) {
+        const responseHandler = new ResponseHandler();
+        handler.apply(_unsafeWindow, [response, responseHandler]);
+        if (responseHandler._resolve) {
+          return responseHandler._resolve;
+        }
+        if (responseHandler._error) {
+          throw responseHandler._error;
+        }
+        if (!responseHandler._next) {
+          break;
+        }
+        response = responseHandler._response;
+      }
+      return response;
+    };
+  };
+  const fproxy = (proxy2, win = _unsafeWindow) => {
+    hook(proxy2, win);
     return {
-      unHook: () => {
+      unProxy: () => {
         if (proxy2.onRequest) {
           onRequestHandlers.splice(
             onRequestHandlers.findIndex((handler) => handler === proxy2.onRequest),
@@ -2943,6 +3023,11 @@
             1
           );
         }
+      },
+      unHook: () => {
+        win.fetch = _fetch;
+        onRequestHandlers = [];
+        onResponseHandlers = [];
       },
       originFetch: _fetch
     };
@@ -2959,27 +3044,47 @@
         return false;
       }
     }
-    async ajaxHook() {
-      proxy(
-        {
-          onRequest: (config, handler) => {
-            if (_NoReport.isTargetURL(config.url)) {
-              handler.resolve({
-                config,
-                status: 200,
-                headers: {
-                  "Content-Type": "text/plain; charset=utf-8"
-                },
-                response: "ok"
-              });
-            } else {
-              handler.next(config);
-            }
+    hookProperties(win) {
+      Object.defineProperty(win.navigator, "sendBeacon", {
+        value: () => {
+          return true;
+        }
+      });
+      Object.defineProperties(win, {
+        reportObserver: {
+          get() {
+            return {};
+          },
+          set() {
           }
         },
-        _unsafeWindow
-      );
-      fproxy({
+        reportConfig: {
+          get() {
+            return {};
+          },
+          set() {
+          }
+        }
+      });
+    }
+    async ajaxHook() {
+      const ajaxHookProxyConfig = {
+        onRequest: (config, handler) => {
+          if (_NoReport.isTargetURL(config.url)) {
+            handler.resolve({
+              config,
+              status: 200,
+              headers: {
+                "Content-Type": "text/plain; charset=utf-8"
+              },
+              response: "ok"
+            });
+          } else {
+            handler.next(config);
+          }
+        }
+      };
+      const fetchHookConfig = {
         onRequest(config, handler) {
           const url = getUrlFromFetchInput(config.input);
           if (_NoReport.isTargetURL(url)) {
@@ -2991,7 +3096,15 @@
         onResponse(response, handler) {
           handler.next(response);
         }
-      });
+      };
+      this.hookProperties(_unsafeWindow);
+      proxy(ajaxHookProxyConfig, _unsafeWindow);
+      fproxy(fetchHookConfig, _unsafeWindow);
+      if (!isSelfTopFrame()) {
+        this.hookProperties(_unsafeWindow.top);
+        proxy(ajaxHookProxyConfig, _unsafeWindow.top);
+        fproxy(fetchHookConfig, _unsafeWindow.top);
+      }
     }
     async run() {
       this.logger.log("拦截日志数据上报模块开始运行");
@@ -3009,10 +3122,10 @@
   class RemovePKBox extends BaseModule {
     constructor() {
       super(...arguments);
-      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.removePKBox);
+      __publicField(this, "config", this.moduleStore.moduleConfig.RemoveElement.removePKBox);
     }
     removePKNode() {
-      _GM_addStyle("#pk-vm, #awesome-pk-vm { display: none !important }");
+      _GM_addStyle("#awesome-pk-vm { display: none !important }");
     }
     removePKToast() {
       const blackWordList = ["主播即将结束PK", "连线断开中"];
@@ -3042,7 +3155,7 @@
   class RemoveLiveWaterMark extends BaseModule {
     constructor() {
       super(...arguments);
-      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.removeLiveWaterMark);
+      __publicField(this, "config", this.moduleStore.moduleConfig.RemoveElement.removeLiveWaterMark);
     }
     async run() {
       this.logger.log("移除直播间水印模块开始运行");
@@ -3052,6 +3165,32 @@
     }
   }
   __publicField(RemoveLiveWaterMark, "runMultiple", true);
+  class RemoveShopPopover extends BaseModule {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "config", this.moduleStore.moduleConfig.RemoveElement.removeShopPopover);
+    }
+    async run() {
+      this.logger.log("移除直播间小黄车弹窗模块开始运行");
+      if (this.config.enabled) {
+        _GM_addStyle(".shop-popover { display: none !important }");
+      }
+    }
+  }
+  __publicField(RemoveShopPopover, "runMultiple", true);
+  class RemoveGameParty extends BaseModule {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "config", this.moduleStore.moduleConfig.RemoveElement.removeGameParty);
+    }
+    async run() {
+      this.logger.log("移除直播间幻星派对标志模块开始运行");
+      if (this.config.enabled) {
+        _GM_addStyle("#game-id { display: none !important }");
+      }
+    }
+  }
+  __publicField(RemoveGameParty, "runMultiple", true);
   const otherModules = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     DailyTask_LiveTask_AppUserTask: AppUserTask,
@@ -3068,10 +3207,12 @@
     DailyTask_OtherTask_GroupSignTask: GroupSignTask,
     DailyTask_OtherTask_SilverToCoinTask: SilverToCoinTask,
     EnhanceExperience_BanP2P: BanP2P,
-    EnhanceExperience_NoRepoet: NoReport,
-    EnhanceExperience_RemoveLiveWaterMark: RemoveLiveWaterMark,
-    EnhanceExperience_RemovePKBox: RemovePKBox,
-    EnhanceExperience_SwitchLiveStreamQuality: SwitchLiveStreamQuality
+    EnhanceExperience_NoReport: NoReport,
+    EnhanceExperience_SwitchLiveStreamQuality: SwitchLiveStreamQuality,
+    RemoveElement_RemoveGameParty: RemoveGameParty,
+    RemoveElement_RemoveLiveWaterMark: RemoveLiveWaterMark,
+    RemoveElement_RemovePKBox: RemovePKBox,
+    RemoveElement_RemoveShopPopover: RemoveShopPopover
   }, Symbol.toStringTag, { value: "Module" }));
   function mitt(n) {
     return { all: n = n || /* @__PURE__ */ new Map(), on: function(t, e) {
@@ -3088,6 +3229,19 @@
         n2(t, e);
       });
     } };
+  }
+  function mittOnce(all) {
+    const emitter = mitt(all);
+    return {
+      // 继承原生 mitt 的方法
+      ...emitter,
+      once(type, handler) {
+        emitter.on(type, function fn(evt) {
+          emitter.off(type, fn);
+          handler(evt);
+        });
+      }
+    };
   }
   const useCacheStore = pinia.defineStore("cache", () => {
     const cache = vue.reactive(Storage.getCache());
@@ -3142,25 +3296,27 @@
   };
   const useModuleStore = pinia.defineStore("module", () => {
     const moduleConfig = vue.reactive(Storage.getModuleConfig());
-    const emitter = mitt();
-    const moduleStatus = vue.reactive(defaultModuleStatus);
+    const emitter = mittOnce();
+    const moduleStatus2 = vue.reactive(defaultModuleStatus);
     async function loadModules() {
       const cacheStore = useCacheStore();
-      for (const [name, Module] of Object.entries(defaultModules).sort(
+      for (const [name, module] of Object.entries(defaultModules).sort(
         (a, b) => a[1].sequence - b[1].sequence
       )) {
         try {
-          if (Module.runMultiple || !cacheStore.isMainBLTHRunning) {
-            await new Module(name).run();
+          if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
+            await new module(name).run();
           }
         } catch (err) {
           new Logger("loadModules").error("加载默认模块时发生致命错误，挂机助手停止运行:", err);
           return;
         }
       }
-      for (const [name, Module] of Object.entries(otherModules)) {
-        if (Module.runMultiple || !cacheStore.isMainBLTHRunning) {
-          new Module(name).run();
+      for (const [name, module] of Object.entries(otherModules)) {
+        if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
+          waitForMoment(module.runAt).then(
+            () => new module(name).run()
+          );
         }
       }
     }
@@ -3173,8 +3329,8 @@
     );
     (function clearStatus() {
       setTimeout(() => {
-        deepestIterate(moduleStatus, (_value, path) => {
-          _.set(moduleStatus, path, "");
+        deepestIterate(moduleStatus2, (_value, path) => {
+          _.set(moduleStatus2, path, "");
         });
         clearStatus();
       }, delayToNextMoment(0, 0).ms);
@@ -3182,11 +3338,11 @@
     return {
       moduleConfig,
       emitter,
-      moduleStatus,
+      moduleStatus: moduleStatus2,
       loadModules
     };
   });
-  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
     __name: "MainSiteTasks",
     setup(__props) {
       const moduleStore = useModuleStore();
@@ -3335,7 +3491,7 @@
   const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-725f1e99"), n = n(), vue.popScopeId(), n);
   const _hoisted_1$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ vue.createElementVNode("br", null, null, -1));
   const _hoisted_2$1 = { class: "avatar-wrap" };
-  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "LiveTasks",
     setup(__props) {
       const moduleStore = useModuleStore();
@@ -3860,8 +4016,8 @@
       };
     }
   });
-  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["__scopeId", "data-v-725f1e99"]]);
-  const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
+  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["__scopeId", "data-v-725f1e99"]]);
+  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "OtherTasks",
     setup(__props) {
       const moduleStore = useModuleStore();
@@ -3988,7 +4144,7 @@
       };
     }
   });
-  const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "EnhanceExperience",
     setup(__props) {
       const moduleStore = useModuleStore();
@@ -4068,16 +4224,33 @@
             ]),
             _: 1
           }),
+          vue.createVNode(_component_el_divider)
+        ]);
+      };
+    }
+  });
+  const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
+    __name: "RemoveElement",
+    setup(__props) {
+      const moduleStore = useModuleStore();
+      const config = moduleStore.moduleConfig.RemoveElement;
+      return (_ctx, _cache) => {
+        const _component_el_switch = vue.resolveComponent("el-switch");
+        const _component_Info = vue.resolveComponent("Info");
+        const _component_el_space = vue.resolveComponent("el-space");
+        const _component_el_row = vue.resolveComponent("el-row");
+        const _component_el_divider = vue.resolveComponent("el-divider");
+        return vue.openBlock(), vue.createElementBlock("div", null, [
           vue.createVNode(_component_el_row, null, {
             default: vue.withCtx(() => [
               vue.createVNode(_component_el_space, { wrap: "" }, {
                 default: vue.withCtx(() => [
                   vue.createVNode(_component_el_switch, {
                     modelValue: vue.unref(config).removePKBox.enabled,
-                    "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => vue.unref(config).removePKBox.enabled = $event),
+                    "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => vue.unref(config).removePKBox.enabled = $event),
                     "active-text": "移除大乱斗元素"
                   }, null, 8, ["modelValue"]),
-                  vue.createVNode(_component_Info, { id: "EnhanceExperience.removePKBox" })
+                  vue.createVNode(_component_Info, { id: "RemoveElement.removePKBox" })
                 ]),
                 _: 1
               })
@@ -4090,10 +4263,42 @@
                 default: vue.withCtx(() => [
                   vue.createVNode(_component_el_switch, {
                     modelValue: vue.unref(config).removeLiveWaterMark.enabled,
-                    "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => vue.unref(config).removeLiveWaterMark.enabled = $event),
+                    "onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => vue.unref(config).removeLiveWaterMark.enabled = $event),
                     "active-text": "移除直播间水印"
                   }, null, 8, ["modelValue"]),
-                  vue.createVNode(_component_Info, { id: "EnhanceExperience.removeLiveWaterMark" })
+                  vue.createVNode(_component_Info, { id: "RemoveElement.removeLiveWaterMark" })
+                ]),
+                _: 1
+              })
+            ]),
+            _: 1
+          }),
+          vue.createVNode(_component_el_row, null, {
+            default: vue.withCtx(() => [
+              vue.createVNode(_component_el_space, { wrap: "" }, {
+                default: vue.withCtx(() => [
+                  vue.createVNode(_component_el_switch, {
+                    modelValue: vue.unref(config).removeShopPopover.enabled,
+                    "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => vue.unref(config).removeShopPopover.enabled = $event),
+                    "active-text": "移除直播间小黄车弹窗"
+                  }, null, 8, ["modelValue"]),
+                  vue.createVNode(_component_Info, { id: "RemoveElement.removeShopPopover" })
+                ]),
+                _: 1
+              })
+            ]),
+            _: 1
+          }),
+          vue.createVNode(_component_el_row, null, {
+            default: vue.withCtx(() => [
+              vue.createVNode(_component_el_space, { wrap: "" }, {
+                default: vue.withCtx(() => [
+                  vue.createVNode(_component_el_switch, {
+                    modelValue: vue.unref(config).removeGameParty.enabled,
+                    "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => vue.unref(config).removeGameParty.enabled = $event),
+                    "active-text": "移除直播间幻星派对标志"
+                  }, null, 8, ["modelValue"]),
+                  vue.createVNode(_component_Info, { id: "RemoveElement.removeGameParty" })
                 ]),
                 _: 1
               })
@@ -4107,10 +4312,11 @@
   });
   const __default__ = {
     components: {
-      MainSiteTasks: _sfc_main$8,
+      MainSiteTasks: _sfc_main$9,
       LiveTasks,
-      OtherTasks: _sfc_main$6,
-      EnhanceExperience: _sfc_main$5
+      OtherTasks: _sfc_main$7,
+      EnhanceExperience: _sfc_main$6,
+      RemoveElement: _sfc_main$5
     }
   };
   const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
@@ -4203,7 +4409,7 @@
                         default: vue.withCtx(() => [
                           vue.createVNode(_component_el_aside, { class: "aside" }, {
                             default: vue.withCtx(() => [
-                              vue.createVNode(_sfc_main$9)
+                              vue.createVNode(_sfc_main$a)
                             ]),
                             _: 1
                           }),
@@ -4241,7 +4447,7 @@
       };
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-4234c94a"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-934516e9"]]);
   const cssLoader = (e) => {
     const t = GM_getResourceText(e), o = document.createElement("style");
     return o.innerText = t, document.head.append(o), t;
@@ -4478,7 +4684,9 @@
             vue.h("span", "。")
           ])
         ])
-      },
+      }
+    },
+    RemoveElement: {
       removePKBox: {
         title: "移除大乱斗元素",
         message: "移除直播间的大乱斗元素（进度条，弹出的提示等）。"
@@ -4486,6 +4694,14 @@
       removeLiveWaterMark: {
         title: "移除直播间水印",
         message: "移除直播画面左上角的水印。"
+      },
+      removeShopPopover: {
+        title: "移除直播间小黄车弹窗",
+        message: "移除直播间左上角的小黄车弹窗。"
+      },
+      removeGameParty: {
+        title: "移除直播间幻星派对标志",
+        message: "移除直播间右下角的幻星派对标志。"
       }
     }
   };
@@ -4582,15 +4798,16 @@
       };
     }
   });
-  const TaskStatusIcon = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-2f9d6050"]]);
+  const TaskStatusIcon = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-72d53133"]]);
   const MyIconsVue = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     Info: InfoIcon,
     TaskStatus: TaskStatusIcon,
     Tasks: TasksIcon
   }, Symbol.toStringTag, { value: "Module" }));
-  const logger = new Logger("main.ts");
+  const logger = new Logger("Main");
   if (isTargetFrame()) {
+    logger.log("document.readyState", document.readyState);
     const app = vue.createApp(App);
     const pinia$1 = pinia.createPinia();
     app.use(ElementPlus);
@@ -4617,12 +4834,7 @@
       document.body.append(div);
       app.mount(div);
     };
-    logger.log("document.readyState", document.readyState);
-    if (document.readyState !== "loading") {
-      mountApp();
-    } else {
-      document.addEventListener("DOMContentLoaded", () => mountApp());
-    }
+    waitForMoment("document-end").then(() => mountApp());
   }
 
 })(Vue, Pinia, _, ElementPlusIconsVue, luxon, CryptoJS, ElementPlus, hotkeys);
