@@ -117,12 +117,20 @@ const hook = (proxy: Iproxy, win: Window) => {
   }
 }
 
+/**
+ * 代理 fetch 请求
+ * @param proxy 代理规则
+ * @param win 目标 Window，使用 iframe window 作为参数时不能违反同源策略
+ */
 const fproxy = (
   proxy: Iproxy,
   win: Window = unsafeWindow
 ): {
+  /** 删除代理规则 proxy */
   unProxy: () => void
+  /** 删除所有代理规则并将被修改的 fetch 还原  */
   unHook: () => void
+  /** 原生 fetch 函数 */
   originFetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 } => {
   hook(proxy, win)
