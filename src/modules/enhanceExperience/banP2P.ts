@@ -22,13 +22,20 @@ class BanP2P extends BaseModule {
         Object.defineProperty(unsafeWindow, i, {
           value: function () {
             this.addEventListener = function () {}
+            this.removeEventListener = function () {}
             this.createDataChannel = function () {
               return { close: function () {} }
             }
-            this.createOffer = function () {}
-            this.setLocalDescription = function () {}
+            this.createOffer = function () {
+              return Promise.resolve()
+            }
+            this.setLocalDescription = function () {
+              return Promise.resolve()
+            }
             this.close = function () {}
-            this.setRemoteDescription = function () {}
+            this.setRemoteDescription = function () {
+              return Promise.resolve()
+            }
             this.createAnswer = function () {}
           },
           enumerable: false,

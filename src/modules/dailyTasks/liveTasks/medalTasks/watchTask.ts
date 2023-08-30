@@ -86,7 +86,7 @@ class RoomHeart {
    */
   public start() {
     if (!this.buvid) {
-      this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务`)
+      this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务，请尝试刷新页面`)
       return
     }
     // 如果到了0点还没完成任务，就不继续了

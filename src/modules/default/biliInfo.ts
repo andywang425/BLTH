@@ -23,10 +23,10 @@ class BiliInfo extends DefaultBaseModule {
    * 获取 Cookies
    *
    * bili_jct: 常作为参数 csrf 在请求中出现
-   * LIVE_BUVID 不能在此处获取，还没生成
+   * LIVE_BUVID: 如果用户以前从来没看过直播，此时可能为 null
    */
   private getCookies(): IbiliCookies {
-    return getCookies(['bili_jct'])
+    return getCookies(['bili_jct', 'LIVE_BUVID'])
   }
 
   /**
