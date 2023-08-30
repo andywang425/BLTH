@@ -10,10 +10,13 @@ import * as MyIconsVue from './components/icons'
 import './assets/css/base.css'
 import Logger from './library/logger'
 import { useModuleStore } from './stores/useModuleStore'
+import { waitForMoment } from './library/utils'
 
-const logger = new Logger('main.ts')
+const logger = new Logger('Main')
 
 if (isTargetFrame()) {
+  logger.log('document.readyState', document.readyState)
+
   const app = createApp(App)
   const pinia = createPinia()
 
@@ -48,13 +51,5 @@ if (isTargetFrame()) {
     app.mount(div)
   }
 
-  logger.log('document.readyState', document.readyState)
-
-  if (document.readyState !== 'loading') {
-    mountApp()
-  } else {
-    document.addEventListener('DOMContentLoaded', () => mountApp())
-  }
+  waitForMoment('document-end').then(() => mountApp())
 }
-
-// trigger workflow

@@ -1,6 +1,6 @@
 import { useModuleStore } from '../stores/useModuleStore'
 import Logger from '../library/logger'
-import { Istatus } from '../types/moduleStatus'
+import { moduleStatus, runAtMoment } from '../types/module'
 
 class BaseModule {
   /**
@@ -15,6 +15,16 @@ class BaseModule {
    * 默认false，即只在Main BLTH运行的页面上运行
    */
   static runMultiple: boolean = false
+  /**
+   * 模块运行时机
+   *
+   * `document-start`: 尽可能早，与脚本注入时机相同
+   *
+   * `document-end`: `document`的`DOMContentLoaded`事件触发后
+   *
+   * `window-load`: `window`的`load`事件触发后
+   */
+  static runAt: runAtMoment = 'document-start'
   /**
    * 用于在控制台中输出日志信息
    */
@@ -33,11 +43,11 @@ class BaseModule {
    * 如果需要在控制面板上显示模块状态，推荐添加一个 status setter 用来设置模块状态
    *
    * @example
-   * public set status(s: Istatus) {
+   * public set status(s: moduleStatus) {
    *    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
    * }
    */
-  set status(_s: Istatus) {
+  set status(_s: moduleStatus) {
     throw new Error('Method not implemented.')
   }
 

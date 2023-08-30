@@ -2,12 +2,12 @@ import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
 import BAPI from '../../../library/bili-api'
 import { sleep } from '../../../library/utils'
-import { Istatus } from '../../../types/moduleStatus'
+import { moduleStatus } from '../../../types/module'
 
 class GroupSignTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.groupSign
 
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     this.moduleStore.moduleStatus.DailyTasks.OtherTasks.groupSign = s
   }
 

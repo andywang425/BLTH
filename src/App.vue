@@ -73,7 +73,7 @@ if (livePlayer) {
   // 监听页面缩放，调整控制面板大小
   // 因为这个操作频率不高就不节流或防抖了
   window.onresize = setPanelSize
-  // 监听 html 根节点个 body 节点
+  // 监听 html 根节点和 body 节点
   // 主要是为了适配滚动条的显示/隐藏和实验室中的功能
   const observer = new MutationObserver(() => setPanelSize())
   observer.observe(document.documentElement, { attributes: true })

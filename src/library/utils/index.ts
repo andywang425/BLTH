@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { useModuleStore } from '../../stores/useModuleStore'
+import { moduleEmitterEvents, runAtMoment } from '../../types/module'
 
 /**
  * 生成一个 version 4 uuid
@@ -25,9 +26,9 @@ function sleep(miliseconds: number): Promise<any> {
  * @param type mitt 的 type 参数
  * @param timeout 超时时间
  */
-function wait(type: string | symbol, timeout: number = -1): Promise<any> {
+function wait(type: keyof moduleEmitterEvents, timeout: number = -1): Promise<any> {
   return new Promise((resolve) => {
-    useModuleStore().emitter.on(type, (event) => resolve(event))
+    useModuleStore().emitter.once(type, (event) => resolve(event))
     if (timeout !== -1) setTimeout(resolve, timeout)
   })
 }
@@ -60,6 +61,11 @@ function deepestIterate(obj: any, fn: (value: any, path: string) => void, path?:
   })
 }
 
+/**
+ * 从 fetch 的 input 参数中获取 URL
+ * @param input fetch 的第一个参数
+ * @returns URL
+ */
 function getUrlFromFetchInput(input: RequestInfo | URL): string {
   if (typeof input === 'string') {
     return input
@@ -72,4 +78,34 @@ function getUrlFromFetchInput(input: RequestInfo | URL): string {
   }
 }
 
-export { uuid, sleep, wait, packFormData, deepestIterate, getUrlFromFetchInput }
+/**
+ * 等待直到指定时刻
+ * @param moment 模块运行时机
+ */
+function waitForMoment(moment: runAtMoment): Promise<void> {
+  switch (moment) {
+    case 'document-end': {
+      return new Promise((resolve) => {
+        if (document.readyState !== 'loading') {
+          resolve()
+        } else {
+          document.addEventListener('DOMContentLoaded', () => resolve())
+        }
+      })
+    }
+    case 'window-load': {
+      return new Promise((resolve) => {
+        if (document.readyState === 'complete') {
+          resolve()
+        } else {
+          window.addEventListener('load', () => resolve())
+        }
+      })
+    }
+    default: {
+      return Promise.resolve()
+    }
+  }
+}
+
+export { uuid, sleep, wait, packFormData, deepestIterate, getUrlFromFetchInput, waitForMoment }

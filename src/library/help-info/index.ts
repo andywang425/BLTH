@@ -215,7 +215,9 @@ const help_info: IhelpInfo = {
           h('span', '。')
         ])
       ])
-    },
+    }
+  },
+  RemoveElement: {
     removePKBox: {
       title: '移除大乱斗元素',
       message: '移除直播间的大乱斗元素（进度条，弹出的提示等）。'
@@ -223,6 +225,14 @@ const help_info: IhelpInfo = {
     removeLiveWaterMark: {
       title: '移除直播间水印',
       message: '移除直播画面左上角的水印。'
+    },
+    removeShopPopover: {
+      title: '移除直播间小黄车弹窗',
+      message: '移除直播间左上角的小黄车弹窗。'
+    },
+    removeGameParty: {
+      title: '移除直播间幻星派对标志',
+      message: '移除直播间右下角的幻星派对标志。'
     }
   }
 }

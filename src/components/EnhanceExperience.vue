@@ -34,18 +34,6 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
         <Info id="EnhanceExperience.noReport" />
       </el-space>
     </el-row>
-    <el-row>
-      <el-space wrap>
-        <el-switch v-model="config.removePKBox.enabled" active-text="移除大乱斗元素" />
-        <Info id="EnhanceExperience.removePKBox" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap>
-        <el-switch v-model="config.removeLiveWaterMark.enabled" active-text="移除直播间水印" />
-        <Info id="EnhanceExperience.removeLiveWaterMark" />
-      </el-space>
-    </el-row>
     <el-divider />
   </div>
 </template>

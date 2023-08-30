@@ -8,7 +8,7 @@ import { uuid, sleep } from '../../../../library/utils'
 import { getCookie } from '../../../../library/cookie'
 import { useModuleStore } from '../../../../stores/useModuleStore'
 import { ImoduleConfig } from '../../../../types'
-import { Istatus } from '../../../../types/moduleStatus'
+import { moduleStatus, runAtMoment } from '../../../../types/module'
 
 interface sypderData {
   benchmark: string
@@ -42,7 +42,7 @@ class RoomHeart {
   private logger = new Logger('RoomHeart')
 
   private config: ImoduleConfig['DailyTasks']['LiveTasks']['medalTasks']['watch']
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
   /** 是不是最后一个心跳任务 */
@@ -85,7 +85,10 @@ class RoomHeart {
    * 开始心跳
    */
   public start() {
-    if (!this.buvid) return
+    if (!this.buvid) {
+      this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务，请尝试刷新页面`)
+      return
+    }
     // 如果到了0点还没完成任务，就不继续了
     this.timer = setTimeout(() => (this.stop = true), delayToNextMoment(0, 0).ms)
     return this.E()
@@ -251,10 +254,12 @@ class RoomHeart {
 }
 
 class WatchTask extends BaseModule {
+  static runAt: runAtMoment = 'document-end'
+
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.watch
 
-  set status(s: Istatus) {
+  set status(s: moduleStatus) {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
 
