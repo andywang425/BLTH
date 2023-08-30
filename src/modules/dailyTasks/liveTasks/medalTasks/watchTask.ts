@@ -85,7 +85,10 @@ class RoomHeart {
    * 开始心跳
    */
   public start() {
-    if (!this.buvid) return
+    if (!this.buvid) {
+      this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务`)
+      return
+    }
     // 如果到了0点还没完成任务，就不继续了
     this.timer = setTimeout(() => (this.stop = true), delayToNextMoment(0, 0).ms)
     return this.E()
