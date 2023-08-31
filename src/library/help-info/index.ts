@@ -215,6 +215,10 @@ const help_info: IhelpInfo = {
           h('span', '。')
         ])
       ])
+    },
+    sleepDetection: {
+      title: '屏蔽挂机检测',
+      message: '屏蔽B站的挂机检测。'
     }
   },
   RemoveElement: {
