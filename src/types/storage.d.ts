@@ -81,6 +81,9 @@ interface ImoduleConfig {
     noReport: {
       enabled: boolean
     }
+    sleepDetection: {
+      enabled: boolean
+    }
   }
   RemoveElement: {
     removePKBox: {
