@@ -38,7 +38,7 @@
     "terser": "^5.18.2",
     "typescript": "^5.0.4",
     "vite": "^4.3.5",
-    "vite-plugin-monkey": "^3.2.0",
+    "vite-plugin-monkey": "^3.5.0",
     "vue-tsc": "^1.6.4"
   }
 }
