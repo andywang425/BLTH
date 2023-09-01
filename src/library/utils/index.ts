@@ -80,10 +80,45 @@ function getUrlFromFetchInput(input: RequestInfo | URL): string {
 
 /**
  * 等待直到指定时刻
- * @param moment 模块运行时机
+ * @param moment 运行时机
  */
 function waitForMoment(moment: runAtMoment): Promise<void> {
   switch (moment) {
+    case 'document-start': {
+      return Promise.resolve()
+    }
+    case 'document-head': {
+      return new Promise((resolve) => {
+        if (document.head) {
+          resolve()
+        } else {
+          const observer = new MutationObserver((mutaions) => {
+            if (document.head) {
+              console.log('mutations head', mutaions)
+              observer.disconnect()
+              resolve()
+            }
+          })
+          observer.observe(document.documentElement, { childList: true })
+        }
+      })
+    }
+    case 'document-body': {
+      return new Promise((resolve) => {
+        if (document.body) {
+          resolve()
+        } else {
+          const observer = new MutationObserver((mutaions) => {
+            if (document.body) {
+              console.log('mutations body', mutaions)
+              observer.disconnect()
+              resolve()
+            }
+          })
+          observer.observe(document.documentElement, { childList: true })
+        }
+      })
+    }
     case 'document-end': {
       return new Promise((resolve) => {
         if (document.readyState !== 'loading') {
@@ -103,7 +138,7 @@ function waitForMoment(moment: runAtMoment): Promise<void> {
       })
     }
     default: {
-      return Promise.resolve()
+      return Promise.reject('Illegal moment')
     }
   }
 }

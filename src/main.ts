@@ -14,6 +14,10 @@ import { waitForMoment } from './library/utils'
 
 const logger = new Logger('Main')
 
+await waitForMoment('document-head')
+
+await waitForMoment('document-body')
+
 if (isTargetFrame()) {
   logger.log('document.readyState', document.readyState)
 

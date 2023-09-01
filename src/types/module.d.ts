@@ -26,7 +26,12 @@ interface ImoduleStatus {
   }
 }
 
-type runAtMoment = 'document-start' | 'document-end' | 'window-load'
+type runAtMoment =
+  | 'document-start'
+  | 'document-head'
+  | 'document-body'
+  | 'document-end'
+  | 'window-load'
 
 type moduleEmitterEvents = {
   BiliInfo: {

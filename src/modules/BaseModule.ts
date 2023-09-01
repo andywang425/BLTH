@@ -20,6 +20,10 @@ class BaseModule {
    *
    * `document-start`: 尽可能早，与脚本注入时机相同
    *
+   * `document-head`: `document.head`刚刚出现后
+   *
+   * `document-body`: `document.body`刚刚出现后
+   *
    * `document-end`: `document`的`DOMContentLoaded`事件触发后
    *
    * `window-load`: `window`的`load`事件触发后
