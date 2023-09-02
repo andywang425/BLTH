@@ -85,16 +85,17 @@ function getUrlFromFetchInput(input: RequestInfo | URL): string {
 function waitForMoment(moment: runAtMoment): Promise<void> {
   switch (moment) {
     case 'document-start': {
+      // 在 document-start 阶段，document-head 可能为 null
       return Promise.resolve()
     }
     case 'document-head': {
+      // 在 document-head 阶段，document.head 已经出现但是部分内部节点可能还没出现
       return new Promise((resolve) => {
         if (document.head) {
           resolve()
         } else {
-          const observer = new MutationObserver((mutaions) => {
+          const observer = new MutationObserver(() => {
             if (document.head) {
-              console.log('mutations head', mutaions)
               observer.disconnect()
               resolve()
             }
@@ -104,13 +105,13 @@ function waitForMoment(moment: runAtMoment): Promise<void> {
       })
     }
     case 'document-body': {
+      // 在 document-body 阶段，document.body 已经出现但是部分内部节点可能还没出现
       return new Promise((resolve) => {
         if (document.body) {
           resolve()
         } else {
-          const observer = new MutationObserver((mutaions) => {
+          const observer = new MutationObserver(() => {
             if (document.body) {
-              console.log('mutations body', mutaions)
               observer.disconnect()
               resolve()
             }
@@ -120,6 +121,7 @@ function waitForMoment(moment: runAtMoment): Promise<void> {
       })
     }
     case 'document-end': {
+      // 在 document-end 阶段，DOM 加载完成，但部分资源可能还没获取到（比如图片）
       return new Promise((resolve) => {
         if (document.readyState !== 'loading') {
           resolve()
@@ -129,6 +131,7 @@ function waitForMoment(moment: runAtMoment): Promise<void> {
       })
     }
     case 'window-load': {
+      // 在 window-load 阶段，整个网页加载完毕
       return new Promise((resolve) => {
         if (document.readyState === 'complete') {
           resolve()

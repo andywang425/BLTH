@@ -13,6 +13,7 @@ import { useModuleStore } from './stores/useModuleStore'
 import { waitForMoment } from './library/utils'
 
 const logger = new Logger('Main')
+logger.log('document.readyState', document.readyState)
 
 const pinia = createPinia()
 const cacheStore = useCacheStore(pinia)
@@ -32,8 +33,6 @@ moduleStore.loadModules('unknown')
 await waitForMoment('document-body')
 
 if (isTargetFrame()) {
-  logger.log('document.readyState', document.readyState)
-
   const app = createApp(App)
 
   app.use(ElementPlus)
@@ -49,12 +48,10 @@ if (isTargetFrame()) {
 
   moduleStore.loadModules('yes')
 
-  const mountApp = () => {
-    const div = dce('div')
-    div.id = 'BLTH'
-    document.body.append(div)
-    app.mount(div)
-  }
+  await waitForMoment('document-end')
 
-  waitForMoment('document-end').then(() => mountApp())
+  const div = dce('div')
+  div.id = 'BLTH'
+  document.body.append(div)
+  app.mount(div)
 }

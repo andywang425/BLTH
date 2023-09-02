@@ -1,6 +1,6 @@
 import { useModuleStore } from '../stores/useModuleStore'
 import Logger from '../library/logger'
-import { moduleStatus, runAtMoment } from '../types/module'
+import { moduleStatus, onFrameTypes, runAtMoment } from '../types/module'
 
 class BaseModule {
   /**
@@ -29,8 +29,14 @@ class BaseModule {
    * `window-load`: `window`的`load`事件触发后
    */
   static runAt: runAtMoment = 'document-body'
-
-  static onFrame: 'all' | 'target' = 'target'
+  /**
+   * 模块运行的 frame
+   *
+   * `all`: 所有符合脚本`@match`规则的 frame
+   *
+   * `target`: window.BilibiliLive 存在的那个 frame
+   */
+  static onFrame: onFrameTypes = 'target'
   /**
    * 用于在控制台中输出日志信息
    */

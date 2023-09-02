@@ -33,6 +33,10 @@ type runAtMoment =
   | 'document-end'
   | 'window-load'
 
+type onFrameTypes = 'all' | 'target'
+
+type isOnTargetFrameTypes = 'unknown' | 'yes'
+
 type moduleEmitterEvents = {
   BiliInfo: {
     target: string
@@ -42,4 +46,11 @@ type moduleEmitterEvents = {
   }
 }
 
-export { moduleStatus, ImoduleStatus, runAtMoment, moduleEmitterEvents }
+export {
+  moduleStatus,
+  ImoduleStatus,
+  runAtMoment,
+  moduleEmitterEvents,
+  onFrameTypes,
+  isOnTargetFrameTypes
+}

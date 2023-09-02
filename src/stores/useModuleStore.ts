@@ -10,7 +10,7 @@ import * as otherModules from '../modules'
 import Logger from '../library/logger'
 import mitt from '../library/mitt'
 import { delayToNextMoment } from '../library/luxon'
-import { ImoduleStatus, moduleEmitterEvents, moduleStatus } from '../types/module'
+import { ImoduleStatus, isOnTargetFrameTypes, moduleEmitterEvents, moduleStatus } from '../types/module'
 import { deepestIterate, waitForMoment } from '../library/utils'
 import { useCacheStore } from './useCacheStore'
 
@@ -40,7 +40,8 @@ const defaultModuleStatus: ImoduleStatus = {
   }
 }
 
-const loadedModuleNames: string[] = []
+// 早期（不确定当前 frame 是否是目标 frame 的时候）加载的模块名称
+const earlyLoadedModuleNames: string[] = []
 
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
@@ -53,8 +54,12 @@ export const useModuleStore = defineStore('module', () => {
 
   /**
    * 加载模块
+   *
+   * @param isOnTargetFrame 当前脚本是否运行在目标 frame 上
+   * - `unknown`: 不知道（至少要等到`document-body`后才能确定）
+   * - `yes`: 是的
    */
-  async function loadModules(isOnTargetFrame: 'unknown' | 'yes') {
+  async function loadModules(isOnTargetFrame: isOnTargetFrameTypes) {
     const cacheStore = useCacheStore()
     if (isOnTargetFrame === 'unknown') {
       for (const [name, module] of Object.entries(otherModules)) {
@@ -63,7 +68,7 @@ export const useModuleStore = defineStore('module', () => {
             waitForMoment(module.runAt).then(() =>
               new (module as new (moduleName: string) => BaseModule)(name).run()
             )
-            loadedModuleNames.push(name)
+            earlyLoadedModuleNames.push(name)
           }
         }
       }
@@ -83,7 +88,8 @@ export const useModuleStore = defineStore('module', () => {
       }
       // 运行其它模块
       for (const [name, module] of Object.entries(otherModules)) {
-        if (!loadedModuleNames.includes(name)) {
+        // 对 onFrame 为 all 的模块来说，如果之前运行过，现在就不运行了
+        if (!earlyLoadedModuleNames.includes(name)) {
           if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
             waitForMoment(module.runAt).then(() =>
               new (module as new (moduleName: string) => BaseModule)(name).run()

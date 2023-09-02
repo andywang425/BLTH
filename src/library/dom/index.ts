@@ -44,16 +44,13 @@ const pollingQuery = (
 }
 
 /**
- * 判断当前脚本是否运行在 BilibiliLive 所在的 frame
+ * 判断当前脚本是否运行在 BilibiliLive 所在的 frame（需要等到 document-body 后才能判断）
  *
  * 注：大部分B站直播间页面只有两个iframe（其中只有一个iframe的源是live.bilibili.com），共三个frame
  *
  * 特殊的直播间（背景很好看的那种，top frame被用来当背景板了）有三个iframe（其中只有两个iframe的源是live.bilibili.com），共四个frame
  */
 const isTargetFrame = (): boolean => {
-  console.log('d h i', document.head.innerHTML)
-  console.log('w l h', window.location.href)
-  console.log('iframes', document.querySelectorAll('iframe').length)
   if (document.head.innerHTML.includes('BilibiliLive')) {
     return true
   } else {
