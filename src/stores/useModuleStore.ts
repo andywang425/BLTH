@@ -40,6 +40,8 @@ const defaultModuleStatus: ImoduleStatus = {
   }
 }
 
+const loadedModuleNames: string[] = []
+
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
   const moduleConfig: ImoduleConfig = reactive(Storage.getModuleConfig())
@@ -50,29 +52,44 @@ export const useModuleStore = defineStore('module', () => {
   const moduleStatus: ImoduleStatus = reactive(defaultModuleStatus)
 
   /**
-   * 加载（运行）所有模块
+   * 加载模块
    */
-  async function loadModules() {
+  async function loadModules(isOnTargetFrame: 'unknown' | 'yes') {
     const cacheStore = useCacheStore()
-    // 按优先级顺序逐个运行默认模块
-    for (const [name, module] of Object.entries(defaultModules).sort(
-      (a, b) => a[1].sequence - b[1].sequence
-    )) {
-      try {
-        if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
-          await new (module as new (moduleName: string) => DefaultBaseModule)(name).run()
+    if (isOnTargetFrame === 'unknown') {
+      for (const [name, module] of Object.entries(otherModules)) {
+        if (module.onFrame === 'all') {
+          if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
+            waitForMoment(module.runAt).then(() =>
+              new (module as new (moduleName: string) => BaseModule)(name).run()
+            )
+            loadedModuleNames.push(name)
+          }
         }
-      } catch (err) {
-        new Logger('loadModules').error('加载默认模块时发生致命错误，挂机助手停止运行:', err)
-        return
       }
-    }
-    // 运行其它模块
-    for (const [name, module] of Object.entries(otherModules)) {
-      if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
-        waitForMoment(module.runAt).then(() =>
-          new (module as new (moduleName: string) => BaseModule)(name).run()
-        )
+    } else {
+      // 按优先级顺序逐个运行默认模块
+      for (const [name, module] of Object.entries(defaultModules).sort(
+        (a, b) => a[1].sequence - b[1].sequence
+      )) {
+        try {
+          if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
+            await new (module as new (moduleName: string) => DefaultBaseModule)(name).run()
+          }
+        } catch (err) {
+          new Logger('loadModules').error('加载默认模块时发生致命错误，挂机助手停止运行:', err)
+          return
+        }
+      }
+      // 运行其它模块
+      for (const [name, module] of Object.entries(otherModules)) {
+        if (!loadedModuleNames.includes(name)) {
+          if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
+            waitForMoment(module.runAt).then(() =>
+              new (module as new (moduleName: string) => BaseModule)(name).run()
+            )
+          }
+        }
       }
     }
   }

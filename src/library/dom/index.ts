@@ -51,6 +51,9 @@ const pollingQuery = (
  * 特殊的直播间（背景很好看的那种，top frame被用来当背景板了）有三个iframe（其中只有两个iframe的源是live.bilibili.com），共四个frame
  */
 const isTargetFrame = (): boolean => {
+  console.log('d h i', document.head.innerHTML)
+  console.log('w l h', window.location.href)
+  console.log('iframes', document.querySelectorAll('iframe').length)
   if (document.head.innerHTML.includes('BilibiliLive')) {
     return true
   } else {

@@ -14,7 +14,20 @@ import { waitForMoment } from './library/utils'
 
 const logger = new Logger('Main')
 
-await waitForMoment('document-head')
+const pinia = createPinia()
+const cacheStore = useCacheStore(pinia)
+const moduleStore = useModuleStore(pinia)
+
+cacheStore.checkIfMainBLTHRunning()
+
+if (!cacheStore.isMainBLTHRunning) {
+  logger.log('当前脚本是Main BLTH，开始存活心跳')
+  cacheStore.startAliveHeartBeat()
+} else {
+  logger.log('其它页面上存在正在运行的Main BLTH')
+}
+
+moduleStore.loadModules('unknown')
 
 await waitForMoment('document-body')
 
@@ -22,20 +35,9 @@ if (isTargetFrame()) {
   logger.log('document.readyState', document.readyState)
 
   const app = createApp(App)
-  const pinia = createPinia()
 
   app.use(ElementPlus)
   app.use(pinia)
-
-  const cacheStore = useCacheStore()
-  cacheStore.checkIfMainBLTHRunning()
-
-  if (!cacheStore.isMainBLTHRunning) {
-    logger.log('当前脚本是Main BLTH，开始存活心跳')
-    cacheStore.startAliveHeartBeat()
-  } else {
-    logger.log('其它页面上存在正在运行的Main BLTH')
-  }
 
   for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
@@ -45,8 +47,7 @@ if (isTargetFrame()) {
     app.component(key, component)
   }
 
-  const moduleStore = useModuleStore()
-  moduleStore.loadModules()
+  moduleStore.loadModules('yes')
 
   const mountApp = () => {
     const div = dce('div')

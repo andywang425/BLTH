@@ -1,8 +1,10 @@
 import { unsafeWindow } from '$'
+import { runAtMoment } from '../../types/module'
 import BaseModule from '../BaseModule'
 
 class BanP2P extends BaseModule {
   static runMultiple = true
+  static runAt: runAtMoment = 'document-start'
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.banp2p
 

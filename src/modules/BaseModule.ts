@@ -28,7 +28,9 @@ class BaseModule {
    *
    * `window-load`: `window`的`load`事件触发后
    */
-  static runAt: runAtMoment = 'document-start'
+  static runAt: runAtMoment = 'document-body'
+
+  static onFrame: 'all' | 'target' = 'target'
   /**
    * 用于在控制台中输出日志信息
    */
