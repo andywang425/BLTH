@@ -68,6 +68,7 @@ export const useModuleStore = defineStore('module', () => {
             waitForMoment(module.runAt).then(() =>
               new (module as new (moduleName: string) => BaseModule)(name).run()
             )
+            // 记录被加载的、onFrame 为 all 的模块名称
             earlyLoadedModuleNames.push(name)
           }
         }
