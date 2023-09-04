@@ -10,8 +10,6 @@ import { sleep } from '../../library/utils'
 import { useModuleStore } from '../../stores/useModuleStore'
 
 class BiliInfo extends DefaultBaseModule {
-  public static sequence = 0
-
   private getBilibiliLive(): Window['BilibiliLive'] {
     this.logger.log('unsafeWindow.BilibiliLive', unsafeWindow.BilibiliLive)
     // 返回一个 BilibiliLive 的引用

@@ -16,7 +16,7 @@ class BaseModule {
    */
   static runMultiple: boolean = false
   /**
-   * 模块运行时机
+   * 模块运行时机，默认 document-body
    *
    * `document-start`: 尽可能早，与脚本注入时机相同
    *
@@ -30,13 +30,17 @@ class BaseModule {
    */
   static runAt: runAtMoment = 'document-body'
   /**
-   * 模块运行的 frame
+   * 模块运行的 frame，默认 target
    *
    * `all`: 所有符合脚本`@match`规则的 frame
    *
    * `target`: window.BilibiliLive 存在的那个 frame
    */
   static onFrame: onFrameTypes = 'target'
+  /**
+   * 是否要等默认模块运行完了再运行，默认 true
+   */
+  static runAfterDefault: boolean = true
   /**
    * 用于在控制台中输出日志信息
    */

@@ -10,7 +10,12 @@ import * as otherModules from '../modules'
 import Logger from '../library/logger'
 import mitt from '../library/mitt'
 import { delayToNextMoment } from '../library/luxon'
-import { ImoduleStatus, isOnTargetFrameTypes, moduleEmitterEvents, moduleStatus } from '../types/module'
+import {
+  ImoduleStatus,
+  isOnTargetFrameTypes,
+  moduleEmitterEvents,
+  moduleStatus
+} from '../types/module'
 import { deepestIterate, waitForMoment } from '../library/utils'
 import { useCacheStore } from './useCacheStore'
 
@@ -53,13 +58,33 @@ export const useModuleStore = defineStore('module', () => {
   const moduleStatus: ImoduleStatus = reactive(defaultModuleStatus)
 
   /**
+   * 加载默认模块（该函数不导出）
+   */
+  async function loadDefaultModules(): Promise<any[]> {
+    const cacheStore = useCacheStore()
+    const promiseArray: Promise<any>[] = []
+    // 按优先级顺序逐个运行默认模块
+    for (const [name, module] of Object.entries(defaultModules)) {
+      if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
+        promiseArray.push(new (module as new (moduleName: string) => DefaultBaseModule)(name).run())
+      }
+    }
+    try {
+      return Promise.all(promiseArray)
+    } catch (reason) {
+      new Logger('loadModules').error('加载默认模块时发生致命错误，挂机助手停止运行:', reason)
+      return Promise.reject(reason)
+    }
+  }
+
+  /**
    * 加载模块
    *
    * @param isOnTargetFrame 当前脚本是否运行在目标 frame 上
    * - `unknown`: 不知道（至少要等到`document-body`后才能确定）
    * - `yes`: 是的
    */
-  async function loadModules(isOnTargetFrame: isOnTargetFrameTypes) {
+  function loadModules(isOnTargetFrame: isOnTargetFrameTypes) {
     const cacheStore = useCacheStore()
     if (isOnTargetFrame === 'unknown') {
       for (const [name, module] of Object.entries(otherModules)) {
@@ -68,33 +93,30 @@ export const useModuleStore = defineStore('module', () => {
             waitForMoment(module.runAt).then(() =>
               new (module as new (moduleName: string) => BaseModule)(name).run()
             )
-            // 记录被加载的、onFrame 为 all 的模块名称
+            // 记录被加载的 onFrame 为 all 的模块名称
             earlyLoadedModuleNames.push(name)
           }
         }
       }
     } else {
-      // 按优先级顺序逐个运行默认模块
-      for (const [name, module] of Object.entries(defaultModules).sort(
-        (a, b) => a[1].sequence - b[1].sequence
-      )) {
-        try {
-          if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
-            await new (module as new (moduleName: string) => DefaultBaseModule)(name).run()
-          }
-        } catch (err) {
-          new Logger('loadModules').error('加载默认模块时发生致命错误，挂机助手停止运行:', err)
-          return
-        }
-      }
+      // 加载默认模块
+      const defaultModulesLoaded: Promise<any> = loadDefaultModules()
       // 运行其它模块
       for (const [name, module] of Object.entries(otherModules)) {
         // 对 onFrame 为 all 的模块来说，如果之前运行过，现在就不运行了
         if (!earlyLoadedModuleNames.includes(name)) {
           if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
-            waitForMoment(module.runAt).then(() =>
-              new (module as new (moduleName: string) => BaseModule)(name).run()
-            )
+            waitForMoment(module.runAt).then(async () => {
+              try {
+                if (module.runAfterDefault) {
+                  // 等待默认模块运行完毕
+                  await defaultModulesLoaded
+                }
+                new (module as new (moduleName: string) => BaseModule)(name).run()
+              } catch (e) {
+                // 默认模块运行出错，不运行该模块
+              }
+            })
           }
         }
       }

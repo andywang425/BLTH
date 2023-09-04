@@ -1,7 +1,11 @@
+import { onFrameTypes, runAtMoment } from '../../types/module'
 import BaseModule from '../BaseModule'
 
 class NoSleep extends BaseModule {
-  static runMultiple = true
+  static runMultiple: boolean = true
+  static runAt: runAtMoment = 'window-load'
+  static onFrame: onFrameTypes = 'target'
+  static runAfterDefault: boolean = false
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.sleepDetection
 

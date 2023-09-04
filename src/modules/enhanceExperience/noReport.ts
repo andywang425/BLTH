@@ -3,12 +3,13 @@ import { XhrRequestConfig, XhrRequestHandler, proxy } from '../../library/ajax-h
 import { Iproxy, fproxy } from '../../library/fetch-hook'
 import BaseModule from '../BaseModule'
 import { getUrlFromFetchInput } from '../../library/utils'
-import { runAtMoment } from '../../types/module'
+import { onFrameTypes, runAtMoment } from '../../types/module'
 
 class NoReport extends BaseModule {
-  static runMultiple = true
+  static runMultiple: boolean = true
   static runAt: runAtMoment = 'document-start'
-  static onFrame: 'all' | 'target' = 'all'
+  static onFrame: onFrameTypes = 'all'
+  static runAfterDefault: boolean = false
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.noReport
 
