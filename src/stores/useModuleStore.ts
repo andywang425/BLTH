@@ -45,8 +45,8 @@ const defaultModuleStatus: ImoduleStatus = {
   }
 }
 
-// 早期（不确定当前 frame 是否是目标 frame 的时候）加载的模块名称
-const earlyLoadedModuleNames: string[] = []
+// 在所有 frame 上运行的被加载的模块名称
+const allFrameModuleNames: string[] = []
 
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
@@ -60,7 +60,7 @@ export const useModuleStore = defineStore('module', () => {
   /**
    * 加载默认模块（该函数不导出）
    */
-  async function loadDefaultModules(): Promise<any[]> {
+  function loadDefaultModules(): Promise<any[]> {
     const cacheStore = useCacheStore()
     const promiseArray: Promise<any>[] = []
     // 按优先级顺序逐个运行默认模块
@@ -69,12 +69,7 @@ export const useModuleStore = defineStore('module', () => {
         promiseArray.push(new (module as new (moduleName: string) => DefaultBaseModule)(name).run())
       }
     }
-    try {
-      return Promise.all(promiseArray)
-    } catch (reason) {
-      new Logger('loadModules').error('加载默认模块时发生致命错误，挂机助手停止运行:', reason)
-      return Promise.reject(reason)
-    }
+    return Promise.all(promiseArray)
   }
 
   /**
@@ -86,15 +81,20 @@ export const useModuleStore = defineStore('module', () => {
    */
   function loadModules(isOnTargetFrame: isOnTargetFrameTypes) {
     const cacheStore = useCacheStore()
+    const logger = new Logger('ModuleStore_LoadModules')
     if (isOnTargetFrame === 'unknown') {
       for (const [name, module] of Object.entries(otherModules)) {
         if (module.onFrame === 'all') {
           if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
-            waitForMoment(module.runAt).then(() =>
-              new (module as new (moduleName: string) => BaseModule)(name).run()
-            )
-            // 记录被加载的 onFrame 为 all 的模块名称
-            earlyLoadedModuleNames.push(name)
+            if (!module.runAfterDefault) {
+              // 如果不需要等默认模块运行完了再运行，现在就加载并记录
+              // 否则不做记录，等之后（isOnTargetFrame 为 yes时）再加载
+              waitForMoment(module.runAt).then(() =>
+                new (module as new (moduleName: string) => BaseModule)(name).run()
+              )
+              // 记录被加载的 onFrame 为 all 的模块名称
+              allFrameModuleNames.push(name)
+            }
           }
         }
       }
@@ -104,7 +104,7 @@ export const useModuleStore = defineStore('module', () => {
       // 运行其它模块
       for (const [name, module] of Object.entries(otherModules)) {
         // 对 onFrame 为 all 的模块来说，如果之前运行过，现在就不运行了
-        if (!earlyLoadedModuleNames.includes(name)) {
+        if (!allFrameModuleNames.includes(name)) {
           if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
             waitForMoment(module.runAt).then(async () => {
               try {
@@ -115,6 +115,7 @@ export const useModuleStore = defineStore('module', () => {
                 new (module as new (moduleName: string) => BaseModule)(name).run()
               } catch (e) {
                 // 默认模块运行出错，不运行该模块
+                logger.error(`运行默认模块时出错，模块${name}不运行`, e)
               }
             })
           }

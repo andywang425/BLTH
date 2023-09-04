@@ -49,7 +49,6 @@ function isTimestampToday(timestamp: number, hour: number = 0, minute: number = 
  *
  * @param hour 小时（0-23），默认0
  * @param minute 分钟（0-59），默认5
- * @returns 毫秒数
  */
 function delayToNextMoment(hour: number = 0, minute: number = 5): Iduration {
   const now = DateTime.now()

@@ -39,6 +39,10 @@ class BaseModule {
   static onFrame: onFrameTypes = 'target'
   /**
    * 是否要等默认模块运行完了再运行，默认 true
+   *
+   * 如果设置为 true，那么就不能保证该模块被及时地执行
+   *
+   * 因为默认模块的运行时机总是 document-body，而且默认模块的运行时间是不确定的
    */
   static runAfterDefault: boolean = true
   /**

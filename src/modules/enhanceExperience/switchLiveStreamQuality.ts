@@ -6,6 +6,7 @@ import BaseModule from '../BaseModule'
 class SwitchLiveStreamQuality extends BaseModule {
   static runMultiple: boolean = true
   static runAt: runAtMoment = 'window-load'
+  static runAfterDefault: boolean = false
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.switchLiveStreamQuality
 

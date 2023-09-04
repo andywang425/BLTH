@@ -38,7 +38,7 @@ type onFrameTypes = 'all' | 'target'
 type isOnTargetFrameTypes = 'unknown' | 'yes'
 
 type moduleEmitterEvents = {
-  BiliInfo: {
+  UserInfo: {
     target: string
   }
   DailyTask_LiveTask_AppUserTask: {
