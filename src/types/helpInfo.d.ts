@@ -34,7 +34,7 @@ interface IhelpInfo {
     switchLiveStreamQuality: IhelpInfoItem
     banp2p: IhelpInfoItem
     noReport: IhelpInfoItem
-    sleepDetection: IhelpInfoItem
+    noSleep: IhelpInfoItem
   }
   RemoveElement: {
     removePKBox: IhelpInfoItem

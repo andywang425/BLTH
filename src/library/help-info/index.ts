@@ -216,7 +216,7 @@ const help_info: IhelpInfo = {
         ])
       ])
     },
-    sleepDetection: {
+    noSleep: {
       title: '屏蔽挂机检测',
       message: h('p', [
         h('div', '屏蔽B站直播间的挂机检测。'),
