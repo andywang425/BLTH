@@ -31,7 +31,9 @@ class NoReport extends BaseModule {
     Object.defineProperties(win, {
       reportObserver: {
         get() {
-          return {}
+          return {
+            reportCustomData: function () {}
+          }
         },
         set() {}
       },
@@ -78,15 +80,6 @@ class NoReport extends BaseModule {
     this.hookProperties(unsafeWindow)
     proxy(ajaxHookProxyConfig, unsafeWindow)
     fproxy(fetchHookConfig, unsafeWindow)
-
-    // if (!isSelfTopFrame()) {
-    //   // 如果处于特殊直播间（有多个frame），也拦截顶层frame的日志上报
-    //   // 但由于注入时机的关系，初期的一些日志报上拦截不到
-    //   // 要优化这一点的话可能要调整模块运行逻辑，允许模块在初期的时候就能在多个frame上允许
-    //   this.hookProperties(unsafeWindow.top as Window)
-    //   proxy(ajaxHookProxyConfig, unsafeWindow.top as Window)
-    //   fproxy(fetchHookConfig, unsafeWindow.top as Window)
-    // }
   }
 
   public async run() {

@@ -68,6 +68,7 @@ const isSelfTopFrame = (): boolean => unsafeWindow.self === unsafeWindow.top
 /**
  * 获取顶层 frame 的 documentElement
  */
-const topFrameDocuemntElement = (): HTMLElement | undefined => unsafeWindow.top?.document?.documentElement
+const topFrameDocuemntElement = (): HTMLElement | undefined =>
+  unsafeWindow.top?.document?.documentElement
 
 export { dq, dqa, dce, pollingQuery, isTargetFrame, isSelfTopFrame, topFrameDocuemntElement }

@@ -13,7 +13,7 @@ class NoSleep extends BaseModule {
     if (this.config.enabled) {
       setInterval(() => {
         document.dispatchEvent(new MouseEvent('mousemove'))
-      }, 3e5)
+      }, 3e5) // 5分钟
     }
   }
 }

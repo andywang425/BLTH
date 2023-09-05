@@ -17,7 +17,7 @@ const logger = new Logger('Main')
 logger.log('document.readyState', document.readyState)
 
 const pinia = createPinia()
-// 在 app.use(pinia) 之前要将 pinia 作为参数传入
+
 const cacheStore = useCacheStore(pinia)
 const moduleStore = useModuleStore(pinia)
 
