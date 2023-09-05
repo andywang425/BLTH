@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.1.0
+// @version         7.1.1
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
@@ -15,7 +15,24 @@
 // @supportURL      https://github.com/andywang425/BLTH/issues
 // @downloadURL     https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.min.user.js
 // @updateURL       https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.min.user.js
-// @match           *://live.bilibili.com/*
+// @match           *://live.bilibili.com/1*
+// @match           *://live.bilibili.com/2*
+// @match           *://live.bilibili.com/3*
+// @match           *://live.bilibili.com/4*
+// @match           *://live.bilibili.com/5*
+// @match           *://live.bilibili.com/6*
+// @match           *://live.bilibili.com/7*
+// @match           *://live.bilibili.com/8*
+// @match           *://live.bilibili.com/9*
+// @match           *://live.bilibili.com/blanc/1*
+// @match           *://live.bilibili.com/blanc/2*
+// @match           *://live.bilibili.com/blanc/3*
+// @match           *://live.bilibili.com/blanc/4*
+// @match           *://live.bilibili.com/blanc/5*
+// @match           *://live.bilibili.com/blanc/6*
+// @match           *://live.bilibili.com/blanc/7*
+// @match           *://live.bilibili.com/blanc/8*
+// @match           *://live.bilibili.com/blanc/9*
 // @require         https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js
 // @require         data:application/javascript,window.Vue%3DVue%2Cwindow.VueDemi%3DVue%3B
 // @require         https://unpkg.com/element-plus@2.3.12/dist/index.full.min.js
@@ -41,9 +58,9 @@
 // @run-at          document-start
 // ==/UserScript==
 
-(t=>{const e=document.createElement("style");e.dataset.source="vite-plugin-monkey",e.textContent=t,document.head.append(e)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-725f1e99]{width:80px;height:80px}.avatar[data-v-725f1e99]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-934516e9]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-934516e9]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-934516e9]{width:auto}.aside #aside-el-menu[data-v-934516e9]:not(.el-menu--collapse){width:150px}.main[data-v-934516e9]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-934516e9],.fade-leave-active[data-v-934516e9]{transition:opacity .1s ease}.fade-enter-from[data-v-934516e9],.fade-leave-to[data-v-934516e9]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-72d53133]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px} ");
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-d7ecdd75]{width:80px;height:80px}.avatar[data-v-d7ecdd75]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-0fb8057a]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-0fb8057a]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-0fb8057a]{width:auto}.aside #aside-el-menu[data-v-0fb8057a]:not(.el-menu--collapse){width:150px}.main[data-v-0fb8057a]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-0fb8057a],.fade-leave-active[data-v-0fb8057a]{transition:opacity .1s ease}.fade-enter-from[data-v-0fb8057a],.fade-leave-to[data-v-0fb8057a]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-72d53133]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px} ");
 
-(function (vue, pinia, _, ElementPlusIconsVue, luxon, CryptoJS, ElementPlus, hotkeys) {
+(async function (vue, pinia$1, _, ElementPlusIconsVue, luxon, CryptoJS, ElementPlus, hotkeys) {
   'use strict';
 
   function _interopNamespaceDefault(e) {
@@ -71,6 +88,7 @@
     __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
     return value;
   };
+  var _a;
   var _GM_addStyle = /* @__PURE__ */ (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
   var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
   var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
@@ -180,6 +198,9 @@
         },
         noReport: {
           enabled: false
+        },
+        sleepDetection: {
+          enabled: false
         }
       },
       RemoveElement: {
@@ -257,7 +278,7 @@
       return this.mergeConfigs(_GM_getValue("cache", {}), defaultValues.cache);
     }
   }
-  const useUIStore = pinia.defineStore("ui", () => {
+  const useUIStore = pinia$1.defineStore("ui", () => {
     const uiConfig = vue.reactive(Storage.getUiConfig());
     const activeMenuName = vue.computed(() => {
       const index2name = {
@@ -471,8 +492,8 @@
       };
     }
   });
-  const useBiliStore = pinia.defineStore("bili", () => {
-    const BilibiliLive = vue.ref();
+  const useBiliStore = pinia$1.defineStore("bili", () => {
+    const BilibiliLive2 = vue.ref();
     const cookies = vue.ref();
     const userInfo = vue.ref();
     const giftConfig = vue.ref();
@@ -485,7 +506,7 @@
       return fansMedals.value.filter((m) => m.room_info.room_id !== 0);
     });
     return {
-      BilibiliLive,
+      BilibiliLive: BilibiliLive2,
       userInfo,
       giftConfig,
       cookies,
@@ -616,6 +637,39 @@
   }
   function waitForMoment(moment) {
     switch (moment) {
+      case "document-start": {
+        return Promise.resolve();
+      }
+      case "document-head": {
+        return new Promise((resolve2) => {
+          if (document.head) {
+            resolve2();
+          } else {
+            const observer = new MutationObserver(() => {
+              if (document.head) {
+                observer.disconnect();
+                resolve2();
+              }
+            });
+            observer.observe(document.documentElement, { childList: true });
+          }
+        });
+      }
+      case "document-body": {
+        return new Promise((resolve2) => {
+          if (document.body) {
+            resolve2();
+          } else {
+            const observer = new MutationObserver(() => {
+              if (document.body) {
+                observer.disconnect();
+                resolve2();
+              }
+            });
+            observer.observe(document.documentElement, { childList: true });
+          }
+        });
+      }
       case "document-end": {
         return new Promise((resolve2) => {
           if (document.readyState !== "loading") {
@@ -635,7 +689,7 @@
         });
       }
       default: {
-        return Promise.resolve();
+        return Promise.reject("Illegal moment");
       }
     }
   }
@@ -851,11 +905,11 @@
         });
       },
       videoHeartbeat: (aid, cid = "", realtime = 0, played_time = 0, real_played_time = 0, refer_url = "https://t.bilibili.com/?spm_id_from=444.3.0.0", quality = 116, video_duration = 100, type = 3, sub_type = 0, play_type = 0, dt = 2, last_play_progress_time = 0, max_play_progress_time = 0, spmid = "333.488.0.0", from_spmid = "333.31.list.card_archive.click", extra = '{"player_version":"4.1.21-rc.1727.0"}') => {
-        var _a;
+        var _a2;
         const biliStore = useBiliStore();
         return request.main.post("/x/click-interface/web/heartbeat", {
           start_ts: ts(),
-          mid: (_a = useBiliStore().userInfo) == null ? void 0 : _a.mid,
+          mid: (_a2 = useBiliStore().userInfo) == null ? void 0 : _a2.mid,
           aid,
           cid,
           type,
@@ -1031,15 +1085,35 @@
    */
   __publicField(BaseModule, "runMultiple", false);
   /**
-   * 模块运行时机
+   * 模块运行时机，默认 document-body
    *
    * `document-start`: 尽可能早，与脚本注入时机相同
+   *
+   * `document-head`: `document.head`刚刚出现后
+   *
+   * `document-body`: `document.body`刚刚出现后
    *
    * `document-end`: `document`的`DOMContentLoaded`事件触发后
    *
    * `window-load`: `window`的`load`事件触发后
    */
-  __publicField(BaseModule, "runAt", "document-start");
+  __publicField(BaseModule, "runAt", "document-body");
+  /**
+   * 模块运行的 frame，默认 target
+   *
+   * `all`: 所有符合脚本`@match`规则的 frame
+   *
+   * `target`: window.BilibiliLive 存在的那个 frame
+   */
+  __publicField(BaseModule, "onFrame", "target");
+  /**
+   * 是否要等默认模块运行完了再运行，默认 true
+   *
+   * 如果设置为 true，那么就不能保证该模块被及时地执行
+   *
+   * 因为默认模块的运行时机总是 document-body，而且默认模块的运行时间是不确定的
+   */
+  __publicField(BaseModule, "runAfterDefault", true);
   class DefaultBaseModule extends BaseModule {
     /**
      * 默认模块按顺序逐个运行，所以必须返回一个 Promise
@@ -1049,54 +1123,14 @@
     }
   }
   /**
-   * 优先级，数字越小优先级越高
+   * 默认模块的运行时机总是 document-body
    */
-  __publicField(DefaultBaseModule, "sequence");
-  function getCookie(name) {
-    const nameEqual = name + "=";
-    for (const cookie of document.cookie.split("; ")) {
-      if (cookie.startsWith(nameEqual)) {
-        const value = cookie.substring(nameEqual.length);
-        return decodeURIComponent(value);
-      }
-    }
-    return null;
-  }
-  function getCookies(names) {
-    const cookies = {};
-    for (const name of names) {
-      cookies[name] = null;
-    }
-    for (const cookie of document.cookie.split("; ")) {
-      for (let i = 0; i < names.length; i++) {
-        const name = names[i];
-        const nameEqual = name + "=";
-        if (cookie.startsWith(nameEqual)) {
-          const value = cookie.substring(nameEqual.length);
-          cookies[name] = decodeURIComponent(value);
-          names.splice(i, 1);
-          break;
-        }
-      }
-      if (names.length === 0)
-        break;
-    }
-    return cookies;
-  }
-  class BiliInfo extends DefaultBaseModule {
-    getBilibiliLive() {
-      this.logger.log("unsafeWindow.BilibiliLive", _unsafeWindow.BilibiliLive);
-      return _unsafeWindow.BilibiliLive;
-    }
-    /**
-     * 获取 Cookies
-     *
-     * bili_jct: 常作为参数 csrf 在请求中出现
-     * LIVE_BUVID: 如果用户以前从来没看过直播，此时可能为 null
-     */
-    getCookies() {
-      return getCookies(["bili_jct", "LIVE_BUVID"]);
-    }
+  __publicField(DefaultBaseModule, "runAt", "document-body");
+  /**
+   * 默认模块只能在目标 frame 上运行
+   */
+  __publicField(DefaultBaseModule, "onFrame", "target");
+  class UserInfo extends DefaultBaseModule {
     /**
      * 通过 BAPI.main.nav 获取用户基本信息
      */
@@ -1115,27 +1149,15 @@
         return Promise.reject(error);
       }
     }
-    /**
-     * 获取礼物配置信息
-     *
-     * 如礼物id，名称，亲密度等等
-     */
-    async getGiftConfig() {
-      try {
-        throw new Error("送礼功能尚未完成，暂时不需要获取礼物配置信息，请忽略本报错 ＞︿＜");
-        const response = await BAPI.live.roomGiftConfig();
-        this.logger.log("BAPI.live.roomGiftConfig response", response);
-        if (response.code === 0) {
-          return Promise.resolve(response.data);
-        } else {
-          this.logger.error("获取礼物配置信息失败", response.message);
-          return Promise.reject(response.message);
-        }
-      } catch (error) {
-        this.logger.error("获取礼物配置信息出错", error);
-        return Promise.reject(error);
-      }
+    async run() {
+      const biliStore = useBiliStore();
+      biliStore.userInfo = await this.getUserInfo();
+      setTimeout(async () => {
+        biliStore.userInfo = await this.getUserInfo();
+      }, delayToNextMoment(0, 4).ms);
     }
+  }
+  class DailyRewardInfo extends DefaultBaseModule {
     /**
      * 获取今日主站每日任务的完成情况
      */
@@ -1156,15 +1178,24 @@
           return Promise.reject(error);
         }
       } else {
-        return Promise.reject();
+        return Promise.resolve(null);
       }
     }
+    async run() {
+      const biliStore = useBiliStore();
+      biliStore.dailyRewardInfo = await this.getDailyRewardInfo();
+      setTimeout(async () => {
+        biliStore.dailyRewardInfo = await this.getDailyRewardInfo();
+      }, delayToNextMoment(0, 4).ms);
+    }
+  }
+  class DynamicVideos extends DefaultBaseModule {
     /**
      * 从动态中获取一页视频的信息
      *
      * 每日观看视频，每日分享视频，每日投币都会用到
      */
-    async getDynamicVideo() {
+    async getDynamicVideos() {
       const MainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks;
       if (Object.entries(MainSiteTasks).filter(([key]) => ["watch", "share", "coin"].includes(key)).some((keyValue) => keyValue[1].enabled && !isTimestampToday(keyValue[1]._lastCompleteTime))) {
         try {
@@ -1181,9 +1212,18 @@
           return Promise.reject(error);
         }
       } else {
-        return Promise.reject();
+        return Promise.resolve(null);
       }
     }
+    async run() {
+      const biliStore = useBiliStore();
+      biliStore.dynamicVideos = await this.getDynamicVideos();
+      setTimeout(async () => {
+        biliStore.dynamicVideos = await this.getDynamicVideos();
+      }, delayToNextMoment(0, 4).ms);
+    }
+  }
+  class FansMetals extends DefaultBaseModule {
     /**
      * 获取粉丝勋章
      *
@@ -1220,58 +1260,106 @@
           }
           return Promise.resolve(fansMetalList);
         } catch (error) {
+          this.logger.error("获取粉丝勋章列表出错", error);
           return Promise.reject(error);
         }
       } else {
-        return Promise.reject();
+        return Promise.resolve(null);
       }
     }
     async run() {
       const biliStore = useBiliStore();
-      biliStore.BilibiliLive = this.getBilibiliLive();
-      biliStore.cookies = this.getCookies();
-      biliStore.userInfo = await this.getUserInfo();
-      setTimeout(async () => {
-        biliStore.userInfo = await this.getUserInfo();
-      }, delayToNextMoment(0, 4).ms);
-      const allPromiseResult = await Promise.allSettled([
-        this.getGiftConfig(),
-        this.getDailyRewardInfo(),
-        this.getDynamicVideo(),
-        this.getFansMetals()
-      ]);
-      this.logger.log("allPromiseResult", allPromiseResult);
-      biliStore.giftConfig = allPromiseResult[0].status === "fulfilled" ? allPromiseResult[0].value : null;
-      biliStore.dailyRewardInfo = allPromiseResult[1].status === "fulfilled" ? allPromiseResult[1].value : null;
-      setTimeout(async () => {
-        const biliStore2 = useBiliStore();
-        if (biliStore2.dailyRewardInfo) {
-          biliStore2.dailyRewardInfo.login = false;
-          biliStore2.dailyRewardInfo.share = false;
-          biliStore2.dailyRewardInfo.watch = false;
-          biliStore2.dailyRewardInfo.coins = 0;
-        }
-        biliStore2.dailyRewardInfo = await this.getDailyRewardInfo();
-      }, delayToNextMoment(0, 4).ms);
-      biliStore.dynamicVideos = allPromiseResult[2].status === "fulfilled" ? allPromiseResult[2].value : null;
-      setTimeout(async () => {
-        biliStore.dynamicVideos = await this.getDynamicVideo();
-      }, delayToNextMoment(0, 4).ms);
-      biliStore.fansMedals = allPromiseResult[3].status === "fulfilled" ? allPromiseResult[3].value : null;
+      biliStore.fansMedals = await this.getFansMetals();
       setTimeout(async () => {
         biliStore.fansMedals = await this.getFansMetals();
       }, delayToNextMoment(0, 4).ms);
-      useModuleStore().emitter.on("BiliInfo", async (event) => {
-        if (event.target === "getFansMetals") {
-          biliStore.fansMedals = await this.getFansMetals(10, true);
-        }
+      useModuleStore().emitter.on("Default_FansMedals", async () => {
+        biliStore.fansMedals = await this.getFansMetals(10, true);
       });
     }
   }
-  __publicField(BiliInfo, "sequence", 0);
+  function getCookie(name) {
+    const nameEqual = name + "=";
+    for (const cookie of document.cookie.split("; ")) {
+      if (cookie.startsWith(nameEqual)) {
+        const value = cookie.substring(nameEqual.length);
+        return decodeURIComponent(value);
+      }
+    }
+    return null;
+  }
+  function getCookies(names) {
+    const cookies = {};
+    for (const name of names) {
+      cookies[name] = null;
+    }
+    for (const cookie of document.cookie.split("; ")) {
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i];
+        const nameEqual = name + "=";
+        if (cookie.startsWith(nameEqual)) {
+          const value = cookie.substring(nameEqual.length);
+          cookies[name] = decodeURIComponent(value);
+          names.splice(i, 1);
+          break;
+        }
+      }
+      if (names.length === 0)
+        break;
+    }
+    return cookies;
+  }
+  class Cookies extends DefaultBaseModule {
+    /**
+     * 获取 Cookies
+     *
+     * bili_jct: 常作为参数 csrf 在请求中出现
+     *
+     * LIVE_BUVID: 如果用户以前从来没看过直播，此时可能为 null
+     */
+    getCookies() {
+      return getCookies(["bili_jct", "LIVE_BUVID"]);
+    }
+    async run() {
+      useBiliStore().cookies = this.getCookies();
+    }
+  }
+  class BilibiliLive extends DefaultBaseModule {
+    /**
+     * 获取 window.BilibiliLive
+     * @returns 一个 window.BilibiliLive 对象的引用
+     */
+    getBilibiliLive() {
+      this.logger.log("unsafeWindow.BilibiliLive", _unsafeWindow.BilibiliLive);
+      return new Promise((resolve2) => {
+        if (_unsafeWindow.BilibiliLive.UID !== 0) {
+          resolve2(_unsafeWindow.BilibiliLive);
+          return;
+        }
+        _unsafeWindow.BilibiliLive = new Proxy(_unsafeWindow.BilibiliLive, {
+          set(target, prop, value) {
+            target[prop] = value;
+            if (prop === "UID" && _unsafeWindow.BilibiliLive.UID !== 0) {
+              resolve2(_unsafeWindow.BilibiliLive);
+              _unsafeWindow.BilibiliLive = target;
+            }
+            return true;
+          }
+        });
+      });
+    }
+    async run() {
+      useBiliStore().BilibiliLive = await this.getBilibiliLive();
+    }
+  }
   const defaultModules = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
-    BiliInfo
+    Default_BilibiliLive: BilibiliLive,
+    Default_Cookies: Cookies,
+    Default_DailyRewardInfo: DailyRewardInfo,
+    Default_DynamicVideos: DynamicVideos,
+    Default_FansMetals: FansMetals,
+    Default_UserInfo: UserInfo
   }, Symbol.toStringTag, { value: "Module" }));
   class LoginTask extends BaseModule {
     constructor() {
@@ -1589,16 +1677,16 @@
     });
   };
   const isTargetFrame = () => {
-    if (_unsafeWindow.document.head.innerHTML.includes("BilibiliLive")) {
+    if (document.head.innerHTML.includes("BilibiliLive")) {
       return true;
     } else {
       return false;
     }
   };
   const isSelfTopFrame = () => _unsafeWindow.self === _unsafeWindow.top;
-  const topFrameDocuemnt = () => {
-    var _a;
-    return (_a = _unsafeWindow.top) == null ? void 0 : _a.document;
+  const topFrameDocuemntElement = () => {
+    var _a2, _b;
+    return (_b = (_a2 = _unsafeWindow.top) == null ? void 0 : _a2.document) == null ? void 0 : _b.documentElement;
   };
   class SignTask extends BaseModule {
     constructor() {
@@ -1884,7 +1972,7 @@
       __publicField(this, "ruid");
       __publicField(this, "seq", 0);
       /** Cookie LIVE_BUVID */
-      __publicField(this, "buvid", getCookie("LIVE_BUVID"));
+      __publicField(this, "buvid", ((_a = useBiliStore().cookies) == null ? void 0 : _a.LIVE_BUVID) ?? getCookie("LIVE_BUVID"));
       __publicField(this, "uuid", uuid());
       /** 计算签名和发送请求时均需要 JSON.stringify */
       __publicField(this, "device", [this.buvid, this.uuid]);
@@ -2169,7 +2257,7 @@
       this.logger.log("距离观看直播模块下次运行时间:", diff.str);
     }
   }
-  __publicField(WatchTask2, "runAt", "document-end");
+  __publicField(WatchTask2, "runAt", "window-load");
   class DanmuTask extends BaseModule {
     constructor() {
       super(...arguments);
@@ -2543,20 +2631,11 @@
             this.logger.log(`已将画质切换为${this.config.qualityDesc}`, targetQuality);
           }
         };
-        const iframes = document.querySelectorAll("iframe");
-        const lastIframe = iframes.item(iframes.length - 1);
-        const timer = setTimeout(
-          () => {
-            this.logger.log("等待最后一个iframe的load事件超时，立即切换画质");
-            lastIframe.onload = null;
-            switchFn();
-          },
-          !isSelfTopFrame() ? 3e3 : 1500
+        setTimeout(
+          () => switchFn(),
+          // 这里针对特殊直播间和普通直播间设置了两套超时时间，特殊直播间超时时间更长
+          !isSelfTopFrame() ? 5e3 : 2500
         );
-        lastIframe.onload = () => {
-          clearTimeout(timer);
-          switchFn();
-        };
       }
     }
     async run() {
@@ -2573,20 +2652,21 @@
   }
   __publicField(SwitchLiveStreamQuality, "runMultiple", true);
   __publicField(SwitchLiveStreamQuality, "runAt", "window-load");
+  __publicField(SwitchLiveStreamQuality, "runAfterDefault", false);
   class BanP2P extends BaseModule {
     constructor() {
       super(...arguments);
       __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.banp2p);
     }
     async banP2P() {
-      var _a;
+      var _a2;
       const RTClist = [
         "RTCPeerConnection",
         "mozRTCPeerConnection",
         "webkitRTCPeerConnection"
       ];
       for (const i of RTClist) {
-        if (Object.prototype.hasOwnProperty.call(_unsafeWindow, i) && ((_a = Object.getOwnPropertyDescriptor(_unsafeWindow, i)) == null ? void 0 : _a.configurable)) {
+        if (Object.prototype.hasOwnProperty.call(_unsafeWindow, i) && ((_a2 = Object.getOwnPropertyDescriptor(_unsafeWindow, i)) == null ? void 0 : _a2.configurable)) {
           Object.defineProperty(_unsafeWindow, i, {
             value: function() {
               this.addEventListener = function() {
@@ -2630,6 +2710,9 @@
     }
   }
   __publicField(BanP2P, "runMultiple", true);
+  __publicField(BanP2P, "runAt", "document-start");
+  __publicField(BanP2P, "onFrame", "all");
+  __publicField(BanP2P, "runAfterDefault", false);
   var events = ["load", "loadend", "timeout", "error", "readystatechange", "abort"];
   var OriginXhr = "__origin_xhr";
   function configEvent(event, xhrProxy) {
@@ -2674,7 +2757,13 @@
     HookXMLHttpRequest.prototype = originXhr.prototype;
     HookXMLHttpRequest.prototype.constructor = HookXMLHttpRequest;
     win.XMLHttpRequest = HookXMLHttpRequest;
-    Object.assign(win.XMLHttpRequest, { UNSENT: 0, OPENED: 1, HEADERS_RECEIVED: 2, LOADING: 3, DONE: 4 });
+    Object.assign(win.XMLHttpRequest, {
+      UNSENT: 0,
+      OPENED: 1,
+      HEADERS_RECEIVED: 2,
+      LOADING: 3,
+      DONE: 4
+    });
     function getterFactory(attr) {
       return function() {
         var v = this.hasOwnProperty(attr + "_") ? this[attr + "_"] : this[OriginXhr][attr];
@@ -2800,11 +2889,30 @@
     var onRequest = proxy2.onRequest, onResponse = proxy2.onResponse, onError = proxy2.onError;
     function handleResponse(xhr, xhrProxy) {
       var handler = new ResponseHandler$1(xhr);
-      var responseType = xhrProxy.responseType;
-      var responseData = !responseType || responseType === "text" || responseType === "json" ? xhrProxy.responseText : xhrProxy.response;
+      var getResponseData = function() {
+        var responseType = xhrProxy.responseType;
+        if (!responseType || responseType === "text") {
+          return xhrProxy.responseText;
+        }
+        if (responseType === "json" && typeof JSON === "object" && ((navigator || 0).userAgent || "").indexOf("Trident") !== -1) {
+          return JSON.parse(xhrProxy.responseText);
+        }
+        return xhrProxy.response;
+      };
+      var responseData;
       var ret = {
-        response: responseData,
-        //ie9
+        get response() {
+          if (getResponseData) {
+            responseData = getResponseData();
+            getResponseData = null;
+          }
+          return responseData;
+        },
+        set response(nv) {
+          getResponseData = null;
+          responseData = nv;
+          return true;
+        },
         status: xhrProxy.status,
         statusText: xhrProxy.statusText,
         config: xhr.config,
@@ -2846,80 +2954,83 @@
       }
       return true;
     }
-    var { originXhr, unHook } = hook$1({
-      onload: preventXhrProxyCallback,
-      onloadend: preventXhrProxyCallback,
-      onerror: errorCallback(eventError),
-      ontimeout: errorCallback(eventTimeout),
-      onabort: errorCallback(eventAbort),
-      onreadystatechange: function(xhr) {
-        return stateChangeCallback(xhr, this);
-      },
-      open: function open(args, xhr) {
-        var _this = this;
-        var config = xhr.config = { headers: {} };
-        config.method = args[0];
-        config.url = args[1];
-        config.async = args[2];
-        config.user = args[3];
-        config.password = args[4];
-        config.xhr = xhr;
-        var evName = "on" + eventReadyStateChange;
-        if (!xhr[evName]) {
-          xhr[evName] = function() {
-            return stateChangeCallback(xhr, _this);
-          };
-        }
-        if (onRequest)
-          return true;
-      },
-      send: function(args, xhr) {
-        var config = xhr.config;
-        config.withCredentials = xhr.withCredentials;
-        config.body = args[0];
-        if (onRequest) {
-          var req = function() {
-            onRequest(config, new RequestHandler$1(xhr));
-          };
-          config.async === false ? req() : setTimeout(req);
-          return true;
-        }
-      },
-      setRequestHeader: function(args, xhr) {
-        xhr.config.headers[args[0].toLowerCase()] = args[1];
-        if (onRequest)
-          return true;
-      },
-      addEventListener: function(args, xhr) {
-        var _this = this;
-        if (events.indexOf(args[0]) !== -1) {
-          var handler = args[1];
-          getEventTarget(xhr).addEventListener(args[0], function(e) {
-            var event = configEvent(e, _this);
-            event.type = args[0];
-            event.isTrusted = true;
-            handler.call(_this, event);
-          });
-          return true;
-        }
-      },
-      getAllResponseHeaders: function(_2, xhr) {
-        var headers = xhr.resHeader;
-        if (headers) {
-          var header = "";
-          for (var key in headers) {
-            header += key + ": " + headers[key] + "\r\n";
+    var { originXhr, unHook } = hook$1(
+      {
+        onload: preventXhrProxyCallback,
+        onloadend: preventXhrProxyCallback,
+        onerror: errorCallback(eventError),
+        ontimeout: errorCallback(eventTimeout),
+        onabort: errorCallback(eventAbort),
+        onreadystatechange: function(xhr) {
+          return stateChangeCallback(xhr, this);
+        },
+        open: function open(args, xhr) {
+          var _this = this;
+          var config = xhr.config = { headers: {} };
+          config.method = args[0];
+          config.url = args[1];
+          config.async = args[2];
+          config.user = args[3];
+          config.password = args[4];
+          config.xhr = xhr;
+          var evName = "on" + eventReadyStateChange;
+          if (!xhr[evName]) {
+            xhr[evName] = function() {
+              return stateChangeCallback(xhr, _this);
+            };
           }
-          return header;
+          if (onRequest)
+            return true;
+        },
+        send: function(args, xhr) {
+          var config = xhr.config;
+          config.withCredentials = xhr.withCredentials;
+          config.body = args[0];
+          if (onRequest) {
+            var req = function() {
+              onRequest(config, new RequestHandler$1(xhr));
+            };
+            config.async === false ? req() : setTimeout(req);
+            return true;
+          }
+        },
+        setRequestHeader: function(args, xhr) {
+          xhr.config.headers[args[0].toLowerCase()] = args[1];
+          if (onRequest)
+            return true;
+        },
+        addEventListener: function(args, xhr) {
+          var _this = this;
+          if (events.indexOf(args[0]) !== -1) {
+            var handler = args[1];
+            getEventTarget(xhr).addEventListener(args[0], function(e) {
+              var event = configEvent(e, _this);
+              event.type = args[0];
+              event.isTrusted = true;
+              handler.call(_this, event);
+            });
+            return true;
+          }
+        },
+        getAllResponseHeaders: function(_2, xhr) {
+          var headers = xhr.resHeader;
+          if (headers) {
+            var header = "";
+            for (var key in headers) {
+              header += key + ": " + headers[key] + "\r\n";
+            }
+            return header;
+          }
+        },
+        getResponseHeader: function(args, xhr) {
+          var headers = xhr.resHeader;
+          if (headers) {
+            return headers[(args[0] || "").toLowerCase()];
+          }
         }
       },
-      getResponseHeader: function(args, xhr) {
-        var headers = xhr.resHeader;
-        if (headers) {
-          return headers[(args[0] || "").toLowerCase()];
-        }
-      }
-    }, win);
+      win
+    );
     return {
       originXhr,
       unProxy: unHook
@@ -2964,15 +3075,10 @@
       this._response = response;
     }
   }
+  let isHooked = false;
   let onRequestHandlers = [];
   let onResponseHandlers = [];
-  const hook = (proxy2, win) => {
-    if (proxy2.onRequest) {
-      onRequestHandlers.push(proxy2.onRequest);
-    }
-    if (proxy2.onResponse) {
-      onResponseHandlers.push(proxy2.onResponse);
-    }
+  const hook = (win) => {
     win.fetch = async (input, init) => {
       for (const handler of onRequestHandlers) {
         const requestHandler = new RequestHandler();
@@ -3008,7 +3114,16 @@
     };
   };
   const fproxy = (proxy2, win = _unsafeWindow) => {
-    hook(proxy2, win);
+    if (proxy2.onRequest) {
+      onRequestHandlers.push(proxy2.onRequest);
+    }
+    if (proxy2.onResponse) {
+      onResponseHandlers.push(proxy2.onResponse);
+    }
+    if (!isHooked) {
+      hook(win);
+      isHooked = true;
+    }
     return {
       unProxy: () => {
         if (proxy2.onRequest) {
@@ -3053,7 +3168,10 @@
       Object.defineProperties(win, {
         reportObserver: {
           get() {
-            return {};
+            return {
+              reportCustomData: function() {
+              }
+            };
           },
           set() {
           }
@@ -3100,11 +3218,6 @@
       this.hookProperties(_unsafeWindow);
       proxy(ajaxHookProxyConfig, _unsafeWindow);
       fproxy(fetchHookConfig, _unsafeWindow);
-      if (!isSelfTopFrame()) {
-        this.hookProperties(_unsafeWindow.top);
-        proxy(ajaxHookProxyConfig, _unsafeWindow.top);
-        fproxy(fetchHookConfig, _unsafeWindow.top);
-      }
     }
     async run() {
       this.logger.log("拦截日志数据上报模块开始运行");
@@ -3118,7 +3231,27 @@
     }
   };
   __publicField(_NoReport, "runMultiple", true);
+  __publicField(_NoReport, "runAt", "document-start");
+  __publicField(_NoReport, "onFrame", "all");
+  __publicField(_NoReport, "runAfterDefault", false);
   let NoReport = _NoReport;
+  class NoSleep extends BaseModule {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.sleepDetection);
+    }
+    async run() {
+      this.logger.log("屏蔽挂机检测模块开始运行");
+      if (this.config.enabled) {
+        setInterval(() => {
+          document.dispatchEvent(new MouseEvent("mousemove"));
+        }, 3e5);
+      }
+    }
+  }
+  __publicField(NoSleep, "runMultiple", true);
+  __publicField(NoSleep, "runAt", "window-load");
+  __publicField(NoSleep, "runAfterDefault", false);
   class RemovePKBox extends BaseModule {
     constructor() {
       super(...arguments);
@@ -3133,8 +3266,8 @@
         for (const mutation of mutationsList) {
           mutation.addedNodes.forEach((addedNode) => {
             if (addedNode instanceof HTMLElement && addedNode.classList.contains("link-toast") && blackWordList.some((word) => {
-              var _a;
-              return (_a = addedNode.textContent) == null ? void 0 : _a.includes(word);
+              var _a2;
+              return (_a2 = addedNode.textContent) == null ? void 0 : _a2.includes(word);
             })) {
               addedNode.style.display = "none";
             }
@@ -3208,6 +3341,7 @@
     DailyTask_OtherTask_SilverToCoinTask: SilverToCoinTask,
     EnhanceExperience_BanP2P: BanP2P,
     EnhanceExperience_NoReport: NoReport,
+    EnhanceExperience_NoSleep: NoSleep,
     EnhanceExperience_SwitchLiveStreamQuality: SwitchLiveStreamQuality,
     RemoveElement_RemoveGameParty: RemoveGameParty,
     RemoveElement_RemoveLiveWaterMark: RemoveLiveWaterMark,
@@ -3243,7 +3377,7 @@
       }
     };
   }
-  const useCacheStore = pinia.defineStore("cache", () => {
+  const useCacheStore = pinia$1.defineStore("cache", () => {
     const cache = vue.reactive(Storage.getCache());
     const isMainBLTHRunning = vue.ref(false);
     function startAliveHeartBeat() {
@@ -3294,29 +3428,54 @@
       }
     }
   };
-  const useModuleStore = pinia.defineStore("module", () => {
+  const allFrameModuleNames = [];
+  const useModuleStore = pinia$1.defineStore("module", () => {
     const moduleConfig = vue.reactive(Storage.getModuleConfig());
     const emitter = mittOnce();
     const moduleStatus2 = vue.reactive(defaultModuleStatus);
-    async function loadModules() {
-      const cacheStore = useCacheStore();
-      for (const [name, module] of Object.entries(defaultModules).sort(
-        (a, b) => a[1].sequence - b[1].sequence
-      )) {
-        try {
-          if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
-            await new module(name).run();
-          }
-        } catch (err) {
-          new Logger("loadModules").error("加载默认模块时发生致命错误，挂机助手停止运行:", err);
-          return;
+    function loadDefaultModules() {
+      const cacheStore2 = useCacheStore();
+      const promiseArray = [];
+      for (const [name, module] of Object.entries(defaultModules)) {
+        if (module.runMultiple || !cacheStore2.isMainBLTHRunning) {
+          promiseArray.push(new module(name).run());
         }
       }
-      for (const [name, module] of Object.entries(otherModules)) {
-        if (module.runMultiple || !cacheStore.isMainBLTHRunning) {
-          waitForMoment(module.runAt).then(
-            () => new module(name).run()
-          );
+      return Promise.all(promiseArray);
+    }
+    function loadModules(isOnTargetFrame) {
+      const cacheStore2 = useCacheStore();
+      const logger2 = new Logger("ModuleStore_LoadModules");
+      if (isOnTargetFrame === "unknown") {
+        for (const [name, module] of Object.entries(otherModules)) {
+          if (module.onFrame === "all") {
+            if (module.runMultiple || !cacheStore2.isMainBLTHRunning) {
+              if (!module.runAfterDefault) {
+                waitForMoment(module.runAt).then(
+                  () => new module(name).run()
+                );
+                allFrameModuleNames.push(name);
+              }
+            }
+          }
+        }
+      } else {
+        const defaultModulesLoaded = loadDefaultModules();
+        for (const [name, module] of Object.entries(otherModules)) {
+          if (!allFrameModuleNames.includes(name)) {
+            if (module.runMultiple || !cacheStore2.isMainBLTHRunning) {
+              waitForMoment(module.runAt).then(async () => {
+                try {
+                  if (module.runAfterDefault) {
+                    await defaultModulesLoaded;
+                  }
+                  new module(name).run();
+                } catch (e) {
+                  logger2.error(`运行默认模块时出错，模块${name}不运行`, e);
+                }
+              });
+            }
+          }
         }
       }
     }
@@ -3345,9 +3504,9 @@
   const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
     __name: "MainSiteTasks",
     setup(__props) {
-      const moduleStore = useModuleStore();
-      const config = moduleStore.moduleConfig.DailyTasks.MainSiteTasks;
-      const status = moduleStore.moduleStatus.DailyTasks.MainSiteTasks;
+      const moduleStore2 = useModuleStore();
+      const config = moduleStore2.moduleConfig.DailyTasks.MainSiteTasks;
+      const status = moduleStore2.moduleStatus.DailyTasks.MainSiteTasks;
       return (_ctx, _cache) => {
         const _component_el_switch = vue.resolveComponent("el-switch");
         const _component_Info = vue.resolveComponent("Info");
@@ -3488,16 +3647,16 @@
       };
     }
   });
-  const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-725f1e99"), n = n(), vue.popScopeId(), n);
+  const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-d7ecdd75"), n = n(), vue.popScopeId(), n);
   const _hoisted_1$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ vue.createElementVNode("br", null, null, -1));
   const _hoisted_2$1 = { class: "avatar-wrap" };
   const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
     __name: "LiveTasks",
     setup(__props) {
-      const moduleStore = useModuleStore();
+      const moduleStore2 = useModuleStore();
       const biliStore = useBiliStore();
-      const config = moduleStore.moduleConfig.DailyTasks.LiveTasks;
-      const status = moduleStore.moduleStatus.DailyTasks.LiveTasks;
+      const config = moduleStore2.moduleConfig.DailyTasks.LiveTasks;
+      const status = moduleStore2.moduleStatus.DailyTasks.LiveTasks;
       const medalDanmuPanelVisible = vue.ref(false);
       const danmuTableData = vue.computed(
         () => config.medalTasks.danmu.list.map((danmu) => {
@@ -3542,8 +3701,8 @@
       const medalInfoPanelVisible = vue.ref(false);
       const medalInfoTableData = vue.computed(
         () => {
-          var _a;
-          return (_a = biliStore.filteredFansMedals) == null ? void 0 : _a.map((medal) => ({
+          var _a2;
+          return (_a2 = biliStore.filteredFansMedals) == null ? void 0 : _a2.map((medal) => ({
             avatar: medal.anchor_info.avatar,
             nick_name: medal.anchor_info.nick_name,
             medal_name: medal.medal.medal_name,
@@ -3567,8 +3726,8 @@
                 medalInfoLoading.value = false;
               }
             });
-            moduleStore.emitter.emit("BiliInfo", {
-              target: "getFansMetals"
+            moduleStore2.emitter.emit("Default_FansMedals", {
+              module: "LiveTasks"
             });
           } else {
             initSelection(medalInfoTableData.value);
@@ -4016,13 +4175,13 @@
       };
     }
   });
-  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["__scopeId", "data-v-725f1e99"]]);
+  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["__scopeId", "data-v-d7ecdd75"]]);
   const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "OtherTasks",
     setup(__props) {
-      const moduleStore = useModuleStore();
-      const config = moduleStore.moduleConfig.DailyTasks.OtherTasks;
-      const status = moduleStore.moduleStatus.DailyTasks.OtherTasks;
+      const moduleStore2 = useModuleStore();
+      const config = moduleStore2.moduleConfig.DailyTasks.OtherTasks;
+      const status = moduleStore2.moduleStatus.DailyTasks.OtherTasks;
       return (_ctx, _cache) => {
         const _component_el_switch = vue.resolveComponent("el-switch");
         const _component_Info = vue.resolveComponent("Info");
@@ -4147,8 +4306,8 @@
   const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
     __name: "EnhanceExperience",
     setup(__props) {
-      const moduleStore = useModuleStore();
-      const config = moduleStore.moduleConfig.EnhanceExperience;
+      const moduleStore2 = useModuleStore();
+      const config = moduleStore2.moduleConfig.EnhanceExperience;
       const qualityDescList = ["原画", "蓝光PRO", "蓝光", "超清PRO", "超清", "高清"];
       return (_ctx, _cache) => {
         const _component_el_switch = vue.resolveComponent("el-switch");
@@ -4224,6 +4383,22 @@
             ]),
             _: 1
           }),
+          vue.createVNode(_component_el_row, null, {
+            default: vue.withCtx(() => [
+              vue.createVNode(_component_el_space, { wrap: "" }, {
+                default: vue.withCtx(() => [
+                  vue.createVNode(_component_el_switch, {
+                    modelValue: vue.unref(config).sleepDetection.enabled,
+                    "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => vue.unref(config).sleepDetection.enabled = $event),
+                    "active-text": "屏蔽挂机检测"
+                  }, null, 8, ["modelValue"]),
+                  vue.createVNode(_component_Info, { id: "EnhanceExperience.sleepDetection" })
+                ]),
+                _: 1
+              })
+            ]),
+            _: 1
+          }),
           vue.createVNode(_component_el_divider)
         ]);
       };
@@ -4232,8 +4407,8 @@
   const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
     __name: "RemoveElement",
     setup(__props) {
-      const moduleStore = useModuleStore();
-      const config = moduleStore.moduleConfig.RemoveElement;
+      const moduleStore2 = useModuleStore();
+      const config = moduleStore2.moduleConfig.RemoveElement;
       return (_ctx, _cache) => {
         const _component_el_switch = vue.resolveComponent("el-switch");
         const _component_Info = vue.resolveComponent("Info");
@@ -4363,14 +4538,14 @@
             hotkeys(
               "alt+b",
               {
-                element: topFrameDocuemnt()
+                element: topFrameDocuemntElement()
               },
               throttleButtoOnClick
             );
           }
           hotkeys("alt+b", throttleButtoOnClick);
         }).catch(() => logger2.error("Can't find playerHeaderLeft in time"));
-        window.onresize = setPanelSize;
+        window.addEventListener("resize", () => setPanelSize());
         const observer = new MutationObserver(() => setPanelSize());
         observer.observe(document.documentElement, { attributes: true });
         observer.observe(document.body, { attributes: true });
@@ -4447,10 +4622,10 @@
       };
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-934516e9"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-0fb8057a"]]);
   const cssLoader = (e) => {
-    const t = GM_getResourceText(e), o = document.createElement("style");
-    return o.innerText = t, document.head.append(o), t;
+    const t = GM_getResourceText(e);
+    return GM_addStyle(t), t;
   };
   cssLoader("element-plus/dist/index.css");
   const _sfc_main$2 = {};
@@ -4684,6 +4859,16 @@
             vue.h("span", "。")
           ])
         ])
+      },
+      sleepDetection: {
+        title: "屏蔽挂机检测",
+        message: vue.h("p", [
+          vue.h("div", "屏蔽B站直播间的挂机检测。"),
+          vue.h(
+            "div",
+            "如果长时间没有操作，会提示“检测到您已离开当前屏幕，倒计时后即将暂停播放”。开启本功能后即可避免这种情况。"
+          )
+        ])
       }
     },
     RemoveElement: {
@@ -4806,35 +4991,35 @@
     Tasks: TasksIcon
   }, Symbol.toStringTag, { value: "Module" }));
   const logger = new Logger("Main");
+  logger.log("document.readyState", document.readyState);
+  const pinia = pinia$1.createPinia();
+  const cacheStore = useCacheStore(pinia);
+  const moduleStore = useModuleStore(pinia);
+  cacheStore.checkIfMainBLTHRunning();
+  if (!cacheStore.isMainBLTHRunning) {
+    logger.log("当前脚本是Main BLTH，开始存活心跳");
+    cacheStore.startAliveHeartBeat();
+  } else {
+    logger.log("其它页面上存在正在运行的Main BLTH");
+  }
+  moduleStore.loadModules("unknown");
+  await( waitForMoment("document-body"));
   if (isTargetFrame()) {
-    logger.log("document.readyState", document.readyState);
     const app = vue.createApp(App);
-    const pinia$1 = pinia.createPinia();
     app.use(ElementPlus);
-    app.use(pinia$1);
-    const cacheStore = useCacheStore();
-    cacheStore.checkIfMainBLTHRunning();
-    if (!cacheStore.isMainBLTHRunning) {
-      logger.log("当前脚本是Main BLTH，开始存活心跳");
-      cacheStore.startAliveHeartBeat();
-    } else {
-      logger.log("其它页面上存在正在运行的Main BLTH");
-    }
+    app.use(pinia);
     for (const [key, component] of Object.entries(ElementPlusIconsVue__namespace)) {
       app.component(key, component);
     }
     for (const [key, component] of Object.entries(MyIconsVue)) {
       app.component(key, component);
     }
-    const moduleStore = useModuleStore();
-    moduleStore.loadModules();
-    const mountApp = () => {
-      const div = dce("div");
-      div.id = "BLTH";
-      document.body.append(div);
-      app.mount(div);
-    };
-    waitForMoment("document-end").then(() => mountApp());
+    moduleStore.loadModules("yes");
+    await( waitForMoment("document-end"));
+    const div = dce("div");
+    div.id = "BLTH";
+    document.body.append(div);
+    app.mount(div);
   }
 
 })(Vue, Pinia, _, ElementPlusIconsVue, luxon, CryptoJS, ElementPlus, hotkeys);
