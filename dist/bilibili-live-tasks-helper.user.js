@@ -199,7 +199,7 @@
         noReport: {
           enabled: false
         },
-        sleepDetection: {
+        noSleep: {
           enabled: false
         }
       },
@@ -3238,7 +3238,7 @@
   class NoSleep extends BaseModule {
     constructor() {
       super(...arguments);
-      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.sleepDetection);
+      __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.noSleep);
     }
     async run() {
       this.logger.log("屏蔽挂机检测模块开始运行");
@@ -4388,11 +4388,11 @@
               vue.createVNode(_component_el_space, { wrap: "" }, {
                 default: vue.withCtx(() => [
                   vue.createVNode(_component_el_switch, {
-                    modelValue: vue.unref(config).sleepDetection.enabled,
-                    "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => vue.unref(config).sleepDetection.enabled = $event),
+                    modelValue: vue.unref(config).noSleep.enabled,
+                    "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => vue.unref(config).noSleep.enabled = $event),
                     "active-text": "屏蔽挂机检测"
                   }, null, 8, ["modelValue"]),
-                  vue.createVNode(_component_Info, { id: "EnhanceExperience.sleepDetection" })
+                  vue.createVNode(_component_Info, { id: "EnhanceExperience.noSleep" })
                 ]),
                 _: 1
               })
@@ -4860,7 +4860,7 @@
           ])
         ])
       },
-      sleepDetection: {
+      noSleep: {
         title: "屏蔽挂机检测",
         message: vue.h("p", [
           vue.h("div", "屏蔽B站直播间的挂机检测。"),
