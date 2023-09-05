@@ -81,7 +81,7 @@ interface ImoduleConfig {
     noReport: {
       enabled: boolean
     }
-    sleepDetection: {
+    noSleep: {
       enabled: boolean
     }
   }

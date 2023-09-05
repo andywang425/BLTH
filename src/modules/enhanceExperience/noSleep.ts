@@ -6,7 +6,7 @@ class NoSleep extends BaseModule {
   static runAt: runAtMoment = 'window-load'
   static runAfterDefault: boolean = false
 
-  config = this.moduleStore.moduleConfig.EnhanceExperience.sleepDetection
+  config = this.moduleStore.moduleConfig.EnhanceExperience.noSleep
 
   public async run() {
     this.logger.log('屏蔽挂机检测模块开始运行')

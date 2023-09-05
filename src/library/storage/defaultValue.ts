@@ -111,7 +111,7 @@ const defaultValues: IdefaultValues = {
       noReport: {
         enabled: false
       },
-      sleepDetection: {
+      noSleep: {
         enabled: false
       }
     },
