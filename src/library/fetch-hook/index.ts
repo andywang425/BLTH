@@ -66,17 +66,11 @@ class ResponseHandler {
   }
 }
 
+let isHooked: boolean = false
 let onRequestHandlers: onRequestHandler[] = []
 let onResponseHandlers: onResponseHandler[] = []
 
-const hook = (proxy: Iproxy, win: Window) => {
-  if (proxy.onRequest) {
-    onRequestHandlers.push(proxy.onRequest)
-  }
-  if (proxy.onResponse) {
-    onResponseHandlers.push(proxy.onResponse)
-  }
-
+const hook = (win: Window) => {
   win.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     // 发起请求前
     for (const handler of onRequestHandlers) {
@@ -133,7 +127,17 @@ const fproxy = (
   /** 原生 fetch 函数 */
   originFetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 } => {
-  hook(proxy, win)
+  if (proxy.onRequest) {
+    onRequestHandlers.push(proxy.onRequest)
+  }
+  if (proxy.onResponse) {
+    onResponseHandlers.push(proxy.onResponse)
+  }
+
+  if (!isHooked) {
+    hook(win)
+    isHooked = true
+  }
 
   return {
     unProxy: () => {

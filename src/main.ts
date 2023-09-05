@@ -14,24 +14,31 @@ import { waitForMoment } from './library/utils'
 
 const logger = new Logger('Main')
 
-if (isTargetFrame()) {
-  logger.log('document.readyState', document.readyState)
+logger.log('document.readyState', document.readyState)
 
+const pinia = createPinia()
+
+const cacheStore = useCacheStore(pinia)
+const moduleStore = useModuleStore(pinia)
+
+cacheStore.checkIfMainBLTHRunning()
+
+if (!cacheStore.isMainBLTHRunning) {
+  logger.log('当前脚本是Main BLTH，开始存活心跳')
+  cacheStore.startAliveHeartBeat()
+} else {
+  logger.log('其它页面上存在正在运行的Main BLTH')
+}
+
+moduleStore.loadModules('unknown')
+
+await waitForMoment('document-body')
+
+if (isTargetFrame()) {
   const app = createApp(App)
-  const pinia = createPinia()
 
   app.use(ElementPlus)
   app.use(pinia)
-
-  const cacheStore = useCacheStore()
-  cacheStore.checkIfMainBLTHRunning()
-
-  if (!cacheStore.isMainBLTHRunning) {
-    logger.log('当前脚本是Main BLTH，开始存活心跳')
-    cacheStore.startAliveHeartBeat()
-  } else {
-    logger.log('其它页面上存在正在运行的Main BLTH')
-  }
 
   for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
@@ -41,15 +48,12 @@ if (isTargetFrame()) {
     app.component(key, component)
   }
 
-  const moduleStore = useModuleStore()
-  moduleStore.loadModules()
+  moduleStore.loadModules('yes')
 
-  const mountApp = () => {
-    const div = dce('div')
-    div.id = 'BLTH'
-    document.body.append(div)
-    app.mount(div)
-  }
+  await waitForMoment('document-end')
 
-  waitForMoment('document-end').then(() => mountApp())
+  const div = dce('div')
+  div.id = 'BLTH'
+  document.body.append(div)
+  app.mount(div)
 }

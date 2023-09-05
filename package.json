@@ -1,7 +1,7 @@
 {
   "name": "bilibili-live-tasks-helper",
   "private": true,
-  "version": "7.1.0",
+  "version": "7.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -38,7 +38,7 @@
     "terser": "^5.18.2",
     "typescript": "^5.0.4",
     "vite": "^4.3.5",
-    "vite-plugin-monkey": "^3.2.0",
+    "vite-plugin-monkey": "^3.5.0",
     "vue-tsc": "^1.6.4"
   }
 }

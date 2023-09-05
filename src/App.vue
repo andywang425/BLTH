@@ -3,10 +3,9 @@ import { useUIStore } from './stores/useUIStore'
 import PanelHeader from './components/PanelHeader.vue'
 import PanelAside from './components/PanelAside.vue'
 import PanelMain from './components/PanelMain.vue'
-import { dce, dq, pollingQuery } from './library/dom'
+import { dce, dq, pollingQuery, isSelfTopFrame, topFrameDocuemntElement } from './library/dom'
 import hotkeys from 'hotkeys-js'
 import _ from 'lodash'
-import { isSelfTopFrame, topFrameDocuemnt } from './library/dom'
 import Logger from './library/logger'
 
 const uiStore = useUIStore()
@@ -56,13 +55,13 @@ if (livePlayer) {
       button.innerText = uiStore.isShowPanelButtonText
       playerHeaderLeft.append(button)
       if (!isSelfTopFrame()) {
-        // 在特殊直播间，脚本所在的 TargetFrame 只占屏幕中间一块地方
+        // 在特殊直播间，脚本所在的目标 frame 只占屏幕中间一块地方
         // 如果焦点不在里面，快捷键会失效
         // 所以这里额外把 hotkeys 注入到顶层 frame 确保快捷键总是可用
         hotkeys(
           'alt+b',
           {
-            element: topFrameDocuemnt() as any
+            element: topFrameDocuemntElement()
           },
           throttleButtoOnClick
         )
@@ -72,7 +71,7 @@ if (livePlayer) {
     .catch(() => logger.error("Can't find playerHeaderLeft in time"))
   // 监听页面缩放，调整控制面板大小
   // 因为这个操作频率不高就不节流或防抖了
-  window.onresize = setPanelSize
+  window.addEventListener('resize', () => setPanelSize())
   // 监听 html 根节点和 body 节点
   // 主要是为了适配滚动条的显示/隐藏和实验室中的功能
   const observer = new MutationObserver(() => setPanelSize())

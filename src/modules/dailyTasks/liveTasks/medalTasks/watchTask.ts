@@ -5,10 +5,10 @@ import { useBiliStore } from '../../../../stores/useBiliStore'
 import Logger from '../../../../library/logger'
 import CryptoJS from 'crypto-js'
 import { uuid, sleep } from '../../../../library/utils'
-import { getCookie } from '../../../../library/cookie'
 import { useModuleStore } from '../../../../stores/useModuleStore'
 import { ImoduleConfig } from '../../../../types'
 import { moduleStatus, runAtMoment } from '../../../../types/module'
+import { getCookie } from '../../../../library/cookie'
 
 interface sypderData {
   benchmark: string
@@ -66,12 +66,12 @@ class RoomHeart {
   }
 
   /** Cookie LIVE_BUVID */
-  private buvid = getCookie('LIVE_BUVID')
+  private buvid: string | null = useBiliStore().cookies?.LIVE_BUVID ?? getCookie('LIVE_BUVID')
 
   private uuid = uuid()
 
   /** 计算签名和发送请求时均需要 JSON.stringify */
-  private device = [this.buvid as string, this.uuid]
+  private device: string[] = [this.buvid as string, this.uuid]
   /** 浏览器 user agent */
   private ua = navigator.userAgent
 
@@ -254,7 +254,7 @@ class RoomHeart {
 }
 
 class WatchTask extends BaseModule {
-  static runAt: runAtMoment = 'document-end'
+  static runAt: runAtMoment = 'window-load'
 
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.watch

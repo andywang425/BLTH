@@ -110,6 +110,9 @@ const defaultValues: IdefaultValues = {
       },
       noReport: {
         enabled: false
+      },
+      sleepDetection: {
+        enabled: false
       }
     },
     RemoveElement: {

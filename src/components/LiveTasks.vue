@@ -100,8 +100,8 @@ const handleEditList = () => {
         }
       })
       // 利用 emitter 通知 BiliInfo 模块去获取数据
-      moduleStore.emitter.emit('BiliInfo', {
-        target: 'getFansMetals'
+      moduleStore.emitter.emit('Default_FansMedals', {
+        module: 'LiveTasks'
       })
     } else {
       initSelection(medalInfoTableData.value)

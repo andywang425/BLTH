@@ -44,14 +44,16 @@ const pollingQuery = (
 }
 
 /**
- * 判断当前脚本是否运行在 BilibiliLive 所在的 frame
+ * 判断当前脚本是否运行在 BilibiliLive 所在的 frame（需要等到 document-body 后才能判断）
  *
- * 注：大部分B站直播间页面只有一个iframe，共两个frame
+ * 注：大部分B站直播间页面只有两个iframe，共三个 frame；
+ * 脚本只会被注入到顶层 frame
  *
- * 特殊的直播间（背景很好看的那种）有两个iframe，共三个frame
+ * 特殊的直播间（背景很好看的那种，top frame被用来当背景板了）有三个 iframe，共四个 frame；
+ * 脚本会被注入到顶层 frame 和一个 iframe
  */
 const isTargetFrame = (): boolean => {
-  if (unsafeWindow.document.head.innerHTML.includes('BilibiliLive')) {
+  if (document.head.innerHTML.includes('BilibiliLive')) {
     return true
   } else {
     return false
@@ -64,8 +66,9 @@ const isTargetFrame = (): boolean => {
 const isSelfTopFrame = (): boolean => unsafeWindow.self === unsafeWindow.top
 
 /**
- * 获取顶层 frame 的 document
+ * 获取顶层 frame 的 documentElement
  */
-const topFrameDocuemnt = (): Document | undefined => unsafeWindow.top?.document
+const topFrameDocuemntElement = (): HTMLElement | undefined =>
+  unsafeWindow.top?.document?.documentElement
 
-export { dq, dqa, dce, pollingQuery, isTargetFrame, isSelfTopFrame, topFrameDocuemnt }
+export { dq, dqa, dce, pollingQuery, isTargetFrame, isSelfTopFrame, topFrameDocuemntElement }

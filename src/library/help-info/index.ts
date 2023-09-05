@@ -215,6 +215,16 @@ const help_info: IhelpInfo = {
           h('span', '。')
         ])
       ])
+    },
+    sleepDetection: {
+      title: '屏蔽挂机检测',
+      message: h('p', [
+        h('div', '屏蔽B站直播间的挂机检测。'),
+        h(
+          'div',
+          '如果长时间没有操作，会提示“检测到您已离开当前屏幕，倒计时后即将暂停播放”。开启本功能后即可避免这种情况。'
+        )
+      ])
     }
   },
   RemoveElement: {

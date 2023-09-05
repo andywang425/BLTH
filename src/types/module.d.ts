@@ -26,15 +26,31 @@ interface ImoduleStatus {
   }
 }
 
-type runAtMoment = 'document-start' | 'document-end' | 'window-load'
+type runAtMoment =
+  | 'document-start'
+  | 'document-head'
+  | 'document-body'
+  | 'document-end'
+  | 'window-load'
+
+type onFrameTypes = 'all' | 'target'
+
+type isOnTargetFrameTypes = 'unknown' | 'yes'
 
 type moduleEmitterEvents = {
-  BiliInfo: {
-    target: string
-  }
   DailyTask_LiveTask_AppUserTask: {
+    module: string
+  }
+  Default_FansMedals: {
     module: string
   }
 }
 
-export { moduleStatus, ImoduleStatus, runAtMoment, moduleEmitterEvents }
+export {
+  moduleStatus,
+  ImoduleStatus,
+  runAtMoment,
+  moduleEmitterEvents,
+  onFrameTypes,
+  isOnTargetFrameTypes
+}
