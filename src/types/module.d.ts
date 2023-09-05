@@ -38,10 +38,10 @@ type onFrameTypes = 'all' | 'target'
 type isOnTargetFrameTypes = 'unknown' | 'yes'
 
 type moduleEmitterEvents = {
-  UserInfo: {
-    target: string
-  }
   DailyTask_LiveTask_AppUserTask: {
+    module: string
+  }
+  Default_FansMedals: {
     module: string
   }
 }

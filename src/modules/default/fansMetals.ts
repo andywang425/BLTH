@@ -4,6 +4,7 @@ import { LiveData } from '../../library/bili-api/data'
 import DefaultBaseModule from '../DefaultBaseModule'
 import { delayToNextMoment, isTimestampToday } from '../../library/luxon'
 import { sleep } from '../../library/utils'
+import { useModuleStore } from '../../stores/useModuleStore'
 
 class FansMetals extends DefaultBaseModule {
   /**
@@ -70,6 +71,10 @@ class FansMetals extends DefaultBaseModule {
     setTimeout(async () => {
       biliStore.fansMedals = await this.getFansMetals()
     }, delayToNextMoment(0, 4).ms)
+
+    useModuleStore().emitter.on('Default_FansMedals', async () => {
+      biliStore.fansMedals = await this.getFansMetals(10, true)
+    })
   }
 }
 
