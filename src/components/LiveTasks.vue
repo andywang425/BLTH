@@ -196,7 +196,7 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.medalTasks.watch.enabled" active-text="观看直播" />
-        <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 64px">
+        <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 70px">
           <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
         </el-select>
         <el-text>分钟</el-text>
