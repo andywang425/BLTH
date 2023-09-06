@@ -99,7 +99,7 @@ const handleEditList = () => {
           medalInfoLoading.value = false
         }
       })
-      // 利用 emitter 通知 BiliInfo 模块去获取数据
+      // 利用 emitter 通知 FansMedals 模块去获取数据
       moduleStore.emitter.emit('Default_FansMedals', {
         module: 'LiveTasks'
       })
