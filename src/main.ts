@@ -48,6 +48,7 @@ if (isTargetFrame()) {
     app.component(key, component)
   }
 
+  cacheStore.cache.isMainBLTHRunningOnTargetFrame = true
   moduleStore.loadModules('yes')
 
   await waitForMoment('document-end')

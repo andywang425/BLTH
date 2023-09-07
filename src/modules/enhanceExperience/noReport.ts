@@ -6,7 +6,7 @@ import { getUrlFromFetchInput } from '../../library/utils'
 import { onFrameTypes, runAtMoment } from '../../types/module'
 
 class NoReport extends BaseModule {
-  static runMultiple: boolean = true
+  static runOnMultiplePages: boolean = true
   static runAt: runAtMoment = 'document-start'
   static onFrame: onFrameTypes = 'all'
   static runAfterDefault: boolean = false

@@ -14,7 +14,7 @@ class BaseModule {
    *
    * 默认false，即只在Main BLTH运行的页面上运行
    */
-  static runMultiple: boolean = false
+  static runOnMultiplePages: boolean = false
   /**
    * 模块运行时机，默认 document-body
    *

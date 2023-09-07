@@ -109,6 +109,7 @@ interface IuiConfig {
 
 interface Icache {
   lastAliveHeartBeatTime: number
+  isMainBLTHRunningOnTargetFrame: boolean
 }
 
 export { ImoduleConfig, IuiConfig, Icache }
