@@ -33,7 +33,7 @@ type runAtMoment =
   | 'document-end'
   | 'window-load'
 
-type onFrameTypes = 'all' | 'target'
+type onFrameTypes = 'all' | 'target' | 'top'
 
 type isOnTargetFrameTypes = 'unknown' | 'yes'
 

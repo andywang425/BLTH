@@ -13,6 +13,8 @@ class BaseModule {
    * 当脚本在多个页面上运行的时候，该模块是否要在每个页面上运行
    *
    * 默认false，即只在Main BLTH运行的页面上运行
+   *
+   * 该选项为 false 时如果要确保模块不会重复运行，还需将 onFrame 设置为 target 或 top
    */
   static runOnMultiplePages: boolean = false
   /**
@@ -35,6 +37,8 @@ class BaseModule {
    * `all`: 所有符合脚本`@match`规则的 frame
    *
    * `target`: window.BilibiliLive 存在的那个 frame
+   *
+   * `top`: 顶层 frame (`window.top`)
    */
   static onFrame: onFrameTypes = 'target'
   /**

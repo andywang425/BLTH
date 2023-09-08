@@ -18,6 +18,7 @@ import {
 } from '../types/module'
 import { deepestIterate, waitForMoment } from '../library/utils'
 import { useCacheStore } from './useCacheStore'
+import { isSelfTopFrame } from '../library/dom'
 
 const defaultModuleStatus: ImoduleStatus = {
   DailyTasks: {
@@ -45,8 +46,8 @@ const defaultModuleStatus: ImoduleStatus = {
   }
 }
 
-// 在所有 frame 上运行的被加载的模块名称
-const allFrameModuleNames: string[] = []
+// 在所有 frame 或顶层 frame 上运行的被加载的模块名称
+const allAndTopFrameModuleNames: string[] = []
 
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
@@ -84,7 +85,7 @@ export const useModuleStore = defineStore('module', () => {
     const logger = new Logger('ModuleStore_LoadModules')
     if (isOnTargetFrame === 'unknown') {
       for (const [name, module] of Object.entries(otherModules)) {
-        if (module.onFrame === 'all') {
+        if (module.onFrame === 'all' || (module.onFrame === 'top' && isSelfTopFrame())) {
           if (module.runOnMultiplePages || !cacheStore.isMainBLTHRunning) {
             if (!module.runAfterDefault) {
               // 如果不需要等默认模块运行完了再运行，现在就加载并记录
@@ -92,8 +93,8 @@ export const useModuleStore = defineStore('module', () => {
               waitForMoment(module.runAt).then(() =>
                 new (module as new (moduleName: string) => BaseModule)(name).run()
               )
-              // 记录被加载的 onFrame 为 all 的模块名称
-              allFrameModuleNames.push(name)
+              // 记录被加载的 onFrame 为 all 或 top 的模块名称
+              allAndTopFrameModuleNames.push(name)
             }
           }
         }
@@ -103,8 +104,14 @@ export const useModuleStore = defineStore('module', () => {
       const defaultModulesLoaded: Promise<any> = loadDefaultModules()
       // 运行其它模块
       for (const [name, module] of Object.entries(otherModules)) {
-        // 对 onFrame 为 all 的模块来说，如果之前运行过，现在就不运行了
-        if (module.onFrame === 'target' || !allFrameModuleNames.includes(name)) {
+        // 对 onFrame 为 all 或 top 的模块来说，如果之前运行过，现在就不运行了
+        if (
+          module.onFrame === 'target' ||
+          (module.onFrame === 'top' &&
+            isSelfTopFrame() &&
+            !allAndTopFrameModuleNames.includes(name)) ||
+          (module.onFrame === 'all' && !allAndTopFrameModuleNames.includes(name))
+        ) {
           if (module.runOnMultiplePages || !cacheStore.isMainBLTHRunning) {
             waitForMoment(module.runAt).then(async () => {
               try {

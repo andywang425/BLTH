@@ -7,7 +7,7 @@ export const useCacheStore = defineStore('cache', () => {
   // 缓存
   const cache: Icache = reactive(Storage.getCache())
   // 是否有Main BLTH在运行
-  // Main BLTH 指所有BLTH中唯一一个（对于特殊直播间来说有两个，因为脚本会被注入到两个 frame 上）运行 runOnMultiplePages 为 false 模块的 BLTH
+  // Main BLTH 指所有BLTH中唯一一个（或两个，因为在特殊直播间脚本会被注入到两个 frame 上）运行 runOnMultiplePages 为 false 模块的 BLTH
   // 用户在打开第一个直播间页面时运行的BLTH一定是Main BLTH，之后打开的则不是
   // 如果关掉Main BLTH所在的页面，那么下一个打开的页面上所运行的BLTH则为Main BLTH
   // 增加这一概念主要时为了确保任务类模块不会重复运行（比如完成各种每日任务的模块）
