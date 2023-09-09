@@ -95,9 +95,9 @@ class GetYearVipPrivilegeTask extends BaseModule {
           if (diff < 86400) {
             this.logger.log(
               '领取年度大会员权益模块下次运行时间:',
-              DateTime.fromSeconds(this.config._nextReceiveTime).toString()
+              DateTime.fromSeconds(this.config._nextReceiveTime).toJSDate()
             )
-            setTimeout(() => this.run(), diff)
+            setTimeout(() => this.run(), diff * 1000)
           } else {
             this.logger.log('距离下次领取年度大会员权益的时间超过一天，不计划下次运行')
           }
