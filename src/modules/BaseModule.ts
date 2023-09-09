@@ -39,6 +39,8 @@ class BaseModule {
    * `target`: window.BilibiliLive 存在的那个 frame
    *
    * `top`: 顶层 frame (`window.top`)
+   *
+   * 如果设置为 target，那么至少要等到`document-body`时刻才能运行
    */
   static onFrame: onFrameTypes = 'target'
   /**

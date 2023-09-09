@@ -66,7 +66,7 @@ export const useModuleStore = defineStore('module', () => {
     const promiseArray: Promise<any>[] = []
     // 按优先级顺序逐个运行默认模块
     for (const [name, module] of Object.entries(defaultModules)) {
-      if (module.runOnMultiplePages || !cacheStore.isMainBLTHRunning) {
+      if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
         promiseArray.push(new (module as new (moduleName: string) => DefaultBaseModule)(name).run())
       }
     }
@@ -86,7 +86,7 @@ export const useModuleStore = defineStore('module', () => {
     if (isOnTargetFrame === 'unknown') {
       for (const [name, module] of Object.entries(otherModules)) {
         if (module.onFrame === 'all' || (module.onFrame === 'top' && isSelfTopFrame())) {
-          if (module.runOnMultiplePages || !cacheStore.isMainBLTHRunning) {
+          if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
             if (!module.runAfterDefault) {
               // 如果不需要等默认模块运行完了再运行，现在就加载并记录
               // 否则不做记录，等之后（isOnTargetFrame 为 yes时）再加载
@@ -112,7 +112,7 @@ export const useModuleStore = defineStore('module', () => {
             !allAndTopFrameModuleNames.includes(name)) ||
           (module.onFrame === 'all' && !allAndTopFrameModuleNames.includes(name))
         ) {
-          if (module.runOnMultiplePages || !cacheStore.isMainBLTHRunning) {
+          if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
             waitForMoment(module.runAt).then(async () => {
               try {
                 if (module.runAfterDefault) {

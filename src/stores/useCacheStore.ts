@@ -3,50 +3,63 @@ import { reactive, ref, watch } from 'vue'
 import Storage from '../library/storage'
 import { Icache } from '../types'
 
+type scriptType = 'Main' | 'SubMain' | 'Other'
+
 export const useCacheStore = defineStore('cache', () => {
   // 缓存
   const cache: Icache = reactive(Storage.getCache())
-  // 是否有Main BLTH在运行
-  // Main BLTH 指所有BLTH中唯一一个（或两个，因为在特殊直播间脚本会被注入到两个 frame 上）运行 runOnMultiplePages 为 false 模块的 BLTH
-  // 用户在打开第一个直播间页面时运行的BLTH一定是Main BLTH，之后打开的则不是
-  // 如果关掉Main BLTH所在的页面，那么下一个打开的页面上所运行的BLTH则为Main BLTH
-  // 增加这一概念主要时为了确保任务类模块不会重复运行（比如完成各种每日任务的模块）
-  const isMainBLTHRunning = ref<boolean>(false)
+  // 当前BLTH的类型：Main BLTH，Sub Main BLTH，Other BLTH
+  // Main BLTH（以及可能存在的 Sub Main BLTH） 指所有BLTH中唯一一个（或两个，因为在特殊直播间脚本会被注入到两个 frame 上）运行 runOnMultiplePages 为 false 模块的 BLTH
+
+  /**
+   * 表示当前BLTH的类型
+   * - `Main`: 运行`runOnMultiplePages`为`false`的模块，有存活心跳
+   * - `SubMain`: 运行`runOnMultiplePages`为`false`的模块，无存活心跳
+   * - `Other`: 运行`runOnMultiplePages`为`true`的模块，无存活心跳
+   *
+   * 用户在打开第一个直播间页面时运行的第一个BLTH一定是Main BLTH，
+   * 假如是特殊直播间，在第二个frame上还会有个SubMain BLTH。
+   * 之后打开的直播间页面上运行的则是Other BLTH。
+   * 如果关掉 Main BLTH 所在的页面，那么下一个打开的页面上所运行的 BLTH 则为 Main BLTH（也可能会有SubMain BLTH）。
+   * 增加这一概念主要时为了确保任务类模块不会重复运行（比如完成各种每日任务的模块）。
+   */
+  const currentScriptType = ref<scriptType>('Main')
 
   /**
    * Main BLTH 存活心跳
    */
-  function startAliveHeartBeat(): void {
+  function startMainBLTHAliveHeartBeat(): void {
     cache.lastAliveHeartBeatTime = Date.now()
     // 每隔5秒写一次时间戳，表示有一个Main BLTH正在运行
     // 之所以写时间戳而不是布尔值，是因为出现类似于浏览器崩溃的情况时 window.onunload 不会触发
     // 那样就会留下一个永久的有脚本在运行的标记
     const timer = setInterval(() => (cache.lastAliveHeartBeatTime = Date.now()), 5000)
 
-    window.addEventListener('unload', function () {
+    window.addEventListener('unload', () => {
       clearInterval(timer)
       cache.lastAliveHeartBeatTime = 0
-      cache.isMainBLTHRunningOnTargetFrame = false
     })
   }
 
   /**
-   * 检查是否有 Main BLTH 正在其它页面上运行
+   * 检查当前脚本的类型
    */
-  function checkIfMainBLTHRunning(): void {
+  function checkCurrentScriptType(): void {
     if (
       cache.lastAliveHeartBeatTime !== 0 &&
       // 允许最多3秒的误差
-      Date.now() - cache.lastAliveHeartBeatTime < 8000 &&
-      // 是否有 Main BLTH 运行在目标 frame 上
-      // 对于特殊直播间，一个页面上会有两个 Main BLTH，需要依赖这个 flag 来判断第二个 frame 上的 BTLH 是不是 Main BLTH
-      cache.isMainBLTHRunningOnTargetFrame
+      Date.now() - cache.lastAliveHeartBeatTime < 8000
     ) {
-      isMainBLTHRunning.value = true
+      // 通过 sessionStorage 中的 flag 来判断当前页面上有没有 Main BLTH
+      if (sessionStorage.getItem('MainBLTHFlag') === null) {
+        currentScriptType.value = 'Other'
+      } else {
+        // 如果有，那么当前脚本的类型是 SubMain
+        currentScriptType.value = 'SubMain'
+      }
     } else {
-      isMainBLTHRunning.value = false
-      // 如果上次网页因浏览器崩溃而关闭，此时 isMainBLTHRunningOnTargetFrame 可能为 true，将其重新置为 false
-      cache.isMainBLTHRunningOnTargetFrame = false
+      currentScriptType.value = 'Main'
+      sessionStorage.setItem('MainBLTHFlag', 'Hello World')
     }
   }
 
@@ -55,8 +68,8 @@ export const useCacheStore = defineStore('cache', () => {
 
   return {
     cache,
-    isMainBLTHRunning,
-    startAliveHeartBeat,
-    checkIfMainBLTHRunning
+    currentScriptType,
+    startMainBLTHAliveHeartBeat,
+    checkCurrentScriptType
   }
 })

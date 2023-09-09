@@ -21,13 +21,15 @@ const pinia = createPinia()
 const cacheStore = useCacheStore(pinia)
 const moduleStore = useModuleStore(pinia)
 
-cacheStore.checkIfMainBLTHRunning()
+cacheStore.checkCurrentScriptType()
 
-if (!cacheStore.isMainBLTHRunning) {
-  logger.log('当前脚本是Main BLTH，开始存活心跳')
-  cacheStore.startAliveHeartBeat()
+if (cacheStore.currentScriptType === 'Main') {
+  logger.log('当前脚本的类型为Main，开始存活心跳')
+  cacheStore.startMainBLTHAliveHeartBeat()
+} else if (cacheStore.currentScriptType === 'SubMain') {
+  logger.log('当前脚本的类型为SubMain')
 } else {
-  logger.log('其它页面上存在正在运行的Main BLTH')
+  logger.log('当前脚本的类型为Other')
 }
 
 moduleStore.loadModules('unknown')
@@ -48,7 +50,6 @@ if (isTargetFrame()) {
     app.component(key, component)
   }
 
-  cacheStore.cache.isMainBLTHRunningOnTargetFrame = true
   moduleStore.loadModules('yes')
 
   await waitForMoment('document-end')

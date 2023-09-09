@@ -131,8 +131,7 @@ const defaultValues: IdefaultValues = {
     }
   },
   cache: {
-    lastAliveHeartBeatTime: 0,
-    isMainBLTHRunningOnTargetFrame: false
+    lastAliveHeartBeatTime: 0
   }
 }
 
