@@ -29,6 +29,8 @@ class BaseModule {
    * `document-end`: `document`的`DOMContentLoaded`事件触发后
    *
    * `window-load`: `window`的`load`事件触发后
+   *
+   * 默认模块的模块运行时机总是为 document-body
    */
   public static runAt: runAtMoment = 'document-body'
   /**
@@ -41,6 +43,8 @@ class BaseModule {
    * `top`: 顶层 frame (`window.top`)
    *
    * 如果设置为 target，那么至少要等到`document-body`时刻才能运行
+   *
+   * 默认模块运行的 frame 总是为 target
    */
   public static onFrame: onFrameTypes = 'target'
   /**

@@ -22,6 +22,8 @@ async function minifyUserscript(inputPath, outputPath) {
   const result = `${metadata}\n${minified.code}`
 
   await fs.writeFile(outputPath, result, 'utf-8')
+
+  console.log(`\n压缩完成: ${inputPath} -> ${outputPath}`)
 }
 
 minifyUserscript(

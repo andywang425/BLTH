@@ -22,14 +22,10 @@ const cacheStore = useCacheStore(pinia)
 const moduleStore = useModuleStore(pinia)
 
 cacheStore.checkCurrentScriptType()
+logger.log('当前脚本的类型为', cacheStore.currentScriptType)
 
 if (cacheStore.currentScriptType === 'Main') {
-  logger.log('当前脚本的类型为Main，开始存活心跳')
   cacheStore.startMainBLTHAliveHeartBeat()
-} else if (cacheStore.currentScriptType === 'SubMain') {
-  logger.log('当前脚本的类型为SubMain')
-} else {
-  logger.log('当前脚本的类型为Other')
 }
 
 moduleStore.loadModules('unknown')
