@@ -18,29 +18,27 @@ class BanP2P extends BaseModule {
     ]
     for (const i of RTClist) {
       // 判断属性是否存在并且是否可配置
-      if (
-        Object.prototype.hasOwnProperty.call(unsafeWindow, i) &&
-        Object.getOwnPropertyDescriptor(unsafeWindow, i)?.configurable
-      ) {
+      if (Object.prototype.hasOwnProperty.call(unsafeWindow, i)) {
         // 定义属性
         Object.defineProperty(unsafeWindow, i, {
-          value: function () {
-            this.addEventListener = function () {}
-            this.removeEventListener = function () {}
-            this.createDataChannel = function () {
+          value: class {
+            constructor() {}
+            addEventListener() {}
+            removeEventListener() {}
+            createDataChannel() {
               return { close: function () {} }
             }
-            this.createOffer = function () {
+            createOffer() {
               return Promise.resolve()
             }
-            this.setLocalDescription = function () {
+            setLocalDescription() {
               return Promise.resolve()
             }
-            this.close = function () {}
-            this.setRemoteDescription = function () {
+            close() {}
+            setRemoteDescription() {
               return Promise.resolve()
             }
-            this.createAnswer = function () {}
+            createAnswer() {}
           },
           enumerable: false,
           writable: false,
