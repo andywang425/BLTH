@@ -3,7 +3,6 @@ import { reactive, watch } from 'vue'
 import Storage from '../library/storage'
 import _ from 'lodash'
 import { ImoduleConfig } from '../types'
-import DefaultBaseModule from '../modules/DefaultBaseModule'
 import BaseModule from '../modules/BaseModule'
 import * as defaultModules from '../modules/default'
 import * as otherModules from '../modules'
@@ -63,11 +62,12 @@ export const useModuleStore = defineStore('module', () => {
    */
   function loadDefaultModules(): Promise<any[]> {
     const cacheStore = useCacheStore()
-    const promiseArray: Promise<any>[] = []
-    // 按优先级顺序逐个运行默认模块
+    const promiseArray: Promise<void>[] = []
     for (const [name, module] of Object.entries(defaultModules)) {
       if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
-        promiseArray.push(new (module as new (moduleName: string) => DefaultBaseModule)(name).run())
+        promiseArray.push(
+          new (module as new (moduleName: string) => BaseModule)(name).run() as Promise<void>
+        )
       }
     }
     return Promise.all(promiseArray)

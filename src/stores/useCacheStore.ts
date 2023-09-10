@@ -8,8 +8,6 @@ type scriptType = 'Main' | 'SubMain' | 'Other'
 export const useCacheStore = defineStore('cache', () => {
   // 缓存
   const cache: Icache = reactive(Storage.getCache())
-  // 当前BLTH的类型：Main BLTH，Sub Main BLTH，Other BLTH
-  // Main BLTH（以及可能存在的 Sub Main BLTH） 指所有BLTH中唯一一个（或两个，因为在特殊直播间脚本会被注入到两个 frame 上）运行 runOnMultiplePages 为 false 模块的 BLTH
 
   /**
    * 表示当前BLTH的类型
@@ -51,7 +49,7 @@ export const useCacheStore = defineStore('cache', () => {
       Date.now() - cache.lastAliveHeartBeatTime < 8000
     ) {
       // 通过 sessionStorage 中的 flag 来判断当前页面上有没有 Main BLTH
-      if (sessionStorage.getItem('MainBLTHFlag') === null) {
+      if (sessionStorage.getItem('main_blth_flag') === null) {
         currentScriptType.value = 'Other'
       } else {
         // 如果有，那么当前脚本的类型是 SubMain
@@ -59,7 +57,7 @@ export const useCacheStore = defineStore('cache', () => {
       }
     } else {
       currentScriptType.value = 'Main'
-      sessionStorage.setItem('MainBLTHFlag', 'Hello World')
+      sessionStorage.setItem('main_blth_flag', '🚩')
     }
   }
 

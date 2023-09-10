@@ -1,9 +1,9 @@
 import { useBiliStore } from '../../stores/useBiliStore'
-import DefaultBaseModule from '../DefaultBaseModule'
 import { getCookies } from '../../library/cookie'
 import { IbiliCookies } from '../../types/cookies'
+import BaseModule from '../BaseModule'
 
-class Cookies extends DefaultBaseModule {
+class Cookies extends BaseModule {
   /**
    * 获取 Cookies
    *

@@ -1,12 +1,12 @@
 import { useBiliStore } from '../../stores/useBiliStore'
 import BAPI from '../../library/bili-api'
 import { LiveData } from '../../library/bili-api/data'
-import DefaultBaseModule from '../DefaultBaseModule'
 import { delayToNextMoment, isTimestampToday } from '../../library/luxon'
 import { sleep } from '../../library/utils'
 import { useModuleStore } from '../../stores/useModuleStore'
+import BaseModule from '../BaseModule'
 
-class FansMetals extends DefaultBaseModule {
+class FansMetals extends BaseModule {
   /**
    * 获取粉丝勋章
    *

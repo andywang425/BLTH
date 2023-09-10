@@ -17,7 +17,7 @@ function uuid(): string {
  * 基于 Promise 的睡眠函数
  * @param miliseconds 睡眠时间
  */
-function sleep(miliseconds: number): Promise<any> {
+function sleep(miliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, miliseconds))
 }
 

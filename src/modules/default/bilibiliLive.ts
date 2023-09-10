@@ -1,8 +1,8 @@
 import { useBiliStore } from '../../stores/useBiliStore'
-import DefaultBaseModule from '../DefaultBaseModule'
 import { unsafeWindow } from '$'
+import BaseModule from '../BaseModule'
 
-class BilibiliLive extends DefaultBaseModule {
+class BilibiliLive extends BaseModule {
   /**
    * 获取 window.BilibiliLive
    * @returns 一个 window.BilibiliLive 对象的引用
