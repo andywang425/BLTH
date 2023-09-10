@@ -14,7 +14,7 @@ class FansMetals extends BaseModule {
    * @param force 是否无视配置强制获取，默认fasle
    */
   private async getFansMetals(
-    pages = 10,
+    pages = Infinity,
     force = false
   ): Promise<LiveData.FansMedalPanel.List[] | null> {
     const medalTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
@@ -69,11 +69,20 @@ class FansMetals extends BaseModule {
     biliStore.fansMedals = await this.getFansMetals()
 
     setTimeout(async () => {
-      biliStore.fansMedals = await this.getFansMetals()
+      // 如果获得了新的粉丝勋章，肯定在第一页的 special_list 中，所以只获取一页
+      const firstPageMedals = await this.getFansMetals(1, true)
+      firstPageMedals?.forEach((firstPageMedal) => {
+        if (
+          biliStore.fansMedals?.findIndex((m) => m.medal.target_id === firstPageMedal.medal.target_id) === -1
+        ) {
+          // 添加新的粉丝勋章
+          biliStore.fansMedals.push(firstPageMedal)
+        }
+      })
     }, delayToNextMoment(0, 4).ms)
 
     useModuleStore().emitter.on('Default_FansMedals', async () => {
-      biliStore.fansMedals = await this.getFansMetals(10, true)
+      biliStore.fansMedals = await this.getFansMetals(Infinity, true)
     })
   }
 }

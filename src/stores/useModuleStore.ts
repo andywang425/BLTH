@@ -102,7 +102,7 @@ export const useModuleStore = defineStore('module', () => {
     } else {
       // 加载默认模块
       const defaultModulesLoaded: Promise<any> = loadDefaultModules()
-      // 运行其它模块
+      // 加载其它模块
       for (const [name, module] of Object.entries(otherModules)) {
         // 对 onFrame 为 all 或 top 的模块来说，如果之前运行过，现在就不运行了
         if (
