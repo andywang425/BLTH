@@ -1,5 +1,5 @@
 import { useBiliStore } from '../../stores/useBiliStore'
-import { getCookies } from '../../library/cookie'
+import { getCookiesAsync } from '../../library/cookie'
 import { IbiliCookies } from '../../types/cookies'
 import BaseModule from '../BaseModule'
 
@@ -11,12 +11,12 @@ class Cookies extends BaseModule {
    *
    * LIVE_BUVID: 如果用户以前从来没看过直播，此时可能为 null
    */
-  private getCookies(): IbiliCookies {
-    return getCookies(['bili_jct', 'LIVE_BUVID'])
+  private getCookies(): Promise<IbiliCookies> {
+    return getCookiesAsync(['bili_jct', 'LIVE_BUVID']) as unknown as Promise<IbiliCookies>
   }
 
   public async run(): Promise<void> {
-    useBiliStore().cookies = this.getCookies()
+    useBiliStore().cookies = await this.getCookies()
   }
 }
 

@@ -73,7 +73,7 @@ class FansMetals extends BaseModule {
       const firstPageMedals = await this.getFansMetals(1, true)
       firstPageMedals?.forEach((firstPageMedal) => {
         if (
-          biliStore.fansMedals?.findIndex((m) => m.medal.target_id === firstPageMedal.medal.target_id) === -1
+          biliStore.fansMedals?.every((m) => m.medal.target_id !== firstPageMedal.medal.target_id)
         ) {
           // 添加新的粉丝勋章
           biliStore.fansMedals.push(firstPageMedal)
