@@ -18,10 +18,10 @@ function getCookie(name: string): string | null {
 /**
  * 获取名称在 names 中的 cookies
  *
- * 该方法会修改 names
+ * 该方法会修改 names，names 中剩余的 cookie 名称是没获取到的 cookie
  * @param names Cookies 名称字符串
  */
-function getCookies(names: string[]): Record<string, string | null> {
+function getCookies<T>(names: string[]): T {
   const cookies: Record<string, string | null> = {}
   // 所有 cookies 赋初值 null
   for (const name of names) {
@@ -41,25 +41,26 @@ function getCookies(names: string[]): Record<string, string | null> {
     }
     if (names.length === 0) break
   }
-  return cookies
+  return cookies as T
 }
 
 /**
  * 获取名称在 names 中的 cookies，如果有 cookie 未获取到，会重复获取直到超时为止
  *
- * 该方法会修改 names
+ * 该方法会修改 names，names 中剩余的 cookie 名称是没获取到的 cookie
  * @param names Cookies 名称字符串
  * @param interval 获取间隔
  * @param timeout 超时时间
  */
-function getCookiesAsync(
+function getCookiesAsync<T>(
   names: string[],
   interval: number = 100,
   timeout: number = 10e3
-): Promise<Record<string, string | null>> {
-  return new Promise((resolve, reject) => {
-    const cookies = getCookies(names)
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const cookies = getCookies<T>(names)
     if (names.length > 0) {
+      let timeoutTimer: number | undefined
       const cookieTimer = setInterval(() => {
         _.merge(cookies, getCookies(names))
         if (names.length === 0) {
@@ -68,10 +69,12 @@ function getCookiesAsync(
           resolve(cookies)
         }
       }, interval)
-      const timeoutTimer = setTimeout(() => {
-        clearInterval(cookieTimer)
-        reject('获取以下Cookies超时: ' + names.toString())
-      }, timeout)
+      if (timeout !== -1) {
+        timeoutTimer = setTimeout(() => {
+          clearInterval(cookieTimer)
+          reject('获取以下Cookies超时: ' + names.toString())
+        }, timeout)
+      }
     } else {
       resolve(cookies)
     }
