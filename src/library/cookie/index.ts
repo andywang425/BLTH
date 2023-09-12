@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 /**
  * 获取名称为 name 的 cookie
  * @param name 要获取的 cookie 名称
