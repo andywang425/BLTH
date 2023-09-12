@@ -45,17 +45,16 @@ export const useCacheStore = defineStore('cache', () => {
   function checkCurrentScriptType(): void {
     if (
       cache.lastAliveHeartBeatTime !== 0 &&
-      // 允许最多3秒的误差
-      Date.now() - cache.lastAliveHeartBeatTime < 8000
+      Date.now() - cache.lastAliveHeartBeatTime < 8000 // 允许最多3秒的误差
     ) {
-      // 通过 sessionStorage 中的 flag 来判断当前页面上有没有 Main BLTH
+      // 存在 Main BLTH，通过 sessionStorage 中的 flag 来判断当前页面上有没有 Main BLTH
       if (sessionStorage.getItem('main_blth_flag') === null) {
         currentScriptType.value = 'Other'
       } else {
-        // 如果有，那么当前脚本的类型是 SubMain
         currentScriptType.value = 'SubMain'
       }
     } else {
+      // 不存在 Main BLTH，则当前脚本成为 Main BLTH 并记录 flag
       currentScriptType.value = 'Main'
       sessionStorage.setItem('main_blth_flag', '🚩')
     }

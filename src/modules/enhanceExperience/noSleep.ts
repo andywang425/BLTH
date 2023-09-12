@@ -8,12 +8,12 @@ class NoSleep extends BaseModule {
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.noSleep
 
-  public async run() {
+  public run(): void {
     this.logger.log('屏蔽挂机检测模块开始运行')
     if (this.config.enabled) {
       setInterval(() => {
         document.dispatchEvent(new MouseEvent('mousemove'))
-      }, 3e5) // 5分钟
+      }, 3e5) // 5分钟触发一次 MouseEvent
     }
   }
 }

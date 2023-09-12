@@ -10,7 +10,7 @@ class BanP2P extends BaseModule {
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.banp2p
 
-  private async banP2P() {
+  private banP2P(): void {
     const RTClist: string[] = [
       'RTCPeerConnection',
       'mozRTCPeerConnection',
@@ -48,11 +48,11 @@ class BanP2P extends BaseModule {
     }
   }
 
-  public async run() {
+  public run(): void {
     this.logger.log('禁用P2P模块开始运行')
     if (this.config.enabled) {
       try {
-        await this.banP2P()
+        this.banP2P()
       } catch (e) {
         this.logger.error('禁用P2P失败', e)
       }

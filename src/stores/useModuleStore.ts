@@ -52,7 +52,6 @@ export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
   const moduleConfig: ImoduleConfig = reactive(Storage.getModuleConfig())
   // Emitter 实例，用于模块间信息传递和 wait 函数
-  // 建议使用模块名称作为 Emitter 方法的 type 参数
   const emitter = mitt<moduleEmitterEvents>()
   // 模块状态，用于显示状态图标
   const moduleStatus: ImoduleStatus = reactive(defaultModuleStatus)
@@ -60,7 +59,7 @@ export const useModuleStore = defineStore('module', () => {
   /**
    * 加载默认模块（该函数不导出）
    */
-  function loadDefaultModules(): Promise<any[]> {
+  function loadDefaultModules(): Promise<void[]> {
     const cacheStore = useCacheStore()
     const promiseArray: Promise<void>[] = []
     for (const [name, module] of Object.entries(defaultModules)) {
@@ -70,7 +69,7 @@ export const useModuleStore = defineStore('module', () => {
         )
       }
     }
-    return Promise.all(promiseArray)
+    return Promise.all<Promise<void>[]>(promiseArray)
   }
 
   /**
@@ -101,7 +100,7 @@ export const useModuleStore = defineStore('module', () => {
       }
     } else {
       // 加载默认模块
-      const defaultModulesLoaded: Promise<any> = loadDefaultModules()
+      const defaultModulesLoaded: Promise<void[]> = loadDefaultModules()
       // 加载其它模块
       for (const [name, module] of Object.entries(otherModules)) {
         // 对 onFrame 为 all 或 top 的模块来说，如果之前运行过，现在就不运行了
@@ -122,7 +121,7 @@ export const useModuleStore = defineStore('module', () => {
                 new (module as new (moduleName: string) => BaseModule)(name).run()
               } catch (e) {
                 // 默认模块运行出错，不运行该模块
-                logger.error(`运行默认模块时出错，模块${name}不运行`, e)
+                logger.error(`运行默认模块时出错，模块 ${name} 不运行:`, e)
               }
             })
           }
