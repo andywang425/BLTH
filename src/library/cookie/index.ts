@@ -2,82 +2,77 @@ import _ from 'lodash'
 
 /**
  * 获取名称为 name 的 cookie
- * @param name Cookie 名称
+ * @param name 要获取的 cookie 名称
  */
 function getCookie(name: string): string | null {
-  const nameEqual = name + '='
-  for (const cookie of document.cookie.split('; ')) {
-    if (cookie.startsWith(nameEqual)) {
-      const value = cookie.substring(nameEqual.length)
-      return decodeURIComponent(value)
-    }
-  }
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop()!.split(';').shift() as string
   return null
 }
 
 /**
- * 获取名称在 names 中的 cookies
- *
- * 该方法会修改 names，names 中剩余的 cookie 名称是没获取到的 cookie
- * @param names Cookies 名称字符串
+ * 获取名称在 names 数组中的 cookies
+ * @param names 要获取的 cookie 名称数组
  */
-function getCookies<T>(names: string[]): T {
-  const cookies: Record<string, string | null> = {}
-  // 所有 cookies 赋初值 null
-  for (const name of names) {
+function getCookies<T extends string>(names: Iterable<T>): Record<T, string | null> {
+  const cookies: Record<T, string | null> = {} as Record<T, string | null>
+  const namesSet = new Set(names)
+
+  // 初始化所有 cookie 为 null
+  for (const name of namesSet) {
     cookies[name] = null
   }
+
   for (const cookie of document.cookie.split('; ')) {
-    for (let i = 0; i < names.length; i++) {
-      const name = names[i]
-      const nameEqual = name + '='
-      if (cookie.startsWith(nameEqual)) {
-        const value = cookie.substring(nameEqual.length)
-        cookies[name] = decodeURIComponent(value)
-        // 从 names 中删除已获取的 cookie
-        names.splice(i, 1)
-        break
-      }
+    const [cookieName, ...cookieValueParts] = cookie.split('=')
+    const cookieValue = cookieValueParts.join('=')
+
+    if (namesSet.has(cookieName as T)) {
+      cookies[cookieName as T] = decodeURIComponent(cookieValue)
+      namesSet.delete(cookieName as T)
+
+      // 所有 cookie 都已找到，跳出循环
+      if (namesSet.size === 0) break
     }
-    if (names.length === 0) break
   }
-  return cookies as T
+
+  return cookies
 }
 
 /**
- * 获取名称在 names 中的 cookies，如果有 cookie 未获取到，会重复获取直到超时为止
+ * 获取名称在 names 中的 cookies，如果有 cookie 未获取到，会反复获取直到超时为止
  *
- * 该方法会修改 names，names 中剩余的 cookie 名称是没获取到的 cookie
- * @param names Cookies 名称字符串
+ * @param names 要获取的 cookie 名称数组
  * @param interval 获取间隔
- * @param timeout 超时时间
+ * @param timeout 超时时间，若为 -1 则永不超时
  */
-function getCookiesAsync<T>(
-  names: string[],
-  interval: number = 100,
-  timeout: number = 10e3
-): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const cookies = getCookies<T>(names)
-    if (names.length > 0) {
-      let timeoutTimer: number | undefined
-      const cookieTimer = setInterval(() => {
-        _.merge(cookies, getCookies(names))
-        if (names.length === 0) {
-          clearInterval(cookieTimer)
-          clearTimeout(timeoutTimer)
-          resolve(cookies)
-        }
-      }, interval)
-      if (timeout !== -1) {
-        timeoutTimer = setTimeout(() => {
-          clearInterval(cookieTimer)
-          reject('获取以下Cookies超时: ' + names.toString())
-        }, timeout)
+function getCookiesAsync<T extends string>(
+  names: T[],
+  interval: number = 200,
+  timeout: number = 10000
+): Promise<Record<T, string | null>> {
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now()
+    const remainNamesSet = new Set(names)
+    const cookies: Record<T, string | null> = {} as Record<T, string | null>
+
+    const timer = setInterval(() => {
+      Object.assign(cookies, getCookies(remainNamesSet))
+
+      // 删去 remainNamesSet 中已获取的 cookies
+      for (const name in cookies) {
+        if (cookies[name] !== null) remainNamesSet.delete(name)
       }
-    } else {
-      resolve(cookies)
-    }
+
+      if (remainNamesSet.size === 0) {
+        clearInterval(timer)
+        resolve(cookies)
+      } else if (timeout !== -1 && Date.now() - startTime > timeout) {
+        clearInterval(timer)
+        reject('获取以下Cookies超时: ' + [...remainNamesSet])
+      }
+    }, interval)
   })
 }
 

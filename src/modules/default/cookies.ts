@@ -12,7 +12,7 @@ class Cookies extends BaseModule {
    * LIVE_BUVID: 如果用户以前从来没看过直播，此时可能为 null
    */
   private getCookies(): Promise<IbiliCookies> {
-    return getCookiesAsync<IbiliCookies>(['bili_jct', 'LIVE_BUVID'])
+    return getCookiesAsync(['bili_jct', 'LIVE_BUVID'])
   }
 
   public async run(): Promise<void> {
