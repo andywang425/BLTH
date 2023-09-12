@@ -19,14 +19,16 @@ class CoinTask extends BaseModule {
   // 通过其响应的copyright字段（1原创，2转载）来判断
   // 不过这个接口带有 wbi 签名，实现起来复杂
   // 所以干脆直接限制每个视频最多投一个币，反正视频数量足够
-  readonly MAX_COIN = 1
+  private readonly MAX_COIN = 1
 
+  /**
+   * 获取动态视频的 aid 和 bvid
+   */
   private getDynamicVideoIds(): { aid: string; bvid: string }[] | null {
     const biliStore = useBiliStore()
-    if (!_.isEmpty(biliStore.dynamicVideos)) {
-      // 当 biliStore.dynamicVideos 不是 {} 或 null 或 [] 时
-      // 返回所有的 aid 和 bvid
-      return (biliStore.dynamicVideos as MainData.DynamicAll.Item[]).map((item) => {
+    if (biliStore.dynamicVideos) {
+      // 当 biliStore.dynamicVideos 不为 null 时，返回所有的 aid 和 bvid
+      return biliStore.dynamicVideos.map((item) => {
         const archive = item.modules.module_dynamic.major.archive
         return {
           aid: archive.aid,
@@ -40,6 +42,11 @@ class CoinTask extends BaseModule {
     }
   }
 
+  /**
+   * 获取一个视频的你的已投硬币数量
+   *
+   * @returns 你的已投硬币数
+   */
   private async getVideoCoinInfo(aid: string, bvid: string): Promise<number> {
     try {
       const response = await BAPI.main.videoRelation(aid, bvid)
@@ -56,7 +63,11 @@ class CoinTask extends BaseModule {
     }
   }
 
-  private async coinDynamicVideos(left_coin_num: number) {
+  /**
+   * 给动态中的视频投币
+   * @param left_coin_num 还需要投的硬币数
+   */
+  private async coinDynamicVideos(left_coin_num: number): Promise<void> {
     const ids = this.getDynamicVideoIds()
     if (ids) {
       for (const { aid, bvid } of ids) {
@@ -87,6 +98,9 @@ class CoinTask extends BaseModule {
     }
   }
 
+  /**
+   * 投币
+   */
   private async coin(aid: string, num: number): Promise<number> {
     try {
       const response = await BAPI.main.coinAdd(aid, num)
@@ -107,7 +121,7 @@ class CoinTask extends BaseModule {
     }
   }
 
-  public async run() {
+  public async run(): Promise<void> {
     this.logger.log('每日投币模块开始运行')
     if (this.config.enabled) {
       const biliStore = useBiliStore()
@@ -139,13 +153,13 @@ class CoinTask extends BaseModule {
       } else {
         // 为了更加准确的语言描述和任务状态图标显示，需要判断当前所处的时间段
         // 下面文字中的今天、昨天是指真实的今天、昨天而非在 isTimestampToday 函数中重新定义的
-        if (!isNowIn(0, 0, 0, 5)) {
+        if (isNowIn(0, 0, 0, 5)) {
+          // 在半夜00:00 ~ 00:05
+          this.logger.log('昨天的每日投币任务已经完成过了，等到今天的00:05再执行')
+        } else {
           // 在非半夜00:00 ~ 00:05的其它时间
           this.logger.log('今天已经完成过每日投币任务了')
           this.status = 'done'
-        } else {
-          // 在半夜00:00 ~ 00:05
-          this.logger.log('昨天的每日投币任务已经完成过了，等到今天的00:05再执行')
         }
       }
     }

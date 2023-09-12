@@ -89,7 +89,8 @@ class BaseModule {
   /**
    * 运行模块
    *
-   * 默认模块返回一个空的Promise，其它模块无返回值
+   * 默认模块必须返回一个空的Promise，
+   * 其它模块若需要使用 await 可以返回一个空的Promise，否则无返回值
    */
   public run(): void | Promise<void> {
     throw new Error('Method not implemented.')

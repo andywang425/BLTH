@@ -60,11 +60,12 @@ class SwitchLiveStreamQuality extends BaseModule {
     }
   }
 
-  public run(): void {
+  public async run(): Promise<void> {
     this.logger.log('自动切换画质模块开始运行')
     if (this.config.enabled) {
       try {
-        this.waitForPlayer().then((livePlayer) => this.switchQuality(livePlayer))
+        const livePlayer = await this.waitForPlayer()
+        this.switchQuality(livePlayer)
       } catch (e) {
         this.logger.error('自动切换画质模块出错', e)
       }
