@@ -16,7 +16,7 @@ class DanmuTask extends BaseModule {
   /**
    * 获取粉丝勋章的房间号，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
    */
-  private getRoomidList() {
+  private getRoomidList(): number[] | null {
     const biliStore = useBiliStore()
     if (biliStore.filteredFansMedals) {
       return biliStore.filteredFansMedals
@@ -36,7 +36,12 @@ class DanmuTask extends BaseModule {
     }
   }
 
-  private async sendDanmu(danmu: string, roomid: number) {
+  /**
+   * 发弹幕
+   * @param danmu 弹幕内容
+   * @param roomid 直播间号
+   */
+  private async sendDanmu(danmu: string, roomid: number): Promise<void> {
     try {
       const response = await BAPI.live.sendMsg(danmu, roomid)
       this.logger.log(`BAPI.live.sendMsg(${danmu}, ${roomid})`, response)
@@ -50,7 +55,7 @@ class DanmuTask extends BaseModule {
     }
   }
 
-  public async run() {
+  public async run(): Promise<void> {
     this.logger.log('发送弹幕模块开始运行')
     if (this.config.enabled) {
       if (!isTimestampToday(this.config._lastCompleteTime)) {
@@ -70,14 +75,15 @@ class DanmuTask extends BaseModule {
           this.logger.log('发送弹幕任务已完成')
         }
       } else {
-        if (!isNowIn(0, 0, 0, 5)) {
+        if (isNowIn(0, 0, 0, 5)) {
+          this.logger.log('昨天的发送弹幕任务已经完成过了，等到今天的00:05再执行')
+        } else {
           this.logger.log('今天已经完成过发送弹幕任务了')
           this.status = 'done'
-        } else {
-          this.logger.log('昨天的发送弹幕任务已经完成过了，等到今天的00:05再执行')
         }
       }
     }
+    // 通知APP用户任务模块，可以开始运行了
     this.moduleStore.emitter.emit('DailyTask_LiveTask_AppUserTask', {
       module: this.moduleName
     })

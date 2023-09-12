@@ -1,9 +1,7 @@
 import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
 import { useBiliStore } from '../../../stores/useBiliStore'
-import { MainData } from '../../../library/bili-api/data'
 import BAPI from '../../../library/bili-api'
-import _ from 'lodash'
 import { moduleStatus } from '../../../types/module'
 
 class ShareTask extends BaseModule {

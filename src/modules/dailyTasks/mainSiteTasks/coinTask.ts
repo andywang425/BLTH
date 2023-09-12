@@ -3,7 +3,6 @@ import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../libr
 import { useBiliStore } from '../../../stores/useBiliStore'
 import { MainData } from '../../../library/bili-api/data'
 import BAPI from '../../../library/bili-api'
-import _ from 'lodash'
 import { moduleStatus } from '../../../types/module'
 
 class CoinTask extends BaseModule {
