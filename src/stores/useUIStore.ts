@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { reactive, computed, CSSProperties, watch } from 'vue'
 import Storage from '../library/storage'
 import _ from 'lodash'
-import { IuiConfig } from '../types'
+import { IuiConfig, menuIndex } from '../types'
 
 interface IbaseStyleValue {
   top: number
@@ -16,10 +16,12 @@ export const useUIStore = defineStore('ui', () => {
   const uiConfig: IuiConfig = reactive(Storage.getUiConfig())
   // 被激活的菜单项的名称，用于在 Header 里显示子标题
   const activeMenuName = computed<string>(() => {
-    const index2name: { [index: string]: string } = {
+    const index2name: { [index in menuIndex]: string } = {
       MainSiteTasks: '主站任务',
       LiveTasks: '直播任务',
-      OtherTasks: '其它任务'
+      OtherTasks: '其它任务',
+      EnhanceExperience: '体验优化',
+      RemoveElement: '移除元素'
     }
     return index2name[uiConfig.activeMenuIndex]
   })
@@ -64,7 +66,7 @@ export const useUIStore = defineStore('ui', () => {
    *设置被激活菜单项的名称，配合 el-menu 的 `@select` 使用
    * @param index 被激活菜单项
    */
-  function setActiveMenuIndex(index: string) {
+  function setActiveMenuIndex(index: menuIndex) {
     uiConfig.activeMenuIndex = index
   }
   // 监听UI配置信息的变化，使用防抖降低油猴写配置信息频率
