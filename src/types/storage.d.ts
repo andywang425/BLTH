@@ -101,7 +101,12 @@ interface ImoduleConfig {
   }
 }
 
-type menuIndex = 'MainSiteTasks' | 'LiveTasks' | 'OtherTasks' | 'EnhanceExperience' | 'RemoveElement'
+type menuIndex =
+  | 'MainSiteTasks'
+  | 'LiveTasks'
+  | 'OtherTasks'
+  | 'EnhanceExperience'
+  | 'RemoveElement'
 
 interface IuiConfig {
   isCollapse: boolean

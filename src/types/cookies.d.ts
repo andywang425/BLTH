@@ -1,6 +1,8 @@
+type cookieValue = string | null
+
 interface IbiliCookies {
-  bili_jct: string | null
-  LIVE_BUVID: string | null
+  bili_jct: cookieValue
+  LIVE_BUVID: cookieValue
 }
 
 export { IbiliCookies }

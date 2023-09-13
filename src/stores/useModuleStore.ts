@@ -79,7 +79,7 @@ export const useModuleStore = defineStore('module', () => {
    * - `unknown`: 不知道（至少要等到`document-body`后才能确定）
    * - `yes`: 是的
    */
-  function loadModules(isOnTargetFrame: isOnTargetFrameTypes) {
+  function loadModules(isOnTargetFrame: isOnTargetFrameTypes): void {
     const cacheStore = useCacheStore()
     const logger = new Logger('ModuleStore_LoadModules')
     if (isOnTargetFrame === 'unknown') {

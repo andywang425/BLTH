@@ -1,5 +1,5 @@
 import { GM_getValue, GM_setValue } from '$'
-import defaultValues from './defaultValue'
+import defaultValues from './defaultValues'
 import { IuiConfig, ImoduleConfig, Icache } from '../../types'
 import _ from 'lodash'
 

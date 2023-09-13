@@ -19,10 +19,9 @@ export const useBiliStore = defineStore('bili', () => {
   // 粉丝勋章列表
   const fansMedals = ref<LiveData.FansMedalPanel.List[] | null>(null)
   // 过滤了不存在直播间的粉丝勋章
-  const filteredFansMedals = computed<LiveData.FansMedalPanel.List[] | null>(() => {
-    if (!fansMedals.value) return null
-    return fansMedals.value.filter((m) => m.room_info.room_id !== 0)
-  })
+  const filteredFansMedals = computed<LiveData.FansMedalPanel.List[] | null>(
+    () => fansMedals.value?.filter((m) => m.room_info.room_id !== 0) ?? null
+  )
 
   return {
     BilibiliLive,
