@@ -6,7 +6,7 @@ const uiStore = useUIStore()
 </script>
 
 <template>
-  <div class="collapse-btn" @click="uiStore.changeCollapse()">
+  <div class="collapse-btn" @click="uiStore.changeCollapse">
     <el-icon v-if="uiStore.uiConfig.isCollapse">
       <Expand />
     </el-icon>
