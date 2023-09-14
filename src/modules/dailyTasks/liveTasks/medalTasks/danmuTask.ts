@@ -29,7 +29,7 @@ class DanmuTask extends BaseModule {
               : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
         )
         .map((medal) => medal.room_info.room_id)
-        .slice(0, 100)
+        .slice(0, 199)
     } else {
       this.status = 'error'
       return null

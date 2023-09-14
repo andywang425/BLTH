@@ -30,7 +30,7 @@ class LikeTask extends BaseModule {
                 : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
           )
           .map((medal) => [medal.room_info.room_id, medal.medal.target_id]) as [number, number][]
-      ).slice(0, 100)
+      ).slice(0, 199)
     } else {
       this.status = 'error'
       return null
