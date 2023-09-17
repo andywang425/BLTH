@@ -2,7 +2,7 @@ import { GM_addStyle } from '$'
 import BaseModule from '../BaseModule'
 
 class RemoveShopPopover extends BaseModule {
-  static runMultiple = true
+  static runOnMultiplePages = true
 
   config = this.moduleStore.moduleConfig.RemoveElement.removeShopPopover
 

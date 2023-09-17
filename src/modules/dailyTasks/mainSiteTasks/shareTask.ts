@@ -1,9 +1,7 @@
 import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
 import { useBiliStore } from '../../../stores/useBiliStore'
-import { MainData } from '../../../library/bili-api/data'
 import BAPI from '../../../library/bili-api'
-import _ from 'lodash'
 import { moduleStatus } from '../../../types/module'
 
 class ShareTask extends BaseModule {
@@ -15,18 +13,16 @@ class ShareTask extends BaseModule {
 
   private getAid(): string {
     const biliStore = useBiliStore()
-    if (!_.isEmpty(biliStore.dynamicVideos)) {
-      // 当 biliStore.dynamicVideos 不是 {} 或 null 或 [] 时
-      // 返回第一个视频的 aid
-      return (biliStore.dynamicVideos as MainData.DynamicAll.Item[])[0].modules.module_dynamic.major
-        .archive.aid
+    if (biliStore.dynamicVideos) {
+      // 当 biliStore.dynamicVideos 不为 null 时，返回第一个视频的 aid
+      return biliStore.dynamicVideos[0].modules.module_dynamic.major.archive.aid
     } else {
       // 否则返回 '2'
       return '2'
     }
   }
 
-  private async share(aid: string) {
+  private async share(aid: string): Promise<void> {
     try {
       const response = await BAPI.main.share(aid)
       this.logger.log(`BAPI.main.share(${aid}) response`, response)
@@ -45,7 +41,7 @@ class ShareTask extends BaseModule {
     }
   }
 
-  public async run() {
+  public async run(): Promise<void> {
     this.logger.log('每日分享视频模块开始运行')
     if (this.config.enabled) {
       const biliStore = useBiliStore()
@@ -60,11 +56,11 @@ class ShareTask extends BaseModule {
           this.logger.log('每日分享视频任务已完成')
         }
       } else {
-        if (!isNowIn(0, 0, 0, 5)) {
-          this.logger.log('今天已经完成过每日分享任务了')
-          this.status = 'done' // done
-        } else {
+        if (isNowIn(0, 0, 0, 5)) {
           this.logger.log('昨天的每日分享任务已经完成过了，等到今天的00:05再执行')
+        } else {
+          this.logger.log('今天已经完成过每日分享任务了')
+          this.status = 'done'
         }
       }
     }

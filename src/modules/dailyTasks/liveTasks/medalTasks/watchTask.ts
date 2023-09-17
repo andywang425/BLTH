@@ -211,7 +211,7 @@ class RoomHeart {
     const data: sypderData = JSON.parse(str)
     const [parent_id, area_id, seq_id, room_id]: number[] = JSON.parse(data.id)
     const [buvid, uuid]: string[] = JSON.parse(data.device)
-    const key = data.benchmark
+    const key: string = data.benchmark
     const newData = {
       platform: 'web',
       parent_id,
@@ -265,21 +265,22 @@ class WatchTask extends BaseModule {
 
   /**
    * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
-   * @returns 数组，每个元素都是数组：[房间号，主播uid]
+   * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
    */
-  private getRoomidUidList() {
+  private getRoomidUidList(): [number, number][] | null {
     const biliStore = useBiliStore()
     if (biliStore.filteredFansMedals) {
-      return biliStore.filteredFansMedals
-        .filter(
-          (medal) =>
-            medal.medal.level < 20 &&
-            (this.medalTasksConfig.isWhiteList
-              ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
-              : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
-        )
-        .map((medal) => [medal.room_info.room_id, medal.medal.target_id])
-        .slice(0, 100)
+      return (
+        biliStore.filteredFansMedals
+          .filter(
+            (medal) =>
+              medal.medal.level < 20 &&
+              (this.medalTasksConfig.isWhiteList
+                ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
+                : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
+          )
+          .map((medal) => [medal.room_info.room_id, medal.medal.target_id]) as [number, number][]
+      ).slice(0, 199)
     } else {
       return null
     }
@@ -288,10 +289,12 @@ class WatchTask extends BaseModule {
   /**
    * 获取指定直播间的 area_id 和 parent_area_id
    *
+   * 出错时返回 [-1, -1]
+   *
    * @param roomid 房间号
    * @returns [area_id, parent_area_id]
    */
-  private async getAreaInfo(roomid: number): Promise<number[] | null> {
+  private async getAreaInfo(roomid: number): Promise<[number, number]> {
     try {
       const response = await BAPI.live.getInfoByRoom(roomid)
       this.logger.log(`BAPI.live.getInfoByRoom(${roomid}) response`, response)
@@ -299,18 +302,18 @@ class WatchTask extends BaseModule {
         const room_info = response.data.room_info
         return [room_info.area_id, room_info.parent_area_id]
       } else {
-        return null
+        return [-1, -1]
       }
     } catch (error) {
       this.logger.error(
         `获取指定直播间的 area_id 和 parent_area_id(roomid = ${roomid}) 出错`,
         error
       )
-      return null
+      return [-1, -1]
     }
   }
 
-  public async run() {
+  public async run(): Promise<void> {
     this.logger.log('观看直播模块开始运行')
     if (this.config.enabled) {
       if (!isTimestampToday(this.config._lastCompleteTime)) {
@@ -323,7 +326,7 @@ class WatchTask extends BaseModule {
           this.config._watchedSecondsToday -= this.config._watchedSecondsToday % 300
         }
         this.config._lastWatchTime = tsm()
-        const idList = this.getRoomidUidList()
+        const idList: number[][] | null = this.getRoomidUidList()
         if (idList) {
           if (idList.length === 0) {
             this.status = 'done'
@@ -331,13 +334,13 @@ class WatchTask extends BaseModule {
           } else {
             for (let i = 0; i < idList.length; i++) {
               const [roomid, uid] = idList[i]
-              const areaInfo = await this.getAreaInfo(roomid)
-              // area_id 和 parent_area_id 都必须存在且大于 0
-              if (areaInfo && areaInfo.every((id) => id > 0)) {
+              const [area_id, parent_area_id] = await this.getAreaInfo(roomid)
+              if (area_id > 0 && parent_area_id > 0) {
+                // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区。开始心跳
                 new RoomHeart(
                   roomid,
-                  areaInfo[0],
-                  areaInfo[1],
+                  area_id,
+                  parent_area_id,
                   uid,
                   this.config._watchedSecondsToday,
                   i === idList.length - 1 ? true : false
@@ -349,11 +352,11 @@ class WatchTask extends BaseModule {
           }
         }
       } else {
-        if (!isNowIn(0, 0, 0, 5)) {
+        if (isNowIn(0, 0, 0, 5)) {
+          this.logger.log('昨天的观看直播任务已经完成过了，等到今天的00:05再执行')
+        } else {
           this.logger.log('今天已经完成过观看直播任务了')
           this.status = 'done'
-        } else {
-          this.logger.log('昨天的观看直播任务已经完成过了，等到今天的00:05再执行')
         }
       }
     }

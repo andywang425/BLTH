@@ -1,10 +1,10 @@
 import { useBiliStore } from '../../stores/useBiliStore'
 import BAPI from '../../library/bili-api'
 import { MainData } from '../../library/bili-api/data'
-import DefaultBaseModule from '../DefaultBaseModule'
 import { delayToNextMoment } from '../../library/luxon'
+import BaseModule from '../BaseModule'
 
-class UserInfo extends DefaultBaseModule {
+class UserInfo extends BaseModule {
   /**
    * 通过 BAPI.main.nav 获取用户基本信息
    */

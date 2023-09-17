@@ -21,13 +21,11 @@ const pinia = createPinia()
 const cacheStore = useCacheStore(pinia)
 const moduleStore = useModuleStore(pinia)
 
-cacheStore.checkIfMainBLTHRunning()
+cacheStore.checkCurrentScriptType()
+logger.log('当前脚本的类型为', cacheStore.currentScriptType)
 
-if (!cacheStore.isMainBLTHRunning) {
-  logger.log('当前脚本是Main BLTH，开始存活心跳')
-  cacheStore.startAliveHeartBeat()
-} else {
-  logger.log('其它页面上存在正在运行的Main BLTH')
+if (cacheStore.currentScriptType === 'Main') {
+  cacheStore.startMainBLTHAliveHeartBeat()
 }
 
 moduleStore.loadModules('unknown')

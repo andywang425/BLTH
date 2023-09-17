@@ -12,13 +12,19 @@ BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [vite-plugin-monkey](https://
 ## 环境搭建
 
 - 安装 [Node.js](https://nodejs.org/), [Visual Studio Code](https://code.visualstudio.com/)。
-- Fork 本项目（注意要取消勾选“只复制master分支”），然后 Clone 至本地。
+- Fork 本项目（注意要取消勾选“Copy the master branch only”），然后 Clone 至本地。
 - 切换到项目根目录，安装依赖 `npm install`。
 - 安装以下几个 vscode 拓展：[Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。同时为了更好的开发体验推荐启用 Volar 的 [Take Over Mode](https://cn.vuejs.org/guide/typescript/overview.html#volar-takeover-mode)。
 
 ## 开始
 
-使用以下命令在浏览器中安装脚本并启动 [Vite](https://cn.vitejs.dev)，然后你就可以开始写代码啦。
+首先切换到`dev`分支：
+
+```sh
+git checkout dev
+```
+
+接着使用以下命令在浏览器中安装脚本并启动 [Vite](https://cn.vitejs.dev)，然后你就可以开始写代码啦。
 
 ```sh
 npm run dev
@@ -32,7 +38,7 @@ npm run dev
 
 ### 分支
 
-- **master**: `master`分支是主分支，主仓库在发布新版本前会把`dev`分支合并到`master`分支。最终供用户安装的用户脚本由Github Actions自动编译。
+- **master**: `master`分支是主分支，主仓库在发布新版本前会把`dev`分支合并到`master`分支。最终供用户安装的用户脚本由Github Actions自动编译并推送到主分支。
 
 - **dev**: `dev`分支是开发用分支，开发时请使用该分支，发起PR时也以主仓库的dev分支为合并的目标。
 
@@ -140,8 +146,8 @@ npm run preview
 
 如果要开发或调试运行时机很早的模块，建议先编译脚本（npm run build）然后运行编译后的脚本。在 dev 状态下调试这类功能可能会遇到以下问题：
 
-- 脚本会被注入得太晚，无法很好地测试
-- 脚本会被注入得太早导致`document.head`为`null`而报错。
+- 脚本被注入得太晚，无法很好地测试
+- 脚本被注入得太早导致`document.head`为`null`而报错。
 
 ## commit 规范
 

@@ -1,12 +1,12 @@
 import { useBiliStore } from '../../stores/useBiliStore'
 import BAPI from '../../library/bili-api'
 import { LiveData } from '../../library/bili-api/data'
-import DefaultBaseModule from '../DefaultBaseModule'
 import { delayToNextMoment, isTimestampToday } from '../../library/luxon'
 import { sleep } from '../../library/utils'
 import { useModuleStore } from '../../stores/useModuleStore'
+import BaseModule from '../BaseModule'
 
-class FansMetals extends DefaultBaseModule {
+class FansMetals extends BaseModule {
   /**
    * 获取粉丝勋章
    *
@@ -14,7 +14,7 @@ class FansMetals extends DefaultBaseModule {
    * @param force 是否无视配置强制获取，默认fasle
    */
   private async getFansMetals(
-    pages = 10,
+    pages = Infinity,
     force = false
   ): Promise<LiveData.FansMedalPanel.List[] | null> {
     const medalTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
@@ -69,11 +69,20 @@ class FansMetals extends DefaultBaseModule {
     biliStore.fansMedals = await this.getFansMetals()
 
     setTimeout(async () => {
-      biliStore.fansMedals = await this.getFansMetals()
+      // 如果获得了新的粉丝勋章，肯定在第一页的 special_list 中，所以只获取一页
+      const firstPageMedals = await this.getFansMetals(1, true)
+      firstPageMedals?.forEach((firstPageMedal) => {
+        if (
+          biliStore.fansMedals?.every((m) => m.medal.target_id !== firstPageMedal.medal.target_id)
+        ) {
+          // 添加新的粉丝勋章
+          biliStore.fansMedals.push(firstPageMedal)
+        }
+      })
     }, delayToNextMoment(0, 4).ms)
 
     useModuleStore().emitter.on('Default_FansMedals', async () => {
-      biliStore.fansMedals = await this.getFansMetals(10, true)
+      biliStore.fansMedals = await this.getFansMetals(Infinity, true)
     })
   }
 }

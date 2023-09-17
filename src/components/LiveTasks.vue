@@ -99,7 +99,7 @@ const handleEditList = () => {
           medalInfoLoading.value = false
         }
       })
-      // 利用 emitter 通知 BiliInfo 模块去获取数据
+      // 利用 emitter 通知 FansMedals 模块去获取数据
       moduleStore.emitter.emit('Default_FansMedals', {
         module: 'LiveTasks'
       })
@@ -196,7 +196,7 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.medalTasks.watch.enabled" active-text="观看直播" />
-        <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 64px">
+        <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 70px">
           <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
         </el-select>
         <el-text>分钟</el-text>
@@ -237,7 +237,7 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     </el-row>
     <el-row>
       <el-text
-        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。</el-text
+        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多199个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。在脚本执行任务期间观看未执行任务的粉丝勋章对应直播间直播可能导致今天无法获取任何亲密度。</el-text
       >
     </el-row>
     <!-- 弹窗 -->

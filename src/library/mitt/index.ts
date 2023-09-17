@@ -1,4 +1,5 @@
 import mitt, { Emitter, EventHandlerMap, EventType, Handler } from 'mitt'
+
 export interface EmitterOnce<Events extends Record<EventType, unknown>> extends Emitter<Events> {
   /**
    * 新增的 once 方法

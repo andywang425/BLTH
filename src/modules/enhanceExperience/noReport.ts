@@ -6,13 +6,17 @@ import { getUrlFromFetchInput } from '../../library/utils'
 import { onFrameTypes, runAtMoment } from '../../types/module'
 
 class NoReport extends BaseModule {
-  static runMultiple: boolean = true
+  static runOnMultiplePages: boolean = true
   static runAt: runAtMoment = 'document-start'
   static onFrame: onFrameTypes = 'all'
   static runAfterDefault: boolean = false
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.noReport
 
+  /**
+   * 判断是否是需要拦截的 URL
+   * @param url 需要判断的 URL
+   */
   private static isTargetURL(url: string) {
     if (url.includes('//data.bilibili.com') || url.includes('//data.bilivideo.com')) {
       return true
@@ -21,6 +25,10 @@ class NoReport extends BaseModule {
     }
   }
 
+  /**
+   * 劫持一些能减少日志上报的方法
+   * @param win window
+   */
   private hookProperties(win: Window) {
     Object.defineProperty(win.navigator, 'sendBeacon', {
       value: () => {
@@ -46,6 +54,9 @@ class NoReport extends BaseModule {
     })
   }
 
+  /**
+   * 劫持 XHR 和 fetch 请求
+   */
   private async ajaxHook() {
     const ajaxHookProxyConfig = {
       onRequest: (config: XhrRequestConfig, handler: XhrRequestHandler) => {
@@ -82,11 +93,11 @@ class NoReport extends BaseModule {
     fproxy(fetchHookConfig, unsafeWindow)
   }
 
-  public async run() {
+  public run() {
     this.logger.log('拦截日志数据上报模块开始运行')
     if (this.config.enabled) {
       try {
-        await this.ajaxHook()
+        this.ajaxHook()
       } catch (e) {
         this.logger.error('拦截日志数据上报失败', e)
       }

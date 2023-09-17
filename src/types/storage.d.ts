@@ -101,14 +101,21 @@ interface ImoduleConfig {
   }
 }
 
+type menuIndex =
+  | 'MainSiteTasks'
+  | 'LiveTasks'
+  | 'OtherTasks'
+  | 'EnhanceExperience'
+  | 'RemoveElement'
+
 interface IuiConfig {
   isCollapse: boolean
   isShowPanel: boolean
-  activeMenuIndex: string
+  activeMenuIndex: menuIndex
 }
 
 interface Icache {
   lastAliveHeartBeatTime: number
 }
 
-export { ImoduleConfig, IuiConfig, Icache }
+export { ImoduleConfig, IuiConfig, Icache, menuIndex }

@@ -2,7 +2,7 @@ import { GM_addStyle } from '$'
 import BaseModule from '../BaseModule'
 
 class RemoveLiveWaterMark extends BaseModule {
-  static runMultiple = true
+  static runOnMultiplePages = true
 
   config = this.moduleStore.moduleConfig.RemoveElement.removeLiveWaterMark
 

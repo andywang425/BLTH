@@ -6,7 +6,7 @@
 
 # 环境要求
 
-- 浏览器：推荐使用 Chrome，Edge, Firefox, Safari 或 Opera。
+- 浏览器：推荐使用 Chrome, Edge, Firefox, Safari 或 Opera。
 - 用户脚本管理器：推荐使用 [Tampermonkey](https://www.tampermonkey.net) 或 [Violentmonkey](https://violentmonkey.github.io)。
 
 # 安装
@@ -40,7 +40,7 @@
 - 打开某一项功能后，如果你希望它立刻执行，需要刷新页面。
   但是刷新页面会打断目前正在执行的任务，下次运行时能否根据上次的进度继续执行取决于功能模块的具体实现（目前大部分都不行）。
   建议首次使用时仔细阅读各项功能的说明，然后一次完成所有功能的设置。
-- 打开多个直播间页面时，每日任务中的功能仅会在第一个直播间页面生效以防止任务被重复执行。体验优化中的功能总是会生效。
+- 打开多个直播间页面时，每日任务中的功能仅会在第一个直播间页面生效以防止任务被重复执行。体验优化、移除元素中的功能总是会生效。
 - 每日任务中大部分任务的任务周期是从每天半夜00:05到下一个半夜00:05，即只要过了每天的00:05就会自动执行下一轮。有个别任务的周期是每天早上08:05到下一个早上08:05。
 - 控制台日志：如果想查看控制台日志，请打开浏览器的开发者工具（快捷键`ctrl+shift+i`或`F12`）并切换到控制台（`Console`）。开头为`BLTH`的日志即为脚本日志。
   部分日志可能只有高级用户才看得懂，大家各取所需看自己想看的即可。善用过滤（`Filter`）和搜索（快捷键`ctrl+f`）功能。
@@ -83,6 +83,7 @@
 - [hotkeys-js](https://github.com/jaywcjlove/hotkeys-js)
 - [crypto-js](https://github.com/brix/crypto-js)
 - [mitt](https://github.com/developit/mitt)
+- [ajax-hook](https://github.com/wendux/ajax-hook)
 - [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS)
 - [transform](https://github.com/ritz078/transform)
 - [inkscape](https://inkscape.org/)

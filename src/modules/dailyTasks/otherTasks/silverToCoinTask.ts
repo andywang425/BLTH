@@ -10,7 +10,7 @@ class SilverToCoinTask extends BaseModule {
     this.moduleStore.moduleStatus.DailyTasks.OtherTasks.silverToCoin = s
   }
 
-  private async exchange() {
+  private async exchange(): Promise<void> {
     try {
       const response = await BAPI.live.silver2coin()
       this.logger.log(`BAPI.live.silver2coin response`, response)
@@ -33,18 +33,18 @@ class SilverToCoinTask extends BaseModule {
     }
   }
 
-  public async run() {
+  public run(): void {
     this.logger.log('银瓜子换硬币模块开始运行')
     if (this.config.enabled) {
       if (!isTimestampToday(this.config._lastCompleteTime)) {
         this.status = 'running'
-        await this.exchange()
+        this.exchange()
       } else {
-        if (!isNowIn(0, 0, 0, 5)) {
+        if (isNowIn(0, 0, 0, 5)) {
+          this.logger.log('昨天的银瓜子换硬币任务已经完成过了，等到今天的00:05再执行')
+        } else {
           this.logger.log('今天已经完成过银瓜子换硬币任务了')
           this.status = 'done'
-        } else {
-          this.logger.log('昨天的银瓜子换硬币任务已经完成过了，等到今天的00:05再执行')
         }
       }
     }

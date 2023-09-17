@@ -1,11 +1,10 @@
 import { useBiliStore } from '../../stores/useBiliStore'
-import DefaultBaseModule from '../DefaultBaseModule'
 import { unsafeWindow } from '$'
+import BaseModule from '../BaseModule'
 
-class BilibiliLive extends DefaultBaseModule {
+class BilibiliLive extends BaseModule {
   /**
    * 获取 window.BilibiliLive
-   * @returns 一个 window.BilibiliLive 对象的引用
    */
   private getBilibiliLive(): Promise<Window['BilibiliLive']> {
     this.logger.log('unsafeWindow.BilibiliLive', unsafeWindow.BilibiliLive)
@@ -20,10 +19,11 @@ class BilibiliLive extends DefaultBaseModule {
         set(target: Window['BilibiliLive'], prop: keyof Window['BilibiliLive'], value: never) {
           target[prop] = value
           // UID 是最后被赋值的属性，等 UID 被赋值后 BilibiliLive 的所有属性就都被初始化了
-          if (prop === 'UID' && unsafeWindow.BilibiliLive.UID !== 0) {
-            resolve(unsafeWindow.BilibiliLive)
+          if (prop === 'UID') {
             // 取消代理，还原为 Object
             unsafeWindow.BilibiliLive = target
+            // 返回 BilibiliLive
+            resolve(unsafeWindow.BilibiliLive)
           }
           return true
         }

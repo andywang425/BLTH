@@ -3,14 +3,14 @@ import { onFrameTypes, runAtMoment } from '../../types/module'
 import BaseModule from '../BaseModule'
 
 class BanP2P extends BaseModule {
-  static runMultiple: boolean = true
+  static runOnMultiplePages: boolean = true
   static runAt: runAtMoment = 'document-start'
   static onFrame: onFrameTypes = 'all'
   static runAfterDefault: boolean = false
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.banp2p
 
-  private async banP2P() {
+  private banP2P(): void {
     const RTClist: string[] = [
       'RTCPeerConnection',
       'mozRTCPeerConnection',
@@ -18,29 +18,27 @@ class BanP2P extends BaseModule {
     ]
     for (const i of RTClist) {
       // 判断属性是否存在并且是否可配置
-      if (
-        Object.prototype.hasOwnProperty.call(unsafeWindow, i) &&
-        Object.getOwnPropertyDescriptor(unsafeWindow, i)?.configurable
-      ) {
+      if (Object.prototype.hasOwnProperty.call(unsafeWindow, i)) {
         // 定义属性
         Object.defineProperty(unsafeWindow, i, {
-          value: function () {
-            this.addEventListener = function () {}
-            this.removeEventListener = function () {}
-            this.createDataChannel = function () {
+          value: class {
+            constructor() {}
+            addEventListener() {}
+            removeEventListener() {}
+            createDataChannel() {
               return { close: function () {} }
             }
-            this.createOffer = function () {
+            createOffer() {
               return Promise.resolve()
             }
-            this.setLocalDescription = function () {
+            setLocalDescription() {
               return Promise.resolve()
             }
-            this.close = function () {}
-            this.setRemoteDescription = function () {
+            close() {}
+            setRemoteDescription() {
               return Promise.resolve()
             }
-            this.createAnswer = function () {}
+            createAnswer() {}
           },
           enumerable: false,
           writable: false,
@@ -50,11 +48,11 @@ class BanP2P extends BaseModule {
     }
   }
 
-  public async run() {
+  public run(): void {
     this.logger.log('禁用P2P模块开始运行')
     if (this.config.enabled) {
       try {
-        await this.banP2P()
+        this.banP2P()
       } catch (e) {
         this.logger.error('禁用P2P失败', e)
       }

@@ -1,10 +1,10 @@
 import { useBiliStore } from '../../stores/useBiliStore'
 import BAPI from '../../library/bili-api'
 import { MainData } from '../../library/bili-api/data'
-import DefaultBaseModule from '../DefaultBaseModule'
 import { delayToNextMoment, isTimestampToday } from '../../library/luxon'
+import BaseModule from '../BaseModule'
 
-class DynamicVideos extends DefaultBaseModule {
+class DynamicVideos extends BaseModule {
   /**
    * 从动态中获取一页视频的信息
    *
