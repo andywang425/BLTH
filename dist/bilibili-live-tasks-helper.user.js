@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.1.1
+// @version         7.1.2
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
@@ -40,7 +40,7 @@
 // @require         https://unpkg.com/pinia@2.1.6/dist/pinia.iife.prod.js
 // @require         https://unpkg.com/lodash@4.17.21/lodash.min.js
 // @require         https://unpkg.com/hotkeys-js@3.12.0/dist/hotkeys.min.js
-// @require         https://unpkg.com/luxon@3.4.2/build/global/luxon.min.js
+// @require         https://unpkg.com/luxon@3.4.3/build/global/luxon.min.js
 // @require         https://unpkg.com/crypto-js@4.1.1/crypto-js.js
 // @resource        element-plus/dist/index.css  https://unpkg.com/element-plus@2.3.12/dist/index.css
 // @connect         api.bilibili.com
@@ -58,7 +58,7 @@
 // @run-at          document-start
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(" .title[data-v-dda95e10]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-dda95e10]{font-size:var(--big-text-size)}.header-small-text[data-v-dda95e10]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-dda95e10]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-d7ecdd75]{width:80px;height:80px}.avatar[data-v-d7ecdd75]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-0fb8057a]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-0fb8057a]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-0fb8057a]{width:auto}.aside #aside-el-menu[data-v-0fb8057a]:not(.el-menu--collapse){width:150px}.main[data-v-0fb8057a]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-0fb8057a],.fade-leave-active[data-v-0fb8057a]{transition:opacity .1s ease}.fade-enter-from[data-v-0fb8057a],.fade-leave-to[data-v-0fb8057a]{opacity:0}.info-icon[data-v-c1d8df5e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-72d53133]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px} ");
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(" .title[data-v-b935cab6]{padding-left:20px;align-items:center;display:flex}.header-big-text[data-v-b935cab6]{font-size:var(--big-text-size)}.header-small-text[data-v-b935cab6]{font-size:var(--small-text-size);padding-top:calc(var(--big-text-size) - var(--small-text-size));margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-b935cab6]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-45a03c87]{width:80px;height:80px}.avatar[data-v-45a03c87]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-0fb8057a]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-0fb8057a]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-0fb8057a]{width:auto}.aside #aside-el-menu[data-v-0fb8057a]:not(.el-menu--collapse){width:150px}.main[data-v-0fb8057a]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-0fb8057a],.fade-leave-active[data-v-0fb8057a]{transition:opacity .1s ease}.fade-enter-from[data-v-0fb8057a],.fade-leave-to[data-v-0fb8057a]{opacity:0}.info-icon[data-v-67653089]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-72d53133]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px} ");
 
 (async function (vue, pinia$1, _, ElementPlusIconsVue, luxon, CryptoJS, ElementPlus, hotkeys) {
   'use strict';
@@ -284,7 +284,9 @@
       const index2name = {
         MainSiteTasks: "主站任务",
         LiveTasks: "直播任务",
-        OtherTasks: "其它任务"
+        OtherTasks: "其它任务",
+        EnhanceExperience: "体验优化",
+        RemoveElement: "移除元素"
       };
       return index2name[uiConfig.activeMenuIndex];
     });
@@ -344,7 +346,8 @@
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("div", {
             class: "collapse-btn",
-            onClick: _cache[0] || (_cache[0] = ($event) => vue.unref(uiStore).changeCollapse())
+            onClick: _cache[0] || (_cache[0] = //@ts-ignore
+            (...args) => vue.unref(uiStore).changeCollapse && vue.unref(uiStore).changeCollapse(...args))
           }, [
             vue.unref(uiStore).uiConfig.isCollapse ? (vue.openBlock(), vue.createBlock(_component_el_icon, { key: 0 }, {
               default: vue.withCtx(() => [
@@ -386,7 +389,7 @@
     }
     return target;
   };
-  const PanelHeader = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["__scopeId", "data-v-dda95e10"]]);
+  const PanelHeader = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["__scopeId", "data-v-b935cab6"]]);
   const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
     __name: "PanelAside",
     setup(__props) {
@@ -493,18 +496,19 @@
     }
   });
   const useBiliStore = pinia$1.defineStore("bili", () => {
-    const BilibiliLive2 = vue.ref();
-    const cookies = vue.ref();
-    const userInfo = vue.ref();
-    const giftConfig = vue.ref();
-    const dailyRewardInfo = vue.ref();
-    const dynamicVideos = vue.ref();
-    const fansMedals = vue.ref();
-    const filteredFansMedals = vue.computed(() => {
-      if (!fansMedals.value)
-        return null;
-      return fansMedals.value.filter((m) => m.room_info.room_id !== 0);
-    });
+    const BilibiliLive2 = vue.ref(null);
+    const cookies = vue.ref(null);
+    const userInfo = vue.ref(null);
+    const giftConfig = vue.ref(null);
+    const dailyRewardInfo = vue.ref(null);
+    const dynamicVideos = vue.ref(null);
+    const fansMedals = vue.ref(null);
+    const filteredFansMedals = vue.computed(
+      () => {
+        var _a2;
+        return ((_a2 = fansMedals.value) == null ? void 0 : _a2.filter((m) => m.room_info.room_id !== 0)) ?? null;
+      }
+    );
     return {
       BilibiliLive: BilibiliLive2,
       userInfo,
@@ -1057,7 +1061,7 @@
       /**
        * 推荐添加一个 config 属性来表示当前模块的配置项
        *
-       * @example this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
+       * @example config: this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
        */
       __publicField(this, "config");
       this.moduleName = moduleName;
@@ -1067,13 +1071,19 @@
      * 如果需要在控制面板上显示模块状态，推荐添加一个 status setter 用来设置模块状态
      *
      * @example
-     * public set status(s: moduleStatus) {
+     * set status(s: moduleStatus) {
      *    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
      * }
      */
     set status(_s) {
       throw new Error("Method not implemented.");
     }
+    /**
+     * 运行模块
+     *
+     * 默认模块必须返回一个空的Promise，
+     * 其它模块若需要使用 await 可以返回一个空的Promise，否则无返回值
+     */
     run() {
       throw new Error("Method not implemented.");
     }
@@ -1082,8 +1092,10 @@
    * 当脚本在多个页面上运行的时候，该模块是否要在每个页面上运行
    *
    * 默认false，即只在Main BLTH运行的页面上运行
+   *
+   * 该选项为 false 时如果要确保模块不会重复运行，还需将 onFrame 设置为 target 或 top
    */
-  __publicField(BaseModule, "runMultiple", false);
+  __publicField(BaseModule, "runOnMultiplePages", false);
   /**
    * 模块运行时机，默认 document-body
    *
@@ -1096,6 +1108,8 @@
    * `document-end`: `document`的`DOMContentLoaded`事件触发后
    *
    * `window-load`: `window`的`load`事件触发后
+   *
+   * 默认模块的模块运行时机总是为 document-body
    */
   __publicField(BaseModule, "runAt", "document-body");
   /**
@@ -1104,6 +1118,12 @@
    * `all`: 所有符合脚本`@match`规则的 frame
    *
    * `target`: window.BilibiliLive 存在的那个 frame
+   *
+   * `top`: 顶层 frame (`window.top`)
+   *
+   * 如果设置为 target，那么至少要等到`document-body`时刻才能运行
+   *
+   * 默认模块运行的 frame 总是为 target
    */
   __publicField(BaseModule, "onFrame", "target");
   /**
@@ -1114,23 +1134,7 @@
    * 因为默认模块的运行时机总是 document-body，而且默认模块的运行时间是不确定的
    */
   __publicField(BaseModule, "runAfterDefault", true);
-  class DefaultBaseModule extends BaseModule {
-    /**
-     * 默认模块按顺序逐个运行，所以必须返回一个 Promise
-     */
-    run() {
-      throw new Error("Method not implemented.");
-    }
-  }
-  /**
-   * 默认模块的运行时机总是 document-body
-   */
-  __publicField(DefaultBaseModule, "runAt", "document-body");
-  /**
-   * 默认模块只能在目标 frame 上运行
-   */
-  __publicField(DefaultBaseModule, "onFrame", "target");
-  class UserInfo extends DefaultBaseModule {
+  class UserInfo extends BaseModule {
     /**
      * 通过 BAPI.main.nav 获取用户基本信息
      */
@@ -1157,7 +1161,7 @@
       }, delayToNextMoment(0, 4).ms);
     }
   }
-  class DailyRewardInfo extends DefaultBaseModule {
+  class DailyRewardInfo extends BaseModule {
     /**
      * 获取今日主站每日任务的完成情况
      */
@@ -1189,7 +1193,7 @@
       }, delayToNextMoment(0, 4).ms);
     }
   }
-  class DynamicVideos extends DefaultBaseModule {
+  class DynamicVideos extends BaseModule {
     /**
      * 从动态中获取一页视频的信息
      *
@@ -1223,14 +1227,14 @@
       }, delayToNextMoment(0, 4).ms);
     }
   }
-  class FansMetals extends DefaultBaseModule {
+  class FansMetals extends BaseModule {
     /**
      * 获取粉丝勋章
      *
      * @param pages 获取的页数
      * @param force 是否无视配置强制获取，默认fasle
      */
-    async getFansMetals(pages = 10, force = false) {
+    async getFansMetals(pages = Infinity, force = false) {
       const medalTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks;
       if (force || Object.entries(medalTasks).filter(([key]) => ["danmu", "like", "watch"].includes(key)).some(
         (keyValue) => keyValue[1].enabled && !isTimestampToday(keyValue[1]._lastCompleteTime)
@@ -1271,45 +1275,66 @@
       const biliStore = useBiliStore();
       biliStore.fansMedals = await this.getFansMetals();
       setTimeout(async () => {
-        biliStore.fansMedals = await this.getFansMetals();
+        const firstPageMedals = await this.getFansMetals(1, true);
+        firstPageMedals == null ? void 0 : firstPageMedals.forEach((firstPageMedal) => {
+          var _a2;
+          if ((_a2 = biliStore.fansMedals) == null ? void 0 : _a2.every((m) => m.medal.target_id !== firstPageMedal.medal.target_id)) {
+            biliStore.fansMedals.push(firstPageMedal);
+          }
+        });
       }, delayToNextMoment(0, 4).ms);
       useModuleStore().emitter.on("Default_FansMedals", async () => {
-        biliStore.fansMedals = await this.getFansMetals(10, true);
+        biliStore.fansMedals = await this.getFansMetals(Infinity, true);
       });
     }
   }
   function getCookie(name) {
-    const nameEqual = name + "=";
-    for (const cookie of document.cookie.split("; ")) {
-      if (cookie.startsWith(nameEqual)) {
-        const value = cookie.substring(nameEqual.length);
-        return decodeURIComponent(value);
-      }
-    }
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2)
+      return parts.pop().split(";").shift();
     return null;
   }
   function getCookies(names) {
     const cookies = {};
-    for (const name of names) {
+    const namesSet = new Set(names);
+    for (const name of namesSet) {
       cookies[name] = null;
     }
     for (const cookie of document.cookie.split("; ")) {
-      for (let i = 0; i < names.length; i++) {
-        const name = names[i];
-        const nameEqual = name + "=";
-        if (cookie.startsWith(nameEqual)) {
-          const value = cookie.substring(nameEqual.length);
-          cookies[name] = decodeURIComponent(value);
-          names.splice(i, 1);
+      const [cookieName, ...cookieValueParts] = cookie.split("=");
+      const cookieValue = cookieValueParts.join("=");
+      if (namesSet.has(cookieName)) {
+        cookies[cookieName] = decodeURIComponent(cookieValue);
+        namesSet.delete(cookieName);
+        if (namesSet.size === 0)
           break;
-        }
       }
-      if (names.length === 0)
-        break;
     }
     return cookies;
   }
-  class Cookies extends DefaultBaseModule {
+  function getCookiesAsync(names, interval = 200, timeout = 1e4) {
+    return new Promise((resolve2, reject2) => {
+      const startTime = Date.now();
+      const remainNamesSet = new Set(names);
+      const cookies = {};
+      const timer = setInterval(() => {
+        Object.assign(cookies, getCookies(remainNamesSet));
+        for (const name in cookies) {
+          if (cookies[name] !== null)
+            remainNamesSet.delete(name);
+        }
+        if (remainNamesSet.size === 0) {
+          clearInterval(timer);
+          resolve2(cookies);
+        } else if (timeout !== -1 && Date.now() - startTime > timeout) {
+          clearInterval(timer);
+          reject2("获取以下Cookies超时: " + [...remainNamesSet]);
+        }
+      }, interval);
+    });
+  }
+  class Cookies extends BaseModule {
     /**
      * 获取 Cookies
      *
@@ -1318,16 +1343,15 @@
      * LIVE_BUVID: 如果用户以前从来没看过直播，此时可能为 null
      */
     getCookies() {
-      return getCookies(["bili_jct", "LIVE_BUVID"]);
+      return getCookiesAsync(["bili_jct", "LIVE_BUVID"]);
     }
     async run() {
-      useBiliStore().cookies = this.getCookies();
+      useBiliStore().cookies = await this.getCookies();
     }
   }
-  class BilibiliLive extends DefaultBaseModule {
+  class BilibiliLive extends BaseModule {
     /**
      * 获取 window.BilibiliLive
-     * @returns 一个 window.BilibiliLive 对象的引用
      */
     getBilibiliLive() {
       this.logger.log("unsafeWindow.BilibiliLive", _unsafeWindow.BilibiliLive);
@@ -1339,9 +1363,9 @@
         _unsafeWindow.BilibiliLive = new Proxy(_unsafeWindow.BilibiliLive, {
           set(target, prop, value) {
             target[prop] = value;
-            if (prop === "UID" && _unsafeWindow.BilibiliLive.UID !== 0) {
-              resolve2(_unsafeWindow.BilibiliLive);
+            if (prop === "UID") {
               _unsafeWindow.BilibiliLive = target;
+              resolve2(_unsafeWindow.BilibiliLive);
             }
             return true;
           }
@@ -1388,11 +1412,11 @@
             this.status = "done";
           }
         } else {
-          if (!isNowIn(0, 0, 0, 5)) {
+          if (isNowIn(0, 0, 0, 5)) {
+            this.logger.log("昨天的每日登录任务已经完成过了，等到今天的00:05再执行");
+          } else {
             this.logger.log("今天已经完成过每日登录任务了");
             this.status = "done";
-          } else {
-            this.logger.log("昨天的每日登录任务已经完成过了，等到今天的00:05再执行");
           }
         }
       }
@@ -1472,7 +1496,7 @@
     }
     getAid() {
       const biliStore = useBiliStore();
-      if (!_.isEmpty(biliStore.dynamicVideos)) {
+      if (biliStore.dynamicVideos) {
         return biliStore.dynamicVideos[0].modules.module_dynamic.major.archive.aid;
       } else {
         return "2";
@@ -1510,11 +1534,11 @@
             this.logger.log("每日分享视频任务已完成");
           }
         } else {
-          if (!isNowIn(0, 0, 0, 5)) {
+          if (isNowIn(0, 0, 0, 5)) {
+            this.logger.log("昨天的每日分享任务已经完成过了，等到今天的00:05再执行");
+          } else {
             this.logger.log("今天已经完成过每日分享任务了");
             this.status = "done";
-          } else {
-            this.logger.log("昨天的每日分享任务已经完成过了，等到今天的00:05再执行");
           }
         }
       }
@@ -1538,9 +1562,12 @@
     set status(s) {
       this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.coin = s;
     }
+    /**
+     * 获取动态视频的 aid 和 bvid
+     */
     getDynamicVideoIds() {
       const biliStore = useBiliStore();
-      if (!_.isEmpty(biliStore.dynamicVideos)) {
+      if (biliStore.dynamicVideos) {
         return biliStore.dynamicVideos.map((item) => {
           const archive = item.modules.module_dynamic.major.archive;
           return {
@@ -1553,6 +1580,11 @@
         return null;
       }
     }
+    /**
+     * 获取一个视频的你的已投硬币数量
+     *
+     * @returns 你的已投硬币数
+     */
     async getVideoCoinInfo(aid, bvid) {
       try {
         const response = await BAPI.main.videoRelation(aid, bvid);
@@ -1568,6 +1600,10 @@
         return 0;
       }
     }
+    /**
+     * 给动态中的视频投币
+     * @param left_coin_num 还需要投的硬币数
+     */
     async coinDynamicVideos(left_coin_num) {
       const ids = this.getDynamicVideoIds();
       if (ids) {
@@ -1593,6 +1629,9 @@
         }
       }
     }
+    /**
+     * 投币
+     */
     async coin(aid, num) {
       try {
         const response = await BAPI.main.coinAdd(aid, num);
@@ -1637,11 +1676,11 @@
             }
           }
         } else {
-          if (!isNowIn(0, 0, 0, 5)) {
+          if (isNowIn(0, 0, 0, 5)) {
+            this.logger.log("昨天的每日投币任务已经完成过了，等到今天的00:05再执行");
+          } else {
             this.logger.log("今天已经完成过每日投币任务了");
             this.status = "done";
-          } else {
-            this.logger.log("昨天的每日投币任务已经完成过了，等到今天的00:05再执行");
           }
         }
       }
@@ -1897,19 +1936,24 @@
     }
     /**
      * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
-     * @returns 数组，每个元素都是数组：[房间号，主播uid]
+     * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
      */
     getRoomidUidList() {
       const biliStore = useBiliStore();
       if (biliStore.filteredFansMedals) {
         return biliStore.filteredFansMedals.filter(
           (medal) => (this.config.includeHighLevelMedals ? true : medal.medal.level < 20) && (this.medalTasksConfig.isWhiteList ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id) : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
-        ).map((medal) => [medal.room_info.room_id, medal.medal.target_id]).slice(0, 100);
+        ).map((medal) => [medal.room_info.room_id, medal.medal.target_id]).slice(0, 199);
       } else {
         this.status = "error";
         return null;
       }
     }
+    /**
+     * 点赞
+     * @param roomid 直播间号
+     * @param target_id 主播UID
+     */
     async like(roomid, target_id) {
       try {
         const response = await BAPI.live.likeReport(roomid, target_id);
@@ -1942,11 +1986,11 @@
             this.logger.log("给主播点赞任务已完成");
           }
         } else {
-          if (!isNowIn(0, 0, 0, 5)) {
+          if (isNowIn(0, 0, 0, 5)) {
+            this.logger.log("昨天的给主播点赞任务已经完成过了，等到今天的00:05再执行");
+          } else {
             this.logger.log("今天已经完成过给主播点赞任务了");
             this.status = "done";
-          } else {
-            this.logger.log("昨天的给主播点赞任务已经完成过了，等到今天的00:05再执行");
           }
         }
       }
@@ -2173,20 +2217,22 @@
     }
     /**
      * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
-     * @returns 数组，每个元素都是数组：[房间号，主播uid]
+     * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
      */
     getRoomidUidList() {
       const biliStore = useBiliStore();
       if (biliStore.filteredFansMedals) {
         return biliStore.filteredFansMedals.filter(
           (medal) => medal.medal.level < 20 && (this.medalTasksConfig.isWhiteList ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id) : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
-        ).map((medal) => [medal.room_info.room_id, medal.medal.target_id]).slice(0, 100);
+        ).map((medal) => [medal.room_info.room_id, medal.medal.target_id]).slice(0, 199);
       } else {
         return null;
       }
     }
     /**
      * 获取指定直播间的 area_id 和 parent_area_id
+     *
+     * 出错时返回 [-1, -1]
      *
      * @param roomid 房间号
      * @returns [area_id, parent_area_id]
@@ -2199,14 +2245,14 @@
           const room_info = response.data.room_info;
           return [room_info.area_id, room_info.parent_area_id];
         } else {
-          return null;
+          return [-1, -1];
         }
       } catch (error) {
         this.logger.error(
           `获取指定直播间的 area_id 和 parent_area_id(roomid = ${roomid}) 出错`,
           error
         );
-        return null;
+        return [-1, -1];
       }
     }
     async run() {
@@ -2228,12 +2274,12 @@
             } else {
               for (let i = 0; i < idList.length; i++) {
                 const [roomid, uid] = idList[i];
-                const areaInfo = await this.getAreaInfo(roomid);
-                if (areaInfo && areaInfo.every((id) => id > 0)) {
+                const [area_id, parent_area_id] = await this.getAreaInfo(roomid);
+                if (area_id > 0 && parent_area_id > 0) {
                   new RoomHeart(
                     roomid,
-                    areaInfo[0],
-                    areaInfo[1],
+                    area_id,
+                    parent_area_id,
                     uid,
                     this.config._watchedSecondsToday,
                     i === idList.length - 1 ? true : false
@@ -2244,11 +2290,11 @@
             }
           }
         } else {
-          if (!isNowIn(0, 0, 0, 5)) {
+          if (isNowIn(0, 0, 0, 5)) {
+            this.logger.log("昨天的观看直播任务已经完成过了，等到今天的00:05再执行");
+          } else {
             this.logger.log("今天已经完成过观看直播任务了");
             this.status = "done";
-          } else {
-            this.logger.log("昨天的观看直播任务已经完成过了，等到今天的00:05再执行");
           }
         }
       }
@@ -2275,12 +2321,17 @@
       if (biliStore.filteredFansMedals) {
         return biliStore.filteredFansMedals.filter(
           (medal) => medal.medal.level < 20 && medal.room_info.room_id != 910884 && (this.medalTasksConfig.isWhiteList ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id) : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
-        ).map((medal) => medal.room_info.room_id).slice(0, 100);
+        ).map((medal) => medal.room_info.room_id).slice(0, 199);
       } else {
         this.status = "error";
         return null;
       }
     }
+    /**
+     * 发弹幕
+     * @param danmu 弹幕内容
+     * @param roomid 直播间号
+     */
     async sendDanmu(danmu, roomid) {
       try {
         const response = await BAPI.live.sendMsg(danmu, roomid);
@@ -2312,11 +2363,11 @@
             this.logger.log("发送弹幕任务已完成");
           }
         } else {
-          if (!isNowIn(0, 0, 0, 5)) {
+          if (isNowIn(0, 0, 0, 5)) {
+            this.logger.log("昨天的发送弹幕任务已经完成过了，等到今天的00:05再执行");
+          } else {
             this.logger.log("今天已经完成过发送弹幕任务了");
             this.status = "done";
-          } else {
-            this.logger.log("昨天的发送弹幕任务已经完成过了，等到今天的00:05再执行");
           }
         }
       }
@@ -2431,18 +2482,18 @@
         this.status = "error";
       }
     }
-    async run() {
+    run() {
       this.logger.log("银瓜子换硬币模块开始运行");
       if (this.config.enabled) {
         if (!isTimestampToday(this.config._lastCompleteTime)) {
           this.status = "running";
-          await this.exchange();
+          this.exchange();
         } else {
-          if (!isNowIn(0, 0, 0, 5)) {
+          if (isNowIn(0, 0, 0, 5)) {
+            this.logger.log("昨天的银瓜子换硬币任务已经完成过了，等到今天的00:05再执行");
+          } else {
             this.logger.log("今天已经完成过银瓜子换硬币任务了");
             this.status = "done";
-          } else {
-            this.logger.log("昨天的银瓜子换硬币任务已经完成过了，等到今天的00:05再执行");
           }
         }
       }
@@ -2580,9 +2631,9 @@
             if (diff < 86400) {
               this.logger.log(
                 "领取年度大会员权益模块下次运行时间:",
-                luxon.DateTime.fromSeconds(this.config._nextReceiveTime).toString()
+                luxon.DateTime.fromSeconds(this.config._nextReceiveTime).toJSDate()
               );
-              setTimeout(() => this.run(), diff);
+              setTimeout(() => this.run(), diff * 1e3);
             } else {
               this.logger.log("距离下次领取年度大会员权益的时间超过一天，不计划下次运行");
             }
@@ -2613,28 +2664,33 @@
         const timeoutTimer = setTimeout(() => {
           clearInterval(findPlayertimer);
           clearTimeout(timeoutTimer);
-          reject2();
+          reject2("等待播放器超时");
         }, 1e4);
       });
     }
     async switchQuality(livePlayer) {
       const playerInfo = livePlayer.getPlayerInfo();
       if (playerInfo.liveStatus === 0) {
-        this.logger.log("当前直播间未开播");
+        this.logger.log("当前直播间未开播，无需切换画质");
       } else {
-        const switchFn = () => {
-          const targetQuality = playerInfo.qualityCandidates.find(
-            ({ desc }) => desc === this.config.qualityDesc
-          );
-          if (targetQuality && playerInfo.quality !== targetQuality.qn) {
-            livePlayer.switchQuality(targetQuality.qn);
-            this.logger.log(`已将画质切换为${this.config.qualityDesc}`, targetQuality);
-          }
-        };
         setTimeout(
-          () => switchFn(),
+          () => {
+            const targetQuality = playerInfo.qualityCandidates.find(
+              ({ desc }) => desc === this.config.qualityDesc
+            );
+            if (targetQuality) {
+              if (playerInfo.quality !== targetQuality.qn) {
+                livePlayer.switchQuality(targetQuality.qn);
+                this.logger.log(`已将画质切换为${this.config.qualityDesc}`, targetQuality);
+              } else {
+                this.logger.log("当前画质已经是目标画质了，无需切换画质");
+              }
+            } else {
+              this.logger.log("当前直播不支持目标画质，保持默认画质");
+            }
+          },
           // 这里针对特殊直播间和普通直播间设置了两套超时时间，特殊直播间超时时间更长
-          !isSelfTopFrame() ? 5e3 : 2500
+          isSelfTopFrame() ? 2500 : 5e3
         );
       }
     }
@@ -2645,12 +2701,12 @@
           const livePlayer = await this.waitForPlayer();
           this.switchQuality(livePlayer);
         } catch (e) {
-          this.logger.error("等待播放器超时");
+          this.logger.error("自动切换画质模块出错", e);
         }
       }
     }
   }
-  __publicField(SwitchLiveStreamQuality, "runMultiple", true);
+  __publicField(SwitchLiveStreamQuality, "runOnMultiplePages", true);
   __publicField(SwitchLiveStreamQuality, "runAt", "window-load");
   __publicField(SwitchLiveStreamQuality, "runAfterDefault", false);
   class BanP2P extends BaseModule {
@@ -2658,38 +2714,39 @@
       super(...arguments);
       __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.banp2p);
     }
-    async banP2P() {
-      var _a2;
+    banP2P() {
       const RTClist = [
         "RTCPeerConnection",
         "mozRTCPeerConnection",
         "webkitRTCPeerConnection"
       ];
       for (const i of RTClist) {
-        if (Object.prototype.hasOwnProperty.call(_unsafeWindow, i) && ((_a2 = Object.getOwnPropertyDescriptor(_unsafeWindow, i)) == null ? void 0 : _a2.configurable)) {
+        if (Object.prototype.hasOwnProperty.call(_unsafeWindow, i)) {
           Object.defineProperty(_unsafeWindow, i, {
-            value: function() {
-              this.addEventListener = function() {
-              };
-              this.removeEventListener = function() {
-              };
-              this.createDataChannel = function() {
+            value: class {
+              constructor() {
+              }
+              addEventListener() {
+              }
+              removeEventListener() {
+              }
+              createDataChannel() {
                 return { close: function() {
                 } };
-              };
-              this.createOffer = function() {
+              }
+              createOffer() {
                 return Promise.resolve();
-              };
-              this.setLocalDescription = function() {
+              }
+              setLocalDescription() {
                 return Promise.resolve();
-              };
-              this.close = function() {
-              };
-              this.setRemoteDescription = function() {
+              }
+              close() {
+              }
+              setRemoteDescription() {
                 return Promise.resolve();
-              };
-              this.createAnswer = function() {
-              };
+              }
+              createAnswer() {
+              }
             },
             enumerable: false,
             writable: false,
@@ -2698,18 +2755,18 @@
         }
       }
     }
-    async run() {
+    run() {
       this.logger.log("禁用P2P模块开始运行");
       if (this.config.enabled) {
         try {
-          await this.banP2P();
+          this.banP2P();
         } catch (e) {
           this.logger.error("禁用P2P失败", e);
         }
       }
     }
   }
-  __publicField(BanP2P, "runMultiple", true);
+  __publicField(BanP2P, "runOnMultiplePages", true);
   __publicField(BanP2P, "runAt", "document-start");
   __publicField(BanP2P, "onFrame", "all");
   __publicField(BanP2P, "runAfterDefault", false);
@@ -3152,6 +3209,10 @@
       super(...arguments);
       __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.noReport);
     }
+    /**
+     * 判断是否是需要拦截的 URL
+     * @param url 需要判断的 URL
+     */
     static isTargetURL(url) {
       if (url.includes("//data.bilibili.com") || url.includes("//data.bilivideo.com")) {
         return true;
@@ -3159,6 +3220,10 @@
         return false;
       }
     }
+    /**
+     * 劫持一些能减少日志上报的方法
+     * @param win window
+     */
     hookProperties(win) {
       Object.defineProperty(win.navigator, "sendBeacon", {
         value: () => {
@@ -3185,6 +3250,9 @@
         }
       });
     }
+    /**
+     * 劫持 XHR 和 fetch 请求
+     */
     async ajaxHook() {
       const ajaxHookProxyConfig = {
         onRequest: (config, handler) => {
@@ -3219,18 +3287,18 @@
       proxy(ajaxHookProxyConfig, _unsafeWindow);
       fproxy(fetchHookConfig, _unsafeWindow);
     }
-    async run() {
+    run() {
       this.logger.log("拦截日志数据上报模块开始运行");
       if (this.config.enabled) {
         try {
-          await this.ajaxHook();
+          this.ajaxHook();
         } catch (e) {
           this.logger.error("拦截日志数据上报失败", e);
         }
       }
     }
   };
-  __publicField(_NoReport, "runMultiple", true);
+  __publicField(_NoReport, "runOnMultiplePages", true);
   __publicField(_NoReport, "runAt", "document-start");
   __publicField(_NoReport, "onFrame", "all");
   __publicField(_NoReport, "runAfterDefault", false);
@@ -3240,7 +3308,7 @@
       super(...arguments);
       __publicField(this, "config", this.moduleStore.moduleConfig.EnhanceExperience.noSleep);
     }
-    async run() {
+    run() {
       this.logger.log("屏蔽挂机检测模块开始运行");
       if (this.config.enabled) {
         setInterval(() => {
@@ -3249,7 +3317,7 @@
       }
     }
   }
-  __publicField(NoSleep, "runMultiple", true);
+  __publicField(NoSleep, "runOnMultiplePages", true);
   __publicField(NoSleep, "runAt", "window-load");
   __publicField(NoSleep, "runAfterDefault", false);
   class RemovePKBox extends BaseModule {
@@ -3284,7 +3352,7 @@
       }
     }
   }
-  __publicField(RemovePKBox, "runMultiple", true);
+  __publicField(RemovePKBox, "runOnMultiplePages", true);
   class RemoveLiveWaterMark extends BaseModule {
     constructor() {
       super(...arguments);
@@ -3297,7 +3365,7 @@
       }
     }
   }
-  __publicField(RemoveLiveWaterMark, "runMultiple", true);
+  __publicField(RemoveLiveWaterMark, "runOnMultiplePages", true);
   class RemoveShopPopover extends BaseModule {
     constructor() {
       super(...arguments);
@@ -3310,7 +3378,7 @@
       }
     }
   }
-  __publicField(RemoveShopPopover, "runMultiple", true);
+  __publicField(RemoveShopPopover, "runOnMultiplePages", true);
   class RemoveGameParty extends BaseModule {
     constructor() {
       super(...arguments);
@@ -3323,7 +3391,7 @@
       }
     }
   }
-  __publicField(RemoveGameParty, "runMultiple", true);
+  __publicField(RemoveGameParty, "runOnMultiplePages", true);
   const otherModules = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     DailyTask_LiveTask_AppUserTask: AppUserTask,
@@ -3379,28 +3447,33 @@
   }
   const useCacheStore = pinia$1.defineStore("cache", () => {
     const cache = vue.reactive(Storage.getCache());
-    const isMainBLTHRunning = vue.ref(false);
-    function startAliveHeartBeat() {
+    const currentScriptType = vue.ref("Main");
+    function startMainBLTHAliveHeartBeat() {
       cache.lastAliveHeartBeatTime = Date.now();
       const timer = setInterval(() => cache.lastAliveHeartBeatTime = Date.now(), 5e3);
-      window.addEventListener("unload", function() {
+      window.addEventListener("unload", () => {
         clearInterval(timer);
         cache.lastAliveHeartBeatTime = 0;
       });
     }
-    function checkIfMainBLTHRunning() {
+    function checkCurrentScriptType() {
       if (cache.lastAliveHeartBeatTime !== 0 && Date.now() - cache.lastAliveHeartBeatTime < 8e3) {
-        isMainBLTHRunning.value = true;
+        if (sessionStorage.getItem("main_blth_flag") === null) {
+          currentScriptType.value = "Other";
+        } else {
+          currentScriptType.value = "SubMain";
+        }
       } else {
-        isMainBLTHRunning.value = false;
+        currentScriptType.value = "Main";
+        sessionStorage.setItem("main_blth_flag", "🚩");
       }
     }
     vue.watch(cache, (newCache) => Storage.setCache(newCache));
     return {
       cache,
-      isMainBLTHRunning,
-      startAliveHeartBeat,
-      checkIfMainBLTHRunning
+      currentScriptType,
+      startMainBLTHAliveHeartBeat,
+      checkCurrentScriptType
     };
   });
   const defaultModuleStatus = {
@@ -3428,7 +3501,7 @@
       }
     }
   };
-  const allFrameModuleNames = [];
+  const allAndTopFrameModuleNames = [];
   const useModuleStore = pinia$1.defineStore("module", () => {
     const moduleConfig = vue.reactive(Storage.getModuleConfig());
     const emitter = mittOnce();
@@ -3437,8 +3510,10 @@
       const cacheStore2 = useCacheStore();
       const promiseArray = [];
       for (const [name, module] of Object.entries(defaultModules)) {
-        if (module.runMultiple || !cacheStore2.isMainBLTHRunning) {
-          promiseArray.push(new module(name).run());
+        if (module.runOnMultiplePages || cacheStore2.currentScriptType !== "Other") {
+          promiseArray.push(
+            new module(name).run()
+          );
         }
       }
       return Promise.all(promiseArray);
@@ -3448,13 +3523,13 @@
       const logger2 = new Logger("ModuleStore_LoadModules");
       if (isOnTargetFrame === "unknown") {
         for (const [name, module] of Object.entries(otherModules)) {
-          if (module.onFrame === "all") {
-            if (module.runMultiple || !cacheStore2.isMainBLTHRunning) {
+          if (module.onFrame === "all" || module.onFrame === "top" && isSelfTopFrame()) {
+            if (module.runOnMultiplePages || cacheStore2.currentScriptType !== "Other") {
               if (!module.runAfterDefault) {
                 waitForMoment(module.runAt).then(
                   () => new module(name).run()
                 );
-                allFrameModuleNames.push(name);
+                allAndTopFrameModuleNames.push(name);
               }
             }
           }
@@ -3462,8 +3537,8 @@
       } else {
         const defaultModulesLoaded = loadDefaultModules();
         for (const [name, module] of Object.entries(otherModules)) {
-          if (!allFrameModuleNames.includes(name)) {
-            if (module.runMultiple || !cacheStore2.isMainBLTHRunning) {
+          if (module.onFrame === "target" || module.onFrame === "top" && isSelfTopFrame() && !allAndTopFrameModuleNames.includes(name) || module.onFrame === "all" && !allAndTopFrameModuleNames.includes(name)) {
+            if (module.runOnMultiplePages || cacheStore2.currentScriptType !== "Other") {
               waitForMoment(module.runAt).then(async () => {
                 try {
                   if (module.runAfterDefault) {
@@ -3471,7 +3546,7 @@
                   }
                   new module(name).run();
                 } catch (e) {
-                  logger2.error(`运行默认模块时出错，模块${name}不运行`, e);
+                  logger2.error(`运行默认模块时出错，模块 ${name} 不运行:`, e);
                 }
               });
             }
@@ -3619,27 +3694,32 @@
             _: 1
           }),
           vue.createVNode(_component_el_divider),
-          vue.createVNode(_component_el_text, null, {
+          vue.createVNode(_component_el_row, null, {
             default: vue.withCtx(() => [
-              vue.createTextVNode("  主站每日任务的完成情况可在")
-            ]),
-            _: 1
-          }),
-          vue.createVNode(_component_el_link, {
-            class: "el-link-va-baseline",
-            rel: "noreferrer",
-            type: "primary",
-            href: "https://account.bilibili.com/account/home",
-            target: "_blank"
-          }, {
-            default: vue.withCtx(() => [
-              vue.createTextVNode("个人中心")
-            ]),
-            _: 1
-          }),
-          vue.createVNode(_component_el_text, null, {
-            default: vue.withCtx(() => [
-              vue.createTextVNode("查看。数据更新可能有一定的延时。")
+              vue.createVNode(_component_el_text, null, {
+                default: vue.withCtx(() => [
+                  vue.createTextVNode("  主站每日任务的完成情况可在")
+                ]),
+                _: 1
+              }),
+              vue.createVNode(_component_el_link, {
+                class: "el-link-va-baseline",
+                rel: "noreferrer",
+                type: "primary",
+                href: "https://account.bilibili.com/account/home",
+                target: "_blank"
+              }, {
+                default: vue.withCtx(() => [
+                  vue.createTextVNode("个人中心")
+                ]),
+                _: 1
+              }),
+              vue.createVNode(_component_el_text, null, {
+                default: vue.withCtx(() => [
+                  vue.createTextVNode("查看。数据更新可能有一定的延时。")
+                ]),
+                _: 1
+              })
             ]),
             _: 1
           })
@@ -3647,7 +3727,7 @@
       };
     }
   });
-  const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-d7ecdd75"), n = n(), vue.popScopeId(), n);
+  const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-45a03c87"), n = n(), vue.popScopeId(), n);
   const _hoisted_1$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ vue.createElementVNode("br", null, null, -1));
   const _hoisted_2$1 = { class: "avatar-wrap" };
   const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
@@ -3904,7 +3984,7 @@
                     modelValue: vue.unref(config).medalTasks.watch.time,
                     "onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => vue.unref(config).medalTasks.watch.time = $event),
                     placeholder: "Select",
-                    style: { "width": "64px" }
+                    style: { "width": "70px" }
                   }, {
                     default: vue.withCtx(() => [
                       (vue.openBlock(), vue.createElementBlock(vue.Fragment, null, vue.renderList(24, (i) => {
@@ -4007,7 +4087,7 @@
             default: vue.withCtx(() => [
               vue.createVNode(_component_el_text, null, {
                 default: vue.withCtx(() => [
-                  vue.createTextVNode("  由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多100个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。")
+                  vue.createTextVNode("  由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多199个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。在脚本执行任务期间观看未执行任务的粉丝勋章对应直播间直播可能导致今天无法获取任何亲密度。")
                 ]),
                 _: 1
               })
@@ -4175,7 +4255,7 @@
       };
     }
   });
-  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["__scopeId", "data-v-d7ecdd75"]]);
+  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["__scopeId", "data-v-45a03c87"]]);
   const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "OtherTasks",
     setup(__props) {
@@ -4485,7 +4565,7 @@
       };
     }
   });
-  const __default__ = {
+  const __default__ = vue.defineComponent({
     components: {
       MainSiteTasks: _sfc_main$9,
       LiveTasks,
@@ -4493,7 +4573,7 @@
       EnhanceExperience: _sfc_main$6,
       RemoveElement: _sfc_main$5
     }
-  };
+  });
   const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
     ...__default__,
     __name: "PanelMain",
@@ -4890,7 +4970,7 @@
       }
     }
   };
-  const _withScopeId = (n) => (vue.pushScopeId("data-v-c1d8df5e"), n = n(), vue.popScopeId(), n);
+  const _withScopeId = (n) => (vue.pushScopeId("data-v-67653089"), n = n(), vue.popScopeId(), n);
   const _hoisted_1 = /* @__PURE__ */ _withScopeId(() => /* @__PURE__ */ vue.createElementVNode("svg", {
     xmlns: "http://www.w3.org/2000/svg",
     width: "128",
@@ -4941,7 +5021,7 @@
       };
     }
   });
-  const InfoIcon = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-c1d8df5e"]]);
+  const InfoIcon = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-67653089"]]);
   const _sfc_main = /* @__PURE__ */ vue.defineComponent({
     __name: "TaskStatusIcon",
     props: {
@@ -4995,12 +5075,10 @@
   const pinia = pinia$1.createPinia();
   const cacheStore = useCacheStore(pinia);
   const moduleStore = useModuleStore(pinia);
-  cacheStore.checkIfMainBLTHRunning();
-  if (!cacheStore.isMainBLTHRunning) {
-    logger.log("当前脚本是Main BLTH，开始存活心跳");
-    cacheStore.startAliveHeartBeat();
-  } else {
-    logger.log("其它页面上存在正在运行的Main BLTH");
+  cacheStore.checkCurrentScriptType();
+  logger.log("当前脚本的类型为", cacheStore.currentScriptType);
+  if (cacheStore.currentScriptType === "Main") {
+    cacheStore.startMainBLTHAliveHeartBeat();
   }
   moduleStore.loadModules("unknown");
   await( waitForMoment("document-body"));
