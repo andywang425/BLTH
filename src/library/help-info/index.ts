@@ -243,6 +243,10 @@ const help_info: IhelpInfo = {
     removeGameParty: {
       title: '移除直播间幻星派对标志',
       message: '移除直播间右下角的幻星派对标志。'
+    },
+    removeGiftPopover: {
+      title: '移除礼物赠送提示弹窗',
+      message: '移除直播间右下角的礼物赠送提示弹窗（赠送一个牛蛙牛蛙支持主播）。'
     }
   }
 }

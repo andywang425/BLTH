@@ -127,6 +127,9 @@ const defaultValues: IdefaultValues = {
       },
       removeGameParty: {
         enabled: false
+      },
+      removeGiftPopover: {
+        enabled: false
       }
     }
   },
