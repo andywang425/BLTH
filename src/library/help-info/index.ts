@@ -38,36 +38,6 @@ const help_info: IhelpInfo = {
           h('div', '完成后会移除当前直播间右上角签到窗口中的签到按钮。')
         ])
       },
-      appUser: {
-        title: 'APP用户任务',
-        message: h('p', [
-          h('div', '完成APP用户任务并领取奖励。'),
-          h('div', [
-            h(
-              'strong',
-              '由于曾经的APP用户任务下架已久，目前的新任务（观看新主播直播并发弹幕）又没有对全部用户开放，故该功能暂时被禁用。'
-            ),
-            h('div', [
-              h(
-                'span',
-                '在APP中观看直播时右下角可能会有个电池图标，点击即可查看APP用户任务内容。并非所有账号都可以参加该任务。\
-  如果开启了发送弹幕功能，该功能会在发送弹幕功能运行完毕后再运行。如果之前发送的弹幕数量不够，会先在直播间'
-              ),
-              h(
-                'a',
-                {
-                  class: 'el-link el-link--primary is-underline el-link-va-baseline',
-                  href: 'https://live.bilibili.com/22474988',
-                  rel: 'noreferrer',
-                  target: '_blank'
-                },
-                '22474988'
-              ),
-              h('span', '发送弹幕再领取奖励。')
-            ])
-          ])
-        ])
-      },
       medalTasks: {
         list: {
           title: '黑白名单',
@@ -239,10 +209,6 @@ const help_info: IhelpInfo = {
     removeShopPopover: {
       title: '移除直播间小黄车弹窗',
       message: '移除直播间左上角的小黄车弹窗。'
-    },
-    removeGameParty: {
-      title: '移除直播间幻星派对标志',
-      message: '移除直播间右下角的幻星派对标志。'
     },
     removeGiftPopover: {
       title: '移除礼物赠送提示弹窗',

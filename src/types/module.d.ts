@@ -10,7 +10,6 @@ interface ImoduleStatus {
     }
     LiveTasks: {
       sign: moduleStatus
-      appUser: moduleStatus
       medalTasks: {
         danmu: moduleStatus
         like: moduleStatus

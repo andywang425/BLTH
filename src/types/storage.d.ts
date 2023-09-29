@@ -24,10 +24,6 @@ interface ImoduleConfig {
         enabled: boolean
         _lastCompleteTime: number
       }
-      appUser: {
-        enabled: boolean
-        _lastCompleteTime: number
-      }
       medalTasks: {
         danmu: {
           enabled: boolean
@@ -93,9 +89,6 @@ interface ImoduleConfig {
       enabled: boolean
     }
     removeShopPopover: {
-      enabled: boolean
-    }
-    removeGameParty: {
       enabled: boolean
     }
     removeGiftPopover: {

@@ -152,13 +152,6 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
         <TaskStatus :status="status.sign" />
       </el-space>
     </el-row>
-    <el-row>
-      <el-space wrap>
-        <el-switch v-model="config.appUser.enabled" disabled active-text="APP用户任务" />
-        <Info id="DailyTasks.LiveTasks.appUser" />
-        <TaskStatus :status="status.appUser" />
-      </el-space>
-    </el-row>
     <el-divider />
     <!-- 粉丝勋章相关任务 -->
     <el-row>

@@ -38,10 +38,6 @@ const defaultValues: IdefaultValues = {
           enabled: false,
           _lastCompleteTime: 0
         },
-        appUser: {
-          enabled: false,
-          _lastCompleteTime: 0
-        },
         medalTasks: {
           danmu: {
             enabled: false,
@@ -123,9 +119,6 @@ const defaultValues: IdefaultValues = {
         enabled: false
       },
       removeShopPopover: {
-        enabled: false
-      },
-      removeGameParty: {
         enabled: false
       },
       removeGiftPopover: {
