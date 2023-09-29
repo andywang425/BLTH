@@ -83,10 +83,6 @@ class DanmuTask extends BaseModule {
         }
       }
     }
-    // 通知APP用户任务模块，可以开始运行了
-    this.moduleStore.emitter.emit('DailyTask_LiveTask_AppUserTask', {
-      module: this.moduleName
-    })
 
     const diff = delayToNextMoment()
     setTimeout(() => this.run(), diff.ms)
