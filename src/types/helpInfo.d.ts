@@ -41,6 +41,7 @@ interface IhelpInfo {
     removeLiveWaterMark: IhelpInfoItem
     removeShopPopover: IhelpInfoItem
     removeGameParty: IhelpInfoItem
+    removeGiftPopover: IhelpInfoItem
   }
 }
 

@@ -31,6 +31,12 @@ const config = moduleStore.moduleConfig.RemoveElement
         <Info id="RemoveElement.removeGameParty" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.removeGiftPopover.enabled" active-text="移除礼物赠送提示弹窗" />
+        <Info id="RemoveElement.removeGiftPopover" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>
