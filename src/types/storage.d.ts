@@ -80,6 +80,9 @@ interface ImoduleConfig {
     noSleep: {
       enabled: boolean
     }
+    invisibility: {
+      enabled: boolean
+    }
   }
   RemoveElement: {
     removePKBox: {

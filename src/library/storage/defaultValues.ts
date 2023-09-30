@@ -109,6 +109,9 @@ const defaultValues: IdefaultValues = {
       },
       noSleep: {
         enabled: false
+      },
+      invisibility: {
+        enabled: false
       }
     },
     RemoveElement: {

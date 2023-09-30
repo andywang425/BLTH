@@ -40,6 +40,12 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
         <Info id="EnhanceExperience.noSleep" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.invisibility.enabled" active-text="隐身入场" />
+        <Info id="EnhanceExperience.invisibility" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>

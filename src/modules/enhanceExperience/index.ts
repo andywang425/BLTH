@@ -2,3 +2,4 @@ export { default as EnhanceExperience_SwitchLiveStreamQuality } from './switchLi
 export { default as EnhanceExperience_BanP2P } from './banP2P'
 export { default as EnhanceExperience_NoReport } from './noReport'
 export { default as EnhanceExperience_NoSleep } from './noSleep'
+export { default as EnhanceExperience_Invisibility } from './invisibility'

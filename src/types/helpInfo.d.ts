@@ -34,6 +34,7 @@ interface IhelpInfo {
     banp2p: IhelpInfoItem
     noReport: IhelpInfoItem
     noSleep: IhelpInfoItem
+    invisibility: IhelpInfoItem
   }
   RemoveElement: {
     removePKBox: IhelpInfoItem
