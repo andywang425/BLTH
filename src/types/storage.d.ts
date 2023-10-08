@@ -82,6 +82,9 @@ interface ImoduleConfig {
     invisibility: {
       enabled: boolean
     }
+    wearFansMedal: {
+      enabled: boolean
+    }
   }
   RemoveElement: {
     removePKBox: {

@@ -111,6 +111,9 @@ const defaultValues: IdefaultValues = {
       },
       invisibility: {
         enabled: false
+      },
+      wearFansMedal: {
+        enabled: false
       }
     },
     RemoveElement: {
