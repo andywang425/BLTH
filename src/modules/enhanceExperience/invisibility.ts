@@ -21,23 +21,8 @@ class Invisibility extends BaseModule {
               config.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')
             ) {
               config.url = config.url.replace('not_mock_enter_effect=0', 'not_mock_enter_effect=1')
-              console.log('TESTLOG getInfoByUser 替换后', config)
-              handler.next(config)
-            } else if (
-              config.url.includes('//live-trace.bilibili.com/xlive/data-interface/v1/x25Kn')
-            ) {
-              console.log('TESTLOG x25Kn resolve', config)
-              handler.resolve({
-                config: config,
-                status: 200,
-                headers: {
-                  'Content-Type': 'application/json; charset=utf-8'
-                },
-                response: 'ok'
-              })
-            } else {
-              handler.next(config)
             }
+            handler.next(config)
           }
         },
         unsafeWindow
