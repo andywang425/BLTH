@@ -128,6 +128,9 @@ const defaultValues: IdefaultValues = {
       },
       removeGiftPopover: {
         enabled: false
+      },
+      removeMicPopover: {
+        enabled: false
       }
     }
   },
