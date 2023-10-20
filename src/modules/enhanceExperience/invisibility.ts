@@ -21,11 +21,8 @@ class Invisibility extends BaseModule {
               config.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')
             ) {
               config.url = config.url.replace('not_mock_enter_effect=0', 'not_mock_enter_effect=1')
-<<<<<<< HEAD
               console.log('TESTLOG frame', unsafeWindow.top === unsafeWindow.self)
               console.log('TESTLOG getInfoByUser 替换后', config)
-=======
->>>>>>> 88b228bb5141f6aa5af8915eeedfd2b19effe8bd
             }
             handler.next(config)
           }
