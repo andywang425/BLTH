@@ -163,17 +163,6 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
     </el-row>
     <el-row>
       <el-space wrap>
-        <el-icon>
-          <SemiSelect />
-        </el-icon>
-        <el-switch
-          v-model="config.medalTasks.like.includeHighLevelMedals"
-          active-text="包含等级≥20的粉丝勋章"
-        />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap>
         <el-switch v-model="config.medalTasks.danmu.enabled" active-text="发送弹幕" />
         <el-button
           type="primary"

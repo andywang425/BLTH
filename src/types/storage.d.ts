@@ -32,7 +32,6 @@ interface ImoduleConfig {
         }
         like: {
           enabled: boolean
-          includeHighLevelMedals: boolean
           _lastCompleteTime: number
         }
         watch: {
@@ -81,6 +80,9 @@ interface ImoduleConfig {
       enabled: boolean
     }
     invisibility: {
+      enabled: boolean
+    }
+    wearFansMedal: {
       enabled: boolean
     }
   }
