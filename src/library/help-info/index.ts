@@ -229,6 +229,10 @@ const help_info: IhelpInfo = {
     removeGiftPopover: {
       title: '移除礼物赠送提示弹窗',
       message: '移除直播间右下角的礼物赠送提示弹窗（赠送一个牛蛙牛蛙支持主播）。'
+    },
+    removeMicPopover: {
+      title: '移除连麦状态提示',
+      message: '移除直播间左上角的连麦提示弹窗。'
     }
   }
 }

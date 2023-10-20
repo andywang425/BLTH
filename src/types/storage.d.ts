@@ -99,6 +99,9 @@ interface ImoduleConfig {
     removeGiftPopover: {
       enabled: boolean
     }
+    removeMicPopover: {
+      enabled: boolean
+    }
   }
 }
 

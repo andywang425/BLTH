@@ -41,6 +41,7 @@ interface IhelpInfo {
     removeLiveWaterMark: IhelpInfoItem
     removeShopPopover: IhelpInfoItem
     removeGiftPopover: IhelpInfoItem
+    removeMicPopover: IhelpInfoItem
   }
 }
 
