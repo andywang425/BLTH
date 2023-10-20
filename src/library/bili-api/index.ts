@@ -75,8 +75,7 @@ const BAPI: IbapiMethods = {
         }
       })
     },
-    likeReport: (room_id, anchor_id, click_time = 1) => {
-      // 这个 API 目前仅在 APP 中出现，但是也可以使用 web 端的身份认证方式
+    likeReport: (room_id, anchor_id, click_time = 1, visit_id = '') => {
       const biliStore = useBiliStore()
       const bili_jct = (biliStore.cookies as IbiliCookies).bili_jct
       return request.live.post('/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3', {
@@ -85,7 +84,9 @@ const BAPI: IbapiMethods = {
         anchor_id,
         uid: anchor_id,
         ts: ts(),
-        csrf: bili_jct
+        csrf: bili_jct,
+        csrf_token: bili_jct,
+        visit_id
       })
     },
     /**
