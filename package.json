@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "ajax-hook": "^3.0.1",
-    "crypto-js": "^4.1.1",
+    "crypto-js": "^4.2.0",
     "element-plus": "^2.3.7",
     "hotkeys-js": "^3.10.4",
     "install": "^0.13.0",
