@@ -65,14 +65,8 @@ export default defineConfig({
       build: {
         externalGlobals: {
           vue: cdn.unpkg('Vue', 'dist/vue.global.prod.js').concat(
-            await util.fn2dataUrl(() => {
-              // For element-plus
-              // @ts-ignore
-              window.Vue = Vue
-              // For pinia, another solution is .concat('https://unpkg.com/vue-demi@0.14.5/lib/index.iife.js')
-              // @ts-ignore
-              window.VueDemi = Vue
-            })
+            // For element-plus and pinia, another solution for pinia is .concat('https://unpkg.com/vue-demi@0.14.5/lib/index.iife.js')
+            util.dataUrl(';window.Vue=Vue;window.VueDemi=Vue;')
           ),
           'element-plus': cdn.unpkg('ElementPlus', 'dist/index.full.min.js'),
           '@element-plus/icons-vue': cdn.unpkg('ElementPlusIconsVue', 'dist/index.iife.min.js'),
