@@ -78,11 +78,12 @@ const BAPI: IbapiMethods = {
     likeReport: (room_id, anchor_id, click_time = 1, visit_id = '') => {
       const biliStore = useBiliStore()
       const bili_jct = (biliStore.cookies as IbiliCookies).bili_jct
+      const uid = biliStore.BilibiliLive?.UID
       return request.live.post('/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3', {
         click_time,
         room_id,
         anchor_id,
-        uid: anchor_id,
+        uid,
         ts: ts(),
         csrf: bili_jct,
         csrf_token: bili_jct,
