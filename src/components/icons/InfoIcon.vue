@@ -26,6 +26,7 @@ const open = () => {
   })
 }
 </script>
+
 <template>
   <el-icon class="info-icon" @click="open">
     <svg
