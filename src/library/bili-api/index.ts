@@ -137,6 +137,12 @@ const BAPI: IbapiMethods = {
         platform,
         visit_id
       })
+    },
+    queryContributionRank: (ruid, room_id) => {
+      return request.live.get('/xlive/general-interface/v1/rank/queryContributionRank', {
+        ruid,
+        room_id
+      })
     }
   },
   liveTrace: {

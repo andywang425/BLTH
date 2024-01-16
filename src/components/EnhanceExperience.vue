@@ -52,6 +52,12 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
         <Info id="EnhanceExperience.wearFansMedal" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.contributionRank.enabled" active-text="显示高能用户数量" />
+        <Info id="EnhanceExperience.contributionRank" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>

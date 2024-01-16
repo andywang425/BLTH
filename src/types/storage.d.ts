@@ -85,6 +85,9 @@ interface ImoduleConfig {
     wearFansMedal: {
       enabled: boolean
     }
+    contributionRank: {
+      enabled: boolean
+    }
   }
   RemoveElement: {
     removePKBox: {

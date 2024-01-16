@@ -114,6 +114,9 @@ const defaultValues: IdefaultValues = {
       },
       wearFansMedal: {
         enabled: false
+      },
+      contributionRank: {
+        enabled: false
       }
     },
     RemoveElement: {
