@@ -67,15 +67,14 @@ const handleAddDanmu = () => {
 }
 
 const medalInfoPanelVisible = ref<boolean>(false)
-const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(
-  () =>
-    biliStore.filteredFansMedals?.map((medal) => ({
-      avatar: medal.anchor_info.avatar,
-      nick_name: medal.anchor_info.nick_name,
-      medal_name: medal.medal.medal_name,
-      medal_level: medal.medal.level,
-      roomid: medal.room_info.room_id
-    }))
+const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(() =>
+  biliStore.filteredFansMedals?.map((medal) => ({
+    avatar: medal.anchor_info.avatar,
+    nick_name: medal.anchor_info.nick_name,
+    medal_name: medal.medal.medal_name,
+    medal_level: medal.medal.level,
+    roomid: medal.room_info.room_id
+  }))
 )
 /** 是否显示加载中图标 */
 const medalInfoLoading = ref<boolean>(false)

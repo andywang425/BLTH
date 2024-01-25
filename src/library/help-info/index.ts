@@ -199,10 +199,7 @@ const help_info: IhelpInfo = {
     invisibility: {
       title: '隐身入场',
       message: h('p', [
-        h(
-          'div',
-          '进入直播间时其他人不会收到提示，但还是会出现在高能用户榜单上。'
-        ),
+        h('div', '进入直播间时其他人不会收到提示，但还是会出现在高能用户榜单上。'),
         h('div', [
           h('strong', '缺点：'),
           h(
