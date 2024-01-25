@@ -17,9 +17,15 @@ export interface IresponseHandler {
   next: (response: Response) => void
 }
 
-export type onRequestHandler = (config: IrequestConfig, handler: IrequestHandler) => void
+export type onRequestHandler = (
+  config: IrequestConfig,
+  handler: IrequestHandler
+) => Promise<void> | void
 
-export type onResponseHandler = (response: Response, handler: IresponseHandler) => void
+export type onResponseHandler = (
+  response: Response,
+  handler: IresponseHandler
+) => Promise<void> | void
 
 export interface Iproxy {
   onRequest?: onRequestHandler
@@ -75,7 +81,7 @@ const hook = (win: Window) => {
     // 发起请求前
     for (const handler of onRequestHandlers) {
       const requestHandler = new RequestHandler()
-      handler.apply(unsafeWindow, [{ input, init }, requestHandler])
+      await handler.apply(unsafeWindow, [{ input, init }, requestHandler])
       if (requestHandler._resolve) {
         return requestHandler._resolve
       }
@@ -94,7 +100,7 @@ const hook = (win: Window) => {
     // 收到响应后
     for (const handler of onResponseHandlers) {
       const responseHandler = new ResponseHandler()
-      handler.apply(unsafeWindow, [response, responseHandler])
+      await handler.apply(unsafeWindow, [response, responseHandler])
       if (responseHandler._resolve) {
         return responseHandler._resolve
       }
