@@ -137,6 +137,15 @@ const BAPI: IbapiMethods = {
         platform,
         visit_id
       })
+    },
+    wearMedal: (medal_id, visit_id = '') => {
+      const bili_jct = (useBiliStore().cookies as IbiliCookies).bili_jct as string
+      return request.live.post('/xlive/web-room/v1/fansMedal/wear', {
+        medal_id,
+        csrf_token: bili_jct,
+        csrf: bili_jct,
+        visit_id: visit_id
+      })
     }
   },
   liveTrace: {

@@ -75,6 +75,13 @@ declare namespace Live {
     data: { silver: number }
     message: string
   }
+
+  interface WearMedal {
+    code: number
+    message: string
+    ttl: number
+    data: {}
+  }
 }
 
 declare namespace LiveTrace {
