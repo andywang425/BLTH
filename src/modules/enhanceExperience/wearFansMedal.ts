@@ -29,12 +29,13 @@ class WearFansMedal extends BaseModule {
                     this.logger.log(`BAPI.live.wearMedal(${medal_id}) response`, response)
                     if (response.code === 0) {
                       this.logger.log('自动佩戴粉丝勋章成功')
-                      const medal_span = dq("#control-panel-ctnr-box .medal-section")?.firstElementChild as HTMLElement;
+                      const medal_span = dq('#control-panel-ctnr-box .medal-section')
+                        ?.firstElementChild as HTMLElement
                       if (medal_span) {
                         // 点击弹幕输入框左侧的粉丝勋章图标，让显示的粉丝勋章发生变化
-                        medal_span.click();
+                        medal_span.click()
                         // 延迟一个很短的时间让页面发生更新
-                        await sleep(1);
+                        await sleep(1)
                         // 再次点击关闭打开的弹窗
                         medal_span.click()
                       }
