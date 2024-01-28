@@ -134,6 +134,9 @@ const defaultValues: IdefaultValues = {
       },
       removeMicPopover: {
         enabled: false
+      },
+      removeComboCard: {
+        enabled: false
       }
     }
   },

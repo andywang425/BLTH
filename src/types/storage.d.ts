@@ -105,6 +105,9 @@ interface ImoduleConfig {
     removeMicPopover: {
       enabled: boolean
     }
+    removeComboCard: {
+      enabled: boolean
+    }
   }
 }
 
