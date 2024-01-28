@@ -82,6 +82,13 @@ declare namespace Live {
     ttl: number
     data: LiveData.QueryContributionRank.Data
   }
+  
+  interface WearMedal {
+    code: number
+    message: string
+    ttl: number
+    data: {}
+  }
 }
 
 declare namespace LiveTrace {
