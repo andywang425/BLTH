@@ -138,6 +138,12 @@ const BAPI: IbapiMethods = {
         visit_id
       })
     },
+    queryContributionRank: (ruid, room_id) => {
+      return request.live.get('/xlive/general-interface/v1/rank/queryContributionRank', {
+        ruid,
+        room_id
+      })
+    },
     wearMedal: (medal_id, visit_id = '') => {
       const bili_jct = (useBiliStore().cookies as IbiliCookies).bili_jct as string
       return request.live.post('/xlive/web-room/v1/fansMedal/wear', {

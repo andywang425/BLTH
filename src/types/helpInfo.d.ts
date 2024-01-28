@@ -35,6 +35,7 @@ interface IhelpInfo {
     noReport: IhelpInfoItem
     noSleep: IhelpInfoItem
     invisibility: IhelpInfoItem
+    contributionRank: IhelpInfoItem
     wearFansMedal: IhelpInfoItem
   }
   RemoveElement: {

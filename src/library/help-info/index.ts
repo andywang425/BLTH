@@ -209,6 +209,10 @@ const help_info: IhelpInfo = {
         ])
       ])
     },
+    contributionRank: {
+      title: '显示高能用户数量',
+      message: '3秒后在高能用户标签上显示当前直播间的高能用户数量。'
+    },
     wearFansMedal: {
       title: '发弹幕自动佩戴粉丝勋章',
       message: h('p', [
