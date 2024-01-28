@@ -241,6 +241,10 @@ const help_info: IhelpInfo = {
     removeMicPopover: {
       title: '移除连麦状态提示',
       message: '移除直播间左上角的连麦提示弹窗。'
+    },
+    removeComboCard: {
+      title: '移除直播间相同弹幕连续提示',
+      message: '移除直播间相同弹幕连续提示。'
     }
   }
 }
