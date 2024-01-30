@@ -85,7 +85,7 @@ interface ImoduleConfig {
     wearFansMedal: {
       enabled: boolean
     }
-    contributionRank: {
+    showContributionUserNum: {
       enabled: boolean
     }
   }

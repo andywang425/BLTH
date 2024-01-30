@@ -115,7 +115,7 @@ const defaultValues: IdefaultValues = {
       wearFansMedal: {
         enabled: false
       },
-      contributionRank: {
+      showContributionUserNum: {
         enabled: false
       }
     },

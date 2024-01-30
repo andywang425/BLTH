@@ -138,10 +138,14 @@ const BAPI: IbapiMethods = {
         visit_id
       })
     },
-    queryContributionRank: (ruid, room_id) => {
+    queryContributionRank: (ruid, room_id, page, page_size, type = 'online_rank', _switch = 'contribution_rank') => {
       return request.live.get('/xlive/general-interface/v1/rank/queryContributionRank', {
         ruid,
-        room_id
+        room_id,
+        page,
+        page_size,
+        type,
+        switch: _switch
       })
     },
     wearMedal: (medal_id, visit_id = '') => {
