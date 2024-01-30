@@ -218,9 +218,7 @@ const help_info: IhelpInfo = {
     },
     wearFansMedal: {
       title: '发弹幕自动佩戴粉丝勋章',
-      message: h('p', [
-        h('div', '发弹幕时自动佩戴当前直播间的粉丝勋章（如果有的话）。')
-      ])
+      message: h('p', [h('div', '发弹幕时自动佩戴当前直播间的粉丝勋章（如果有的话）。')])
     }
   },
   RemoveElement: {
