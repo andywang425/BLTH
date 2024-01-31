@@ -31,7 +31,7 @@ class FansMetals extends BaseModule {
             !isTimestampToday((keyValue[1] as any)._lastCompleteTime)
         ) ||
       // 开启了发弹幕自动佩戴粉丝勋章
-      this.moduleStore.moduleConfig.EnhanceExperience.wearFansMedal
+      this.moduleStore.moduleConfig.EnhanceExperience.wearFansMedal.enabled
     ) {
       const fansMetalList: LiveData.FansMedalPanel.List[] = []
       let total_page = 1
