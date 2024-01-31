@@ -38,7 +38,7 @@ class ShowContributionUserNum extends BaseModule {
   ): Promise<void> {
     const num = await this.getContributionUserNum(anchor_uid, roomid, 1, 100)
     if (num !== -1) {
-      element.innerText = `高能用户（${num}）`
+      element.innerText = `高能用户(${num})`
       setTimeout(() => this.updateNumber(element, anchor_uid, roomid), _.random(50e3, 70e3))
     } else {
       element.innerText = '高能用户'
