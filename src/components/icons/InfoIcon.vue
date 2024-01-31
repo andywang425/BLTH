@@ -23,7 +23,7 @@ const open = () => {
     lockScroll: false,
     autofocus: true,
     confirmButtonText: 'OK'
-  })
+  }).catch(() => {})
 }
 </script>
 
