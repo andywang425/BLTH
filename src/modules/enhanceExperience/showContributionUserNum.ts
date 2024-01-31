@@ -31,6 +31,12 @@ class ShowContributionUserNum extends BaseModule {
     })
   }
 
+  /**
+   * 更新显示的高能用户数量
+   * @param element 高能用户的 DOM 元素
+   * @param anchor_uid 主播uid
+   * @param roomid 房间号
+   */
   private async updateNumber(
     element: HTMLElement,
     anchor_uid: number,
@@ -41,6 +47,7 @@ class ShowContributionUserNum extends BaseModule {
       element.innerText = `高能用户(${num})`
       setTimeout(() => this.updateNumber(element, anchor_uid, roomid), _.random(50e3, 70e3))
     } else {
+      // 如果获取高能用户人数失败，则不再获取
       element.innerText = '高能用户'
     }
   }
