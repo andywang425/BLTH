@@ -75,7 +75,7 @@ class Request {
       }
       const details = _.defaultsDeep(otherDetails, defaultDetails)
       if (details.headers['Content-Type'] === 'multipart/form-data') {
-        // 如果要提交表单，删除该属性让浏览器自动生成 header
+        // 如果要提交 multipart/form-data 格式的数据，删除该属性让浏览器自动生成 header
         delete details.headers['Content-Type']
       }
       GM_xmlhttpRequest(details)

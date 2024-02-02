@@ -18,16 +18,20 @@ class FansMetals extends BaseModule {
     force = false
   ): Promise<LiveData.FansMedalPanel.List[] | null> {
     const medalTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
-    // 开启了任意一项粉丝勋章相关功能且该功能今天没完成过
+
     if (
+      // 强制运行
       force ||
+      // 开启了任意一项粉丝勋章相关功能且该功能今天没完成过
       Object.entries(medalTasks)
         .filter(([key]) => ['danmu', 'like', 'watch'].includes(key))
         .some(
           (keyValue) =>
             (keyValue[1] as any).enabled &&
             !isTimestampToday((keyValue[1] as any)._lastCompleteTime)
-        )
+        ) ||
+      // 开启了发弹幕自动佩戴粉丝勋章
+      this.moduleStore.moduleConfig.EnhanceExperience.wearFansMedal.enabled
     ) {
       const fansMetalList: LiveData.FansMedalPanel.List[] = []
       let total_page = 1

@@ -29,7 +29,6 @@ const defaultModuleStatus: ImoduleStatus = {
     },
     LiveTasks: {
       sign: '',
-      appUser: '',
       medalTasks: {
         danmu: '',
         like: '',

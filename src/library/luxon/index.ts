@@ -59,8 +59,8 @@ function delayToNextMoment(hour: number = 0, minute: number = 5): Iduration {
     // 计算距离明天 hour 点 minute 分的时间
     nextTime = nextTime.plus({ days: 1 })
   }
-  // 否则就直接算距离今天 hour 点 minute 分的时间
 
+  // 否则就直接算距离今天 hour 点 minute 分的时间
   const diff = nextTime.diff(now)
 
   return {

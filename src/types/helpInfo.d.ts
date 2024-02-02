@@ -15,7 +15,6 @@ interface IhelpInfo {
     }
     LiveTasks: {
       sign: IhelpInfoItem
-      appUser: IhelpInfoItem
       medalTasks: {
         list: IhelpInfoItem
         like: IhelpInfoItem
@@ -35,12 +34,17 @@ interface IhelpInfo {
     banp2p: IhelpInfoItem
     noReport: IhelpInfoItem
     noSleep: IhelpInfoItem
+    invisibility: IhelpInfoItem
+    showContributionUserNum: IhelpInfoItem
+    wearFansMedal: IhelpInfoItem
   }
   RemoveElement: {
     removePKBox: IhelpInfoItem
     removeLiveWaterMark: IhelpInfoItem
     removeShopPopover: IhelpInfoItem
-    removeGameParty: IhelpInfoItem
+    removeGiftPopover: IhelpInfoItem
+    removeMicPopover: IhelpInfoItem
+    removeComboCard: IhelpInfoItem
   }
 }
 

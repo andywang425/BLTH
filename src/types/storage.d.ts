@@ -24,10 +24,6 @@ interface ImoduleConfig {
         enabled: boolean
         _lastCompleteTime: number
       }
-      appUser: {
-        enabled: boolean
-        _lastCompleteTime: number
-      }
       medalTasks: {
         danmu: {
           enabled: boolean
@@ -36,7 +32,6 @@ interface ImoduleConfig {
         }
         like: {
           enabled: boolean
-          includeHighLevelMedals: boolean
           _lastCompleteTime: number
         }
         watch: {
@@ -84,6 +79,15 @@ interface ImoduleConfig {
     noSleep: {
       enabled: boolean
     }
+    invisibility: {
+      enabled: boolean
+    }
+    wearFansMedal: {
+      enabled: boolean
+    }
+    showContributionUserNum: {
+      enabled: boolean
+    }
   }
   RemoveElement: {
     removePKBox: {
@@ -95,7 +99,13 @@ interface ImoduleConfig {
     removeShopPopover: {
       enabled: boolean
     }
-    removeGameParty: {
+    removeGiftPopover: {
+      enabled: boolean
+    }
+    removeMicPopover: {
+      enabled: boolean
+    }
+    removeComboCard: {
       enabled: boolean
     }
   }

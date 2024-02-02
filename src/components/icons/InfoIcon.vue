@@ -23,9 +23,10 @@ const open = () => {
     lockScroll: false,
     autofocus: true,
     confirmButtonText: 'OK'
-  })
+  }).catch(() => {})
 }
 </script>
+
 <template>
   <el-icon class="info-icon" @click="open">
     <svg

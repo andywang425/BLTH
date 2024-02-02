@@ -75,6 +75,20 @@ declare namespace Live {
     data: { silver: number }
     message: string
   }
+
+  interface QueryContributionRank {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.QueryContributionRank.Data
+  }
+
+  interface WearMedal {
+    code: number
+    message: string
+    ttl: number
+    data: {}
+  }
 }
 
 declare namespace LiveTrace {

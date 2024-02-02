@@ -32,7 +32,7 @@ class SignTask extends BaseModule {
       const response = await BAPI.live.doSign()
       this.logger.log(`BAPI.live.doSign response`, response)
       if (response.code === 0) {
-        this.logger.log('直播签到成功，获得奖励：', response.data.text)
+        this.logger.log('直播签到成功，获得奖励:', response.data.text)
         this.config._lastCompleteTime = tsm()
         this.status = 'done'
         this.logger.log('直播签到任务已完成')

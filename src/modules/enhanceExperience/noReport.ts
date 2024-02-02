@@ -1,5 +1,5 @@
 import { unsafeWindow } from '$'
-import { XhrRequestConfig, XhrRequestHandler, proxy } from '../../library/ajax-hook'
+import { XhrRequestConfig, XhrRequestHandler, proxy } from 'ajax-hook'
 import { Iproxy, fproxy } from '../../library/fetch-hook'
 import BaseModule from '../BaseModule'
 import { getUrlFromFetchInput } from '../../library/utils'

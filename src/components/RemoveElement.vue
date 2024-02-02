@@ -27,8 +27,23 @@ const config = moduleStore.moduleConfig.RemoveElement
     </el-row>
     <el-row>
       <el-space wrap>
-        <el-switch v-model="config.removeGameParty.enabled" active-text="移除直播间幻星派对标志" />
-        <Info id="RemoveElement.removeGameParty" />
+        <el-switch v-model="config.removeGiftPopover.enabled" active-text="移除礼物赠送提示弹窗" />
+        <Info id="RemoveElement.removeGiftPopover" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.removeMicPopover.enabled" active-text="移除连麦状态提示" />
+        <Info id="RemoveElement.removeMicPopover" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch
+          v-model="config.removeComboCard.enabled"
+          active-text="移除直播间相同弹幕连续提示"
+        />
+        <Info id="RemoveElement.removeComboCard" />
       </el-space>
     </el-row>
     <el-divider />

@@ -67,15 +67,14 @@ const handleAddDanmu = () => {
 }
 
 const medalInfoPanelVisible = ref<boolean>(false)
-const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(
-  () =>
-    biliStore.filteredFansMedals?.map((medal) => ({
-      avatar: medal.anchor_info.avatar,
-      nick_name: medal.anchor_info.nick_name,
-      medal_name: medal.medal.medal_name,
-      medal_level: medal.medal.level,
-      roomid: medal.room_info.room_id
-    }))
+const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(() =>
+  biliStore.filteredFansMedals?.map((medal) => ({
+    avatar: medal.anchor_info.avatar,
+    nick_name: medal.anchor_info.nick_name,
+    medal_name: medal.medal.medal_name,
+    medal_level: medal.medal.level,
+    roomid: medal.room_info.room_id
+  }))
 )
 /** 是否显示加载中图标 */
 const medalInfoLoading = ref<boolean>(false)
@@ -152,13 +151,6 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
         <TaskStatus :status="status.sign" />
       </el-space>
     </el-row>
-    <el-row>
-      <el-space wrap>
-        <el-switch v-model="config.appUser.enabled" disabled active-text="APP用户任务" />
-        <Info id="DailyTasks.LiveTasks.appUser" />
-        <TaskStatus :status="status.appUser" />
-      </el-space>
-    </el-row>
     <el-divider />
     <!-- 粉丝勋章相关任务 -->
     <el-row>
@@ -166,17 +158,6 @@ function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
         <el-switch v-model="config.medalTasks.like.enabled" active-text="给主播点赞" />
         <Info id="DailyTasks.LiveTasks.medalTasks.like" />
         <TaskStatus :status="status.medalTasks.like" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap>
-        <el-icon>
-          <SemiSelect />
-        </el-icon>
-        <el-switch
-          v-model="config.medalTasks.like.includeHighLevelMedals"
-          active-text="包含等级≥20的粉丝勋章"
-        />
       </el-space>
     </el-row>
     <el-row>

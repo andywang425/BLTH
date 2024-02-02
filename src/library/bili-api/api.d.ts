@@ -34,13 +34,23 @@ interface IbapiMethods {
     likeReport: (
       room_id: number,
       anchor_id: number,
-      click_time?: number
+      click_time?: number,
+      visit_id?: string
     ) => Promise<Live.LikeReport>
     getInfoByRoom: (room_id: number) => Promise<Live.GetInfoByRoom>
     getUserTaskProgress: (target_id?: number) => Promise<Live.GetUserTaskProgress>
     userTaskReceiveRewards: (target_id?: number) => Promise<Live.UserTaskReceiveRewards>
     silver2coin: (visit_id?: string) => Promise<Live.Silver2coin>
     coin2silver: (num: number, platform?: string, visit_id?: string) => Promise<Live.Coin2silver>
+    queryContributionRank: (
+      ruid: number,
+      room_id: number,
+      page: number,
+      page_size: number,
+      type?: string,
+      _switch?: string
+    ) => Promise<Live.QueryContributionRank>
+    wearMedal: (medal_id: number, visit_id?: string) => Promise<Live.WearMedal>
   }
   liveTrace: {
     E: (
@@ -115,7 +125,7 @@ interface IbapiMethods {
     }
   }
   vc: {
-    myGroups: (build?: numeber, mobi_app?: string) => Promise<Vc.MyGroups>
+    myGroups: (build?: number, mobi_app?: string) => Promise<Vc.MyGroups>
     signIn: (group_id: number, owner_id: number) => Promise<Vc.SignIn>
   }
 }

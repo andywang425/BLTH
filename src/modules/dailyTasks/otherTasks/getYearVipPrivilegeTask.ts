@@ -5,6 +5,7 @@ import { moduleStatus } from '../../../types/module'
 import { useBiliStore } from '../../../stores/useBiliStore'
 import { MainData } from '../../../library/bili-api/data'
 import { DateTime } from 'luxon'
+import { sleep } from '../../../library/utils'
 
 class GetYearVipPrivilegeTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.getYearVipPrivilege
@@ -78,6 +79,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
               if (i.vip_type === 2) {
                 if (i.state === 0) {
                   await this.receivePrivilege(i.type)
+                  await sleep(200)
                 } else {
                   this.logger.log(`该权益（type = ${i.type}）已经领取过了`)
                 }

@@ -806,6 +806,83 @@ declare namespace LiveData {
       tid: string
     }
   }
+
+  namespace QueryContributionRank {
+    interface Data {
+      count: number
+      item: Item[]
+      own_info: OwnInfo
+      tips_text: string
+      count_format: string
+      desc_format: string
+      config: Config
+    }
+
+    interface Item {
+      uid: number
+      name: string
+      face: string
+      rank: number
+      score: number
+      medal_info: MedalInfo
+      guard_level: number
+      wealth_level: number
+      is_mystery: boolean
+      uinfo: Uinfo
+    }
+    interface MedalInfo {
+      guard_level: number
+      medal_color_start: number
+      medal_color_end: number
+      medal_color_border: number
+      medal_name: string
+      level: number
+      target_id: number
+      is_light: number
+    }
+    interface Uinfo {
+      uid: number
+      base: Base
+    }
+    interface Base {
+      name: string
+      face: string
+      name_color: number
+      is_mystery: boolean
+      risk_ctrl_info: RiskCtrlInfo
+      origin_info: OriginInfo
+    }
+    interface RiskCtrlInfo {
+      name: string
+      face: string
+    }
+    interface OriginInfo {
+      name: string
+      face: string
+    }
+
+    interface OwnInfo {
+      uid: number
+      name: string
+      face: string
+      rank: number
+      score: number
+      rank_text: string
+      need_score: number
+      medal_info: MedalInfo
+      guard_level: number
+      wealth_level: number
+      score_lead: number
+      score_behind: number
+      is_mystery: boolean
+      uinfo: Uinfo
+    }
+
+    interface Config {
+      deadline_ts: number
+      value_text: string
+    }
+  }
 }
 
 declare namespace LiveTraceData {

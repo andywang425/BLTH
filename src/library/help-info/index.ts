@@ -38,36 +38,6 @@ const help_info: IhelpInfo = {
           h('div', '完成后会移除当前直播间右上角签到窗口中的签到按钮。')
         ])
       },
-      appUser: {
-        title: 'APP用户任务',
-        message: h('p', [
-          h('div', '完成APP用户任务并领取奖励。'),
-          h('div', [
-            h(
-              'strong',
-              '由于曾经的APP用户任务下架已久，目前的新任务（观看新主播直播并发弹幕）又没有对全部用户开放，故该功能暂时被禁用。'
-            ),
-            h('div', [
-              h(
-                'span',
-                '在APP中观看直播时右下角可能会有个电池图标，点击即可查看APP用户任务内容。并非所有账号都可以参加该任务。\
-  如果开启了发送弹幕功能，该功能会在发送弹幕功能运行完毕后再运行。如果之前发送的弹幕数量不够，会先在直播间'
-              ),
-              h(
-                'a',
-                {
-                  class: 'el-link el-link--primary is-underline el-link-va-baseline',
-                  href: 'https://live.bilibili.com/22474988',
-                  rel: 'noreferrer',
-                  target: '_blank'
-                },
-                '22474988'
-              ),
-              h('span', '发送弹幕再领取奖励。')
-            ])
-          ])
-        ])
-      },
       medalTasks: {
         list: {
           title: '黑白名单',
@@ -92,14 +62,6 @@ const help_info: IhelpInfo = {
           title: '给主播点赞',
           message: h('p', [
             h('div', '在你的每个粉丝勋章对应的直播间给主播点赞。'),
-            h('div', [
-              h('span', '如果你不希望等级≥20的粉丝勋章熄灭，可以勾选下面的“包含等级≥20的粉丝勋章”'),
-              h(
-                'strong',
-                '（虽然B站的帮助中心说点赞可以点亮粉丝勋章但现在似乎不行了，所以该选项以后可能会被删除）'
-              ),
-              h('span', '。')
-            ]),
             h('div', '部分直播间无法完成该任务，原因未知。')
           ])
         },
@@ -225,6 +187,25 @@ const help_info: IhelpInfo = {
           '如果长时间没有操作，会提示“检测到您已离开当前屏幕，倒计时后即将暂停播放”。开启本功能后即可避免这种情况。'
         )
       ])
+    },
+    invisibility: {
+      title: '隐身入场',
+      message: h('p', [h('div', '进入直播间时其他人不会收到提示，但还是会出现在高能用户榜单上。')])
+    },
+    showContributionUserNum: {
+      title: '显示高能用户数量',
+      message: h('p', [
+        h('div', '在高能用户标签上显示当前直播间的高能用户数量，每分钟更新一次数据。')
+      ])
+    },
+    wearFansMedal: {
+      title: '发弹幕自动佩戴粉丝勋章',
+      message: h('p', [
+        h(
+          'div',
+          '如果有当前直播间的粉丝勋章，则会在发弹幕时自动佩戴。这样你的每条弹幕都会带有当前直播间的粉丝勋章。'
+        )
+      ])
     }
   },
   RemoveElement: {
@@ -240,9 +221,17 @@ const help_info: IhelpInfo = {
       title: '移除直播间小黄车弹窗',
       message: '移除直播间左上角的小黄车弹窗。'
     },
-    removeGameParty: {
-      title: '移除直播间幻星派对标志',
-      message: '移除直播间右下角的幻星派对标志。'
+    removeGiftPopover: {
+      title: '移除礼物赠送提示弹窗',
+      message: '移除直播间右下角的礼物赠送提示弹窗（赠送一个牛蛙牛蛙支持主播）。'
+    },
+    removeMicPopover: {
+      title: '移除连麦状态提示',
+      message: '移除直播间左上角的连麦提示弹窗。'
+    },
+    removeComboCard: {
+      title: '移除直播间相同弹幕连续提示',
+      message: '移除直播间相同弹幕连续提示。'
     }
   }
 }

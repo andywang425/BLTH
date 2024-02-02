@@ -10,7 +10,6 @@ interface ImoduleStatus {
     }
     LiveTasks: {
       sign: moduleStatus
-      appUser: moduleStatus
       medalTasks: {
         danmu: moduleStatus
         like: moduleStatus
@@ -38,9 +37,6 @@ type onFrameTypes = 'all' | 'target' | 'top'
 type isOnTargetFrameTypes = 'unknown' | 'yes'
 
 type moduleEmitterEvents = {
-  DailyTask_LiveTask_AppUserTask: {
-    module: string
-  }
   Default_FansMedals: {
     module: string
   }

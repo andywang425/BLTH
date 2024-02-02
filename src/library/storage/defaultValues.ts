@@ -38,10 +38,6 @@ const defaultValues: IdefaultValues = {
           enabled: false,
           _lastCompleteTime: 0
         },
-        appUser: {
-          enabled: false,
-          _lastCompleteTime: 0
-        },
         medalTasks: {
           danmu: {
             enabled: false,
@@ -66,7 +62,6 @@ const defaultValues: IdefaultValues = {
           },
           like: {
             enabled: false,
-            includeHighLevelMedals: false,
             _lastCompleteTime: 0
           },
           watch: {
@@ -113,6 +108,15 @@ const defaultValues: IdefaultValues = {
       },
       noSleep: {
         enabled: false
+      },
+      invisibility: {
+        enabled: false
+      },
+      wearFansMedal: {
+        enabled: false
+      },
+      showContributionUserNum: {
+        enabled: false
       }
     },
     RemoveElement: {
@@ -125,7 +129,13 @@ const defaultValues: IdefaultValues = {
       removeShopPopover: {
         enabled: false
       },
-      removeGameParty: {
+      removeGiftPopover: {
+        enabled: false
+      },
+      removeMicPopover: {
+        enabled: false
+      },
+      removeComboCard: {
         enabled: false
       }
     }

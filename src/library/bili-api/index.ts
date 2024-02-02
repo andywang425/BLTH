@@ -75,17 +75,19 @@ const BAPI: IbapiMethods = {
         }
       })
     },
-    likeReport: (room_id, anchor_id, click_time = 1) => {
-      // 这个 API 目前仅在 APP 中出现，但是也可以使用 web 端的身份认证方式
+    likeReport: (room_id, anchor_id, click_time = 1, visit_id = '') => {
       const biliStore = useBiliStore()
       const bili_jct = (biliStore.cookies as IbiliCookies).bili_jct
+      const uid = biliStore.BilibiliLive?.UID
       return request.live.post('/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3', {
         click_time,
         room_id,
         anchor_id,
-        uid: anchor_id,
+        uid,
         ts: ts(),
-        csrf: bili_jct
+        csrf: bili_jct,
+        csrf_token: bili_jct,
+        visit_id
       })
     },
     /**
@@ -134,6 +136,32 @@ const BAPI: IbapiMethods = {
         csrf_token: bili_jct,
         platform,
         visit_id
+      })
+    },
+    queryContributionRank: (
+      ruid,
+      room_id,
+      page,
+      page_size,
+      type = 'online_rank',
+      _switch = 'contribution_rank'
+    ) => {
+      return request.live.get('/xlive/general-interface/v1/rank/queryContributionRank', {
+        ruid,
+        room_id,
+        page,
+        page_size,
+        type,
+        switch: _switch
+      })
+    },
+    wearMedal: (medal_id, visit_id = '') => {
+      const bili_jct = (useBiliStore().cookies as IbiliCookies).bili_jct as string
+      return request.live.post('/xlive/web-room/v1/fansMedal/wear', {
+        medal_id,
+        csrf_token: bili_jct,
+        csrf: bili_jct,
+        visit_id: visit_id
       })
     }
   },
