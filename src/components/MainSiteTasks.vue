@@ -54,7 +54,8 @@ const status = moduleStore.moduleStatus.DailyTasks.MainSiteTasks
         target="_blank"
         >个人中心</el-link
       >
-      <el-text>查看。数据更新可能有一定的延时。</el-text>
+      <el-text>查看。</el-text>
+      <el-text>数据更新可能有一定的延时。</el-text>
     </el-row>
   </div>
 </template>

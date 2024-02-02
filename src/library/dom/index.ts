@@ -47,10 +47,10 @@ const pollingQuery = (
  * 判断当前脚本是否运行在 BilibiliLive 所在的 frame（需要等到 document-body 后才能判断）
  *
  * 注：大部分B站直播间页面只有两个iframe，共三个 frame；
- * 脚本只会被注入到顶层 frame
+ * 在这种情况下，脚本只会被注入到顶层 frame
  *
- * 特殊的直播间（背景很好看的那种，top frame被用来当背景板了）有三个 iframe，共四个 frame；
- * 脚本会被注入到顶层 frame 和一个 iframe
+ * 特殊的直播间（背景很好看的那种，顶层 frame 被用来当背景板了）有三个 iframe，共四个 frame；
+ * 此时脚本会被注入到顶层 frame 和一个 iframe
  */
 const isTargetFrame = (): boolean => {
   if (document.head.innerHTML.includes('BilibiliLive')) {
