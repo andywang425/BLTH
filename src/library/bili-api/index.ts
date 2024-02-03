@@ -326,7 +326,27 @@ const BAPI: IbapiMethods = {
           {
             headers: {
               Referer: 'https://account.bilibili.com/account/big/myPackage',
-              Origin: 'https://account.bilibili.com/account/big/myPackage'
+              Origin: 'https://account.bilibili.com'
+            }
+          }
+        )
+      },
+      addExperience: () => {
+        const biliStore = useBiliStore()
+        const mid = biliStore.BilibiliLive?.UID
+        const buvid = '' // buvid3
+        const bili_jct = biliStore.cookies?.bili_jct as string
+        return request.main.post(
+          '/x/vip/experience/add',
+          {
+            mid,
+            buvid,
+            csrf: bili_jct
+          },
+          {
+            headers: {
+              Referer: 'https://account.bilibili.com/big',
+              Origin: 'https://account.bilibili.com'
             }
           }
         )

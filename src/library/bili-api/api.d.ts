@@ -122,6 +122,7 @@ interface IbapiMethods {
     vip: {
       myPrivilege: () => Promise<Main.Vip.MyPrivilege>
       receivePrivilege: (type: number, platform?: string) => Promise<Main.Vip.ReceivePrivilege>
+      addExperience: () => Promise<Main.Vip.AddExperience>
     }
   }
   vc: {

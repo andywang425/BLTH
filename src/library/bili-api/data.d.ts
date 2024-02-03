@@ -1511,6 +1511,13 @@ declare namespace MainData {
         list: List[]
         is_short_vip: boolean
         is_freight_open: boolean
+        level: number
+        cur_exp: number
+        next_exp: number
+        is_vip: boolean
+        is_senior_member: number
+        format060102: number
+        is_overdue_vip: boolean
       }
 
       interface List {
@@ -1520,6 +1527,18 @@ declare namespace MainData {
         vip_type: number
         next_receive_days: number
         period_end_unix: number
+        is_count: boolean
+        name: string
+        coupon_code: string
+        app_describe: string
+        recive_state: number
+        salary_type: number
+      }
+    }
+    namespace AddExperience {
+      interface Data {
+        type: number
+        is_grant: boolean
       }
     }
   }
