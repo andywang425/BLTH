@@ -90,14 +90,17 @@ const handleEditList = () => {
     if (!biliStore.fansMedals) {
       medalInfoLoading.value = true
       // 等待数据被获取到
-      const unwatch = watch(medalInfoTableData, (newData) => {
-        if (newData) {
-          unwatch()
-          firstClickEditList = false
-          initSelection(medalInfoTableData.value)
-          medalInfoLoading.value = false
+      const unwatch = watch(
+        () => medalInfoTableData.value,
+        (newData) => {
+          if (newData) {
+            unwatch()
+            firstClickEditList = false
+            initSelection(newData)
+            medalInfoLoading.value = false
+          }
         }
-      })
+      )
       // 利用 emitter 通知 FansMedals 模块去获取数据
       moduleStore.emitter.emit('Default_FansMedals', {
         module: 'LiveTasks'
@@ -119,9 +122,9 @@ const initSelection = (rows?: ImedalInfoRow[]) => {
     const unwatch = watch(
       () => medalInfoTableRef.value,
       (newValue) => {
-        // unwatch 可能还未初始化，延迟到下一个空闲时间点执行
-        setTimeout(() => unwatch(), 0)
         if (newValue) {
+          // unwatch 可能还未初始化，延迟到下一个空闲时间点执行
+          setTimeout(() => unwatch(), 0)
           config.medalTasks.roomidList.forEach((roomid) =>
             newValue.toggleRowSelection(
               rows.find((row) => row.roomid === roomid),
