@@ -1,4 +1,4 @@
-import { fproxy, IrequestConfig, IrequestHandler } from '../../library/fetch-hook'
+import { fproxy, FetchRequestConfig, FetchRequestHandler } from '../../library/fetch-hook'
 import BaseModule from '../BaseModule'
 import { unsafeWindow } from '$'
 import { getUrlFromFetchInput, sleep } from '../../library/utils'
@@ -17,7 +17,7 @@ class WearFansMedal extends BaseModule {
     if (this.config.enabled) {
       fproxy(
         {
-          onRequest: async (config: IrequestConfig, handler: IrequestHandler) => {
+          onRequest: async (config: FetchRequestConfig, handler: FetchRequestHandler) => {
             if (getUrlFromFetchInput(config.input).includes('//api.live.bilibili.com/msg/send')) {
               const biliStore = useBiliStore()
               const roomid = biliStore.BilibiliLive?.ROOMID

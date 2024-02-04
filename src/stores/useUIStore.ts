@@ -4,7 +4,7 @@ import Storage from '../library/storage'
 import _ from 'lodash'
 import { UiConfig, MenuIndex } from '../types'
 
-interface IbaseStyleValue {
+interface BaseStyleValue {
   top: number
   left: number
   height: number
@@ -26,7 +26,7 @@ export const useUIStore = defineStore('ui', () => {
     return index2name[uiConfig.activeMenuIndex]
   })
   // 控制面板长、宽、位置信息
-  const baseStyleValue: IbaseStyleValue = reactive({
+  const baseStyleValue: BaseStyleValue = reactive({
     top: 0,
     left: 0,
     height: 0,

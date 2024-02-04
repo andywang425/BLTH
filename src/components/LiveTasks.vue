@@ -5,7 +5,7 @@ import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
 import { useBiliStore } from '../stores/useBiliStore'
 
-interface ImedalInfoRow {
+interface MedalInfoRow {
   avatar: string
   nick_name: string
   medal_name: string
@@ -67,7 +67,7 @@ const handleAddDanmu = () => {
 }
 
 const medalInfoPanelVisible = ref<boolean>(false)
-const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(() =>
+const medalInfoTableData = computed<MedalInfoRow[] | undefined>(() =>
   biliStore.filteredFansMedals?.map((medal) => ({
     avatar: medal.anchor_info.avatar,
     nick_name: medal.anchor_info.nick_name,
@@ -115,7 +115,7 @@ const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
 /** 是否锁住配置 */
 let lockConfig = false
 /** 初始化多选框选择状态 */
-const initSelection = (rows?: ImedalInfoRow[]) => {
+const initSelection = (rows?: MedalInfoRow[]) => {
   lockConfig = true
   if (rows) {
     // 如果直接使用 medalInfoTableRef.value，medalInfoTableRef.value 可能为 undefined
@@ -138,7 +138,7 @@ const initSelection = (rows?: ImedalInfoRow[]) => {
   }
   lockConfig = false
 }
-function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
+function handleSelectionChange(selectedRows: MedalInfoRow[]) {
   if (!lockConfig) {
     config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
   }

@@ -3,19 +3,19 @@ import { useUIStore } from '../stores/useUIStore'
 
 const uiStore = useUIStore()
 
-interface menuItem {
+interface MenuItem {
   icon: string
   title: string
   index: string
-  subs?: subMenuItem[]
+  subs?: SubMenuItem[]
 }
 
-interface subMenuItem {
+interface SubMenuItem {
   title: string
   index: string
 }
 
-const items: menuItem[] = [
+const items: MenuItem[] = [
   {
     icon: 'Tasks',
     title: '每日任务',

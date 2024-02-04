@@ -10,7 +10,7 @@ import { ModuleConfig } from '../../../../types'
 import { ModuleStatusTypes, RunAtMoment } from '../../../../types/module'
 import { getCookie } from '../../../../library/cookie'
 
-interface sypderData {
+interface SypderData {
   benchmark: string
   device: string
   ets: number
@@ -137,7 +137,7 @@ class RoomHeart {
       return
     }
     try {
-      const sypderData: sypderData = {
+      const sypderData: SypderData = {
         id: JSON.stringify(this.id),
         device: JSON.stringify(this.device),
         ets: this.timestamp,
@@ -208,7 +208,7 @@ class RoomHeart {
    * @returns s
    */
   private sypder(str: string, rule: number[]): string {
-    const data: sypderData = JSON.parse(str)
+    const data: SypderData = JSON.parse(str)
     const [parent_id, area_id, seq_id, room_id]: number[] = JSON.parse(data.id)
     const [buvid, uuid]: string[] = JSON.parse(data.device)
     const key: string = data.benchmark

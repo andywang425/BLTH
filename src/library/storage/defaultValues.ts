@@ -1,12 +1,12 @@
 import { UiConfig, ModuleConfig, Cache } from '../../types'
 
-interface IdefaultValues {
+interface DefaultValues {
   ui: UiConfig
   modules: ModuleConfig
   cache: Cache
 }
 
-const defaultValues: IdefaultValues = {
+const defaultValues: DefaultValues = {
   ui: {
     isCollapse: false,
     isShowPanel: true,

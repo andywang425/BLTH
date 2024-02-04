@@ -1,35 +1,35 @@
 import { unsafeWindow } from '$'
 
-export interface IrequestConfig {
+export interface FetchRequestConfig {
   input: RequestInfo | URL
   init?: RequestInit
 }
 
-export interface IrequestHandler {
+export interface FetchRequestHandler {
   resolve: (response: Response) => void
   error: (error: Error) => void
-  next: (config: IrequestConfig) => void
+  next: (config: FetchRequestConfig) => void
 }
 
-export interface IresponseHandler {
+export interface FetchResponseHandler {
   resolve: (response: Response) => void
   error: (error: Error) => void
   next: (response: Response) => void
 }
 
-export type onRequestHandler = (
-  config: IrequestConfig,
-  handler: IrequestHandler
+export type OnRequestHandler = (
+  config: FetchRequestConfig,
+  handler: FetchRequestHandler
 ) => Promise<void> | void
 
-export type onResponseHandler = (
+export type OnResponseHandler = (
   response: Response,
-  handler: IresponseHandler
+  handler: FetchResponseHandler
 ) => Promise<void> | void
 
-export interface Iproxy {
-  onRequest?: onRequestHandler
-  onResponse?: onResponseHandler
+export interface FetchHookProxyConfig {
+  onRequest?: OnRequestHandler
+  onResponse?: OnResponseHandler
 }
 
 const _fetch = window.fetch
@@ -38,8 +38,8 @@ class RequestHandler {
   _resolve: Promise<Response> | undefined
   _error: Error | undefined
   _next: boolean = false
-  _input: IrequestConfig['input'] | undefined
-  _init: IrequestConfig['init'] | undefined
+  _input: FetchRequestConfig['input'] | undefined
+  _init: FetchRequestConfig['init'] | undefined
 
   public resolve(response: Response) {
     this._resolve = Promise.resolve(response)
@@ -47,7 +47,7 @@ class RequestHandler {
   public error(error: Error) {
     this._error = error
   }
-  public next(config: IrequestConfig) {
+  public next(config: FetchRequestConfig) {
     this._next = true
     this._input = config.input
     this._init = config.init
@@ -73,8 +73,8 @@ class ResponseHandler {
 }
 
 let isHooked: boolean = false
-let onRequestHandlers: onRequestHandler[] = []
-let onResponseHandlers: onResponseHandler[] = []
+let onRequestHandlers: OnRequestHandler[] = []
+let onResponseHandlers: OnResponseHandler[] = []
 
 const hook = (win: Window) => {
   win.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -92,8 +92,8 @@ const hook = (win: Window) => {
         break
       }
 
-      input = requestHandler._input as IrequestConfig['input']
-      init = requestHandler._init as IrequestConfig['init']
+      input = requestHandler._input as FetchRequestConfig['input']
+      init = requestHandler._init as FetchRequestConfig['init']
     }
     // 发起请求
     let response = await _fetch.apply(unsafeWindow, [input, init])
@@ -123,7 +123,7 @@ const hook = (win: Window) => {
  * @param win 目标 Window，使用 iframe window 作为参数时不能违反同源策略
  */
 const fproxy = (
-  proxy: Iproxy,
+  proxy: FetchHookProxyConfig,
   win: Window = unsafeWindow
 ): {
   /** 删除代理规则 proxy */

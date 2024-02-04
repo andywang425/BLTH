@@ -1,6 +1,6 @@
 import { DateTime, Settings } from 'luxon'
 
-interface Iduration {
+interface Duration {
   ms: number
   str: string
 }
@@ -50,7 +50,7 @@ function isTimestampToday(timestamp: number, hour: number = 0, minute: number = 
  * @param hour 小时（0-23），默认0
  * @param minute 分钟（0-59），默认5
  */
-function delayToNextMoment(hour: number = 0, minute: number = 5): Iduration {
+function delayToNextMoment(hour: number = 0, minute: number = 5): Duration {
   const now = DateTime.now()
   let nextTime = DateTime.local(now.year, now.month, now.day, hour, minute)
 

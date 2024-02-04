@@ -3,7 +3,7 @@ import { reactive, ref, watch } from 'vue'
 import Storage from '../library/storage'
 import { Cache } from '../types'
 
-type scriptType = 'Main' | 'SubMain' | 'Other'
+type ScriptType = 'Main' | 'SubMain' | 'Other'
 
 export const useCacheStore = defineStore('cache', () => {
   // 缓存
@@ -21,7 +21,7 @@ export const useCacheStore = defineStore('cache', () => {
    * 如果关掉 Main BLTH 所在的页面，那么下一个打开的页面上所运行的 BLTH 则为 Main BLTH（也可能会有SubMain BLTH）。
    * 增加这一概念主要时为了确保任务类模块不会重复运行（比如完成各种每日任务的模块）。
    */
-  const currentScriptType = ref<scriptType>('Main')
+  const currentScriptType = ref<ScriptType>('Main')
 
   /**
    * Main BLTH 存活心跳
