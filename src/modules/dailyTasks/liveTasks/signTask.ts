@@ -2,12 +2,12 @@ import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
 import BAPI from '../../../library/bili-api'
 import { dq } from '../../../library/dom'
-import { moduleStatus } from '../../../types/module'
+import { ModuleStatusTypes } from '../../../types/module'
 
 class SignTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.sign
 
-  set status(s: moduleStatus) {
+  set status(s: ModuleStatusTypes) {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.sign = s
   }
 

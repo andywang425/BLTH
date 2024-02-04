@@ -1,11 +1,11 @@
 import { unsafeWindow } from '$'
 import { isSelfTopFrame } from '../../library/dom'
-import { runAtMoment } from '../../types/module'
+import { RunAtMoment } from '../../types/module'
 import BaseModule from '../BaseModule'
 
 class SwitchLiveStreamQuality extends BaseModule {
   static runOnMultiplePages: boolean = true
-  static runAt: runAtMoment = 'window-load'
+  static runAt: RunAtMoment = 'window-load'
   static runAfterDefault: boolean = false
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.switchLiveStreamQuality

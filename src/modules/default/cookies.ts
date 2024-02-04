@@ -1,6 +1,6 @@
 import { useBiliStore } from '../../stores/useBiliStore'
 import { getCookiesAsync } from '../../library/cookie'
-import { IbiliCookies } from '../../types/cookies'
+import { BiliCookies } from '../../types/cookies'
 import BaseModule from '../BaseModule'
 
 class Cookies extends BaseModule {
@@ -11,7 +11,7 @@ class Cookies extends BaseModule {
    * LIVE_BUVID: 如果用户以前从来没看过直播，此时可能为 null
    * buvid3: 作为参数 buvid 在请求中出现，目前仅在主站 API 中使用
    */
-  private getCookies(): Promise<IbiliCookies> {
+  private getCookies(): Promise<BiliCookies> {
     return getCookiesAsync(['bili_jct', 'LIVE_BUVID', 'buvid3'])
   }
 

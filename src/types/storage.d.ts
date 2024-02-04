@@ -1,4 +1,4 @@
-interface ImoduleConfig {
+interface ModuleConfig {
   DailyTasks: {
     MainSiteTasks: {
       login: {
@@ -111,21 +111,21 @@ interface ImoduleConfig {
   }
 }
 
-type menuIndex =
+type MenuIndex =
   | 'MainSiteTasks'
   | 'LiveTasks'
   | 'OtherTasks'
   | 'EnhanceExperience'
   | 'RemoveElement'
 
-interface IuiConfig {
+interface UiConfig {
   isCollapse: boolean
   isShowPanel: boolean
-  activeMenuIndex: menuIndex
+  activeMenuIndex: MenuIndex
 }
 
-interface Icache {
+interface Cache {
   lastAliveHeartBeatTime: number
 }
 
-export { ImoduleConfig, IuiConfig, Icache, menuIndex }
+export { ModuleConfig, UiConfig, Cache, MenuIndex }

@@ -1,7 +1,7 @@
 import { h } from 'vue'
-import { IhelpInfo } from '../../types'
+import { HelpInfo } from '../../types'
 
-const help_info: IhelpInfo = {
+const help_info: HelpInfo = {
   DailyTasks: {
     MainSiteTasks: {
       login: {

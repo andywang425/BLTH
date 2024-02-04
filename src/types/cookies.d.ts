@@ -1,7 +1,5 @@
-type cookieValue = string | null
+type CookieNames = 'bili_jct' | 'LIVE_BUVID' | 'buvid3'
 
-type cookieNames = 'bili_jct' | 'LIVE_BUVID' | 'buvid3'
+type BiliCookies = Record<CookieNames, string | null>
 
-type IbiliCookies = Record<cookieNames, cookieValue>
-
-export { IbiliCookies }
+export { BiliCookies }

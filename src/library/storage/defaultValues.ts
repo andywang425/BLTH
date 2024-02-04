@@ -1,9 +1,9 @@
-import { IuiConfig, ImoduleConfig, Icache } from '../../types'
+import { UiConfig, ModuleConfig, Cache } from '../../types'
 
 interface IdefaultValues {
-  ui: IuiConfig
-  modules: ImoduleConfig
-  cache: Icache
+  ui: UiConfig
+  modules: ModuleConfig
+  cache: Cache
 }
 
 const defaultValues: IdefaultValues = {

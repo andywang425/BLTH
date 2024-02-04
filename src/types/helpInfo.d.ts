@@ -1,51 +1,51 @@
 import { VNode } from 'vue'
 
-interface IhelpInfoItem {
+interface HelpInfoItem {
   title: string
   message: string | VNode | (() => VNode)
 }
 
-interface IhelpInfo {
+interface HelpInfo {
   DailyTasks: {
     MainSiteTasks: {
-      login: IhelpInfoItem
-      watch: IhelpInfoItem
-      coin: IhelpInfoItem
-      share: IhelpInfoItem
+      login: HelpInfoItem
+      watch: HelpInfoItem
+      coin: HelpInfoItem
+      share: HelpInfoItem
     }
     LiveTasks: {
-      sign: IhelpInfoItem
+      sign: HelpInfoItem
       medalTasks: {
-        list: IhelpInfoItem
-        like: IhelpInfoItem
-        danmu: IhelpInfoItem
-        watch: IhelpInfoItem
+        list: HelpInfoItem
+        like: HelpInfoItem
+        danmu: HelpInfoItem
+        watch: HelpInfoItem
       }
     }
     OtherTasks: {
-      groupSign: IhelpInfoItem
-      silverToCoin: IhelpInfoItem
-      coinToSilver: IhelpInfoItem
-      getYearVipPrivilege: IhelpInfoItem
+      groupSign: HelpInfoItem
+      silverToCoin: HelpInfoItem
+      coinToSilver: HelpInfoItem
+      getYearVipPrivilege: HelpInfoItem
     }
   }
   EnhanceExperience: {
-    switchLiveStreamQuality: IhelpInfoItem
-    banp2p: IhelpInfoItem
-    noReport: IhelpInfoItem
-    noSleep: IhelpInfoItem
-    invisibility: IhelpInfoItem
-    showContributionUserNum: IhelpInfoItem
-    wearFansMedal: IhelpInfoItem
+    switchLiveStreamQuality: HelpInfoItem
+    banp2p: HelpInfoItem
+    noReport: HelpInfoItem
+    noSleep: HelpInfoItem
+    invisibility: HelpInfoItem
+    showContributionUserNum: HelpInfoItem
+    wearFansMedal: HelpInfoItem
   }
   RemoveElement: {
-    removePKBox: IhelpInfoItem
-    removeLiveWaterMark: IhelpInfoItem
-    removeShopPopover: IhelpInfoItem
-    removeGiftPopover: IhelpInfoItem
-    removeMicPopover: IhelpInfoItem
-    removeComboCard: IhelpInfoItem
+    removePKBox: HelpInfoItem
+    removeLiveWaterMark: HelpInfoItem
+    removeShopPopover: HelpInfoItem
+    removeGiftPopover: HelpInfoItem
+    removeMicPopover: HelpInfoItem
+    removeComboCard: HelpInfoItem
   }
 }
 
-export { IhelpInfoItem, IhelpInfo }
+export { HelpInfoItem, HelpInfo }
