@@ -8,7 +8,6 @@ import { dq } from '../../library/dom'
 
 class WearFansMedal extends BaseModule {
   static runOnMultiplePages: boolean = true
-  static runAfterDefault: boolean = false
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.wearFansMedal
 
@@ -35,7 +34,7 @@ class WearFansMedal extends BaseModule {
                         // 点击弹幕输入框左侧的粉丝勋章图标，让显示的粉丝勋章发生变化
                         medal_span.click()
                         // 延迟一个很短的时间让页面发生更新
-                        await sleep(1)
+                        await sleep(0)
                         // 再次点击关闭打开的弹窗
                         medal_span.click()
                       }
