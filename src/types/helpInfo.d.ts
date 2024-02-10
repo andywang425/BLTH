@@ -42,6 +42,7 @@ interface HelpInfo {
     removePKBox: HelpInfoItem
     removeLiveWaterMark: HelpInfoItem
     removeShopPopover: HelpInfoItem
+    removeGameParty: IhelpInfoItem
     removeGiftPopover: HelpInfoItem
     removeMicPopover: HelpInfoItem
     removeComboCard: HelpInfoItem
