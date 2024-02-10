@@ -221,13 +221,17 @@ const help_info: HelpInfo = {
       title: '移除直播间小黄车弹窗',
       message: '移除直播间左上角的小黄车弹窗。'
     },
+    removeGameParty: {
+      title: '移除直播间幻星派对标志',
+      message: '移除直播间右下角的幻星派对标志。'
+    },
     removeGiftPopover: {
       title: '移除礼物赠送提示弹窗',
       message: '移除直播间右下角的礼物赠送提示弹窗（赠送一个牛蛙牛蛙支持主播）。'
     },
     removeMicPopover: {
       title: '移除连麦状态提示',
-      message: '移除直播间左上角的连麦提示弹窗。'
+      message: '移除直播间左上角的连麦提示弹窗（连线功能只能在手机端使用，快使用手机登录吧～）。'
     },
     removeComboCard: {
       title: '移除直播间相同弹幕连续提示',

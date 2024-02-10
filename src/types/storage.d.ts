@@ -99,6 +99,9 @@ interface ModuleConfig {
     removeShopPopover: {
       enabled: boolean
     }
+    removeGameParty: {
+      enabled: boolean
+    }
     removeGiftPopover: {
       enabled: boolean
     }

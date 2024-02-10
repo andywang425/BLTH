@@ -4,7 +4,7 @@ import BaseModule from '../BaseModule'
 
 class BilibiliLive extends BaseModule {
   static runOnMultiplePages: boolean = true
-  
+
   /**
    * 获取 window.BilibiliLive
    */

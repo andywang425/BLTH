@@ -129,6 +129,9 @@ const defaultValues: DefaultValues = {
       removeShopPopover: {
         enabled: false
       },
+      removeGameParty: {
+        enabled: false
+      },
       removeGiftPopover: {
         enabled: false
       },
