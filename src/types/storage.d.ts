@@ -107,22 +107,22 @@ interface ImoduleConfig {
     }
     removeComboCard: {
       enabled: boolean
-    },
-    removeRank:{
+    }
+    removeRank: {
       enabled: boolean
-    },
+    }
     removeGiftPlanet: {
       enabled: boolean
-    },
+    }
     removeActivityBanner: {
       enabled: boolean
-    },
+    }
     removePKBanner: {
       enabled: boolean
-    },
+    }
     removeFlipView: {
       enabled: boolean
-    },
+    }
     removeRecommendRoom: {
       enabled: boolean
     }
