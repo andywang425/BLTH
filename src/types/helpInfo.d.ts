@@ -45,6 +45,7 @@ interface IhelpInfo {
     removeGiftPopover: IhelpInfoItem
     removeMicPopover: IhelpInfoItem
     removeComboCard: IhelpInfoItem
+    removeRank: IhelpInfoItem
   }
 }
 

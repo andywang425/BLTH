@@ -137,6 +137,9 @@ const defaultValues: IdefaultValues = {
       },
       removeComboCard: {
         enabled: false
+      },
+      removeRank: {
+        enabled: false
       }
     }
   },

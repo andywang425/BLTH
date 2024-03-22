@@ -46,6 +46,15 @@ const config = moduleStore.moduleConfig.RemoveElement
         <Info id="RemoveElement.removeComboCard" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch
+          v-model="config.removeRank.enabled"
+          active-text="移除排行榜"
+        />
+        <Info id="RemoveElement.removeRank" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>

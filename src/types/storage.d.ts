@@ -107,6 +107,9 @@ interface ImoduleConfig {
     }
     removeComboCard: {
       enabled: boolean
+    },
+    removeRank:{
+      enabled: boolean
     }
   }
 }
