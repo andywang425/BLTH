@@ -116,6 +116,9 @@ interface ImoduleConfig {
     },
     removeActivityBanner: {
       enabled: boolean
+    },
+    removePKBanner: {
+      enabled: boolean
     }
   }
 }

@@ -48,6 +48,7 @@ interface IhelpInfo {
     removeRank: IhelpInfoItem
     removeGiftPlanet: IhelpInfoItem
     removeActivityBanner: IhelpInfoItem
+    removePKBanner: IhelpInfoItem
   }
 }
 

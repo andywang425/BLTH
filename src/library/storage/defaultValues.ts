@@ -146,6 +146,9 @@ const defaultValues: IdefaultValues = {
       },
       removeActivityBanner: {
         enabled: false
+      },
+      removePKBanner: {
+        enabled: false
       }
     }
   },

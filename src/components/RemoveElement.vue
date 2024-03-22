@@ -73,6 +73,15 @@ const config = moduleStore.moduleConfig.RemoveElement
         <Info id="RemoveElement.removeActivityBanner" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch
+          v-model="config.removePKBanner.enabled"
+          active-text="移除大乱斗入口"
+        />
+        <Info id="RemoveElement.removePKBanner" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>
