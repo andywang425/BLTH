@@ -140,6 +140,9 @@ const defaultValues: IdefaultValues = {
       },
       removeRank: {
         enabled: false
+      },
+      removeGiftPlanet: {
+        enabled: false
       }
     }
   },

@@ -110,6 +110,9 @@ interface ImoduleConfig {
     },
     removeRank:{
       enabled: boolean
+    },
+    removeGiftPlanet: {
+      enabled: boolean
     }
   }
 }

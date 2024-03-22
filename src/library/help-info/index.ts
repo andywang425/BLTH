@@ -236,6 +236,10 @@ const help_info: IhelpInfo = {
     removeRank: {
       title: '移除排行榜',
       message: '移除直播画面上方的人气榜/航海榜，赠送人气票的入口也在这里。'
+    },
+    removeGiftPlanet: {
+      title: '移除礼物星球',
+      message: '移除直播画面上方的礼物星球。'
     }
   }
 }

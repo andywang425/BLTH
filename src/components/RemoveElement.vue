@@ -55,6 +55,15 @@ const config = moduleStore.moduleConfig.RemoveElement
         <Info id="RemoveElement.removeRank" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch
+          v-model="config.removeGiftPlanet.enabled"
+          active-text="移除礼物星球"
+        />
+        <Info id="RemoveElement.removeGiftPlanet" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>
