@@ -143,6 +143,9 @@ const defaultValues: IdefaultValues = {
       },
       removeGiftPlanet: {
         enabled: false
+      },
+      removeActivityBanner: {
+        enabled: false
       }
     }
   },

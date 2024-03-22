@@ -47,6 +47,7 @@ interface IhelpInfo {
     removeComboCard: IhelpInfoItem
     removeRank: IhelpInfoItem
     removeGiftPlanet: IhelpInfoItem
+    removeActivityBanner: IhelpInfoItem
   }
 }
 

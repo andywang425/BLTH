@@ -113,6 +113,9 @@ interface ImoduleConfig {
     },
     removeGiftPlanet: {
       enabled: boolean
+    },
+    removeActivityBanner: {
+      enabled: boolean
     }
   }
 }

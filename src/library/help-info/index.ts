@@ -240,6 +240,10 @@ const help_info: IhelpInfo = {
     removeGiftPlanet: {
       title: '移除礼物星球',
       message: '移除直播画面上方的礼物星球。'
+    },
+    removeActivityBanner: {
+      title: '移除活动入口',
+      message: '移除直播画面上方的活动入口，当前活动内容会滚动切换。'
     }
   }
 }
