@@ -252,6 +252,10 @@ const help_info: IhelpInfo = {
     removeFlipView: {
       title: '移除礼物栏下方广告',
       message: '移除礼物栏下方广告。'
+    },
+    removeRecommendRoom: {
+      title: '移除礼物栏下方推荐直播间',
+      message: '移除礼物栏下方推荐直播间。'
     }
   }
 }

@@ -91,6 +91,15 @@ const config = moduleStore.moduleConfig.RemoveElement
         <Info id="RemoveElement.removeFlipView" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch
+          v-model="config.removeRecommendRoom.enabled"
+          active-text="移除礼物栏下方推荐直播间"
+        />
+        <Info id="RemoveElement.removeRecommendRoom" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>

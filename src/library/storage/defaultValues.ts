@@ -152,6 +152,9 @@ const defaultValues: IdefaultValues = {
       },
       removeFlipView: {
         enabled: false
+      },
+      removeRecommendRoom: {
+        enabled: false
       }
     }
   },

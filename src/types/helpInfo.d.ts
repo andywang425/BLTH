@@ -50,6 +50,7 @@ interface IhelpInfo {
     removeActivityBanner: IhelpInfoItem
     removePKBanner: IhelpInfoItem
     removeFlipView: IhelpInfoItem
+    removeRecommendRoom: IhelpInfoItem
   }
 }
 

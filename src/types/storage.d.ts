@@ -122,6 +122,9 @@ interface ImoduleConfig {
     },
     removeFlipView: {
       enabled: boolean
+    },
+    removeRecommendRoom: {
+      enabled: boolean
     }
   }
 }
