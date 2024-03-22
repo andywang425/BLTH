@@ -49,6 +49,7 @@ interface IhelpInfo {
     removeGiftPlanet: IhelpInfoItem
     removeActivityBanner: IhelpInfoItem
     removePKBanner: IhelpInfoItem
+    removeFlipView: IhelpInfoItem
   }
 }
 

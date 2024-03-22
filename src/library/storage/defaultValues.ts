@@ -149,6 +149,9 @@ const defaultValues: IdefaultValues = {
       },
       removePKBanner: {
         enabled: false
+      },
+      removeFlipView: {
+        enabled: false
       }
     }
   },

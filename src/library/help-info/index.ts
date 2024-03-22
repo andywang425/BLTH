@@ -248,6 +248,10 @@ const help_info: IhelpInfo = {
     removePKBanner: {
       title: '移除大乱斗入口',
       message: '移除直播画面上方的大乱斗入口，这里在有BLS的时候也会成为BLS的入口，和大乱斗的入口滚动切换。'
+    },
+    removeFlipView: {
+      title: '移除礼物栏下方广告',
+      message: '移除礼物栏下方广告。'
     }
   }
 }

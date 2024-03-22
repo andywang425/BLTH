@@ -119,6 +119,9 @@ interface ImoduleConfig {
     },
     removePKBanner: {
       enabled: boolean
+    },
+    removeFlipView: {
+      enabled: boolean
     }
   }
 }

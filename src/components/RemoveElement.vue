@@ -82,6 +82,15 @@ const config = moduleStore.moduleConfig.RemoveElement
         <Info id="RemoveElement.removePKBanner" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch
+          v-model="config.removeFlipView.enabled"
+          active-text="移除礼物栏下方广告"
+        />
+        <Info id="RemoveElement.removeFlipView" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>
