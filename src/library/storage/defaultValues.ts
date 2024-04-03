@@ -140,6 +140,24 @@ const defaultValues: DefaultValues = {
       },
       removeComboCard: {
         enabled: false
+      },
+      removeRank: {
+        enabled: false
+      },
+      removeGiftPlanet: {
+        enabled: false
+      },
+      removeActivityBanner: {
+        enabled: false
+      },
+      removePKBanner: {
+        enabled: false
+      },
+      removeFlipView: {
+        enabled: false
+      },
+      removeRecommendRoom: {
+        enabled: false
       }
     }
   },
