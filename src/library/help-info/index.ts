@@ -261,6 +261,10 @@ const help_info: HelpInfo = {
     removeRecommendRoom: {
       title: '移除礼物栏下方推荐直播间',
       message: '移除礼物栏下方推荐直播间。'
+    },
+    removeLiveMosaic: {
+      title: '移除直播间马赛克',
+      message: '移除部分直播间特有的马赛克。'
     }
   }
 }

@@ -91,6 +91,12 @@ const config = moduleStore.moduleConfig.RemoveElement
         <Info id="RemoveElement.removeRecommendRoom" />
       </el-space>
     </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-switch v-model="config.removeLiveMosaic.enabled" active-text="移除直播间马赛克" />
+        <Info id="RemoveElement.removeLiveMosaic" />
+      </el-space>
+    </el-row>
     <el-divider />
   </div>
 </template>

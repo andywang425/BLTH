@@ -158,6 +158,9 @@ const defaultValues: DefaultValues = {
       },
       removeRecommendRoom: {
         enabled: false
+      },
+      removeLiveMosaic: {
+        enabled: false
       }
     }
   },
