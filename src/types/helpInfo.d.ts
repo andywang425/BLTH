@@ -52,6 +52,7 @@ interface HelpInfo {
     removePKBanner: HelpInfoItem
     removeFlipView: HelpInfoItem
     removeRecommendRoom: HelpInfoItem
+    removeLiveMosaic: IhelpInfoItem
   }
 }
 

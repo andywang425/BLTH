@@ -129,6 +129,9 @@ interface ModuleConfig {
     removeRecommendRoom: {
       enabled: boolean
     }
+    removeLiveMosaic: {
+      enabled: boolean
+    }
   }
 }
 

@@ -11,3 +11,4 @@ export { default as RemoveElement_RemoveActivityBanner } from './removeActivityB
 export { default as RemoveElement_RemovePKBanner } from './removePKBanner'
 export { default as RemoveElement_RemoveFlipView } from './removeFlipView'
 export { default as RemoveElement_RemoveRecommendRoom } from './removeRecommendRoom'
+export { default as RemoveElement_RemoveLiveMosaic } from './removeLiveMosaic'
