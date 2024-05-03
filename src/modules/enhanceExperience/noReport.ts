@@ -1,14 +1,14 @@
 import { unsafeWindow } from '$'
 import { XhrRequestConfig, XhrRequestHandler, proxy } from 'ajax-hook'
-import { Iproxy, fproxy } from '../../library/fetch-hook'
+import { FetchHookProxyConfig, fproxy } from '../../library/fetch-hook'
 import BaseModule from '../BaseModule'
 import { getUrlFromFetchInput } from '../../library/utils'
-import { onFrameTypes, runAtMoment } from '../../types/module'
+import { OnFrameTypes, RunAtMoment } from '../../types/module'
 
 class NoReport extends BaseModule {
   static runOnMultiplePages: boolean = true
-  static runAt: runAtMoment = 'document-start'
-  static onFrame: onFrameTypes = 'all'
+  static runAt: RunAtMoment = 'document-start'
+  static onFrame: OnFrameTypes = 'all'
   static runAfterDefault: boolean = false
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.noReport
@@ -74,7 +74,7 @@ class NoReport extends BaseModule {
         }
       }
     }
-    const fetchHookConfig: Iproxy = {
+    const fetchHookConfig: FetchHookProxyConfig = {
       onRequest(config, handler) {
         const url = getUrlFromFetchInput(config.input)
         if (NoReport.isTargetURL(url)) {

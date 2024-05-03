@@ -1,13 +1,13 @@
-import { onFrameTypes, runAtMoment } from '../../types/module'
+import { OnFrameTypes, RunAtMoment } from '../../types/module'
 import { XhrRequestConfig, XhrRequestHandler, proxy } from 'ajax-hook'
 import BaseModule from '../BaseModule'
 import { unsafeWindow } from '$'
 
 class Invisibility extends BaseModule {
   static runOnMultiplePages: boolean = true
-  static runAt: runAtMoment = 'document-start'
+  static runAt: RunAtMoment = 'document-start'
   static runAfterDefault: boolean = false
-  static onFrame: onFrameTypes = 'all'
+  static onFrame: OnFrameTypes = 'all'
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.invisibility
 

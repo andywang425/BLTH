@@ -1,5 +1,5 @@
 import BaseModule from '../BaseModule'
-import { runAtMoment } from '../../types/module'
+import { RunAtMoment } from '../../types/module'
 import BAPI from '../../library/bili-api'
 import { dq } from '../../library/dom'
 import { useBiliStore } from '../../stores/useBiliStore'
@@ -7,7 +7,7 @@ import _ from 'lodash'
 
 class ShowContributionUserNum extends BaseModule {
   static runOnMultiplePages: boolean = true
-  static runAt: runAtMoment = 'window-load'
+  static runAt: RunAtMoment = 'window-load'
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.showContributionUserNum
 

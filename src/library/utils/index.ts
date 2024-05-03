@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { useModuleStore } from '../../stores/useModuleStore'
-import { moduleEmitterEvents, runAtMoment } from '../../types/module'
+import { ModuleEmitterEvents, RunAtMoment } from '../../types/module'
 
 /**
  * 生成一个 version 4 uuid
@@ -26,7 +26,7 @@ function sleep(miliseconds: number): Promise<void> {
  * @param type mitt 的 type 参数
  * @param timeout 超时时间
  */
-function wait(type: keyof moduleEmitterEvents, timeout: number = -1): Promise<any> {
+function wait(type: keyof ModuleEmitterEvents, timeout: number = -1): Promise<any> {
   return new Promise((resolve) => {
     useModuleStore().emitter.once(type, (event) => resolve(event))
     if (timeout !== -1) setTimeout(resolve, timeout)
@@ -82,7 +82,7 @@ function getUrlFromFetchInput(input: RequestInfo | URL): string {
  * 等待直到指定时刻
  * @param moment 运行时机
  */
-function waitForMoment(moment: runAtMoment): Promise<void> {
+function waitForMoment(moment: RunAtMoment): Promise<void> {
   switch (moment) {
     case 'document-start': {
       // 在 document-start 阶段，document-head 可能为 null

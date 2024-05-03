@@ -1,7 +1,7 @@
 import { h } from 'vue'
-import { IhelpInfo } from '../../types'
+import { HelpInfo } from '../../types'
 
-const help_info: IhelpInfo = {
+const help_info: HelpInfo = {
   DailyTasks: {
     MainSiteTasks: {
       login: {
@@ -221,17 +221,50 @@ const help_info: IhelpInfo = {
       title: '移除直播间小黄车弹窗',
       message: '移除直播间左上角的小黄车弹窗。'
     },
+    removeGameParty: {
+      title: '移除直播间幻星派对标志',
+      message: '移除直播间右下角的幻星派对标志。'
+    },
     removeGiftPopover: {
       title: '移除礼物赠送提示弹窗',
       message: '移除直播间右下角的礼物赠送提示弹窗（赠送一个牛蛙牛蛙支持主播）。'
     },
     removeMicPopover: {
       title: '移除连麦状态提示',
-      message: '移除直播间左上角的连麦提示弹窗。'
+      message: '移除直播间左上角的连麦提示弹窗（连线功能只能在手机端使用，快使用手机登录吧～）。'
     },
     removeComboCard: {
       title: '移除直播间相同弹幕连续提示',
       message: '移除直播间相同弹幕连续提示。'
+    },
+    removeRank: {
+      title: '移除排行榜',
+      message: '移除直播画面上方的人气榜/航海榜，赠送人气票的入口也在这里。'
+    },
+    removeGiftPlanet: {
+      title: '移除礼物星球',
+      message: '移除直播画面上方的礼物星球。'
+    },
+    removeActivityBanner: {
+      title: '移除活动入口',
+      message: '移除直播画面上方的活动入口，当前活动内容会滚动切换。'
+    },
+    removePKBanner: {
+      title: '移除大乱斗入口',
+      message:
+        '移除直播画面上方的大乱斗入口，这里在有BLS的时候也会成为BLS的入口，和大乱斗的入口滚动切换。'
+    },
+    removeFlipView: {
+      title: '移除礼物栏下方广告',
+      message: '移除礼物栏下方广告。'
+    },
+    removeRecommendRoom: {
+      title: '移除礼物栏下方推荐直播间',
+      message: '移除礼物栏下方推荐直播间。'
+    },
+    removeLiveMosaic: {
+      title: '移除直播间马赛克',
+      message: '移除部分直播间特有的马赛克。'
     }
   }
 }

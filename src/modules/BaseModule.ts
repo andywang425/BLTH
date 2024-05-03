@@ -1,6 +1,6 @@
 import { useModuleStore } from '../stores/useModuleStore'
 import Logger from '../library/logger'
-import { moduleStatus, onFrameTypes, runAtMoment } from '../types/module'
+import { ModuleStatusTypes, OnFrameTypes, RunAtMoment } from '../types/module'
 
 class BaseModule {
   /**
@@ -32,7 +32,7 @@ class BaseModule {
    *
    * 默认模块的模块运行时机总是为 document-body
    */
-  public static runAt: runAtMoment = 'document-body'
+  public static runAt: RunAtMoment = 'document-body'
   /**
    * 模块运行的 frame，默认 target
    *
@@ -46,7 +46,7 @@ class BaseModule {
    *
    * 默认模块运行的 frame 总是为 target
    */
-  public static onFrame: onFrameTypes = 'target'
+  public static onFrame: OnFrameTypes = 'target'
   /**
    * 是否要等默认模块运行完了再运行，默认 true
    *
@@ -77,7 +77,7 @@ class BaseModule {
    *    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
    * }
    */
-  protected set status(_s: moduleStatus) {
+  protected set status(_s: ModuleStatusTypes) {
     throw new Error('Method not implemented.')
   }
 

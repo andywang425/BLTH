@@ -1,6 +1,6 @@
 import { GM_getValue, GM_setValue } from '$'
 import defaultValues from './defaultValues'
-import { IuiConfig, ImoduleConfig, Icache } from '../../types'
+import { UiConfig, ModuleConfig, Cache } from '../../types'
 import _ from 'lodash'
 
 class Storage {
@@ -48,27 +48,27 @@ class Storage {
     return current_config_item
   }
 
-  public static setUiConfig(uiConfig: IuiConfig) {
+  public static setUiConfig(uiConfig: UiConfig) {
     GM_setValue('ui', uiConfig)
   }
 
-  public static getUiConfig(): IuiConfig {
+  public static getUiConfig(): UiConfig {
     return this.mergeConfigs(GM_getValue('ui', {}), defaultValues.ui)
   }
 
-  public static setModuleConfig(moduleConfig: ImoduleConfig) {
+  public static setModuleConfig(moduleConfig: ModuleConfig) {
     GM_setValue('modules', moduleConfig)
   }
 
-  public static getModuleConfig(): ImoduleConfig {
+  public static getModuleConfig(): ModuleConfig {
     return this.mergeConfigs(GM_getValue('modules', {}), defaultValues.modules)
   }
 
-  public static setCache(cache: Icache) {
+  public static setCache(cache: Cache) {
     GM_setValue('cache', cache)
   }
 
-  public static getCache(): Icache {
+  public static getCache(): Cache {
     return this.mergeConfigs(GM_getValue('cache', {}), defaultValues.cache)
   }
 }

@@ -1,7 +1,7 @@
 import Request from '../request'
 import { Live, LiveTrace, Main, Vc } from './response'
 
-interface Irequests {
+interface Requests {
   live: Request
   liveTrace: Request
   passport: Request
@@ -10,7 +10,7 @@ interface Irequests {
   raw: Request
 }
 
-interface IbapiMethods {
+interface BapiMethods {
   live: {
     roomGiftConfig: (
       room_id?: number,
@@ -122,6 +122,7 @@ interface IbapiMethods {
     vip: {
       myPrivilege: () => Promise<Main.Vip.MyPrivilege>
       receivePrivilege: (type: number, platform?: string) => Promise<Main.Vip.ReceivePrivilege>
+      addExperience: () => Promise<Main.Vip.AddExperience>
     }
   }
   vc: {
@@ -130,4 +131,4 @@ interface IbapiMethods {
   }
 }
 
-export { Irequests, IbapiMethods }
+export { Requests as Irequests, BapiMethods as IbapiMethods }

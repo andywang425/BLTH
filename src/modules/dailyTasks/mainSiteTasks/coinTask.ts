@@ -3,12 +3,12 @@ import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../libr
 import { useBiliStore } from '../../../stores/useBiliStore'
 import { MainData } from '../../../library/bili-api/data'
 import BAPI from '../../../library/bili-api'
-import { moduleStatus } from '../../../types/module'
+import { ModuleStatusTypes } from '../../../types/module'
 
 class CoinTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.coin
 
-  set status(s: moduleStatus) {
+  set status(s: ModuleStatusTypes) {
     this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.coin = s
   }
 

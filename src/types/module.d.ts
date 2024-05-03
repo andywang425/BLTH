@@ -1,52 +1,52 @@
-type moduleStatus = 'running' | 'done' | 'error' | ''
+type ModuleStatusTypes = 'running' | 'done' | 'error' | ''
 
-interface ImoduleStatus {
+interface ModuleStatus {
   DailyTasks: {
     MainSiteTasks: {
-      login: moduleStatus
-      watch: moduleStatus
-      coin: moduleStatus
-      share: moduleStatus
+      login: ModuleStatusTypes
+      watch: ModuleStatusTypes
+      coin: ModuleStatusTypes
+      share: ModuleStatusTypes
     }
     LiveTasks: {
-      sign: moduleStatus
+      sign: ModuleStatusTypes
       medalTasks: {
-        danmu: moduleStatus
-        like: moduleStatus
-        watch: moduleStatus
+        danmu: ModuleStatusTypes
+        like: ModuleStatusTypes
+        watch: ModuleStatusTypes
       }
     }
     OtherTasks: {
-      groupSign: moduleStatus
-      silverToCoin: moduleStatus
-      coinToSilver: moduleStatus
-      getYearVipPrivilege: moduleStatus
+      groupSign: ModuleStatusTypes
+      silverToCoin: ModuleStatusTypes
+      coinToSilver: ModuleStatusTypes
+      getYearVipPrivilege: ModuleStatusTypes
     }
   }
 }
 
-type runAtMoment =
+type RunAtMoment =
   | 'document-start'
   | 'document-head'
   | 'document-body'
   | 'document-end'
   | 'window-load'
 
-type onFrameTypes = 'all' | 'target' | 'top'
+type OnFrameTypes = 'all' | 'target' | 'top'
 
-type isOnTargetFrameTypes = 'unknown' | 'yes'
+type IsOnTargetFrameTypes = 'unknown' | 'yes'
 
-type moduleEmitterEvents = {
+type ModuleEmitterEvents = {
   Default_FansMedals: {
     module: string
   }
 }
 
 export {
-  moduleStatus,
-  ImoduleStatus,
-  runAtMoment,
-  moduleEmitterEvents,
-  onFrameTypes,
-  isOnTargetFrameTypes
+  ModuleStatusTypes,
+  ModuleStatus,
+  RunAtMoment,
+  ModuleEmitterEvents,
+  OnFrameTypes,
+  IsOnTargetFrameTypes
 }

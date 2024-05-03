@@ -1,12 +1,12 @@
-import { IuiConfig, ImoduleConfig, Icache } from '../../types'
+import { UiConfig, ModuleConfig, Cache } from '../../types'
 
-interface IdefaultValues {
-  ui: IuiConfig
-  modules: ImoduleConfig
-  cache: Icache
+interface DefaultValues {
+  ui: UiConfig
+  modules: ModuleConfig
+  cache: Cache
 }
 
-const defaultValues: IdefaultValues = {
+const defaultValues: DefaultValues = {
   ui: {
     isCollapse: false,
     isShowPanel: true,
@@ -129,6 +129,9 @@ const defaultValues: IdefaultValues = {
       removeShopPopover: {
         enabled: false
       },
+      removeGameParty: {
+        enabled: false
+      },
       removeGiftPopover: {
         enabled: false
       },
@@ -136,6 +139,27 @@ const defaultValues: IdefaultValues = {
         enabled: false
       },
       removeComboCard: {
+        enabled: false
+      },
+      removeRank: {
+        enabled: false
+      },
+      removeGiftPlanet: {
+        enabled: false
+      },
+      removeActivityBanner: {
+        enabled: false
+      },
+      removePKBanner: {
+        enabled: false
+      },
+      removeFlipView: {
+        enabled: false
+      },
+      removeRecommendRoom: {
+        enabled: false
+      },
+      removeLiveMosaic: {
         enabled: false
       }
     }

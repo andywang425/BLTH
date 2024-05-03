@@ -1,4 +1,4 @@
-interface ImoduleConfig {
+interface ModuleConfig {
   DailyTasks: {
     MainSiteTasks: {
       login: {
@@ -99,6 +99,9 @@ interface ImoduleConfig {
     removeShopPopover: {
       enabled: boolean
     }
+    removeGameParty: {
+      enabled: boolean
+    }
     removeGiftPopover: {
       enabled: boolean
     }
@@ -108,24 +111,45 @@ interface ImoduleConfig {
     removeComboCard: {
       enabled: boolean
     }
+    removeRank: {
+      enabled: boolean
+    }
+    removeGiftPlanet: {
+      enabled: boolean
+    }
+    removeActivityBanner: {
+      enabled: boolean
+    }
+    removePKBanner: {
+      enabled: boolean
+    }
+    removeFlipView: {
+      enabled: boolean
+    }
+    removeRecommendRoom: {
+      enabled: boolean
+    }
+    removeLiveMosaic: {
+      enabled: boolean
+    }
   }
 }
 
-type menuIndex =
+type MenuIndex =
   | 'MainSiteTasks'
   | 'LiveTasks'
   | 'OtherTasks'
   | 'EnhanceExperience'
   | 'RemoveElement'
 
-interface IuiConfig {
+interface UiConfig {
   isCollapse: boolean
   isShowPanel: boolean
-  activeMenuIndex: menuIndex
+  activeMenuIndex: MenuIndex
 }
 
-interface Icache {
+interface Cache {
   lastAliveHeartBeatTime: number
 }
 
-export { ImoduleConfig, IuiConfig, Icache, menuIndex }
+export { ModuleConfig, UiConfig, Cache, MenuIndex }

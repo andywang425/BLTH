@@ -14,7 +14,7 @@ BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [vite-plugin-monkey](https://
 - 安装 [Node.js](https://nodejs.org/), [Visual Studio Code](https://code.visualstudio.com/)。
 - Fork 本项目，然后 Clone 至本地。
 - 切换到项目根目录，安装依赖 `npm install`。
-- 安装以下几个 vscode 拓展：[Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。同时为了更好的开发体验推荐启用 Volar 的 [Take Over Mode](https://cn.vuejs.org/guide/typescript/overview.html#volar-takeover-mode)。
+- 安装以下几个 vscode 拓展：[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。
 
 ## 开始
 

@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import { reactive, ref, watch } from 'vue'
 import Storage from '../library/storage'
-import { Icache } from '../types'
+import { Cache } from '../types'
 
-type scriptType = 'Main' | 'SubMain' | 'Other'
+type ScriptType = 'Main' | 'SubMain' | 'Other'
 
 export const useCacheStore = defineStore('cache', () => {
   // 缓存
-  const cache: Icache = reactive(Storage.getCache())
+  const cache: Cache = reactive(Storage.getCache())
 
   /**
    * 表示当前BLTH的类型
@@ -21,7 +21,7 @@ export const useCacheStore = defineStore('cache', () => {
    * 如果关掉 Main BLTH 所在的页面，那么下一个打开的页面上所运行的 BLTH 则为 Main BLTH（也可能会有SubMain BLTH）。
    * 增加这一概念主要时为了确保任务类模块不会重复运行（比如完成各种每日任务的模块）。
    */
-  const currentScriptType = ref<scriptType>('Main')
+  const currentScriptType = ref<ScriptType>('Main')
 
   /**
    * Main BLTH 存活心跳
@@ -61,7 +61,7 @@ export const useCacheStore = defineStore('cache', () => {
   }
 
   // 监听缓存信息的变化，写缓存
-  watch(cache, (newCache: Icache) => Storage.setCache(newCache))
+  watch(cache, (newCache: Cache) => Storage.setCache(newCache))
 
   return {
     cache,

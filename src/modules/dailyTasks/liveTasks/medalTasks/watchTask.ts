@@ -6,11 +6,11 @@ import Logger from '../../../../library/logger'
 import CryptoJS from 'crypto-js'
 import { uuid, sleep } from '../../../../library/utils'
 import { useModuleStore } from '../../../../stores/useModuleStore'
-import { ImoduleConfig } from '../../../../types'
-import { moduleStatus, runAtMoment } from '../../../../types/module'
+import { ModuleConfig } from '../../../../types'
+import { ModuleStatusTypes, RunAtMoment } from '../../../../types/module'
 import { getCookie } from '../../../../library/cookie'
 
-interface sypderData {
+interface SypderData {
   benchmark: string
   device: string
   ets: number
@@ -41,8 +41,8 @@ class RoomHeart {
 
   private logger = new Logger('RoomHeart')
 
-  private config: ImoduleConfig['DailyTasks']['LiveTasks']['medalTasks']['watch']
-  set status(s: moduleStatus) {
+  private config: ModuleConfig['DailyTasks']['LiveTasks']['medalTasks']['watch']
+  set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
   /** 是不是最后一个心跳任务 */
@@ -137,7 +137,7 @@ class RoomHeart {
       return
     }
     try {
-      const sypderData: sypderData = {
+      const sypderData: SypderData = {
         id: JSON.stringify(this.id),
         device: JSON.stringify(this.device),
         ets: this.timestamp,
@@ -208,7 +208,7 @@ class RoomHeart {
    * @returns s
    */
   private sypder(str: string, rule: number[]): string {
-    const data: sypderData = JSON.parse(str)
+    const data: SypderData = JSON.parse(str)
     const [parent_id, area_id, seq_id, room_id]: number[] = JSON.parse(data.id)
     const [buvid, uuid]: string[] = JSON.parse(data.device)
     const key: string = data.benchmark
@@ -254,12 +254,12 @@ class RoomHeart {
 }
 
 class WatchTask extends BaseModule {
-  static runAt: runAtMoment = 'window-load'
+  static runAt: RunAtMoment = 'window-load'
 
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.watch
 
-  set status(s: moduleStatus) {
+  set status(s: ModuleStatusTypes) {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
 

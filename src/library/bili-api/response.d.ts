@@ -169,6 +169,13 @@ declare namespace Main {
       message: string
       ttl: number
     }
+
+    interface AddExperience {
+      code: number
+      message: string
+      ttl: number
+      data: MainData.Vip.AddExperience.Data
+    }
   }
 }
 

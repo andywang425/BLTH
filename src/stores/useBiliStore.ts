@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { LiveData, MainData } from '../library/bili-api/data'
-import { IbiliCookies } from '../types'
+import { BiliCookies } from '../types'
 
 export const useBiliStore = defineStore('bili', () => {
   // window.BilibiliLive 包含当前直播间的一些基本信息
   const BilibiliLive = ref<Window['BilibiliLive'] | null>(null)
   // 脚本要用到的 Cookies
-  const cookies = ref<IbiliCookies | null>(null)
+  const cookies = ref<BiliCookies | null>(null)
   // 用户基本信息
   const userInfo = ref<MainData.Nav.Data | null>(null)
   // 礼物配置信息

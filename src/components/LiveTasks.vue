@@ -5,7 +5,7 @@ import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
 import { useBiliStore } from '../stores/useBiliStore'
 
-interface ImedalInfoRow {
+interface MedalInfoRow {
   avatar: string
   nick_name: string
   medal_name: string
@@ -67,7 +67,7 @@ const handleAddDanmu = () => {
 }
 
 const medalInfoPanelVisible = ref<boolean>(false)
-const medalInfoTableData = computed<ImedalInfoRow[] | undefined>(() =>
+const medalInfoTableData = computed<MedalInfoRow[] | undefined>(() =>
   biliStore.filteredFansMedals?.map((medal) => ({
     avatar: medal.anchor_info.avatar,
     nick_name: medal.anchor_info.nick_name,
@@ -90,14 +90,17 @@ const handleEditList = () => {
     if (!biliStore.fansMedals) {
       medalInfoLoading.value = true
       // 等待数据被获取到
-      const unwatch = watch(medalInfoTableData, (newData) => {
-        if (newData) {
-          unwatch()
-          firstClickEditList = false
-          initSelection(medalInfoTableData.value)
-          medalInfoLoading.value = false
+      const unwatch = watch(
+        () => medalInfoTableData.value,
+        (newData) => {
+          if (newData) {
+            unwatch()
+            firstClickEditList = false
+            initSelection(newData)
+            medalInfoLoading.value = false
+          }
         }
-      })
+      )
       // 利用 emitter 通知 FansMedals 模块去获取数据
       moduleStore.emitter.emit('Default_FansMedals', {
         module: 'LiveTasks'
@@ -112,16 +115,16 @@ const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
 /** 是否锁住配置 */
 let lockConfig = false
 /** 初始化多选框选择状态 */
-const initSelection = (rows?: ImedalInfoRow[]) => {
+const initSelection = (rows?: MedalInfoRow[]) => {
   lockConfig = true
   if (rows) {
     // 如果直接使用 medalInfoTableRef.value，medalInfoTableRef.value 可能为 undefined
     const unwatch = watch(
       () => medalInfoTableRef.value,
       (newValue) => {
-        // unwatch 可能还未初始化，延迟到下一个空闲时间点执行
-        setTimeout(() => unwatch(), 0)
         if (newValue) {
+          // unwatch 可能还未初始化，延迟到下一个空闲时间点执行
+          setTimeout(() => unwatch(), 0)
           config.medalTasks.roomidList.forEach((roomid) =>
             newValue.toggleRowSelection(
               rows.find((row) => row.roomid === roomid),
@@ -135,7 +138,7 @@ const initSelection = (rows?: ImedalInfoRow[]) => {
   }
   lockConfig = false
 }
-function handleSelectionChange(selectedRows: ImedalInfoRow[]) {
+function handleSelectionChange(selectedRows: MedalInfoRow[]) {
   if (!lockConfig) {
     config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
   }

@@ -1,8 +1,5 @@
-type cookieValue = string | null
+type CookieNames = 'bili_jct' | 'LIVE_BUVID' | 'buvid3'
 
-interface IbiliCookies {
-  bili_jct: cookieValue
-  LIVE_BUVID: cookieValue
-}
+type BiliCookies = Record<CookieNames, string | null>
 
-export { IbiliCookies }
+export { BiliCookies }

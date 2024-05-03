@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { reactive, watch } from 'vue'
 import Storage from '../library/storage'
 import _ from 'lodash'
-import { ImoduleConfig } from '../types'
+import { ModuleConfig } from '../types'
 import BaseModule from '../modules/BaseModule'
 import * as defaultModules from '../modules/default'
 import * as otherModules from '../modules'
@@ -10,16 +10,16 @@ import Logger from '../library/logger'
 import mitt from '../library/mitt'
 import { delayToNextMoment } from '../library/luxon'
 import {
-  ImoduleStatus,
-  isOnTargetFrameTypes,
-  moduleEmitterEvents,
-  moduleStatus
+  ModuleStatus,
+  IsOnTargetFrameTypes,
+  ModuleEmitterEvents,
+  ModuleStatusTypes
 } from '../types/module'
 import { deepestIterate, waitForMoment } from '../library/utils'
 import { useCacheStore } from './useCacheStore'
 import { isSelfTopFrame } from '../library/dom'
 
-const defaultModuleStatus: ImoduleStatus = {
+const defaultModuleStatus: ModuleStatus = {
   DailyTasks: {
     MainSiteTasks: {
       login: '',
@@ -49,11 +49,11 @@ const allAndTopFrameModuleNames: string[] = []
 
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
-  const moduleConfig: ImoduleConfig = reactive(Storage.getModuleConfig())
+  const moduleConfig: ModuleConfig = reactive(Storage.getModuleConfig())
   // Emitter 实例，用于模块间信息传递和 wait 函数
-  const emitter = mitt<moduleEmitterEvents>()
+  const emitter = mitt<ModuleEmitterEvents>()
   // 模块状态，用于显示状态图标
-  const moduleStatus: ImoduleStatus = reactive(defaultModuleStatus)
+  const moduleStatus: ModuleStatus = reactive(defaultModuleStatus)
 
   /**
    * 加载默认模块（该函数不导出）
@@ -78,7 +78,7 @@ export const useModuleStore = defineStore('module', () => {
    * - `unknown`: 不知道（至少要等到`document-body`后才能确定）
    * - `yes`: 是的
    */
-  function loadModules(isOnTargetFrame: isOnTargetFrameTypes): void {
+  function loadModules(isOnTargetFrame: IsOnTargetFrameTypes): void {
     const cacheStore = useCacheStore()
     const logger = new Logger('ModuleStore_LoadModules')
     if (isOnTargetFrame === 'unknown') {
@@ -132,7 +132,7 @@ export const useModuleStore = defineStore('module', () => {
   // 监听模块配置信息的变化，使用防抖降低油猴写配置信息频率
   watch(
     moduleConfig,
-    _.debounce((newModuleConfig: ImoduleConfig) => Storage.setModuleConfig(newModuleConfig), 250, {
+    _.debounce((newModuleConfig: ModuleConfig) => Storage.setModuleConfig(newModuleConfig), 250, {
       leading: true,
       trailing: true
     })
@@ -143,7 +143,7 @@ export const useModuleStore = defineStore('module', () => {
    */
   ;(function clearStatus() {
     setTimeout(() => {
-      deepestIterate(moduleStatus, (_value: moduleStatus, path: string) => {
+      deepestIterate(moduleStatus, (_value: ModuleStatusTypes, path: string) => {
         _.set(moduleStatus, path, '')
       })
       clearStatus()

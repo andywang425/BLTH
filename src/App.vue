@@ -25,7 +25,7 @@ let button: HTMLButtonElement
  * 设置控制面板的大小和位置
  */
 function setPanelSize() {
-  const rect: DOMRect = (livePlayer as Element).getBoundingClientRect()
+  const rect: DOMRect = livePlayer!.getBoundingClientRect()
 
   uiStore.baseStyleValue.top = rect.top + window.scrollY
   uiStore.baseStyleValue.left = rect.left + window.scrollX
