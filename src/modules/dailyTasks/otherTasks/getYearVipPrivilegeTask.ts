@@ -76,6 +76,11 @@ class GetYearVipPrivilegeTask extends BaseModule {
           const list = await this.myPrivilege()
           if (list) {
             for (const i of list) {
+              if (i.type === 14) {
+                // type=14的权益似乎总是无法正确领取，暂时忽略
+                continue
+              }
+
               if (i.vip_type === 2) {
                 if (i.state === 0) {
                   await this.receivePrivilege(i.type)
