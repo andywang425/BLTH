@@ -1,11 +1,11 @@
 import Request from '../request'
-import { Irequests, IbapiMethods } from './api'
+import { Requests, BapiMethods } from './api'
 import { useBiliStore } from '../../stores/useBiliStore'
 import { BiliCookies } from '../../types'
 import { packFormData } from '../utils'
 import { ts, tsm } from '../luxon'
 
-const request: Irequests = {
+const request: Requests = {
   live: new Request('https://api.live.bilibili.com', 'https://live.bilibili.com'),
   liveTrace: new Request('https://live-trace.bilibili.com', 'https://live.bilibili.com'),
   passport: new Request('https://passport.bilibili.com', 'https://passport.bilibili.com/'),
@@ -14,7 +14,7 @@ const request: Irequests = {
   raw: new Request()
 }
 
-const BAPI: IbapiMethods = {
+const BAPI: BapiMethods = {
   live: {
     roomGiftConfig: (room_id = 0, area_parent_id = 0, area_id = 0, platform = 'pc') => {
       return request.live.get('/xlive/web-room/v1/giftPanel/roomGiftConfig', {

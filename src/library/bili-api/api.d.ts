@@ -131,4 +131,4 @@ interface BapiMethods {
   }
 }
 
-export { Requests as Irequests, BapiMethods as IbapiMethods }
+export { Requests, BapiMethods }
