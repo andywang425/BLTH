@@ -138,9 +138,18 @@ const initSelection = (rows?: MedalInfoRow[]) => {
   }
   lockConfig = false
 }
+
 function handleSelectionChange(selectedRows: MedalInfoRow[]) {
   if (!lockConfig) {
     config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
+  }
+}
+
+function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
+  // 如果没点到链接，切换当前行的选择状态
+  if (!(event.target as HTMLElement).className.startsWith('el-link')) {
+    // @ts-expect-error
+    medalInfoTableRef.value?.toggleRowSelection(row, undefined)
   }
 }
 </script>
@@ -175,6 +184,15 @@ function handleSelectionChange(selectedRows: MedalInfoRow[]) {
         >
         <Info id="DailyTasks.LiveTasks.medalTasks.danmu" />
         <TaskStatus :status="status.medalTasks.danmu" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap>
+        <el-icon>
+          <SemiSelect />
+        </el-icon>
+        <!-- v-model="config.medalTasks.like.includeHighLevelMedals" -->
+        <el-switch active-text="包含等级≥20的粉丝勋章" />
       </el-space>
     </el-row>
     <el-row>
@@ -262,6 +280,7 @@ function handleSelectionChange(selectedRows: MedalInfoRow[]) {
         max-height="500"
         empty-text="没有粉丝勋章"
         @selection-change="handleSelectionChange"
+        @row-click="handleRowClick"
       >
         <el-table-column type="selection" align="center" width="55" />
         <el-table-column prop="avatar" label="头像" width="100">
