@@ -41,6 +41,7 @@ const defaultValues: DefaultValues = {
         medalTasks: {
           danmu: {
             enabled: false,
+            includeHighLevelMedals: false,
             list: [
               '(⌒▽⌒)',
               '（￣▽￣）',

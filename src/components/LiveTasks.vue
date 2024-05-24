@@ -191,8 +191,10 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
         <el-icon>
           <SemiSelect />
         </el-icon>
-        <!-- v-model="config.medalTasks.like.includeHighLevelMedals" -->
-        <el-switch active-text="包含等级≥20的粉丝勋章" />
+        <el-switch
+          v-model="config.medalTasks.danmu.includeHighLevelMedals"
+          active-text="包含等级≥20的粉丝勋章"
+        />
       </el-space>
     </el-row>
     <el-row>

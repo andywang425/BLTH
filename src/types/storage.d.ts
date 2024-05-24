@@ -27,6 +27,7 @@ interface ModuleConfig {
       medalTasks: {
         danmu: {
           enabled: boolean
+          includeHighLevelMedals: boolean
           list: string[]
           _lastCompleteTime: number
         }
