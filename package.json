@@ -12,33 +12,33 @@
     "svg2vue": "node scripts/convertSvgToVue.js"
   },
   "dependencies": {
-    "ajax-hook": "^3.0.1",
+    "ajax-hook": "^3.0.3",
     "crypto-js": "^4.2.0",
-    "element-plus": "^2.3.7",
-    "hotkeys-js": "^3.10.4",
+    "element-plus": "^2.7.5",
+    "hotkeys-js": "^3.13.7",
     "install": "^0.13.0",
     "lodash": "^4.17.21",
-    "luxon": "^3.3.0",
+    "luxon": "^3.4.4",
     "mitt": "^3.0.1",
-    "pinia": "^2.1.4",
-    "vue": "^3.2.47"
+    "pinia": "^2.1.7",
+    "vue": "^3.4.29"
   },
   "devDependencies": {
-    "@rushstack/eslint-patch": "^1.10.1",
+    "@rushstack/eslint-patch": "^1.10.3",
     "@types/crypto-js": "^4.2.2",
     "@types/luxon": "^3.4.2",
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue": "^5.0.5",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/tsconfig": "^0.5.1",
     "eslint": "^8.57.0",
-    "eslint-plugin-vue": "^9.24.0",
-    "prettier": "^3.2.5",
-    "svgo": "^3.2.0",
-    "terser": "^5.30.3",
-    "typescript": "^5.4.4",
-    "vite": "^5.2.8",
+    "eslint-plugin-vue": "^9.26.0",
+    "prettier": "^3.3.2",
+    "svgo": "^3.3.2",
+    "terser": "^5.31.1",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1",
     "vite-plugin-monkey": "^3.5.2",
-    "vue-tsc": "^2.0.10"
+    "vue-tsc": "^2.0.21"
   }
 }
