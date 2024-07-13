@@ -32,17 +32,10 @@ const BAPI: BapiMethods = {
     },
     fansMedalPanel: (page, page_size = 10) => {
       // 返回的 room_id 是长号
-      return request.live.get(
-        '/xlive/app-ucenter/v1/fansMedal/panel',
-        {
-          page,
-          page_size
-        },
-        {
-          Origin: 'https://link.bilibili.com',
-          Referer: 'https://link.bilibili.com/p/center/index'
-        }
-      )
+      return request.live.get('/xlive/app-ucenter/v1/fansMedal/panel', {
+        page,
+        page_size
+      })
     },
     sendMsg: (
       msg,
