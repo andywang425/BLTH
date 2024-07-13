@@ -20,14 +20,13 @@ class DanmuTask extends BaseModule {
     const biliStore = useBiliStore()
     if (biliStore.filteredFansMedals) {
       return biliStore.filteredFansMedals
-        .filter((medal) =>
-          this.config.includeHighLevelMedals
-            ? true
-            : medal.medal.level < 20 &&
-              medal.room_info.room_id != 910884 &&
-              (this.medalTasksConfig.isWhiteList
-                ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
-                : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
+        .filter(
+          (medal) =>
+            (this.config.includeHighLevelMedals ? true : medal.medal.level < 20) &&
+            medal.room_info.room_id != 910884 &&
+            (this.medalTasksConfig.isWhiteList
+              ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
+              : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
         )
         .map((medal) => medal.room_info.room_id)
         .slice(0, 199)

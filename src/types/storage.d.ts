@@ -83,9 +83,6 @@ interface ModuleConfig {
     invisibility: {
       enabled: boolean
     }
-    wearFansMedal: {
-      enabled: boolean
-    }
     showContributionUserNum: {
       enabled: boolean
     }

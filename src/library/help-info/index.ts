@@ -198,15 +198,6 @@ const help_info: HelpInfo = {
       message: h('p', [
         h('div', '在高能用户标签上显示当前直播间的高能用户数量，每分钟更新一次数据。')
       ])
-    },
-    wearFansMedal: {
-      title: '发弹幕自动佩戴粉丝勋章',
-      message: h('p', [
-        h(
-          'div',
-          '如果有当前直播间的粉丝勋章，则会在发弹幕时自动佩戴。这样你的每条弹幕都会带有当前直播间的粉丝勋章。'
-        )
-      ])
     }
   },
   RemoveElement: {

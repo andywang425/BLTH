@@ -113,9 +113,6 @@ const defaultValues: DefaultValues = {
       invisibility: {
         enabled: false
       },
-      wearFansMedal: {
-        enabled: false
-      },
       showContributionUserNum: {
         enabled: false
       }

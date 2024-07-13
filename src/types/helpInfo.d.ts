@@ -36,7 +36,6 @@ interface HelpInfo {
     noSleep: HelpInfoItem
     invisibility: HelpInfoItem
     showContributionUserNum: HelpInfoItem
-    wearFansMedal: HelpInfoItem
   }
   RemoveElement: {
     removePKBox: HelpInfoItem

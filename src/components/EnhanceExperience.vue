@@ -12,11 +12,7 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.switchLiveStreamQuality.enabled" active-text="自动切换画质" />
-        <el-select
-          v-model="config.switchLiveStreamQuality.qualityDesc"
-          placeholder="Select"
-          style="width: 110px"
-        >
+        <el-select v-model="config.switchLiveStreamQuality.qualityDesc" placeholder="Select" style="width: 110px">
           <el-option v-for="i in qualityDescList" :key="i" :label="i" :value="i" />
         </el-select>
         <Info id="EnhanceExperience.switchLiveStreamQuality" />
@@ -48,16 +44,7 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
     </el-row>
     <el-row>
       <el-space wrap>
-        <el-switch v-model="config.wearFansMedal.enabled" active-text="发弹幕自动佩戴粉丝勋章" />
-        <Info id="EnhanceExperience.wearFansMedal" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap>
-        <el-switch
-          v-model="config.showContributionUserNum.enabled"
-          active-text="显示高能用户数量"
-        />
+        <el-switch v-model="config.showContributionUserNum.enabled" active-text="显示高能用户数量" />
         <Info id="EnhanceExperience.showContributionUserNum" />
       </el-space>
     </el-row>
