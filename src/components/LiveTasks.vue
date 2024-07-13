@@ -84,7 +84,7 @@ let firstClickEditList = true
  * 编辑名单
  */
 const handleEditList = async () => {
-  medalInfoPanelVisible.value = !medalInfoPanelVisible.value
+  medalInfoPanelVisible.value = true
 
   if (firstClickEditList) {
     // 第一次点击编辑名单按钮时需要初始化多选框状态

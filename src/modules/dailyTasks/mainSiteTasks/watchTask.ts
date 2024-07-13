@@ -59,11 +59,11 @@ class WatchTask extends BaseModule {
           this.logger.log('每日观看视频任务已完成')
         }
       } else {
-        if (!isNowIn(0, 0, 0, 5)) {
+        if (isNowIn(0, 0, 0, 5)) {
+          this.logger.log('昨天的每日观看视频任务已经完成过了，等到今天的00:05再执行')
+        } else {
           this.logger.log('今天已经完成过每日观看视频任务了')
           this.status = 'done'
-        } else {
-          this.logger.log('昨天的每日观看视频任务已经完成过了，等到今天的00:05再执行')
         }
       }
     }

@@ -11,10 +11,10 @@ class DynamicVideos extends BaseModule {
    * 每日观看视频，每日分享视频，每日投币都会用到
    */
   private async getDynamicVideos(): Promise<MainData.DynamicAll.Item[] | null> {
-    const MainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
+    const mainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
     // 开启了观看视频、每日分享视频或每日投币功能且今天没完成过
     if (
-      Object.entries(MainSiteTasks)
+      Object.entries(mainSiteTasks)
         .filter(([key]) => ['watch', 'share', 'coin'].includes(key))
         .some((keyValue) => keyValue[1].enabled && !isTimestampToday(keyValue[1]._lastCompleteTime))
     ) {

@@ -161,7 +161,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
         }
       }
     } else {
-      const diff = delayToNextMoment(0, 0)
+      const diff = delayToNextMoment(0)
       setTimeout(() => this.run(), diff.ms)
       this.logger.log('领取年度大会员权益模块下次运行时间:', diff.str)
     }
