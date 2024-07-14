@@ -6,6 +6,8 @@ on:
       - master
     paths:
       - src/**
+      - package.json
+      - vite.config.ts
 
 jobs:
   build:
@@ -26,9 +28,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Remove .gitignore
-        run: rm -f .gitignore
-
       - name: Get package version
         id: package_version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
@@ -37,6 +36,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]@users.noreply.github.com"
-          git add dist/*
-          git diff --quiet && git diff --staged --quiet || git commit -m "🔧 Automated build: v${{ steps.package_version.outputs.version }}"
+          git add -f dist/*
+          git commit -m "🔧 Automated build: v${{ steps.package_version.outputs.version }}"
           git push
