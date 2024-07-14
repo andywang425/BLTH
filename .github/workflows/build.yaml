@@ -6,6 +6,8 @@ on:
       - master
     paths:
       - src/**
+      - package.json
+      - vite.config.ts
 
 jobs:
   build:
@@ -18,7 +20,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.18.0"
+          node-version: '18.18.0'
 
       - name: Install Dependencies
         run: npm install
