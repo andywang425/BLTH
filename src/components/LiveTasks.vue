@@ -212,7 +212,6 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
     <el-row>
       <el-text>直播任务相关信息可在</el-text>
       <el-link
-        class="el-link-va-baseline"
         rel="noreferrer"
         type="primary"
         href="https://link.bilibili.com/p/help/index#/audience-fans-medal"
