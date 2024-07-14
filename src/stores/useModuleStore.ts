@@ -3,7 +3,6 @@ import { reactive, watch } from 'vue'
 import Storage from '../library/storage'
 import _ from 'lodash'
 import { ModuleConfig } from '../types'
-import BaseModule from '../modules/BaseModule'
 import * as defaultModules from '../modules/default'
 import * as otherModules from '../modules'
 import Logger from '../library/logger'
@@ -63,9 +62,7 @@ export const useModuleStore = defineStore('module', () => {
     const promiseArray: Promise<void>[] = []
     for (const [name, module] of Object.entries(defaultModules)) {
       if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
-        promiseArray.push(
-          new (module as new (moduleName: string) => BaseModule)(name).run() as Promise<void>
-        )
+        promiseArray.push(new module(name).run())
       }
     }
     return Promise.all<Promise<void>[]>(promiseArray)
@@ -88,9 +85,7 @@ export const useModuleStore = defineStore('module', () => {
             if (!module.runAfterDefault) {
               // 如果不需要等默认模块运行完了再运行，现在就加载并记录
               // 否则不做记录，等之后（isOnTargetFrame 为 yes时）再加载
-              waitForMoment(module.runAt).then(() =>
-                new (module as new (moduleName: string) => BaseModule)(name).run()
-              )
+              waitForMoment(module.runAt).then(() => new module(name).run())
               // 记录被加载的 onFrame 为 all 或 top 的模块名称
               allAndTopFrameModuleNames.push(name)
             }
@@ -117,7 +112,7 @@ export const useModuleStore = defineStore('module', () => {
                   // 等待默认模块运行完毕
                   await defaultModulesLoaded
                 }
-                new (module as new (moduleName: string) => BaseModule)(name).run()
+                new module(name).run()
               } catch (e) {
                 // 默认模块运行出错，不运行该模块
                 logger.error(`运行默认模块时出错，模块 ${name} 不运行:`, e)
