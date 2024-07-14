@@ -19,7 +19,7 @@ export default defineConfig({
         description: {
           '': 'Enhancing the experience of watching Bilibili live streaming.',
           en: 'Enhancing the experience of watching Bilibili live streaming.',
-          zh: '增加Bilibili直播观看体验。'
+          zh: '增强Bilibili直播观看体验。'
         },
         homepageURL: 'https://github.com/andywang425/BLTH',
         supportURL: 'https://github.com/andywang425/BLTH/issues',
