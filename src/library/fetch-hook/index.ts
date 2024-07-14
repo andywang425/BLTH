@@ -111,7 +111,7 @@ const hook = (win: Window) => {
         break
       }
 
-      response = responseHandler._response as Response
+      response = responseHandler._response!
     }
     return response
   }

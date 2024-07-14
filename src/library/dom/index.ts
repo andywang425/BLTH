@@ -7,7 +7,7 @@ const dce = document.createElement.bind(document)
 
 /**
  * 等待目标元素出现
- * @param parentElement 目标元素的父节点
+ * @param parentElement 目标元素的父节点（必须已存在）
  * @param selector 选择器
  * @param timeout 超时时间
  */
