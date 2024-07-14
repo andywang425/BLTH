@@ -5453,7 +5453,7 @@
     TaskStatus: TaskStatusIcon,
     Tasks: TasksIcon
   }, Symbol.toStringTag, { value: "Module" }));
-  const logger = new Logger(`Main`);
+  const logger = new Logger("Main");
   logger.log("document.readyState", document.readyState);
   const pinia = pinia$1.createPinia();
   const cacheStore = useCacheStore(pinia);
