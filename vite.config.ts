@@ -10,7 +10,6 @@ export default defineConfig({
       entry: 'src/main.ts',
       userscript: {
         name: {
-          // 确保能通过 GreasyFork 的语言类型检查
           '': 'Bilibili Live Tasks Helper',
           en: 'Bilibili Live Tasks Helper',
           zh: 'Bilibili Live Tasks Helper'
@@ -18,10 +17,9 @@ export default defineConfig({
         namespace: 'https://github.com/andywang425',
         author: 'andywang425',
         description: {
-          // 确保能通过 GreasyFork 的语言类型检查
           '': 'Enhancing the experience of watching Bilibili live streaming.',
           en: 'Enhancing the experience of watching Bilibili live streaming.',
-          zh: 'Enhancing the experience of watching Bilibili live streaming.'
+          zh: '增加Bilibili直播观看体验。'
         },
         homepageURL: 'https://github.com/andywang425/BLTH',
         supportURL: 'https://github.com/andywang425/BLTH/issues',

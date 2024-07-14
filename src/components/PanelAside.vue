@@ -66,11 +66,9 @@ const items: MenuItem[] = [
             </el-icon>
             <span>{{ item.title }}</span>
           </template>
-          <template v-for="subItem in item.subs" :key="subItem.index">
-            <el-menu-item :index="subItem.index">
-              {{ subItem.title }}
-            </el-menu-item>
-          </template>
+          <el-menu-item v-for="subItem in item.subs" :index="subItem.index" :key="subItem.index">
+            {{ subItem.title }}
+          </el-menu-item>
         </el-sub-menu>
       </template>
       <template v-else>

@@ -41,6 +41,7 @@ const defaultValues: DefaultValues = {
         medalTasks: {
           danmu: {
             enabled: false,
+            includeHighLevelMedals: false,
             list: [
               '(⌒▽⌒)',
               '（￣▽￣）',
@@ -110,9 +111,6 @@ const defaultValues: DefaultValues = {
         enabled: false
       },
       invisibility: {
-        enabled: false
-      },
-      wearFansMedal: {
         enabled: false
       },
       showContributionUserNum: {

@@ -48,12 +48,6 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
     </el-row>
     <el-row>
       <el-space wrap>
-        <el-switch v-model="config.wearFansMedal.enabled" active-text="发弹幕自动佩戴粉丝勋章" />
-        <Info id="EnhanceExperience.wearFansMedal" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap>
         <el-switch
           v-model="config.showContributionUserNum.enabled"
           active-text="显示高能用户数量"

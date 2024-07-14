@@ -1,11 +1,11 @@
 import Request from '../request'
-import { Irequests, IbapiMethods } from './api'
+import { Requests, BapiMethods } from './api'
 import { useBiliStore } from '../../stores/useBiliStore'
 import { BiliCookies } from '../../types'
 import { packFormData } from '../utils'
 import { ts, tsm } from '../luxon'
 
-const request: Irequests = {
+const request: Requests = {
   live: new Request('https://api.live.bilibili.com', 'https://live.bilibili.com'),
   liveTrace: new Request('https://live-trace.bilibili.com', 'https://live.bilibili.com'),
   passport: new Request('https://passport.bilibili.com', 'https://passport.bilibili.com/'),
@@ -14,7 +14,7 @@ const request: Irequests = {
   raw: new Request()
 }
 
-const BAPI: IbapiMethods = {
+const BAPI: BapiMethods = {
   live: {
     roomGiftConfig: (room_id = 0, area_parent_id = 0, area_id = 0, platform = 'pc') => {
       return request.live.get('/xlive/web-room/v1/giftPanel/roomGiftConfig', {
@@ -32,17 +32,10 @@ const BAPI: IbapiMethods = {
     },
     fansMedalPanel: (page, page_size = 10) => {
       // 返回的 room_id 是长号
-      return request.live.get(
-        '/xlive/app-ucenter/v1/fansMedal/panel',
-        {
-          page,
-          page_size
-        },
-        {
-          Origin: 'https://link.bilibili.com',
-          Referer: 'https://link.bilibili.com/p/center/index'
-        }
-      )
+      return request.live.get('/xlive/app-ucenter/v1/fansMedal/panel', {
+        page,
+        page_size
+      })
     },
     sendMsg: (
       msg,
@@ -121,7 +114,7 @@ const BAPI: IbapiMethods = {
       })
     },
     silver2coin: (visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct as string
+      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
       return request.live.post('/xlive/revenue/v1/wallet/silver2coin', {
         csrf: bili_jct,
         csrf_token: bili_jct,
@@ -129,7 +122,7 @@ const BAPI: IbapiMethods = {
       })
     },
     coin2silver: (num, platform = 'pc', visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct as string
+      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
       return request.live.post('/xlive/revenue/v1/wallet/coin2silver', {
         num,
         csrf: bili_jct,
@@ -156,7 +149,7 @@ const BAPI: IbapiMethods = {
       })
     },
     wearMedal: (medal_id, visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct as string
+      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
       return request.live.post('/xlive/web-room/v1/fansMedal/wear', {
         medal_id,
         csrf_token: bili_jct,
@@ -167,7 +160,7 @@ const BAPI: IbapiMethods = {
   },
   liveTrace: {
     E: (id, device, ruid, is_patch = 0, heart_beat = [], visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct as string
+      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
       return request.liveTrace.post('/xlive/data-interface/v1/x25Kn/E', {
         id: JSON.stringify(id),
         device: JSON.stringify(device),
@@ -182,7 +175,7 @@ const BAPI: IbapiMethods = {
       })
     },
     X: (s, id, device, ruid, ets, benchmark, time, ts, visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct as string
+      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
       return request.liveTrace.post('/xlive/data-interface/v1/x25Kn/X', {
         s,
         id: JSON.stringify(id),
@@ -259,7 +252,7 @@ const BAPI: IbapiMethods = {
     },
     share: (aid, source = 'pc_client_normal', eab_x = 2, ramval = 0, ga = 1) => {
       // source 不能用 web 端的值，改成 pc 客户端的才能完成任务
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct as string
+      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
       return request.main.post('/x/web-interface/share/add', {
         aid,
         eab_x,
@@ -279,7 +272,7 @@ const BAPI: IbapiMethods = {
       source = 'web_normal',
       ga = 1
     ) => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct as string
+      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
       return request.main.post('/x/web-interface/coin/add ', {
         aid: aid,
         multiply: num,
@@ -300,7 +293,7 @@ const BAPI: IbapiMethods = {
     },
     vip: {
       myPrivilege: () => {
-        const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct as string
+        const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
         return request.main.get(
           '/x/vip/privilege/my',
           {
@@ -315,7 +308,7 @@ const BAPI: IbapiMethods = {
         )
       },
       receivePrivilege: (type, platform = 'web') => {
-        const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct as string
+        const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
         return request.main.post(
           '/x/vip/privilege/receive',
           {
@@ -334,8 +327,8 @@ const BAPI: IbapiMethods = {
       addExperience: () => {
         const biliStore = useBiliStore()
         const mid = biliStore.BilibiliLive?.UID
-        const buvid = '' // buvid3
-        const bili_jct = biliStore.cookies?.bili_jct as string
+        const buvid = biliStore.cookies?.buvid3
+        const bili_jct = biliStore.cookies?.bili_jct
         return request.main.post(
           '/x/vip/experience/add',
           {

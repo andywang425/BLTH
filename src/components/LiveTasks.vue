@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useModuleStore } from '../stores/useModuleStore'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
@@ -83,23 +83,25 @@ let firstClickEditList = true
 /**
  * 编辑名单
  */
-const handleEditList = () => {
-  medalInfoPanelVisible.value = !medalInfoPanelVisible.value
-  // 如果没有粉丝勋章信息，先获取
+const handleEditList = async () => {
+  medalInfoPanelVisible.value = true
+
   if (firstClickEditList) {
+    // 第一次点击编辑名单按钮时需要初始化多选框状态
+    firstClickEditList = false
+    // 等对话框加载好后再对表格进行操作
+    await nextTick()
+    // 如果没有粉丝勋章信息，先获取
     if (!biliStore.fansMedals) {
       medalInfoLoading.value = true
       // 等待数据被获取到
-      const unwatch = watch(
-        () => medalInfoTableData.value,
+      watch(
+        medalInfoTableData,
         (newData) => {
-          if (newData) {
-            unwatch()
-            firstClickEditList = false
-            initSelection(newData)
-            medalInfoLoading.value = false
-          }
-        }
+          initSelection(newData)
+          medalInfoLoading.value = false
+        },
+        { once: true }
       )
       // 利用 emitter 通知 FansMedals 模块去获取数据
       moduleStore.emitter.emit('Default_FansMedals', {
@@ -112,35 +114,28 @@ const handleEditList = () => {
 }
 /** 用来管理多选框状态的表格Ref */
 const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
-/** 是否锁住配置 */
-let lockConfig = false
+
 /** 初始化多选框选择状态 */
 const initSelection = (rows?: MedalInfoRow[]) => {
-  lockConfig = true
   if (rows) {
-    // 如果直接使用 medalInfoTableRef.value，medalInfoTableRef.value 可能为 undefined
-    const unwatch = watch(
-      () => medalInfoTableRef.value,
-      (newValue) => {
-        if (newValue) {
-          // unwatch 可能还未初始化，延迟到下一个空闲时间点执行
-          setTimeout(() => unwatch(), 0)
-          config.medalTasks.roomidList.forEach((roomid) =>
-            newValue.toggleRowSelection(
-              rows.find((row) => row.roomid === roomid),
-              true
-            )
-          )
-        }
-      },
-      { immediate: true }
+    config.medalTasks.roomidList.forEach((roomid) =>
+      medalInfoTableRef.value?.toggleRowSelection(
+        rows.find((row) => row.roomid === roomid),
+        true
+      )
     )
   }
-  lockConfig = false
 }
+
 function handleSelectionChange(selectedRows: MedalInfoRow[]) {
-  if (!lockConfig) {
-    config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
+  config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
+}
+
+function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
+  // 如果没点到链接，切换当前行的选择状态
+  if (!(event.target as HTMLElement).className.startsWith('el-link')) {
+    // @ts-expect-error
+    medalInfoTableRef.value?.toggleRowSelection(row, undefined)
   }
 }
 </script>
@@ -179,6 +174,17 @@ function handleSelectionChange(selectedRows: MedalInfoRow[]) {
     </el-row>
     <el-row>
       <el-space wrap>
+        <el-icon>
+          <SemiSelect />
+        </el-icon>
+        <el-switch
+          v-model="config.medalTasks.danmu.includeHighLevelMedals"
+          active-text="包含等级≥20的粉丝勋章"
+        />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap>
         <el-switch v-model="config.medalTasks.watch.enabled" active-text="观看直播" />
         <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 70px">
           <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
@@ -206,7 +212,6 @@ function handleSelectionChange(selectedRows: MedalInfoRow[]) {
     <el-row>
       <el-text>直播任务相关信息可在</el-text>
       <el-link
-        class="el-link-va-baseline"
         rel="noreferrer"
         type="primary"
         href="https://link.bilibili.com/p/help/index#/audience-fans-medal"
@@ -262,6 +267,7 @@ function handleSelectionChange(selectedRows: MedalInfoRow[]) {
         max-height="500"
         empty-text="没有粉丝勋章"
         @selection-change="handleSelectionChange"
+        @row-click="handleRowClick"
       >
         <el-table-column type="selection" align="center" width="55" />
         <el-table-column prop="avatar" label="头像" width="100">

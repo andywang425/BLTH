@@ -3,7 +3,7 @@ import { useUIStore } from './stores/useUIStore'
 import PanelHeader from './components/PanelHeader.vue'
 import PanelAside from './components/PanelAside.vue'
 import PanelMain from './components/PanelMain.vue'
-import { dce, dq, pollingQuery, isSelfTopFrame, topFrameDocuemntElement } from './library/dom'
+import { dce, dq, waitForElement, isSelfTopFrame, topFrameDocuemntElement } from './library/dom'
 import hotkeys from 'hotkeys-js'
 import _ from 'lodash'
 import Logger from './library/logger'
@@ -41,12 +41,13 @@ function buttonOnClick() {
 }
 // 节流，防止点击过快，减小渲染压力
 const throttleButtoOnClick = _.throttle(buttonOnClick, 300)
-
+// 播放器节点出现在最初的html中，可以直接获取
 livePlayer = dq('#live-player-ctnr')
 if (livePlayer) {
   setPanelSize()
   // 查找播放器上面的 header
-  pollingQuery(document, '.left-ctnr.left-header-area', 300, 3000, true)
+  // 节点#player-ctnr在初始html中出现
+  waitForElement(dq('#player-ctnr')!, '.left-ctnr.left-header-area', 10e3)
     .then((playerHeaderLeft) => {
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
@@ -68,7 +69,7 @@ if (livePlayer) {
       }
       hotkeys('alt+b', throttleButtoOnClick)
     })
-    .catch(() => logger.error("Can't find playerHeaderLeft in time"))
+    .catch((e: Error) => logger.error(e))
   // 监听页面缩放，调整控制面板大小
   // 因为这个操作频率不高就不节流或防抖了
   window.addEventListener('resize', () => setPanelSize())
@@ -89,27 +90,25 @@ if (livePlayer) {
 
 <template>
   <el-collapse-transition>
-    <div :style="uiStore.baseStyle" class="base" v-show="uiStore.uiConfig.isShowPanel">
-      <el-container>
-        <el-header class="header">
-          <PanelHeader />
-        </el-header>
-        <el-scrollbar :height="uiStore.scrollBarHeight">
-          <el-container>
-            <el-aside class="aside">
-              <PanelAside />
-            </el-aside>
-            <el-main class="main">
-              <KeepAlive>
-                <Transition name="fade" mode="out-in">
-                  <PanelMain />
-                </Transition>
-              </KeepAlive>
-            </el-main>
-          </el-container>
-        </el-scrollbar>
-      </el-container>
-    </div>
+    <el-container :style="uiStore.baseStyle" class="base" v-show="uiStore.uiConfig.isShowPanel">
+      <el-header class="header">
+        <PanelHeader />
+      </el-header>
+      <el-scrollbar :height="uiStore.scrollBarHeight">
+        <el-container>
+          <el-aside class="aside">
+            <PanelAside />
+          </el-aside>
+          <el-main class="main">
+            <KeepAlive>
+              <Transition name="fade" mode="out-in">
+                <PanelMain />
+              </Transition>
+            </KeepAlive>
+          </el-main>
+        </el-container>
+      </el-scrollbar>
+    </el-container>
   </el-collapse-transition>
 </template>
 

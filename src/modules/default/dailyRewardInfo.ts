@@ -9,10 +9,10 @@ class DailyRewardInfo extends BaseModule {
    * 获取今日主站每日任务的完成情况
    */
   private async getDailyRewardInfo(): Promise<MainData.Reward.Data | null> {
-    const MainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
+    const mainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
     // 开启了任意一项主站功能且该功能今天没完成过
     if (
-      Object.values(MainSiteTasks).some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime))
+      Object.values(mainSiteTasks).some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime))
     ) {
       try {
         const response = await BAPI.main.reward()

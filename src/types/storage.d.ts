@@ -27,6 +27,7 @@ interface ModuleConfig {
       medalTasks: {
         danmu: {
           enabled: boolean
+          includeHighLevelMedals: boolean
           list: string[]
           _lastCompleteTime: number
         }
@@ -80,9 +81,6 @@ interface ModuleConfig {
       enabled: boolean
     }
     invisibility: {
-      enabled: boolean
-    }
-    wearFansMedal: {
       enabled: boolean
     }
     showContributionUserNum: {

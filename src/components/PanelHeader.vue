@@ -23,17 +23,18 @@ const uiStore = useUIStore()
 <style scoped>
 .title {
   padding-left: 20px;
-  align-items: center;
+  align-items: baseline;
   display: flex;
 }
 
 .header-big-text {
   font-size: var(--big-text-size);
+  align-self: unset;
 }
 
 .header-small-text {
   font-size: var(--small-text-size);
-  padding-top: calc(var(--big-text-size) - var(--small-text-size));
+  align-self: unset;
   margin-left: 10px;
   --small-text-size: 18px;
 }
