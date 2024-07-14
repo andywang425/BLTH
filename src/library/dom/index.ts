@@ -6,39 +6,41 @@ const dqa = document.querySelectorAll.bind(document)
 const dce = document.createElement.bind(document)
 
 /**
- * 使用轮询的方式查找目标元素
- * @param element 目标元素的父节点
- * @param selectors 选择器
- * @param intervel 轮询查找间隔
+ * 等待目标元素出现
+ * @param parentElement 目标元素的父节点
+ * @param selector 选择器
  * @param timeout 超时时间
- * @param immediate 是否立即查找一次
  */
-const pollingQuery = (
-  element: Document | Element,
-  selectors: string,
-  intervel: number,
-  timeout: number,
-  immediate: boolean = true
-): Promise<Element> => {
+function waitForElement(
+  parentElement: Element,
+  selector: string,
+  timeout: number = 5000
+): Promise<Element> {
   return new Promise((resolve, reject) => {
-    if (immediate) {
-      const ele = element.querySelector(selectors)
-      if (ele) {
-        resolve(ele)
-        return
-      }
+    const element = parentElement.querySelector(selector)
+
+    if (element) {
+      resolve(element)
+      return
     }
-    const timerPolling = setInterval(() => {
-      const ele: Element | null = element.querySelector(selectors)
-      if (ele) {
-        clearTimeout(timerPolling)
-        resolve(ele)
+
+    const observer = new MutationObserver(() => {
+      const element = parentElement.querySelector(selector)
+      if (element) {
+        clearTimeout(timeoutId)
+        observer.disconnect()
+        resolve(element)
       }
-    }, intervel)
-    const timerTimeout = setTimeout(() => {
-      clearTimeout(timerPolling)
-      clearTimeout(timerTimeout)
-      reject()
+    })
+
+    observer.observe(parentElement, {
+      childList: true,
+      subtree: true
+    })
+
+    const timeoutId = setTimeout(() => {
+      observer.disconnect()
+      reject(new Error(`无法在${timeout}毫秒内找到${parentElement.localName}的子节点${selector}`))
     }, timeout)
   })
 }
@@ -71,4 +73,4 @@ const isSelfTopFrame = (): boolean => unsafeWindow.self === unsafeWindow.top
 const topFrameDocuemntElement = (): HTMLElement | undefined =>
   unsafeWindow.top?.document?.documentElement
 
-export { dq, dqa, dce, pollingQuery, isTargetFrame, isSelfTopFrame, topFrameDocuemntElement }
+export { dq, dqa, dce, waitForElement, isTargetFrame, isSelfTopFrame, topFrameDocuemntElement }
