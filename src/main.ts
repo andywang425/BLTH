@@ -12,7 +12,7 @@ import Logger from './library/logger'
 import { useModuleStore } from './stores/useModuleStore'
 import { waitForMoment } from './library/utils'
 
-const logger = new Logger('Main')
+const logger = new Logger(`Main`)
 
 logger.log('document.readyState', document.readyState)
 
@@ -55,5 +55,3 @@ if (isTargetFrame()) {
   document.body.append(div)
   app.mount(div)
 }
-
-// trigger github action
