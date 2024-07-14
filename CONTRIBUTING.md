@@ -6,8 +6,7 @@
 
 ## 技术栈
 
-BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [vite-plugin-monkey](https://github.com/lisonge/vite-plugin-monkey) 和 Typescript 的用户脚本。
-如果想要贡献代码，你至少需要有 [Vue3](https://cn.vuejs.org) 和 Typescript 基础。
+BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [vite-plugin-monkey](https://github.com/lisonge/vite-plugin-monkey) 和 Typescript 的用户脚本。如果想要贡献代码，你至少需要有 [Vue3](https://cn.vuejs.org) 和 Typescript 基础。
 
 ## 环境搭建
 
@@ -144,10 +143,7 @@ npm run preview
 
 ## 已知问题
 
-如果要开发或调试运行时机很早的模块，建议先编译脚本（npm run build）然后运行编译后的脚本。在 dev 状态下调试这类功能可能会遇到以下问题：
-
-- 脚本被注入得太晚，无法很好地测试
-- 脚本被注入得太早导致`document.head`为`null`而报错。
+如果要开发或调试运行时机很早的模块，建议先编译脚本（npm run build）然后运行编译后的脚本。在 dev 状态下调试这类功能可能会因为脚本被注入得太晚从而无法很好地进行测试。
 
 ## commit 规范
 
