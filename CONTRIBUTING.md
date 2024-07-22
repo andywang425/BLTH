@@ -6,21 +6,21 @@
 
 ## 技术栈
 
-BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [vite-plugin-monkey](https://github.com/lisonge/vite-plugin-monkey) 和 Typescript 的用户脚本。如果想要贡献代码，你至少需要有 [Vue3](https://cn.vuejs.org) 和 Typescript 基础。
+BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [Element Plus](https://element-plus.org/), [vite-plugin-monkey](https://github.com/lisonge/vite-plugin-monkey) 和 Typescript 的用户脚本。如果想要贡献代码，你至少需要有 [Vue3](https://cn.vuejs.org) 和 Typescript 基础。
 
 ## 环境搭建
 
 - 安装 [Node.js](https://nodejs.org/), [Visual Studio Code](https://code.visualstudio.com/)。
-- Fork 本项目，然后 Clone 至本地。
+- Fork 本项目（取消勾选 Copy the `master` branch only），然后 Clone 至本地。
 - 切换到项目根目录，安装依赖 `npm install`。
-- 安装以下几个 vscode 拓展：[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。
+- 安装以下几个 vscode 拓展（使用 vscode 打开项目时会提示你安装）：[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。
 
 ## 开始
 
-首先创建并切换到`dev`分支：
+首先切换到`dev`分支：
 
 ```sh
-git checkout -b dev
+git checkout dev
 ```
 
 接着使用以下命令在浏览器中安装脚本并启动 [Vite](https://cn.vitejs.dev)，然后你就可以开始写代码啦。
@@ -29,7 +29,7 @@ git checkout -b dev
 npm run dev
 ```
 
-得益于 Vite 的模块热更新（HMR）功能，修改代码后可以直接在浏览器中看到结果， Vite 会自动帮你刷新页面（如果仅修改了 UI 连刷新页面都不需要）。但是在部分情况下仍需手动刷新页面。
+得益于 Vite 的模块热更新（HMR）功能，如果仅修改了 UI 相关代码，可以直接在浏览器中看到结果。其余情况下通常 Vite 会自动帮你刷新页面，但是在部分情况下仍需手动刷新。
 
 脚本运行过程中会调用B站API，过于频繁地刷新页面从而让脚本反复调用API可能导致你的B站账号被风控。如果你写代码的时候经常保存请注意这一点。
 
@@ -37,7 +37,7 @@ npm run dev
 
 ### 分支
 
-- **master**: `master`分支是主分支，主仓库在发布新版本前会把`dev`分支合并到`master`分支。最终供用户安装的用户脚本由Github Actions自动编译并推送到主分支。
+- **master**: `master`分支是主分支，主仓库在发布新版本前会把`dev`分支合并到`master`分支。最终供用户安装的用户脚本由 Github Actions 自动编译并推送到主分支。
 
 - **dev**: `dev`分支是开发用分支，开发时请使用该分支，发起PR时也以主仓库的dev分支为合并的目标。
 
@@ -115,7 +115,7 @@ npm run format
 
 ### 强制性
 
-- 对于`src/library/bili-api`中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](https://github.com/ritz078/transform)和[quicktype](https://github.com/quicktype/quicktype)或许会有帮助。
+- 对于`src/library/bili-api`中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](https://github.com/ritz078/transform) 和 [quicktype](https://github.com/quicktype/quicktype) 或许会有帮助。
 - 如果添加了新的第三方库或资源文件，请修改`vite.config.ts`使其通过`@require`或`@resource`引入。
 
 ### 建议性
