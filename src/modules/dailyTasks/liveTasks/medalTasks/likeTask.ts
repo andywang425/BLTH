@@ -4,6 +4,7 @@ import BAPI from '../../../../library/bili-api'
 import { useBiliStore } from '../../../../stores/useBiliStore'
 import { sleep } from '../../../../library/utils'
 import { ModuleStatusTypes } from '../../../../types/module'
+import _ from 'lodash'
 
 class LikeTask extends BaseModule {
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
@@ -14,7 +15,7 @@ class LikeTask extends BaseModule {
   }
 
   /**
-   * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
+   * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20、不符合黑白名单要求以及主播没开播的粉丝勋章
    * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
    */
   private getRoomidUidList(): [number, number][] | null {
@@ -27,7 +28,9 @@ class LikeTask extends BaseModule {
               medal.medal.level < 20 &&
               (this.medalTasksConfig.isWhiteList
                 ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
-                : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
+                : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
+              // 只有给正在直播的房间点赞才能获得粉丝勋章亲密度
+              medal.room_info.living_status === 1
           )
           .map((medal) => [medal.room_info.room_id, medal.medal.target_id]) as [number, number][]
       ).slice(0, 199)
@@ -42,20 +45,25 @@ class LikeTask extends BaseModule {
    * @param roomid 直播间号
    * @param target_id 主播UID
    */
-  private async like(roomid: number, target_id: number): Promise<void> {
+  private async like(roomid: number, target_id: number, click_time: number): Promise<void> {
     try {
-      const response = await BAPI.live.likeReport(roomid, target_id)
-      this.logger.log(`BAPI.live.likeReport(${roomid}, ${target_id})`, response)
+      const response = await BAPI.live.likeReport(roomid, target_id, click_time)
+      this.logger.log(`BAPI.live.likeReport(${roomid}, ${target_id}, ${click_time})`, response)
       if (response.code === 0) {
-        this.logger.log(`给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 成功`)
+        this.logger.log(
+          `给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 点赞次数 = ${click_time} 成功`
+        )
       } else {
         this.logger.error(
-          `给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 失败`,
+          `给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 点赞次数 = ${click_time} 失败`,
           response.message
         )
       }
     } catch (error) {
-      this.logger.error(`给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 出错`, error)
+      this.logger.error(
+        `给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 点赞次数 = ${click_time} 出错`,
+        error
+      )
     }
   }
 
@@ -67,7 +75,7 @@ class LikeTask extends BaseModule {
         const idList = this.getRoomidUidList()
         if (idList) {
           for (const [roomid, target_id] of idList) {
-            await this.like(roomid, target_id)
+            await this.like(roomid, target_id, _.random(50, 55))
             // 延时防风控
             await sleep(2000)
           }
