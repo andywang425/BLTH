@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.1.5
+// @version         7.1.6
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
@@ -33,7 +33,7 @@
 // @match           *://live.bilibili.com/blanc/7*
 // @match           *://live.bilibili.com/blanc/8*
 // @match           *://live.bilibili.com/blanc/9*
-// @require         https://unpkg.com/vue@3.4.31/dist/vue.global.prod.js
+// @require         https://unpkg.com/vue@3.4.33/dist/vue.global.prod.js
 // @require         data:application/javascript,%3Bwindow.Vue%3DVue%3Bwindow.VueDemi%3DVue%3B
 // @require         https://unpkg.com/element-plus@2.7.7/dist/index.full.min.js
 // @require         https://unpkg.com/@element-plus/icons-vue@2.3.1/dist/index.iife.min.js
@@ -58,7 +58,7 @@
 // @run-at          document-start
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(" .title[data-v-a28e87fa]{padding-left:20px;align-items:baseline;display:flex}.header-big-text[data-v-a28e87fa]{font-size:var(--big-text-size);align-self:unset}.header-small-text[data-v-a28e87fa]{font-size:var(--small-text-size);align-self:unset;margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-a28e87fa]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-d7c74163]{width:80px;height:80px}.avatar[data-v-d7c74163]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-3884f5fc]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-3884f5fc]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-3884f5fc]{width:auto}.aside #aside-el-menu[data-v-3884f5fc]:not(.el-menu--collapse){width:150px}.main[data-v-3884f5fc]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-3884f5fc],.fade-leave-active[data-v-3884f5fc]{transition:opacity .1s ease}.fade-enter-from[data-v-3884f5fc],.fade-leave-to[data-v-3884f5fc]{opacity:0}.info-icon[data-v-5cc8821e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-41b10222]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px} ");
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(" .title[data-v-a28e87fa]{padding-left:20px;align-items:baseline;display:flex}.header-big-text[data-v-a28e87fa]{font-size:var(--big-text-size);align-self:unset}.header-small-text[data-v-a28e87fa]{font-size:var(--small-text-size);align-self:unset;margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-a28e87fa]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}.avatar-wrap[data-v-268e1b13]{width:80px;height:80px}.avatar[data-v-268e1b13]{display:flex;justify-content:center;align-items:center;border-radius:50%}.base[data-v-3884f5fc]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-3884f5fc]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-3884f5fc]{width:auto}.aside #aside-el-menu[data-v-3884f5fc]:not(.el-menu--collapse){width:150px}.main[data-v-3884f5fc]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-3884f5fc],.fade-leave-active[data-v-3884f5fc]{transition:opacity .1s ease}.fade-enter-from[data-v-3884f5fc],.fade-leave-to[data-v-3884f5fc]{opacity:0}.info-icon[data-v-5cc8821e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-41b10222]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px} ");
 
 (async function (vue, pinia$1, _, ElementPlusIconsVue, luxon, CryptoJS, ElementPlus, hotkeys) {
   'use strict';
@@ -152,7 +152,7 @@
             },
             watch: {
               enabled: false,
-              time: 70,
+              time: 20,
               _watchedSecondsToday: 0,
               _lastWatchTime: 0,
               _lastCompleteTime: 0
@@ -1875,14 +1875,15 @@
       this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.like = s;
     }
     /**
-     * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
+     * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20、不符合黑白名单要求以及主播没开播的粉丝勋章
      * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
      */
     getRoomidUidList() {
       const biliStore = useBiliStore();
       if (biliStore.filteredFansMedals) {
         return biliStore.filteredFansMedals.filter(
-          (medal) => medal.medal.level < 20 && (this.medalTasksConfig.isWhiteList ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id) : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
+          (medal) => medal.medal.level < 20 && (this.medalTasksConfig.isWhiteList ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id) : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) && // 只有给正在直播的房间点赞才能获得粉丝勋章亲密度
+          medal.room_info.living_status === 1
         ).map((medal) => [medal.room_info.room_id, medal.medal.target_id]).slice(0, 199);
       } else {
         this.status = "error";
@@ -1894,20 +1895,25 @@
      * @param roomid 直播间号
      * @param target_id 主播UID
      */
-    async like(roomid, target_id) {
+    async like(roomid, target_id, click_time) {
       try {
-        const response = await BAPI.live.likeReport(roomid, target_id);
-        this.logger.log(`BAPI.live.likeReport(${roomid}, ${target_id})`, response);
+        const response = await BAPI.live.likeReport(roomid, target_id, click_time);
+        this.logger.log(`BAPI.live.likeReport(${roomid}, ${target_id}, ${click_time})`, response);
         if (response.code === 0) {
-          this.logger.log(`给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 成功`);
+          this.logger.log(
+            `给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 点赞次数 = ${click_time} 成功`
+          );
         } else {
           this.logger.error(
-            `给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 失败`,
+            `给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 点赞次数 = ${click_time} 失败`,
             response.message
           );
         }
       } catch (error) {
-        this.logger.error(`给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 出错`, error);
+        this.logger.error(
+          `给主播点赞 房间号 = ${roomid} 主播UID = ${target_id} 点赞次数 = ${click_time} 出错`,
+          error
+        );
       }
     }
     async run() {
@@ -1918,7 +1924,7 @@
           const idList = this.getRoomidUidList();
           if (idList) {
             for (const [roomid, target_id] of idList) {
-              await this.like(roomid, target_id);
+              await this.like(roomid, target_id, _.random(50, 55));
               await sleep(2e3);
             }
             this.config._lastCompleteTime = tsm();
@@ -2294,9 +2300,11 @@
           if (roomIdList) {
             const danmuList = this.config.list;
             for (let i = 0; i < roomIdList.length; i++) {
-              const danmu = danmuList[i % danmuList.length];
-              await this.sendDanmu(danmu, roomIdList[i]);
-              await sleep(2e3);
+              for (let j = 0; j < 10; j++) {
+                const danmu = danmuList[(i * 10 + j) % danmuList.length];
+                await this.sendDanmu(danmu, roomIdList[i]);
+                await sleep(2e3);
+              }
             }
             this.config._lastCompleteTime = tsm();
             this.status = "done";
@@ -3928,7 +3936,7 @@
       };
     }
   });
-  const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-d7c74163"), n = n(), vue.popScopeId(), n);
+  const _withScopeId$1 = (n) => (vue.pushScopeId("data-v-268e1b13"), n = n(), vue.popScopeId(), n);
   const _hoisted_1$2 = /* @__PURE__ */ _withScopeId$1(() => /* @__PURE__ */ vue.createElementVNode("br", null, null, -1));
   const _hoisted_2$1 = { class: "avatar-wrap" };
   const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
@@ -4020,15 +4028,15 @@
       const medalInfoTableRef = vue.ref();
       const initSelection = (rows) => {
         if (rows) {
-          config.medalTasks.roomidList.forEach(
-            (roomid) => {
-              var _a2;
-              return (_a2 = medalInfoTableRef.value) == null ? void 0 : _a2.toggleRowSelection(
-                rows.find((row) => row.roomid === roomid),
-                true
-              );
+          config.medalTasks.roomidList.forEach((roomid, index) => {
+            var _a2;
+            const row = rows.find((row2) => row2.roomid === roomid);
+            if (row) {
+              (_a2 = medalInfoTableRef.value) == null ? void 0 : _a2.toggleRowSelection(row, true);
+            } else {
+              config.medalTasks.roomidList.splice(index, 1);
             }
-          );
+          });
         }
       };
       function handleSelectionChange(selectedRows) {
@@ -4433,7 +4441,7 @@
       };
     }
   });
-  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["__scopeId", "data-v-d7c74163"]]);
+  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["__scopeId", "data-v-268e1b13"]]);
   const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
     __name: "OtherTasks",
     setup(__props) {
@@ -5155,13 +5163,20 @@
             title: "给主播点赞",
             message: vue.h("p", [
               vue.h("div", "在你的每个粉丝勋章对应的直播间给主播点赞。"),
-              vue.h("div", "部分直播间无法完成该任务，原因未知。")
+              vue.h("div", ""),
+              vue.h("div", [
+                vue.h("li", [
+                  vue.h("span", "仅在开播的直播间点赞（经测试在不开播的直播间点赞不增加亲密度）。")
+                ]),
+                vue.h("li", [vue.h("span", "点赞次数为50~55次之间的随机值。")]),
+                vue.h("li", [vue.h("span", "部分直播间无法完成该任务，原因未知。")])
+              ])
             ])
           },
           danmu: {
             title: "发送弹幕",
             message: vue.h("p", [
-              vue.h("div", "在你的每个粉丝勋章对应的直播间发送一条弹幕。"),
+              vue.h("div", "在你的每个粉丝勋章对应的直播间发送10条弹幕。"),
               vue.h("div", [
                 vue.h("span", "点击编辑弹幕按钮编辑发送的弹幕，脚本会从中按顺序循环抽取弹幕发送。"),
                 vue.h("span", "如果有点亮高等级勋章的需求，请勾选“包含等级≥20的粉丝勋章”选项。"),
@@ -5186,7 +5201,7 @@
               vue.h("div", "完成观看持有粉丝勋章对应主播直播的任务。"),
               vue.h(
                 "div",
-                "部分直播间因为没有设置直播分区导致任务无法完成。主播当前是否开播不会影响该任务的完成。"
+                "部分直播间因为没有设置直播分区导致任务无法完成。主播当前是否开播不会影响该任务的完成。目前该功能尚未适配新版粉丝勋章亲密度机制，会同时观看所有粉丝勋章的直播，但据测试粉丝勋章的亲密度是逐个增加的（即每20分钟获取完一个粉丝勋章的单日亲密度上限80）。"
               )
             ])
           }
