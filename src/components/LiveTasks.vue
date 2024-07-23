@@ -118,12 +118,16 @@ const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
 /** 初始化多选框选择状态 */
 const initSelection = (rows?: MedalInfoRow[]) => {
   if (rows) {
-    config.medalTasks.roomidList.forEach((roomid) =>
-      medalInfoTableRef.value?.toggleRowSelection(
-        rows.find((row) => row.roomid === roomid),
-        true
-      )
-    )
+    config.medalTasks.roomidList.forEach((roomid, index) => {
+      const row = rows.find((row) => row.roomid === roomid)
+      if (row) {
+        medalInfoTableRef.value?.toggleRowSelection(row, true)
+      } else {
+        // 没有找到直播间号为 roomid 的粉丝勋章，可能是因为该粉丝勋章已被删除或是过滤
+        // 从黑白名单中去掉这个 roomid
+        config.medalTasks.roomidList.splice(index, 1)
+      }
+    })
   }
 }
 

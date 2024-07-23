@@ -64,11 +64,13 @@ class DanmuTask extends BaseModule {
         if (roomIdList) {
           const danmuList = this.config.list
           for (let i = 0; i < roomIdList.length; i++) {
-            // 循环抽取弹幕
-            const danmu = danmuList[i % danmuList.length]
-            await this.sendDanmu(danmu, roomIdList[i])
-            // 延时防风控
-            await sleep(2000)
+            for (let j = 0; j < 10; j++) {
+              // 循环抽取弹幕
+              const danmu = danmuList[(i * 10 + j) % danmuList.length]
+              await this.sendDanmu(danmu, roomIdList[i])
+              // 延时防风控
+              await sleep(2000)
+            }
           }
           this.config._lastCompleteTime = tsm()
           this.status = 'done'

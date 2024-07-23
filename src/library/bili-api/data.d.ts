@@ -151,23 +151,25 @@ declare namespace LiveData {
   }
 
   namespace FansMedalPanel {
-    interface Data {
+    export interface Data {
       list: List[]
-      special_list: List[] | []
+      special_list: SpecialList[]
       bottom_bar: any
       page_info: PageInfo
       total_number: number
       has_medal: number
+      group_medal: any
     }
 
-    interface List {
+    export interface List {
       medal: Medal
       anchor_info: AnchorInfo
       superscript: any
       room_info: RoomInfo
+      uinfo_medal: UinfoMedal
     }
 
-    interface Medal {
+    export interface Medal {
       uid: number
       target_id: number
       target_name: string
@@ -190,21 +192,57 @@ declare namespace LiveData {
       guard_icon: string
       honor_icon: string
       can_delete: boolean
+      v2_medal_color_start: string
+      v2_medal_color_end: string
+      v2_medal_color_border: string
+      v2_medal_color_text: string
+      v2_medal_color_level: string
     }
 
-    interface AnchorInfo {
+    export interface AnchorInfo {
       nick_name: string
       avatar: string
       verify: number
     }
 
-    interface RoomInfo {
+    export interface RoomInfo {
       room_id: number
       living_status: number
       url: string
     }
 
-    interface PageInfo {
+    export interface UinfoMedal {
+      name: string
+      level: number
+      color_start: number
+      color_end: number
+      color_border: number
+      color: number
+      id: number
+      typ: number
+      is_light: number
+      ruid: number
+      guard_level: number
+      score: number
+      guard_icon: string
+      honor_icon: string
+      v2_medal_color_start: string
+      v2_medal_color_end: string
+      v2_medal_color_border: string
+      v2_medal_color_text: string
+      v2_medal_color_level: string
+      user_receive_count: number
+    }
+
+    export interface SpecialList {
+      medal: Medal
+      anchor_info: AnchorInfo
+      superscript: any
+      room_info: RoomInfo
+      uinfo_medal: UinfoMedal
+    }
+
+    export interface PageInfo {
       number: number
       current_page: number
       has_more: boolean

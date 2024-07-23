@@ -67,7 +67,7 @@ const defaultValues: DefaultValues = {
           },
           watch: {
             enabled: false,
-            time: 70,
+            time: 20,
             _watchedSecondsToday: 0,
             _lastWatchTime: 0,
             _lastCompleteTime: 0
