@@ -46,7 +46,6 @@ class ShowContributionUserNum extends BaseModule {
     if (num !== -1) {
       element.innerText = `高能用户(${num})`
       setTimeout(() => this.updateNumber(element, anchor_uid, roomid), _.random(50e3, 70e3))
-      // this.logger.log('更新高能用户数量', num)
     } else {
       // 如果获取高能用户人数失败，则不再获取
       element.innerText = '高能用户'
@@ -59,11 +58,12 @@ class ShowContributionUserNum extends BaseModule {
       const biliStore = useBiliStore()
       const anchor_uid = biliStore.BilibiliLive!.ANCHOR_UID
       const roomid = biliStore.BilibiliLive!.ROOMID
-      const element = (await waitForElement(document.body, '#rank-list-ctnr-box .tab-list'))?.firstChild as HTMLElement
+      const element = (await waitForElement(document.body, '#rank-list-ctnr-box .tab-list'))
+        ?.firstChild as HTMLElement
       if (element) {
         this.updateNumber(element, anchor_uid, roomid)
       } else {
-        this.logger.error('未找到高能用户元素')
+        this.logger.error('未找到高能用户标签')
       }
     }
   }
