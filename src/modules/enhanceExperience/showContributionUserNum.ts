@@ -1,7 +1,7 @@
 import BaseModule from '../BaseModule'
 import { RunAtMoment } from '../../types/module'
 import BAPI from '../../library/bili-api'
-import { dq } from '../../library/dom'
+import { waitForElement } from '../../library/dom'
 import { useBiliStore } from '../../stores/useBiliStore'
 import _ from 'lodash'
 
@@ -53,21 +53,18 @@ class ShowContributionUserNum extends BaseModule {
     }
   }
 
-  public run(): void {
+  public async run(): Promise<void> {
     this.logger.log('显示高能用户数量模块开始运行')
     if (this.config.enabled) {
       const biliStore = useBiliStore()
       const anchor_uid = biliStore.BilibiliLive!.ANCHOR_UID
       const roomid = biliStore.BilibiliLive!.ROOMID
-      new MutationObserver((mutationsList, observer) => {
-        const element = dq('#rank-list-ctnr-box .tab-list')?.firstChild as HTMLElement
-        // this.logger.log('查找DOM元素')
-        if (element) {
-          // this.logger.log('找到DOM元素', element)
-          this.updateNumber(element, anchor_uid, roomid)
-          observer.disconnect()
-        }
-      }).observe(document.body, { childList: true, subtree: true })
+      const element = (await waitForElement(document.body, '#rank-list-ctnr-box .tab-list'))?.firstChild as HTMLElement
+      if (element) {
+        this.updateNumber(element, anchor_uid, roomid)
+      } else {
+        this.logger.error('未找到高能用户元素')
+      }
     }
   }
 }
