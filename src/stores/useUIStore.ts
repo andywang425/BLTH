@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import { reactive, computed, CSSProperties, watch } from 'vue'
+import { reactive, computed, type CSSProperties, watch } from 'vue'
 import Storage from '../library/storage'
 import _ from 'lodash'
-import { UiConfig, MenuIndex } from '../types'
+import type { UiConfig, MenuIndex } from '../types'
 
 interface BaseStyleValue {
   top: number

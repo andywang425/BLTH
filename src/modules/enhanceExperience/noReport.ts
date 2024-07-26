@@ -1,9 +1,9 @@
 import { unsafeWindow } from '$'
-import { XhrRequestConfig, XhrRequestHandler, proxy } from 'ajax-hook'
-import { FetchHookProxyConfig, fproxy } from '../../library/fetch-hook'
+import { type XhrRequestConfig, type XhrRequestHandler, proxy } from 'ajax-hook'
+import { type FetchHookProxyConfig, fproxy } from '../../library/fetch-hook'
 import BaseModule from '../BaseModule'
 import { getUrlFromFetchInput } from '../../library/utils'
-import { OnFrameTypes, RunAtMoment } from '../../types/module'
+import type { OnFrameTypes, RunAtMoment } from '../../types/module'
 
 class NoReport extends BaseModule {
   static runOnMultiplePages: boolean = true

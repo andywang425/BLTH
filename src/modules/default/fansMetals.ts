@@ -1,6 +1,6 @@
 import { useBiliStore } from '../../stores/useBiliStore'
 import BAPI from '../../library/bili-api'
-import { LiveData } from '../../library/bili-api/data'
+import type { LiveData } from '../../library/bili-api/data'
 import { delayToNextMoment, isTimestampToday } from '../../library/luxon'
 import { sleep } from '../../library/utils'
 import { useModuleStore } from '../../stores/useModuleStore'

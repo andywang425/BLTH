@@ -3,7 +3,7 @@ import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../../l
 import BAPI from '../../../../library/bili-api'
 import { useBiliStore } from '../../../../stores/useBiliStore'
 import { sleep } from '../../../../library/utils'
-import { ModuleStatusTypes } from '../../../../types/module'
+import type { ModuleStatusTypes } from '../../../../types/module'
 
 class DanmuTask extends BaseModule {
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks

@@ -2,7 +2,7 @@
 import { ElMessageBox } from 'element-plus'
 import help_info from '../../library/help-info'
 import _ from 'lodash'
-import { HelpInfoItem } from '../../types'
+import type { HelpInfoItem } from '../../types'
 
 const props = defineProps<{
   id: string

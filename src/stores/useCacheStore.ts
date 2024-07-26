@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { reactive, ref, watch } from 'vue'
 import Storage from '../library/storage'
-import { Cache } from '../types'
+import type { Cache } from '../types'
 
 type ScriptType = 'Main' | 'SubMain' | 'Other'
 

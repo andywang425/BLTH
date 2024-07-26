@@ -2,13 +2,13 @@ import { defineStore } from 'pinia'
 import { reactive, watch } from 'vue'
 import Storage from '../library/storage'
 import _ from 'lodash'
-import { ModuleConfig } from '../types'
+import type { ModuleConfig } from '../types'
 import * as defaultModules from '../modules/default'
 import * as otherModules from '../modules'
 import Logger from '../library/logger'
 import mitt from '../library/mitt'
 import { delayToNextMoment } from '../library/luxon'
-import {
+import type {
   ModuleStatus,
   IsOnTargetFrameTypes,
   ModuleEmitterEvents,

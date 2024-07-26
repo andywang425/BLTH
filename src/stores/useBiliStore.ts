@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { LiveData, MainData } from '../library/bili-api/data'
-import { BiliCookies } from '../types'
+import type { LiveData, MainData } from '../library/bili-api/data'
+import type { BiliCookies } from '../types'
 
 export const useBiliStore = defineStore('bili', () => {
   // window.BilibiliLive 包含当前直播间的一些基本信息

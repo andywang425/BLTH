@@ -6,8 +6,8 @@ import Logger from '../../../../library/logger'
 import CryptoJS from 'crypto-js'
 import { uuid, sleep } from '../../../../library/utils'
 import { useModuleStore } from '../../../../stores/useModuleStore'
-import { ModuleConfig } from '../../../../types'
-import { ModuleStatusTypes, RunAtMoment } from '../../../../types/module'
+import type { ModuleConfig } from '../../../../types'
+import type { ModuleStatusTypes, RunAtMoment } from '../../../../types/module'
 import { getCookie } from '../../../../library/cookie'
 
 interface SypderData {

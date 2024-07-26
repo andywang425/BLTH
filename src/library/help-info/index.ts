@@ -1,5 +1,5 @@
 import { h } from 'vue'
-import { HelpInfo } from '../../types'
+import type { HelpInfo } from '../../types'
 
 const help_info: HelpInfo = {
   DailyTasks: {

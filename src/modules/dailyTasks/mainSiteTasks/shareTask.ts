@@ -2,7 +2,7 @@ import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
 import { useBiliStore } from '../../../stores/useBiliStore'
 import BAPI from '../../../library/bili-api'
-import { ModuleStatusTypes } from '../../../types/module'
+import type { ModuleStatusTypes } from '../../../types/module'
 
 class ShareTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.share

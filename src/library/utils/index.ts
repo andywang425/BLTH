@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { useModuleStore } from '../../stores/useModuleStore'
-import { ModuleEmitterEvents, RunAtMoment } from '../../types/module'
+import type { ModuleEmitterEvents, RunAtMoment } from '../../types/module'
 
 /**
  * 生成一个 version 4 uuid

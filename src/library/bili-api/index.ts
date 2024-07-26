@@ -1,7 +1,7 @@
 import Request from '../request'
-import { Requests, BapiMethods } from './api'
+import type { Requests, BapiMethods } from './api'
 import { useBiliStore } from '../../stores/useBiliStore'
-import { BiliCookies } from '../../types'
+import type { BiliCookies } from '../../types'
 import { packFormData } from '../utils'
 import { ts, tsm } from '../luxon'
 

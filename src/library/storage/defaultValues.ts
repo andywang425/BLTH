@@ -1,4 +1,4 @@
-import { UiConfig, ModuleConfig, Cache } from '../../types'
+import type { UiConfig, ModuleConfig, Cache } from '../../types'
 
 interface DefaultValues {
   ui: UiConfig

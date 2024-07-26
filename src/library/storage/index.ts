@@ -1,6 +1,6 @@
 import { GM_getValue, GM_setValue } from '$'
 import defaultValues from './defaultValues'
-import { UiConfig, ModuleConfig, Cache } from '../../types'
+import type { UiConfig, ModuleConfig, Cache } from '../../types'
 import _ from 'lodash'
 
 class Storage {

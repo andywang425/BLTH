@@ -1,5 +1,5 @@
 import BaseModule from '../BaseModule'
-import { RunAtMoment } from '../../types/module'
+import type { RunAtMoment } from '../../types/module'
 import BAPI from '../../library/bili-api'
 import { waitForElement } from '../../library/dom'
 import { useBiliStore } from '../../stores/useBiliStore'

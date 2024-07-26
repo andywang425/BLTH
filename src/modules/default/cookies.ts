@@ -1,6 +1,6 @@
 import { useBiliStore } from '../../stores/useBiliStore'
 import { getCookiesAsync } from '../../library/cookie'
-import { BiliCookies } from '../../types/cookies'
+import type { BiliCookies } from '../../types/cookies'
 import BaseModule from '../BaseModule'
 
 class Cookies extends BaseModule {
