@@ -14,7 +14,7 @@
   "dependencies": {
     "ajax-hook": "^3.0.3",
     "crypto-js": "^4.2.0",
-    "element-plus": "^2.7.7",
+    "element-plus": "^2.7.8",
     "hotkeys-js": "^3.13.7",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
@@ -26,7 +26,7 @@
     "@rushstack/eslint-patch": "^1.10.3",
     "@types/crypto-js": "^4.2.2",
     "@types/luxon": "^3.4.2",
-    "@vitejs/plugin-vue": "^5.0.5",
+    "@vitejs/plugin-vue": "^5.1.0",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/tsconfig": "^0.5.1",
@@ -36,8 +36,8 @@
     "svgo": "^3.3.2",
     "terser": "^5.31.3",
     "typescript": "^5.5.4",
-    "vite": "^5.3.4",
+    "vite": "^5.3.5",
     "vite-plugin-monkey": "^4.0.6",
-    "vue-tsc": "^2.0.28"
+    "vue-tsc": "^2.0.29"
   }
 }
