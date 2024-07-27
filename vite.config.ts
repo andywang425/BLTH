@@ -1,12 +1,14 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import monkey, { cdn, util } from 'vite-plugin-monkey'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    vueJsx(),
     monkey({
       entry: 'src/main.ts',
       userscript: {
