@@ -1,6 +1,6 @@
 import { GM_getValue, GM_setValue } from '$'
 import defaultValues from './defaultValues'
-import type { UiConfig, ModuleConfig, Cache } from '../../types'
+import type { UiConfig, ModuleConfig, Cache } from '@/types'
 import _ from 'lodash'
 
 class Storage {
@@ -33,9 +33,6 @@ class Storage {
       if (_.isPlainObject(value) && _.isPlainObject(defaultConfig[key])) {
         // 如果都是普通对象，递归合并子配置项
         object[key] = this.mergeConfigs(value, defaultConfig[key])
-      } else {
-        // 否则直接赋值
-        object[key] = defaultConfig[key]
       }
     })
 
