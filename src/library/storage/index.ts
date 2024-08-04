@@ -30,7 +30,11 @@ class Storage {
     _.defaults(config, defaultConfig)
 
     _.forOwn(config, (value, key, object) => {
-      if (_.isPlainObject(value) && _.isPlainObject(defaultConfig[key])) {
+      if (
+        _.isPlainObject(value) &&
+        _.isPlainObject(defaultConfig[key]) &&
+        !_.isEmpty(defaultConfig[key])
+      ) {
         // 如果都是普通对象，递归合并子配置项
         object[key] = this.mergeConfigs(value, defaultConfig[key])
       }

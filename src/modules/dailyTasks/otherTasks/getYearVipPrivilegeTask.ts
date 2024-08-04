@@ -15,7 +15,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
     this.moduleStore.moduleStatus.DailyTasks.OtherTasks.getYearVipPrivilege = s
   }
 
-  private type2Name: Record<number, string> = {
+  private type2Name: Record<string, string> = {
     1: '年度专享B币赠送',
     2: '年度专享会员购优惠券',
     3: '年度专享漫画礼包 - 漫画福利券',

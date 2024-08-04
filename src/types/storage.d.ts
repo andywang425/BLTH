@@ -25,20 +25,16 @@ interface ModuleConfig {
         _lastCompleteTime: number
       }
       medalTasks: {
-        danmu: {
+        light: {
           enabled: boolean
-          includeHighLevelMedals: boolean
-          list: string[]
-          _lastCompleteTime: number
-        }
-        like: {
-          enabled: boolean
+          mode: 'like' | 'danmu'
+          danmuList: string[]
           _lastCompleteTime: number
         }
         watch: {
           enabled: boolean
           time: number
-          _watchedSecondsToday: number
+          _watchingProgress: Record<string, number>
           _lastWatchTime: number
           _lastCompleteTime: number
         }
