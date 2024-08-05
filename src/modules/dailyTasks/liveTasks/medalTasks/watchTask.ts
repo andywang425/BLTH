@@ -1,14 +1,14 @@
-import BaseModule from '../../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../../library/luxon'
-import BAPI from '../../../../library/bili-api'
-import { useBiliStore } from '../../../../stores/useBiliStore'
-import Logger from '../../../../library/logger'
+import BaseModule from '@/modules/BaseModule'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import BAPI from '@/library/bili-api'
+import { useBiliStore } from '@/stores/useBiliStore'
+import Logger from '@/library/logger'
 import CryptoJS from 'crypto-js'
-import { uuid, sleep } from '../../../../library/utils'
-import { useModuleStore } from '../../../../stores/useModuleStore'
-import type { ModuleConfig } from '../../../../types'
-import type { ModuleStatusTypes, RunAtMoment } from '../../../../types/module'
-import { getCookie } from '../../../../library/cookie'
+import { uuid, sleep } from '@/library/utils'
+import { useModuleStore } from '@/stores/useModuleStore'
+import type { ModuleConfig } from '@/types'
+import type { ModuleStatusTypes, RunAtMoment } from '@/types'
+import { getCookie } from '@/library/cookie'
 import _ from 'lodash'
 
 interface SypderData {
@@ -52,11 +52,11 @@ class RoomHeart {
   private timer!: number
   private stop: boolean = false
 
-  private areaID: number
-  private parentID: number
-  private roomID: number
+  private readonly areaID: number
+  private readonly parentID: number
+  private readonly roomID: number
   /** 主播的 UID */
-  private ruid: number
+  private readonly ruid: number
   private seq = 0
 
   /** 计算签名和发送请求时均需要 JSON.stringify */
@@ -343,7 +343,7 @@ class WatchTask extends BaseModule {
                 // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
                 if (
                   !this.config._watchingProgress[roomid] ||
-                  this.config._watchingProgress[roomid] < this.config.time
+                  this.config._watchingProgress[roomid] < this.config.time * 60
                 ) {
                   // 今日观看时间未达到设置值，开始心跳
                   this.logger.log(`开始直播间${roomid}的观看直播任务`)
