@@ -1,8 +1,8 @@
 import BaseModule from '../BaseModule'
-import type { RunAtMoment } from '../../types/module'
-import BAPI from '../../library/bili-api'
-import { waitForElement } from '../../library/dom'
-import { useBiliStore } from '../../stores/useBiliStore'
+import type { RunAtMoment } from '@/types'
+import BAPI from '@/library/bili-api'
+import { waitForElement } from '@/library/dom'
+import { useBiliStore } from '@/stores/useBiliStore'
 import _ from 'lodash'
 
 class ShowContributionUserNum extends BaseModule {

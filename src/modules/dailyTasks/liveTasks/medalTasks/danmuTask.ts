@@ -1,9 +1,9 @@
-import BaseModule from '../../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../../library/luxon'
-import BAPI from '../../../../library/bili-api'
-import { useBiliStore } from '../../../../stores/useBiliStore'
-import { sleep } from '../../../../library/utils'
-import type { ModuleStatusTypes } from '../../../../types/module'
+import BaseModule from '@/modules/BaseModule'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import BAPI from '@/library/bili-api'
+import { useBiliStore } from '@/stores/useBiliStore'
+import { sleep } from '@/library/utils'
+import type { ModuleStatusTypes } from '@/types'
 
 class DanmuTask extends BaseModule {
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks

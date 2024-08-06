@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useModuleStore } from '../stores/useModuleStore'
+import { useModuleStore } from '@/stores/useModuleStore'
 
 const moduleStore = useModuleStore()
 const config = moduleStore.moduleConfig.RemoveElement

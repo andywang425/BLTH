@@ -1,5 +1,5 @@
 import { unsafeWindow } from '$'
-import type { OnFrameTypes, RunAtMoment } from '../../types/module'
+import type { OnFrameTypes, RunAtMoment } from '@/types'
 import BaseModule from '../BaseModule'
 
 class BanP2P extends BaseModule {

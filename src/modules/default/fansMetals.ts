@@ -1,9 +1,9 @@
-import { useBiliStore } from '../../stores/useBiliStore'
-import BAPI from '../../library/bili-api'
-import type { LiveData } from '../../library/bili-api/data'
-import { delayToNextMoment, isTimestampToday } from '../../library/luxon'
-import { sleep } from '../../library/utils'
-import { useModuleStore } from '../../stores/useModuleStore'
+import { useBiliStore } from '@/stores/useBiliStore'
+import BAPI from '@/library/bili-api'
+import type { LiveData } from '@/library/bili-api/data'
+import { delayToNextMoment, isTimestampToday } from '@/library/luxon'
+import { sleep } from '@/library/utils'
+import { useModuleStore } from '@/stores/useModuleStore'
 import BaseModule from '../BaseModule'
 
 class FansMetals extends BaseModule {

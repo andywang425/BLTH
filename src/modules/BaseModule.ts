@@ -1,6 +1,6 @@
-import { useModuleStore } from '../stores/useModuleStore'
-import Logger from '../library/logger'
-import type { ModuleStatusTypes, OnFrameTypes, RunAtMoment } from '../types/module'
+import { useModuleStore } from '@/stores/useModuleStore'
+import Logger from '@/library/logger'
+import type { ModuleStatusTypes, OnFrameTypes, RunAtMoment } from '@/types'
 
 class BaseModule {
   /**

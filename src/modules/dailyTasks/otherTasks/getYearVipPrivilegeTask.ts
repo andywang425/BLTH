@@ -1,11 +1,11 @@
 import BaseModule from '../../BaseModule'
-import { delayToNextMoment, ts } from '../../../library/luxon'
-import BAPI from '../../../library/bili-api'
-import type { ModuleStatusTypes } from '../../../types/module'
-import { useBiliStore } from '../../../stores/useBiliStore'
-import type { MainData } from '../../../library/bili-api/data'
+import { delayToNextMoment, ts } from '@/library/luxon'
+import BAPI from '@/library/bili-api'
+import type { ModuleStatusTypes } from '@/types'
+import { useBiliStore } from '@/stores/useBiliStore'
+import type { MainData } from '@/library/bili-api/data'
 import { DateTime } from 'luxon'
-import { sleep } from '../../../library/utils'
+import { sleep } from '@/library/utils'
 import { watch } from 'vue'
 
 class GetYearVipPrivilegeTask extends BaseModule {

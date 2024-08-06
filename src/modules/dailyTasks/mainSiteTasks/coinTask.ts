@@ -1,9 +1,9 @@
 import BaseModule from '../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
-import { useBiliStore } from '../../../stores/useBiliStore'
-import type { MainData } from '../../../library/bili-api/data'
-import BAPI from '../../../library/bili-api'
-import type { ModuleStatusTypes } from '../../../types/module'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import { useBiliStore } from '@/stores/useBiliStore'
+import type { MainData } from '@/library/bili-api/data'
+import BAPI from '@/library/bili-api'
+import type { ModuleStatusTypes } from '@/types'
 
 class CoinTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.coin

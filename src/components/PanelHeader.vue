@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Expand, Fold } from '@element-plus/icons-vue'
-import { useUIStore } from '../stores/useUIStore'
+import { useUIStore } from '@/stores/useUIStore'
 
 const uiStore = useUIStore()
 </script>

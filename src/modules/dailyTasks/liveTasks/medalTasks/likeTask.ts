@@ -1,9 +1,9 @@
-import BaseModule from '../../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../../library/luxon'
-import BAPI from '../../../../library/bili-api'
-import { useBiliStore } from '../../../../stores/useBiliStore'
-import { sleep } from '../../../../library/utils'
-import type { ModuleStatusTypes } from '../../../../types/module'
+import BaseModule from '@/modules/BaseModule'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import BAPI from '@/library/bili-api'
+import { useBiliStore } from '@/stores/useBiliStore'
+import { sleep } from '@/library/utils'
+import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
 
 class LikeTask extends BaseModule {
@@ -44,6 +44,7 @@ class LikeTask extends BaseModule {
    * 点赞
    * @param roomid 直播间号
    * @param target_id 主播UID
+   * @param click_time 点赞次数
    */
   private async like(roomid: number, target_id: number, click_time: number): Promise<void> {
     try {

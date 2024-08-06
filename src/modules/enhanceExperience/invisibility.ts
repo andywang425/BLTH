@@ -1,4 +1,4 @@
-import type { OnFrameTypes, RunAtMoment } from '../../types/module'
+import type { OnFrameTypes, RunAtMoment } from '@/types'
 import { type XhrRequestConfig, type XhrRequestHandler, proxy } from 'ajax-hook'
 import BaseModule from '../BaseModule'
 import { unsafeWindow } from '$'

@@ -1,4 +1,4 @@
-import type { RunAtMoment } from '../../types/module'
+import type { RunAtMoment } from '@/types'
 import BaseModule from '../BaseModule'
 
 class NoSleep extends BaseModule {

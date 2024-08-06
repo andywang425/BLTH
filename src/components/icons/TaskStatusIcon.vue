@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ModuleStatusTypes } from '../../types/module'
+import type { ModuleStatusTypes } from '@/types'
 
 defineProps<{
   status: ModuleStatusTypes

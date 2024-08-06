@@ -1,7 +1,7 @@
 import BaseModule from '../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
-import { useBiliStore } from '../../../stores/useBiliStore'
-import type { ModuleStatusTypes } from '../../../types/module'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import { useBiliStore } from '@/stores/useBiliStore'
+import type { ModuleStatusTypes } from '@/types'
 
 class LoginTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
