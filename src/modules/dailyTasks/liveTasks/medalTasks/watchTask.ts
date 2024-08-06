@@ -11,7 +11,7 @@ import type { ModuleStatusTypes, RunAtMoment } from '@/types'
 import { getCookie } from '@/library/cookie'
 import _ from 'lodash'
 
-interface SypderData {
+interface SpyderData {
   benchmark: string
   device: string
   ets: number
@@ -147,7 +147,7 @@ class RoomHeart {
       return
     }
     try {
-      const sypderData: SypderData = {
+      const sypderData: SpyderData = {
         id: JSON.stringify(this.id),
         device: JSON.stringify(this.device),
         ets: this.timestamp,
@@ -210,7 +210,7 @@ class RoomHeart {
    * @returns s
    */
   private spyder(str: string, rule: number[]): string {
-    const data: SypderData = JSON.parse(str)
+    const data: SpyderData = JSON.parse(str)
     const [parent_id, area_id, seq_id, room_id]: number[] = JSON.parse(data.id)
     const [buvid, uuid]: string[] = JSON.parse(data.device)
     const key: string = data.benchmark

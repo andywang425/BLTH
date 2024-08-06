@@ -35,7 +35,7 @@ class Storage {
         _.isPlainObject(defaultConfig[key]) &&
         !_.isEmpty(defaultConfig[key])
       ) {
-        // 如果都是普通对象，递归合并子配置项
+        // 如果都是普通对象且默认配置项不为空，递归合并子配置项
         object[key] = this.mergeConfigs(value, defaultConfig[key])
       }
     })
