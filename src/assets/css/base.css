@@ -22,3 +22,14 @@
   position: relative;
   top: 1px;
 }
+
+/**
+  向下滚动网页后B站会动态插入一段css
+  li {
+      list-style: none;
+  }
+  从而导致弹窗中的列表样式失效
+ */
+.el-message-box li {
+  list-style: initial;
+}

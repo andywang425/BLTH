@@ -41,7 +41,7 @@ const defaultValues: DefaultValues = {
         medalTasks: {
           light: {
             enabled: false,
-            mode: 'like',
+            mode: 'danmu',
             danmuList: [
               '(⌒▽⌒)',
               '（￣▽￣）',
@@ -63,7 +63,7 @@ const defaultValues: DefaultValues = {
           },
           watch: {
             enabled: false,
-            time: 20,
+            time: 25,
             _watchingProgress: {},
             _lastWatchTime: 0,
             _lastCompleteTime: 0

@@ -151,7 +151,7 @@ declare namespace LiveData {
   }
 
   namespace FansMedalPanel {
-    export interface Data {
+    interface Data {
       list: List[]
       special_list: SpecialList[]
       bottom_bar: any
@@ -161,7 +161,7 @@ declare namespace LiveData {
       group_medal: any
     }
 
-    export interface List {
+    interface List {
       medal: Medal
       anchor_info: AnchorInfo
       superscript: any
@@ -169,7 +169,7 @@ declare namespace LiveData {
       uinfo_medal: UinfoMedal
     }
 
-    export interface Medal {
+    interface Medal {
       uid: number
       target_id: number
       target_name: string
@@ -199,19 +199,19 @@ declare namespace LiveData {
       v2_medal_color_level: string
     }
 
-    export interface AnchorInfo {
+    interface AnchorInfo {
       nick_name: string
       avatar: string
       verify: number
     }
 
-    export interface RoomInfo {
+    interface RoomInfo {
       room_id: number
       living_status: number
       url: string
     }
 
-    export interface UinfoMedal {
+    interface UinfoMedal {
       name: string
       level: number
       color_start: number
@@ -234,7 +234,7 @@ declare namespace LiveData {
       user_receive_count: number
     }
 
-    export interface SpecialList {
+    interface SpecialList {
       medal: Medal
       anchor_info: AnchorInfo
       superscript: any
@@ -242,7 +242,7 @@ declare namespace LiveData {
       uinfo_medal: UinfoMedal
     }
 
-    export interface PageInfo {
+    interface PageInfo {
       number: number
       current_page: number
       has_more: boolean
@@ -255,13 +255,57 @@ declare namespace LiveData {
   namespace SendMsg {
     interface Data {
       mode_info: ModeInfo
-      dm_v2: string
+      dm_v2: any
     }
 
     interface ModeInfo {
       mode: number
       show_player_type: number
       extra: string
+      user: User
+    }
+
+    interface User {
+      uid: number
+      base: Base
+      medal: any
+      wealth: any
+      title: Title
+      guard: any
+      uhead_frame: any
+      guard_leader: GuardLeader
+    }
+
+    interface Base {
+      name: string
+      face: string
+      name_color: number
+      is_mystery: boolean
+      risk_ctrl_info: any
+      origin_info: OriginInfo
+      official_info: OfficialInfo
+      name_color_str: string
+    }
+
+    interface OriginInfo {
+      name: string
+      face: string
+    }
+
+    interface OfficialInfo {
+      role: number
+      title: string
+      desc: string
+      type: number
+    }
+
+    interface Title {
+      old_title_css_id: string
+      title_css_id: string
+    }
+
+    interface GuardLeader {
+      is_guard_leader: boolean
     }
   }
 

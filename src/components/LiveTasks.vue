@@ -21,7 +21,7 @@ const status = moduleStore.moduleStatus.DailyTasks.LiveTasks
 
 const medalDanmuPanelVisible = ref<boolean>(false)
 const danmuTableData = computed(() =>
-  config.medalTasks.danmu.list.map((danmu) => {
+  config.medalTasks.light.danmuList.map((danmu) => {
     return { content: danmu }
   })
 )
@@ -36,20 +36,20 @@ const handleEditDanmu = (index: number, row: { content: string }) => {
     lockScroll: false
   })
     .then(({ value }) => {
-      config.medalTasks.danmu.list[index] = value
+      config.medalTasks.light.danmuList[index] = value
     })
     .catch(() => {})
 }
 
 const handleDeleteDanmu = (index: number) => {
-  if (config.medalTasks.danmu.list.length === 1) {
+  if (config.medalTasks.light.danmuList.length === 1) {
     ElMessage.warning({
       message: '至少要有一条弹幕',
       appendTo: '.el-dialog'
     })
     return
   }
-  config.medalTasks.danmu.list.splice(index, 1)
+  config.medalTasks.light.danmuList.splice(index, 1)
 }
 
 const handleAddDanmu = () => {
@@ -61,7 +61,7 @@ const handleAddDanmu = () => {
     lockScroll: false
   })
     .then(({ value }) => {
-      config.medalTasks.danmu.list.push(value)
+      config.medalTasks.light.danmuList.push(value)
     })
     .catch(() => {})
 }
@@ -157,20 +157,20 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
     <!-- 粉丝勋章相关任务 -->
     <el-row>
       <el-space wrap>
-        <el-switch active-text="点亮熄灭勋章" />
-        <Info id="DailyTasks.LiveTasks.medalTasks.like" />
-        <TaskStatus :status="status.medalTasks.like" />
+        <el-switch v-model="config.medalTasks.light.enabled" active-text="点亮熄灭勋章" />
+        <Info id="DailyTasks.LiveTasks.medalTasks.light.main" />
+        <TaskStatus :status="status.medalTasks.light" />
       </el-space>
     </el-row>
     <el-row>
-      <el-radio-group class="radio-group">
+      <el-radio-group v-model="config.medalTasks.light.mode" class="radio-group">
         <el-row>
           <el-space wrap>
             <el-icon>
               <SemiSelect />
             </el-icon>
-            <el-radio :value="3">点赞</el-radio>
-            <Info id="DailyTasks.LiveTasks.medalTasks.danmu" />
+            <el-radio value="like">点赞</el-radio>
+            <Info id="DailyTasks.LiveTasks.medalTasks.light.like" />
           </el-space>
         </el-row>
         <el-row>
@@ -178,7 +178,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
             <el-icon>
               <SemiSelect />
             </el-icon>
-            <el-radio :value="6">发弹幕</el-radio>
+            <el-radio value="danmu">发送弹幕</el-radio>
             <el-button
               type="primary"
               size="small"
@@ -186,7 +186,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
               @click="medalDanmuPanelVisible = !medalDanmuPanelVisible"
               >编辑弹幕
             </el-button>
-            <Info id="DailyTasks.LiveTasks.medalTasks.danmu" />
+            <Info id="DailyTasks.LiveTasks.medalTasks.light.danmu" />
           </el-space>
         </el-row>
       </el-radio-group>
@@ -234,7 +234,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
     </el-row>
     <el-row>
       <el-text
-        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多199个等级小于20的粉丝勋章完成给主播点赞，发送弹幕，观看直播任务。在脚本执行任务期间观看未执行任务的粉丝勋章对应直播间直播可能导致今天无法获取任何亲密度。
+        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多199个等级小于20的粉丝勋章完成观看直播任务。在脚本执行任务期间观看直播可能导致今天无法获取任何亲密度。
       </el-text>
     </el-row>
     <!-- 弹窗 -->

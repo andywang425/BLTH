@@ -29,7 +29,11 @@ interface BapiMethods {
       jumpfrom?: number,
       fontsize?: number,
       color?: number,
-      bubble?: number
+      bubble?: number,
+      reply_mid?: number,
+      reply_attr?: number,
+      replay_dmid?: unknown,
+      statistics?: { appId: number; platform: number }
     ) => Promise<Live.SendMsg>
     likeReport: (
       room_id: number,

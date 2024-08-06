@@ -24,7 +24,7 @@ class FansMetals extends BaseModule {
       force ||
       // 开启了任意一项粉丝勋章相关功能且该功能今天没完成过
       Object.entries(medalTasks)
-        .filter(([key]) => ['danmu', 'like', 'watch'].includes(key))
+        .filter(([key]) => ['light', 'watch'].includes(key))
         .some(
           (keyValue) =>
             (keyValue[1] as any).enabled &&

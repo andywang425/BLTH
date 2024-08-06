@@ -1,7 +1,6 @@
 import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
-import { dq } from '@/library/dom'
 import type { ModuleStatusTypes } from '@/types'
 
 class SignTask extends BaseModule {
@@ -36,11 +35,6 @@ class SignTask extends BaseModule {
         this.config._lastCompleteTime = tsm()
         this.status = 'done'
         this.logger.log('直播签到任务已完成')
-        // 移除直播签到按钮
-        const checkinBtn = dq('.checkin-btn')
-        if (checkinBtn) {
-          checkinBtn.remove()
-        }
       } else {
         this.logger.error('直播签到失败', response.message)
         this.status = 'error'
