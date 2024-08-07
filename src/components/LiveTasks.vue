@@ -4,6 +4,7 @@ import { useModuleStore } from '@/stores/useModuleStore'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
 import { useBiliStore } from '@/stores/useBiliStore'
+import helpInfo from '@/library/help-info'
 
 interface MedalInfoRow {
   avatar: string
@@ -149,7 +150,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.sign.enabled" active-text="直播签到" />
-        <Info id="DailyTasks.LiveTasks.sign" />
+        <Info :item="helpInfo.DailyTasks.LiveTasks.sign" />
         <TaskStatus :status="status.sign" />
       </el-space>
     </el-row>
@@ -158,7 +159,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.medalTasks.light.enabled" active-text="点亮熄灭勋章" />
-        <Info id="DailyTasks.LiveTasks.medalTasks.light.main" />
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.main" />
         <TaskStatus :status="status.medalTasks.light" />
       </el-space>
     </el-row>
@@ -170,7 +171,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
               <SemiSelect />
             </el-icon>
             <el-radio value="like">点赞</el-radio>
-            <Info id="DailyTasks.LiveTasks.medalTasks.light.like" />
+            <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.like" />
           </el-space>
         </el-row>
         <el-row>
@@ -186,7 +187,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
               @click="medalDanmuPanelVisible = !medalDanmuPanelVisible"
               >编辑弹幕
             </el-button>
-            <Info id="DailyTasks.LiveTasks.medalTasks.light.danmu" />
+            <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.danmu" />
           </el-space>
         </el-row>
       </el-radio-group>
@@ -198,7 +199,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
           <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
         </el-select>
         <el-text>分钟</el-text>
-        <Info id="DailyTasks.LiveTasks.medalTasks.watch" />
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.watch" />
         <TaskStatus :status="status.medalTasks.watch" />
       </el-space>
     </el-row>
@@ -212,7 +213,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
         <el-button type="primary" size="small" :icon="Edit" @click="handleEditList"
           >编辑名单
         </el-button>
-        <Info id="DailyTasks.LiveTasks.medalTasks.list" />
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.list" />
       </el-space>
     </el-row>
     <el-divider />

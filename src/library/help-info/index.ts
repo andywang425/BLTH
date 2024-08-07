@@ -1,7 +1,7 @@
 import { h } from 'vue'
 import type { HelpInfo } from '@/types'
 
-const help_info: HelpInfo = {
+const helpInfo: HelpInfo = {
   DailyTasks: {
     MainSiteTasks: {
       login: {
@@ -112,11 +112,11 @@ const help_info: HelpInfo = {
           title: '观看直播',
           message: h('p', [
             h('div', '完成粉丝勋章的观看直播任务。'),
-            h(
-              'div',
-              '部分直播间因为没有设置直播分区导致任务无法完成。主播当前是否开播不会影响该任务的完成。'
-            ),
-            h('div', '脚本会按粉丝勋章的默认顺序逐个完成观看指定时长直播的任务。')
+            h('div', [
+              h('li', '部分直播间因为没有设置直播分区导致任务无法完成。'),
+              h('li', '主播当前是否开播不会影响该任务的完成。'),
+              h('li', '脚本会按粉丝勋章的默认顺序逐个完成观看指定时长直播的任务。')
+            ])
           ])
         }
       }
@@ -283,4 +283,4 @@ const help_info: HelpInfo = {
   }
 }
 
-export default help_info
+export default helpInfo

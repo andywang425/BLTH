@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useModuleStore } from '@/stores/useModuleStore'
+import helpInfo from '@/library/help-info'
 
 const moduleStore = useModuleStore()
 const config = moduleStore.moduleConfig.EnhanceExperience
@@ -19,31 +20,31 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
         >
           <el-option v-for="i in qualityDescList" :key="i" :label="i" :value="i" />
         </el-select>
-        <Info id="EnhanceExperience.switchLiveStreamQuality" />
+        <Info :item="helpInfo.EnhanceExperience.switchLiveStreamQuality" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.banp2p.enabled" active-text="禁用P2P" />
-        <Info id="EnhanceExperience.banp2p" />
+        <Info :item="helpInfo.EnhanceExperience.banp2p" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.noReport.enabled" active-text="拦截日志数据上报" />
-        <Info id="EnhanceExperience.noReport" />
+        <Info :item="helpInfo.EnhanceExperience.noReport" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.noSleep.enabled" active-text="屏蔽挂机检测" />
-        <Info id="EnhanceExperience.noSleep" />
+        <Info :item="helpInfo.EnhanceExperience.noSleep" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.invisibility.enabled" active-text="隐身入场" />
-        <Info id="EnhanceExperience.invisibility" />
+        <Info :item="helpInfo.EnhanceExperience.invisibility" />
       </el-space>
     </el-row>
     <el-row>
@@ -52,7 +53,7 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
           v-model="config.showContributionUserNum.enabled"
           active-text="显示高能用户数量"
         />
-        <Info id="EnhanceExperience.showContributionUserNum" />
+        <Info :item="helpInfo.EnhanceExperience.showContributionUserNum" />
       </el-space>
     </el-row>
     <el-divider />
