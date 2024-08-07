@@ -64,7 +64,7 @@ const BAPI: BapiMethods = {
           reply_mid,
           reply_attr,
           replay_dmid,
-          statistics,
+          statistics: JSON.stringify(statistics),
           fontsize,
           rnd: ts(),
           roomid,
