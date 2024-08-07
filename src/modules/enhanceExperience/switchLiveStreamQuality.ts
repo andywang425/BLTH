@@ -1,6 +1,6 @@
 import { unsafeWindow } from '$'
-import { isSelfTopFrame } from '../../library/dom'
-import { RunAtMoment } from '../../types/module'
+import { isSelfTopFrame } from '@/library/dom'
+import type { RunAtMoment } from '@/types'
 import BaseModule from '../BaseModule'
 
 class SwitchLiveStreamQuality extends BaseModule {

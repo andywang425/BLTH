@@ -1,9 +1,13 @@
 # Dependency directories
 node_modules
 
-# vscode directories and files
+# MacOS
+.DS_Store
+
+# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+.idea
 
 # Notes
 notes

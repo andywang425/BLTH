@@ -1,4 +1,4 @@
-import { GM_xmlhttpRequest, GmXhrRequest } from '$'
+import { GM_xmlhttpRequest, type GmXhrRequest } from '$'
 import _ from 'lodash'
 
 class Request {

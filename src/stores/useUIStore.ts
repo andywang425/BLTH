@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import { reactive, computed, CSSProperties, watch } from 'vue'
-import Storage from '../library/storage'
+import { reactive, computed, type CSSProperties, watch } from 'vue'
+import Storage from '@/library/storage'
 import _ from 'lodash'
-import { UiConfig, MenuIndex } from '../types'
+import type { UiConfig, MenuIndex } from '@/types'
 
 interface BaseStyleValue {
   top: number
@@ -11,18 +11,20 @@ interface BaseStyleValue {
   width: number
 }
 
+// 菜单index到名称的映射
+const index2name: Record<MenuIndex, string> = {
+  MainSiteTasks: '主站任务',
+  LiveTasks: '直播任务',
+  OtherTasks: '其它任务',
+  EnhanceExperience: '体验优化',
+  RemoveElement: '移除元素'
+}
+
 export const useUIStore = defineStore('ui', () => {
   // 控制面板 UI 相关的设置
   const uiConfig: UiConfig = reactive(Storage.getUiConfig())
   // 被激活的菜单项的名称，用于在 Header 里显示子标题
   const activeMenuName = computed<string>(() => {
-    const index2name: { [index in MenuIndex]: string } = {
-      MainSiteTasks: '主站任务',
-      LiveTasks: '直播任务',
-      OtherTasks: '其它任务',
-      EnhanceExperience: '体验优化',
-      RemoveElement: '移除元素'
-    }
     return index2name[uiConfig.activeMenuIndex]
   })
   // 控制面板长、宽、位置信息

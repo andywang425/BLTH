@@ -96,10 +96,6 @@
 
 请查看[CHANGELOG](https://github.com/andywang425/BLTH/blob/master/CHANGELOG.md)。
 
-# 贡献者公约
-
-请查看[CODE OF CONDUCT](https://github.com/andywang425/BLTH/blob/master/CODE_OF_CONDUCT.md)。
-
 # 相关推荐
 
 ## Bilibili Evolved

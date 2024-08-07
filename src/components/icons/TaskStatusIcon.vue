@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ModuleStatusTypes } from '../../types/module'
+import type { ModuleStatusTypes } from '@/types'
 
 defineProps<{
   status: ModuleStatusTypes
@@ -34,4 +34,3 @@ defineProps<{
   font-size: var(--el-font-size-base);
 }
 </style>
-../../types/module

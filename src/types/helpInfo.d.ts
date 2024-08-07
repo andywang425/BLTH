@@ -17,8 +17,11 @@ interface HelpInfo {
       sign: HelpInfoItem
       medalTasks: {
         list: HelpInfoItem
-        like: HelpInfoItem
-        danmu: HelpInfoItem
+        light: {
+          main: HelpInfoItem
+          like: HelpInfoItem
+          danmu: HelpInfoItem
+        }
         watch: HelpInfoItem
       }
     }

@@ -1,11 +1,11 @@
 import BaseModule from '../../BaseModule'
-import { delayToNextMoment, ts } from '../../../library/luxon'
-import BAPI from '../../../library/bili-api'
-import { ModuleStatusTypes } from '../../../types/module'
-import { useBiliStore } from '../../../stores/useBiliStore'
-import { MainData } from '../../../library/bili-api/data'
+import { delayToNextMoment, ts } from '@/library/luxon'
+import BAPI from '@/library/bili-api'
+import type { ModuleStatusTypes } from '@/types'
+import { useBiliStore } from '@/stores/useBiliStore'
+import type { MainData } from '@/library/bili-api/data'
 import { DateTime } from 'luxon'
-import { sleep } from '../../../library/utils'
+import { sleep } from '@/library/utils'
 import { watch } from 'vue'
 
 class GetYearVipPrivilegeTask extends BaseModule {
@@ -15,7 +15,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
     this.moduleStore.moduleStatus.DailyTasks.OtherTasks.getYearVipPrivilege = s
   }
 
-  private type2Name: Record<number, string> = {
+  private type2Name: Record<string, string> = {
     1: '年度专享B币赠送',
     2: '年度专享会员购优惠券',
     3: '年度专享漫画礼包 - 漫画福利券',

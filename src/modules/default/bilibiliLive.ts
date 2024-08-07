@@ -1,4 +1,4 @@
-import { useBiliStore } from '../../stores/useBiliStore'
+import { useBiliStore } from '@/stores/useBiliStore'
 import { unsafeWindow } from '$'
 import BaseModule from '../BaseModule'
 

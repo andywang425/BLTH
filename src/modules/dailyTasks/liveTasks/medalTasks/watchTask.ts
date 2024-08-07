@@ -1,16 +1,17 @@
-import BaseModule from '../../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../../library/luxon'
-import BAPI from '../../../../library/bili-api'
-import { useBiliStore } from '../../../../stores/useBiliStore'
-import Logger from '../../../../library/logger'
+import BaseModule from '@/modules/BaseModule'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import BAPI from '@/library/bili-api'
+import { useBiliStore } from '@/stores/useBiliStore'
+import Logger from '@/library/logger'
 import CryptoJS from 'crypto-js'
-import { uuid, sleep } from '../../../../library/utils'
-import { useModuleStore } from '../../../../stores/useModuleStore'
-import { ModuleConfig } from '../../../../types'
-import { ModuleStatusTypes, RunAtMoment } from '../../../../types/module'
-import { getCookie } from '../../../../library/cookie'
+import { uuid, sleep } from '@/library/utils'
+import { useModuleStore } from '@/stores/useModuleStore'
+import type { ModuleConfig } from '@/types'
+import type { ModuleStatusTypes, RunAtMoment } from '@/types'
+import { getCookie } from '@/library/cookie'
+import _ from 'lodash'
 
-interface SypderData {
+interface SpyderData {
   benchmark: string
   device: string
   ets: number
@@ -26,15 +27,13 @@ class RoomHeart {
     areaID: number,
     parentID: number,
     ruid: number,
-    watchedSeconds: number,
-    isLast: boolean = false
+    watchedSeconds: number
   ) {
     this.roomID = roomID
     this.areaID = areaID
     this.parentID = parentID
     this.ruid = ruid
     this.watchedSeconds = watchedSeconds
-    this.isLast = isLast
 
     this.config = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks.watch
   }
@@ -42,27 +41,37 @@ class RoomHeart {
   private logger = new Logger('RoomHeart')
 
   private config: ModuleConfig['DailyTasks']['LiveTasks']['medalTasks']['watch']
+
   set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
-  /** 是不是最后一个心跳任务 */
-  private isLast: boolean
-  /** 已观看时间（秒） */
+
+  /** 今日当前直播间已观看时间（秒） */
   private watchedSeconds: number
 
   private timer!: number
   private stop: boolean = false
 
-  private areaID: number
-  private parentID: number
-  private roomID: number
+  private readonly areaID: number
+  private readonly parentID: number
+  private readonly roomID: number
   /** 主播的 UID */
-  private ruid: number
+  private readonly ruid: number
   private seq = 0
 
   /** 计算签名和发送请求时均需要 JSON.stringify */
   private get id(): number[] {
     return [this.parentID, this.areaID, this.seq, this.roomID]
+  }
+
+  /** 更新当前直播间的观看任务进度 */
+  private updateProgress() {
+    // 记录观看时间
+    this.watchedSeconds += this.heartBeatInterval
+
+    useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress[
+      this.roomID
+    ] = this.watchedSeconds
   }
 
   /** Cookie LIVE_BUVID */
@@ -84,10 +93,10 @@ class RoomHeart {
   /**
    * 开始心跳
    */
-  public start() {
+  public start(): Promise<void> {
     if (!this.buvid) {
       this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务，请尝试刷新页面`)
-      return
+      return Promise.resolve()
     }
     // 如果到了0点还没完成任务，就不继续了
     this.timer = setTimeout(() => (this.stop = true), delayToNextMoment(0, 0).ms)
@@ -97,7 +106,7 @@ class RoomHeart {
   /**
    * E心跳，开始时发送一次
    */
-  private async E() {
+  private async E(): Promise<void> {
     if (this.stop) {
       this.status = ''
       return
@@ -116,7 +125,8 @@ class RoomHeart {
           secret_rule: this.secretRule,
           timestamp: this.timestamp
         } = response.data)
-        setTimeout(() => this.X(), this.heartBeatInterval * 1000)
+        await sleep(this.heartBeatInterval * 1000)
+        return this.X()
       } else {
         this.logger.error(
           `BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) 失败`,
@@ -131,13 +141,13 @@ class RoomHeart {
   /**
    * X心跳，E心跳过后都是X心跳
    */
-  private async X() {
+  private async X(): Promise<void> {
     if (this.stop) {
       this.status = ''
       return
     }
     try {
-      const sypderData: SypderData = {
+      const sypderData: SpyderData = {
         id: JSON.stringify(this.id),
         device: JSON.stringify(this.device),
         ets: this.timestamp,
@@ -147,7 +157,7 @@ class RoomHeart {
         ua: this.ua
       }
       // 签名
-      const s = this.sypder(JSON.stringify(sypderData), this.secretRule)
+      const s = this.spyder(JSON.stringify(sypderData), this.secretRule)
 
       const response = await BAPI.liveTrace.X(
         s,
@@ -165,18 +175,9 @@ class RoomHeart {
       )
       if (response.code === 0) {
         this.seq += 1
-        this.watchedSeconds += this.heartBeatInterval
-        if (this.isLast) {
-          // 记录观看时间（秒）
-          this.config._watchedSecondsToday = this.watchedSeconds
-        }
+        this.updateProgress()
         if (this.watchedSeconds >= this.config.time * 60) {
           // 达到设置的观看时间，结束
-          if (this.isLast) {
-            this.config._lastCompleteTime = tsm()
-            this.logger.log('观看直播任务已完成')
-            this.status = 'done'
-          }
           clearTimeout(this.timer)
           return
         }
@@ -186,7 +187,8 @@ class RoomHeart {
           secret_rule: this.secretRule,
           timestamp: this.timestamp
         } = response.data)
-        setTimeout(() => this.X(), this.heartBeatInterval * 1000)
+        await sleep(this.heartBeatInterval * 1000)
+        return this.X()
       } else {
         this.logger.error(
           `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 失败`,
@@ -202,13 +204,13 @@ class RoomHeart {
   }
 
   /**
-   * wasm 导出的 spyider 函数的 javascript 实现
+   * wasm 导出的 spyder 函数的 javascript 实现
    * @param str 一个经过 JSON.stringify 的 json 字符串
    * @param rule secret_rule 数组
    * @returns s
    */
-  private sypder(str: string, rule: number[]): string {
-    const data: SypderData = JSON.parse(str)
+  private spyder(str: string, rule: number[]): string {
+    const data: SpyderData = JSON.parse(str)
     const [parent_id, area_id, seq_id, room_id]: number[] = JSON.parse(data.id)
     const [buvid, uuid]: string[] = JSON.parse(data.device)
     const key: string = data.benchmark
@@ -320,36 +322,49 @@ class WatchTask extends BaseModule {
         this.status = 'running'
         if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
           // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0
-          this.config._watchedSecondsToday = 0
+          this.config._watchingProgress = {}
         } else {
           // 因为连续看 5 分钟（300秒）才能加亲密度，所以上一次观看时最后不足 5 分钟的时间是无效的
-          this.config._watchedSecondsToday -= this.config._watchedSecondsToday % 300
+          _.forOwn(this.config._watchingProgress, (value, key, object) => {
+            object[key] -= value % 300
+          })
         }
         this.config._lastWatchTime = tsm()
-        const idList: number[][] | null = this.getRoomidUidList()
-        if (idList) {
-          if (idList.length === 0) {
+        const roomidUidList: number[][] | null = this.getRoomidUidList()
+        if (roomidUidList) {
+          if (roomidUidList.length === 0) {
             this.status = 'done'
             this.config._lastCompleteTime = tsm()
           } else {
-            for (let i = 0; i < idList.length; i++) {
-              const [roomid, uid] = idList[i]
+            for (let i = 0; i < roomidUidList.length; i++) {
+              const [roomid, uid] = roomidUidList[i]
               const [area_id, parent_area_id] = await this.getAreaInfo(roomid)
               if (area_id > 0 && parent_area_id > 0) {
-                // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区。开始心跳
-                new RoomHeart(
-                  roomid,
-                  area_id,
-                  parent_area_id,
-                  uid,
-                  this.config._watchedSecondsToday,
-                  i === idList.length - 1 ? true : false
-                ).start()
+                // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
+                if (
+                  !this.config._watchingProgress[roomid] ||
+                  this.config._watchingProgress[roomid] < this.config.time * 60
+                ) {
+                  // 今日观看时间未达到设置值，开始心跳
+                  this.logger.log(`开始直播间${roomid}的观看直播任务`)
+                  await new RoomHeart(
+                    roomid,
+                    area_id,
+                    parent_area_id,
+                    uid,
+                    this.config._watchingProgress[roomid] ?? 0
+                  ).start()
+                  await sleep(10e3)
+                }
               }
-              // 延时防风控
-              await sleep(3000)
             }
+
+            this.config._lastCompleteTime = tsm()
+            this.logger.log('观看直播任务已完成')
+            this.status = 'done'
           }
+        } else {
+          this.status = 'error'
         }
       } else {
         if (isNowIn(0, 0, 0, 5)) {

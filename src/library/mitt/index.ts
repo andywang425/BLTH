@@ -1,4 +1,4 @@
-import mitt, { Emitter, EventHandlerMap, EventType, Handler } from 'mitt'
+import mitt, { type Emitter, type EventHandlerMap, type EventType, type Handler } from 'mitt'
 
 export interface EmitterOnce<Events extends Record<EventType, unknown>> extends Emitter<Events> {
   /**

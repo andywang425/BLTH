@@ -1,10 +1,10 @@
 import BaseModule from '../../BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '../../../library/luxon'
-import { useBiliStore } from '../../../stores/useBiliStore'
-import { MainData } from '../../../library/bili-api/data'
-import BAPI from '../../../library/bili-api'
+import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import { useBiliStore } from '@/stores/useBiliStore'
+import type { MainData } from '@/library/bili-api/data'
+import BAPI from '@/library/bili-api'
 import _ from 'lodash'
-import { ModuleStatusTypes } from '../../../types/module'
+import type { ModuleStatusTypes } from '@/types'
 
 class WatchTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch

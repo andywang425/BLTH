@@ -1,7 +1,7 @@
 import Request from '../request'
-import { Requests, BapiMethods } from './api'
-import { useBiliStore } from '../../stores/useBiliStore'
-import { BiliCookies } from '../../types'
+import type { Requests, BapiMethods } from './api'
+import { useBiliStore } from '@/stores/useBiliStore'
+import type { BiliCookies } from '@/types'
 import { packFormData } from '../utils'
 import { ts, tsm } from '../luxon'
 
@@ -45,23 +45,31 @@ const BAPI: BapiMethods = {
       jumpfrom = 0,
       fontsize = 25,
       color = 16777215,
-      bubble = 0
+      bubble = 0,
+      reply_mid = 0,
+      reply_attr = 0,
+      replay_dmid = '',
+      statistics = { appId: 100, platform: 5 }
     ) => {
       const biliStore = useBiliStore()
       const bili_jct = (biliStore.cookies as BiliCookies).bili_jct
       return request.live.post('/msg/send', undefined, {
         data: packFormData({
-          roomid,
-          room_type,
-          rnd: ts(),
+          bubble,
           msg,
-          mode,
-          jumpfrom,
-          fontsize,
-          csrf: bili_jct,
-          csrf_token: bili_jct,
           color,
-          bubble
+          mode,
+          room_type,
+          jumpfrom,
+          reply_mid,
+          reply_attr,
+          replay_dmid,
+          statistics: JSON.stringify(statistics),
+          fontsize,
+          rnd: ts(),
+          roomid,
+          csrf: bili_jct,
+          csrf_token: bili_jct
         }),
         headers: {
           'Content-Type': 'multipart/form-data'

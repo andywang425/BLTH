@@ -1,7 +1,7 @@
-import { useBiliStore } from '../../stores/useBiliStore'
-import BAPI from '../../library/bili-api'
-import { MainData } from '../../library/bili-api/data'
-import { delayToNextMoment } from '../../library/luxon'
+import { useBiliStore } from '@/stores/useBiliStore'
+import BAPI from '@/library/bili-api'
+import type { MainData } from '@/library/bili-api/data'
+import { delayToNextMoment } from '@/library/luxon'
 import BaseModule from '../BaseModule'
 
 class UserInfo extends BaseModule {

@@ -11,8 +11,7 @@ interface ModuleStatus {
     LiveTasks: {
       sign: ModuleStatusTypes
       medalTasks: {
-        danmu: ModuleStatusTypes
-        like: ModuleStatusTypes
+        light: ModuleStatusTypes
         watch: ModuleStatusTypes
       }
     }

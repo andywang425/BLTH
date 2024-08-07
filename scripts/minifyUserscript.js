@@ -23,7 +23,7 @@ async function minifyUserscript(inputPath, outputPath) {
 
   await fs.writeFile(outputPath, result, 'utf-8')
 
-  console.log(`\n压缩完成: ${inputPath} -> ${outputPath}`)
+  console.log(`压缩完成: ${inputPath} -> ${outputPath}`)
 }
 
 minifyUserscript(
