@@ -16,8 +16,8 @@ class SwitchLiveStreamQuality extends BaseModule {
       const findPlayertimer = setInterval(() => {
         if (
           topWindow.livePlayer &&
-          Object.prototype.hasOwnProperty.call(topWindow.livePlayer, 'switchQuality') &&
-          Object.prototype.hasOwnProperty.call(topWindow.livePlayer, 'getPlayerInfo')
+          Object.hasOwn(topWindow.livePlayer, 'switchQuality') &&
+          Object.hasOwn(topWindow.livePlayer, 'getPlayerInfo')
         ) {
           clearInterval(findPlayertimer)
           clearTimeout(timeoutTimer)
