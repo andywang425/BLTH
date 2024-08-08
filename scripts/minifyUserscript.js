@@ -1,11 +1,11 @@
 /**
  * @description 压缩编译后的用户脚本
  */
-import { promises as fs } from 'fs'
+import { readFile, writeFile } from 'node:fs/promises'
 import { minify } from 'terser'
 
 async function minifyUserscript(inputPath, outputPath) {
-  const code = await fs.readFile(inputPath, 'utf-8')
+  const code = await readFile(inputPath, 'utf-8')
 
   // 获取 Userscript metadata
   const metadataMatch = code.match(/\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==/)
@@ -21,7 +21,7 @@ async function minifyUserscript(inputPath, outputPath) {
   // 加上 metadata
   const result = `${metadata}\n${minified.code}`
 
-  await fs.writeFile(outputPath, result, 'utf-8')
+  await writeFile(outputPath, result, 'utf-8')
 
   console.log(`压缩完成: ${inputPath} -> ${outputPath}`)
 }
