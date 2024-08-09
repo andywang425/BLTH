@@ -280,7 +280,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
       >
         <el-table-column type="selection" align="center" width="55" />
         <el-table-column prop="avatar" label="头像" width="100">
-          <template v-slot:default="scope">
+          <template #default="scope">
             <div class="avatar-wrap">
               <el-image
                 :src="scope.row.avatar"
@@ -303,7 +303,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
         <el-table-column prop="medal_name" label="粉丝勋章" />
         <el-table-column prop="medal_level" label="等级" width="80" sortable />
         <el-table-column prop="roomid" label="房间号">
-          <template v-slot:default="scope">
+          <template #default="scope">
             <el-link
               :href="'https://live.bilibili.com/' + scope.row.roomid + '?visit_id='"
               rel="noreferrer"
