@@ -300,17 +300,16 @@ const BAPI: BapiMethods = {
       })
     },
     vip: {
-      myPrivilege: () => {
-        const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+      myPrivilege: (web_location = '333.33') => {
         return request.main.get(
           '/x/vip/privilege/my',
           {
-            csrf: bili_jct
+            web_location
           },
           {
             headers: {
               Referer: 'https://account.bilibili.com/account/big/myPackage',
-              Origin: 'https://account.bilibili.com/account/big/myPackage'
+              Origin: 'https://account.bilibili.com'
             }
           }
         )

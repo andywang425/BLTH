@@ -124,7 +124,7 @@ interface BapiMethods {
     ) => Promise<Main.CoinAdd>
     videoRelation: (aid: string, bvid?: string) => Promise<Main.VideoRelation>
     vip: {
-      myPrivilege: () => Promise<Main.Vip.MyPrivilege>
+      myPrivilege: (web_location?: string) => Promise<Main.Vip.MyPrivilege>
       receivePrivilege: (type: number, platform?: string) => Promise<Main.Vip.ReceivePrivilege>
       addExperience: () => Promise<Main.Vip.AddExperience>
     }

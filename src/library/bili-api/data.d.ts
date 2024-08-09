@@ -1600,6 +1600,9 @@ declare namespace MainData {
         is_senior_member: number
         format060102: number
         is_overdue_vip: boolean
+        vip_status: number
+        vip_type: number
+        keeptime_end: number
       }
 
       interface List {
@@ -1615,6 +1618,12 @@ declare namespace MainData {
         app_describe: string
         recive_state: number
         salary_type: number
+        exp_params?: ExpParams
+      }
+
+      interface ExpParams {
+        exp_group_tag: string
+        hit_value: number
       }
     }
     namespace AddExperience {
