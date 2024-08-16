@@ -33,7 +33,7 @@ interface BapiMethods {
       reply_mid?: number,
       reply_attr?: number,
       replay_dmid?: unknown,
-      statistics?: { appId: number; platform: number }
+      statistics?: string
     ) => Promise<Live.SendMsg>
     likeReport: (
       room_id: number,

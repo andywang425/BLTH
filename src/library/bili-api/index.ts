@@ -48,7 +48,7 @@ const BAPI: BapiMethods = {
       reply_mid = 0,
       reply_attr = 0,
       replay_dmid = '',
-      statistics = { appId: 100, platform: 5 }
+      statistics = '{"appId":100,"platform":5}'
     ) => {
       const biliStore = useBiliStore()
       const bili_jct = biliStore.cookies!.bili_jct
@@ -63,7 +63,7 @@ const BAPI: BapiMethods = {
           reply_mid,
           reply_attr,
           replay_dmid,
-          statistics: JSON.stringify(statistics),
+          statistics,
           fontsize,
           rnd: ts(),
           roomid,
@@ -241,7 +241,7 @@ const BAPI: BapiMethods = {
         cid,
         type,
         sub_type,
-        dt: dt,
+        dt,
         play_type,
         realtime,
         played_time,
@@ -251,7 +251,7 @@ const BAPI: BapiMethods = {
         video_duration,
         last_play_progress_time,
         max_play_progress_time,
-        spmid: spmid,
+        spmid,
         from_spmid,
         extra,
         csrf: biliStore.cookies!.bili_jct
@@ -281,14 +281,14 @@ const BAPI: BapiMethods = {
     ) => {
       const bili_jct = useBiliStore().cookies!.bili_jct
       return request.main.post('/x/web-interface/coin/add ', {
-        aid: aid,
+        aid,
         multiply: num,
         select_like: select_like,
         cross_domain: cross_domain,
-        eab_x: eab_x,
-        ramval: ramval,
-        source: source,
-        ga: ga,
+        eab_x,
+        ramval,
+        source,
+        ga,
         csrf: bili_jct
       })
     },
