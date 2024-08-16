@@ -1,6 +1,7 @@
 import _ from 'lodash'
-import { useModuleStore } from '@/stores/useModuleStore'
-import type { ModuleEmitterEvents, RunAtMoment } from '@/types'
+import CryptoJS from 'crypto-js'
+import type { RunAtMoment } from '@/types'
+import { ts } from '@/library/luxon'
 
 /**
  * 生成一个 version 4 uuid
@@ -22,15 +23,43 @@ function sleep(miliseconds: number): Promise<void> {
 }
 
 /**
- * 基于 Promise 和 mitt 的等待函数
- * @param type mitt 的 type 参数
- * @param timeout 超时时间
+ * 对请求参数进行 wbi 签名
+ * @param params 请求参数
+ * @param imgKey img_key
+ * @param subKey sub_key
  */
-function wait(type: keyof ModuleEmitterEvents, timeout: number = -1): Promise<any> {
-  return new Promise((resolve) => {
-    useModuleStore().emitter.once(type, (event) => resolve(event))
-    if (timeout !== -1) setTimeout(resolve, timeout)
-  })
+function wbiSign(
+  params: Record<string, string | number | object>,
+  imgKey: string,
+  subKey: string
+): string {
+  // 拼接 imgKey 和 subKey
+  const imgAndSubKey = imgKey + subKey
+  // 将 imgKey 和 subKey 中的字符按特定顺序重新排列，取前32位
+  const salt = [
+    46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49, 33, 9, 42, 19, 29,
+    28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40, 61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25,
+    54, 21, 56, 59, 6, 63, 57, 62, 11, 36, 20, 34, 44, 52
+  ]
+    .map((n) => imgAndSubKey[n])
+    .join('')
+    .slice(0, 32)
+  // 添加 wts 字段（当前秒级时间戳）
+  params.wts = ts()
+  // 按照键对参数进行排序
+  const query = Object.keys(params)
+    .sort()
+    .map((key) => {
+      // 过滤 value 中的 !'()* 字符
+      const value = params[key].toString().replace(/[!'()*]/g, '')
+      // 注：空格需被编码为%20而不是+，因此不能使用URLSearchParams
+      return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    })
+    .join('&')
+  // 计算 w_rid
+  const wbiSign = CryptoJS.MD5(query + salt).toString()
+
+  return query + '&w_rid=' + wbiSign
 }
 
 /**
@@ -146,4 +175,4 @@ function waitForMoment(moment: RunAtMoment): Promise<void> {
   }
 }
 
-export { uuid, sleep, wait, packFormData, deepestIterate, getUrlFromFetchInput, waitForMoment }
+export { uuid, sleep, wbiSign, packFormData, deepestIterate, getUrlFromFetchInput, waitForMoment }
