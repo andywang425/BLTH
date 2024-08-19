@@ -52,8 +52,9 @@ const BAPI: BapiMethods = {
     ) => {
       const biliStore = useBiliStore()
       const bili_jct = biliStore.cookies!.bili_jct
-      return request.live.post('/msg/send', undefined, {
-        data: packFormData({
+      return request.live.post(
+        '/msg/send',
+        packFormData({
           bubble,
           msg,
           color,
@@ -69,11 +70,8 @@ const BAPI: BapiMethods = {
           roomid,
           csrf: bili_jct,
           csrf_token: bili_jct
-        }),
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
+        })
+      )
     },
     likeReport: (room_id, anchor_id, click_time = 1, visit_id = '') => {
       const biliStore = useBiliStore()
