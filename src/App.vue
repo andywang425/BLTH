@@ -40,7 +40,7 @@ function buttonOnClick() {
   button.innerText = uiStore.isShowPanelButtonText
 }
 // 节流，防止点击过快，减小渲染压力
-const throttleButtoOnClick = _.throttle(buttonOnClick, 300)
+const throttleButtonOnClick = _.throttle(buttonOnClick, 300)
 // 播放器节点出现在最初的html中，可以直接获取
 livePlayer = dq('#live-player-ctnr')
 if (livePlayer) {
@@ -52,7 +52,7 @@ if (livePlayer) {
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
       button.setAttribute('class', 'blth_btn')
-      button.onclick = throttleButtoOnClick
+      button.onclick = throttleButtonOnClick
       button.innerText = uiStore.isShowPanelButtonText
       playerHeaderLeft.append(button)
       if (!isSelfTopFrame()) {
@@ -64,10 +64,10 @@ if (livePlayer) {
           {
             element: topFrameDocuemntElement()
           },
-          throttleButtoOnClick
+          throttleButtonOnClick
         )
       }
-      hotkeys('alt+b', throttleButtoOnClick)
+      hotkeys('alt+b', throttleButtonOnClick)
     })
     .catch((e: Error) => logger.error(e))
   // 监听页面缩放，调整控制面板大小
