@@ -1,5 +1,5 @@
 import { useBiliStore } from '@/stores/useBiliStore'
-import { getCookiesAsync } from '@/library/cookie'
+import Cookie from '@/library/cookie'
 import type { BiliCookies } from '@/types'
 import BaseModule from '../BaseModule'
 
@@ -12,11 +12,12 @@ class Cookies extends BaseModule {
    * buvid3: 作为参数 buvid 在请求中出现，目前仅在主站 API 中使用
    */
   private getCookies(): Promise<BiliCookies> {
-    return getCookiesAsync(['bili_jct', 'LIVE_BUVID', 'buvid3'])
+    return Cookie.getAsync(['bili_jct', 'LIVE_BUVID', 'buvid3'], 300, 10e3)
   }
 
   public async run(): Promise<void> {
     useBiliStore().cookies = await this.getCookies()
+    console.log(useBiliStore().cookies)
   }
 }
 

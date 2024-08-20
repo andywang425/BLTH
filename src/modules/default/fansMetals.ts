@@ -16,7 +16,7 @@ class FansMetals extends BaseModule {
   private async getFansMetals(
     pages = Infinity,
     force = false
-  ): Promise<LiveData.FansMedalPanel.List[] | null> {
+  ): Promise<LiveData.FansMedalPanel.List[] | undefined> {
     const medalTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
 
     if (
@@ -61,8 +61,6 @@ class FansMetals extends BaseModule {
         this.logger.error('获取粉丝勋章列表出错', error)
         return Promise.reject(error)
       }
-    } else {
-      return Promise.resolve(null)
     }
   }
 

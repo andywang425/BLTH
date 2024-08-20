@@ -8,7 +8,6 @@ import { uuid, sleep } from '@/library/utils'
 import { useModuleStore } from '@/stores/useModuleStore'
 import type { ModuleConfig } from '@/types'
 import type { ModuleStatusTypes, RunAtMoment } from '@/types'
-import { getCookie } from '@/library/cookie'
 import _ from 'lodash'
 
 interface SpyderData {
@@ -75,7 +74,7 @@ class RoomHeart {
   }
 
   /** Cookie LIVE_BUVID */
-  private buvid: string | null = useBiliStore().cookies?.LIVE_BUVID ?? getCookie('LIVE_BUVID')
+  private buvid?: string = useBiliStore().cookies!.LIVE_BUVID
 
   private uuid = uuid()
 

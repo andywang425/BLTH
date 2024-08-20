@@ -1,77 +1,99 @@
-/**
- * 获取名称为 name 的 cookie
- * @param name 要获取的 cookie 名称
- */
-function getCookie(name: string): string | null {
-  const value = `; ${document.cookie}`
-  const parts = value.split(`; ${name}=`)
-  if (parts.length === 2) return parts.pop()!.split(';').shift() as string
-  return null
-}
+class Cookie {
+  /**
+   * 获取所有 cookies
+   */
+  public static getAll(): Record<string, string> {
+    if (document.cookie === '') return {}
 
-/**
- * 获取名称在 names 数组中的 cookies
- * @param names 要获取的 cookie 名称数组
- */
-function getCookies<T extends string>(names: Iterable<T>): Record<T, string | null> {
-  const cookies: Record<T, string | null> = {} as Record<T, string | null>
-  const namesSet = new Set(names)
+    const cookies = document.cookie.split('; ')
+    const result: Record<string, string> = {}
 
-  // 初始化所有 cookie 为 null
-  for (const name of namesSet) {
-    cookies[name] = null
+    for (const cookie of cookies) {
+      const [name, value] = cookie.split('=', 2)
+      result[decodeURIComponent(name)] = decodeURIComponent(value)
+    }
+
+    return result
   }
 
-  for (const cookie of document.cookie.split('; ')) {
-    const [cookieName, ...cookieValueParts] = cookie.split('=')
-    const cookieValue = cookieValueParts.join('=')
+  /**
+   * 获取指定名称的一组 cookies
+   * @param names cookie 名称数组
+   * @param defaultValue 当 cookie 不存在时使用的默认值，默认 undefined
+   */
+  public static get(names: string[], defaultValue?: string): Record<string, undefined>
+  /**
+   * 获取指定名称的一个 cookie
+   * @param name cookie 名称
+   * @param defaultValue 当 cookie 不存在时使用的默认值，默认 undefined
+   */
+  public static get(name: string, defaultValue?: string): string | undefined
+  /**
+   * 获取指定名称的一个或多个 cookies
+   * @param names cookie 名称或 cookie 名称数组
+   * @param defaultValue 当 cookie 不存在时使用的默认值，默认 undefined
+   */
+  public static get(names: string[] | string, defaultValue?: string) {
+    const cookies = this.getAll()
 
-    if (namesSet.has(cookieName as T)) {
-      cookies[cookieName as T] = decodeURIComponent(cookieValue)
-      namesSet.delete(cookieName as T)
+    if (Array.isArray(names)) {
+      const result: Record<string, string | undefined> = {}
 
-      // 所有 cookie 都已找到，跳出循环
-      if (namesSet.size === 0) break
+      for (const name of names) {
+        result[name] = cookies[name] ? cookies[name] : defaultValue
+      }
+
+      return result
+    } else {
+      return cookies[names] ? cookies[names] : defaultValue
     }
   }
 
-  return cookies
-}
+  /**
+   * 获取一组 cookies，如果有 cookie 未获取到，会反复获取直到超时为止
+   *
+   * TODO: 等 cookieStore 普及后使用监听取代轮询
+   *
+   * @param names 要获取的 cookie 名称数组
+   * @param interval 获取间隔，默认 300 毫秒
+   * @param timeout 超时时间，若留空则永不超时
+   */
+  public static getAsync<T extends string>(
+    names: T[],
+    interval: number = 300,
+    timeout?: number
+  ): Promise<Record<T, string>> {
+    return new Promise((resolve, reject) => {
+      let remainCookieNames = [...names]
+      const cookies: Record<T, string | undefined> = this.get(remainCookieNames)
 
-/**
- * 获取名称在 names 中的 cookies，如果有 cookie 未获取到，会反复获取直到超时为止
- *
- * @param names 要获取的 cookie 名称数组
- * @param interval 获取间隔
- * @param timeout 超时时间，若为 -1 则永不超时
- */
-function getCookiesAsync<T extends string>(
-  names: T[],
-  interval: number = 200,
-  timeout: number = 10000
-): Promise<Record<T, string | null>> {
-  return new Promise((resolve, reject) => {
-    const startTime = Date.now()
-    const remainNamesSet = new Set(names)
-    const cookies: Record<T, string | null> = {} as Record<T, string | null>
-
-    const timer = setInterval(() => {
-      Object.assign(cookies, getCookies(remainNamesSet))
-
-      // 删去 remainNamesSet 中已获取的 cookies
-      for (const name in cookies) {
-        if (cookies[name] !== null) remainNamesSet.delete(name)
+      remainCookieNames = remainCookieNames.filter((r) => !cookies[r])
+      if (remainCookieNames.length === 0) {
+        resolve(<Record<T, string>>cookies)
+        return
       }
 
-      if (remainNamesSet.size === 0) {
-        clearInterval(timer)
-        resolve(cookies)
-      } else if (timeout !== -1 && Date.now() - startTime > timeout) {
-        clearInterval(timer)
-        reject('获取以下Cookies超时: ' + [...remainNamesSet])
+      let timeoutTimer: number
+
+      const timer = setInterval(() => {
+        Object.assign(cookies, this.get(remainCookieNames))
+        remainCookieNames = remainCookieNames.filter((r) => !cookies[r])
+
+        if (remainCookieNames.length === 0) {
+          if (timeout) clearTimeout(timeoutTimer)
+          clearInterval(timer)
+          resolve(<Record<T, string>>cookies)
+        }
+      }, interval)
+
+      if (timeout) {
+        timeoutTimer = setTimeout(() => {
+          clearInterval(timer)
+          reject(`获取以下 cookie 超时：${remainCookieNames}`)
+        }, timeout)
       }
-    }, interval)
-  })
+    })
+  }
 }
 
-export { getCookie, getCookies, getCookiesAsync }
+export default Cookie

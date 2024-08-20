@@ -31,7 +31,7 @@ class LoginTask extends BaseModule {
       if (!isTimestampToday(this.config._lastCompleteTime)) {
         this.status = 'running'
         // 每日登录任务未完成
-        if (biliStore.dailyRewardInfo && !biliStore.dailyRewardInfo.login) {
+        if (!biliStore.dailyRewardInfo!.login) {
           await this.login()
         } else {
           // 用户在运行脚本前已经完成了任务，也记录完成时间

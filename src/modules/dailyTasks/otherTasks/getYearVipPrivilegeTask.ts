@@ -92,7 +92,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
   private isYearVip(): boolean {
     const biliStore = useBiliStore()
     const userInfo = biliStore.userInfo
-    if (userInfo && userInfo.vip.status === 1 && userInfo.vip.type === 2) {
+    if (userInfo!.vip.status === 1 && userInfo!.vip.type === 2) {
       return true
     } else {
       this.logger.log('当前账号不是年度大会员，不领取权益')

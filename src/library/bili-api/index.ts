@@ -76,7 +76,7 @@ const BAPI: BapiMethods = {
     likeReport: (room_id, anchor_id, click_time = 1, visit_id = '') => {
       const biliStore = useBiliStore()
       const bili_jct = biliStore.cookies!.bili_jct
-      const uid = biliStore.BilibiliLive?.UID
+      const uid = biliStore.BilibiliLive!.UID
       return request.live.post('/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3', {
         click_time,
         room_id,
@@ -234,7 +234,7 @@ const BAPI: BapiMethods = {
       const biliStore = useBiliStore()
       return request.main.post('/x/click-interface/web/heartbeat', {
         start_ts: ts(),
-        mid: useBiliStore().userInfo?.mid,
+        mid: useBiliStore().userInfo!.mid,
         aid,
         cid,
         type,
@@ -330,7 +330,7 @@ const BAPI: BapiMethods = {
       },
       addExperience: () => {
         const biliStore = useBiliStore()
-        const mid = biliStore.BilibiliLive?.UID
+        const mid = biliStore.BilibiliLive!.UID
         const buvid = biliStore.cookies!.buvid3
         const bili_jct = biliStore.cookies!.bili_jct
         return request.main.post(
