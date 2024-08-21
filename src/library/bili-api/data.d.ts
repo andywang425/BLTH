@@ -912,6 +912,7 @@ declare namespace LiveData {
       is_mystery: boolean
       uinfo: Uinfo
     }
+
     interface MedalInfo {
       guard_level: number
       medal_color_start: number
@@ -922,10 +923,12 @@ declare namespace LiveData {
       target_id: number
       is_light: number
     }
+
     interface Uinfo {
       uid: number
       base: Base
     }
+
     interface Base {
       name: string
       face: string
@@ -934,10 +937,12 @@ declare namespace LiveData {
       risk_ctrl_info: RiskCtrlInfo
       origin_info: OriginInfo
     }
+
     interface RiskCtrlInfo {
       name: string
       face: string
     }
+
     interface OriginInfo {
       name: string
       face: string
@@ -1023,13 +1028,14 @@ declare namespace MainData {
       is_senior_member: number
       wbi_img: WbiImg
       is_jury: boolean
+      name_render: any
     }
 
     interface LevelInfo {
       current_level: number
       current_min: number
       current_exp: number
-      next_exp: string
+      next_exp: number | string
     }
 
     interface Official {
@@ -1051,6 +1057,7 @@ declare namespace MainData {
       expire: number
       image_enhance: string
       image_enhance_frame: string
+      n_pid: number
     }
 
     interface VipLabel {
@@ -1082,6 +1089,7 @@ declare namespace MainData {
       tv_vip_status: number
       tv_vip_pay_type: number
       tv_due_date: number
+      avatar_icon: AvatarIcon
     }
 
     interface Label {
@@ -1098,6 +1106,12 @@ declare namespace MainData {
       img_label_uri_hans_static: string
       img_label_uri_hant_static: string
     }
+
+    interface AvatarIcon {
+      icon_resource: IconResource
+    }
+
+    interface IconResource {}
 
     interface Wallet {
       mid: number

@@ -23,27 +23,19 @@ function sleep(miliseconds: number): Promise<void> {
 }
 
 /**
+ * 从 URL 中获取文件名
+ * @param url
+ */
+function getFilenameFromUrl(url: string): string {
+  return url.substring(url.lastIndexOf('/') + 1).split('.')[0]
+}
+
+/**
  * 对请求参数进行 wbi 签名
  * @param params 请求参数
- * @param imgKey img_key
- * @param subKey sub_key
+ * @param salt 计算MD5时使用的盐值
  */
-function wbiSign(
-  params: Record<string, string | number | object>,
-  imgKey: string,
-  subKey: string
-): string {
-  // 拼接 imgKey 和 subKey
-  const imgAndSubKey = imgKey + subKey
-  // 将 imgKey 和 subKey 中的字符按特定顺序重新排列，取前32位
-  const salt = [
-    46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49, 33, 9, 42, 19, 29,
-    28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40, 61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25,
-    54, 21, 56, 59, 6, 63, 57, 62, 11, 36, 20, 34, 44, 52
-  ]
-    .map((n) => imgAndSubKey[n])
-    .join('')
-    .slice(0, 32)
+function wbiSign(params: Record<string, string | number | object>, salt: string): string {
   // 添加 wts 字段（当前秒级时间戳）
   params.wts = ts()
   // 按照键对参数进行排序
@@ -175,4 +167,13 @@ function waitForMoment(moment: RunAtMoment): Promise<void> {
   }
 }
 
-export { uuid, sleep, wbiSign, packFormData, deepestIterate, getUrlFromFetchInput, waitForMoment }
+export {
+  uuid,
+  sleep,
+  getFilenameFromUrl,
+  wbiSign,
+  packFormData,
+  deepestIterate,
+  getUrlFromFetchInput,
+  waitForMoment
+}

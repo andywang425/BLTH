@@ -18,7 +18,7 @@ class NoReport extends BaseModule {
    * @param url 需要判断的 URL
    */
   private static isTargetURL(url: string) {
-    return url.includes('//data.bilibili.com') || url.includes('//data.bilivideo.com');
+    return url.includes('//data.bilibili.com') || url.includes('//data.bilivideo.com')
   }
 
   /**

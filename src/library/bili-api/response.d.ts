@@ -111,8 +111,8 @@ declare namespace Main {
   interface Nav {
     code: number
     message: string
-    data: MainData.Nav.Data
     ttl: number
+    data: MainData.Nav.Data
   }
 
   interface Reward {
