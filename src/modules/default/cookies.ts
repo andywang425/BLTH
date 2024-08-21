@@ -17,7 +17,6 @@ class Cookies extends BaseModule {
 
   public async run(): Promise<void> {
     useBiliStore().cookies = await this.getCookies()
-    console.log(useBiliStore().cookies)
   }
 }
 
