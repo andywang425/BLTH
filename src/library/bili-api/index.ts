@@ -204,12 +204,25 @@ const BAPI: BapiMethods = {
     reward: () => {
       return request.main.get('/x/member/web/exp/reward')
     },
-    dynamicAll: (type, page = 1, timezone_offset = -480, features = 'itemOpusStyle') => {
+    dynamicAll: (
+      type,
+      page = 1,
+      timezone_offset = -480,
+      platform = 'web',
+      features = 'itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote,decorationCard,onlyfansAssetsV2,forwardListHidden,ugcDelete',
+      web_location = '333.1365',
+      x_bili_device_req_json = '{"platform":"web","device":"pc"}',
+      x_bili_web_req_json = '{"spm_id":"333.1365"}'
+    ) => {
       return request.main.get('/x/polymer/web-dynamic/v1/feed/all', {
         timezone_offset,
         type,
+        platform,
         page,
-        features
+        features,
+        web_location,
+        x_bili_device_req_json,
+        x_bili_web_req_json
       })
     },
     videoHeartbeat: (
