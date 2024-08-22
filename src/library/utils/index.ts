@@ -2,6 +2,7 @@ import _ from 'lodash'
 import CryptoJS from 'crypto-js'
 import type { RunAtMoment } from '@/types'
 import { ts } from '@/library/luxon'
+import { useBiliStore } from '@/stores/useBiliStore'
 
 /**
  * 生成一个 version 4 uuid
@@ -50,9 +51,8 @@ function addURLParams(url: string, params?: Record<string, any> | string): strin
 /**
  * 对请求参数进行 wbi 签名
  * @param params 请求参数
- * @param salt 计算MD5时使用的盐值
  */
-function wbiSign(params: Record<string, string | number | object>, salt: string): string {
+function wbiSign(params: Record<string, string | number | object>): string {
   // 添加 wts 字段（当前秒级时间戳）
   params.wts = ts()
   // 按照键对参数进行排序
@@ -66,7 +66,7 @@ function wbiSign(params: Record<string, string | number | object>, salt: string)
     })
     .join('&')
   // 计算 w_rid
-  const wbiSign = CryptoJS.MD5(query + salt).toString()
+  const wbiSign = CryptoJS.MD5(query + useBiliStore().wbiSalt).toString()
 
   return query + '&w_rid=' + wbiSign
 }
