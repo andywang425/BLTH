@@ -1,5 +1,6 @@
 import { GM_xmlhttpRequest, type GmXhrRequest } from '$'
 import _ from 'lodash'
+import { addURLParams } from '../utils'
 
 class Request {
   /** 请求 URL 的前缀 */
@@ -19,14 +20,13 @@ class Request {
    * @param url 请求 URL 除去前缀的部分
    * @param params URL 参数
    * @param otherDetails GM_xmlhttpRequest 的 details 参数
-   * @returns Promise
    */
-  public get(url: string, params?: Record<string, any> | string, otherDetails?: any): Promise<any> {
-    if (typeof params === 'string') {
-      url = this.url_prefix + url + '?' + params
-    } else {
-      url = this.url_prefix + url + (params ? '?' + new URLSearchParams(params).toString() : '')
-    }
+  public get(
+    url: string,
+    params?: Record<string, any> | string,
+    otherDetails?: Record<string, any>
+  ): Promise<any> {
+    url = addURLParams(this.url_prefix + url, params)
 
     return new Promise((resolve, reject) => {
       const defaultDetails: GmXhrRequest<never, any> = {
@@ -56,10 +56,13 @@ class Request {
    * 发起一个 POST 请求
    * @param url 请求 URL 除去前缀的部分
    * @param data POST data
-   * @param otherDetails GM_xmlhttpRequest 的 details 参数
-   * @returns Promise
+   * @param otherDetails GM_xmlhttpRequest 的 details 参数（特别的，可以提供 params 属性作为 URL 参数）
    */
-  public post(url: string, data?: Record<string, any> | string, otherDetails?: any): Promise<any> {
+  public post(
+    url: string,
+    data?: Record<string, any> | string,
+    otherDetails?: Record<string, any>
+  ): Promise<any> {
     const headers: Record<string, string> = {
       Accept: 'application/json, text/plain, */*',
       Referer: this.origin,
@@ -76,10 +79,13 @@ class Request {
       data = new URLSearchParams(data).toString()
     }
 
+    url = addURLParams(this.url_prefix + url, otherDetails?.params)
+    delete otherDetails?.params
+
     return new Promise((resolve, reject) => {
       const defaultDetails: GmXhrRequest<never, any> = {
         method: 'POST',
-        url: this.url_prefix + url,
+        url,
         data,
         responseType: 'json',
         headers,

@@ -31,6 +31,23 @@ function getFilenameFromUrl(url: string): string {
 }
 
 /**
+ * 为 URL 添加查询参数
+ * @param url URL
+ * @param params 查询参数
+ */
+function addURLParams(url: string, params?: Record<string, any> | string): string {
+  if (!params) {
+    return url
+  }
+
+  if (typeof params === 'string') {
+    return url + '?' + params
+  } else {
+    return url + '?' + new URLSearchParams(params).toString()
+  }
+}
+
+/**
  * 对请求参数进行 wbi 签名
  * @param params 请求参数
  * @param salt 计算MD5时使用的盐值
@@ -171,6 +188,7 @@ export {
   uuid,
   sleep,
   getFilenameFromUrl,
+  addURLParams,
   wbiSign,
   packFormData,
   deepestIterate,
