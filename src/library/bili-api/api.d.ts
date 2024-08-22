@@ -81,10 +81,14 @@ interface BapiMethods {
     nav: () => Promise<Main.Nav>
     reward: () => Promise<Main.Reward>
     dynamicAll: (
-      type: string,
+      type?: string,
       page?: number,
       timezone_offset?: number,
-      features?: string
+      platform?: string,
+      features?: string,
+      web_location?: string,
+      x_bili_device_req_json?: string,
+      x_bili_web_req_json?: string
     ) => Promise<Main.DynamicAll>
     videoHeartbeat: (
       aid: string,

@@ -205,7 +205,7 @@ const BAPI: BapiMethods = {
       return request.main.get('/x/member/web/exp/reward')
     },
     dynamicAll: (
-      type,
+      type = 'video',
       page = 1,
       timezone_offset = -480,
       platform = 'web',
@@ -214,16 +214,23 @@ const BAPI: BapiMethods = {
       x_bili_device_req_json = '{"platform":"web","device":"pc"}',
       x_bili_web_req_json = '{"spm_id":"333.1365"}'
     ) => {
-      return request.main.get('/x/polymer/web-dynamic/v1/feed/all', {
-        timezone_offset,
-        type,
-        platform,
-        page,
-        features,
-        web_location,
-        x_bili_device_req_json,
-        x_bili_web_req_json
-      })
+      return request.main.get(
+        '/x/polymer/web-dynamic/v1/feed/all',
+        {
+          timezone_offset,
+          type,
+          platform,
+          page,
+          features,
+          web_location,
+          x_bili_device_req_json,
+          x_bili_web_req_json
+        },
+        {
+          Origin: 'https://t.bilibili.com',
+          Referer: 'https://t.bilibili.com/'
+        }
+      )
     },
     videoHeartbeat: (
       aid,
