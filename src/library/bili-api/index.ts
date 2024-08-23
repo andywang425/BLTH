@@ -80,11 +80,10 @@ const BAPI: BapiMethods = {
       return request.live.post('/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3', {
         click_time,
         room_id,
-        anchor_id,
         uid,
-        ts: ts(),
-        csrf: bili_jct,
+        anchor_id,
         csrf_token: bili_jct,
+        csrf: bili_jct,
         visit_id
       })
     },
