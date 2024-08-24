@@ -90,10 +90,14 @@ const BAPI: BapiMethods = {
     /**
      * 该API只在带有多层iframe（背景很好看）的直播间中被使用，但参数填任意直播间均可
      */
-    getInfoByRoom: (room_id) => {
-      return request.live.get('/xlive/web-room/v1/index/getInfoByRoom', {
-        room_id
-      })
+    getInfoByRoom: (room_id, web_location = '444.8') => {
+      return request.live.get(
+        '/xlive/web-room/v1/index/getInfoByRoom',
+        wbiSign({
+          room_id,
+          web_location
+        })
+      )
     },
     getUserTaskProgress: (target_id = 11153765) => {
       // 该 API 是 APP API，但也可以使用 web 的身份校验方式

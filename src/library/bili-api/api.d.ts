@@ -41,7 +41,7 @@ interface BapiMethods {
       click_time?: number,
       visit_id?: string
     ) => Promise<Live.LikeReport>
-    getInfoByRoom: (room_id: number) => Promise<Live.GetInfoByRoom>
+    getInfoByRoom: (room_id: number, web_location?: string) => Promise<Live.GetInfoByRoom>
     getUserTaskProgress: (target_id?: number) => Promise<Live.GetUserTaskProgress>
     userTaskReceiveRewards: (target_id?: number) => Promise<Live.UserTaskReceiveRewards>
     silver2coin: (visit_id?: string) => Promise<Live.Silver2coin>
