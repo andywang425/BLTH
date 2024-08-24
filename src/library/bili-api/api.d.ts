@@ -91,23 +91,26 @@ interface BapiMethods {
       x_bili_web_req_json?: string
     ) => Promise<Main.DynamicAll>
     videoHeartbeat: (
-      aid: string,
-      cid?: string,
+      aid: number,
+      cid?: number,
+      type?: number,
+      sub_type?: number,
+      dt?: number,
+      play_type?: number,
       realtime?: number,
       played_time?: number,
       real_played_time?: number,
       refer_url?: string,
       quality?: number,
       video_duration?: number,
-      type?: number,
-      sub_type?: number,
-      play_type?: number,
-      dt?: number,
       last_play_progress_time?: number,
       max_play_progress_time?: number,
+      outer?: number,
       spmid?: string,
       from_spmid?: string,
-      extra?: string
+      session?: string,
+      extra?: string,
+      web_location?: number
     ) => Promise<Main.VideoHeartbeat>
     share: (
       aid: string,

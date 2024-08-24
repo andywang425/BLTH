@@ -1,7 +1,7 @@
 import Request from '../request'
 import type { Requests, BapiMethods } from './api'
 import { useBiliStore } from '@/stores/useBiliStore'
-import { packFormData } from '../utils'
+import { packFormData, uuid, wbiSign } from '../utils'
 import { ts, tsm } from '../luxon'
 
 const request: Requests = {
@@ -233,46 +233,71 @@ const BAPI: BapiMethods = {
     },
     videoHeartbeat: (
       aid,
-      cid = '',
-      realtime = 0,
-      played_time = 0,
-      real_played_time = 0,
-      refer_url = 'https://t.bilibili.com/?spm_id_from=444.3.0.0',
-      quality = 116,
-      video_duration = 100,
+      cid = 1000000000,
       type = 3,
       sub_type = 0,
-      play_type = 0,
       dt = 2,
-      last_play_progress_time = 0,
-      max_play_progress_time = 0,
-      spmid = '333.488.0.0',
-      from_spmid = '333.31.list.card_archive.click',
-      extra = '{"player_version":"4.1.21-rc.1727.0"}'
+      play_type = 1,
+      realtime = 61,
+      played_time = 62,
+      real_played_time = 62,
+      refer_url = 'https://t.bilibili.com/?tab=video',
+      quality = 64,
+      video_duration = 180,
+      last_play_progress_time = 62,
+      max_play_progress_time = 62,
+      outer = 0,
+      spmid = '333.788.0.0',
+      from_spmid = '333.1365.list.card_archive.click',
+      session = uuid().replaceAll('-', ''),
+      extra = '{"player_version":"4.8.43"}',
+      web_location = 1315873
     ) => {
       const biliStore = useBiliStore()
-      return request.main.post('/x/click-interface/web/heartbeat', {
-        start_ts: ts(),
-        mid: useBiliStore().userInfo!.mid,
-        aid,
-        cid,
-        type,
-        sub_type,
-        dt,
-        play_type,
-        realtime,
-        played_time,
-        real_played_time,
-        refer_url,
-        quality,
-        video_duration,
-        last_play_progress_time,
-        max_play_progress_time,
-        spmid,
-        from_spmid,
-        extra,
-        csrf: biliStore.cookies!.bili_jct
-      })
+      const start_ts = ts()
+      const mid = useBiliStore().userInfo!.mid
+
+      return request.main.post(
+        '/x/click-interface/web/heartbeat',
+        {
+          start_ts,
+          mid,
+          aid,
+          cid,
+          type,
+          sub_type,
+          dt,
+          play_type,
+          realtime,
+          played_time,
+          real_played_time,
+          refer_url,
+          quality,
+          video_duration,
+          last_play_progress_time,
+          max_play_progress_time,
+          outer,
+          spmid,
+          from_spmid,
+          session,
+          extra,
+          csrf: biliStore.cookies!.bili_jct
+        },
+        {
+          params: wbiSign({
+            w_start_ts: start_ts,
+            w_mid: mid,
+            w_aid: aid,
+            w_dt: dt,
+            w_realtime: realtime,
+            w_played_time: played_time,
+            w_real_played_time: real_played_time,
+            w_video_duration: video_duration,
+            w_last_play_progress_time: last_play_progress_time,
+            web_location
+          })
+        }
+      )
     },
     share: (aid, source = 'pc_client_normal', eab_x = 2, ramval = 0, ga = 1) => {
       // source 不能用 web 端的值，改成 pc 客户端的才能完成任务

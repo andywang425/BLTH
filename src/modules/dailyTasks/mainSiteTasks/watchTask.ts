@@ -3,6 +3,7 @@ import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/lux
 import { useBiliStore } from '@/stores/useBiliStore'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
+import _ from 'lodash'
 
 class WatchTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch
@@ -11,16 +12,15 @@ class WatchTask extends BaseModule {
     this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.watch = s
   }
 
-  private getAid(): string {
+  private getAid(): number {
     const biliStore = useBiliStore()
-    // 当 biliStore.dynamicVideos 不是 null 或 [] 时
     // 返回第一个视频的 aid
-    return biliStore.dynamicVideos![0].modules.module_dynamic.major.archive.aid
+    return Number(biliStore.dynamicVideos![0].modules.module_dynamic.major.archive.aid)
   }
 
-  private async watch(aid: string) {
+  private async watch(aid: number) {
     try {
-      const response = await BAPI.main.videoHeartbeat(aid)
+      const response = await BAPI.main.videoHeartbeat(aid, _.random(1000000000, 2000000000))
       this.logger.log(`BAPI.main.videoHeartbeat(${aid}) response`, response)
       if (response.code === 0) {
         this.logger.log('每日观看视频任务已完成')
