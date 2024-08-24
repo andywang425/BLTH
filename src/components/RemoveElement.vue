@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useModuleStore } from '@/stores/useModuleStore'
+import helpInfo from '@/library/help-info'
 
 const moduleStore = useModuleStore()
 const config = moduleStore.moduleConfig.RemoveElement
@@ -10,37 +11,37 @@ const config = moduleStore.moduleConfig.RemoveElement
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removePKBox.enabled" active-text="移除大乱斗元素" />
-        <Info id="RemoveElement.removePKBox" />
+        <Info :item="helpInfo.RemoveElement.removePKBox" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeLiveWaterMark.enabled" active-text="移除直播间水印" />
-        <Info id="RemoveElement.removeLiveWaterMark" />
+        <Info :item="helpInfo.RemoveElement.removeLiveWaterMark" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeShopPopover.enabled" active-text="移除直播间小黄车弹窗" />
-        <Info id="RemoveElement.removeShopPopover" />
+        <Info :item="helpInfo.RemoveElement.removeShopPopover" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeGameParty.enabled" active-text="移除直播间幻星派对标志" />
-        <Info id="RemoveElement.removeGameParty" />
+        <Info :item="helpInfo.RemoveElement.removeGameParty" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeGiftPopover.enabled" active-text="移除礼物赠送提示弹窗" />
-        <Info id="RemoveElement.removeGiftPopover" />
+        <Info :item="helpInfo.RemoveElement.removeGiftPopover" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeMicPopover.enabled" active-text="移除连麦状态提示" />
-        <Info id="RemoveElement.removeMicPopover" />
+        <Info :item="helpInfo.RemoveElement.removeMicPopover" />
       </el-space>
     </el-row>
     <el-row>
@@ -49,37 +50,37 @@ const config = moduleStore.moduleConfig.RemoveElement
           v-model="config.removeComboCard.enabled"
           active-text="移除直播间相同弹幕连续提示"
         />
-        <Info id="RemoveElement.removeComboCard" />
+        <Info :item="helpInfo.RemoveElement.removeComboCard" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeRank.enabled" active-text="移除排行榜" />
-        <Info id="RemoveElement.removeRank" />
+        <Info :item="helpInfo.RemoveElement.removeRank" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeGiftPlanet.enabled" active-text="移除礼物星球" />
-        <Info id="RemoveElement.removeGiftPlanet" />
+        <Info :item="helpInfo.RemoveElement.removeGiftPlanet" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeActivityBanner.enabled" active-text="移除活动入口" />
-        <Info id="RemoveElement.removeActivityBanner" />
+        <Info :item="helpInfo.RemoveElement.removeActivityBanner" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removePKBanner.enabled" active-text="移除大乱斗入口" />
-        <Info id="RemoveElement.removePKBanner" />
+        <Info :item="helpInfo.RemoveElement.removePKBanner" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeFlipView.enabled" active-text="移除礼物栏下方广告" />
-        <Info id="RemoveElement.removeFlipView" />
+        <Info :item="helpInfo.RemoveElement.removeFlipView" />
       </el-space>
     </el-row>
     <el-row>
@@ -88,13 +89,13 @@ const config = moduleStore.moduleConfig.RemoveElement
           v-model="config.removeRecommendRoom.enabled"
           active-text="移除礼物栏下方推荐直播间"
         />
-        <Info id="RemoveElement.removeRecommendRoom" />
+        <Info :item="helpInfo.RemoveElement.removeRecommendRoom" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.removeLiveMosaic.enabled" active-text="移除直播间马赛克" />
-        <Info id="RemoveElement.removeLiveMosaic" />
+        <Info :item="helpInfo.RemoveElement.removeLiveMosaic" />
       </el-space>
     </el-row>
     <el-divider />
