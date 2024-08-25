@@ -139,23 +139,6 @@ const BAPI: BapiMethods = {
         visit_id
       })
     },
-    queryContributionRank: (
-      ruid,
-      room_id,
-      page,
-      page_size,
-      type = 'online_rank',
-      _switch = 'contribution_rank'
-    ) => {
-      return request.live.get('/xlive/general-interface/v1/rank/queryContributionRank', {
-        ruid,
-        room_id,
-        page,
-        page_size,
-        type,
-        switch: _switch
-      })
-    },
     wearMedal: (medal_id, visit_id = '') => {
       const bili_jct = useBiliStore().cookies!.bili_jct
       return request.live.post('/xlive/web-room/v1/fansMedal/wear', {

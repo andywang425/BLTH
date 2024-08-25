@@ -79,9 +79,6 @@ interface ModuleConfig {
     invisibility: {
       enabled: boolean
     }
-    showContributionUserNum: {
-      enabled: boolean
-    }
   }
   RemoveElement: {
     removePKBox: {

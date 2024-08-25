@@ -108,9 +108,6 @@ const defaultValues: DefaultValues = {
       },
       invisibility: {
         enabled: false
-      },
-      showContributionUserNum: {
-        enabled: false
       }
     },
     RemoveElement: {

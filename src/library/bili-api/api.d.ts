@@ -46,14 +46,6 @@ interface BapiMethods {
     userTaskReceiveRewards: (target_id?: number) => Promise<Live.UserTaskReceiveRewards>
     silver2coin: (visit_id?: string) => Promise<Live.Silver2coin>
     coin2silver: (num: number, platform?: string, visit_id?: string) => Promise<Live.Coin2silver>
-    queryContributionRank: (
-      ruid: number,
-      room_id: number,
-      page: number,
-      page_size: number,
-      type?: string,
-      _switch?: string
-    ) => Promise<Live.QueryContributionRank>
     wearMedal: (medal_id: number, visit_id?: string) => Promise<Live.WearMedal>
   }
   liveTrace: {

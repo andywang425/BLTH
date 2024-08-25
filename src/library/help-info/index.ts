@@ -221,12 +221,6 @@ const helpInfo: HelpInfo = {
     invisibility: {
       title: '隐身入场',
       message: h('p', [h('div', '进入直播间时其他人不会收到提示，但还是会出现在高能用户榜单上。')])
-    },
-    showContributionUserNum: {
-      title: '显示高能用户数量',
-      message: h('p', [
-        h('div', '在高能用户标签上显示当前直播间的高能用户数量，每分钟更新一次数据。')
-      ])
     }
   },
   RemoveElement: {

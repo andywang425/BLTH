@@ -76,13 +76,6 @@ declare namespace Live {
     message: string
   }
 
-  interface QueryContributionRank {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.QueryContributionRank.Data
-  }
-
   interface WearMedal {
     code: number
     message: string

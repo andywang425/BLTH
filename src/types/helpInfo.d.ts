@@ -38,7 +38,6 @@ interface HelpInfo {
     noReport: HelpInfoItem
     noSleep: HelpInfoItem
     invisibility: HelpInfoItem
-    showContributionUserNum: HelpInfoItem
   }
   RemoveElement: {
     removePKBox: HelpInfoItem
