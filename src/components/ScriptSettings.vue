@@ -7,7 +7,7 @@ const uiConfig = useUIStore().uiConfig
 <template>
   <div>
     <el-row align="middle">
-      <el-space wrap size="large">
+      <el-space wrap :size="[16, 0]">
         <el-text class="label-text">控制面板宽度</el-text>
         <el-slider
           style="width: 150px"
@@ -24,5 +24,6 @@ const uiConfig = useUIStore().uiConfig
 <style scoped>
 .label-text {
   color: var(--el-text-color-primary);
+  line-height: 32px;
 }
 </style>

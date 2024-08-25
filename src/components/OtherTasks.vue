@@ -26,7 +26,7 @@ const status = moduleStore.moduleStatus.DailyTasks.OtherTasks
       </el-space>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.coinToSilver.enabled" active-text="硬币换银瓜子" />
         <el-text>花费硬币</el-text>
         <el-select v-model="config.coinToSilver.num" placeholder="Select" style="width: 64px">
@@ -38,7 +38,7 @@ const status = moduleStore.moduleStatus.DailyTasks.OtherTasks
       </el-space>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.getYearVipPrivilege.enabled" active-text="领取年度大会员权益" />
         <Info :item="helpInfo.DailyTasks.OtherTasks.getYearVipPrivilege" />
         <TaskStatus :status="status.getYearVipPrivilege" />

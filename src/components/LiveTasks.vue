@@ -148,7 +148,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
 <template>
   <div>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.sign.enabled" active-text="直播签到" />
         <Info :item="helpInfo.DailyTasks.LiveTasks.sign" />
         <TaskStatus :status="status.sign" />
@@ -157,7 +157,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
     <el-divider />
     <!-- 粉丝勋章相关任务 -->
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.medalTasks.light.enabled" active-text="点亮熄灭勋章" />
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.main" />
         <TaskStatus :status="status.medalTasks.light" />
@@ -166,7 +166,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
     <el-row>
       <el-radio-group v-model="config.medalTasks.light.mode" class="radio-group">
         <el-row>
-          <el-space wrap>
+          <el-space wrap :size="[8, 0]">
             <el-icon>
               <SemiSelect />
             </el-icon>
@@ -175,7 +175,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
           </el-space>
         </el-row>
         <el-row>
-          <el-space wrap>
+          <el-space wrap :size="[8, 0]">
             <el-icon>
               <SemiSelect />
             </el-icon>
@@ -193,7 +193,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
       </el-radio-group>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.medalTasks.watch.enabled" active-text="观看直播" />
         <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 70px">
           <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
@@ -204,7 +204,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
       </el-space>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch
           v-model="config.medalTasks.isWhiteList"
           active-text="白名单"
