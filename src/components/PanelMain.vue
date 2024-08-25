@@ -4,6 +4,7 @@ import LiveTasks from './LiveTasks.vue'
 import OtherTasks from './OtherTasks.vue'
 import EnhanceExperience from './EnhanceExperience.vue'
 import RemoveElement from './RemoveElement.vue'
+import ScriptSettings from './ScriptSettings.vue'
 import { defineComponent } from 'vue'
 
 // 注册对当前组件实例可用的组件
@@ -13,7 +14,8 @@ export default defineComponent({
     LiveTasks,
     OtherTasks,
     EnhanceExperience,
-    RemoveElement
+    RemoveElement,
+    ScriptSettings
   }
 })
 </script>

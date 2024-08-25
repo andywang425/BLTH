@@ -132,11 +132,13 @@ type MenuIndex =
   | 'OtherTasks'
   | 'EnhanceExperience'
   | 'RemoveElement'
+  | 'ScriptSettings'
 
 interface UiConfig {
   isCollapse: boolean
   isShowPanel: boolean
   activeMenuIndex: MenuIndex
+  panelWidthPercent: number
 }
 
 interface Cache {

@@ -10,7 +10,8 @@ const defaultValues: DefaultValues = {
   ui: {
     isCollapse: false,
     isShowPanel: true,
-    activeMenuIndex: 'MainSiteTasks'
+    activeMenuIndex: 'MainSiteTasks',
+    panelWidthPercent: 40
   },
   modules: {
     DailyTasks: {
