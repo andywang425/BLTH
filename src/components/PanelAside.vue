@@ -89,3 +89,9 @@ const items: MenuItem[] = [
     </template>
   </el-menu>
 </template>
+
+<style scoped>
+#aside-el-menu {
+  height: 100%;
+}
+</style>
