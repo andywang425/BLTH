@@ -55,7 +55,7 @@ export const useUIStore = defineStore('ui', () => {
   })
   // 控制面板主体的滚动条窗口高度
   // 因为 header 的高度是固定的 60px，所以用控制面板高度 - 60px
-  const scrollBarHeight = computed<string>(() => (livePlayerRect.height - 60).toString() + 'px')
+  const scrollBarHeight = computed<string>(() => `${livePlayerRect.height - 60}px`)
 
   /**
    * 切换侧边栏的展开/收起状态

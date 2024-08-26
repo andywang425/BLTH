@@ -76,7 +76,7 @@ if (livePlayer) {
     .catch((e: Error) => logger.error(e))
   // 监听页面缩放，调整控制面板大小
   // 因为这个操作频率不高就不节流或防抖了
-  window.addEventListener('resize', () => updatePosition())
+  unsafeWindow.addEventListener('resize', () => updatePosition())
   // 监听 html 根节点和 body 节点
   // 适配播放器网页模式
   const observer = new MutationObserver(() => updatePosition())
