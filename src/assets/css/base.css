@@ -33,3 +33,39 @@
 .el-message-box li {
   list-style: initial;
 }
+
+/**
+  适配实验室的“屏幕适配”功能
+  原理：屏幕适配css中的zoom值为n，此处就设置为1/n
+ */
+html[lab-style*='adaptive'] {
+  @media screen and (min-width: 1930px) {
+    .base {
+      zoom: calc(15 / 16);
+    }
+  }
+
+  @media screen and (min-width: 2058px) {
+    .base {
+      zoom: calc(3 / 4);
+    }
+  }
+
+  @media screen and (min-width: 2570px) {
+    .base {
+      zoom: calc(2 / 3);
+    }
+  }
+
+  @media screen and (min-width: 3210px) {
+    .base {
+      zoom: calc(1 / 2);
+    }
+  }
+
+  @media screen and (min-width: 3850px) {
+    .base {
+      zoom: calc(15 / 32);
+    }
+  }
+}
