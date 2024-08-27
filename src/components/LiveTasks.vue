@@ -136,12 +136,10 @@ function handleSelectionChange(selectedRows: MedalInfoRow[]) {
   config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
 }
 
-function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
-  // 如果没点到链接，切换当前行的选择状态
-  if (!(event.target as HTMLElement).className.startsWith('el-link')) {
-    // @ts-expect-error
-    medalInfoTableRef.value?.toggleRowSelection(row, undefined)
-  }
+function handleRowClick(row: MedalInfoRow) {
+  // 切换当前行的选择状态
+  // @ts-expect-error
+  medalInfoTableRef.value?.toggleRowSelection(row, undefined)
 }
 </script>
 
@@ -309,6 +307,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
               rel="noreferrer"
               type="primary"
               target="_blank"
+              @click.stop
             >
               {{ scope.row.roomid }}
             </el-link>
