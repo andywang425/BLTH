@@ -3,7 +3,7 @@ import { useUIStore } from './stores/useUIStore'
 import PanelHeader from './components/PanelHeader.vue'
 import PanelAside from './components/PanelAside.vue'
 import PanelMain from './components/PanelMain.vue'
-import { dce, dq, waitForElement, isSelfTopFrame, topFrameDocuemntElement } from './library/dom'
+import { dce, dq, waitForElement, isSelfTopFrame, topFrameDocumentElement } from './library/dom'
 import hotkeys from 'hotkeys-js'
 import _ from 'lodash'
 import Logger from './library/logger'
@@ -66,7 +66,7 @@ if (livePlayer) {
         hotkeys(
           'alt+b',
           {
-            element: topFrameDocuemntElement()
+            element: topFrameDocumentElement()
           },
           throttleButtonOnClick
         )
@@ -76,12 +76,11 @@ if (livePlayer) {
     .catch((e: Error) => logger.error(e))
   // 监听页面缩放，调整控制面板大小
   // 因为这个操作频率不高就不节流或防抖了
-  unsafeWindow.addEventListener('resize', () => updatePosition())
+  window.addEventListener('resize', () => updatePosition())
   // 监听 html 根节点和 body 节点
   // 适配播放器网页模式
   const observer = new MutationObserver(() => updatePosition())
   observer.observe(document.body, { attributes: true })
-  // TODO: 适配实验室中的屏幕适配功能
   observer.observe(document.documentElement, { attributes: true })
 
   // 准备完毕，显示控制面板
@@ -153,13 +152,8 @@ if (livePlayer) {
   padding-bottom: var(--main-top-botton-padding);
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.1s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+/* PanelMain切换时的动画效果 */
+.fade-enter-active {
+  animation: fade-in linear 0.2s;
 }
 </style>

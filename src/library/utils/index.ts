@@ -3,7 +3,6 @@ import CryptoJS from 'crypto-js'
 import type { RunAtMoment } from '@/types'
 import { ts } from '@/library/luxon'
 import { useBiliStore } from '@/stores/useBiliStore'
-import { unsafeWindow } from '$'
 
 /**
  * 生成一个 version 4 uuid
@@ -175,7 +174,7 @@ function waitForMoment(moment: RunAtMoment): Promise<void> {
         if (document.readyState === 'complete') {
           resolve()
         } else {
-          unsafeWindow.addEventListener('load', () => resolve())
+          window.addEventListener('load', () => resolve())
         }
       })
     }

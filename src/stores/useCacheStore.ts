@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { reactive, ref, watch } from 'vue'
 import Storage from '@/library/storage'
 import type { Cache } from '@/types'
-import { unsafeWindow } from '$'
 
 type ScriptType = 'Main' | 'SubMain' | 'Other'
 
@@ -34,7 +33,7 @@ export const useCacheStore = defineStore('cache', () => {
     // 那样就会留下一个永久的有脚本在运行的标记
     const timer = setInterval(() => (cache.lastAliveHeartBeatTime = Date.now()), 5000)
 
-    unsafeWindow.addEventListener('unload', () => {
+    window.addEventListener('unload', () => {
       clearInterval(timer)
       cache.lastAliveHeartBeatTime = 0
     })
