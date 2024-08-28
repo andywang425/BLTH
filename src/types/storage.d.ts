@@ -105,9 +105,6 @@ interface ModuleConfig {
     removeRank: {
       enabled: boolean
     }
-    removeGiftPlanet: {
-      enabled: boolean
-    }
     removeActivityBanner: {
       enabled: boolean
     }

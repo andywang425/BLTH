@@ -136,9 +136,6 @@ const defaultValues: DefaultValues = {
       removeRank: {
         enabled: false
       },
-      removeGiftPlanet: {
-        enabled: false
-      },
       removeActivityBanner: {
         enabled: false
       },

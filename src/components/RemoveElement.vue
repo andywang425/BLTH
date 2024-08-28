@@ -61,12 +61,6 @@ const config = moduleStore.moduleConfig.RemoveElement
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
-        <el-switch v-model="config.removeGiftPlanet.enabled" active-text="移除礼物星球" />
-        <Info :item="helpInfo.RemoveElement.removeGiftPlanet" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.removeActivityBanner.enabled" active-text="移除活动入口" />
         <Info :item="helpInfo.RemoveElement.removeActivityBanner" />
       </el-space>
