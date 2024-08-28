@@ -105,10 +105,7 @@ interface ModuleConfig {
     removeRank: {
       enabled: boolean
     }
-    removeActivityBanner: {
-      enabled: boolean
-    }
-    removePKBanner: {
+    removeHeaderStuff: {
       enabled: boolean
     }
     removeFlipView: {

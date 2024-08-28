@@ -136,10 +136,7 @@ const defaultValues: DefaultValues = {
       removeRank: {
         enabled: false
       },
-      removeActivityBanner: {
-        enabled: false
-      },
-      removePKBanner: {
+      removeHeaderStuff: {
         enabled: false
       },
       removeFlipView: {

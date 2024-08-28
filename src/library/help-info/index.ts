@@ -256,14 +256,9 @@ const helpInfo: HelpInfo = {
       title: '移除排行榜',
       message: '移除直播画面上方的人气榜/航海榜，赠送人气票的入口也在这里。'
     },
-    removeActivityBanner: {
-      title: '移除活动入口',
-      message: '移除直播画面上方的活动入口，当前活动内容会滚动切换。'
-    },
-    removePKBanner: {
-      title: '移除大乱斗入口',
-      message:
-        '移除直播画面上方的大乱斗入口，这里在有BLS的时候也会成为BLS的入口，和大乱斗的入口滚动切换。'
+    removeHeaderStuff: {
+      title: '移除直播画面上方杂项',
+      message: '移除直播画面上方各种杂七杂八的东西，比如排行榜、活动轮播图等。'
     },
     removeFlipView: {
       title: '移除礼物栏下方广告',

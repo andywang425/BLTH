@@ -61,14 +61,8 @@ const config = moduleStore.moduleConfig.RemoveElement
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
-        <el-switch v-model="config.removeActivityBanner.enabled" active-text="移除活动入口" />
-        <Info :item="helpInfo.RemoveElement.removeActivityBanner" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap :size="[8, 0]">
-        <el-switch v-model="config.removePKBanner.enabled" active-text="移除大乱斗入口" />
-        <Info :item="helpInfo.RemoveElement.removePKBanner" />
+        <el-switch v-model="config.removeHeaderStuff.enabled" active-text="移除直播画面上方杂项" />
+        <Info :item="helpInfo.RemoveElement.removeHeaderStuff" />
       </el-space>
     </el-row>
     <el-row>
