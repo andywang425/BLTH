@@ -22,7 +22,7 @@ const config = moduleStore.moduleConfig.RemoveElement
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
-        <el-switch v-model="config.removeShopPopover.enabled" active-text="移除直播间小黄车弹窗" />
+        <el-switch v-model="config.removeShopPopover.enabled" active-text="移除直播间小橙车弹窗" />
         <Info :item="helpInfo.RemoveElement.removeShopPopover" />
       </el-space>
     </el-row>

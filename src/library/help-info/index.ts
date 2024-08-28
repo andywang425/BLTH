@@ -233,8 +233,8 @@ const helpInfo: HelpInfo = {
       message: '移除直播画面左上角的水印。'
     },
     removeShopPopover: {
-      title: '移除直播间小黄车弹窗',
-      message: '移除直播间左上角的小黄车弹窗。'
+      title: '移除直播间小橙车弹窗',
+      message: '移除直播间左上角的小橙车弹窗。'
     },
     removeGameParty: {
       title: '移除直播间幻星派对标志',
