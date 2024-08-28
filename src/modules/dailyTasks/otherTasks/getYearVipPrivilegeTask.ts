@@ -130,9 +130,10 @@ class GetYearVipPrivilegeTask extends BaseModule {
                   const watchTaskConfig =
                     this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch
                   if (watchTaskConfig.enabled) {
+                    // 等观看视频任务完成再领取
                     watch(
                       () => watchTaskConfig._lastCompleteTime,
-                      () => this.addExperience(),
+                      () => sleep(3000).then(() => this.addExperience()),
                       { once: true }
                     )
                   } else {
