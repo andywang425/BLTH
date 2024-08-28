@@ -17,8 +17,8 @@ class BanP2P extends BaseModule {
       'webkitRTCPeerConnection'
     ]
     for (const i of RTClist) {
-      // 判断属性是否存在并且是否可配置
-      if (Object.prototype.hasOwnProperty.call(unsafeWindow, i)) {
+      // 判断属性是否存在
+      if (Object.hasOwn(unsafeWindow, i)) {
         // 定义属性
         Object.defineProperty(unsafeWindow, i, {
           value: class {

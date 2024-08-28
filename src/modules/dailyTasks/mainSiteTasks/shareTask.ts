@@ -13,13 +13,8 @@ class ShareTask extends BaseModule {
 
   private getAid(): string {
     const biliStore = useBiliStore()
-    if (biliStore.dynamicVideos) {
-      // 当 biliStore.dynamicVideos 不为 null 时，返回第一个视频的 aid
-      return biliStore.dynamicVideos[0].modules.module_dynamic.major.archive.aid
-    } else {
-      // 否则返回 '2'
-      return '2'
-    }
+    // 返回第一个视频的 aid
+    return biliStore.dynamicVideos![0].modules.module_dynamic.major.archive.aid
   }
 
   private async share(aid: string): Promise<void> {
@@ -47,7 +42,7 @@ class ShareTask extends BaseModule {
       const biliStore = useBiliStore()
       if (!isTimestampToday(this.config._lastCompleteTime)) {
         this.status = 'running'
-        if (biliStore.dailyRewardInfo && !biliStore.dailyRewardInfo.share) {
+        if (!biliStore.dailyRewardInfo!.share) {
           const aid = this.getAid()
           await this.share(aid)
         } else {

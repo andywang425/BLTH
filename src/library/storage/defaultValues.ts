@@ -10,7 +10,8 @@ const defaultValues: DefaultValues = {
   ui: {
     isCollapse: false,
     isShowPanel: true,
-    activeMenuIndex: 'MainSiteTasks'
+    activeMenuIndex: 'MainSiteTasks',
+    panelWidthPercent: 40
   },
   modules: {
     DailyTasks: {
@@ -107,9 +108,6 @@ const defaultValues: DefaultValues = {
         enabled: false
       },
       invisibility: {
-        enabled: false
-      },
-      showContributionUserNum: {
         enabled: false
       }
     },

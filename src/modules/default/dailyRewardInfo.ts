@@ -8,7 +8,7 @@ class DailyRewardInfo extends BaseModule {
   /**
    * 获取今日主站每日任务的完成情况
    */
-  private async getDailyRewardInfo(): Promise<MainData.Reward.Data | null> {
+  private async getDailyRewardInfo(): Promise<MainData.Reward.Data | undefined> {
     const mainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
     // 开启了任意一项主站功能且该功能今天没完成过
     if (
@@ -27,8 +27,6 @@ class DailyRewardInfo extends BaseModule {
         this.logger.error('获取主站每日任务完成情况出错', error)
         return Promise.reject(error)
       }
-    } else {
-      return Promise.resolve(null)
     }
   }
 

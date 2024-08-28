@@ -1,8 +1,8 @@
-<div align ="center">
+<div align = "center">
     <img alt="BLTH logo" src="https://raw.githubusercontent.com/andywang425/BLTH/master/images/logo.min.svg" width="150">
 </div>
 
-<h1 align="center">Bilibili Live Tasks Helper</h1>
+<h1 align = "center">Bilibili Live Tasks Helper</h1>
 
 # 环境要求
 
@@ -60,7 +60,6 @@
 # 交流群
 
 - QQ 频道：[点我加入 aw 的频道](https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=1W7eVLs&businessType=9&from=181074&biz=ka&shareSource=5)。
-- 非官方电报群：[LaTiao01](https://t.me/LaTiao01)。
 
 # 参与开发
 

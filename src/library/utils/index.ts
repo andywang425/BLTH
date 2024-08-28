@@ -1,6 +1,8 @@
 import _ from 'lodash'
-import { useModuleStore } from '@/stores/useModuleStore'
-import type { ModuleEmitterEvents, RunAtMoment } from '@/types'
+import CryptoJS from 'crypto-js'
+import type { RunAtMoment } from '@/types'
+import { ts } from '@/library/luxon'
+import { useBiliStore } from '@/stores/useBiliStore'
 
 /**
  * 生成一个 version 4 uuid
@@ -22,15 +24,51 @@ function sleep(miliseconds: number): Promise<void> {
 }
 
 /**
- * 基于 Promise 和 mitt 的等待函数
- * @param type mitt 的 type 参数
- * @param timeout 超时时间
+ * 从 URL 中获取文件名
+ * @param url
  */
-function wait(type: keyof ModuleEmitterEvents, timeout: number = -1): Promise<any> {
-  return new Promise((resolve) => {
-    useModuleStore().emitter.once(type, (event) => resolve(event))
-    if (timeout !== -1) setTimeout(resolve, timeout)
-  })
+function getFilenameFromUrl(url: string): string {
+  return url.substring(url.lastIndexOf('/') + 1).split('.')[0]
+}
+
+/**
+ * 为 URL 添加查询参数
+ * @param url URL
+ * @param params 查询参数
+ */
+function addURLParams(url: string, params?: Record<string, any> | string): string {
+  if (!params) {
+    return url
+  }
+
+  if (typeof params === 'string') {
+    return url + '?' + params
+  } else {
+    return url + '?' + new URLSearchParams(params).toString()
+  }
+}
+
+/**
+ * 对请求参数进行 wbi 签名
+ * @param params 请求参数
+ */
+function wbiSign(params: Record<string, string | number | object>): string {
+  // 添加 wts 字段（当前秒级时间戳）
+  params.wts = ts()
+  // 按照键对参数进行排序
+  const query = Object.keys(params)
+    .sort()
+    .map((key) => {
+      // 过滤 value 中的 !'()* 字符
+      const value = params[key].toString().replace(/[!'()*]/g, '')
+      // 注：空格需被编码为%20而不是+，因此不能使用URLSearchParams
+      return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    })
+    .join('&')
+  // 计算 w_rid
+  const wbiSign = CryptoJS.MD5(query + useBiliStore().wbiSalt).toString()
+
+  return query + '&w_rid=' + wbiSign
 }
 
 /**
@@ -146,4 +184,14 @@ function waitForMoment(moment: RunAtMoment): Promise<void> {
   }
 }
 
-export { uuid, sleep, wait, packFormData, deepestIterate, getUrlFromFetchInput, waitForMoment }
+export {
+  uuid,
+  sleep,
+  getFilenameFromUrl,
+  addURLParams,
+  wbiSign,
+  packFormData,
+  deepestIterate,
+  getUrlFromFetchInput,
+  waitForMoment
+}

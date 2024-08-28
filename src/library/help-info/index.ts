@@ -121,7 +121,7 @@ const helpInfo: HelpInfo = {
               h('strong', '注意：'),
               h(
                 'span',
-                '如果当前所处的直播间正在直播，可能无法获得任何亲密度。请在未开播的直播间使用本功能，后续会优化这一点。'
+                '使用本功能时不能以任何方式观看直播（网页、APP、电视），否则可能无法获得任何亲密度。'
               )
             ])
           ])
@@ -221,12 +221,6 @@ const helpInfo: HelpInfo = {
     invisibility: {
       title: '隐身入场',
       message: h('p', [h('div', '进入直播间时其他人不会收到提示，但还是会出现在高能用户榜单上。')])
-    },
-    showContributionUserNum: {
-      title: '显示高能用户数量',
-      message: h('p', [
-        h('div', '在高能用户标签上显示当前直播间的高能用户数量，每分钟更新一次数据。')
-      ])
     }
   },
   RemoveElement: {

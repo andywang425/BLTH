@@ -79,9 +79,6 @@ interface ModuleConfig {
     invisibility: {
       enabled: boolean
     }
-    showContributionUserNum: {
-      enabled: boolean
-    }
   }
   RemoveElement: {
     removePKBox: {
@@ -135,11 +132,13 @@ type MenuIndex =
   | 'OtherTasks'
   | 'EnhanceExperience'
   | 'RemoveElement'
+  | 'ScriptSettings'
 
 interface UiConfig {
   isCollapse: boolean
   isShowPanel: boolean
   activeMenuIndex: MenuIndex
+  panelWidthPercent: number
 }
 
 interface Cache {

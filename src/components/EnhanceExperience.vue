@@ -11,7 +11,7 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
 <template>
   <div>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.switchLiveStreamQuality.enabled" active-text="自动切换画质" />
         <el-select
           v-model="config.switchLiveStreamQuality.qualityDesc"
@@ -24,36 +24,27 @@ const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清',
       </el-space>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.banp2p.enabled" active-text="禁用P2P" />
         <Info :item="helpInfo.EnhanceExperience.banp2p" />
       </el-space>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.noReport.enabled" active-text="拦截日志数据上报" />
         <Info :item="helpInfo.EnhanceExperience.noReport" />
       </el-space>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.noSleep.enabled" active-text="屏蔽挂机检测" />
         <Info :item="helpInfo.EnhanceExperience.noSleep" />
       </el-space>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.invisibility.enabled" active-text="隐身入场" />
         <Info :item="helpInfo.EnhanceExperience.invisibility" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap>
-        <el-switch
-          v-model="config.showContributionUserNum.enabled"
-          active-text="显示高能用户数量"
-        />
-        <Info :item="helpInfo.EnhanceExperience.showContributionUserNum" />
       </el-space>
     </el-row>
     <el-divider />

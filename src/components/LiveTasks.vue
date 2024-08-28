@@ -136,19 +136,17 @@ function handleSelectionChange(selectedRows: MedalInfoRow[]) {
   config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
 }
 
-function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
-  // 如果没点到链接，切换当前行的选择状态
-  if (!(event.target as HTMLElement).className.startsWith('el-link')) {
-    // @ts-expect-error
-    medalInfoTableRef.value?.toggleRowSelection(row, undefined)
-  }
+function handleRowClick(row: MedalInfoRow) {
+  // 切换当前行的选择状态
+  // @ts-expect-error
+  medalInfoTableRef.value?.toggleRowSelection(row, undefined)
 }
 </script>
 
 <template>
   <div>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.sign.enabled" active-text="直播签到" />
         <Info :item="helpInfo.DailyTasks.LiveTasks.sign" />
         <TaskStatus :status="status.sign" />
@@ -157,7 +155,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
     <el-divider />
     <!-- 粉丝勋章相关任务 -->
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.medalTasks.light.enabled" active-text="点亮熄灭勋章" />
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.main" />
         <TaskStatus :status="status.medalTasks.light" />
@@ -166,7 +164,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
     <el-row>
       <el-radio-group v-model="config.medalTasks.light.mode" class="radio-group">
         <el-row>
-          <el-space wrap>
+          <el-space wrap :size="[8, 0]">
             <el-icon>
               <SemiSelect />
             </el-icon>
@@ -175,7 +173,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
           </el-space>
         </el-row>
         <el-row>
-          <el-space wrap>
+          <el-space wrap :size="[8, 0]">
             <el-icon>
               <SemiSelect />
             </el-icon>
@@ -193,7 +191,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
       </el-radio-group>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.medalTasks.watch.enabled" active-text="观看直播" />
         <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 70px">
           <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
@@ -204,7 +202,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
       </el-space>
     </el-row>
     <el-row>
-      <el-space wrap>
+      <el-space wrap :size="[8, 0]">
         <el-switch
           v-model="config.medalTasks.isWhiteList"
           active-text="白名单"
@@ -280,7 +278,7 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
       >
         <el-table-column type="selection" align="center" width="55" />
         <el-table-column prop="avatar" label="头像" width="100">
-          <template v-slot:default="scope">
+          <template #default="scope">
             <div class="avatar-wrap">
               <el-image
                 :src="scope.row.avatar"
@@ -303,12 +301,13 @@ function handleRowClick(row: MedalInfoRow, _column: any, event: PointerEvent) {
         <el-table-column prop="medal_name" label="粉丝勋章" />
         <el-table-column prop="medal_level" label="等级" width="80" sortable />
         <el-table-column prop="roomid" label="房间号">
-          <template v-slot:default="scope">
+          <template #default="scope">
             <el-link
               :href="'https://live.bilibili.com/' + scope.row.roomid + '?visit_id='"
               rel="noreferrer"
               type="primary"
               target="_blank"
+              @click.stop
             >
               {{ scope.row.roomid }}
             </el-link>

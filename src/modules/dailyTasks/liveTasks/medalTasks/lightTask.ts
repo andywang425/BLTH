@@ -73,7 +73,13 @@ class LightTask extends BaseModule {
       const response = await BAPI.live.sendMsg(danmu, roomid)
       this.logger.log(`BAPI.live.sendMsg(${danmu}, ${roomid})`, response)
       if (response.code === 0) {
-        this.logger.log(`点亮熄灭勋章-发送弹幕 在直播间 ${roomid} 发送弹幕 ${danmu} 成功`)
+        if (response.msg === 'k') {
+          this.logger.warn(
+            `点亮熄灭勋章-发送弹幕 在直播间 ${roomid} 发送弹幕 ${danmu} 异常，弹幕可能包含屏蔽词`
+          )
+        } else {
+          this.logger.log(`点亮熄灭勋章-发送弹幕 在直播间 ${roomid} 发送弹幕 ${danmu} 成功`)
+        }
       } else {
         this.logger.error(
           `点亮熄灭勋章-发送弹幕 在直播间 ${roomid} 发送弹幕 ${danmu} 失败`,

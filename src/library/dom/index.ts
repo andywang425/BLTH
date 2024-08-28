@@ -1,5 +1,3 @@
-import { unsafeWindow } from '$'
-
 // 一些常用 DOM 方法的简写
 const dq = document.querySelector.bind(document)
 const dqa = document.querySelectorAll.bind(document)
@@ -54,23 +52,16 @@ function waitForElement(
  * 特殊的直播间（背景很好看的那种，顶层 frame 被用来当背景板了）有三个 iframe，共四个 frame；
  * 此时脚本会被注入到顶层 frame 和一个 iframe
  */
-const isTargetFrame = (): boolean => {
-  if (document.head.innerHTML.includes('BilibiliLive')) {
-    return true
-  } else {
-    return false
-  }
-}
+const isTargetFrame = (): boolean => document.head.innerHTML.includes('BilibiliLive')
 
 /**
  * 判断是否在顶层 frame
  */
-const isSelfTopFrame = (): boolean => unsafeWindow.self === unsafeWindow.top
+const isSelfTopFrame = (): boolean => window.self === window.top
 
 /**
  * 获取顶层 frame 的 documentElement
  */
-const topFrameDocuemntElement = (): HTMLElement | undefined =>
-  unsafeWindow.top?.document?.documentElement
+const topFrameDocumentElement = (): HTMLElement | undefined => window.top?.document.documentElement
 
-export { dq, dqa, dce, waitForElement, isTargetFrame, isSelfTopFrame, topFrameDocuemntElement }
+export { dq, dqa, dce, waitForElement, isTargetFrame, isSelfTopFrame, topFrameDocumentElement }

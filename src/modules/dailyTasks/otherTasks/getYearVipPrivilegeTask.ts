@@ -92,7 +92,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
   private isYearVip(): boolean {
     const biliStore = useBiliStore()
     const userInfo = biliStore.userInfo
-    if (userInfo && userInfo.vip.status === 1 && userInfo.vip.type === 2) {
+    if (userInfo!.vip.status === 1 && userInfo!.vip.type === 2) {
       return true
     } else {
       this.logger.log('当前账号不是年度大会员，不领取权益')
@@ -130,9 +130,10 @@ class GetYearVipPrivilegeTask extends BaseModule {
                   const watchTaskConfig =
                     this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch
                   if (watchTaskConfig.enabled) {
+                    // 等观看视频任务完成再领取
                     watch(
                       () => watchTaskConfig._lastCompleteTime,
-                      () => this.addExperience(),
+                      () => sleep(3000).then(() => this.addExperience()),
                       { once: true }
                     )
                   } else {

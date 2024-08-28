@@ -888,83 +888,6 @@ declare namespace LiveData {
       tid: string
     }
   }
-
-  namespace QueryContributionRank {
-    interface Data {
-      count: number
-      item: Item[]
-      own_info: OwnInfo
-      tips_text: string
-      count_format: string
-      desc_format: string
-      config: Config
-    }
-
-    interface Item {
-      uid: number
-      name: string
-      face: string
-      rank: number
-      score: number
-      medal_info: MedalInfo
-      guard_level: number
-      wealth_level: number
-      is_mystery: boolean
-      uinfo: Uinfo
-    }
-    interface MedalInfo {
-      guard_level: number
-      medal_color_start: number
-      medal_color_end: number
-      medal_color_border: number
-      medal_name: string
-      level: number
-      target_id: number
-      is_light: number
-    }
-    interface Uinfo {
-      uid: number
-      base: Base
-    }
-    interface Base {
-      name: string
-      face: string
-      name_color: number
-      is_mystery: boolean
-      risk_ctrl_info: RiskCtrlInfo
-      origin_info: OriginInfo
-    }
-    interface RiskCtrlInfo {
-      name: string
-      face: string
-    }
-    interface OriginInfo {
-      name: string
-      face: string
-    }
-
-    interface OwnInfo {
-      uid: number
-      name: string
-      face: string
-      rank: number
-      score: number
-      rank_text: string
-      need_score: number
-      medal_info: MedalInfo
-      guard_level: number
-      wealth_level: number
-      score_lead: number
-      score_behind: number
-      is_mystery: boolean
-      uinfo: Uinfo
-    }
-
-    interface Config {
-      deadline_ts: number
-      value_text: string
-    }
-  }
 }
 
 declare namespace LiveTraceData {
@@ -1023,13 +946,14 @@ declare namespace MainData {
       is_senior_member: number
       wbi_img: WbiImg
       is_jury: boolean
+      name_render: any
     }
 
     interface LevelInfo {
       current_level: number
       current_min: number
       current_exp: number
-      next_exp: string
+      next_exp: number | string
     }
 
     interface Official {
@@ -1051,6 +975,7 @@ declare namespace MainData {
       expire: number
       image_enhance: string
       image_enhance_frame: string
+      n_pid: number
     }
 
     interface VipLabel {
@@ -1082,6 +1007,7 @@ declare namespace MainData {
       tv_vip_status: number
       tv_vip_pay_type: number
       tv_due_date: number
+      avatar_icon: AvatarIcon
     }
 
     interface Label {
@@ -1098,6 +1024,12 @@ declare namespace MainData {
       img_label_uri_hans_static: string
       img_label_uri_hant_static: string
     }
+
+    interface AvatarIcon {
+      icon_resource: IconResource
+    }
+
+    interface IconResource {}
 
     interface Wallet {
       mid: number
@@ -1159,14 +1091,14 @@ declare namespace MainData {
     interface Modules {
       module_author: ModuleAuthor
       module_dynamic: ModuleDynamic
-      module_interaction?: ModuleInteraction
       module_more: ModuleMore
       module_stat: ModuleStat
-      module_fold?: ModuleFold
+      module_interaction?: ModuleInteraction
     }
 
     interface ModuleAuthor {
       avatar: Avatar
+      decoration_card?: DecorationCard
       face: string
       face_nft: boolean
       following: boolean
@@ -1182,14 +1114,12 @@ declare namespace MainData {
       pub_ts: number
       type: string
       vip: Vip
-      decorate?: Decorate
     }
 
     interface Avatar {
       container_size: ContainerSize
       fallback_layers: FallbackLayers
       mid: string
-      layers?: Layer2[]
     }
 
     interface ContainerSize {
@@ -1238,8 +1168,8 @@ declare namespace MainData {
     interface Tags {
       AVATAR_LAYER?: AvatarLayer
       GENERAL_CFG?: GeneralCfg
-      ICON_LAYER?: IconLayer
       PENDENT_LAYER?: PendentLayer
+      ICON_LAYER?: IconLayer
     }
 
     interface AvatarLayer {}
@@ -1260,9 +1190,9 @@ declare namespace MainData {
       boxSizing?: string
     }
 
-    interface IconLayer {}
-
     interface PendentLayer {}
+
+    interface IconLayer {}
 
     interface Resource {
       res_image: ResImage
@@ -1285,107 +1215,33 @@ declare namespace MainData {
       url: string
     }
 
-    interface Layer2 {
-      is_critical_group?: boolean
-      layers: Layer3[]
+    interface DecorationCard {
+      big_card_url: string
+      card_type: number
+      card_type_name: string
+      card_url: string
+      fan: Fan
+      id: number
+      image_enhance: string
+      item_id: number
+      jump_url: string
+      name: string
     }
 
-    interface Layer3 {
-      general_spec: GeneralSpec2
-      layer_config: LayerConfig2
-      resource: Resource2
-      visible: boolean
+    interface Fan {
+      color?: string
+      color_format?: ColorFormat
+      is_fan?: number
+      name?: string
+      num_desc?: string
+      number?: number
     }
 
-    interface GeneralSpec2 {
-      pos_spec: PosSpec2
-      render_spec: RenderSpec2
-      size_spec: SizeSpec2
-    }
-
-    interface PosSpec2 {
-      axis_x: number
-      axis_y: number
-      coordinate_pos: number
-    }
-
-    interface RenderSpec2 {
-      opacity: number
-    }
-
-    interface SizeSpec2 {
-      height: number
-      width: number
-    }
-
-    interface LayerConfig2 {
-      is_critical?: boolean
-      tags: Tags2
-    }
-
-    interface Tags2 {
-      AVATAR_LAYER?: AvatarLayer2
-      GENERAL_CFG?: GeneralCfg2
-      PENDENT_LAYER?: PendentLayer2
-      ICON_LAYER?: IconLayer2
-    }
-
-    interface AvatarLayer2 {}
-
-    interface GeneralCfg2 {
-      config_type: number
-      general_config: GeneralConfig2
-    }
-
-    interface GeneralConfig2 {
-      web_css_style: WebCssStyle2
-    }
-
-    interface WebCssStyle2 {
-      'background-color'?: string
-      border?: string
-      borderRadius: string
-      boxSizing?: string
-    }
-
-    interface PendentLayer2 {}
-
-    interface IconLayer2 {}
-
-    interface Resource2 {
-      res_image?: ResImage2
-      res_type: number
-      res_animation?: ResAnimation
-    }
-
-    interface ResImage2 {
-      image_src: ImageSrc2
-    }
-
-    interface ImageSrc2 {
-      local?: number
-      src_type: number
-      placeholder?: number
-      remote?: Remote2
-    }
-
-    interface Remote2 {
-      bfs_style: string
-      url: string
-    }
-
-    interface ResAnimation {
-      webp_src: WebpSrc
-    }
-
-    interface WebpSrc {
-      remote: Remote3
-      src_type: number
-    }
-
-    interface Remote3 {
-      bfs_style: string
-      url: string
+    interface ColorFormat {
+      colors: string[]
+      end_point: string
+      gradients: number[]
+      start_point: string
     }
 
     interface OfficialVerify {
@@ -1398,6 +1254,7 @@ declare namespace MainData {
       image: string
       image_enhance: string
       image_enhance_frame: string
+      n_pid: number
       name: string
       pid: number
     }
@@ -1428,27 +1285,40 @@ declare namespace MainData {
       use_img_label: boolean
     }
 
-    interface Decorate {
-      card_url: string
-      fan: Fan
-      id: number
-      jump_url: string
-      name: string
-      type: number
-    }
-
-    interface Fan {
-      color: string
-      is_fan: boolean
-      num_str: string
-      number: number
-    }
-
     interface ModuleDynamic {
-      additional: any
+      additional?: Additional
       desc?: Desc
       major: Major
       topic?: Topic
+    }
+
+    interface Additional {
+      common: Common
+      type: string
+    }
+
+    interface Common {
+      button: Button
+      cover: string
+      desc1: string
+      desc2: string
+      head_text: string
+      id_str: string
+      jump_url: string
+      style: number
+      sub_type: string
+      title: string
+    }
+
+    interface Button {
+      jump_style: JumpStyle
+      jump_url: string
+      type: number
+    }
+
+    interface JumpStyle {
+      icon_url: string
+      text: string
     }
 
     interface Desc {
@@ -1460,15 +1330,6 @@ declare namespace MainData {
       orig_text: string
       text: string
       type: string
-      emoji?: Emoji
-      jump_url?: string
-    }
-
-    interface Emoji {
-      icon_url: string
-      size: number
-      text: string
-      type: number
     }
 
     interface Major {
@@ -1508,35 +1369,6 @@ declare namespace MainData {
       name: string
     }
 
-    interface ModuleInteraction {
-      items: Item2[]
-    }
-
-    interface Item2 {
-      desc: Desc2
-      type: number
-    }
-
-    interface Desc2 {
-      rich_text_nodes: RichTextNode2[]
-      text: string
-    }
-
-    interface RichTextNode2 {
-      orig_text: string
-      rid?: string
-      text: string
-      type: string
-      emoji?: Emoji2
-    }
-
-    interface Emoji2 {
-      icon_url: string
-      size: number
-      text: string
-      type: number
-    }
-
     interface ModuleMore {
       three_point_items: ThreePointItem[]
     }
@@ -1568,11 +1400,33 @@ declare namespace MainData {
       status: boolean
     }
 
-    interface ModuleFold {
-      ids: string[]
-      statement: string
+    interface ModuleInteraction {
+      items: Item2[]
+    }
+
+    interface Item2 {
+      desc: Desc2
       type: number
-      users: any[]
+    }
+
+    interface Desc2 {
+      rich_text_nodes: RichTextNode2[]
+      text: string
+    }
+
+    interface RichTextNode2 {
+      orig_text: string
+      rid?: string
+      text: string
+      type: string
+      emoji?: Emoji
+    }
+
+    interface Emoji {
+      icon_url: string
+      size: number
+      text: string
+      type: number
     }
   }
 
@@ -1600,6 +1454,9 @@ declare namespace MainData {
         is_senior_member: number
         format060102: number
         is_overdue_vip: boolean
+        vip_status: number
+        vip_type: number
+        keeptime_end: number
       }
 
       interface List {
@@ -1615,6 +1472,12 @@ declare namespace MainData {
         app_describe: string
         recive_state: number
         salary_type: number
+        exp_params?: ExpParams
+      }
+
+      interface ExpParams {
+        exp_group_tag: string
+        hit_value: number
       }
     }
     namespace AddExperience {

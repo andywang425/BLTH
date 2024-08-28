@@ -10,7 +10,7 @@ class DynamicVideos extends BaseModule {
    *
    * 每日观看视频，每日分享视频，每日投币都会用到
    */
-  private async getDynamicVideos(): Promise<MainData.DynamicAll.Item[] | null> {
+  private async getDynamicVideos(): Promise<MainData.DynamicAll.Item[] | undefined> {
     const mainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
     // 开启了观看视频、每日分享视频或每日投币功能且今天没完成过
     if (
@@ -31,8 +31,6 @@ class DynamicVideos extends BaseModule {
         this.logger.error('获取主站每日任务完成情况出错', error)
         return Promise.reject(error)
       }
-    } else {
-      return Promise.resolve(null)
     }
   }
 

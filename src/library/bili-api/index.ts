@@ -1,8 +1,7 @@
 import Request from '../request'
 import type { Requests, BapiMethods } from './api'
 import { useBiliStore } from '@/stores/useBiliStore'
-import type { BiliCookies } from '@/types'
-import { packFormData } from '../utils'
+import { packFormData, uuid, wbiSign } from '../utils'
 import { ts, tsm } from '../luxon'
 
 const request: Requests = {
@@ -49,12 +48,13 @@ const BAPI: BapiMethods = {
       reply_mid = 0,
       reply_attr = 0,
       replay_dmid = '',
-      statistics = { appId: 100, platform: 5 }
+      statistics = '{"appId":100,"platform":5}'
     ) => {
       const biliStore = useBiliStore()
-      const bili_jct = (biliStore.cookies as BiliCookies).bili_jct
-      return request.live.post('/msg/send', undefined, {
-        data: packFormData({
+      const bili_jct = biliStore.cookies!.bili_jct
+      return request.live.post(
+        '/msg/send',
+        packFormData({
           bubble,
           msg,
           color,
@@ -64,45 +64,45 @@ const BAPI: BapiMethods = {
           reply_mid,
           reply_attr,
           replay_dmid,
-          statistics: JSON.stringify(statistics),
+          statistics,
           fontsize,
           rnd: ts(),
           roomid,
           csrf: bili_jct,
           csrf_token: bili_jct
-        }),
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
+        })
+      )
     },
     likeReport: (room_id, anchor_id, click_time = 1, visit_id = '') => {
       const biliStore = useBiliStore()
-      const bili_jct = (biliStore.cookies as BiliCookies).bili_jct
-      const uid = biliStore.BilibiliLive?.UID
+      const bili_jct = biliStore.cookies!.bili_jct
+      const uid = biliStore.BilibiliLive!.UID
       return request.live.post('/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3', {
         click_time,
         room_id,
-        anchor_id,
         uid,
-        ts: ts(),
-        csrf: bili_jct,
+        anchor_id,
         csrf_token: bili_jct,
+        csrf: bili_jct,
         visit_id
       })
     },
     /**
      * 该API只在带有多层iframe（背景很好看）的直播间中被使用，但参数填任意直播间均可
      */
-    getInfoByRoom: (room_id) => {
-      return request.live.get('/xlive/web-room/v1/index/getInfoByRoom', {
-        room_id
-      })
+    getInfoByRoom: (room_id, web_location = '444.8') => {
+      return request.live.get(
+        '/xlive/web-room/v1/index/getInfoByRoom',
+        wbiSign({
+          room_id,
+          web_location
+        })
+      )
     },
     getUserTaskProgress: (target_id = 11153765) => {
       // 该 API 是 APP API，但也可以使用 web 的身份校验方式
       const biliStore = useBiliStore()
-      const bili_jct = (biliStore.cookies as BiliCookies).bili_jct
+      const bili_jct = biliStore.cookies!.bili_jct
       return request.live.get('/xlive/app-ucenter/v1/userTask/GetUserTaskProgress', {
         target_id,
         csrf: bili_jct,
@@ -113,7 +113,7 @@ const BAPI: BapiMethods = {
       // 该 API 是 APP API，但也可以使用 web 的身份校验方式，将 actionKey 设置为 csrf 即可
       // 而且似乎不需要观看直播5分钟，只要发5条弹幕就行了
       const biliStore = useBiliStore()
-      const bili_jct = (biliStore.cookies as BiliCookies).bili_jct
+      const bili_jct = biliStore.cookies!.bili_jct
       return request.live.post('/xlive/app-ucenter/v1/userTask/UserTaskReceiveRewards', {
         actionKey: 'csrf',
         target_id,
@@ -122,7 +122,7 @@ const BAPI: BapiMethods = {
       })
     },
     silver2coin: (visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+      const bili_jct = useBiliStore().cookies!.bili_jct
       return request.live.post('/xlive/revenue/v1/wallet/silver2coin', {
         csrf: bili_jct,
         csrf_token: bili_jct,
@@ -130,7 +130,7 @@ const BAPI: BapiMethods = {
       })
     },
     coin2silver: (num, platform = 'pc', visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+      const bili_jct = useBiliStore().cookies!.bili_jct
       return request.live.post('/xlive/revenue/v1/wallet/coin2silver', {
         num,
         csrf: bili_jct,
@@ -139,25 +139,8 @@ const BAPI: BapiMethods = {
         visit_id
       })
     },
-    queryContributionRank: (
-      ruid,
-      room_id,
-      page,
-      page_size,
-      type = 'online_rank',
-      _switch = 'contribution_rank'
-    ) => {
-      return request.live.get('/xlive/general-interface/v1/rank/queryContributionRank', {
-        ruid,
-        room_id,
-        page,
-        page_size,
-        type,
-        switch: _switch
-      })
-    },
     wearMedal: (medal_id, visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+      const bili_jct = useBiliStore().cookies!.bili_jct
       return request.live.post('/xlive/web-room/v1/fansMedal/wear', {
         medal_id,
         csrf_token: bili_jct,
@@ -168,7 +151,7 @@ const BAPI: BapiMethods = {
   },
   liveTrace: {
     E: (id, device, ruid, is_patch = 0, heart_beat = [], visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+      const bili_jct = useBiliStore().cookies!.bili_jct
       return request.liveTrace.post('/xlive/data-interface/v1/x25Kn/E', {
         id: JSON.stringify(id),
         device: JSON.stringify(device),
@@ -183,7 +166,7 @@ const BAPI: BapiMethods = {
       })
     },
     X: (s, id, device, ruid, ets, benchmark, time, ts, visit_id = '') => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+      const bili_jct = useBiliStore().cookies!.bili_jct
       return request.liveTrace.post('/xlive/data-interface/v1/x25Kn/X', {
         s,
         id: JSON.stringify(id),
@@ -207,60 +190,105 @@ const BAPI: BapiMethods = {
     reward: () => {
       return request.main.get('/x/member/web/exp/reward')
     },
-    dynamicAll: (type, page = 1, timezone_offset = -480, features = 'itemOpusStyle') => {
-      return request.main.get('/x/polymer/web-dynamic/v1/feed/all', {
-        timezone_offset,
-        type,
-        page,
-        features
-      })
+    dynamicAll: (
+      type = 'video',
+      page = 1,
+      timezone_offset = -480,
+      platform = 'web',
+      features = 'itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote,decorationCard,onlyfansAssetsV2,forwardListHidden,ugcDelete',
+      web_location = '333.1365',
+      x_bili_device_req_json = '{"platform":"web","device":"pc"}',
+      x_bili_web_req_json = '{"spm_id":"333.1365"}'
+    ) => {
+      return request.main.get(
+        '/x/polymer/web-dynamic/v1/feed/all',
+        {
+          timezone_offset,
+          type,
+          platform,
+          page,
+          features,
+          web_location,
+          x_bili_device_req_json,
+          x_bili_web_req_json
+        },
+        {
+          Origin: 'https://t.bilibili.com',
+          Referer: 'https://t.bilibili.com/'
+        }
+      )
     },
     videoHeartbeat: (
       aid,
-      cid = '',
-      realtime = 0,
-      played_time = 0,
-      real_played_time = 0,
-      refer_url = 'https://t.bilibili.com/?spm_id_from=444.3.0.0',
-      quality = 116,
-      video_duration = 100,
+      cid = 1000000000,
       type = 3,
       sub_type = 0,
-      play_type = 0,
       dt = 2,
-      last_play_progress_time = 0,
-      max_play_progress_time = 0,
-      spmid = '333.488.0.0',
-      from_spmid = '333.31.list.card_archive.click',
-      extra = '{"player_version":"4.1.21-rc.1727.0"}'
+      play_type = 1,
+      realtime = 61,
+      played_time = 62,
+      real_played_time = 62,
+      refer_url = 'https://t.bilibili.com/?tab=video',
+      quality = 64,
+      video_duration = 180,
+      last_play_progress_time = 62,
+      max_play_progress_time = 62,
+      outer = 0,
+      spmid = '333.788.0.0',
+      from_spmid = '333.1365.list.card_archive.click',
+      session = uuid().replaceAll('-', ''),
+      extra = '{"player_version":"4.8.43"}',
+      web_location = 1315873
     ) => {
       const biliStore = useBiliStore()
-      return request.main.post('/x/click-interface/web/heartbeat', {
-        start_ts: ts(),
-        mid: useBiliStore().userInfo?.mid,
-        aid,
-        cid,
-        type,
-        sub_type,
-        dt: dt,
-        play_type,
-        realtime,
-        played_time,
-        real_played_time,
-        refer_url,
-        quality,
-        video_duration,
-        last_play_progress_time,
-        max_play_progress_time,
-        spmid: spmid,
-        from_spmid,
-        extra,
-        csrf: (biliStore.cookies as BiliCookies).bili_jct
-      })
+      const start_ts = ts()
+      const mid = useBiliStore().userInfo!.mid
+
+      return request.main.post(
+        '/x/click-interface/web/heartbeat',
+        {
+          start_ts,
+          mid,
+          aid,
+          cid,
+          type,
+          sub_type,
+          dt,
+          play_type,
+          realtime,
+          played_time,
+          real_played_time,
+          refer_url,
+          quality,
+          video_duration,
+          last_play_progress_time,
+          max_play_progress_time,
+          outer,
+          spmid,
+          from_spmid,
+          session,
+          extra,
+          csrf: biliStore.cookies!.bili_jct
+        },
+        {
+          params: wbiSign({
+            w_start_ts: start_ts,
+            w_mid: mid,
+            w_aid: aid,
+            w_dt: dt,
+            w_realtime: realtime,
+            w_played_time: played_time,
+            w_real_played_time: real_played_time,
+            w_video_duration: video_duration,
+            w_last_play_progress_time: last_play_progress_time,
+            web_location
+          })
+        }
+      )
     },
     share: (aid, source = 'pc_client_normal', eab_x = 2, ramval = 0, ga = 1) => {
       // source 不能用 web 端的值，改成 pc 客户端的才能完成任务
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+      const bili_jct = useBiliStore().cookies!.bili_jct
       return request.main.post('/x/web-interface/share/add', {
         aid,
         eab_x,
@@ -280,16 +308,16 @@ const BAPI: BapiMethods = {
       source = 'web_normal',
       ga = 1
     ) => {
-      const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+      const bili_jct = useBiliStore().cookies!.bili_jct
       return request.main.post('/x/web-interface/coin/add ', {
-        aid: aid,
+        aid,
         multiply: num,
         select_like: select_like,
         cross_domain: cross_domain,
-        eab_x: eab_x,
-        ramval: ramval,
-        source: source,
-        ga: ga,
+        eab_x,
+        ramval,
+        source,
+        ga,
         csrf: bili_jct
       })
     },
@@ -300,23 +328,22 @@ const BAPI: BapiMethods = {
       })
     },
     vip: {
-      myPrivilege: () => {
-        const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+      myPrivilege: (web_location = '333.33') => {
         return request.main.get(
           '/x/vip/privilege/my',
           {
-            csrf: bili_jct
+            web_location
           },
           {
             headers: {
               Referer: 'https://account.bilibili.com/account/big/myPackage',
-              Origin: 'https://account.bilibili.com/account/big/myPackage'
+              Origin: 'https://account.bilibili.com'
             }
           }
         )
       },
       receivePrivilege: (type, platform = 'web') => {
-        const bili_jct = (useBiliStore().cookies as BiliCookies).bili_jct
+        const bili_jct = useBiliStore().cookies!.bili_jct
         return request.main.post(
           '/x/vip/privilege/receive',
           {
@@ -334,9 +361,9 @@ const BAPI: BapiMethods = {
       },
       addExperience: () => {
         const biliStore = useBiliStore()
-        const mid = biliStore.BilibiliLive?.UID
-        const buvid = biliStore.cookies?.buvid3
-        const bili_jct = biliStore.cookies?.bili_jct
+        const mid = biliStore.BilibiliLive!.UID
+        const buvid = biliStore.cookies!.buvid3
+        const bili_jct = biliStore.cookies!.bili_jct
         return request.main.post(
           '/x/vip/experience/add',
           {

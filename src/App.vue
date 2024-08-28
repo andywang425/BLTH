@@ -3,10 +3,11 @@ import { useUIStore } from './stores/useUIStore'
 import PanelHeader from './components/PanelHeader.vue'
 import PanelAside from './components/PanelAside.vue'
 import PanelMain from './components/PanelMain.vue'
-import { dce, dq, waitForElement, isSelfTopFrame, topFrameDocuemntElement } from './library/dom'
+import { dce, dq, waitForElement, isSelfTopFrame, topFrameDocumentElement } from './library/dom'
 import hotkeys from 'hotkeys-js'
 import _ from 'lodash'
 import Logger from './library/logger'
+import { unsafeWindow } from '$'
 
 const uiStore = useUIStore()
 
@@ -22,15 +23,18 @@ let livePlayer: Element | null
 // 显示/隐藏控制面板按钮
 let button: HTMLButtonElement
 /**
- * 设置控制面板的大小和位置
+ * 更新播放器的大小、位置和滚动条位置
  */
-function setPanelSize() {
+function updatePosition() {
   const rect: DOMRect = livePlayer!.getBoundingClientRect()
 
-  uiStore.baseStyleValue.top = rect.top + window.scrollY
-  uiStore.baseStyleValue.left = rect.left + window.scrollX
-  uiStore.baseStyleValue.height = rect.height
-  uiStore.baseStyleValue.width = rect.width * 0.4
+  uiStore.livePlayerRect.top = rect.top
+  uiStore.livePlayerRect.left = rect.left
+  uiStore.livePlayerRect.height = rect.height
+  uiStore.livePlayerRect.width = rect.width
+  // 窗口滚动条位置需和播放器的大小、位置同步更新
+  uiStore.windowScrollPosition.x = unsafeWindow.scrollX
+  uiStore.windowScrollPosition.y = unsafeWindow.scrollY
 }
 /**
  * 显示/隐藏控制面板按钮被点击
@@ -40,11 +44,11 @@ function buttonOnClick() {
   button.innerText = uiStore.isShowPanelButtonText
 }
 // 节流，防止点击过快，减小渲染压力
-const throttleButtoOnClick = _.throttle(buttonOnClick, 300)
+const throttleButtonOnClick = _.throttle(buttonOnClick, 300)
 // 播放器节点出现在最初的html中，可以直接获取
 livePlayer = dq('#live-player-ctnr')
 if (livePlayer) {
-  setPanelSize()
+  updatePosition()
   // 查找播放器上面的 header
   // 节点#player-ctnr在初始html中出现
   waitForElement(dq('#player-ctnr')!, '.left-ctnr.left-header-area', 10e3)
@@ -52,7 +56,7 @@ if (livePlayer) {
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
       button.setAttribute('class', 'blth_btn')
-      button.onclick = throttleButtoOnClick
+      button.onclick = throttleButtonOnClick
       button.innerText = uiStore.isShowPanelButtonText
       playerHeaderLeft.append(button)
       if (!isSelfTopFrame()) {
@@ -62,22 +66,22 @@ if (livePlayer) {
         hotkeys(
           'alt+b',
           {
-            element: topFrameDocuemntElement()
+            element: topFrameDocumentElement()
           },
-          throttleButtoOnClick
+          throttleButtonOnClick
         )
       }
-      hotkeys('alt+b', throttleButtoOnClick)
+      hotkeys('alt+b', throttleButtonOnClick)
     })
     .catch((e: Error) => logger.error(e))
   // 监听页面缩放，调整控制面板大小
   // 因为这个操作频率不高就不节流或防抖了
-  window.addEventListener('resize', () => setPanelSize())
+  window.addEventListener('resize', () => updatePosition())
   // 监听 html 根节点和 body 节点
-  // 主要是为了适配滚动条的显示/隐藏和实验室中的功能
-  const observer = new MutationObserver(() => setPanelSize())
-  observer.observe(document.documentElement, { attributes: true })
+  // 适配播放器网页模式
+  const observer = new MutationObserver(() => updatePosition())
   observer.observe(document.body, { attributes: true })
+  observer.observe(document.documentElement, { attributes: true })
 
   // 准备完毕，显示控制面板
   if (isShowPanel) {
@@ -90,24 +94,24 @@ if (livePlayer) {
 
 <template>
   <el-collapse-transition>
-    <el-container :style="uiStore.baseStyle" class="base" v-show="uiStore.uiConfig.isShowPanel">
+    <el-container :style="uiStore.panelStyle" class="base" v-show="uiStore.uiConfig.isShowPanel">
       <el-header class="header">
         <PanelHeader />
       </el-header>
-      <el-scrollbar :height="uiStore.scrollBarHeight">
-        <el-container>
-          <el-aside class="aside">
-            <PanelAside />
-          </el-aside>
-          <el-main class="main">
+      <el-container>
+        <el-aside class="aside">
+          <PanelAside />
+        </el-aside>
+        <el-main class="main">
+          <el-scrollbar :height="uiStore.scrollBarHeight">
             <KeepAlive>
               <Transition name="fade" mode="out-in">
                 <PanelMain />
               </Transition>
             </KeepAlive>
-          </el-main>
-        </el-container>
-      </el-scrollbar>
+          </el-scrollbar>
+        </el-main>
+      </el-container>
     </el-container>
   </el-collapse-transition>
 </template>
@@ -148,13 +152,8 @@ if (livePlayer) {
   padding-bottom: var(--main-top-botton-padding);
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.1s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+/* PanelMain切换时的动画效果 */
+.fade-enter-active {
+  animation: fade-in linear 0.2s;
 }
 </style>

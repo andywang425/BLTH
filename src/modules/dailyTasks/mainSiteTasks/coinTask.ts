@@ -1,7 +1,6 @@
 import BaseModule from '../../BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import { useBiliStore } from '@/stores/useBiliStore'
-import type { MainData } from '@/library/bili-api/data'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
 
@@ -23,22 +22,16 @@ class CoinTask extends BaseModule {
   /**
    * 获取动态视频的 aid 和 bvid
    */
-  private getDynamicVideoIds(): { aid: string; bvid: string }[] | null {
+  private getDynamicVideoIds(): { aid: string; bvid: string }[] {
     const biliStore = useBiliStore()
-    if (biliStore.dynamicVideos) {
-      // 当 biliStore.dynamicVideos 不为 null 时，返回所有的 aid 和 bvid
-      return biliStore.dynamicVideos.map((item) => {
-        const archive = item.modules.module_dynamic.major.archive
-        return {
-          aid: archive.aid,
-          bvid: archive.bvid
-        }
-      })
-    } else {
-      this.status = 'error'
-      // 否则返回 null
-      return null
-    }
+    // 当 biliStore.dynamicVideos 不为 null 时，返回所有的 aid 和 bvid
+    return biliStore.dynamicVideos!.map((item) => {
+      const archive = item.modules.module_dynamic.major.archive
+      return {
+        aid: archive.aid,
+        bvid: archive.bvid
+      }
+    })
   }
 
   /**
@@ -126,28 +119,26 @@ class CoinTask extends BaseModule {
       const biliStore = useBiliStore()
       if (!isTimestampToday(this.config._lastCompleteTime)) {
         this.status = 'running'
-        if (biliStore.dailyRewardInfo) {
-          // 今日已投币数量
-          const total_coined_num = biliStore.dailyRewardInfo.coins / 10
-          if (total_coined_num < this.config.num) {
-            // 剩余要投的硬币数量
-            const left_coin_num = this.config.num - total_coined_num
-            const biliStore = useBiliStore()
-            // 拥有的硬币数量
-            const money = (biliStore.userInfo as MainData.Nav.Data).money ?? 5
-            if (left_coin_num > money) {
-              this.logger.log('硬币余额不足，不执行每日投币任务')
-              this.status = 'done'
-            } else {
-              // 目前仅支持动态视频投币
-              // TODO: 增加别的投币方式，比如给某UP的视频投币
-              await this.coinDynamicVideos(left_coin_num)
-            }
-          } else {
-            this.config._lastCompleteTime = tsm()
+        // 今日已投币数量
+        const total_coined_num = biliStore.dailyRewardInfo!.coins / 10
+        if (total_coined_num < this.config.num) {
+          // 剩余要投的硬币数量
+          const left_coin_num = this.config.num - total_coined_num
+          const biliStore = useBiliStore()
+          // 拥有的硬币数量
+          const money = biliStore.userInfo!.money ?? 5
+          if (left_coin_num > money) {
+            this.logger.log('硬币余额不足，不执行每日投币任务')
             this.status = 'done'
-            this.logger.log('每日投币任务已完成')
+          } else {
+            // 目前仅支持动态视频投币
+            // TODO: 增加别的投币方式，比如给某UP的视频投币
+            await this.coinDynamicVideos(left_coin_num)
           }
+        } else {
+          this.config._lastCompleteTime = tsm()
+          this.status = 'done'
+          this.logger.log('每日投币任务已完成')
         }
       } else {
         // 为了更加准确的语言描述和任务状态图标显示，需要判断当前所处的时间段

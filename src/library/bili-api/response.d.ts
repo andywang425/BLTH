@@ -76,13 +76,6 @@ declare namespace Live {
     message: string
   }
 
-  interface QueryContributionRank {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.QueryContributionRank.Data
-  }
-
   interface WearMedal {
     code: number
     message: string
@@ -111,8 +104,8 @@ declare namespace Main {
   interface Nav {
     code: number
     message: string
-    data: MainData.Nav.Data
     ttl: number
+    data: MainData.Nav.Data
   }
 
   interface Reward {

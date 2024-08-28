@@ -44,6 +44,11 @@ const items: MenuItem[] = [
     icon: 'Scissor',
     title: '移除元素',
     index: 'RemoveElement'
+  },
+  {
+    icon: 'Setting',
+    title: '设置',
+    index: 'ScriptSettings'
   }
 ]
 </script>
@@ -84,3 +89,9 @@ const items: MenuItem[] = [
     </template>
   </el-menu>
 </template>
+
+<style scoped>
+#aside-el-menu {
+  height: 100%;
+}
+</style>
