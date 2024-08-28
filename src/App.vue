@@ -98,20 +98,20 @@ if (livePlayer) {
       <el-header class="header">
         <PanelHeader />
       </el-header>
-      <el-scrollbar :height="uiStore.scrollBarHeight">
-        <el-container>
-          <el-aside class="aside">
-            <PanelAside />
-          </el-aside>
-          <el-main class="main">
+      <el-container>
+        <el-aside class="aside">
+          <PanelAside />
+        </el-aside>
+        <el-main class="main">
+          <el-scrollbar :height="uiStore.scrollBarHeight">
             <KeepAlive>
               <Transition name="fade" mode="out-in">
                 <PanelMain />
               </Transition>
             </KeepAlive>
-          </el-main>
-        </el-container>
-      </el-scrollbar>
+          </el-scrollbar>
+        </el-main>
+      </el-container>
     </el-container>
   </el-collapse-transition>
 </template>
