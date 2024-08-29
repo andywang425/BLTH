@@ -130,7 +130,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
                   const watchTaskConfig =
                     this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch
                   if (watchTaskConfig.enabled) {
-                    // 等观看视频任务完成再领取
+                    this.logger.log('等待观看视频任务完成后再领取专属等级加速包（10主站经验）...')
                     watch(
                       () => watchTaskConfig._lastCompleteTime,
                       () => sleep(3000).then(() => this.addExperience()),
@@ -150,7 +150,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
           }
         }
         // 等待下次运行或什么都不做
-        const diff = this.config._nextReceiveTime - ts()
+        const diff = this.config._nextReceiveTime - ts() + 3e5 // 增加5分钟延时
         if (diff < 86400) {
           this.logger.log(
             '领取年度大会员权益模块下次运行时间:',
@@ -162,7 +162,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
         }
       }
     } else {
-      const diff = delayToNextMoment(0)
+      const diff = delayToNextMoment()
       setTimeout(() => this.run(), diff.ms)
       this.logger.log('领取年度大会员权益模块下次运行时间:', diff.str)
     }

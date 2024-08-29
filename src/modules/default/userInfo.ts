@@ -13,7 +13,7 @@ class UserInfo extends BaseModule {
       const response = await BAPI.main.nav()
       this.logger.log('BAPI.main.nav response', response)
       if (response.code === 0) {
-        return Promise.resolve(response.data)
+        return response.data
       } else {
         this.logger.error('获取用户信息失败', response.message)
         return Promise.reject(response.message)
