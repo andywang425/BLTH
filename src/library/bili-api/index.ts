@@ -286,14 +286,15 @@ const BAPI: BapiMethods = {
         }
       )
     },
-    share: (aid, source = 'pc_client_normal', eab_x = 2, ramval = 0, ga = 1) => {
+    share: (aid, source = 'pc_client_normal', eab_x = 2, ramval = 0, ga = 1, referer = '') => {
       // source 不能用 web 端的值，改成 pc 客户端的才能完成任务
       const bili_jct = useBiliStore().cookies!.bili_jct
       return request.main.post('/x/web-interface/share/add', {
-        aid,
         eab_x,
         ramval,
+        referer,
         source,
+        aid,
         ga,
         csrf: bili_jct
       })
