@@ -76,6 +76,7 @@ function delayToNextMoment(hour: number = 0, minute: number = 5): Duration {
 
 /**
  * 判断现在是不是处在目标时间范围内
+
  * @param startHour 开始小时
  * @param startMinute 开始分钟
  * @param endHour 结束小时
@@ -90,6 +91,7 @@ function isNowIn(
   const now = DateTime.now()
   const start = DateTime.local(now.year, now.month, now.day, startHour, startMinute)
   const end = DateTime.local(now.year, now.month, now.day, endHour, endMinute)
+
   return now >= start && now < end
 }
 

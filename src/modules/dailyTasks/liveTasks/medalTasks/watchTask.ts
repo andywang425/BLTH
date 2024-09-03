@@ -49,7 +49,6 @@ class RoomHeart {
   private watchedSeconds: number
 
   private timer!: number
-  private stop: boolean = false
 
   private readonly areaID: number
   private readonly parentID: number
@@ -97,8 +96,6 @@ class RoomHeart {
       this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务，请尝试刷新页面`)
       return Promise.resolve()
     }
-    // 如果到了0点还没完成任务，就不继续了
-    this.timer = setTimeout(() => (this.stop = true), delayToNextMoment(0, 0).ms)
     return this.E()
   }
 
@@ -106,10 +103,6 @@ class RoomHeart {
    * E心跳，开始时发送一次
    */
   private async E(): Promise<void> {
-    if (this.stop) {
-      this.status = ''
-      return
-    }
     try {
       const response = await BAPI.liveTrace.E(this.id, this.device, this.ruid)
       this.logger.log(
@@ -141,10 +134,11 @@ class RoomHeart {
    * X心跳，E心跳过后都是X心跳
    */
   private async X(): Promise<void> {
-    if (this.stop) {
-      this.status = ''
+    if (isNowIn(23, 59, 0, 0) || isNowIn(0, 0, 0, 5)) {
+      this.logger.log(`即将或刚刚发生跨天，停止直播间 ${this.roomID} 的X心跳`)
       return
     }
+
     try {
       const sypderData: SpyderData = {
         id: JSON.stringify(this.id),
@@ -268,23 +262,17 @@ class WatchTask extends BaseModule {
    * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
    * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
    */
-  private getRoomidUidList(): [number, number][] | null {
-    const biliStore = useBiliStore()
-    if (biliStore.filteredFansMedals) {
-      return (
-        biliStore.filteredFansMedals
-          .filter(
-            (medal) =>
-              medal.medal.level < 20 &&
-              (this.medalTasksConfig.isWhiteList
-                ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
-                : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
-          )
-          .map((medal) => [medal.room_info.room_id, medal.medal.target_id]) as [number, number][]
-      ).slice(0, 199)
-    } else {
-      return null
-    }
+  private getRoomidUidList(): [number, number][] {
+    return useBiliStore()
+      .filteredFansMedals.filter(
+        (medal) =>
+          medal.medal.level < 20 &&
+          (this.medalTasksConfig.isWhiteList
+            ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
+            : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
+      )
+      .map<[number, number]>((medal) => [medal.room_info.room_id, medal.medal.target_id])
+      .slice(0, 199)
   }
 
   /**
@@ -316,9 +304,11 @@ class WatchTask extends BaseModule {
 
   public async run(): Promise<void> {
     this.logger.log('观看直播模块开始运行')
+
     if (this.config.enabled) {
       if (!isTimestampToday(this.config._lastCompleteTime)) {
         this.status = 'running'
+
         if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
           // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0
           this.config._watchingProgress = {}
@@ -328,42 +318,49 @@ class WatchTask extends BaseModule {
             object[key] -= value % 300
           })
         }
+
         this.config._lastWatchTime = tsm()
-        const roomidUidList: number[][] | null = this.getRoomidUidList()
-        if (roomidUidList) {
-          if (roomidUidList.length === 0) {
-            this.status = 'done'
-            this.config._lastCompleteTime = tsm()
-          } else {
-            for (let i = 0; i < roomidUidList.length; i++) {
-              const [roomid, uid] = roomidUidList[i]
-              const [area_id, parent_area_id] = await this.getAreaInfo(roomid)
-              if (area_id > 0 && parent_area_id > 0) {
-                // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
-                if (
-                  !this.config._watchingProgress[roomid] ||
-                  this.config._watchingProgress[roomid] < this.config.time * 60
-                ) {
-                  // 今日观看时间未达到设置值，开始心跳
-                  this.logger.log(`开始直播间${roomid}的观看直播任务`)
-                  await new RoomHeart(
-                    roomid,
-                    area_id,
-                    parent_area_id,
-                    uid,
-                    this.config._watchingProgress[roomid] ?? 0
-                  ).start()
-                  await sleep(10e3)
+        const roomidUidList: number[][] = this.getRoomidUidList()
+
+        if (roomidUidList.length > 0) {
+          let i: number
+
+          for (i = 0; i < roomidUidList.length; i++) {
+            const [roomid, uid] = roomidUidList[i]
+            const [area_id, parent_area_id] = await this.getAreaInfo(roomid)
+            if (area_id > 0 && parent_area_id > 0) {
+              // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
+              if (
+                !this.config._watchingProgress[roomid] ||
+                this.config._watchingProgress[roomid] < this.config.time * 60
+              ) {
+                if (isNowIn(23, 55, 0, 0) || isNowIn(0, 0, 0, 5)) {
+                  this.logger.log('即将或刚刚发生跨天，提早结束本轮观看直播任务')
+                  break
                 }
+                // 今日观看时间未达到设置值，开始心跳
+                this.logger.log(`开始直播间${roomid}的观看直播任务`)
+
+                await new RoomHeart(
+                  roomid,
+                  area_id,
+                  parent_area_id,
+                  uid,
+                  this.config._watchingProgress[roomid] ?? 0
+                ).start()
               }
             }
+          }
 
+          if (i === roomidUidList.length) {
+            // 没有提早跳出循环，说明所有直播间的观看任务均已完成
             this.config._lastCompleteTime = tsm()
             this.logger.log('观看直播任务已完成')
             this.status = 'done'
           }
         } else {
-          this.status = 'error'
+          this.status = 'done'
+          this.config._lastCompleteTime = tsm()
         }
       } else {
         if (isNowIn(0, 0, 0, 5)) {

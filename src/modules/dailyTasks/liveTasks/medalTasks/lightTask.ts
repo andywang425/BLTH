@@ -18,21 +18,15 @@ class LightTask extends BaseModule {
   /**
    * 获取粉丝勋章，过滤不符合黑白名单要求和不需要点亮的粉丝勋章
    */
-  private getMedalList(): LiveData.FansMedalPanel.List[] | null {
-    const biliStore = useBiliStore()
-    if (biliStore.filteredFansMedals) {
-      return biliStore.filteredFansMedals.filter(
-        (medal) =>
-          medal.medal.level < 20 &&
-          (this.medalTasksConfig.isWhiteList
-            ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
-            : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
-          medal.medal.is_lighted === 0
-      )
-    } else {
-      this.status = 'error'
-      return null
-    }
+  private getMedalList(): LiveData.FansMedalPanel.List[] {
+    return useBiliStore().filteredFansMedals.filter(
+      (medal) =>
+        medal.medal.level < 20 &&
+        (this.medalTasksConfig.isWhiteList
+          ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
+          : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
+        medal.medal.is_lighted === 0
+    )
   }
 
   /**
@@ -93,11 +87,13 @@ class LightTask extends BaseModule {
 
   public async run(): Promise<void> {
     this.logger.log('点亮熄灭勋章模块开始运行')
+
     if (this.config.enabled) {
       if (!isTimestampToday(this.config._lastCompleteTime)) {
         this.status = 'running'
         const medalList = this.getMedalList()
-        if (medalList) {
+
+        if (medalList.length > 0) {
           for (let i = 0; i < medalList.length; i++) {
             const roomid = medalList[i].room_info.room_id // 房间号
             const target_id = medalList[i].medal.target_id // 主播UID
@@ -109,10 +105,11 @@ class LightTask extends BaseModule {
             // 延时防风控
             await sleep(2000)
           }
-          this.config._lastCompleteTime = tsm()
-          this.status = 'done'
-          this.logger.log('点亮熄灭勋章任务已完成')
         }
+
+        this.config._lastCompleteTime = tsm()
+        this.status = 'done'
+        this.logger.log('点亮熄灭勋章任务已完成')
       } else {
         if (isNowIn(0, 0, 0, 5)) {
           this.logger.log('昨天的给点亮熄灭勋章任务已经完成过了，等到今天的00:05再执行')
