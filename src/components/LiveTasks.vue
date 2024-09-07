@@ -89,16 +89,16 @@ const medalInfoTableData = computed({
           : !config.medalTasks.roomidList.includes(medal.roomid)
       )
       // 根据 config.medalTasks.roomidList 排序
-      const sortedMedals = filteredMedals.sort(
+      return filteredMedals.sort(
         (a, b) =>
           config.medalTasks.roomidList.indexOf(a.roomid) -
           config.medalTasks.roomidList.indexOf(b.roomid)
       )
-      return sortedMedals
     }
     return medals
   },
   set(newValue: MedalInfoRow[]) {
+    console.log('sorted newValue', newValue)
     config.medalTasks.roomidList = newValue.map((row) => row.roomid)
   }
 })
@@ -321,6 +321,7 @@ function handleRowClick(row: MedalInfoRow) {
           @select="handleSelect"
           @select-all="handleSelectAll"
           @row-click="handleRowClick"
+          :row-key="(row: MedalInfoRow) => row.roomid.toString()"
         >
           <template v-if="!uiStore.uiConfig.medalInfoPanelSortMode">
             <el-table-column type="selection" align="center" width="80" />
