@@ -23,7 +23,8 @@
     "luxon": "^3.4.4",
     "mitt": "^3.0.1",
     "pinia": "^2.2.0",
-    "vue": "^3.4.31"
+    "vue": "^3.4.31",
+    "vue-draggable-plus": "^0.5.3"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.10.4",
