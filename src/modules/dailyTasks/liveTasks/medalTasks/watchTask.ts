@@ -263,7 +263,7 @@ class WatchTask extends BaseModule {
    * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
    */
   private getRoomidUidList(): [number, number][] {
-    return useBiliStore()
+    const filtered = useBiliStore()
       .filteredFansMedals.filter(
         (medal) =>
           medal.medal.level < 20 &&
@@ -273,6 +273,16 @@ class WatchTask extends BaseModule {
       )
       .map<[number, number]>((medal) => [medal.room_info.room_id, medal.medal.target_id])
       .slice(0, 199)
+
+    if (this.medalTasksConfig.isWhiteList) {
+      return filtered.sort(
+        (a, b) =>
+          this.medalTasksConfig.roomidList.indexOf(a[0]) -
+          this.medalTasksConfig.roomidList.indexOf(b[0])
+      )
+    }
+
+    return filtered
   }
 
   /**

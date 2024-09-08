@@ -5,7 +5,6 @@ import { useBiliStore } from '@/stores/useBiliStore'
 import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
-import type { LiveData } from '@/library/bili-api/data'
 
 class LightTask extends BaseModule {
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
@@ -17,16 +16,29 @@ class LightTask extends BaseModule {
 
   /**
    * 获取粉丝勋章，过滤不符合黑白名单要求和不需要点亮的粉丝勋章
+   * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
    */
-  private getMedalList(): LiveData.FansMedalPanel.List[] {
-    return useBiliStore().filteredFansMedals.filter(
-      (medal) =>
-        medal.medal.level < 20 &&
-        (this.medalTasksConfig.isWhiteList
-          ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
-          : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
-        medal.medal.is_lighted === 0
-    )
+  private getRoomidTargetidList(): [number, number][] {
+    const filtered = useBiliStore()
+      .filteredFansMedals.filter(
+        (medal) =>
+          medal.medal.level < 20 &&
+          (this.medalTasksConfig.isWhiteList
+            ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
+            : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
+          medal.medal.is_lighted === 0
+      )
+      .map<[number, number]>((medal) => [medal.room_info.room_id, medal.medal.target_id])
+
+    if (this.medalTasksConfig.isWhiteList) {
+      return filtered.sort(
+        (a, b) =>
+          this.medalTasksConfig.roomidList.indexOf(a[0]) -
+          this.medalTasksConfig.roomidList.indexOf(b[0])
+      )
+    }
+
+    return filtered
   }
 
   /**
@@ -91,12 +103,11 @@ class LightTask extends BaseModule {
     if (this.config.enabled) {
       if (!isTimestampToday(this.config._lastCompleteTime)) {
         this.status = 'running'
-        const medalList = this.getMedalList()
+        const roomidTargetidList: number[][] = this.getRoomidTargetidList()
 
-        if (medalList.length > 0) {
-          for (let i = 0; i < medalList.length; i++) {
-            const roomid = medalList[i].room_info.room_id // 房间号
-            const target_id = medalList[i].medal.target_id // 主播UID
+        if (roomidTargetidList.length > 0) {
+          for (let i = 0; i < roomidTargetidList.length; i++) {
+            const [roomid, target_id] = roomidTargetidList[i]
             if (this.config.mode === 'like') {
               await this.like(roomid, target_id, _.random(31, 33))
             } else {
