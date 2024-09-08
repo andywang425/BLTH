@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useUIStore } from '@/stores/useUIStore'
+import type { MenuIndex } from '@/types'
 
 const uiStore = useUIStore()
 
@@ -59,7 +60,7 @@ const items: MenuItem[] = [
     :style="{ 'min-height': uiStore.scrollBarHeight }"
     :collapse="uiStore.uiConfig.isCollapse"
     unique-opened
-    @select="uiStore.setActiveMenuIndex"
+    @select="(index: string) => uiStore.setActiveMenuIndex(index as MenuIndex)"
     id="aside-el-menu"
   >
     <template v-for="item in items">
