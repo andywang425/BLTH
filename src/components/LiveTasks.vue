@@ -262,14 +262,6 @@ function handleRowClick(row: MedalInfoRow) {
       <el-text>查看。</el-text>
     </el-row>
     <br />
-    <el-row>
-      <el-text tag="b">注意：</el-text>
-    </el-row>
-    <el-row>
-      <el-text
-        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多199个等级小于20的粉丝勋章完成观看直播任务。在脚本执行任务期间观看直播可能导致今天无法获取任何亲密度。
-      </el-text>
-    </el-row>
     <!-- 弹窗 -->
     <el-dialog
       v-model="medalDanmuPanelVisible"
