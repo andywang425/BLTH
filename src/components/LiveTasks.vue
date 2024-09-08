@@ -124,8 +124,10 @@ const handleEditList = async () => {
       watch(
         medalInfoTableData,
         (newData) => {
-          initSelection(newData)
-          medalInfoLoading.value = false
+          nextTick(() => {
+            initSelection(newData)
+            medalInfoLoading.value = false
+          })
         },
         { once: true }
       )
@@ -160,27 +162,14 @@ const initSelection = (rows?: MedalInfoRow[]) => {
   }
 }
 
-function handleSelect(selection: MedalInfoRow[], row: MedalInfoRow) {
-  console.log('selection row', selection, row)
-  config.medalTasks.roomidList = selection.map((row) => row.roomid)
-  // // 从常规模式切换到排序模式时会触发一次回调，需要忽略
-  // if (!uiStore.uiConfig.medalInfoPanelSortMode) {
-  //   console.log('selectedRows', selectedRows)
-  //   // 从排序模式切换到常规模式时也会触发一次回调，此时需等多选框状态
-  //   nextTick(() => {config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)})
-  // }
-}
-
-function handleSelectAll(selection: MedalInfoRow[]) {
-  console.log('selection all', selection)
+function handleSelect(selection: MedalInfoRow[]) {
   config.medalTasks.roomidList = selection.map((row) => row.roomid)
 }
 
 function handleRowClick(row: MedalInfoRow) {
-  console.log('row click', row)
   // 切换当前行的选择状态
-  // @ts-expect-error
-  medalInfoTableRef.value?.toggleRowSelection(row, undefined)
+  medalInfoTableRef.value?.toggleRowSelection(row)
+  // 更新黑白名单
   const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows()
   config.medalTasks.roomidList = selection.map((row) => row.roomid)
 }
@@ -250,6 +239,7 @@ function handleRowClick(row: MedalInfoRow) {
           v-model="config.medalTasks.isWhiteList"
           active-text="白名单"
           inactive-text="黑名单"
+          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelSortMode = false)"
         />
         <el-button type="primary" size="small" :icon="Edit" @click="handleEditList"
           >编辑名单
@@ -319,7 +309,7 @@ function handleRowClick(row: MedalInfoRow) {
           :max-height="tableMaxHeight"
           empty-text="没有粉丝勋章"
           @select="handleSelect"
-          @select-all="handleSelectAll"
+          @select-all="handleSelect"
           @row-click="handleRowClick"
           :row-key="(row: MedalInfoRow) => row.roomid.toString()"
         >
@@ -370,10 +360,11 @@ function handleRowClick(row: MedalInfoRow) {
       </VueDraggable>
       <template #footer>
         <el-switch
+          :disabled="!config.medalTasks.isWhiteList"
           v-model="uiStore.uiConfig.medalInfoPanelSortMode"
           inactive-text="常规模式"
           active-text="排序模式"
-          @change="(val: boolean) => !val && nextTick(() => initSelection(medalInfoTableData))"
+          @change="(val) => !val && nextTick(() => initSelection(medalInfoTableData))"
         />
       </template>
     </el-dialog>
