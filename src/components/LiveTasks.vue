@@ -20,7 +20,8 @@ const moduleStore = useModuleStore()
 const biliStore = useBiliStore()
 const uiStore = useUIStore()
 
-const tableMaxHeight = screen.height * 0.55
+const medalTableMaxHeight = screen.height * 0.55
+const danmuTableMaxHeight = screen.height * 0.5
 
 const config = moduleStore.moduleConfig.DailyTasks.LiveTasks
 const status = moduleStore.moduleStatus.DailyTasks.LiveTasks
@@ -228,7 +229,7 @@ function handleRowClick(row: MedalInfoRow) {
         <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 70px">
           <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
         </el-select>
-        <el-text>分钟</el-text>
+        <el-text>分钟 / 直播间</el-text>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.watch" />
         <TaskStatus :status="status.medalTasks.watch" />
       </el-space>
@@ -276,8 +277,8 @@ function handleRowClick(row: MedalInfoRow) {
       :lock-scroll="false"
       width="40%"
     >
-      <el-table :data="danmuTableData" max-height="500">
-        <el-table-column type="index" width="50" />
+      <el-table :data="danmuTableData" :max-height="danmuTableMaxHeight">
+        <el-table-column type="index" width="80" />
         <el-table-column prop="content" label="弹幕内容" />
         <el-table-column label="操作" width="220" align="center">
           <template #default="scope">
@@ -296,17 +297,19 @@ function handleRowClick(row: MedalInfoRow) {
     </el-dialog>
     <el-dialog v-model="medalInfoPanelVisible" title="编辑粉丝勋章名单" :lock-scroll="false">
       <VueDraggable
-        :disabled="!uiStore.uiConfig.medalInfoPanelSortMode"
         v-model="medalInfoTableData"
-        :animation="150"
         target="#draggable-fans-medal-table table tbody"
+        :disabled="!uiStore.uiConfig.medalInfoPanelSortMode"
+        :animation="150"
+        :scroll-sensitivity="36"
+        :scroll-speed="8"
       >
         <el-table
           id="draggable-fans-medal-table"
           ref="medalInfoTableRef"
           v-loading="medalInfoLoading"
           :data="medalInfoTableData"
-          :max-height="tableMaxHeight"
+          :max-height="medalTableMaxHeight"
           empty-text="没有粉丝勋章"
           @select="handleSelect"
           @select-all="handleSelect"
