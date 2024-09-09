@@ -7,6 +7,7 @@ import { useBiliStore } from '@/stores/useBiliStore'
 import helpInfo from '@/library/help-info'
 import { VueDraggable } from 'vue-draggable-plus'
 import { useUIStore } from '@/stores/useUIStore'
+import { arrayToMap } from '@/library/utils'
 
 interface MedalInfoRow {
   avatar: string
@@ -89,12 +90,8 @@ const medalInfoTableData = computed({
           ? config.medalTasks.roomidList.includes(medal.roomid)
           : !config.medalTasks.roomidList.includes(medal.roomid)
       )
-      // 根据 config.medalTasks.roomidList 排序
-      return filteredMedals.sort(
-        (a, b) =>
-          config.medalTasks.roomidList.indexOf(a.roomid) -
-          config.medalTasks.roomidList.indexOf(b.roomid)
-      )
+      const orderMap = arrayToMap(config.medalTasks.roomidList)
+      return filteredMedals.sort((a, b) => orderMap.get(a.roomid)! - orderMap.get(b.roomid)!)
     }
     return medals
   },

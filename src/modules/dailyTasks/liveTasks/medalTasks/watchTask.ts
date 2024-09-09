@@ -4,7 +4,7 @@ import BAPI from '@/library/bili-api'
 import { useBiliStore } from '@/stores/useBiliStore'
 import Logger from '@/library/logger'
 import CryptoJS from 'crypto-js'
-import { uuid, sleep } from '@/library/utils'
+import { uuid, sleep, arrayToMap } from '@/library/utils'
 import { useModuleStore } from '@/stores/useModuleStore'
 import type { ModuleConfig } from '@/types'
 import type { ModuleStatusTypes, RunAtMoment } from '@/types'
@@ -275,11 +275,8 @@ class WatchTask extends BaseModule {
       .slice(0, 199)
 
     if (this.medalTasksConfig.isWhiteList) {
-      return filtered.sort(
-        (a, b) =>
-          this.medalTasksConfig.roomidList.indexOf(a[0]) -
-          this.medalTasksConfig.roomidList.indexOf(b[0])
-      )
+      const orderMap = arrayToMap(this.medalTasksConfig.roomidList)
+      return filtered.sort((a, b) => orderMap.get(a[0])! - orderMap.get(b[0])!)
     }
 
     return filtered

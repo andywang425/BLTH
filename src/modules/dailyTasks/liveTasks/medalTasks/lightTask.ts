@@ -2,7 +2,7 @@ import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore } from '@/stores/useBiliStore'
-import { sleep } from '@/library/utils'
+import { arrayToMap, sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
 
@@ -31,11 +31,8 @@ class LightTask extends BaseModule {
       .map<[number, number]>((medal) => [medal.room_info.room_id, medal.medal.target_id])
 
     if (this.medalTasksConfig.isWhiteList) {
-      return filtered.sort(
-        (a, b) =>
-          this.medalTasksConfig.roomidList.indexOf(a[0]) -
-          this.medalTasksConfig.roomidList.indexOf(b[0])
-      )
+      const orderMap = arrayToMap(this.medalTasksConfig.roomidList)
+      return filtered.sort((a, b) => orderMap.get(a[0])! - orderMap.get(b[0])!)
     }
 
     return filtered

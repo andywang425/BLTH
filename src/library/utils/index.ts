@@ -184,6 +184,14 @@ function waitForMoment(moment: RunAtMoment): Promise<void> {
   }
 }
 
+/**
+ * 将数组转换为 Map（key 为数组元素，value 为元素下标）
+ * @param arr 数组
+ */
+function arrayToMap<T>(arr: T[]): Map<T, number> {
+  return new Map(arr.map((value, index) => [value, index]))
+}
+
 export {
   uuid,
   sleep,
@@ -193,5 +201,6 @@ export {
   packFormData,
   deepestIterate,
   getUrlFromFetchInput,
-  waitForMoment
+  waitForMoment,
+  arrayToMap
 }
