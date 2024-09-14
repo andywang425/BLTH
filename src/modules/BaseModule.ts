@@ -73,7 +73,7 @@ class BaseModule {
   /**
    * 模块是否启用，默认通过 config.enabled 判断
    *
-   * 如果没有 config.enabled 属性，则默认启用
+   * 如果没有 config.enabled 属性，则默认启用（比如默认模块）
    */
   public get isEnabled(): boolean {
     return this.config?.enabled ?? true
