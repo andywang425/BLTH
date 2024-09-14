@@ -17,6 +17,7 @@ import type {
 import { deepestIterate, waitForMoment } from '@/library/utils'
 import { useCacheStore } from './useCacheStore'
 import { isSelfTopFrame } from '@/library/dom'
+import type BaseModule from '@/modules/BaseModule'
 
 const defaultModuleStatus: ModuleStatus = {
   DailyTasks: {
@@ -61,10 +62,26 @@ export const useModuleStore = defineStore('module', () => {
     const promiseArray: Promise<void>[] = []
     for (const [name, module] of Object.entries(defaultModules)) {
       if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
-        promiseArray.push(new module(name).run())
+        promiseArray.push(runModule(module, name)!)
       }
     }
     return Promise.all<Promise<void>[]>(promiseArray)
+  }
+
+  /**
+   * 运行模块（该函数不导出）
+   *
+   * @param module 模块类
+   * @param name 模块名称
+   */
+  function runModule(
+    module: new (moduleName: string) => BaseModule,
+    name: string
+  ): Promise<void> | void {
+    const moduleInstance = new module(name)
+    if (moduleInstance.isEnabled) {
+      return moduleInstance.run()
+    }
   }
 
   /**
@@ -84,7 +101,7 @@ export const useModuleStore = defineStore('module', () => {
             if (!module.runAfterDefault) {
               // 如果不需要等默认模块运行完了再运行，现在就加载并记录
               // 否则不做记录，等之后（isOnTargetFrame 为 yes时）再加载
-              waitForMoment(module.runAt).then(() => new module(name).run())
+              waitForMoment(module.runAt).then(() => runModule(module, name))
               // 记录被加载的 onFrame 为 all 或 top 的模块名称
               allAndTopFrameModuleNames.push(name)
             }
@@ -111,7 +128,7 @@ export const useModuleStore = defineStore('module', () => {
                   // 等待默认模块运行完毕
                   await defaultModulesLoaded
                 }
-                new module(name).run()
+                runModule(module, name)
               } catch (e) {
                 // 默认模块运行出错，不运行该模块
                 logger.error(`运行默认模块时出错，模块 ${name} 不运行:`, e)

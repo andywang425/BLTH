@@ -69,6 +69,15 @@ class BaseModule {
    * @example config: this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
    */
   protected config?: any
+
+  /**
+   * 模块是否启用，默认通过 config.enabled 判断
+   *
+   * 如果没有 config.enabled 属性，则默认启用
+   */
+  public get isEnabled(): boolean {
+    return this.config?.enabled ?? true
+  }
   /**
    * 如果需要在控制面板上显示模块状态，推荐添加一个 status setter 用来设置模块状态
    *

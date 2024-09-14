@@ -312,70 +312,68 @@ class WatchTask extends BaseModule {
   public async run(): Promise<void> {
     this.logger.log('观看直播模块开始运行')
 
-    if (this.config.enabled) {
-      if (!isTimestampToday(this.config._lastCompleteTime)) {
-        this.status = 'running'
+    if (!isTimestampToday(this.config._lastCompleteTime)) {
+      this.status = 'running'
 
-        if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
-          // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0
-          this.config._watchingProgress = {}
-        } else {
-          // 因为连续看 5 分钟（300秒）才能加亲密度，所以上一次观看时最后不足 5 分钟的时间是无效的
-          _.forOwn(this.config._watchingProgress, (value, key, object) => {
-            object[key] -= value % 300
-          })
-        }
+      if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
+        // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0
+        this.config._watchingProgress = {}
+      } else {
+        // 因为连续看 5 分钟（300秒）才能加亲密度，所以上一次观看时最后不足 5 分钟的时间是无效的
+        _.forOwn(this.config._watchingProgress, (value, key, object) => {
+          object[key] -= value % 300
+        })
+      }
 
-        this.config._lastWatchTime = tsm()
-        const roomidUidList: number[][] = this.getRoomidUidList()
+      this.config._lastWatchTime = tsm()
+      const roomidUidList: number[][] = this.getRoomidUidList()
 
-        if (roomidUidList.length > 0) {
-          let i: number
+      if (roomidUidList.length > 0) {
+        let i: number
 
-          for (i = 0; i < roomidUidList.length; i++) {
-            const [roomid, uid] = roomidUidList[i]
-            const [area_id, parent_area_id] = await this.getAreaInfo(roomid)
-            if (area_id > 0 && parent_area_id > 0) {
-              // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
-              if (
-                !this.config._watchingProgress[roomid] ||
-                this.config._watchingProgress[roomid] < this.config.time * 60
-              ) {
-                if (isNowIn(23, 55, 0, 0) || isNowIn(0, 0, 0, 5)) {
-                  this.logger.log('即将或刚刚发生跨天，提早结束本轮观看直播任务')
-                  break
-                }
-                // 今日观看时间未达到设置值，开始心跳
-                this.logger.log(`开始直播间${roomid}的观看直播任务`)
-
-                await new RoomHeart(
-                  roomid,
-                  area_id,
-                  parent_area_id,
-                  uid,
-                  this.config._watchingProgress[roomid] ?? 0
-                ).start()
+        for (i = 0; i < roomidUidList.length; i++) {
+          const [roomid, uid] = roomidUidList[i]
+          const [area_id, parent_area_id] = await this.getAreaInfo(roomid)
+          if (area_id > 0 && parent_area_id > 0) {
+            // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
+            if (
+              !this.config._watchingProgress[roomid] ||
+              this.config._watchingProgress[roomid] < this.config.time * 60
+            ) {
+              if (isNowIn(23, 55, 0, 0) || isNowIn(0, 0, 0, 5)) {
+                this.logger.log('即将或刚刚发生跨天，提早结束本轮观看直播任务')
+                break
               }
+              // 今日观看时间未达到设置值，开始心跳
+              this.logger.log(`开始直播间${roomid}的观看直播任务`)
+
+              await new RoomHeart(
+                roomid,
+                area_id,
+                parent_area_id,
+                uid,
+                this.config._watchingProgress[roomid] ?? 0
+              ).start()
             }
           }
+        }
 
-          if (i === roomidUidList.length) {
-            // 没有提早跳出循环，说明所有直播间的观看任务均已完成
-            this.config._lastCompleteTime = tsm()
-            this.logger.log('观看直播任务已完成')
-            this.status = 'done'
-          }
-        } else {
-          this.status = 'done'
+        if (i === roomidUidList.length) {
+          // 没有提早跳出循环，说明所有直播间的观看任务均已完成
           this.config._lastCompleteTime = tsm()
+          this.logger.log('观看直播任务已完成')
+          this.status = 'done'
         }
       } else {
-        if (isNowIn(0, 0, 0, 5)) {
-          this.logger.log('昨天的观看直播任务已经完成过了，等到今天的00:05再执行')
-        } else {
-          this.logger.log('今天已经完成过观看直播任务了')
-          this.status = 'done'
-        }
+        this.status = 'done'
+        this.config._lastCompleteTime = tsm()
+      }
+    } else {
+      if (isNowIn(0, 0, 0, 5)) {
+        this.logger.log('昨天的观看直播任务已经完成过了，等到今天的00:05再执行')
+      } else {
+        this.logger.log('今天已经完成过观看直播任务了')
+        this.status = 'done'
       }
     }
 

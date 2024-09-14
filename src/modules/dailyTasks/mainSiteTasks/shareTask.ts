@@ -38,25 +38,24 @@ class ShareTask extends BaseModule {
 
   public async run(): Promise<void> {
     this.logger.log('每日分享视频模块开始运行')
-    if (this.config.enabled) {
-      const biliStore = useBiliStore()
-      if (!isTimestampToday(this.config._lastCompleteTime)) {
-        this.status = 'running'
-        if (!biliStore.dailyRewardInfo!.share) {
-          const aid = this.getAid()
-          await this.share(aid)
-        } else {
-          this.config._lastCompleteTime = tsm()
-          this.status = 'done'
-          this.logger.log('每日分享视频任务已完成')
-        }
+
+    const biliStore = useBiliStore()
+    if (!isTimestampToday(this.config._lastCompleteTime)) {
+      this.status = 'running'
+      if (!biliStore.dailyRewardInfo!.share) {
+        const aid = this.getAid()
+        await this.share(aid)
       } else {
-        if (isNowIn(0, 0, 0, 5)) {
-          this.logger.log('昨天的每日分享任务已经完成过了，等到今天的00:05再执行')
-        } else {
-          this.logger.log('今天已经完成过每日分享任务了')
-          this.status = 'done'
-        }
+        this.config._lastCompleteTime = tsm()
+        this.status = 'done'
+        this.logger.log('每日分享视频任务已完成')
+      }
+    } else {
+      if (isNowIn(0, 0, 0, 5)) {
+        this.logger.log('昨天的每日分享任务已经完成过了，等到今天的00:05再执行')
+      } else {
+        this.logger.log('今天已经完成过每日分享任务了')
+        this.status = 'done'
       }
     }
 

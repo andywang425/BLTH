@@ -115,42 +115,41 @@ class CoinTask extends BaseModule {
 
   public async run(): Promise<void> {
     this.logger.log('每日投币模块开始运行')
-    if (this.config.enabled) {
-      const biliStore = useBiliStore()
-      if (!isTimestampToday(this.config._lastCompleteTime)) {
-        this.status = 'running'
-        // 今日已投币数量
-        const total_coined_num = biliStore.dailyRewardInfo!.coins / 10
-        if (total_coined_num < this.config.num) {
-          // 剩余要投的硬币数量
-          const left_coin_num = this.config.num - total_coined_num
-          const biliStore = useBiliStore()
-          // 拥有的硬币数量
-          const money = biliStore.userInfo!.money ?? 5
-          if (left_coin_num > money) {
-            this.logger.log('硬币余额不足，不执行每日投币任务')
-            this.status = 'done'
-          } else {
-            // 目前仅支持动态视频投币
-            // TODO: 增加别的投币方式，比如给某UP的视频投币
-            await this.coinDynamicVideos(left_coin_num)
-          }
-        } else {
-          this.config._lastCompleteTime = tsm()
+
+    const biliStore = useBiliStore()
+    if (!isTimestampToday(this.config._lastCompleteTime)) {
+      this.status = 'running'
+      // 今日已投币数量
+      const total_coined_num = biliStore.dailyRewardInfo!.coins / 10
+      if (total_coined_num < this.config.num) {
+        // 剩余要投的硬币数量
+        const left_coin_num = this.config.num - total_coined_num
+        const biliStore = useBiliStore()
+        // 拥有的硬币数量
+        const money = biliStore.userInfo!.money ?? 5
+        if (left_coin_num > money) {
+          this.logger.log('硬币余额不足，不执行每日投币任务')
           this.status = 'done'
-          this.logger.log('每日投币任务已完成')
+        } else {
+          // 目前仅支持动态视频投币
+          // TODO: 增加别的投币方式，比如给某UP的视频投币
+          await this.coinDynamicVideos(left_coin_num)
         }
       } else {
-        // 为了更加准确的语言描述和任务状态图标显示，需要判断当前所处的时间段
-        // 下面文字中的今天、昨天是指真实的今天、昨天而非在 isTimestampToday 函数中重新定义的
-        if (isNowIn(0, 0, 0, 5)) {
-          // 在半夜00:00 ~ 00:05
-          this.logger.log('昨天的每日投币任务已经完成过了，等到今天的00:05再执行')
-        } else {
-          // 在非半夜00:00 ~ 00:05的其它时间
-          this.logger.log('今天已经完成过每日投币任务了')
-          this.status = 'done'
-        }
+        this.config._lastCompleteTime = tsm()
+        this.status = 'done'
+        this.logger.log('每日投币任务已完成')
+      }
+    } else {
+      // 为了更加准确的语言描述和任务状态图标显示，需要判断当前所处的时间段
+      // 下面文字中的今天、昨天是指真实的今天、昨天而非在 isTimestampToday 函数中重新定义的
+      if (isNowIn(0, 0, 0, 5)) {
+        // 在半夜00:00 ~ 00:05
+        this.logger.log('昨天的每日投币任务已经完成过了，等到今天的00:05再执行')
+      } else {
+        // 在非半夜00:00 ~ 00:05的其它时间
+        this.logger.log('今天已经完成过每日投币任务了')
+        this.status = 'done'
       }
     }
 

@@ -52,28 +52,27 @@ class GroupSignTask extends BaseModule {
 
   public async run() {
     this.logger.log('应援团签到模块开始运行')
-    if (this.config.enabled) {
-      // 应援团签到的刷新时间是每天早上8点
-      if (!isTimestampToday(this.config._lastCompleteTime, 8, 5)) {
-        this.status = 'running'
-        const idList = await this.getGroupidOwneruidList()
-        if (idList) {
-          for (const [group_id, owner_uid] of idList) {
-            await this.sign(group_id, owner_uid)
-            await sleep(2000)
-          }
-          this.config._lastCompleteTime = tsm()
-          this.logger.log('应援团签到任务已完成')
-          this.status = 'done'
+
+    // 应援团签到的刷新时间是每天早上8点
+    if (!isTimestampToday(this.config._lastCompleteTime, 8, 5)) {
+      this.status = 'running'
+      const idList = await this.getGroupidOwneruidList()
+      if (idList) {
+        for (const [group_id, owner_uid] of idList) {
+          await this.sign(group_id, owner_uid)
+          await sleep(2000)
         }
+        this.config._lastCompleteTime = tsm()
+        this.logger.log('应援团签到任务已完成')
+        this.status = 'done'
+      }
+    } else {
+      if (!isNowIn(0, 0, 8, 5)) {
+        this.logger.log('今天已经完成过应援团签到任务了')
+        this.status = 'done'
       } else {
-        if (!isNowIn(0, 0, 8, 5)) {
-          this.logger.log('今天已经完成过应援团签到任务了')
-          this.status = 'done'
-        } else {
-          // 现在位于 00:00 ~ 08:05 这个时间段
-          this.logger.log('昨天的应援团签到任务已经完成过了，等到今天早上八点零五分再次执行')
-        }
+        // 现在位于 00:00 ~ 08:05 这个时间段
+        this.logger.log('昨天的应援团签到任务已经完成过了，等到今天早上八点零五分再次执行')
       }
     }
 
