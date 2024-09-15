@@ -134,7 +134,7 @@ class RoomHeart {
    * X心跳，E心跳过后都是X心跳
    */
   private async X(): Promise<void> {
-    if (isNowIn(23, 59, 0, 0) || isNowIn(0, 0, 0, 5)) {
+    if (isNowIn(23, 59, 0, 5)) {
       this.logger.log(`即将或刚刚发生跨天，停止直播间 ${this.roomID} 的X心跳`)
       return
     }
@@ -340,7 +340,7 @@ class WatchTask extends BaseModule {
               !this.config._watchingProgress[roomid] ||
               this.config._watchingProgress[roomid] < this.config.time * 60
             ) {
-              if (isNowIn(23, 55, 0, 0) || isNowIn(0, 0, 0, 5)) {
+              if (isNowIn(23, 55, 0, 5)) {
                 this.logger.log('即将或刚刚发生跨天，提早结束本轮观看直播任务')
                 break
               }
