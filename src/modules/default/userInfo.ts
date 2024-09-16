@@ -3,6 +3,7 @@ import BAPI from '@/library/bili-api'
 import type { MainData } from '@/library/bili-api/data'
 import { delayToNextMoment } from '@/library/luxon'
 import BaseModule from '../BaseModule'
+import ModuleCriticalError from '@/library/error/ModuleCriticalError'
 
 class UserInfo extends BaseModule {
   /**
@@ -15,12 +16,10 @@ class UserInfo extends BaseModule {
       if (response.code === 0) {
         return response.data
       } else {
-        this.logger.error('获取用户信息失败', response.message)
-        return Promise.reject(response.message)
+        throw new Error(`响应 code 不为 0: ${response.message}`)
       }
-    } catch (error) {
-      this.logger.error('获取用户信息出错', error)
-      return Promise.reject(error)
+    } catch (error: any) {
+      throw new ModuleCriticalError(this.moduleName, `获取用户信息出错: ${error.message}`)
     }
   }
 

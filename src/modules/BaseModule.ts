@@ -75,7 +75,7 @@ class BaseModule {
    *
    * 如果没有 config.enabled 属性，则默认启用（比如默认模块）
    */
-  public get isEnabled(): boolean {
+  public isEnabled(): boolean {
     return this.config?.enabled ?? true
   }
   /**

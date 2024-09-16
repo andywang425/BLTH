@@ -18,6 +18,8 @@ import { deepestIterate, waitForMoment } from '@/library/utils'
 import { useCacheStore } from './useCacheStore'
 import { isSelfTopFrame } from '@/library/dom'
 import type BaseModule from '@/modules/BaseModule'
+import ModuleCriticalError from '@/library/error/ModuleCriticalError'
+import ModuleError from '@/library/error/ModuleError'
 
 const defaultModuleStatus: ModuleStatus = {
   DailyTasks: {
@@ -43,9 +45,6 @@ const defaultModuleStatus: ModuleStatus = {
   }
 }
 
-// 在所有 frame 或顶层 frame 上运行的被加载的模块名称
-const allAndTopFrameModuleNames: string[] = []
-
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
   const moduleConfig: ModuleConfig = reactive(Storage.getModuleConfig())
@@ -57,7 +56,7 @@ export const useModuleStore = defineStore('module', () => {
   /**
    * 加载默认模块（该函数不导出）
    */
-  function loadDefaultModules(): Promise<void[]> {
+  function loadDefaultModules(): Promise<PromiseSettledResult<void>[]> {
     const cacheStore = useCacheStore()
     const promiseArray: Promise<void>[] = []
     for (const [name, module] of Object.entries(defaultModules)) {
@@ -65,7 +64,7 @@ export const useModuleStore = defineStore('module', () => {
         promiseArray.push(runModule(module, name)!)
       }
     }
-    return Promise.all<Promise<void>[]>(promiseArray)
+    return Promise.allSettled<Promise<void>[]>(promiseArray)
   }
 
   /**
@@ -74,12 +73,9 @@ export const useModuleStore = defineStore('module', () => {
    * @param module 模块类
    * @param name 模块名称
    */
-  function runModule(
-    module: new (moduleName: string) => BaseModule,
-    name: string
-  ): Promise<void> | void {
+  function runModule(module: typeof BaseModule, name: string): Promise<void> | void {
     const moduleInstance = new module(name)
-    if (moduleInstance.isEnabled) {
+    if (moduleInstance.isEnabled()) {
       return moduleInstance.run()
     }
   }
@@ -93,7 +89,11 @@ export const useModuleStore = defineStore('module', () => {
    */
   function loadModules(isOnTargetFrame: IsOnTargetFrameTypes): void {
     const cacheStore = useCacheStore()
-    const logger = new Logger('ModuleStore_LoadModules')
+    // 在所有 frame 或顶层 frame 上运行的被加载的模块名称
+    const allAndTopFrameModuleNames: string[] = []
+
+    const moduleAfterDefault: Record<string, typeof BaseModule> = {}
+
     if (isOnTargetFrame === 'unknown') {
       for (const [name, module] of Object.entries(otherModules)) {
         if (module.onFrame === 'all' || (module.onFrame === 'top' && isSelfTopFrame())) {
@@ -110,7 +110,8 @@ export const useModuleStore = defineStore('module', () => {
       }
     } else {
       // 加载默认模块
-      const defaultModulesLoaded: Promise<void[]> = loadDefaultModules()
+      const defaultModulesLoadingResult: Promise<PromiseSettledResult<void>[]> =
+        loadDefaultModules()
       // 加载其它模块
       for (const [name, module] of Object.entries(otherModules)) {
         // 对 onFrame 为 all 或 top 的模块来说，如果之前运行过，现在就不运行了
@@ -122,21 +123,42 @@ export const useModuleStore = defineStore('module', () => {
           (module.onFrame === 'all' && !allAndTopFrameModuleNames.includes(name))
         ) {
           if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
-            waitForMoment(module.runAt).then(async () => {
-              try {
-                if (module.runAfterDefault) {
-                  // 等待默认模块运行完毕
-                  await defaultModulesLoaded
-                }
-                runModule(module, name)
-              } catch (e) {
-                // 默认模块运行出错，不运行该模块
-                logger.error(`运行默认模块时出错，模块 ${name} 不运行:`, e)
-              }
-            })
+            if (module.runAfterDefault) {
+              moduleAfterDefault[name] = module
+            } else {
+              waitForMoment(module.runAt).then(() => runModule(module, name))
+            }
           }
         }
       }
+
+      // 等待默认模块运行完毕
+      defaultModulesLoadingResult.then((results) => {
+        console.log(results)
+
+        for (const result of results) {
+          if (result.status === 'rejected') {
+            const error: Error = result.reason
+
+            if (error instanceof ModuleCriticalError) {
+              // 致命错误，停止运行
+              new Logger(error.moduleName).error(error.message)
+              return
+            } else if (error instanceof ModuleError) {
+              // 一般错误，继续运行
+              new Logger(error.moduleName).error(error.message)
+            } else {
+              // 意外错误，停止运行（可能是默认模块编写有误）
+              new Logger('ModuleStore').error(`意外错误: ${error.message}`)
+              return
+            }
+          }
+        }
+
+        for (const [name, module] of Object.entries(moduleAfterDefault)) {
+          waitForMoment(module.runAt).then(() => runModule(module, name))
+        }
+      })
     }
   }
 

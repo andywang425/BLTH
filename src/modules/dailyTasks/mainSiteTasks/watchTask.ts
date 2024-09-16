@@ -41,6 +41,12 @@ class WatchTask extends BaseModule {
 
     const biliStore = useBiliStore()
     if (!isTimestampToday(this.config._lastCompleteTime)) {
+      if (!useBiliStore().dynamicVideos) {
+        this.logger.error('动态视频数据不存在，不执行每日观看视频任务')
+        this.status = 'error'
+        return
+      }
+
       this.status = 'running'
       if (!biliStore.dailyRewardInfo!.watch) {
         const aid = this.getAid()

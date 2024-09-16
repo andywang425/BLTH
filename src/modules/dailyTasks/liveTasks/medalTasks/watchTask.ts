@@ -313,6 +313,12 @@ class WatchTask extends BaseModule {
     this.logger.log('观看直播模块开始运行')
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
+      if (!useBiliStore().fansMedals) {
+        this.logger.error('粉丝勋章数据不存在，不执行观看直播任务')
+        this.status = 'error'
+        return
+      }
+
       this.status = 'running'
 
       if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {

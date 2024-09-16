@@ -98,6 +98,12 @@ class LightTask extends BaseModule {
     this.logger.log('点亮熄灭勋章模块开始运行')
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
+      if (!useBiliStore().fansMedals) {
+        this.logger.error('粉丝勋章数据不存在，不执行点亮熄灭勋章任务')
+        this.status = 'error'
+        return
+      }
+
       this.status = 'running'
       const roomidTargetidList: number[][] = this.getRoomidTargetidList()
 

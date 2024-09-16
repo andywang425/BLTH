@@ -3,6 +3,7 @@ import BAPI from '@/library/bili-api'
 import type { MainData } from '@/library/bili-api/data'
 import { delayToNextMoment, isTimestampToday } from '@/library/luxon'
 import BaseModule from '../BaseModule'
+import ModuleError from '@/library/error/ModuleError'
 
 class DailyRewardInfo extends BaseModule {
   /**
@@ -13,14 +14,12 @@ class DailyRewardInfo extends BaseModule {
       const response = await BAPI.main.reward()
       this.logger.log('BAPI.main.reward response', response)
       if (response.code === 0) {
-        return Promise.resolve(response.data)
+        return response.data
       } else {
-        this.logger.error('获取主站每日任务完成情况失败', response.message)
-        return Promise.reject(response.message)
+        throw new Error(`响应 code 不为 0: ${response.message}`)
       }
-    } catch (error) {
-      this.logger.error('获取主站每日任务完成情况出错', error)
-      return Promise.reject(error)
+    } catch (error: any) {
+      throw new ModuleError(this.moduleName, `获取主站每日任务完成情况出错: ${error.message}`)
     }
   }
 

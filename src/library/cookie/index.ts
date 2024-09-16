@@ -89,7 +89,7 @@ class Cookie {
       if (timeout) {
         timeoutTimer = setTimeout(() => {
           clearInterval(timer)
-          reject(`获取以下 cookie 超时：${remainCookieNames}`)
+          reject(new Error(`获取以下 cookie 超时：${remainCookieNames}`))
         }, timeout)
       }
     })

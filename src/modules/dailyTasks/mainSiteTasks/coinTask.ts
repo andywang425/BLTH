@@ -24,7 +24,7 @@ class CoinTask extends BaseModule {
    */
   private getDynamicVideoIds(): { aid: string; bvid: string }[] {
     const biliStore = useBiliStore()
-    // 当 biliStore.dynamicVideos 不为 null 时，返回所有的 aid 和 bvid
+    // 返回所有视频的 aid 和 bvid
     return biliStore.dynamicVideos!.map((item) => {
       const archive = item.modules.module_dynamic.major.archive
       return {
@@ -61,32 +61,37 @@ class CoinTask extends BaseModule {
    */
   private async coinDynamicVideos(left_coin_num: number): Promise<void> {
     const ids = this.getDynamicVideoIds()
-    if (ids) {
-      for (const { aid, bvid } of ids) {
-        // 该视频已投币数量
-        const coined_num = await this.getVideoCoinInfo(aid, bvid)
-        // 剩余可投硬币数量
-        const allowed_coin_num = this.MAX_COIN - coined_num
-        if (allowed_coin_num > 0) {
-          // 剩余可投硬币数和剩余所需投币数取较小者
-          const coin_num = Math.min(allowed_coin_num, left_coin_num)
-          const result = await this.coin(aid, coin_num)
-          if (result === 0) {
-            // 成功投币
-            left_coin_num -= coin_num
-            if (left_coin_num === 0) {
-              this.logger.log('每日投币任务已完成')
-              this.config._lastCompleteTime = tsm()
-              this.status = 'done'
-              break
-            }
-          } else if (result === 1) {
-            // 硬币余额不足，终止任务，不记录完成时间
-            this.status = 'error'
+    for (const { aid, bvid } of ids) {
+      // 该视频已投币数量
+      const coined_num = await this.getVideoCoinInfo(aid, bvid)
+      // 剩余可投硬币数量
+      const allowed_coin_num = this.MAX_COIN - coined_num
+      if (allowed_coin_num > 0) {
+        // 剩余可投硬币数和剩余所需投币数取较小者
+        const coin_num = Math.min(allowed_coin_num, left_coin_num)
+        const result = await this.coin(aid, coin_num)
+        if (result === 0) {
+          // 成功投币
+          left_coin_num -= coin_num
+          if (left_coin_num === 0) {
+            this.logger.log('每日投币任务已完成')
+            this.config._lastCompleteTime = tsm()
+            this.status = 'done'
             break
           }
+        } else if (result === 1) {
+          // 硬币余额不足，终止任务，不记录完成时间
+          this.logger.warn('硬币余额不足，每日投币任务终止')
+          this.status = 'error'
+          break
         }
       }
+    }
+
+    if (left_coin_num > 0) {
+      // 硬币余额不足，终止任务，不记录完成时间
+      this.logger.warn('硬币余额不足，每日投币任务终止')
+      this.status = 'error'
     }
   }
 
@@ -118,6 +123,12 @@ class CoinTask extends BaseModule {
 
     const biliStore = useBiliStore()
     if (!isTimestampToday(this.config._lastCompleteTime)) {
+      if (!useBiliStore().dynamicVideos) {
+        this.logger.error('动态视频数据不存在，不执行每日投币任务')
+        this.status = 'error'
+        return
+      }
+
       this.status = 'running'
       // 今日已投币数量
       const total_coined_num = biliStore.dailyRewardInfo!.coins / 10
