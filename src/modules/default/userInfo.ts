@@ -27,9 +27,10 @@ class UserInfo extends BaseModule {
     const biliStore = useBiliStore()
     biliStore.userInfo = await this.getUserInfo()
 
-    setTimeout(async () => {
-      biliStore.userInfo = await this.getUserInfo()
-    }, delayToNextMoment(0, 4).ms)
+    setTimeout(
+      () => this.run().catch((reason) => this.logger.error(reason)),
+      delayToNextMoment(0, 4).ms
+    )
   }
 }
 

@@ -6,6 +6,7 @@ import { sleep } from '@/library/utils'
 import { useModuleStore } from '@/stores/useModuleStore'
 import BaseModule from '../BaseModule'
 import ModuleError from '@/library/error/ModuleError'
+import _ from 'lodash'
 
 class FansMetals extends BaseModule {
   /**
@@ -37,7 +38,7 @@ class FansMetals extends BaseModule {
           return fansMetalList
         }
         // 防止风控，稍微加点延时
-        await sleep(250)
+        await sleep(_.random(300, 500))
       }
       return fansMetalList
     } catch (error: any) {
@@ -50,24 +51,20 @@ class FansMetals extends BaseModule {
     const medalTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
     const taskValues = [medalTasks.light, medalTasks.watch]
 
-    if (taskValues.some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime))) {
+    useModuleStore().emitter.on('Default_FansMedals', async () => {
+      biliStore.fansMedals = await this.getFansMetals(Infinity)
+    })
+
+    if (taskValues.some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4))) {
       // 开启了点亮熄灭勋章或观看直播功能且今天没完成过
       biliStore.fansMedals = await this.getFansMetals()
     }
 
-    setTimeout(
-      // 如果获得了新的粉丝勋章，肯定在第一页的 special_list 中
-      // 但是获取全部勋章可以避免在此期间被用户删除的勋章存留的问题，同时更新勋章状态（是否在直播，是否点亮等）
-      async () => {
-        biliStore.fansMedals = []
-        biliStore.fansMedals = await this.getFansMetals(Infinity)
-      },
-      delayToNextMoment(0, 4).ms
-    )
-
-    useModuleStore().emitter.on('Default_FansMedals', async () => {
-      biliStore.fansMedals = await this.getFansMetals(Infinity)
-    })
+    setTimeout(() => {
+      biliStore.fansMedals = []
+      useModuleStore().emitter.off('Default_FansMedals')
+      this.run().catch((reason) => this.logger.error(reason))
+    }, delayToNextMoment(0, 4).ms)
   }
 }
 

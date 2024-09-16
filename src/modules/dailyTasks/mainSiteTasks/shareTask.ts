@@ -41,6 +41,11 @@ class ShareTask extends BaseModule {
 
     const biliStore = useBiliStore()
     if (!isTimestampToday(this.config._lastCompleteTime)) {
+      if (!biliStore.dailyRewardInfo) {
+        this.logger.error('主站每日任务完成情况不存在，不执行每日分享视频任务')
+        this.status = 'error'
+        return
+      }
       if (!useBiliStore().dynamicVideos) {
         this.logger.error('动态视频数据不存在，不执行每日分享视频任务')
         this.status = 'error'
@@ -48,7 +53,8 @@ class ShareTask extends BaseModule {
       }
 
       this.status = 'running'
-      if (!biliStore.dailyRewardInfo!.share) {
+
+      if (!biliStore.dailyRewardInfo.share) {
         const aid = this.getAid()
         await this.share(aid)
       } else {

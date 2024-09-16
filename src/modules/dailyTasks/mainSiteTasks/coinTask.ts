@@ -123,7 +123,12 @@ class CoinTask extends BaseModule {
 
     const biliStore = useBiliStore()
     if (!isTimestampToday(this.config._lastCompleteTime)) {
-      if (!useBiliStore().dynamicVideos) {
+      if (!biliStore.dailyRewardInfo) {
+        this.logger.error('主站每日任务完成情况不存在，不执行每日投币任务')
+        this.status = 'error'
+        return
+      }
+      if (!biliStore.dynamicVideos) {
         this.logger.error('动态视频数据不存在，不执行每日投币任务')
         this.status = 'error'
         return
@@ -131,11 +136,10 @@ class CoinTask extends BaseModule {
 
       this.status = 'running'
       // 今日已投币数量
-      const total_coined_num = biliStore.dailyRewardInfo!.coins / 10
+      const total_coined_num = biliStore.dailyRewardInfo.coins / 10
       if (total_coined_num < this.config.num) {
         // 剩余要投的硬币数量
         const left_coin_num = this.config.num - total_coined_num
-        const biliStore = useBiliStore()
         // 拥有的硬币数量
         const money = biliStore.userInfo!.money ?? 5
         if (left_coin_num > money) {

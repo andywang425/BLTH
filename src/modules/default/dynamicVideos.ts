@@ -35,7 +35,10 @@ class DynamicVideos extends BaseModule {
       biliStore.dynamicVideos = await this.getDynamicVideos()
     }
 
-    setTimeout(() => this.run(), delayToNextMoment(0, 4).ms)
+    setTimeout(
+      () => this.run().catch((reason) => this.logger.error(reason)),
+      delayToNextMoment(0, 4).ms
+    )
   }
 }
 

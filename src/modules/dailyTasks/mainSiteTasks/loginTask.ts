@@ -28,9 +28,15 @@ class LoginTask extends BaseModule {
     const biliStore = useBiliStore()
     // 上一次完成每日登录任务的时间不在今天
     if (!isTimestampToday(this.config._lastCompleteTime)) {
+      if (!biliStore.dailyRewardInfo) {
+        this.logger.error('主站每日任务完成情况不存在，不执行每日登录任务')
+        this.status = 'error'
+        return
+      }
+
       this.status = 'running'
       // 每日登录任务未完成
-      if (!biliStore.dailyRewardInfo!.login) {
+      if (!biliStore.dailyRewardInfo.login) {
         await this.login()
       } else {
         // 用户在运行脚本前已经完成了任务，也记录完成时间
