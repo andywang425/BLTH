@@ -43,7 +43,7 @@
     "svgo": "^3.3.2",
     "terser": "^5.31.3",
     "typescript": "^5.5.4",
-    "vite": "^5.3.5",
+    "vite": "^5.4.6",
     "vite-plugin-monkey": "^4.0.6",
     "vue-tsc": "^2.0.29"
   }
