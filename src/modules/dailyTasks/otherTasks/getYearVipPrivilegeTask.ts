@@ -22,7 +22,10 @@ class GetYearVipPrivilegeTask extends BaseModule {
     4: '大会员专享会员购包邮券',
     5: '年度专享漫画礼包 - 漫画商城优惠券',
     6: '大会员专享会员体验卡',
-    7: '大会员专享课堂优惠券'
+    7: '大会员专享课堂优惠券',
+    15: '年度专享会员购星光宝盒88折券',
+    16: '大会员专享会员购10魔晶',
+    17: '年度专享游戏优惠券'
   }
 
   /**
@@ -54,15 +57,20 @@ class GetYearVipPrivilegeTask extends BaseModule {
       const response = await BAPI.main.vip.receivePrivilege(type)
       this.logger.log(`BAPI.main.vip.receivePrivilege(${type}) response`, response)
       if (response.code === 0) {
-        this.logger.log(`领取年度大会员权益（type = ${type}, ${this.type2Name[type]}）成功`)
+        this.logger.log(
+          `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）成功`
+        )
       } else {
         this.logger.error(
-          `领取年度大会员权益（type = ${type}, ${this.type2Name[type]}）失败`,
+          `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）失败`,
           response.message
         )
       }
     } catch (error) {
-      this.logger.error(`领取年度大会员权益（type = ${type}, ${this.type2Name[type]}）出错`, error)
+      this.logger.error(
+        `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）出错`,
+        error
+      )
     }
   }
 
