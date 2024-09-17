@@ -1,4 +1,3 @@
-import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore } from '@/stores/useBiliStore'
@@ -9,6 +8,7 @@ import { useModuleStore } from '@/stores/useModuleStore'
 import type { ModuleConfig } from '@/types'
 import type { ModuleStatusTypes, RunAtMoment } from '@/types'
 import _ from 'lodash'
+import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 
 interface SpyderData {
   benchmark: string
@@ -248,7 +248,7 @@ class RoomHeart {
   }
 }
 
-class WatchTask extends BaseModule {
+class WatchTask extends MedalModule {
   static runAt: RunAtMoment = 'window-load'
 
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
@@ -313,7 +313,7 @@ class WatchTask extends BaseModule {
     this.logger.log('观看直播模块开始运行')
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
-      if (!useBiliStore().fansMedals) {
+      if (!(await this.waitForFansMedals())) {
         this.logger.error('粉丝勋章数据不存在，不执行观看直播任务')
         this.status = 'error'
         return

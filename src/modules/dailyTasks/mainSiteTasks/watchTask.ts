@@ -12,10 +12,11 @@ class WatchTask extends BaseModule {
     this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.watch = s
   }
 
+  /**
+   * 获取第一个视频的 aid
+   */
   private getAid(): number {
-    const biliStore = useBiliStore()
-    // 返回第一个视频的 aid
-    return Number(biliStore.dynamicVideos![0].modules.module_dynamic.major.archive.aid)
+    return Number(useBiliStore().dynamicVideos![0].modules.module_dynamic.major.archive.aid)
   }
 
   private async watch(aid: number) {
@@ -36,25 +37,35 @@ class WatchTask extends BaseModule {
     }
   }
 
+  private runCheck(): boolean {
+    const biliStore = useBiliStore()
+
+    if (!biliStore.dailyRewardInfo) {
+      this.logger.error('主站每日任务完成情况不存在，不执行每日观看视频任务')
+      this.status = 'error'
+      return false
+    }
+    if (!biliStore.dynamicVideos) {
+      this.logger.error('动态视频数据不存在，不执行每日观看视频任务')
+      this.status = 'error'
+      return false
+    }
+
+    return true
+  }
+
   public async run() {
     this.logger.log('每日观看视频模块开始运行')
 
-    const biliStore = useBiliStore()
     if (!isTimestampToday(this.config._lastCompleteTime)) {
-      if (!biliStore.dailyRewardInfo) {
-        this.logger.error('主站每日任务完成情况不存在，不执行每日观看视频任务')
-        this.status = 'error'
-        return
-      }
-      if (!useBiliStore().dynamicVideos) {
-        this.logger.error('动态视频数据不存在，不执行每日观看视频任务')
-        this.status = 'error'
+      if (!this.runCheck()) {
         return
       }
 
+      const biliStore = useBiliStore()
       this.status = 'running'
 
-      if (!biliStore.dailyRewardInfo.watch) {
+      if (!biliStore.dailyRewardInfo!.watch) {
         const aid = this.getAid()
         await this.watch(aid)
       } else {

@@ -9,7 +9,7 @@ class DailyRewardInfo extends BaseModule {
   /**
    * 获取今日主站每日任务的完成情况
    */
-  private async getDailyRewardInfo(): Promise<MainData.Reward.Data | undefined> {
+  private async getDailyRewardInfo(): Promise<MainData.Reward.Data> {
     try {
       const response = await BAPI.main.reward()
       this.logger.log('BAPI.main.reward response', response)

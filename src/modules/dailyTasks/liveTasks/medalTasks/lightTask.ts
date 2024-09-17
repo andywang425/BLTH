@@ -1,12 +1,12 @@
-import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore } from '@/stores/useBiliStore'
 import { arrayToMap, sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
+import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 
-class LightTask extends BaseModule {
+class LightTask extends MedalModule {
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.light
 
@@ -98,7 +98,7 @@ class LightTask extends BaseModule {
     this.logger.log('点亮熄灭勋章模块开始运行')
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
-      if (!useBiliStore().fansMedals) {
+      if (!(await this.waitForFansMedals())) {
         this.logger.error('粉丝勋章数据不存在，不执行点亮熄灭勋章任务')
         this.status = 'error'
         return

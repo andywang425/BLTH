@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { LiveData, MainData } from '@/library/bili-api/data'
-import type { BiliCookies } from '@/types'
+import type { BiliCookies, FansMedalsStatus } from '@/types'
 import { getFilenameFromUrl } from '@/library/utils'
 
 export const useBiliStore = defineStore('bili', () => {
@@ -23,6 +23,8 @@ export const useBiliStore = defineStore('bili', () => {
   const filteredFansMedals = computed<LiveData.FansMedalPanel.List[]>(
     () => fansMedals.value?.filter((m) => m.room_info.room_id !== 0) ?? []
   )
+  // 粉丝勋章获取状态（初始值：undefined，获取中：loading，获取成功：loaded，获取失败：error）
+  const fansMedalsStatus = ref<FansMedalsStatus>()
   // wbi 签名所需的盐值
   const wbiSalt = computed<string>(() => {
     if (!userInfo.value) {
@@ -53,6 +55,7 @@ export const useBiliStore = defineStore('bili', () => {
     dynamicVideos,
     fansMedals,
     filteredFansMedals,
+    fansMedalsStatus,
     wbiSalt
   }
 })

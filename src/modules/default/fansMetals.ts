@@ -33,8 +33,11 @@ class FansMetals extends BaseModule {
         if (firstPageResponse.code === 0) {
           fansMetalList.push(...response.data.list)
         } else {
-          this.logger.error(`获取粉丝勋章列表第${page}页失败`, firstPageResponse.message)
-          // 中途出错，返回已获取的分析勋章列表
+          this.logger.error(
+            `获取粉丝勋章列表第${page}页失败，提前结束获取`,
+            firstPageResponse.message
+          )
+          // 中途出错，返回已获取的分析勋章列表，不抛出错误
           return fansMetalList
         }
         // 防止风控，稍微加点延时
@@ -42,29 +45,37 @@ class FansMetals extends BaseModule {
       }
       return fansMetalList
     } catch (error: any) {
+      useBiliStore().fansMedalsStatus = 'error'
       throw new ModuleError(this.moduleName, `获取粉丝勋章列表出错: ${error.message}`)
     }
   }
 
   public async run(): Promise<void> {
     const biliStore = useBiliStore()
+    const emitter = useModuleStore().emitter
+
+    // 监听 LiveTasks.vue 发出的获取粉丝勋章事件
+    emitter.off('Default_FansMedals')
+    emitter.on('Default_FansMedals', async () => {
+      biliStore.fansMedalsStatus = 'loading'
+      biliStore.fansMedals = await this.getFansMetals(Infinity)
+      biliStore.fansMedalsStatus = 'loaded'
+    })
+
     const medalTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
     const taskValues = [medalTasks.light, medalTasks.watch]
 
-    useModuleStore().emitter.on('Default_FansMedals', async () => {
-      biliStore.fansMedals = await this.getFansMetals(Infinity)
-    })
-
     if (taskValues.some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4))) {
       // 开启了点亮熄灭勋章或观看直播功能且今天没完成过
+      biliStore.fansMedalsStatus = 'loading'
       biliStore.fansMedals = await this.getFansMetals()
+      biliStore.fansMedalsStatus = 'loaded'
     }
 
-    setTimeout(() => {
-      biliStore.fansMedals = []
-      useModuleStore().emitter.off('Default_FansMedals')
-      this.run().catch((reason) => this.logger.error(reason))
-    }, delayToNextMoment(0, 4).ms)
+    setTimeout(
+      () => this.run().catch((reason) => this.logger.error(reason)),
+      delayToNextMoment(0, 4).ms
+    )
   }
 }
 

@@ -15,8 +15,7 @@ class CoinTask extends BaseModule {
   // 因为转载视频只能投一个币，原创视频能投两个币
   // 但是想查询视频是否为转载，我目前只知道一个 /x/web-interface/wbi/view
   // 通过其响应的copyright字段（1原创，2转载）来判断
-  // 不过这个接口带有 wbi 签名，实现起来复杂
-  // 所以干脆直接限制每个视频最多投一个币，反正视频数量足够
+  // 不过视频数量足够多，所以干脆直接限制每个视频最多投一个币
   private readonly MAX_COIN = 1
 
   /**
@@ -118,25 +117,40 @@ class CoinTask extends BaseModule {
     }
   }
 
+  /**
+   * 运行前检查
+   *
+   * 该检查应该在上次任务完成时间（_lastCompleteTime）检查之后执行
+   */
+  private runCheck(): boolean {
+    const biliStore = useBiliStore()
+
+    if (!biliStore.dailyRewardInfo) {
+      this.logger.error('主站每日任务完成情况不存在，不执行每日投币任务')
+      this.status = 'error'
+      return false
+    }
+    if (!biliStore.dynamicVideos) {
+      this.logger.error('动态视频数据不存在，不执行每日投币任务')
+      this.status = 'error'
+      return false
+    }
+
+    return true
+  }
+
   public async run(): Promise<void> {
     this.logger.log('每日投币模块开始运行')
 
-    const biliStore = useBiliStore()
     if (!isTimestampToday(this.config._lastCompleteTime)) {
-      if (!biliStore.dailyRewardInfo) {
-        this.logger.error('主站每日任务完成情况不存在，不执行每日投币任务')
-        this.status = 'error'
-        return
-      }
-      if (!biliStore.dynamicVideos) {
-        this.logger.error('动态视频数据不存在，不执行每日投币任务')
-        this.status = 'error'
+      if (!this.runCheck()) {
         return
       }
 
+      const biliStore = useBiliStore()
       this.status = 'running'
       // 今日已投币数量
-      const total_coined_num = biliStore.dailyRewardInfo.coins / 10
+      const total_coined_num = biliStore.dailyRewardInfo!.coins / 10
       if (total_coined_num < this.config.num) {
         // 剩余要投的硬币数量
         const left_coin_num = this.config.num - total_coined_num
@@ -147,7 +161,6 @@ class CoinTask extends BaseModule {
           this.status = 'done'
         } else {
           // 目前仅支持动态视频投币
-          // TODO: 增加别的投币方式，比如给某UP的视频投币
           await this.coinDynamicVideos(left_coin_num)
         }
       } else {
