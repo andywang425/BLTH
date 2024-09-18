@@ -1,5 +1,8 @@
 import ModuleError from '@/library/error/ModuleError'
 
+/**
+ * 严重模块错误
+ */
 class ModuleCriticalError extends ModuleError {
   public name: string = 'ModuleCriticalError'
   public moduleName: string

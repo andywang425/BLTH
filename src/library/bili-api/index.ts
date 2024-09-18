@@ -26,6 +26,9 @@ const BAPI: BapiMethods = {
     doSign: () => {
       return request.live.get('/xlive/web-ucenter/v1/sign/DoSign')
     },
+    /**
+     * 网页直播签到功能已不存在，但该API仍可以使用（并且也存在于B站js代码中）
+     */
     getSignInfo: () => {
       return request.live.get('/xlive/web-ucenter/v1/sign/WebGetSignInfo')
     },

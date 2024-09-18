@@ -119,8 +119,6 @@ class CoinTask extends BaseModule {
 
   /**
    * 运行前检查
-   *
-   * 该检查应该在上次任务完成时间（_lastCompleteTime）检查之后执行
    */
   private runCheck(): boolean {
     const biliStore = useBiliStore()
@@ -175,7 +173,7 @@ class CoinTask extends BaseModule {
         // 在半夜00:00 ~ 00:05
         this.logger.log('昨天的每日投币任务已经完成过了，等到今天的00:05再执行')
       } else {
-        // 在非半夜00:00 ~ 00:05的其它时间
+        // 在其它时间
         this.logger.log('今天已经完成过每日投币任务了')
         this.status = 'done'
       }

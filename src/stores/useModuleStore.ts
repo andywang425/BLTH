@@ -45,6 +45,9 @@ const defaultModuleStatus: ModuleStatus = {
   }
 }
 
+// 在所有 frame 或顶层 frame 上运行的被加载的模块名称
+const allAndTopFrameModuleNames: string[] = []
+
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
   const moduleConfig: ModuleConfig = reactive(Storage.getModuleConfig())
@@ -89,10 +92,6 @@ export const useModuleStore = defineStore('module', () => {
    */
   function loadModules(isOnTargetFrame: IsOnTargetFrameTypes): void {
     const cacheStore = useCacheStore()
-    // 在所有 frame 或顶层 frame 上运行的被加载的模块名称
-    const allAndTopFrameModuleNames: string[] = []
-
-    const moduleAfterDefault: Record<string, typeof BaseModule> = {}
 
     if (isOnTargetFrame === 'unknown') {
       for (const [name, module] of Object.entries(otherModules)) {
@@ -100,7 +99,7 @@ export const useModuleStore = defineStore('module', () => {
           if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
             if (!module.runAfterDefault) {
               // 如果不需要等默认模块运行完了再运行，现在就加载并记录
-              // 否则不做记录，等之后（isOnTargetFrame 为 yes时）再加载
+              // 否则不做记录，等之后（isOnTargetFrame 为 yes 时）再加载
               waitForMoment(module.runAt).then(() => runModule(module, name))
               // 记录被加载的 onFrame 为 all 或 top 的模块名称
               allAndTopFrameModuleNames.push(name)
@@ -109,6 +108,8 @@ export const useModuleStore = defineStore('module', () => {
         }
       }
     } else {
+      // 在默认模块之后运行的模块（key为模块名称，value为模块）
+      const moduleAfterDefault: Record<string, typeof BaseModule> = {}
       // 加载默认模块
       const defaultModulesLoadingResult: Promise<PromiseSettledResult<void>[]> =
         loadDefaultModules()

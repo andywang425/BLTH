@@ -37,7 +37,7 @@ class FansMetals extends BaseModule {
             `获取粉丝勋章列表第${page}页失败，提前结束获取`,
             firstPageResponse.message
           )
-          // 中途出错，返回已获取的分析勋章列表，不抛出错误
+          // 中途出错，返回已获取的粉丝勋章列表，不抛出错误
           return fansMetalList
         }
         // 防止风控，稍微加点延时
