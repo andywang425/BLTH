@@ -48,6 +48,33 @@ const defaultModuleStatus: ModuleStatus = {
 // 在所有 frame 或顶层 frame 上运行的被加载的模块名称
 const allAndTopFrameModuleNames: string[] = []
 
+/**
+ * 加载默认模块
+ */
+function loadDefaultModules(): Promise<PromiseSettledResult<void>[]> {
+  const cacheStore = useCacheStore()
+  const promiseArray: Promise<void>[] = []
+  for (const [name, module] of Object.entries(defaultModules)) {
+    if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
+      promiseArray.push(runModule(module, name)!)
+    }
+  }
+  return Promise.allSettled<Promise<void>[]>(promiseArray)
+}
+
+/**
+ * 运行模块
+ *
+ * @param module 模块类
+ * @param name 模块名称
+ */
+function runModule(module: typeof BaseModule, name: string): Promise<void> | void {
+  const moduleInstance = new module(name)
+  if (moduleInstance.isEnabled()) {
+    return moduleInstance.run()
+  }
+}
+
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
   const moduleConfig: ModuleConfig = reactive(Storage.getModuleConfig())
@@ -55,34 +82,6 @@ export const useModuleStore = defineStore('module', () => {
   const emitter = mitt<ModuleEmitterEvents>()
   // 模块状态，用于显示状态图标
   const moduleStatus: ModuleStatus = reactive(defaultModuleStatus)
-
-  /**
-   * 加载默认模块（该函数不导出）
-   */
-  function loadDefaultModules(): Promise<PromiseSettledResult<void>[]> {
-    const cacheStore = useCacheStore()
-    const promiseArray: Promise<void>[] = []
-    for (const [name, module] of Object.entries(defaultModules)) {
-      if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
-        promiseArray.push(runModule(module, name)!)
-      }
-    }
-    return Promise.allSettled<Promise<void>[]>(promiseArray)
-  }
-
-  /**
-   * 运行模块（该函数不导出）
-   *
-   * @param module 模块类
-   * @param name 模块名称
-   */
-  function runModule(module: typeof BaseModule, name: string): Promise<void> | void {
-    const moduleInstance = new module(name)
-    if (moduleInstance.isEnabled()) {
-      return moduleInstance.run()
-    }
-  }
-
   /**
    * 加载模块
    *
@@ -108,7 +107,7 @@ export const useModuleStore = defineStore('module', () => {
         }
       }
     } else {
-      // 在默认模块之后运行的模块（key为模块名称，value为模块）
+      // 在默认模块之后运行的模块（key为模块名称，value为模块class）
       const moduleAfterDefault: Record<string, typeof BaseModule> = {}
       // 加载默认模块
       const defaultModulesLoadingResult: Promise<PromiseSettledResult<void>[]> =
@@ -125,6 +124,7 @@ export const useModuleStore = defineStore('module', () => {
         ) {
           if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
             if (module.runAfterDefault) {
+              // 记录需要等默认模块运行完后再运行的模块，暂时不运行
               moduleAfterDefault[name] = module
             } else {
               waitForMoment(module.runAt).then(() => runModule(module, name))
@@ -136,7 +136,7 @@ export const useModuleStore = defineStore('module', () => {
       // 等待默认模块运行完毕
       defaultModulesLoadingResult.then((results) => {
         console.log(results)
-
+        // 解析默认模块返回的 Promises
         for (const result of results) {
           if (result.status === 'rejected') {
             const error: Error = result.reason
@@ -155,7 +155,7 @@ export const useModuleStore = defineStore('module', () => {
             }
           }
         }
-
+        // 一切正常或只有一般错误，运行模块
         for (const [name, module] of Object.entries(moduleAfterDefault)) {
           waitForMoment(module.runAt).then(() => runModule(module, name))
         }
