@@ -32,10 +32,9 @@ class RemovePKBox extends BaseModule {
 
   public async run() {
     this.logger.log('移除大乱斗元素模块开始运行')
-    if (this.config.enabled) {
-      this.removePKNode()
-      this.removePKToast()
-    }
+
+    this.removePKNode()
+    this.removePKToast()
   }
 }
 

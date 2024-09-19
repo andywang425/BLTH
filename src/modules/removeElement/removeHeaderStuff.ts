@@ -5,14 +5,11 @@ class RemoveHeaderStuff extends BaseModule {
   static runOnMultiplePages = true
 
   config = this.moduleStore.moduleConfig.RemoveElement.removeHeaderStuff
-  //
+
   public async run() {
     this.logger.log('移除活动入口模块开始运行')
-    if (this.config.enabled) {
-      GM_addStyle(
-        '.header-info-ctnr .rows-ctnr .lower-row .right-ctnr { display: none !important }'
-      )
-    }
+
+    GM_addStyle('.header-info-ctnr .rows-ctnr .lower-row .right-ctnr { display: none !important }')
   }
 }
 

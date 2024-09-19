@@ -13,21 +13,20 @@ class Invisibility extends BaseModule {
 
   public run(): void {
     this.logger.log('隐身入场模块开始运行')
-    if (this.config.enabled) {
-      proxy(
-        {
-          onRequest: (config: XhrRequestConfig, handler: XhrRequestHandler) => {
-            if (
-              config.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')
-            ) {
-              config.url = config.url.replace('not_mock_enter_effect=0', 'not_mock_enter_effect=1')
-            }
-            handler.next(config)
+
+    proxy(
+      {
+        onRequest: (config: XhrRequestConfig, handler: XhrRequestHandler) => {
+          if (
+            config.url.includes('//api.live.bilibili.com/xlive/web-room/v1/index/getInfoByUser')
+          ) {
+            config.url = config.url.replace('not_mock_enter_effect=0', 'not_mock_enter_effect=1')
           }
-        },
-        unsafeWindow
-      )
-    }
+          handler.next(config)
+        }
+      },
+      unsafeWindow
+    )
   }
 }
 

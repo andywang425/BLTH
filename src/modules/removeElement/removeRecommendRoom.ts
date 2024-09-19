@@ -8,9 +8,8 @@ class RemoveRecommendRoom extends BaseModule {
 
   public async run() {
     this.logger.log('移除礼物栏下方推荐直播间模块开始运行')
-    if (this.config.enabled) {
-      GM_addStyle('.room-info-ctnr { display: none !important }')
-    }
+
+    GM_addStyle('.room-info-ctnr { display: none !important }')
   }
 }
 

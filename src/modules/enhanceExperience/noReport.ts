@@ -26,7 +26,6 @@ class NoReport extends BaseModule {
    * @param win window
    */
   private hookProperties(win: Window) {
-    console.log('hook', win.navigator.sendBeacon)
     Object.defineProperty(win.navigator, 'sendBeacon', {
       value: () => {
         return true
@@ -92,13 +91,12 @@ class NoReport extends BaseModule {
 
   public run() {
     this.logger.log('拦截日志数据上报模块开始运行')
-    if (this.config.enabled) {
-      try {
-        this.hookProperties(unsafeWindow)
-        this.ajaxHook()
-      } catch (e) {
-        this.logger.error('拦截日志数据上报失败', e)
-      }
+
+    try {
+      this.hookProperties(unsafeWindow)
+      this.ajaxHook()
+    } catch (e) {
+      this.logger.error('拦截日志数据上报失败', e)
     }
   }
 }

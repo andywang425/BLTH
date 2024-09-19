@@ -8,9 +8,8 @@ class RemoveShopPopover extends BaseModule {
 
   public async run() {
     this.logger.log('移除直播间小橙车弹窗模块开始运行')
-    if (this.config.enabled) {
-      GM_addStyle('.shop-popover { display: none !important }')
-    }
+
+    GM_addStyle('.shop-popover { display: none !important }')
   }
 }
 

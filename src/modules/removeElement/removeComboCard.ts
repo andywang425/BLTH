@@ -8,9 +8,8 @@ class RemoveComboCard extends BaseModule {
 
   public async run() {
     this.logger.log('移除直播间相同弹幕连续提示模块开始运行')
-    if (this.config.enabled) {
-      GM_addStyle('#combo-card { display: none !important }')
-    }
+
+    GM_addStyle('#combo-card { display: none !important }')
   }
 }
 

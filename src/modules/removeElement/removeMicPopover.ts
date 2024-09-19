@@ -8,9 +8,8 @@ class removeMicPopover extends BaseModule {
 
   public async run() {
     this.logger.log('移除连麦状态提示模块开始运行')
-    if (this.config.enabled) {
-      GM_addStyle('.lin-mic-cntr { display: none !important }')
-    }
+
+    GM_addStyle('.lin-mic-cntr { display: none !important }')
   }
 }
 

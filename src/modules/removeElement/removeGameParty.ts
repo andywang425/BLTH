@@ -8,9 +8,8 @@ class RemoveGameParty extends BaseModule {
 
   public async run() {
     this.logger.log('移除直播间幻星派对标志模块开始运行')
-    if (this.config.enabled) {
-      GM_addStyle('#game-id { display: none !important }')
-    }
+
+    GM_addStyle('#game-id { display: none !important }')
   }
 }
 

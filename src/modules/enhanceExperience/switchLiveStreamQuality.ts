@@ -32,7 +32,7 @@ class SwitchLiveStreamQuality extends BaseModule {
     })
   }
 
-  private async switchQuality(livePlayer: Window['livePlayer']) {
+  private switchQuality(livePlayer: Window['livePlayer']) {
     const playerInfo = livePlayer.getPlayerInfo()
     if (playerInfo.liveStatus === 0) {
       this.logger.log('当前直播间未开播，无需切换画质')
@@ -62,13 +62,12 @@ class SwitchLiveStreamQuality extends BaseModule {
 
   public async run(): Promise<void> {
     this.logger.log('自动切换画质模块开始运行')
-    if (this.config.enabled) {
-      try {
-        const livePlayer = await this.waitForPlayer()
-        this.switchQuality(livePlayer)
-      } catch (e) {
-        this.logger.error('自动切换画质模块出错', e)
-      }
+
+    try {
+      const livePlayer = await this.waitForPlayer()
+      this.switchQuality(livePlayer)
+    } catch (e) {
+      this.logger.error('自动切换画质模块出错', e)
     }
   }
 }
