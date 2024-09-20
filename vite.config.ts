@@ -72,6 +72,7 @@ export default defineConfig({
           'element-plus': cdn.unpkg('ElementPlus', 'dist/index.full.min.js'),
           '@element-plus/icons-vue': cdn.unpkg('ElementPlusIconsVue', 'dist/index.iife.min.js'),
           pinia: cdn.unpkg('Pinia', 'dist/pinia.iife.prod.js'),
+          'vue-draggable-plus': cdn.unpkg('VueDraggablePlus', 'dist/vue-draggable-plus.iife.js'),
           lodash: cdn.unpkg('_', 'lodash.min.js'),
           'hotkeys-js': cdn.unpkg('hotkeys', 'dist/hotkeys.min.js'),
           luxon: cdn.unpkg('luxon', 'build/global/luxon.min.js'),
