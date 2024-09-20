@@ -233,7 +233,7 @@ function handleRowClick(row: MedalInfoRow) {
           v-model="config.medalTasks.isWhiteList"
           active-text="白名单"
           inactive-text="黑名单"
-          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelSortMode = false)"
+          @change="(val: any) => !val && (uiStore.uiConfig.medalInfoPanelSortMode = false)"
         />
         <el-button type="primary" size="small" :icon="Edit" @click="handleEditList"
           >编辑名单
@@ -352,7 +352,7 @@ function handleRowClick(row: MedalInfoRow) {
           v-model="uiStore.uiConfig.medalInfoPanelSortMode"
           inactive-text="常规模式"
           active-text="排序模式"
-          @change="(val) => !val && nextTick(() => initSelection(medalInfoTableData))"
+          @change="(val: any) => !val && nextTick(() => initSelection(medalInfoTableData))"
         />
       </template>
     </el-dialog>
