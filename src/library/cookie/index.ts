@@ -21,7 +21,7 @@ class Cookie {
    * @param names cookie 名称数组
    * @param defaultValue 当 cookie 不存在时使用的默认值，默认 undefined
    */
-  public static get(names: string[], defaultValue?: string): Record<string, undefined>
+  public static get(names: string[], defaultValue?: string): Record<string, string | undefined>
   /**
    * 获取指定名称的一个 cookie
    * @param name cookie 名称
