@@ -135,7 +135,6 @@ export const useModuleStore = defineStore('module', () => {
 
       // 等待默认模块运行完毕
       defaultModulesLoadingResult.then((results) => {
-        console.log(results)
         // 解析默认模块返回的 Promises
         for (const result of results) {
           if (result.status === 'rejected') {
