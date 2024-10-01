@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.1.8
+// @version         7.1.9
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
@@ -33,16 +33,17 @@
 // @match           *://live.bilibili.com/blanc/7*
 // @match           *://live.bilibili.com/blanc/8*
 // @match           *://live.bilibili.com/blanc/9*
-// @require         https://unpkg.com/vue@3.4.34/dist/vue.global.prod.js
+// @require         https://unpkg.com/vue@3.5.10/dist/vue.global.prod.js
 // @require         data:application/javascript,%3Bwindow.Vue%3DVue%3Bwindow.VueDemi%3DVue%3B
-// @require         https://unpkg.com/element-plus@2.7.8/dist/index.full.min.js
+// @require         https://unpkg.com/element-plus@2.8.4/dist/index.full.min.js
 // @require         https://unpkg.com/@element-plus/icons-vue@2.3.1/dist/index.iife.min.js
-// @require         https://unpkg.com/pinia@2.2.0/dist/pinia.iife.prod.js
+// @require         https://unpkg.com/pinia@2.2.3/dist/pinia.iife.prod.js
+// @require         https://unpkg.com/vue-draggable-plus@0.5.3/dist/vue-draggable-plus.iife.js
 // @require         https://unpkg.com/lodash@4.17.21/lodash.min.js
 // @require         https://unpkg.com/hotkeys-js@3.13.7/dist/hotkeys.min.js
-// @require         https://unpkg.com/luxon@3.4.4/build/global/luxon.min.js
+// @require         https://unpkg.com/luxon@3.5.0/build/global/luxon.min.js
 // @require         https://unpkg.com/crypto-js@4.2.0/crypto-js.js
-// @resource        element-plus/dist/index.css  https://unpkg.com/element-plus@2.7.8/dist/index.css
+// @resource        element-plus/dist/index.css  https://unpkg.com/element-plus@2.8.4/dist/index.css
 // @connect         api.bilibili.com
 // @connect         api.live.bilibili.com
 // @connect         api.vc.bilibili.com
