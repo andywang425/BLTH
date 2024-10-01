@@ -1,13 +1,12 @@
-import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore } from '@/stores/useBiliStore'
-import { sleep } from '@/library/utils'
+import { arrayToMap, sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
-import type { LiveData } from '@/library/bili-api/data'
+import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 
-class LightTask extends BaseModule {
+class LightTask extends MedalModule {
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.light
 
@@ -17,11 +16,11 @@ class LightTask extends BaseModule {
 
   /**
    * 获取粉丝勋章，过滤不符合黑白名单要求和不需要点亮的粉丝勋章
+   * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
    */
-  private getMedalList(): LiveData.FansMedalPanel.List[] | null {
-    const biliStore = useBiliStore()
-    if (biliStore.filteredFansMedals) {
-      return biliStore.filteredFansMedals.filter(
+  private getRoomidTargetidList(): [number, number][] {
+    const filtered = useBiliStore()
+      .filteredFansMedals.filter(
         (medal) =>
           medal.medal.level < 20 &&
           (this.medalTasksConfig.isWhiteList
@@ -29,10 +28,14 @@ class LightTask extends BaseModule {
             : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
           medal.medal.is_lighted === 0
       )
-    } else {
-      this.status = 'error'
-      return null
+      .map<[number, number]>((medal) => [medal.room_info.room_id, medal.medal.target_id])
+
+    if (this.medalTasksConfig.isWhiteList) {
+      const orderMap = arrayToMap(this.medalTasksConfig.roomidList)
+      return filtered.sort((a, b) => orderMap.get(a[0])! - orderMap.get(b[0])!)
     }
+
+    return filtered
   }
 
   /**
@@ -93,33 +96,39 @@ class LightTask extends BaseModule {
 
   public async run(): Promise<void> {
     this.logger.log('点亮熄灭勋章模块开始运行')
-    if (this.config.enabled) {
-      if (!isTimestampToday(this.config._lastCompleteTime)) {
-        this.status = 'running'
-        const medalList = this.getMedalList()
-        if (medalList) {
-          for (let i = 0; i < medalList.length; i++) {
-            const roomid = medalList[i].room_info.room_id // 房间号
-            const target_id = medalList[i].medal.target_id // 主播UID
-            if (this.config.mode === 'like') {
-              await this.like(roomid, target_id, _.random(31, 33))
-            } else {
-              await this.sendDanmu(this.config.danmuList[i % this.config.danmuList.length], roomid)
-            }
-            // 延时防风控
-            await sleep(2000)
+
+    if (!isTimestampToday(this.config._lastCompleteTime)) {
+      if (!(await this.waitForFansMedals())) {
+        this.logger.error('粉丝勋章数据不存在，不执行点亮熄灭勋章任务')
+        this.status = 'error'
+        return
+      }
+
+      this.status = 'running'
+      const roomidTargetidList: number[][] = this.getRoomidTargetidList()
+
+      if (roomidTargetidList.length > 0) {
+        for (let i = 0; i < roomidTargetidList.length; i++) {
+          const [roomid, target_id] = roomidTargetidList[i]
+          if (this.config.mode === 'like') {
+            await this.like(roomid, target_id, _.random(31, 33))
+          } else {
+            await this.sendDanmu(this.config.danmuList[i % this.config.danmuList.length], roomid)
           }
-          this.config._lastCompleteTime = tsm()
-          this.status = 'done'
-          this.logger.log('点亮熄灭勋章任务已完成')
+          // 延时防风控
+          await sleep(_.random(3000, 5000))
         }
+      }
+
+      this.config._lastCompleteTime = tsm()
+      this.status = 'done'
+      this.logger.log('点亮熄灭勋章任务已完成')
+    } else {
+      if (isNowIn(0, 0, 0, 5)) {
+        this.logger.log('昨天的给点亮熄灭勋章任务已经完成过了，等到今天的00:05再执行')
       } else {
-        if (isNowIn(0, 0, 0, 5)) {
-          this.logger.log('昨天的给点亮熄灭勋章任务已经完成过了，等到今天的00:05再执行')
-        } else {
-          this.logger.log('今天已经完成过点亮熄灭勋章任务了')
-          this.status = 'done'
-        }
+        this.logger.log('今天已经完成过点亮熄灭勋章任务了')
+        this.status = 'done'
       }
     }
 

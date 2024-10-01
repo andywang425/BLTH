@@ -8,9 +8,8 @@ class RemoveLiveMosaic extends BaseModule {
 
   public async run() {
     this.logger.log('移除直播间马赛克模块开始运行')
-    if (this.config.enabled) {
-      GM_addStyle('#web-player-module-area-mask-panel { opacity: 0 !important }')
-    }
+
+    GM_addStyle('#web-player-module-area-mask-panel { opacity: 0 !important }')
   }
 }
 

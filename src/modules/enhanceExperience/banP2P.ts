@@ -50,12 +50,11 @@ class BanP2P extends BaseModule {
 
   public run(): void {
     this.logger.log('禁用P2P模块开始运行')
-    if (this.config.enabled) {
-      try {
-        this.banP2P()
-      } catch (e) {
-        this.logger.error('禁用P2P失败', e)
-      }
+
+    try {
+      this.banP2P()
+    } catch (e) {
+      this.logger.error('禁用P2P失败', e)
     }
   }
 }

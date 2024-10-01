@@ -3,6 +3,7 @@ import BAPI from '@/library/bili-api'
 import type { MainData } from '@/library/bili-api/data'
 import { delayToNextMoment } from '@/library/luxon'
 import BaseModule from '../BaseModule'
+import ModuleCriticalError from '@/library/error/ModuleCriticalError'
 
 class UserInfo extends BaseModule {
   /**
@@ -13,14 +14,12 @@ class UserInfo extends BaseModule {
       const response = await BAPI.main.nav()
       this.logger.log('BAPI.main.nav response', response)
       if (response.code === 0) {
-        return Promise.resolve(response.data)
+        return response.data
       } else {
-        this.logger.error('获取用户信息失败', response.message)
-        return Promise.reject(response.message)
+        throw new Error(`响应 code 不为 0: ${response.message}`)
       }
-    } catch (error) {
-      this.logger.error('获取用户信息出错', error)
-      return Promise.reject(error)
+    } catch (error: any) {
+      throw new ModuleCriticalError(this.moduleName, `获取用户信息出错: ${error.message}`)
     }
   }
 
@@ -28,9 +27,10 @@ class UserInfo extends BaseModule {
     const biliStore = useBiliStore()
     biliStore.userInfo = await this.getUserInfo()
 
-    setTimeout(async () => {
-      biliStore.userInfo = await this.getUserInfo()
-    }, delayToNextMoment(0, 4).ms)
+    setTimeout(
+      () => this.run().catch((reason) => this.logger.error(reason)),
+      delayToNextMoment(0, 4).ms
+    )
   }
 }
 

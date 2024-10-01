@@ -5,6 +5,9 @@ import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
 import { useBiliStore } from '@/stores/useBiliStore'
 import helpInfo from '@/library/help-info'
+import { VueDraggable } from 'vue-draggable-plus'
+import { useUIStore } from '@/stores/useUIStore'
+import { arrayToMap } from '@/library/utils'
 
 interface MedalInfoRow {
   avatar: string
@@ -16,6 +19,10 @@ interface MedalInfoRow {
 
 const moduleStore = useModuleStore()
 const biliStore = useBiliStore()
+const uiStore = useUIStore()
+
+const medalTableMaxHeight = screen.height * 0.55
+const danmuTableMaxHeight = screen.height * 0.5
 
 const config = moduleStore.moduleConfig.DailyTasks.LiveTasks
 const status = moduleStore.moduleStatus.DailyTasks.LiveTasks
@@ -68,15 +75,30 @@ const handleAddDanmu = () => {
 }
 
 const medalInfoPanelVisible = ref<boolean>(false)
-const medalInfoTableData = computed<MedalInfoRow[] | undefined>(() =>
-  biliStore.filteredFansMedals?.map((medal) => ({
-    avatar: medal.anchor_info.avatar,
-    nick_name: medal.anchor_info.nick_name,
-    medal_name: medal.medal.medal_name,
-    medal_level: medal.medal.level,
-    roomid: medal.room_info.room_id
-  }))
-)
+const medalInfoTableData = computed({
+  get() {
+    const medals = biliStore.filteredFansMedals.map((medal) => ({
+      avatar: medal.anchor_info.avatar,
+      nick_name: medal.anchor_info.nick_name,
+      medal_name: medal.medal.medal_name,
+      medal_level: medal.medal.level,
+      roomid: medal.room_info.room_id
+    }))
+    if (uiStore.uiConfig.medalInfoPanelSortMode) {
+      const filteredMedals = medals.filter((medal) =>
+        config.medalTasks.isWhiteList
+          ? config.medalTasks.roomidList.includes(medal.roomid)
+          : !config.medalTasks.roomidList.includes(medal.roomid)
+      )
+      const orderMap = arrayToMap(config.medalTasks.roomidList)
+      return filteredMedals.sort((a, b) => orderMap.get(a.roomid)! - orderMap.get(b.roomid)!)
+    }
+    return medals
+  },
+  set(newValue: MedalInfoRow[]) {
+    config.medalTasks.roomidList = newValue.map((row) => row.roomid)
+  }
+})
 /** 是否显示加载中图标 */
 const medalInfoLoading = ref<boolean>(false)
 /** 是否是第一次点击编辑名单按钮 */
@@ -99,8 +121,10 @@ const handleEditList = async () => {
       watch(
         medalInfoTableData,
         (newData) => {
-          initSelection(newData)
-          medalInfoLoading.value = false
+          nextTick(() => {
+            initSelection(newData)
+            medalInfoLoading.value = false
+          })
         },
         { once: true }
       )
@@ -132,14 +156,16 @@ const initSelection = (rows?: MedalInfoRow[]) => {
   }
 }
 
-function handleSelectionChange(selectedRows: MedalInfoRow[]) {
-  config.medalTasks.roomidList = selectedRows.map((row) => row.roomid)
+function handleSelect(selection: MedalInfoRow[]) {
+  config.medalTasks.roomidList = selection.map((row) => row.roomid)
 }
 
 function handleRowClick(row: MedalInfoRow) {
   // 切换当前行的选择状态
-  // @ts-expect-error
-  medalInfoTableRef.value?.toggleRowSelection(row, undefined)
+  medalInfoTableRef.value?.toggleRowSelection(row)
+  // 更新黑白名单
+  const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows()
+  config.medalTasks.roomidList = selection.map((row) => row.roomid)
 }
 </script>
 
@@ -194,9 +220,9 @@ function handleRowClick(row: MedalInfoRow) {
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.medalTasks.watch.enabled" active-text="观看直播" />
         <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 70px">
-          <el-option v-for="i in 24" :key="i" :label="i * 5" :value="i * 5" />
+          <el-option v-for="i in 6" :key="i" :label="i * 5" :value="i * 5" />
         </el-select>
-        <el-text>分钟</el-text>
+        <el-text>分钟 / 直播间</el-text>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.watch" />
         <TaskStatus :status="status.medalTasks.watch" />
       </el-space>
@@ -207,6 +233,7 @@ function handleRowClick(row: MedalInfoRow) {
           v-model="config.medalTasks.isWhiteList"
           active-text="白名单"
           inactive-text="黑名单"
+          @change="(val: any) => !val && (uiStore.uiConfig.medalInfoPanelSortMode = false)"
         />
         <el-button type="primary" size="small" :icon="Edit" @click="handleEditList"
           >编辑名单
@@ -228,14 +255,6 @@ function handleRowClick(row: MedalInfoRow) {
       <el-text>查看。</el-text>
     </el-row>
     <br />
-    <el-row>
-      <el-text tag="b">注意：</el-text>
-    </el-row>
-    <el-row>
-      <el-text
-        >&emsp;&emsp;由于每天能通过完成任务获得亲密度的粉丝勋章数量有限，脚本默认仅为最多199个等级小于20的粉丝勋章完成观看直播任务。在脚本执行任务期间观看直播可能导致今天无法获取任何亲密度。
-      </el-text>
-    </el-row>
     <!-- 弹窗 -->
     <el-dialog
       v-model="medalDanmuPanelVisible"
@@ -243,8 +262,8 @@ function handleRowClick(row: MedalInfoRow) {
       :lock-scroll="false"
       width="40%"
     >
-      <el-table :data="danmuTableData" max-height="500">
-        <el-table-column type="index" width="50" />
+      <el-table :data="danmuTableData" :max-height="danmuTableMaxHeight">
+        <el-table-column type="index" width="80" />
         <el-table-column prop="content" label="弹幕内容" />
         <el-table-column label="操作" width="220" align="center">
           <template #default="scope">
@@ -261,59 +280,81 @@ function handleRowClick(row: MedalInfoRow) {
         <el-button type="primary" @click="handleAddDanmu">新增弹幕</el-button>
       </template>
     </el-dialog>
-    <el-dialog
-      v-model="medalInfoPanelVisible"
-      title="编辑粉丝勋章名单"
-      :lock-scroll="false"
-      width="40%"
-    >
-      <el-table
-        ref="medalInfoTableRef"
-        v-loading="medalInfoLoading"
-        :data="medalInfoTableData"
-        max-height="500"
-        empty-text="没有粉丝勋章"
-        @selection-change="handleSelectionChange"
-        @row-click="handleRowClick"
+    <el-dialog v-model="medalInfoPanelVisible" title="编辑粉丝勋章名单" :lock-scroll="false">
+      <VueDraggable
+        v-model="medalInfoTableData"
+        target="#draggable-fans-medal-table table tbody"
+        :disabled="!uiStore.uiConfig.medalInfoPanelSortMode"
+        :animation="150"
+        :scroll-sensitivity="36"
+        :scroll-speed="8"
       >
-        <el-table-column type="selection" align="center" width="55" />
-        <el-table-column prop="avatar" label="头像" width="100">
-          <template #default="scope">
-            <div class="avatar-wrap">
-              <el-image
-                :src="scope.row.avatar"
-                loading="lazy"
-                referrerpolicy="origin"
-                class="avatar"
+        <el-table
+          id="draggable-fans-medal-table"
+          ref="medalInfoTableRef"
+          v-loading="medalInfoLoading"
+          :data="medalInfoTableData"
+          :max-height="medalTableMaxHeight"
+          empty-text="没有粉丝勋章"
+          @select="handleSelect"
+          @select-all="handleSelect"
+          @row-click="handleRowClick"
+          :row-key="(row: MedalInfoRow) => row.roomid.toString()"
+        >
+          <template v-if="!uiStore.uiConfig.medalInfoPanelSortMode">
+            <el-table-column type="selection" align="center" width="80" />
+          </template>
+          <template v-else>
+            <el-table-column type="index" align="center" width="80" />
+          </template>
+
+          <el-table-column prop="avatar" label="头像" width="100">
+            <template #default="scope">
+              <div class="avatar-wrap">
+                <el-image
+                  :src="scope.row.avatar"
+                  loading="lazy"
+                  referrerpolicy="origin"
+                  class="avatar"
+                >
+                  <template #error>
+                    <el-image
+                      src="//i0.hdslb.com/bfs/face/member/noface.jpg"
+                      referrerpolicy="origin"
+                      class="avatar"
+                    />
+                  </template>
+                </el-image>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="nick_name" label="昵称" />
+          <el-table-column prop="medal_name" label="粉丝勋章" />
+          <el-table-column prop="medal_level" label="等级" width="80" sortable />
+          <el-table-column prop="roomid" label="房间号">
+            <template #default="scope">
+              <el-link
+                :href="'https://live.bilibili.com/' + scope.row.roomid + '?visit_id='"
+                rel="noreferrer"
+                type="primary"
+                target="_blank"
+                @click.stop
               >
-                <template #error>
-                  <el-image
-                    src="//i0.hdslb.com/bfs/face/member/noface.jpg"
-                    referrerpolicy="origin"
-                    class="avatar"
-                  />
-                </template>
-              </el-image>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="nick_name" label="昵称" />
-        <el-table-column prop="medal_name" label="粉丝勋章" />
-        <el-table-column prop="medal_level" label="等级" width="80" sortable />
-        <el-table-column prop="roomid" label="房间号">
-          <template #default="scope">
-            <el-link
-              :href="'https://live.bilibili.com/' + scope.row.roomid + '?visit_id='"
-              rel="noreferrer"
-              type="primary"
-              target="_blank"
-              @click.stop
-            >
-              {{ scope.row.roomid }}
-            </el-link>
-          </template>
-        </el-table-column>
-      </el-table>
+                {{ scope.row.roomid }}
+              </el-link>
+            </template>
+          </el-table-column>
+        </el-table>
+      </VueDraggable>
+      <template #footer>
+        <el-switch
+          :disabled="!config.medalTasks.isWhiteList"
+          v-model="uiStore.uiConfig.medalInfoPanelSortMode"
+          inactive-text="常规模式"
+          active-text="排序模式"
+          @change="(val: any) => !val && nextTick(() => initSelection(medalInfoTableData))"
+        />
+      </template>
     </el-dialog>
   </div>
 </template>

@@ -2,6 +2,7 @@ import { useBiliStore } from '@/stores/useBiliStore'
 import Cookie from '@/library/cookie'
 import type { BiliCookies } from '@/types'
 import BaseModule from '../BaseModule'
+import ModuleCriticalError from '@/library/error/ModuleCriticalError'
 
 class Cookies extends BaseModule {
   /**
@@ -16,7 +17,11 @@ class Cookies extends BaseModule {
   }
 
   public async run(): Promise<void> {
-    useBiliStore().cookies = await this.getCookies()
+    try {
+      useBiliStore().cookies = await this.getCookies()
+    } catch (error: any) {
+      throw new ModuleCriticalError(this.moduleName, error.message)
+    }
   }
 }
 

@@ -1,6 +1,7 @@
 import { useBiliStore } from '@/stores/useBiliStore'
 import { unsafeWindow } from '$'
 import BaseModule from '../BaseModule'
+import ModuleCriticalError from '@/library/error/ModuleCriticalError'
 
 class BilibiliLive extends BaseModule {
   static runOnMultiplePages: boolean = true
@@ -11,7 +12,7 @@ class BilibiliLive extends BaseModule {
   private getBilibiliLive(): Promise<Window['BilibiliLive']> {
     this.logger.log('unsafeWindow.BilibiliLive', unsafeWindow.BilibiliLive)
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       // window.Bilibili 的定义在 document.head 里，此时一定已经是个 Object 了
       if (unsafeWindow.BilibiliLive.UID !== 0) {
         resolve(unsafeWindow.BilibiliLive)
@@ -30,11 +31,17 @@ class BilibiliLive extends BaseModule {
           return true
         }
       })
+
+      setTimeout(() => reject(new Error('获取 BilibiliLive 超时')), 10e3)
     })
   }
 
   public async run(): Promise<void> {
-    useBiliStore().BilibiliLive = await this.getBilibiliLive()
+    try {
+      useBiliStore().BilibiliLive = await this.getBilibiliLive()
+    } catch (error: any) {
+      throw new ModuleCriticalError(this.moduleName, error.message)
+    }
   }
 }
 

@@ -8,9 +8,8 @@ class RemoveFlipView extends BaseModule {
 
   public async run() {
     this.logger.log('移除礼物栏下方广告模块开始运行')
-    if (this.config.enabled) {
-      GM_addStyle('.flip-view { display: none !important }')
-    }
+
+    GM_addStyle('.flip-view { display: none !important }')
   }
 }
 

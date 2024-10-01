@@ -11,7 +11,8 @@ const defaultValues: DefaultValues = {
     isCollapse: false,
     isShowPanel: true,
     activeMenuIndex: 'MainSiteTasks',
-    panelWidthPercent: 40
+    panelWidthPercent: 40,
+    medalInfoPanelSortMode: false
   },
   modules: {
     DailyTasks: {
@@ -136,13 +137,7 @@ const defaultValues: DefaultValues = {
       removeRank: {
         enabled: false
       },
-      removeGiftPlanet: {
-        enabled: false
-      },
-      removeActivityBanner: {
-        enabled: false
-      },
-      removePKBanner: {
+      removeHeaderStuff: {
         enabled: false
       },
       removeFlipView: {

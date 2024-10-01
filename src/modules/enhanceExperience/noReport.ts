@@ -53,7 +53,7 @@ class NoReport extends BaseModule {
   /**
    * 劫持 XHR 和 fetch 请求
    */
-  private async ajaxHook() {
+  private ajaxHook() {
     const ajaxHookProxyConfig = {
       onRequest: (config: XhrRequestConfig, handler: XhrRequestHandler) => {
         if (NoReport.isTargetURL(config.url)) {
@@ -70,6 +70,7 @@ class NoReport extends BaseModule {
         }
       }
     }
+
     const fetchHookConfig: FetchHookProxyConfig = {
       onRequest(config, handler) {
         const url = getUrlFromFetchInput(config.input)
@@ -84,19 +85,18 @@ class NoReport extends BaseModule {
       }
     }
 
-    this.hookProperties(unsafeWindow)
     proxy(ajaxHookProxyConfig, unsafeWindow)
     fproxy(fetchHookConfig, unsafeWindow)
   }
 
   public run() {
     this.logger.log('拦截日志数据上报模块开始运行')
-    if (this.config.enabled) {
-      try {
-        this.ajaxHook()
-      } catch (e) {
-        this.logger.error('拦截日志数据上报失败', e)
-      }
+
+    try {
+      this.hookProperties(unsafeWindow)
+      this.ajaxHook()
+    } catch (e) {
+      this.logger.error('拦截日志数据上报失败', e)
     }
   }
 }

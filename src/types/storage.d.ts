@@ -105,13 +105,7 @@ interface ModuleConfig {
     removeRank: {
       enabled: boolean
     }
-    removeGiftPlanet: {
-      enabled: boolean
-    }
-    removeActivityBanner: {
-      enabled: boolean
-    }
-    removePKBanner: {
+    removeHeaderStuff: {
       enabled: boolean
     }
     removeFlipView: {
@@ -139,6 +133,7 @@ interface UiConfig {
   isShowPanel: boolean
   activeMenuIndex: MenuIndex
   panelWidthPercent: number
+  medalInfoPanelSortMode: boolean
 }
 
 interface Cache {

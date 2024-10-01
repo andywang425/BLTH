@@ -1,5 +1,5 @@
 import BaseModule from '../../BaseModule'
-import { delayToNextMoment, ts } from '@/library/luxon'
+import { ts } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
 import { useBiliStore } from '@/stores/useBiliStore'
@@ -22,7 +22,10 @@ class GetYearVipPrivilegeTask extends BaseModule {
     4: '大会员专享会员购包邮券',
     5: '年度专享漫画礼包 - 漫画商城优惠券',
     6: '大会员专享会员体验卡',
-    7: '大会员专享课堂优惠券'
+    7: '大会员专享课堂优惠券',
+    15: '年度专享会员购星光宝盒88折券',
+    16: '大会员专享会员购10魔晶',
+    17: '年度专享游戏优惠券'
   }
 
   /**
@@ -54,15 +57,20 @@ class GetYearVipPrivilegeTask extends BaseModule {
       const response = await BAPI.main.vip.receivePrivilege(type)
       this.logger.log(`BAPI.main.vip.receivePrivilege(${type}) response`, response)
       if (response.code === 0) {
-        this.logger.log(`领取年度大会员权益（type = ${type}, ${this.type2Name[type]}）成功`)
+        this.logger.log(
+          `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）成功`
+        )
       } else {
         this.logger.error(
-          `领取年度大会员权益（type = ${type}, ${this.type2Name[type]}）失败`,
+          `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）失败`,
           response.message
         )
       }
     } catch (error) {
-      this.logger.error(`领取年度大会员权益（type = ${type}, ${this.type2Name[type]}）出错`, error)
+      this.logger.error(
+        `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）出错`,
+        error
+      )
     }
   }
 
@@ -102,69 +110,63 @@ class GetYearVipPrivilegeTask extends BaseModule {
 
   public async run() {
     this.logger.log('领取年度大会员权益模块开始运行')
-    if (this.config.enabled) {
-      if (this.isYearVip()) {
-        if (ts() >= this.config._nextReceiveTime) {
-          // 当前时间已经超过了上次记录的下次领取时间，领取权益
-          this.status = 'running'
-          const list = await this.myPrivilege()
-          if (list) {
-            for (const i of list) {
-              if (i.type === 8 || i.type === 14) {
-                // 8: 可能是游戏礼包兑换，state总是为 1，不领取
-                // 14：不清楚是什么，总是无法正确领取
-                continue
-              }
-              if (i.state === 0) {
-                if (i.type === 9) {
-                  // 专属等级加速包
-                  await this.addExperience()
-                } else {
-                  await this.receivePrivilege(i.type)
-                }
-              } else if (i.state === 1) {
-                this.logger.log(`该权益（type = ${i.type}）已经领取过了`)
-              } else {
-                // 需要完成任务才能领取
-                if (i.type === 9) {
-                  const watchTaskConfig =
-                    this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch
-                  if (watchTaskConfig.enabled) {
-                    // 等观看视频任务完成再领取
-                    watch(
-                      () => watchTaskConfig._lastCompleteTime,
-                      () => sleep(3000).then(() => this.addExperience()),
-                      { once: true }
-                    )
-                  } else {
-                    this.logger.warn(
-                      '领取专属等级加速包（10主站经验）前需要观看任意一个视频，请打开【主站任务】中的【每日观看视频】，或是在运行脚本前手动观看'
-                    )
-                  }
-                }
-              }
-              await sleep(200)
+
+    if (this.isYearVip()) {
+      if (ts() >= this.config._nextReceiveTime) {
+        // 当前时间已经超过了上次记录的下次领取时间，领取权益
+        this.status = 'running'
+        const list = await this.myPrivilege()
+        if (list) {
+          for (const i of list) {
+            if (i.type === 8 || i.type === 14) {
+              // 8: 可能是游戏礼包兑换，state总是为 1，不领取
+              // 14：不清楚是什么，总是无法正确领取
+              continue
             }
-            this.status = 'done'
-            this.config._nextReceiveTime = Math.min(...list.map((i) => i.period_end_unix))
+            if (i.state === 0) {
+              if (i.type === 9) {
+                // 专属等级加速包
+                await this.addExperience()
+              } else {
+                await this.receivePrivilege(i.type)
+              }
+            } else if (i.state === 1) {
+              this.logger.log(`该权益（type = ${i.type}）已经领取过了`)
+            } else {
+              // 需要完成任务才能领取
+              if (i.type === 9) {
+                const watchTaskConfig = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch
+                if (watchTaskConfig.enabled) {
+                  this.logger.log('等待观看视频任务完成后再领取专属等级加速包（10主站经验）...')
+                  watch(
+                    () => watchTaskConfig._lastCompleteTime,
+                    () => sleep(3000).then(() => this.addExperience()),
+                    { once: true }
+                  )
+                } else {
+                  this.logger.warn(
+                    '领取专属等级加速包（10主站经验）前需要观看任意一个视频，请打开【主站任务】中的【每日观看视频】，或是在运行脚本前手动观看'
+                  )
+                }
+              }
+            }
+            await sleep(200)
           }
-        }
-        // 等待下次运行或什么都不做
-        const diff = this.config._nextReceiveTime - ts()
-        if (diff < 86400) {
-          this.logger.log(
-            '领取年度大会员权益模块下次运行时间:',
-            DateTime.fromSeconds(this.config._nextReceiveTime).toJSDate()
-          )
-          setTimeout(() => this.run(), diff * 1000)
-        } else {
-          this.logger.log('距离下次领取年度大会员权益的时间超过一天，不计划下次运行')
+          this.status = 'done'
+          this.config._nextReceiveTime = Math.min(...list.map((i) => i.period_end_unix))
         }
       }
-    } else {
-      const diff = delayToNextMoment(0)
-      setTimeout(() => this.run(), diff.ms)
-      this.logger.log('领取年度大会员权益模块下次运行时间:', diff.str)
+      // 等待下次运行或什么都不做
+      const diff = this.config._nextReceiveTime - ts() + 3e5 // 增加5分钟延时
+      if (diff < 86400) {
+        this.logger.log(
+          '领取年度大会员权益模块下次运行时间:',
+          DateTime.fromSeconds(this.config._nextReceiveTime).toJSDate()
+        )
+        setTimeout(() => this.run(), diff * 1000)
+      } else {
+        this.logger.log('距离下次领取年度大会员权益的时间超过一天，不计划下次运行')
+      }
     }
   }
 }

@@ -109,7 +109,8 @@ interface BapiMethods {
       source?: string,
       eab_x?: number,
       ramval?: number,
-      ga?: number
+      ga?: number,
+      referer?: string
     ) => Promise<Main.Share>
     coinAdd: (
       aid: string,

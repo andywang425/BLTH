@@ -25,9 +25,7 @@ export const useUIStore = defineStore('ui', () => {
   // 控制面板 UI 相关的设置
   const uiConfig = reactive<UiConfig>(Storage.getUiConfig())
   // 被激活的菜单项的名称，用于在 Header 里显示子标题
-  const activeMenuName = computed<string>(() => {
-    return index2name[uiConfig.activeMenuIndex]
-  })
+  const activeMenuName = computed<string>(() => index2name[uiConfig.activeMenuIndex])
   // 播放器长、宽、位置信息
   const livePlayerRect = reactive<LivePlayerRect>({
     top: 0,
@@ -46,13 +44,9 @@ export const useUIStore = defineStore('ui', () => {
     width: `${(livePlayerRect.width * uiConfig.panelWidthPercent) / 100}px`
   }))
   // 开关控制面板按钮的文字
-  const isShowPanelButtonText = computed<string>(() => {
-    if (uiConfig.isShowPanel) {
-      return '隐藏控制面板'
-    } else {
-      return '显示控制面板'
-    }
-  })
+  const isShowPanelButtonText = computed<string>(() =>
+    uiConfig.isShowPanel ? '隐藏控制面板' : '显示控制面板'
+  )
   // 控制面板主体的滚动条窗口高度
   // 因为 header 的高度是固定的 60px，所以用控制面板高度 - 60px
   const scrollBarHeight = computed<string>(() => `${livePlayerRect.height - 60}px`)

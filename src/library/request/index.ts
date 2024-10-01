@@ -43,7 +43,7 @@ class Request {
           resolve(response.response)
         },
         onerror: function (err) {
-          reject(err)
+          reject(new Error(JSON.stringify(err)))
         }
       }
 
@@ -93,7 +93,7 @@ class Request {
           resolve(response.response)
         },
         onerror: function (err) {
-          reject(err)
+          reject(new Error(JSON.stringify(err)))
         }
       }
 

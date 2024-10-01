@@ -8,9 +8,8 @@ class RemoveLiveWaterMark extends BaseModule {
 
   public async run() {
     this.logger.log('移除直播间水印模块开始运行')
-    if (this.config.enabled) {
-      GM_addStyle('.web-player-icon-roomStatus { display: none !important }')
-    }
+
+    GM_addStyle('.web-player-icon-roomStatus { display: none !important }')
   }
 }
 

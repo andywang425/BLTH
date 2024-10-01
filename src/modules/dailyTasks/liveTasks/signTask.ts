@@ -47,27 +47,26 @@ class SignTask extends BaseModule {
 
   public async run() {
     this.logger.log('直播签到模块开始运行')
-    if (this.config.enabled) {
-      if (!isTimestampToday(this.config._lastCompleteTime)) {
-        this.status = 'running'
-        const signInfo = await this.getSignInfo()
-        if (signInfo) {
-          if (signInfo.status === 0) {
-            await this.sign()
-          } else {
-            this.config._lastCompleteTime = tsm()
-            this.status = 'done'
-          }
-        } else {
+
+    if (!isTimestampToday(this.config._lastCompleteTime)) {
+      this.status = 'running'
+      const signInfo = await this.getSignInfo()
+      if (signInfo) {
+        if (signInfo.status === 0) {
           await this.sign()
+        } else {
+          this.config._lastCompleteTime = tsm()
+          this.status = 'done'
         }
       } else {
-        if (!isNowIn(0, 0, 0, 5)) {
-          this.logger.log('今天已经完成过直播签到任务了')
-          this.status = 'done'
-        } else {
-          this.logger.log('昨天的直播签到任务已经完成过了，等到今天的00:05再执行')
-        }
+        await this.sign()
+      }
+    } else {
+      if (!isNowIn(0, 0, 0, 5)) {
+        this.logger.log('今天已经完成过直播签到任务了')
+        this.status = 'done'
+      } else {
+        this.logger.log('昨天的直播签到任务已经完成过了，等到今天的00:05再执行')
       }
     }
 

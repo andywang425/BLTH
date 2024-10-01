@@ -48,9 +48,7 @@ interface HelpInfo {
     removeMicPopover: HelpInfoItem
     removeComboCard: HelpInfoItem
     removeRank: HelpInfoItem
-    removeGiftPlanet: HelpInfoItem
-    removeActivityBanner: HelpInfoItem
-    removePKBanner: HelpInfoItem
+    removeHeaderStuff: HelpInfoItem
     removeFlipView: HelpInfoItem
     removeRecommendRoom: HelpInfoItem
     removeLiveMosaic: HelpInfoItem

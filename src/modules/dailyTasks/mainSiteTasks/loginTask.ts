@@ -24,27 +24,33 @@ class LoginTask extends BaseModule {
 
   public async run(): Promise<void> {
     this.logger.log('每日登录模块开始运行')
-    // 开启了每日登录
-    if (this.config.enabled) {
+
+    // 上一次完成每日登录任务的时间不在今天
+    if (!isTimestampToday(this.config._lastCompleteTime)) {
       const biliStore = useBiliStore()
-      // 上一次完成每日登录任务的时间不在今天
-      if (!isTimestampToday(this.config._lastCompleteTime)) {
-        this.status = 'running'
+
+      if (!biliStore.dailyRewardInfo) {
+        this.logger.error('主站每日任务完成情况不存在，不执行每日登录任务')
+        this.status = 'error'
+        return
+      }
+
+      this.status = 'running'
+
+      if (!biliStore.dailyRewardInfo!.login) {
         // 每日登录任务未完成
-        if (!biliStore.dailyRewardInfo!.login) {
-          await this.login()
-        } else {
-          // 用户在运行脚本前已经完成了任务，也记录完成时间
-          this.config._lastCompleteTime = tsm()
-          this.status = 'done'
-        }
+        await this.login()
       } else {
-        if (isNowIn(0, 0, 0, 5)) {
-          this.logger.log('昨天的每日登录任务已经完成过了，等到今天的00:05再执行')
-        } else {
-          this.logger.log('今天已经完成过每日登录任务了')
-          this.status = 'done'
-        }
+        // 用户在运行脚本前已经完成了任务，也记录完成时间
+        this.config._lastCompleteTime = tsm()
+        this.status = 'done'
+      }
+    } else {
+      if (isNowIn(0, 0, 0, 5)) {
+        this.logger.log('昨天的每日登录任务已经完成过了，等到今天的00:05再执行')
+      } else {
+        this.logger.log('今天已经完成过每日登录任务了')
+        this.status = 'done'
       }
     }
 
