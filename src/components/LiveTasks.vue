@@ -142,7 +142,8 @@ const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
 
 /** 初始化多选框选择状态 */
 const initSelection = (rows?: MedalInfoRow[]) => {
-  if (rows) {
+  // 排序模式下不初始化多选框选择状态
+  if (rows && !uiStore.uiConfig.medalInfoPanelSortMode) {
     config.medalTasks.roomidList.forEach((roomid, index) => {
       const row = rows.find((row) => row.roomid === roomid)
       if (row) {
@@ -161,11 +162,14 @@ function handleSelect(selection: MedalInfoRow[]) {
 }
 
 function handleRowClick(row: MedalInfoRow) {
-  // 切换当前行的选择状态
-  medalInfoTableRef.value?.toggleRowSelection(row)
-  // 更新黑白名单
-  const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows()
-  config.medalTasks.roomidList = selection.map((row) => row.roomid)
+  // 排序模式下不切换选择状态
+  if (!uiStore.uiConfig.medalInfoPanelSortMode) {
+    // 切换当前行的选择状态
+    medalInfoTableRef.value?.toggleRowSelection(row)
+    // 更新黑白名单
+    const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows()
+    config.medalTasks.roomidList = selection.map((row) => row.roomid)
+  }
 }
 </script>
 
