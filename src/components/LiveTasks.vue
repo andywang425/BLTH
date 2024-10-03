@@ -334,7 +334,7 @@ function handleRowClick(row: MedalInfoRow) {
           </el-table-column>
           <el-table-column prop="nick_name" label="昵称" />
           <el-table-column prop="medal_name" label="粉丝勋章" />
-          <el-table-column prop="medal_level" label="等级" width="80" sortable />
+          <el-table-column prop="medal_level" label="等级" width="80" />
           <el-table-column prop="roomid" label="房间号">
             <template #default="scope">
               <el-link
