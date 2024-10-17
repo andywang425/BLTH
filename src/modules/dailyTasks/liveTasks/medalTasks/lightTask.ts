@@ -22,7 +22,7 @@ class LightTask extends MedalModule {
     const filtered = useBiliStore()
       .filteredFansMedals.filter(
         (medal) =>
-          medal.medal.level < 20 &&
+          medal.medal.level <= 20 &&
           (this.medalTasksConfig.isWhiteList
             ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
             : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
