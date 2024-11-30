@@ -31,10 +31,6 @@ const helpInfo: HelpInfo = {
       }
     },
     LiveTasks: {
-      sign: {
-        title: '直播签到',
-        message: h('p', [h('div', '完成直播签到任务。')])
-      },
       medalTasks: {
         list: {
           title: '黑白名单 / 排序模式',

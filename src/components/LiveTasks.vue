@@ -175,14 +175,6 @@ function handleRowClick(row: MedalInfoRow) {
 
 <template>
   <div>
-    <el-row>
-      <el-space wrap :size="[8, 0]">
-        <el-switch v-model="config.sign.enabled" active-text="直播签到" />
-        <Info :item="helpInfo.DailyTasks.LiveTasks.sign" />
-        <TaskStatus :status="status.sign" />
-      </el-space>
-    </el-row>
-    <el-divider />
     <!-- 粉丝勋章相关任务 -->
     <el-row>
       <el-space wrap :size="[8, 0]">
