@@ -153,7 +153,9 @@ class GetYearVipPrivilegeTask extends BaseModule {
             await sleep(200)
           }
           this.status = 'done'
-          this.config._nextReceiveTime = Math.min(...list.map((i) => i.period_end_unix))
+          this.config._nextReceiveTime = Math.min(
+            ...list.map((i) => i.period_end_unix).filter((unix) => unix > ts())
+          )
         }
       }
       // 等待下次运行或什么都不做
