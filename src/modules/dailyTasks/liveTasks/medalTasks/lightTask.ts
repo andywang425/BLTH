@@ -113,7 +113,12 @@ class LightTask extends MedalModule {
           if (this.config.mode === 'like') {
             await this.like(roomid, target_id, _.random(31, 33))
           } else {
-            await this.sendDanmu(this.config.danmuList[i % this.config.danmuList.length], roomid)
+            for (let j = 0; j < 10; j++) {
+              await this.sendDanmu(this.config.danmuList[i % this.config.danmuList.length], roomid)
+              if (j < 9) {
+                await sleep(5000)
+              }
+            }
           }
           // 延时防风控
           await sleep(_.random(3000, 5000))

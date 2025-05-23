@@ -5,7 +5,7 @@ import helpInfo from '@/library/help-info'
 const moduleStore = useModuleStore()
 const config = moduleStore.moduleConfig.EnhanceExperience
 
-const qualityDescList = ['原画', '蓝光PRO', '蓝光', '超清PRO', '超清', '高清']
+const qualityDescList = ['1080P 原画（高帧率）', '1080P 蓝光', '720P 超清']
 </script>
 
 <template>
