@@ -106,22 +106,24 @@ class LightTask extends MedalModule {
 
       this.status = 'running'
       const roomidTargetidList: number[][] = this.getRoomidTargetidList()
+      let danmuIndex = 0
 
       if (roomidTargetidList.length > 0) {
         for (let i = 0; i < roomidTargetidList.length; i++) {
           const [roomid, target_id] = roomidTargetidList[i]
+
           if (this.config.mode === 'like') {
-            await this.like(roomid, target_id, _.random(31, 33))
+            await this.like(roomid, target_id, _.random(30, 35))
+            await sleep(_.random(30000, 35000))
           } else {
             for (let j = 0; j < 10; j++) {
-              await this.sendDanmu(this.config.danmuList[i % this.config.danmuList.length], roomid)
-              if (j < 9) {
-                await sleep(5000)
-              }
+              await this.sendDanmu(
+                this.config.danmuList[danmuIndex++ % this.config.danmuList.length],
+                roomid
+              )
+              await sleep(_.random(5000, 7000))
             }
           }
-          // 延时防风控
-          await sleep(_.random(3000, 5000))
         }
       }
 
