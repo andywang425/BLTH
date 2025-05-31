@@ -23,10 +23,23 @@ class GetYearVipPrivilegeTask extends BaseModule {
     5: '年度专享漫画礼包 - 漫画商城优惠券',
     6: '大会员专享会员体验卡',
     7: '大会员专享课堂优惠券',
+    // 9: '专属等级加速包'
     15: '年度专享会员购星光宝盒88折券',
     16: '大会员专享会员购10魔晶',
-    17: '年度专享游戏优惠券'
+    17: '大会员专享游戏优惠券'
   }
+
+  /**
+   * 权益类型黑名单
+   *
+   * 8: 可能是游戏礼包兑换，state总是为 1，不领取；
+   * 14: 不清楚是什么，总是无法正确领取；
+   * 18: 尝试领取后提示：淘宝账号查询异常，请退出重试；
+   * 19: 能领取但不知道是什么，保险起见不领取；
+   * 20: 尝试领取后提示：饿了么领取活动已经过期~；
+   * 21: 尝试领取后提示：超大会员身份状态异常
+   */
+  private blackList: number[] = [8, 14, 18, 19, 20, 21]
 
   /**
    * 获取会员权益
@@ -118,9 +131,8 @@ class GetYearVipPrivilegeTask extends BaseModule {
         const list = await this.myPrivilege()
         if (list) {
           for (const i of list) {
-            if (i.type === 8 || i.type === 14) {
-              // 8: 可能是游戏礼包兑换，state总是为 1，不领取
-              // 14：不清楚是什么，总是无法正确领取
+            if (this.blackList.includes(i.type)) {
+              // 不领取黑名单中的权益
               continue
             }
             if (i.state === 0) {
@@ -150,7 +162,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
                 }
               }
             }
-            await sleep(200)
+            await sleep(500)
           }
           this.status = 'done'
           this.config._nextReceiveTime = Math.min(
