@@ -6,7 +6,7 @@ const moduleStore = useModuleStore()
 const config = moduleStore.moduleConfig.EnhanceExperience
 
 // 画质名称列表
-const qualityDescList = ['1080P 原画（高帧率）', '1080P 蓝光', '720P 超清']
+const qualityDescList = ['原画', '蓝光', '超清', '高清']
 
 // 修改画质名称列表后用户配置如果不合法，回退到第一个画质
 if (!qualityDescList.includes(config.switchLiveStreamQuality.qualityDesc)) {
@@ -22,7 +22,7 @@ if (!qualityDescList.includes(config.switchLiveStreamQuality.qualityDesc)) {
         <el-select
           v-model="config.switchLiveStreamQuality.qualityDesc"
           placeholder="Select"
-          style="width: 190px"
+          style="width: 100px"
         >
           <el-option v-for="i in qualityDescList" :key="i" :label="i" :value="i" />
         </el-select>
