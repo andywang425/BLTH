@@ -44,7 +44,7 @@
     "svgo": "^3.3.2",
     "terser": "^5.34.1",
     "typescript": "~5.5.4",
-    "vite": "^5.4.8",
+    "vite": "^5.4.19",
     "vite-plugin-monkey": "^4.0.6",
     "vue-tsc": "^2.1.6"
   }
