@@ -17,10 +17,10 @@ function uuid(): string {
 
 /**
  * 基于 Promise 的睡眠函数
- * @param miliseconds 睡眠时间
+ * @param milliseconds 睡眠时间（毫秒）
  */
-function sleep(miliseconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, miliseconds))
+function sleep(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds))
 }
 
 /**

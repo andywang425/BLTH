@@ -36,10 +36,6 @@ const defaultValues: DefaultValues = {
         }
       },
       LiveTasks: {
-        sign: {
-          enabled: false,
-          _lastCompleteTime: 0
-        },
         medalTasks: {
           light: {
             enabled: false,

@@ -142,7 +142,8 @@ const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
 
 /** 初始化多选框选择状态 */
 const initSelection = (rows?: MedalInfoRow[]) => {
-  if (rows) {
+  // 排序模式下不初始化多选框选择状态
+  if (rows && !uiStore.uiConfig.medalInfoPanelSortMode) {
     config.medalTasks.roomidList.forEach((roomid, index) => {
       const row = rows.find((row) => row.roomid === roomid)
       if (row) {
@@ -161,24 +162,19 @@ function handleSelect(selection: MedalInfoRow[]) {
 }
 
 function handleRowClick(row: MedalInfoRow) {
-  // 切换当前行的选择状态
-  medalInfoTableRef.value?.toggleRowSelection(row)
-  // 更新黑白名单
-  const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows()
-  config.medalTasks.roomidList = selection.map((row) => row.roomid)
+  // 排序模式下不切换选择状态
+  if (!uiStore.uiConfig.medalInfoPanelSortMode) {
+    // 切换当前行的选择状态
+    medalInfoTableRef.value?.toggleRowSelection(row)
+    // 更新黑白名单
+    const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows()
+    config.medalTasks.roomidList = selection.map((row) => row.roomid)
+  }
 }
 </script>
 
 <template>
   <div>
-    <el-row>
-      <el-space wrap :size="[8, 0]">
-        <el-switch v-model="config.sign.enabled" active-text="直播签到" />
-        <Info :item="helpInfo.DailyTasks.LiveTasks.sign" />
-        <TaskStatus :status="status.sign" />
-      </el-space>
-    </el-row>
-    <el-divider />
     <!-- 粉丝勋章相关任务 -->
     <el-row>
       <el-space wrap :size="[8, 0]">
@@ -220,7 +216,7 @@ function handleRowClick(row: MedalInfoRow) {
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.medalTasks.watch.enabled" active-text="观看直播" />
         <el-select v-model="config.medalTasks.watch.time" placeholder="Select" style="width: 70px">
-          <el-option v-for="i in 6" :key="i" :label="i * 5" :value="i * 5" />
+          <el-option v-for="i in 12" :key="i" :label="i * 5" :value="i * 5" />
         </el-select>
         <el-text>分钟 / 直播间</el-text>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.watch" />
@@ -330,7 +326,7 @@ function handleRowClick(row: MedalInfoRow) {
           </el-table-column>
           <el-table-column prop="nick_name" label="昵称" />
           <el-table-column prop="medal_name" label="粉丝勋章" />
-          <el-table-column prop="medal_level" label="等级" width="80" sortable />
+          <el-table-column prop="medal_level" label="等级" width="80" />
           <el-table-column prop="roomid" label="房间号">
             <template #default="scope">
               <el-link

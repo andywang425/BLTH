@@ -31,10 +31,6 @@ const helpInfo: HelpInfo = {
       }
     },
     LiveTasks: {
-      sign: {
-        title: '直播签到',
-        message: h('p', [h('div', '完成直播签到任务。')])
-      },
       medalTasks: {
         list: {
           title: '黑白名单 / 排序模式',
@@ -74,8 +70,8 @@ const helpInfo: HelpInfo = {
               h('div', '在你的每个已熄灭的粉丝勋章对应的直播间完成点亮任务，从而点亮粉丝勋章。'),
               h('div', '支持两种点亮方式，可自由选择：'),
               h('div', [
-                h('li', [h('span', '点赞（不推荐）：点赞30次')]),
-                h('li', [h('strong', '发送弹幕（推荐）：'), h('span', '发送弹幕1条')])
+                h('li', [h('span', '点赞：点赞30次')]),
+                h('li', [h('strong', '发送弹幕（推荐）：'), h('span', '发送弹幕10条')])
               ])
             ])
           },
@@ -96,7 +92,7 @@ const helpInfo: HelpInfo = {
           danmu: {
             title: '发送弹幕',
             message: h('p', [
-              h('div', '在已熄灭粉丝勋章对应的直播间发送一条弹幕，点亮粉丝勋章。'),
+              h('div', '在已熄灭粉丝勋章对应的直播间发送十条弹幕，点亮粉丝勋章。'),
               h('div', [
                 h('span', '点击编辑弹幕按钮编辑发送的弹幕，脚本会从中按顺序循环抽取弹幕发送。'),
                 h('span', '部分直播间无法完成该任务，可能的原因有:'),

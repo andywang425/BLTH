@@ -14,7 +14,6 @@ interface HelpInfo {
       share: HelpInfoItem
     }
     LiveTasks: {
-      sign: HelpInfoItem
       medalTasks: {
         list: HelpInfoItem
         light: {

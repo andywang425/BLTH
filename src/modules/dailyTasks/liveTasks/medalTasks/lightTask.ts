@@ -15,18 +15,19 @@ class LightTask extends MedalModule {
   }
 
   /**
-   * 获取粉丝勋章，过滤不符合黑白名单要求和不需要点亮的粉丝勋章
+   * 获取粉丝勋章，过滤等级大于20，已经点亮的和没开播粉丝勋章
    * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
    */
   private getRoomidTargetidList(): [number, number][] {
     const filtered = useBiliStore()
       .filteredFansMedals.filter(
         (medal) =>
-          medal.medal.level < 20 &&
+          medal.medal.level <= 20 &&
           (this.medalTasksConfig.isWhiteList
             ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
             : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
-          medal.medal.is_lighted === 0
+          medal.medal.is_lighted === 0 &&
+          medal.room_info.living_status === 1
       )
       .map<[number, number]>((medal) => [medal.room_info.room_id, medal.medal.target_id])
 
@@ -106,17 +107,24 @@ class LightTask extends MedalModule {
 
       this.status = 'running'
       const roomidTargetidList: number[][] = this.getRoomidTargetidList()
+      let danmuIndex = 0
 
       if (roomidTargetidList.length > 0) {
         for (let i = 0; i < roomidTargetidList.length; i++) {
           const [roomid, target_id] = roomidTargetidList[i]
+
           if (this.config.mode === 'like') {
-            await this.like(roomid, target_id, _.random(31, 33))
+            await this.like(roomid, target_id, _.random(30, 35))
+            await sleep(_.random(30000, 35000))
           } else {
-            await this.sendDanmu(this.config.danmuList[i % this.config.danmuList.length], roomid)
+            for (let j = 0; j < 10; j++) {
+              await this.sendDanmu(
+                this.config.danmuList[danmuIndex++ % this.config.danmuList.length],
+                roomid
+              )
+              await sleep(_.random(5000, 7000))
+            }
           }
-          // 延时防风控
-          await sleep(_.random(3000, 5000))
         }
       }
 

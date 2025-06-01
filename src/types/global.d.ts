@@ -40,6 +40,9 @@ declare global {
           showMaskOption: boolean
           enableMask: boolean
         }
+        timeShift: number
+        hdrType: number
+        streamName?: string
       }
       switchQuality: (qn: string) => void
     }

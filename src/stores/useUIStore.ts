@@ -11,6 +11,11 @@ interface LivePlayerRect {
   width: number
 }
 
+interface WindowScrollPosition {
+  x: number
+  y: number
+}
+
 // 菜单index到名称的映射
 const index2name: Record<MenuIndex, string> = {
   MainSiteTasks: '主站任务',
@@ -34,7 +39,7 @@ export const useUIStore = defineStore('ui', () => {
     width: 0
   })
   // 缓存的窗口滚动条位置
-  const windowScrollPosition = reactive({ x: 0, y: 0 })
+  const windowScrollPosition = reactive<WindowScrollPosition>({ x: 0, y: 0 })
   // 控制面板 css（长、宽、位置信息）
   const panelStyle = computed<CSSProperties>(() => ({
     // 此处若使用最新的滚动条位置（window.scrollX/Y），用户在调整控制面板宽度时可能导致面板在垂直方向上错位

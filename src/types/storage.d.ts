@@ -20,10 +20,6 @@ interface ModuleConfig {
       }
     }
     LiveTasks: {
-      sign: {
-        enabled: boolean
-        _lastCompleteTime: number
-      }
       medalTasks: {
         light: {
           enabled: boolean
