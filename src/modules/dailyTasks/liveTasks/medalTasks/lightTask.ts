@@ -15,7 +15,7 @@ class LightTask extends MedalModule {
   }
 
   /**
-   * 获取粉丝勋章，过滤不符合黑白名单要求和不需要点亮的粉丝勋章
+   * 获取粉丝勋章，过滤等级大于20，已经点亮的和没开播粉丝勋章
    * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
    */
   private getRoomidTargetidList(): [number, number][] {
@@ -26,7 +26,8 @@ class LightTask extends MedalModule {
           (this.medalTasksConfig.isWhiteList
             ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
             : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
-          medal.medal.is_lighted === 0
+          medal.medal.is_lighted === 0 &&
+          medal.room_info.living_status === 1
       )
       .map<[number, number]>((medal) => [medal.room_info.room_id, medal.medal.target_id])
 
