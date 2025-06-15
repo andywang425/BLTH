@@ -128,10 +128,12 @@ const handleEditList = async () => {
         },
         { once: true }
       )
-      // 利用 emitter 通知 FansMedals 模块去获取数据
-      moduleStore.emitter.emit('Default_FansMedals', {
-        module: 'LiveTasks'
-      })
+      if (!biliStore.fansMedalsStatus) {
+        // FansMedals 模块没有获取过粉丝勋章数据，利用 emitter 通知该模块去获取
+        moduleStore.emitter.emit('Default_FansMedals', {
+          module: 'LiveTasks'
+        })
+      }
     } else {
       initSelection(medalInfoTableData.value)
     }

@@ -1,14 +1,15 @@
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import { delayToNextMoment, isNowIn, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore } from '@/stores/useBiliStore'
 import Logger from '@/library/logger'
 import CryptoJS from 'crypto-js'
-import { uuid, sleep, arrayToMap } from '@/library/utils'
+import { sleep, uuid } from '@/library/utils'
 import { useModuleStore } from '@/stores/useModuleStore'
-import type { ModuleConfig } from '@/types'
-import type { ModuleStatusTypes, RunAtMoment } from '@/types'
+import type { ModuleConfig, ModuleStatusTypes, RunAtMoment } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
+import type { WatchTaskMedalFilters } from '@/modules/dailyTasks/liveTasks/medalTasks/types'
+import type { LiveData } from '@/library/bili-api/data'
 
 interface SpyderData {
   benchmark: string
@@ -140,7 +141,7 @@ class RoomHeart {
     }
 
     try {
-      const sypderData: SpyderData = {
+      const spyderData: SpyderData = {
         id: JSON.stringify(this.id),
         device: JSON.stringify(this.device),
         ets: this.timestamp,
@@ -150,7 +151,7 @@ class RoomHeart {
         ua: this.ua
       }
       // 签名
-      const s = this.spyder(JSON.stringify(sypderData), this.secretRule)
+      const s = this.spyder(JSON.stringify(spyderData), this.secretRule)
 
       const response = await BAPI.liveTrace.X(
         s,
@@ -160,10 +161,10 @@ class RoomHeart {
         this.timestamp,
         this.secretKey,
         this.heartBeatInterval,
-        sypderData.ts
+        spyderData.ts
       )
       this.logger.log(
-        `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}, ${sypderData.ts}) response`,
+        `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}, ${spyderData.ts}) response`,
         response
       )
       if (response.code === 0) {
@@ -251,35 +252,33 @@ class RoomHeart {
 class WatchTask extends MedalModule {
   static runAt: RunAtMoment = 'window-load'
 
-  medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.watch
 
   set status(s: ModuleStatusTypes) {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
 
+  private MEDAL_FILTERS: WatchTaskMedalFilters = {
+    // 等级小于20返回true，否则返回false
+    level: (medal) => medal.medal.level < 20
+  }
+
   /**
-   * 获取粉丝勋章的房间号和主播uid，过滤等级大于等于20或不符合黑白名单要求的粉丝勋章
-   * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
+   * 获取粉丝勋章
+   * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
    */
-  private getRoomidUidList(): [number, number][] {
-    const filtered = useBiliStore()
-      .filteredFansMedals.filter(
-        (medal) =>
-          medal.medal.level < 20 &&
-          (this.medalTasksConfig.isWhiteList
-            ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
-            : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id))
-      )
-      .map<[number, number]>((medal) => [medal.room_info.room_id, medal.medal.target_id])
-      .slice(0, 199)
+  private getMedals(): LiveData.FansMedalPanel.List[] {
+    const fansMedals = [...useBiliStore().filteredFansMedals]
+
+    const result = fansMedals.filter(
+      (medal) => this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) && this.MEDAL_FILTERS.level(medal)
+    )
 
     if (this.medalTasksConfig.isWhiteList) {
-      const orderMap = arrayToMap(this.medalTasksConfig.roomidList)
-      return filtered.sort((a, b) => orderMap.get(a[0])! - orderMap.get(b[0])!)
+      this.sortMedals(result)
     }
 
-    return filtered
+    return result
   }
 
   /**
@@ -332,13 +331,16 @@ class WatchTask extends MedalModule {
       }
 
       this.config._lastWatchTime = tsm()
-      const roomidUidList: number[][] = this.getRoomidUidList()
+      const fansMedals = this.getMedals()
 
-      if (roomidUidList.length > 0) {
+      if (fansMedals.length > 0) {
         let i: number
 
-        for (i = 0; i < roomidUidList.length; i++) {
-          const [roomid, uid] = roomidUidList[i]
+        for (i = 0; i < fansMedals.length; i++) {
+          const medal = fansMedals[i]
+          const roomid = medal.room_info.room_id
+          const uid = medal.medal.target_id
+          // TODO: 此处可以考虑不调用API，直接解析粉丝勋章 medal.room_info.url 的URL参数来获取
           const [area_id, parent_area_id] = await this.getAreaInfo(roomid)
           if (area_id > 0 && parent_area_id > 0) {
             // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
@@ -351,7 +353,9 @@ class WatchTask extends MedalModule {
                 break
               }
               // 今日观看时间未达到设置值，开始心跳
-              this.logger.log(`开始直播间${roomid}的观看直播任务`)
+              this.logger.log(
+                `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务`
+              )
 
               await new RoomHeart(
                 roomid,
@@ -364,7 +368,7 @@ class WatchTask extends MedalModule {
           }
         }
 
-        if (i === roomidUidList.length) {
+        if (i === fansMedals.length) {
           // 没有提早跳出循环，说明所有直播间的观看任务均已完成
           this.config._lastCompleteTime = tsm()
           this.logger.log('观看直播任务已完成')

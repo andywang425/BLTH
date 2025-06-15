@@ -2,8 +2,27 @@ import BaseModule from '@/modules/BaseModule'
 import { storeToRefs } from 'pinia'
 import { useBiliStore } from '@/stores/useBiliStore'
 import { watch } from 'vue'
+import type { PublicMedalFilters } from './types'
+import { arrayToMap } from '@/library/utils'
+import type { LiveData } from '@/library/bili-api/data'
 
 class MedalModule extends BaseModule {
+  medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
+
+  protected PUBLIC_MEDAL_FILTERS: PublicMedalFilters = {
+    whiteBlackList: (m) =>
+      this.medalTasksConfig.isWhiteList
+        ? this.medalTasksConfig.roomidList.includes(m.room_info.room_id)
+        : !this.medalTasksConfig.roomidList.includes(m.room_info.room_id)
+  }
+
+  protected sortMedals(medals: LiveData.FansMedalPanel.List[]): LiveData.FansMedalPanel.List[] {
+    const orderMap = arrayToMap(this.medalTasksConfig.roomidList)
+    return medals.sort(
+      (a, b) => orderMap.get(a.room_info.room_id)! - orderMap.get(b.room_info.room_id)!
+    )
+  }
+
   /**
    * 等待粉丝勋章数据获取完毕
    *

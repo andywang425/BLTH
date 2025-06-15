@@ -1,96 +1,155 @@
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import { delayToNextMoment, isNowIn, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore } from '@/stores/useBiliStore'
-import { arrayToMap, sleep } from '@/library/utils'
+import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
+import type { LightTaskMedalFilters, MedalsByLivingStatus } from './types'
+import type { LiveData } from '@/library/bili-api/data'
 
 class LightTask extends MedalModule {
-  medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
   config = this.medalTasksConfig.light
 
   set status(s: ModuleStatusTypes) {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.light = s
   }
 
-  /**
-   * 获取粉丝勋章，过滤等级大于20，已经点亮的粉丝勋章
-   * @returns 数组，数组中的每个元素都是数组：[房间号，主播uid]
-   */
-  private getRoomidTargetidList(): [number, number][] {
-    const filtered = useBiliStore()
-      .filteredFansMedals.filter(
-        (medal) =>
-          medal.medal.level <= 20 &&
-          (this.medalTasksConfig.isWhiteList
-            ? this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)
-            : !this.medalTasksConfig.roomidList.includes(medal.room_info.room_id)) &&
-          medal.medal.is_lighted === 0
-      )
-      .map<[number, number]>((medal) => [medal.room_info.room_id, medal.medal.target_id])
+  private MEDAL_FILTERS: LightTaskMedalFilters = {
+    // 等级大于20返回true，否则返回false
+    level: (medal) => medal.medal.level > 20,
+    // 点亮返回true，否则返回false
+    isLighted: (medal) => medal.medal.is_lighted === 1,
+    // 直播中返回on，否则返回off
+    livingStatus: (medal) => (medal.room_info.living_status === 1 ? 'on' : 'off')
+  }
 
-    if (this.medalTasksConfig.isWhiteList) {
-      const orderMap = arrayToMap(this.medalTasksConfig.roomidList)
-      return filtered.sort((a, b) => orderMap.get(a[0])! - orderMap.get(b[0])!)
+  /**
+   * 获取粉丝勋章
+   * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
+   */
+  private getMedals(): MedalsByLivingStatus {
+    const fansMedals = [...useBiliStore().filteredFansMedals]
+
+    const result: MedalsByLivingStatus = {
+      on: [],
+      off: []
     }
 
-    return filtered
+    fansMedals.forEach((medal) => {
+      if (
+        this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) ||
+        this.MEDAL_FILTERS.isLighted(medal) ||
+        this.MEDAL_FILTERS.level(medal)
+      ) {
+        // 跳过被黑白名单过滤的、已经点亮的和等级大于20的粉丝勋章
+        return
+      }
+
+      const livingStatus = this.MEDAL_FILTERS.livingStatus(medal)
+      result[livingStatus].push(medal)
+    })
+
+    if (this.medalTasksConfig.isWhiteList) {
+      // 白名单排序
+      this.sortMedals(result.on)
+      this.sortMedals(result.off)
+    }
+
+    return result
   }
 
   /**
    * 点赞
-   * @param roomid 直播间号
-   * @param target_id 主播UID
+   * @param medal 粉丝勋章
    * @param click_time 点赞次数
    */
-  private async like(roomid: number, target_id: number, click_time: number): Promise<void> {
+  private async like(medal: LiveData.FansMedalPanel.List, click_time: number): Promise<void> {
+    const room_id = medal.room_info.room_id
+    const target_id = medal.medal.target_id
+    const nick_name = medal.anchor_info.nick_name
+    const medal_name = medal.medal.medal_name
+    const logMessage = `粉丝勋章【${medal_name}】 给主播【${nick_name}】（UID：${target_id}）的直播间（${room_id}）点赞 ${click_time} 次`
+
     try {
-      const response = await BAPI.live.likeReport(roomid, target_id, click_time)
-      this.logger.log(`BAPI.live.likeReport(${roomid}, ${target_id}, ${click_time})`, response)
+      const response = await BAPI.live.likeReport(room_id, target_id, click_time)
+      this.logger.log(`BAPI.live.likeReport(${room_id}, ${target_id}, ${click_time})`, response)
       if (response.code === 0) {
-        this.logger.log(
-          `点亮熄灭勋章-点赞 房间号 = ${roomid} 主播UID = ${target_id} 点赞次数 = ${click_time} 成功`
-        )
+        this.logger.log(`点亮熄灭勋章-点赞 ${logMessage} 成功`)
       } else {
-        this.logger.error(
-          `点亮熄灭勋章-点赞 房间号 = ${roomid} 主播UID = ${target_id} 点赞次数 = ${click_time} 失败`,
-          response.message
-        )
+        this.logger.error(`点亮熄灭勋章-点赞 ${logMessage} 失败`, response.message)
       }
     } catch (error) {
-      this.logger.error(
-        `点亮熄灭勋章-点赞 房间号 = ${roomid} 主播UID = ${target_id} 点赞次数 = ${click_time} 出错`,
-        error
-      )
+      this.logger.error(`点亮熄灭勋章-点赞 ${logMessage} 出错`, error)
     }
   }
 
   /**
    * 发弹幕
+   * @param medal 粉丝勋章
    * @param danmu 弹幕内容
-   * @param roomid 直播间号
    */
-  private async sendDanmu(danmu: string, roomid: number): Promise<void> {
+  private async sendDanmu(medal: LiveData.FansMedalPanel.List, danmu: string): Promise<boolean> {
+    const room_id = medal.room_info.room_id
+    const target_id = medal.medal.target_id
+    const nick_name = medal.anchor_info.nick_name
+    const medal_name = medal.medal.medal_name
+    const logMessage = `粉丝勋章【${medal_name}】 在主播【${nick_name}】（UID：${target_id}）的直播间（${room_id}）发送弹幕 ${danmu}`
+
     try {
-      const response = await BAPI.live.sendMsg(danmu, roomid)
-      this.logger.log(`BAPI.live.sendMsg(${danmu}, ${roomid})`, response)
+      const response = await BAPI.live.sendMsg(danmu, room_id)
+      this.logger.log(`BAPI.live.sendMsg(${danmu}, ${room_id})`, response)
       if (response.code === 0) {
         if (response.msg === 'k') {
-          this.logger.warn(
-            `点亮熄灭勋章-发送弹幕 在直播间 ${roomid} 发送弹幕 ${danmu} 异常，弹幕可能包含屏蔽词`
-          )
+          this.logger.warn(`点亮熄灭勋章-发送弹幕 ${logMessage} 异常，弹幕可能包含屏蔽词`)
         } else {
-          this.logger.log(`点亮熄灭勋章-发送弹幕 在直播间 ${roomid} 发送弹幕 ${danmu} 成功`)
+          this.logger.log(`点亮熄灭勋章-发送弹幕 ${logMessage} 成功`)
+          return true
         }
       } else {
-        this.logger.error(
-          `点亮熄灭勋章-发送弹幕 在直播间 ${roomid} 发送弹幕 ${danmu} 失败`,
-          response.message
-        )
+        this.logger.error(`点亮熄灭勋章-发送弹幕 ${logMessage} 失败`, response.message)
       }
     } catch (error) {
-      this.logger.error(`点亮熄灭勋章-发送弹幕 在直播间 ${roomid} 发送弹幕 ${danmu} 出错`, error)
+      this.logger.error(`点亮熄灭勋章-发送弹幕 ${logMessage} 出错`, error)
+    }
+
+    return false
+  }
+
+  /**
+   * 给正在直播的直播间点赞
+   * @param medals
+   * @private
+   */
+  private async likeTask(medals: LiveData.FansMedalPanel.List[]) {
+    for (const medal of medals) {
+      await this.like(medal, _.random(30, 35))
+      await sleep(_.random(30000, 35000))
+    }
+  }
+
+  /**
+   * 在未开播的直播间发弹幕
+   * @param medals
+   * @private
+   */
+  private async sendDanmuTask(medals: LiveData.FansMedalPanel.List[]) {
+    let danmuIndex = 0
+
+    for (const medal of medals) {
+      let target = 10
+
+      for (let j = 0; j < target; j++)
+        if (
+          !(await this.sendDanmu(
+            medal,
+            this.config.danmuList[danmuIndex++ % this.config.danmuList.length]
+          ))
+        ) {
+          // 弹幕发送失败，多尝试一次，每个直播间最多发13条
+          target = Math.min(target + 1, 13)
+        }
+      await sleep(_.random(6000, 8000))
     }
   }
 
@@ -105,27 +164,9 @@ class LightTask extends MedalModule {
       }
 
       this.status = 'running'
-      const roomidTargetidList: number[][] = this.getRoomidTargetidList()
-      let danmuIndex = 0
+      const fansMedals = this.getMedals()
 
-      if (roomidTargetidList.length > 0) {
-        for (let i = 0; i < roomidTargetidList.length; i++) {
-          const [roomid, target_id] = roomidTargetidList[i]
-
-          if (this.config.mode === 'like') {
-            await this.like(roomid, target_id, _.random(30, 35))
-            await sleep(_.random(30000, 35000))
-          } else {
-            for (let j = 0; j < 10; j++) {
-              await this.sendDanmu(
-                this.config.danmuList[danmuIndex++ % this.config.danmuList.length],
-                roomid
-              )
-              await sleep(_.random(5000, 7000))
-            }
-          }
-        }
-      }
+      await Promise.allSettled([this.likeTask(fansMedals.on), this.sendDanmuTask(fansMedals.off)])
 
       this.config._lastCompleteTime = tsm()
       this.status = 'done'
