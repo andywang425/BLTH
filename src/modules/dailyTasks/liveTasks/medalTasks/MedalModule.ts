@@ -10,6 +10,7 @@ class MedalModule extends BaseModule {
   medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
 
   protected PUBLIC_MEDAL_FILTERS: PublicMedalFilters = {
+    // 包含在白名单中或不包含在黑名单中返回true，否则返回false
     whiteBlackList: (m) =>
       this.medalTasksConfig.isWhiteList
         ? this.medalTasksConfig.roomidList.includes(m.room_info.room_id)

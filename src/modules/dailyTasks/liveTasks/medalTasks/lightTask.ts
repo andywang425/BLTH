@@ -17,7 +17,7 @@ class LightTask extends MedalModule {
 
   private MEDAL_FILTERS: LightTaskMedalFilters = {
     // 等级大于20返回true，否则返回false
-    level: (medal) => medal.medal.level > 20,
+    levelGt20: (medal) => medal.medal.level > 20,
     // 点亮返回true，否则返回false
     isLighted: (medal) => medal.medal.is_lighted === 1,
     // 直播中返回on，否则返回off
@@ -38,9 +38,9 @@ class LightTask extends MedalModule {
 
     fansMedals.forEach((medal) => {
       if (
-        this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) ||
+        !this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) ||
         this.MEDAL_FILTERS.isLighted(medal) ||
-        this.MEDAL_FILTERS.level(medal)
+        this.MEDAL_FILTERS.levelGt20(medal)
       ) {
         // 跳过被黑白名单过滤的、已经点亮的和等级大于20的粉丝勋章
         return
@@ -139,7 +139,7 @@ class LightTask extends MedalModule {
     for (const medal of medals) {
       let target = 10
 
-      for (let j = 0; j < target; j++)
+      for (let j = 0; j < target; j++) {
         if (
           !(await this.sendDanmu(
             medal,
@@ -149,7 +149,8 @@ class LightTask extends MedalModule {
           // 弹幕发送失败，多尝试一次，每个直播间最多发13条
           target = Math.min(target + 1, 13)
         }
-      await sleep(_.random(6000, 8000))
+        await sleep(_.random(6000, 8000))
+      }
     }
   }
 

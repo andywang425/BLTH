@@ -7,13 +7,13 @@ interface PublicMedalFilters {
 }
 
 interface LightTaskMedalFilters {
-  level: (medal: LiveData.FansMedalPanel.List) => boolean
+  levelGt20: (medal: LiveData.FansMedalPanel.List) => boolean
   isLighted: (medal: LiveData.FansMedalPanel.List) => boolean
   livingStatus: (medal: LiveData.FansMedalPanel.List) => LiveStatus
 }
 
 interface WatchTaskMedalFilters {
-  level: (medal: LiveData.FansMedalPanel.List) => boolean
+  levelLt20: (medal: LiveData.FansMedalPanel.List) => boolean
 }
 
 type MedalsByLivingStatus = Record<LiveStatus, LiveData.FansMedalPanel.List[]>

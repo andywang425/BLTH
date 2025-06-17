@@ -260,7 +260,7 @@ class WatchTask extends MedalModule {
 
   private MEDAL_FILTERS: WatchTaskMedalFilters = {
     // 等级小于20返回true，否则返回false
-    level: (medal) => medal.medal.level < 20
+    levelLt20: (medal) => medal.medal.level < 20
   }
 
   /**
@@ -271,7 +271,8 @@ class WatchTask extends MedalModule {
     const fansMedals = [...useBiliStore().filteredFansMedals]
 
     const result = fansMedals.filter(
-      (medal) => this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) && this.MEDAL_FILTERS.level(medal)
+      (medal) =>
+        this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) && this.MEDAL_FILTERS.levelLt20(medal)
     )
 
     if (this.medalTasksConfig.isWhiteList) {
