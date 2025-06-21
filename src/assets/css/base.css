@@ -24,14 +24,19 @@
 }
 
 /**
-  向下滚动网页后B站会动态插入一段css
-  li {
-      list-style: none;
-  }
-  从而导致弹窗中的列表样式失效
+  覆盖B站CSS样式，美化弹窗中的列表样式
  */
-.el-message-box li {
-  list-style: initial;
+.el-message-box ul,
+ol {
+  padding-left: 1em !important;
+}
+
+.el-message-box ul {
+  list-style: initial !important;
+}
+
+.el-message-box ol {
+  list-style: decimal !important;
 }
 
 /**
