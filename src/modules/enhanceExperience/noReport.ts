@@ -27,21 +27,121 @@ class NoReport extends BaseModule {
    */
   private hookProperties(win: Window) {
     Object.defineProperty(win.navigator, 'sendBeacon', {
-      value: () => {
-        return true
-      }
+      value: () => {}
     })
 
     Object.defineProperties(win, {
       reportObserver: {
         get() {
-          return {
-            reportCustomData: function () {}
-          }
+          return () => {}
         },
         set() {}
       },
       reportConfig: {
+        get() {
+          return () => {}
+        },
+        set() {}
+      },
+      __biliMirror__: {
+        get() {
+          return {}
+        },
+        set() {}
+      },
+      __biliMirrorPbInstance__: {
+        get() {
+          return new Proxy(
+            {},
+            {
+              get(_target, property) {
+                const __biliMirrorPbInstance__: Record<string | symbol, any> = {
+                  fpPromise: Promise.resolve(),
+                  initBuvidPromise: Promise.resolve(),
+                  miss: false,
+                  options: {},
+                  scheduler: {},
+                  sequencer: {},
+                  techEventReporter: {},
+                  version: ''
+                }
+                return __biliMirrorPbInstance__[property] ?? (() => {})
+              }
+            }
+          )
+        },
+        set() {}
+      },
+      __INITIAL_MIRROR__: {
+        get() {
+          return () => {}
+        },
+        set() {}
+      },
+      __MIRROR_REPORT__: {
+        get() {
+          return new Proxy(
+            {},
+            {
+              get() {
+                return () => {}
+              }
+            }
+          )
+        },
+        set() {}
+      },
+      __MIRROR_VERSION__: {
+        get() {
+          return ''
+        },
+        set() {}
+      },
+      __statisObserver: {
+        // 拦截该属性后会导致一些报错，如：
+        // Error: 数据上报请勿重复初始化!
+        // 但能减少大量日志上报请求，总的来看还是值得的
+        get() {
+          return new Proxy(
+            {},
+            {
+              get(_target, property) {
+                switch (property) {
+                  case '__initConfig':
+                  case '__loadedFlag':
+                    return {}
+                  case '__bufferFuns':
+                    return []
+                  case '__visitId':
+                    return ''
+                  default:
+                    return () => {}
+                }
+              }
+            }
+          )
+        },
+        set() {}
+      },
+      __statisObserverConfig: {
+        get() {
+          return {}
+        },
+        set() {}
+      },
+      __cm_tracker__: {
+        get() {
+          return undefined
+        },
+        set() {}
+      },
+      bilicm: {
+        get() {
+          return {}
+        },
+        set() {}
+      },
+      BiliCm: {
         get() {
           return {}
         },
@@ -55,7 +155,7 @@ class NoReport extends BaseModule {
    */
   private ajaxHook() {
     const ajaxHookProxyConfig = {
-      onRequest: (config: XhrRequestConfig, handler: XhrRequestHandler) => {
+      onRequest(config: XhrRequestConfig, handler: XhrRequestHandler) {
         if (NoReport.isTargetURL(config.url)) {
           handler.resolve({
             config: config,
@@ -63,7 +163,7 @@ class NoReport extends BaseModule {
             headers: {
               'Content-Type': 'text/plain; charset=utf-8'
             },
-            response: 'ok'
+            response: '{}'
           })
         } else {
           handler.next(config)
@@ -75,7 +175,7 @@ class NoReport extends BaseModule {
       onRequest(config, handler) {
         const url = getUrlFromFetchInput(config.input)
         if (NoReport.isTargetURL(url)) {
-          handler.resolve(new Response('ok'))
+          handler.resolve(new Response('{}'))
         } else {
           handler.next(config)
         }
