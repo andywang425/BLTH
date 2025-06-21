@@ -39,7 +39,6 @@ const defaultValues: DefaultValues = {
         medalTasks: {
           light: {
             enabled: false,
-            mode: 'danmu',
             danmuList: [
               '(⌒▽⌒)',
               '（￣▽￣）',

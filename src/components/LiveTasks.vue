@@ -181,38 +181,9 @@ function handleRowClick(row: MedalInfoRow) {
     <el-row>
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.medalTasks.light.enabled" active-text="点亮熄灭勋章" />
-        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.main" />
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light" />
         <TaskStatus :status="status.medalTasks.light" />
       </el-space>
-    </el-row>
-    <el-row>
-      <el-radio-group v-model="config.medalTasks.light.mode" class="radio-group">
-        <el-row>
-          <el-space wrap :size="[8, 0]">
-            <el-icon>
-              <SemiSelect />
-            </el-icon>
-            <el-radio value="like">点赞</el-radio>
-            <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.like" />
-          </el-space>
-        </el-row>
-        <el-row>
-          <el-space wrap :size="[8, 0]">
-            <el-icon>
-              <SemiSelect />
-            </el-icon>
-            <el-radio value="danmu">发送弹幕</el-radio>
-            <el-button
-              type="primary"
-              size="small"
-              :icon="Edit"
-              @click="medalDanmuPanelVisible = !medalDanmuPanelVisible"
-              >编辑弹幕
-            </el-button>
-            <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.danmu" />
-          </el-space>
-        </el-row>
-      </el-radio-group>
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
