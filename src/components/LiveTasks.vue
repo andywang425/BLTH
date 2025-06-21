@@ -340,9 +340,4 @@ function handleRowClick(row: MedalInfoRow) {
   align-items: center;
   border-radius: 50%;
 }
-
-.radio-group {
-  display: block;
-  font-size: inherit;
-}
 </style>
