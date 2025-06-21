@@ -122,9 +122,13 @@ class LightTask extends MedalModule {
    * @private
    */
   private async likeTask(medals: LiveData.FansMedalPanel.List[]) {
-    for (const medal of medals) {
+    for (let i = 0; i < medals.length; i++) {
+      const medal = medals[i]
       await this.like(medal, _.random(30, 35))
-      await sleep(_.random(30000, 35000))
+
+      if (i < medals.length - 1) {
+        await sleep(_.random(30000, 35000))
+      }
     }
   }
 
@@ -136,7 +140,8 @@ class LightTask extends MedalModule {
   private async sendDanmuTask(medals: LiveData.FansMedalPanel.List[]) {
     let danmuIndex = 0
 
-    for (const medal of medals) {
+    for (let i = 0; i < medals.length; i++) {
+      const medal = medals[i]
       let target = 10
 
       for (let j = 0; j < target; j++) {
@@ -149,7 +154,10 @@ class LightTask extends MedalModule {
           // 弹幕发送失败，多尝试一次，每个直播间最多发13条
           target = Math.min(target + 1, 13)
         }
-        await sleep(_.random(6000, 8000))
+
+        if (i < medals.length - 1 || j < target - 1) {
+          await sleep(_.random(6000, 8000))
+        }
       }
     }
   }
