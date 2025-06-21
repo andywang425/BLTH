@@ -16,11 +16,7 @@ interface HelpInfo {
     LiveTasks: {
       medalTasks: {
         list: HelpInfoItem
-        light: {
-          main: HelpInfoItem
-          like: HelpInfoItem
-          danmu: HelpInfoItem
-        }
+        light: HelpInfoItem
         watch: HelpInfoItem
       }
     }
