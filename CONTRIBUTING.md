@@ -10,10 +10,10 @@ BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [Element Plus](https://elemen
 
 ## 环境搭建
 
-- 安装 [Node.js](https://nodejs.org/), [Visual Studio Code](https://code.visualstudio.com/)。
+- 安装 [Node.js](https://nodejs.org/), [Visual Studio Code](https://code.visualstudio.com/) 或 [WebStorm](https://www.jetbrains.com/webstorm/)。
 - Fork 本项目（取消勾选 Copy the `master` branch only），然后 Clone 至本地。
 - 切换到项目根目录，安装依赖 `npm install`。
-- 安装以下几个 vscode 拓展（使用 vscode 打开项目时会提示你安装）：[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。
+- 如果使用 vscode，安装以下几个拓展（打开项目时会提示你安装）：[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。
 
 ## 开始
 
@@ -143,7 +143,7 @@ npm run preview
 
 ## 已知问题
 
-如果要开发或调试运行时机很早的模块，建议先编译脚本（npm run build）然后运行编译后的脚本。在 dev 状态下调试这类功能可能会因为脚本被注入得太晚从而无法很好地进行测试。
+如果要开发或调试运行时机很早的模块，建议先编译脚本（build 或 build-only）然后运行编译后的脚本。在 dev 状态下调试这类功能可能会因为脚本被注入得太晚从而无法很好地进行测试。
 
 ## commit 规范
 
