@@ -216,8 +216,10 @@ const BAPI: BapiMethods = {
           x_bili_web_req_json,
         },
         {
-          Origin: 'https://t.bilibili.com',
-          Referer: 'https://t.bilibili.com/',
+          headers: {
+            Origin: 'https://t.bilibili.com',
+            Referer: 'https://t.bilibili.com/',
+          },
         },
       )
     },

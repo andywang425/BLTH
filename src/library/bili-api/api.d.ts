@@ -32,7 +32,7 @@ interface BapiMethods {
       bubble?: number,
       reply_mid?: number,
       reply_attr?: number,
-      replay_dmid?: unknown,
+      replay_dmid?: any,
       statistics?: string,
     ) => Promise<Live.SendMsg>
     likeReport: (

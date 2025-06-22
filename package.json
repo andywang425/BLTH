@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "run-s type-check \"build-only {@}\" minify --",
+    "build": "run-p type-check \"build-minify {@}\" --",
+    "build-minify": "run-s \"build-only {@}\" minify --",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",

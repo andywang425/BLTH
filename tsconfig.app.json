@@ -9,6 +9,7 @@
       "@/*": ["./src/*"]
     },
 
-    "types": ["element-plus/global"]
+    "types": ["element-plus/global"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"]
   }
 }

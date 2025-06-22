@@ -1,4 +1,4 @@
-import { GM_xmlhttpRequest, type GmXhrRequest } from '$'
+import { GM_xmlhttpRequest, type GmXmlhttpRequestOption, type GmResponseType } from '$'
 import _ from 'lodash'
 import { addURLParams } from '../utils'
 
@@ -21,15 +21,15 @@ class Request {
    * @param params URL 参数
    * @param otherDetails GM_xmlhttpRequest 的 details 参数
    */
-  public get(
+  public get<T>(
     url: string,
     params?: Record<string, any> | string,
-    otherDetails?: Record<string, any>,
-  ): Promise<any> {
+    otherDetails?: Partial<GmXmlhttpRequestOption<GmResponseType, any>>,
+  ): Promise<T> {
     url = addURLParams(this.url_prefix + url, params)
 
-    return new Promise((resolve, reject) => {
-      const defaultDetails: GmXhrRequest<never, any> = {
+    return new Promise<T>((resolve, reject) => {
+      const defaultDetails: GmXmlhttpRequestOption<GmResponseType, any> = {
         method: 'GET',
         url,
         responseType: 'json',
@@ -58,11 +58,15 @@ class Request {
    * @param data POST data
    * @param otherDetails GM_xmlhttpRequest 的 details 参数（特别的，可以提供 params 属性作为 URL 参数）
    */
-  public post(
+  public post<T>(
     url: string,
     data?: Record<string, any> | string,
-    otherDetails?: Record<string, any>,
-  ): Promise<any> {
+    otherDetails?: Partial<
+      GmXmlhttpRequestOption<GmResponseType, any> & {
+        params: Record<string, any> | string
+      }
+    >,
+  ): Promise<T> {
     const headers: Record<string, string> = {
       Accept: 'application/json, text/plain, */*',
       Referer: this.origin,
@@ -82,8 +86,8 @@ class Request {
     url = addURLParams(this.url_prefix + url, otherDetails?.params)
     delete otherDetails?.params
 
-    return new Promise((resolve, reject) => {
-      const defaultDetails: GmXhrRequest<never, any> = {
+    return new Promise<T>((resolve, reject) => {
+      const defaultDetails: GmXmlhttpRequestOption<GmResponseType, any> = {
         method: 'POST',
         url,
         data,

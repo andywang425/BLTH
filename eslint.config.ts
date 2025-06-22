@@ -1,5 +1,5 @@
 import { globalIgnores } from 'eslint/config'
-import { includeIgnoreFile } from "@eslint/compat";
+import { includeIgnoreFile } from '@eslint/compat'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import pluginVue from 'eslint-plugin-vue'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url'
 // configureVueProject({ scriptLangs: ['ts', 'tsx'] })
 // More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
 
-const gitignorePath = fileURLToPath(new URL(".gitignore", import.meta.url));
+const gitignorePath = fileURLToPath(new URL('.gitignore', import.meta.url))
 
 export default defineConfigWithVueTs(
   {
@@ -19,9 +19,16 @@ export default defineConfigWithVueTs(
   },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
-  includeIgnoreFile(gitignorePath, "Imported .gitignore patterns"),
+  includeIgnoreFile(gitignorePath, 'Imported .gitignore patterns'),
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
   skipFormatting,
+
+  {
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-empty-object-type': ['off'],
+    },
+  },
 )

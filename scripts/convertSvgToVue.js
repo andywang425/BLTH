@@ -6,7 +6,7 @@
 
 import { promises as fs } from 'fs'
 import { join, extname, basename, resolve } from 'path'
-import { optimize } from 'svgo';
+import { optimize } from 'svgo'
 
 const svgDirPath = resolve('./src/components/icons/')
 
@@ -20,9 +20,9 @@ fs.readdir(svgDirPath)
       const data = await fs.readFile(filePath, 'utf8')
       // 使用 svgo 优化 svg
       const result = optimize(data, {
-        multipass: true
-      });
-      const optimizedSvgString = result.data;
+        multipass: true,
+      })
+      const optimizedSvgString = result.data
       // 加上 Vue 的 <template> 标签
       const vueContent = `<template>\n${optimizedSvgString}\n</template>\n`
       // 修改文件后缀，获得新的文件路径

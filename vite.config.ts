@@ -16,14 +16,14 @@ export default defineConfig({
         name: {
           '': 'Bilibili Live Tasks Helper',
           en: 'Bilibili Live Tasks Helper',
-          zh: 'Bilibili Live Tasks Helper'
+          zh: 'Bilibili Live Tasks Helper',
         },
         namespace: 'https://github.com/andywang425',
         author: 'andywang425',
         description: {
           '': 'Enhancing the experience of watching Bilibili live streaming.',
           en: 'Enhancing the experience of watching Bilibili live streaming.',
-          zh: '增强Bilibili直播观看体验。'
+          zh: '增强Bilibili直播观看体验。',
         },
         homepageURL: 'https://github.com/andywang425/BLTH',
         supportURL: 'https://github.com/andywang425/BLTH/issues',
@@ -52,7 +52,7 @@ export default defineConfig({
           '*://live.bilibili.com/blanc/6*',
           '*://live.bilibili.com/blanc/7*',
           '*://live.bilibili.com/blanc/8*',
-          '*://live.bilibili.com/blanc/9*'
+          '*://live.bilibili.com/blanc/9*',
         ],
         'run-at': 'document-start',
         connect: [
@@ -61,14 +61,14 @@ export default defineConfig({
           'api.vc.bilibili.com',
           'passport.bilibili.com',
           'live.bilibili.com',
-          'live-trace.bilibili.com'
-        ]
+          'live-trace.bilibili.com',
+        ],
       },
       build: {
         externalGlobals: {
           vue: cdn.unpkg('Vue', 'dist/vue.global.prod.js').concat(
             // For pinia, another solution is .concat('https://unpkg.com/vue-demi@latest/lib/index.iife.js')
-            util.dataUrl(';window.Vue=Vue;window.VueDemi=Vue;')
+            util.dataUrl(';window.Vue=Vue;window.VueDemi=Vue;'),
           ),
           'element-plus': cdn.unpkg('ElementPlus', 'dist/index.full.min.js'),
           '@element-plus/icons-vue': cdn.unpkg('ElementPlusIconsVue', 'dist/index.iife.min.js'),
@@ -77,18 +77,18 @@ export default defineConfig({
           lodash: cdn.unpkg('_', 'lodash.min.js'),
           'hotkeys-js': cdn.unpkg('hotkeys', 'dist/hotkeys.min.js'),
           luxon: cdn.unpkg('luxon', 'build/global/luxon.min.js'),
-          'crypto-js': cdn.unpkg('CryptoJS', 'crypto-js.js')
+          'crypto-js': cdn.unpkg('CryptoJS', 'crypto-js.js'),
         },
         externalResource: {
-          'element-plus/dist/index.css': cdn.unpkg()
+          'element-plus/dist/index.css': cdn.unpkg(),
         },
-        metaFileName: true
-      }
-    })
+        metaFileName: true,
+      },
+    }),
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
 })

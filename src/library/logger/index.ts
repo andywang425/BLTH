@@ -15,15 +15,15 @@ class Logger {
     ]
   }
 
-  public log(...data: any) {
+  public log(...data: any[]) {
     console.log(...this.prefix, ...data)
   }
 
-  public error(...data: any) {
+  public error(...data: any[]) {
     console.error(...this.prefix, ...data)
   }
 
-  public warn(...data: any) {
+  public warn(...data: any[]) {
     console.warn(...this.prefix, ...data)
   }
 
