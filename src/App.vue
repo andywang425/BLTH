@@ -14,12 +14,10 @@ const uiStore = useUIStore()
 const logger = new Logger('App.vue')
 
 // 临时存储一下是否显示控制面板
-let isShowPanel = uiStore.uiConfig.isShowPanel
+const isShowPanel = uiStore.uiConfig.isShowPanel
 // 先设置为不显示，等准备工作完成了再显示（如果原来的配置是显示的话）
 // 太早显示会导致几个字悬浮在屏幕左上角的问题
 uiStore.uiConfig.isShowPanel = false
-// B站的播放器
-let livePlayer: Element | null
 // 显示/隐藏控制面板按钮
 let button: HTMLButtonElement
 /**
@@ -46,7 +44,7 @@ function buttonOnClick() {
 // 节流，防止点击过快，减小渲染压力
 const throttleButtonOnClick = _.throttle(buttonOnClick, 300)
 // 播放器节点出现在最初的html中，可以直接获取
-livePlayer = dq('#live-player-ctnr')
+const livePlayer = dq('#live-player-ctnr')
 if (livePlayer) {
   updatePosition()
   // 查找播放器上面的 header
