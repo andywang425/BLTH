@@ -35,7 +35,7 @@ class FansMetals extends BaseModule {
         } else {
           this.logger.error(
             `获取粉丝勋章列表第${page}页失败，提前结束获取`,
-            firstPageResponse.message
+            firstPageResponse.message,
           )
           // 中途出错，返回已获取的粉丝勋章列表，不抛出错误
           return fansMetalList
@@ -74,7 +74,7 @@ class FansMetals extends BaseModule {
 
     setTimeout(
       () => this.run().catch((reason) => this.logger.error(reason)),
-      delayToNextMoment(0, 4).ms
+      delayToNextMoment(0, 4).ms,
     )
   }
 }

@@ -28,7 +28,7 @@ class CoinTask extends BaseModule {
       const archive = item.modules.module_dynamic.major.archive
       return {
         aid: archive.aid,
-        bvid: archive.bvid
+        bvid: archive.bvid,
       }
     })
   }

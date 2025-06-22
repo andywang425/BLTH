@@ -21,7 +21,7 @@ class LightTask extends MedalModule {
     // 点亮返回true，否则返回false
     isLighted: (medal) => medal.medal.is_lighted === 1,
     // 直播中返回on，否则返回off
-    livingStatus: (medal) => (medal.room_info.living_status === 1 ? 'on' : 'off')
+    livingStatus: (medal) => (medal.room_info.living_status === 1 ? 'on' : 'off'),
   }
 
   /**
@@ -33,7 +33,7 @@ class LightTask extends MedalModule {
 
     const result: MedalsByLivingStatus = {
       on: [],
-      off: []
+      off: [],
     }
 
     fansMedals.forEach((medal) => {
@@ -148,7 +148,7 @@ class LightTask extends MedalModule {
         if (
           !(await this.sendDanmu(
             medal,
-            this.config.danmuList[danmuIndex++ % this.config.danmuList.length]
+            this.config.danmuList[danmuIndex++ % this.config.danmuList.length],
           ))
         ) {
           // 弹幕发送失败，多尝试一次，每个直播间最多发13条

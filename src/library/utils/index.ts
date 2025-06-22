@@ -202,5 +202,5 @@ export {
   deepestIterate,
   getUrlFromFetchInput,
   waitForMoment,
-  arrayToMap
+  arrayToMap,
 }

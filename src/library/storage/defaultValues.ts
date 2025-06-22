@@ -12,28 +12,28 @@ const defaultValues: DefaultValues = {
     isShowPanel: true,
     activeMenuIndex: 'MainSiteTasks',
     panelWidthPercent: 40,
-    medalInfoPanelSortMode: false
+    medalInfoPanelSortMode: false,
   },
   modules: {
     DailyTasks: {
       MainSiteTasks: {
         login: {
           enabled: false,
-          _lastCompleteTime: 0
+          _lastCompleteTime: 0,
         },
         watch: {
           enabled: false,
-          _lastCompleteTime: 0
+          _lastCompleteTime: 0,
         },
         coin: {
           enabled: false,
           num: 1,
-          _lastCompleteTime: 0
+          _lastCompleteTime: 0,
         },
         share: {
           enabled: false,
-          _lastCompleteTime: 0
-        }
+          _lastCompleteTime: 0,
+        },
       },
       LiveTasks: {
         medalTasks: {
@@ -54,101 +54,101 @@ const defaultValues: DefaultValues = {
               'ε=ε=(ノ≧∇≦)ノ',
               '⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄',
               '←◡←',
-              `(●'◡'●)ﾉ♥`
+              `(●'◡'●)ﾉ♥`,
             ],
-            _lastCompleteTime: 0
+            _lastCompleteTime: 0,
           },
           watch: {
             enabled: false,
             time: 25,
             _watchingProgress: {},
             _lastWatchTime: 0,
-            _lastCompleteTime: 0
+            _lastCompleteTime: 0,
           },
           isWhiteList: false,
-          roomidList: []
-        }
+          roomidList: [],
+        },
       },
       OtherTasks: {
         groupSign: {
           enabled: false,
-          _lastCompleteTime: 0
+          _lastCompleteTime: 0,
         },
         silverToCoin: {
           enabled: false,
-          _lastCompleteTime: 0
+          _lastCompleteTime: 0,
         },
         coinToSilver: {
           enabled: false,
           num: 1,
-          _lastCompleteTime: 0
+          _lastCompleteTime: 0,
         },
         getYearVipPrivilege: {
           enabled: false,
-          _nextReceiveTime: 0
-        }
-      }
+          _nextReceiveTime: 0,
+        },
+      },
     },
     EnhanceExperience: {
       switchLiveStreamQuality: {
         enabled: false,
-        qualityDesc: '原画'
+        qualityDesc: '原画',
       },
       banp2p: {
-        enabled: false
+        enabled: false,
       },
       noReport: {
-        enabled: false
+        enabled: false,
       },
       noSleep: {
-        enabled: false
+        enabled: false,
       },
       invisibility: {
-        enabled: false
-      }
+        enabled: false,
+      },
     },
     RemoveElement: {
       removePKBox: {
-        enabled: false
+        enabled: false,
       },
       removeLiveWaterMark: {
-        enabled: false
+        enabled: false,
       },
       removeShopPopover: {
-        enabled: false
+        enabled: false,
       },
       removeGameParty: {
-        enabled: false
+        enabled: false,
       },
       removeGiftPopover: {
-        enabled: false
+        enabled: false,
       },
       removeMicPopover: {
-        enabled: false
+        enabled: false,
       },
       removeComboCard: {
-        enabled: false
+        enabled: false,
       },
       removeRank: {
-        enabled: false
+        enabled: false,
       },
       removeHeaderStuff: {
-        enabled: false
+        enabled: false,
       },
       removeFlipView: {
-        enabled: false
+        enabled: false,
       },
       removeRecommendRoom: {
-        enabled: false
+        enabled: false,
       },
       removeLiveMosaic: {
-        enabled: false
-      }
-    }
+        enabled: false,
+      },
+    },
   },
   cache: {
-    lastAliveHeartBeatTime: 0
-  }
+    lastAliveHeartBeatTime: 0,
+  },
 }
 
 export default defaultValues

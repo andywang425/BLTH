@@ -26,7 +26,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
     // 9: '专属等级加速包'
     15: '年度专享会员购星光宝盒88折券',
     16: '大会员专享会员购10魔晶',
-    17: '大会员专享游戏优惠券'
+    17: '大会员专享游戏优惠券',
   }
 
   /**
@@ -71,18 +71,18 @@ class GetYearVipPrivilegeTask extends BaseModule {
       this.logger.log(`BAPI.main.vip.receivePrivilege(${type}) response`, response)
       if (response.code === 0) {
         this.logger.log(
-          `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）成功`
+          `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）成功`,
         )
       } else {
         this.logger.error(
           `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）失败`,
-          response.message
+          response.message,
         )
       }
     } catch (error) {
       this.logger.error(
         `领取年度大会员权益（type = ${type}, ${this.type2Name[type] ?? '未知'}）出错`,
-        error
+        error,
       )
     }
   }
@@ -99,7 +99,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
       } else {
         this.logger.error(
           `领取年度大会员权益（type = 9，专属等级加速包（10主站经验））失败`,
-          response.message
+          response.message,
         )
       }
     } catch (error) {
@@ -153,11 +153,11 @@ class GetYearVipPrivilegeTask extends BaseModule {
                   watch(
                     () => watchTaskConfig._lastCompleteTime,
                     () => sleep(3000).then(() => this.addExperience()),
-                    { once: true }
+                    { once: true },
                   )
                 } else {
                   this.logger.warn(
-                    '领取专属等级加速包（10主站经验）前需要观看任意一个视频，请打开【主站任务】中的【每日观看视频】，或是在运行脚本前手动观看'
+                    '领取专属等级加速包（10主站经验）前需要观看任意一个视频，请打开【主站任务】中的【每日观看视频】，或是在运行脚本前手动观看',
                   )
                 }
               }
@@ -166,7 +166,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
           }
           this.status = 'done'
           this.config._nextReceiveTime = Math.min(
-            ...list.map((i) => i.period_end_unix).filter((unix) => unix > ts())
+            ...list.map((i) => i.period_end_unix).filter((unix) => unix > ts()),
           )
         }
       }
@@ -175,7 +175,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
       if (diff < 86400) {
         this.logger.log(
           '领取年度大会员权益模块下次运行时间:',
-          DateTime.fromSeconds(this.config._nextReceiveTime).toJSDate()
+          DateTime.fromSeconds(this.config._nextReceiveTime).toJSDate(),
         )
         setTimeout(() => this.run(), diff * 1000)
       } else {

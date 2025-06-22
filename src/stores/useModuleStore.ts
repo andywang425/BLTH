@@ -12,7 +12,7 @@ import type {
   ModuleStatus,
   IsOnTargetFrameTypes,
   ModuleEmitterEvents,
-  ModuleStatusTypes
+  ModuleStatusTypes,
 } from '@/types'
 import { deepestIterate, waitForMoment } from '@/library/utils'
 import { useCacheStore } from './useCacheStore'
@@ -27,22 +27,22 @@ const defaultModuleStatus: ModuleStatus = {
       login: '',
       watch: '',
       coin: '',
-      share: ''
+      share: '',
     },
     LiveTasks: {
       sign: '',
       medalTasks: {
         light: '',
-        watch: ''
-      }
+        watch: '',
+      },
     },
     OtherTasks: {
       groupSign: '',
       silverToCoin: '',
       coinToSilver: '',
-      getYearVipPrivilege: ''
-    }
-  }
+      getYearVipPrivilege: '',
+    },
+  },
 }
 
 // 在所有 frame 或顶层 frame 上运行的被加载的模块名称
@@ -167,8 +167,8 @@ export const useModuleStore = defineStore('module', () => {
     moduleConfig,
     _.debounce((newModuleConfig: ModuleConfig) => Storage.setModuleConfig(newModuleConfig), 250, {
       leading: true,
-      trailing: true
-    })
+      trailing: true,
+    }),
   )
 
   /**
@@ -187,6 +187,6 @@ export const useModuleStore = defineStore('module', () => {
     moduleConfig,
     emitter,
     moduleStatus,
-    loadModules
+    loadModules,
   }
 })

@@ -66,9 +66,9 @@ if (livePlayer) {
         hotkeys(
           'alt+b',
           {
-            element: topFrameDocumentElement()
+            element: topFrameDocumentElement(),
           },
-          throttleButtonOnClick
+          throttleButtonOnClick,
         )
       }
       hotkeys('alt+b', throttleButtonOnClick)

@@ -11,7 +11,7 @@ class Logger {
       'font-weight: bold; color: white; background-color: #23ade5; padding: 1px 4px; border-radius: 4px;',
       'font-weight: bold; color: #0920e6;',
       'font-weight: bold;',
-      ''
+      '',
     ]
   }
 

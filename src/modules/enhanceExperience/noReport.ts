@@ -27,7 +27,7 @@ class NoReport extends BaseModule {
    */
   private hookProperties(win: Window) {
     Object.defineProperty(win.navigator, 'sendBeacon', {
-      value: () => {}
+      value: () => {},
     })
 
     Object.defineProperties(win, {
@@ -35,19 +35,19 @@ class NoReport extends BaseModule {
         get() {
           return () => {}
         },
-        set() {}
+        set() {},
       },
       reportConfig: {
         get() {
           return () => {}
         },
-        set() {}
+        set() {},
       },
       __biliMirror__: {
         get() {
           return {}
         },
-        set() {}
+        set() {},
       },
       __biliMirrorPbInstance__: {
         get() {
@@ -63,20 +63,20 @@ class NoReport extends BaseModule {
                   scheduler: {},
                   sequencer: {},
                   techEventReporter: {},
-                  version: ''
+                  version: '',
                 }
                 return __biliMirrorPbInstance__[property] ?? (() => {})
-              }
-            }
+              },
+            },
           )
         },
-        set() {}
+        set() {},
       },
       __INITIAL_MIRROR__: {
         get() {
           return () => {}
         },
-        set() {}
+        set() {},
       },
       __MIRROR_REPORT__: {
         get() {
@@ -85,17 +85,17 @@ class NoReport extends BaseModule {
             {
               get() {
                 return () => {}
-              }
-            }
+              },
+            },
           )
         },
-        set() {}
+        set() {},
       },
       __MIRROR_VERSION__: {
         get() {
           return ''
         },
-        set() {}
+        set() {},
       },
       __statisObserver: {
         // 拦截该属性后会导致一些报错，如：
@@ -117,36 +117,36 @@ class NoReport extends BaseModule {
                   default:
                     return () => {}
                 }
-              }
-            }
+              },
+            },
           )
         },
-        set() {}
+        set() {},
       },
       __statisObserverConfig: {
         get() {
           return {}
         },
-        set() {}
+        set() {},
       },
       __cm_tracker__: {
         get() {
           return undefined
         },
-        set() {}
+        set() {},
       },
       bilicm: {
         get() {
           return {}
         },
-        set() {}
+        set() {},
       },
       BiliCm: {
         get() {
           return {}
         },
-        set() {}
-      }
+        set() {},
+      },
     })
   }
 
@@ -161,14 +161,14 @@ class NoReport extends BaseModule {
             config: config,
             status: 200,
             headers: {
-              'Content-Type': 'text/plain; charset=utf-8'
+              'Content-Type': 'text/plain; charset=utf-8',
             },
-            response: '{}'
+            response: '{}',
           })
         } else {
           handler.next(config)
         }
-      }
+      },
     }
 
     const fetchHookConfig: FetchHookProxyConfig = {
@@ -182,7 +182,7 @@ class NoReport extends BaseModule {
       },
       onResponse(response, handler) {
         handler.next(response)
-      }
+      },
     }
 
     proxy(ajaxHookProxyConfig, unsafeWindow)

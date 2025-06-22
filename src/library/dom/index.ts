@@ -12,7 +12,7 @@ const dce = document.createElement.bind(document)
 function waitForElement(
   parentElement: Element,
   selector: string,
-  timeout: number = 5000
+  timeout: number = 5000,
 ): Promise<Element> {
   return new Promise((resolve, reject) => {
     const element = parentElement.querySelector(selector)
@@ -33,7 +33,7 @@ function waitForElement(
 
     observer.observe(parentElement, {
       childList: true,
-      subtree: true
+      subtree: true,
     })
 
     const timeoutId = setTimeout(() => {

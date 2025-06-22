@@ -61,7 +61,7 @@ class Cookie {
   public static getAsync<T extends string>(
     names: T[],
     interval: number = 300,
-    timeout?: number
+    timeout?: number,
   ): Promise<Record<T, string>> {
     return new Promise((resolve, reject) => {
       let remainCookieNames = [...names]

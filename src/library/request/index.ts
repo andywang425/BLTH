@@ -24,7 +24,7 @@ class Request {
   public get(
     url: string,
     params?: Record<string, any> | string,
-    otherDetails?: Record<string, any>
+    otherDetails?: Record<string, any>,
   ): Promise<any> {
     url = addURLParams(this.url_prefix + url, params)
 
@@ -37,14 +37,14 @@ class Request {
           Accept: 'application/json, text/plain, */*',
           Referer: this.origin,
           Origin: this.origin,
-          'Sec-Fetch-Site': 'same-site'
+          'Sec-Fetch-Site': 'same-site',
         },
         onload: function (response) {
           resolve(response.response)
         },
         onerror: function (err) {
           reject(new Error(JSON.stringify(err)))
-        }
+        },
       }
 
       const details = _.defaultsDeep(otherDetails, defaultDetails)
@@ -61,14 +61,14 @@ class Request {
   public post(
     url: string,
     data?: Record<string, any> | string,
-    otherDetails?: Record<string, any>
+    otherDetails?: Record<string, any>,
   ): Promise<any> {
     const headers: Record<string, string> = {
       Accept: 'application/json, text/plain, */*',
       Referer: this.origin,
       Origin: this.origin,
       'Sec-Fetch-Site': 'same-site',
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/x-www-form-urlencoded',
     }
 
     if (data instanceof FormData) {
@@ -94,7 +94,7 @@ class Request {
         },
         onerror: function (err) {
           reject(new Error(JSON.stringify(err)))
-        }
+        },
       }
 
       const details = _.defaultsDeep(otherDetails, defaultDetails)

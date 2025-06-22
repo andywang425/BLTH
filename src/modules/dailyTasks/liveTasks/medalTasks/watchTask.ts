@@ -27,7 +27,7 @@ class RoomHeart {
     areaID: number,
     parentID: number,
     ruid: number,
-    watchedSeconds: number
+    watchedSeconds: number,
   ) {
     this.roomID = roomID
     this.areaID = areaID
@@ -108,7 +108,7 @@ class RoomHeart {
       const response = await BAPI.liveTrace.E(this.id, this.device, this.ruid)
       this.logger.log(
         `BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) response`,
-        response
+        response,
       )
       if (response.code === 0) {
         this.seq += 1
@@ -116,14 +116,14 @@ class RoomHeart {
           heartbeat_interval: this.heartBeatInterval,
           secret_key: this.secretKey,
           secret_rule: this.secretRule,
-          timestamp: this.timestamp
+          timestamp: this.timestamp,
         } = response.data)
         await sleep(this.heartBeatInterval * 1000)
         return this.X()
       } else {
         this.logger.error(
           `BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) 失败`,
-          response.message
+          response.message,
         )
       }
     } catch (error) {
@@ -148,7 +148,7 @@ class RoomHeart {
         benchmark: this.secretKey,
         time: this.heartBeatInterval,
         ts: tsm(),
-        ua: this.ua
+        ua: this.ua,
       }
       // 签名
       const s = this.spyder(JSON.stringify(spyderData), this.secretRule)
@@ -161,11 +161,11 @@ class RoomHeart {
         this.timestamp,
         this.secretKey,
         this.heartBeatInterval,
-        spyderData.ts
+        spyderData.ts,
       )
       this.logger.log(
         `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}, ${spyderData.ts}) response`,
-        response
+        response,
       )
       if (response.code === 0) {
         this.seq += 1
@@ -179,20 +179,20 @@ class RoomHeart {
           heartbeat_interval: this.heartBeatInterval,
           secret_key: this.secretKey,
           secret_rule: this.secretRule,
-          timestamp: this.timestamp
+          timestamp: this.timestamp,
         } = response.data)
         await sleep(this.heartBeatInterval * 1000)
         return this.X()
       } else {
         this.logger.error(
           `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 失败`,
-          response.message
+          response.message,
         )
       }
     } catch (error) {
       this.logger.error(
         `BAPI.liveTrace.X(s, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 出错`,
-        error
+        error,
       )
     }
   }
@@ -218,7 +218,7 @@ class RoomHeart {
       uuid,
       ets: data.ets,
       time: data.time,
-      ts: data.ts
+      ts: data.ts,
     }
     let s = JSON.stringify(newData)
     for (const r of rule) {
@@ -260,7 +260,7 @@ class WatchTask extends MedalModule {
 
   private MEDAL_FILTERS: WatchTaskMedalFilters = {
     // 等级小于20返回true，否则返回false
-    levelLt20: (medal) => medal.medal.level < 20
+    levelLt20: (medal) => medal.medal.level < 20,
   }
 
   /**
@@ -272,7 +272,7 @@ class WatchTask extends MedalModule {
 
     const result = fansMedals.filter(
       (medal) =>
-        this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) && this.MEDAL_FILTERS.levelLt20(medal)
+        this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) && this.MEDAL_FILTERS.levelLt20(medal),
     )
 
     if (this.medalTasksConfig.isWhiteList) {
@@ -303,7 +303,7 @@ class WatchTask extends MedalModule {
     } catch (error) {
       this.logger.error(
         `获取指定直播间的 area_id 和 parent_area_id(roomid = ${roomid}) 出错`,
-        error
+        error,
       )
       return [-1, -1]
     }
@@ -355,7 +355,7 @@ class WatchTask extends MedalModule {
               }
               // 今日观看时间未达到设置值，开始心跳
               this.logger.log(
-                `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务`
+                `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务`,
               )
 
               await new RoomHeart(
@@ -363,7 +363,7 @@ class WatchTask extends MedalModule {
                 area_id,
                 parent_area_id,
                 uid,
-                this.config._watchingProgress[roomid] ?? 0
+                this.config._watchingProgress[roomid] ?? 0,
               ).start()
             }
           }

@@ -31,7 +31,7 @@ const medalDanmuPanelVisible = ref<boolean>(false)
 const danmuTableData = computed(() =>
   config.medalTasks.light.danmuList.map((danmu) => {
     return { content: danmu }
-  })
+  }),
 )
 
 const handleEditDanmu = (index: number, row: { content: string }) => {
@@ -41,7 +41,7 @@ const handleEditDanmu = (index: number, row: { content: string }) => {
     inputPattern: /^.{1,30}$/,
     inputErrorMessage: '弹幕内容不得为空且长度不能超过30',
     inputValue: row.content,
-    lockScroll: false
+    lockScroll: false,
   })
     .then(({ value }) => {
       config.medalTasks.light.danmuList[index] = value
@@ -53,7 +53,7 @@ const handleDeleteDanmu = (index: number) => {
   if (config.medalTasks.light.danmuList.length === 1) {
     ElMessage.warning({
       message: '至少要有一条弹幕',
-      appendTo: '.el-dialog'
+      appendTo: '.el-dialog',
     })
     return
   }
@@ -66,7 +66,7 @@ const handleAddDanmu = () => {
     cancelButtonText: '取消',
     inputPattern: /^.{1,30}$/,
     inputErrorMessage: '弹幕内容不得为空且长度不能超过30',
-    lockScroll: false
+    lockScroll: false,
   })
     .then(({ value }) => {
       config.medalTasks.light.danmuList.push(value)
@@ -82,13 +82,13 @@ const medalInfoTableData = computed({
       nick_name: medal.anchor_info.nick_name,
       medal_name: medal.medal.medal_name,
       medal_level: medal.medal.level,
-      roomid: medal.room_info.room_id
+      roomid: medal.room_info.room_id,
     }))
     if (uiStore.uiConfig.medalInfoPanelSortMode) {
       const filteredMedals = medals.filter((medal) =>
         config.medalTasks.isWhiteList
           ? config.medalTasks.roomidList.includes(medal.roomid)
-          : !config.medalTasks.roomidList.includes(medal.roomid)
+          : !config.medalTasks.roomidList.includes(medal.roomid),
       )
       const orderMap = arrayToMap(config.medalTasks.roomidList)
       return filteredMedals.sort((a, b) => orderMap.get(a.roomid)! - orderMap.get(b.roomid)!)
@@ -97,7 +97,7 @@ const medalInfoTableData = computed({
   },
   set(newValue: MedalInfoRow[]) {
     config.medalTasks.roomidList = newValue.map((row) => row.roomid)
-  }
+  },
 })
 /** 是否显示加载中图标 */
 const medalInfoLoading = ref<boolean>(false)
@@ -126,12 +126,12 @@ const handleEditList = async () => {
             medalInfoLoading.value = false
           })
         },
-        { once: true }
+        { once: true },
       )
       if (!biliStore.fansMedalsStatus) {
         // FansMedals 模块没有获取过粉丝勋章数据，利用 emitter 通知该模块去获取
         moduleStore.emitter.emit('Default_FansMedals', {
-          module: 'LiveTasks'
+          module: 'LiveTasks',
         })
       }
     } else {

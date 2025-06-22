@@ -24,33 +24,33 @@ const items: MenuItem[] = [
     subs: [
       {
         title: '主站任务',
-        index: 'MainSiteTasks' // index 是组件名
+        index: 'MainSiteTasks', // index 是组件名
       },
       {
         title: '直播任务',
-        index: 'LiveTasks'
+        index: 'LiveTasks',
       },
       {
         title: '其它任务',
-        index: 'OtherTasks'
-      }
-    ]
+        index: 'OtherTasks',
+      },
+    ],
   },
   {
     icon: 'Monitor',
     title: '体验优化',
-    index: 'EnhanceExperience'
+    index: 'EnhanceExperience',
   },
   {
     icon: 'Scissor',
     title: '移除元素',
-    index: 'RemoveElement'
+    index: 'RemoveElement',
   },
   {
     icon: 'Setting',
     title: '设置',
-    index: 'ScriptSettings'
-  }
+    index: 'ScriptSettings',
+  },
 ]
 </script>
 

@@ -15,8 +15,8 @@ export default defineComponent({
     OtherTasks,
     EnhanceExperience,
     RemoveElement,
-    ScriptSettings
-  }
+    ScriptSettings,
+  },
 })
 </script>
 

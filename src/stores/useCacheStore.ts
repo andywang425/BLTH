@@ -67,6 +67,6 @@ export const useCacheStore = defineStore('cache', () => {
     cache,
     currentScriptType,
     startMainBLTHAliveHeartBeat,
-    checkCurrentScriptType
+    checkCurrentScriptType,
   }
 })

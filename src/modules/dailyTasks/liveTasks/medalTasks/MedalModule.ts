@@ -14,13 +14,13 @@ class MedalModule extends BaseModule {
     whiteBlackList: (m) =>
       this.medalTasksConfig.isWhiteList
         ? this.medalTasksConfig.roomidList.includes(m.room_info.room_id)
-        : !this.medalTasksConfig.roomidList.includes(m.room_info.room_id)
+        : !this.medalTasksConfig.roomidList.includes(m.room_info.room_id),
   }
 
   protected sortMedals(medals: LiveData.FansMedalPanel.List[]): LiveData.FansMedalPanel.List[] {
     const orderMap = arrayToMap(this.medalTasksConfig.roomidList)
     return medals.sort(
-      (a, b) => orderMap.get(a.room_info.room_id)! - orderMap.get(b.room_info.room_id)!
+      (a, b) => orderMap.get(a.room_info.room_id)! - orderMap.get(b.room_info.room_id)!,
     )
   }
 

@@ -17,7 +17,7 @@ export interface EmitterOnce<Events extends Record<EventType, unknown>> extends 
  * 一个添加了 once 方法的 mitt
  */
 export default function mittOnce<Events extends Record<EventType, unknown>>(
-  all?: EventHandlerMap<Events>
+  all?: EventHandlerMap<Events>,
 ): EmitterOnce<Events> {
   const emitter = mitt<Events>(all)
 
@@ -30,6 +30,6 @@ export default function mittOnce<Events extends Record<EventType, unknown>>(
         emitter.off(type, fn)
         handler(evt)
       })
-    }
+    },
   }
 }

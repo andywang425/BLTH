@@ -16,7 +16,7 @@ interface BapiMethods {
       room_id?: number,
       area_parent_id?: number,
       area_id?: number,
-      platform?: string
+      platform?: string,
     ) => Promise<Live.RoomGiftConfig>
     doSign: () => Promise<Live.DoSign>
     getSignInfo: () => Promise<Live.GetSignInfo>
@@ -33,13 +33,13 @@ interface BapiMethods {
       reply_mid?: number,
       reply_attr?: number,
       replay_dmid?: unknown,
-      statistics?: string
+      statistics?: string,
     ) => Promise<Live.SendMsg>
     likeReport: (
       room_id: number,
       anchor_id: number,
       click_time?: number,
-      visit_id?: string
+      visit_id?: string,
     ) => Promise<Live.LikeReport>
     getInfoByRoom: (room_id: number, web_location?: string) => Promise<Live.GetInfoByRoom>
     getUserTaskProgress: (target_id?: number) => Promise<Live.GetUserTaskProgress>
@@ -55,7 +55,7 @@ interface BapiMethods {
       ruid: number,
       is_patch?: number,
       heart_beat?: any[],
-      visit_id?: string
+      visit_id?: string,
     ) => Promise<LiveTrace.E>
     X: (
       s: string,
@@ -66,7 +66,7 @@ interface BapiMethods {
       benchmark: string,
       time: number,
       ts: number,
-      visit_id?: string
+      visit_id?: string,
     ) => Promise<LiveTrace.X>
   }
   main: {
@@ -80,7 +80,7 @@ interface BapiMethods {
       features?: string,
       web_location?: string,
       x_bili_device_req_json?: string,
-      x_bili_web_req_json?: string
+      x_bili_web_req_json?: string,
     ) => Promise<Main.DynamicAll>
     videoHeartbeat: (
       aid: number,
@@ -102,7 +102,7 @@ interface BapiMethods {
       from_spmid?: string,
       session?: string,
       extra?: string,
-      web_location?: number
+      web_location?: number,
     ) => Promise<Main.VideoHeartbeat>
     share: (
       aid: string,
@@ -110,7 +110,7 @@ interface BapiMethods {
       eab_x?: number,
       ramval?: number,
       ga?: number,
-      referer?: string
+      referer?: string,
     ) => Promise<Main.Share>
     coinAdd: (
       aid: string,
@@ -120,7 +120,7 @@ interface BapiMethods {
       eab_x?: number,
       ramval?: number,
       source?: string,
-      ga?: number
+      ga?: number,
     ) => Promise<Main.CoinAdd>
     videoRelation: (aid: string, bvid?: string) => Promise<Main.VideoRelation>
     vip: {

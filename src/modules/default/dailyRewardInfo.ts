@@ -29,7 +29,7 @@ class DailyRewardInfo extends BaseModule {
 
     if (
       Object.values(mainSiteTasks).some(
-        (t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4)
+        (t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4),
       )
     ) {
       // 开启了任意一项主站功能且该功能今天没完成过
@@ -38,7 +38,7 @@ class DailyRewardInfo extends BaseModule {
 
     setTimeout(
       () => this.run().catch((reason) => this.logger.error(reason)),
-      delayToNextMoment(0, 4).ms
+      delayToNextMoment(0, 4).ms,
     )
   }
 }
