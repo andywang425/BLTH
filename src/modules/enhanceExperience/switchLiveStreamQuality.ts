@@ -39,7 +39,7 @@ class SwitchLiveStreamQuality extends BaseModule {
     }
 
     const targetQuality = playerInfo.qualityCandidates.find(({ desc }) =>
-      desc.includes(this.config.qualityDesc)
+      desc.includes(this.config.qualityDesc),
     )
 
     if (!targetQuality) {

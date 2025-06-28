@@ -10,33 +10,16 @@ const request: Requests = {
   passport: new Request('https://passport.bilibili.com', 'https://passport.bilibili.com/'),
   main: new Request('https://api.bilibili.com', 'https://www.bilibili.com'),
   vc: new Request('https://api.vc.bilibili.com', 'https://message.bilibili.com/'),
-  raw: new Request()
+  raw: new Request(),
 }
 
 const BAPI: BapiMethods = {
   live: {
-    roomGiftConfig: (room_id = 0, area_parent_id = 0, area_id = 0, platform = 'pc') => {
-      return request.live.get('/xlive/web-room/v1/giftPanel/roomGiftConfig', {
-        platform,
-        room_id,
-        area_parent_id,
-        area_id
-      })
-    },
-    doSign: () => {
-      return request.live.get('/xlive/web-ucenter/v1/sign/DoSign')
-    },
-    /**
-     * 网页直播签到功能已不存在，但该API仍可以使用（并且也存在于B站js代码中）
-     */
-    getSignInfo: () => {
-      return request.live.get('/xlive/web-ucenter/v1/sign/WebGetSignInfo')
-    },
     fansMedalPanel: (page, page_size = 10) => {
       // 返回的 room_id 是长号
       return request.live.get('/xlive/app-ucenter/v1/fansMedal/panel', {
         page,
-        page_size
+        page_size,
       })
     },
     sendMsg: (
@@ -51,7 +34,7 @@ const BAPI: BapiMethods = {
       reply_mid = 0,
       reply_attr = 0,
       replay_dmid = '',
-      statistics = '{"appId":100,"platform":5}'
+      statistics = '{"appId":100,"platform":5}',
     ) => {
       const biliStore = useBiliStore()
       const bili_jct = biliStore.cookies!.bili_jct
@@ -72,8 +55,8 @@ const BAPI: BapiMethods = {
           rnd: ts(),
           roomid,
           csrf: bili_jct,
-          csrf_token: bili_jct
-        })
+          csrf_token: bili_jct,
+        }),
       )
     },
     likeReport: (room_id, anchor_id, click_time = 1, visit_id = '') => {
@@ -87,7 +70,7 @@ const BAPI: BapiMethods = {
         anchor_id,
         csrf_token: bili_jct,
         csrf: bili_jct,
-        visit_id
+        visit_id,
       })
     },
     /**
@@ -98,38 +81,16 @@ const BAPI: BapiMethods = {
         '/xlive/web-room/v1/index/getInfoByRoom',
         wbiSign({
           room_id,
-          web_location
-        })
+          web_location,
+        }),
       )
-    },
-    getUserTaskProgress: (target_id = 11153765) => {
-      // 该 API 是 APP API，但也可以使用 web 的身份校验方式
-      const biliStore = useBiliStore()
-      const bili_jct = biliStore.cookies!.bili_jct
-      return request.live.get('/xlive/app-ucenter/v1/userTask/GetUserTaskProgress', {
-        target_id,
-        csrf: bili_jct,
-        ts: ts()
-      })
-    },
-    userTaskReceiveRewards: (target_id = 11153765) => {
-      // 该 API 是 APP API，但也可以使用 web 的身份校验方式，将 actionKey 设置为 csrf 即可
-      // 而且似乎不需要观看直播5分钟，只要发5条弹幕就行了
-      const biliStore = useBiliStore()
-      const bili_jct = biliStore.cookies!.bili_jct
-      return request.live.post('/xlive/app-ucenter/v1/userTask/UserTaskReceiveRewards', {
-        actionKey: 'csrf',
-        target_id,
-        csrf: bili_jct,
-        ts: ts()
-      })
     },
     silver2coin: (visit_id = '') => {
       const bili_jct = useBiliStore().cookies!.bili_jct
       return request.live.post('/xlive/revenue/v1/wallet/silver2coin', {
         csrf: bili_jct,
         csrf_token: bili_jct,
-        visit_id
+        visit_id,
       })
     },
     coin2silver: (num, platform = 'pc', visit_id = '') => {
@@ -139,18 +100,9 @@ const BAPI: BapiMethods = {
         csrf: bili_jct,
         csrf_token: bili_jct,
         platform,
-        visit_id
+        visit_id,
       })
     },
-    wearMedal: (medal_id, visit_id = '') => {
-      const bili_jct = useBiliStore().cookies!.bili_jct
-      return request.live.post('/xlive/web-room/v1/fansMedal/wear', {
-        medal_id,
-        csrf_token: bili_jct,
-        csrf: bili_jct,
-        visit_id: visit_id
-      })
-    }
   },
   liveTrace: {
     E: (id, device, ruid, is_patch = 0, heart_beat = [], visit_id = '') => {
@@ -165,7 +117,7 @@ const BAPI: BapiMethods = {
         ua: navigator.userAgent,
         csrf_token: bili_jct,
         csrf: bili_jct,
-        visit_id
+        visit_id,
       })
     },
     X: (s, id, device, ruid, ets, benchmark, time, ts, visit_id = '') => {
@@ -182,9 +134,9 @@ const BAPI: BapiMethods = {
         ua: navigator.userAgent,
         csrf_token: bili_jct,
         csrf: bili_jct,
-        visit_id
+        visit_id,
       })
-    }
+    },
   },
   main: {
     nav: () => {
@@ -201,7 +153,7 @@ const BAPI: BapiMethods = {
       features = 'itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote,decorationCard,onlyfansAssetsV2,forwardListHidden,ugcDelete',
       web_location = '333.1365',
       x_bili_device_req_json = '{"platform":"web","device":"pc"}',
-      x_bili_web_req_json = '{"spm_id":"333.1365"}'
+      x_bili_web_req_json = '{"spm_id":"333.1365"}',
     ) => {
       return request.main.get(
         '/x/polymer/web-dynamic/v1/feed/all',
@@ -213,12 +165,14 @@ const BAPI: BapiMethods = {
           features,
           web_location,
           x_bili_device_req_json,
-          x_bili_web_req_json
+          x_bili_web_req_json,
         },
         {
-          Origin: 'https://t.bilibili.com',
-          Referer: 'https://t.bilibili.com/'
-        }
+          headers: {
+            Origin: 'https://t.bilibili.com',
+            Referer: 'https://t.bilibili.com/',
+          },
+        },
       )
     },
     videoHeartbeat: (
@@ -241,7 +195,7 @@ const BAPI: BapiMethods = {
       from_spmid = '333.1365.list.card_archive.click',
       session = uuid().replaceAll('-', ''),
       extra = '{"player_version":"4.8.43"}',
-      web_location = 1315873
+      web_location = 1315873,
     ) => {
       const biliStore = useBiliStore()
       const start_ts = ts()
@@ -271,7 +225,7 @@ const BAPI: BapiMethods = {
           from_spmid,
           session,
           extra,
-          csrf: biliStore.cookies!.bili_jct
+          csrf: biliStore.cookies!.bili_jct,
         },
         {
           params: wbiSign({
@@ -284,9 +238,9 @@ const BAPI: BapiMethods = {
             w_real_played_time: real_played_time,
             w_video_duration: video_duration,
             w_last_play_progress_time: last_play_progress_time,
-            web_location
-          })
-        }
+            web_location,
+          }),
+        },
       )
     },
     share: (aid, source = 'pc_client_normal', eab_x = 2, ramval = 0, ga = 1, referer = '') => {
@@ -299,7 +253,7 @@ const BAPI: BapiMethods = {
         source,
         aid,
         ga,
-        csrf: bili_jct
+        csrf: bili_jct,
       })
     },
     coinAdd: (
@@ -310,7 +264,7 @@ const BAPI: BapiMethods = {
       eab_x = 2,
       ramval = 6,
       source = 'web_normal',
-      ga = 1
+      ga = 1,
     ) => {
       const bili_jct = useBiliStore().cookies!.bili_jct
       return request.main.post('/x/web-interface/coin/add ', {
@@ -322,13 +276,13 @@ const BAPI: BapiMethods = {
         ramval,
         source,
         ga,
-        csrf: bili_jct
+        csrf: bili_jct,
       })
     },
     videoRelation: (aid, bvid = '') => {
       return request.main.get('/x/web-interface/archive/relation', {
         aid,
-        bvid
+        bvid,
       })
     },
     vip: {
@@ -336,14 +290,14 @@ const BAPI: BapiMethods = {
         return request.main.get(
           '/x/vip/privilege/my',
           {
-            web_location
+            web_location,
           },
           {
             headers: {
               Referer: 'https://account.bilibili.com/account/big/myPackage',
-              Origin: 'https://account.bilibili.com'
-            }
-          }
+              Origin: 'https://account.bilibili.com',
+            },
+          },
         )
       },
       receivePrivilege: (type, platform = 'web') => {
@@ -353,14 +307,14 @@ const BAPI: BapiMethods = {
           {
             type,
             platform,
-            csrf: bili_jct
+            csrf: bili_jct,
           },
           {
             headers: {
               Referer: 'https://account.bilibili.com/account/big/myPackage',
-              Origin: 'https://account.bilibili.com'
-            }
-          }
+              Origin: 'https://account.bilibili.com',
+            },
+          },
         )
       },
       addExperience: () => {
@@ -373,33 +327,33 @@ const BAPI: BapiMethods = {
           {
             mid,
             buvid,
-            csrf: bili_jct
+            csrf: bili_jct,
           },
           {
             headers: {
               Referer: 'https://account.bilibili.com/big',
-              Origin: 'https://account.bilibili.com'
-            }
-          }
+              Origin: 'https://account.bilibili.com',
+            },
+          },
         )
-      }
-    }
+      },
+    },
   },
   vc: {
     myGroups: (build = 0, mobi_app = 'web') => {
       return request.vc.get('/link_group/v1/member/my_groups', {
         build,
-        mobi_app
+        mobi_app,
       })
     },
     signIn: (group_id, owner_id) => {
       // 此处 v1 也能改成 v2，v3，v4 ...返回的数据略微不同
       return request.vc.get('/link_setting/v1/link_setting/sign_in', {
         group_id,
-        owner_id
+        owner_id,
       })
-    }
-  }
+    },
+  },
 }
 
 export default BAPI

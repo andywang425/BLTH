@@ -52,7 +52,7 @@ function addURLParams(url: string, params?: Record<string, any> | string): strin
  * 对请求参数进行 wbi 签名
  * @param params 请求参数
  */
-function wbiSign(params: Record<string, string | number | object>): string {
+function wbiSign(params: Record<string, {}>): string {
   // 添加 wts 字段（当前秒级时间戳）
   params.wts = ts()
   // 按照键对参数进行排序
@@ -76,7 +76,7 @@ function wbiSign(params: Record<string, string | number | object>): string {
  * @param json 一个不包含嵌套对象的对象
  * @returns FormData
  */
-function packFormData(json: Record<string, any>): FormData {
+function packFormData(json: Record<string, {}>): FormData {
   const formData = new FormData()
   _.forEach(json, (value, key) => formData.append(key, value.toString()))
   return formData
@@ -88,7 +88,7 @@ function packFormData(json: Record<string, any>): FormData {
  * @param fn 回调函数，参数是最深层属性的值和当前路径
  * @param path 遍历对象的路径，默认从最外层开始遍历
  */
-function deepestIterate(obj: any, fn: (value: any, path: string) => void, path?: string) {
+function deepestIterate(obj: object, fn: (value: any, path: string) => void, path?: string) {
   _.forOwn(obj, function (value, key) {
     const newPath = path ? path + '.' + key : key
     if (_.isPlainObject(value) && !_.isEmpty(value)) {
@@ -202,5 +202,5 @@ export {
   deepestIterate,
   getUrlFromFetchInput,
   waitForMoment,
-  arrayToMap
+  arrayToMap,
 }

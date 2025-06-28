@@ -23,7 +23,6 @@ interface ModuleConfig {
       medalTasks: {
         light: {
           enabled: boolean
-          mode: 'like' | 'danmu'
           danmuList: string[]
           _lastCompleteTime: number
         }

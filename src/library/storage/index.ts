@@ -22,7 +22,7 @@ class Storage {
    */
   private static mergeConfigs<T extends Record<string, any>>(
     currentConfig: Record<string, any>,
-    defaultConfig: T
+    defaultConfig: T,
   ): T {
     // 取出当前配置中存在于默认配置的键以及其所对应的值
     const config = _.pick(currentConfig, _.keys(defaultConfig))

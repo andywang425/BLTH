@@ -26,7 +26,7 @@ function isTimestampToday(timestamp: number, hour: number = 0, minute: number = 
     hour: hour,
     minute: minute,
     second: 0,
-    millisecond: 0
+    millisecond: 0,
   })
   // 定义 A 的明天开始的时间（A 的结束的时间）
   const startOfTomorrow = startOfADay.plus({ days: 1 })
@@ -70,7 +70,7 @@ function delayToNextMoment(hour: number = 0, minute: number = 5): Duration {
     str: diff
       .toFormat('h小时m分钟s秒')
       .replace(/^0小时/, '')
-      .replace(/^0分钟/, '')
+      .replace(/^0分钟/, ''),
   }
 }
 
@@ -88,7 +88,7 @@ function isNowIn(
   startHour: number,
   startMinute: number,
   endHour: number,
-  endMinute: number
+  endMinute: number,
 ): boolean {
   const now = DateTime.now()
   const start = DateTime.local(now.year, now.month, now.day, startHour, startMinute)

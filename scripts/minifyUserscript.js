@@ -14,8 +14,8 @@ async function minifyUserscript(inputPath, outputPath) {
   // 压缩
   const minified = await minify(code, {
     format: {
-      comments: false
-    }
+      comments: false,
+    },
   })
 
   // 加上 metadata
@@ -28,5 +28,5 @@ async function minifyUserscript(inputPath, outputPath) {
 
 minifyUserscript(
   'dist/bilibili-live-tasks-helper.user.js',
-  'dist/bilibili-live-tasks-helper.min.user.js'
+  'dist/bilibili-live-tasks-helper.min.user.js',
 )

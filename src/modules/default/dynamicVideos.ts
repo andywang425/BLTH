@@ -37,7 +37,7 @@ class DynamicVideos extends BaseModule {
 
     setTimeout(
       () => this.run().catch((reason) => this.logger.error(reason)),
-      delayToNextMoment(0, 4).ms
+      delayToNextMoment(0, 4).ms,
     )
   }
 }

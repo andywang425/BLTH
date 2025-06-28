@@ -29,7 +29,7 @@ class BilibiliLive extends BaseModule {
             resolve(unsafeWindow.BilibiliLive)
           }
           return true
-        }
+        },
       })
 
       setTimeout(() => reject(new Error('获取 BilibiliLive 超时')), 10e3)

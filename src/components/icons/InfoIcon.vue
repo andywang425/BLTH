@@ -17,7 +17,7 @@ const open = () => {
     message: message,
     lockScroll: false,
     autofocus: true,
-    confirmButtonText: 'OK'
+    confirmButtonText: 'OK',
   }).catch(() => {})
 }
 </script>

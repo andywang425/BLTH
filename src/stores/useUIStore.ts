@@ -23,7 +23,7 @@ const index2name: Record<MenuIndex, string> = {
   OtherTasks: '其它任务',
   EnhanceExperience: '体验优化',
   RemoveElement: '移除元素',
-  ScriptSettings: '设置'
+  ScriptSettings: '设置',
 }
 
 export const useUIStore = defineStore('ui', () => {
@@ -36,7 +36,7 @@ export const useUIStore = defineStore('ui', () => {
     top: 0,
     left: 0,
     height: 0,
-    width: 0
+    width: 0,
   })
   // 缓存的窗口滚动条位置
   const windowScrollPosition = reactive<WindowScrollPosition>({ x: 0, y: 0 })
@@ -46,11 +46,11 @@ export const useUIStore = defineStore('ui', () => {
     top: `${livePlayerRect.top + windowScrollPosition.y}px`,
     left: `${livePlayerRect.left + windowScrollPosition.x}px`,
     height: `${livePlayerRect.height}px`,
-    width: `${(livePlayerRect.width * uiConfig.panelWidthPercent) / 100}px`
+    width: `${(livePlayerRect.width * uiConfig.panelWidthPercent) / 100}px`,
   }))
   // 开关控制面板按钮的文字
   const isShowPanelButtonText = computed<string>(() =>
-    uiConfig.isShowPanel ? '隐藏控制面板' : '显示控制面板'
+    uiConfig.isShowPanel ? '隐藏控制面板' : '显示控制面板',
   )
   // 控制面板主体的滚动条窗口高度
   // 因为 header 的高度是固定的 60px，所以用控制面板高度 - 60px
@@ -81,7 +81,7 @@ export const useUIStore = defineStore('ui', () => {
   // 监听UI配置信息的变化，使用防抖降低油猴写配置信息频率
   watch(
     uiConfig,
-    _.debounce((newUiConfig: UiConfig) => Storage.setUiConfig(newUiConfig), 350)
+    _.debounce((newUiConfig: UiConfig) => Storage.setUiConfig(newUiConfig), 350),
   )
 
   return {
@@ -94,6 +94,6 @@ export const useUIStore = defineStore('ui', () => {
     uiConfig,
     changeCollapse,
     changeShowPanel,
-    setActiveMenuIndex
+    setActiveMenuIndex,
   }
 })

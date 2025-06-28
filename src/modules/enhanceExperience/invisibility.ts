@@ -23,9 +23,9 @@ class Invisibility extends BaseModule {
             config.url = config.url.replace('not_mock_enter_effect=0', 'not_mock_enter_effect=1')
           }
           handler.next(config)
-        }
+        },
       },
-      unsafeWindow
+      unsafeWindow,
     )
   }
 }

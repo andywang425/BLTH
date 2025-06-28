@@ -31,7 +31,7 @@ const medalDanmuPanelVisible = ref<boolean>(false)
 const danmuTableData = computed(() =>
   config.medalTasks.light.danmuList.map((danmu) => {
     return { content: danmu }
-  })
+  }),
 )
 
 const handleEditDanmu = (index: number, row: { content: string }) => {
@@ -41,7 +41,7 @@ const handleEditDanmu = (index: number, row: { content: string }) => {
     inputPattern: /^.{1,30}$/,
     inputErrorMessage: '弹幕内容不得为空且长度不能超过30',
     inputValue: row.content,
-    lockScroll: false
+    lockScroll: false,
   })
     .then(({ value }) => {
       config.medalTasks.light.danmuList[index] = value
@@ -53,7 +53,7 @@ const handleDeleteDanmu = (index: number) => {
   if (config.medalTasks.light.danmuList.length === 1) {
     ElMessage.warning({
       message: '至少要有一条弹幕',
-      appendTo: '.el-dialog'
+      appendTo: '.el-dialog',
     })
     return
   }
@@ -66,7 +66,7 @@ const handleAddDanmu = () => {
     cancelButtonText: '取消',
     inputPattern: /^.{1,30}$/,
     inputErrorMessage: '弹幕内容不得为空且长度不能超过30',
-    lockScroll: false
+    lockScroll: false,
   })
     .then(({ value }) => {
       config.medalTasks.light.danmuList.push(value)
@@ -82,13 +82,13 @@ const medalInfoTableData = computed({
       nick_name: medal.anchor_info.nick_name,
       medal_name: medal.medal.medal_name,
       medal_level: medal.medal.level,
-      roomid: medal.room_info.room_id
+      roomid: medal.room_info.room_id,
     }))
     if (uiStore.uiConfig.medalInfoPanelSortMode) {
       const filteredMedals = medals.filter((medal) =>
         config.medalTasks.isWhiteList
           ? config.medalTasks.roomidList.includes(medal.roomid)
-          : !config.medalTasks.roomidList.includes(medal.roomid)
+          : !config.medalTasks.roomidList.includes(medal.roomid),
       )
       const orderMap = arrayToMap(config.medalTasks.roomidList)
       return filteredMedals.sort((a, b) => orderMap.get(a.roomid)! - orderMap.get(b.roomid)!)
@@ -97,7 +97,7 @@ const medalInfoTableData = computed({
   },
   set(newValue: MedalInfoRow[]) {
     config.medalTasks.roomidList = newValue.map((row) => row.roomid)
-  }
+  },
 })
 /** 是否显示加载中图标 */
 const medalInfoLoading = ref<boolean>(false)
@@ -126,12 +126,14 @@ const handleEditList = async () => {
             medalInfoLoading.value = false
           })
         },
-        { once: true }
+        { once: true },
       )
-      // 利用 emitter 通知 FansMedals 模块去获取数据
-      moduleStore.emitter.emit('Default_FansMedals', {
-        module: 'LiveTasks'
-      })
+      if (!biliStore.fansMedalsStatus) {
+        // FansMedals 模块没有获取过粉丝勋章数据，利用 emitter 通知该模块去获取
+        moduleStore.emitter.emit('Default_FansMedals', {
+          module: 'LiveTasks',
+        })
+      }
     } else {
       initSelection(medalInfoTableData.value)
     }
@@ -179,38 +181,9 @@ function handleRowClick(row: MedalInfoRow) {
     <el-row>
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.medalTasks.light.enabled" active-text="点亮熄灭勋章" />
-        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.main" />
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light" />
         <TaskStatus :status="status.medalTasks.light" />
       </el-space>
-    </el-row>
-    <el-row>
-      <el-radio-group v-model="config.medalTasks.light.mode" class="radio-group">
-        <el-row>
-          <el-space wrap :size="[8, 0]">
-            <el-icon>
-              <SemiSelect />
-            </el-icon>
-            <el-radio value="like">点赞</el-radio>
-            <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.like" />
-          </el-space>
-        </el-row>
-        <el-row>
-          <el-space wrap :size="[8, 0]">
-            <el-icon>
-              <SemiSelect />
-            </el-icon>
-            <el-radio value="danmu">发送弹幕</el-radio>
-            <el-button
-              type="primary"
-              size="small"
-              :icon="Edit"
-              @click="medalDanmuPanelVisible = !medalDanmuPanelVisible"
-              >编辑弹幕
-            </el-button>
-            <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light.danmu" />
-          </el-space>
-        </el-row>
-      </el-radio-group>
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
@@ -366,10 +339,5 @@ function handleRowClick(row: MedalInfoRow) {
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-}
-
-.radio-group {
-  display: block;
-  font-size: inherit;
 }
 </style>

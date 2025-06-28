@@ -19,12 +19,12 @@ export interface FetchResponseHandler {
 
 export type OnRequestHandler = (
   config: FetchRequestConfig,
-  handler: FetchRequestHandler
+  handler: FetchRequestHandler,
 ) => Promise<void> | void
 
 export type OnResponseHandler = (
   response: Response,
-  handler: FetchResponseHandler
+  handler: FetchResponseHandler,
 ) => Promise<void> | void
 
 export interface FetchHookProxyConfig {
@@ -124,7 +124,7 @@ const hook = (win: Window) => {
  */
 const fproxy = (
   proxy: FetchHookProxyConfig,
-  win: Window = unsafeWindow
+  win: Window = unsafeWindow,
 ): {
   /** 删除代理规则 proxy */
   unProxy: () => void
@@ -150,13 +150,13 @@ const fproxy = (
       if (proxy.onRequest) {
         onRequestHandlers.splice(
           onRequestHandlers.findIndex((handler) => handler === proxy.onRequest),
-          1
+          1,
         )
       }
       if (proxy.onResponse) {
         onResponseHandlers.splice(
           onResponseHandlers.findIndex((handler) => handler === proxy.onResponse),
-          1
+          1,
         )
       }
     },
@@ -165,7 +165,7 @@ const fproxy = (
       onRequestHandlers = []
       onResponseHandlers = []
     },
-    originFetch: _fetch
+    originFetch: _fetch,
   }
 }
 

@@ -47,5 +47,5 @@ export {
   RunAtMoment,
   ModuleEmitterEvents,
   OnFrameTypes,
-  IsOnTargetFrameTypes
+  IsOnTargetFrameTypes,
 }

@@ -37,12 +37,12 @@ class GroupSignTask extends BaseModule {
       this.logger.log(`BAPI.vc.signIn(${group_id}, ${owner_uid}) response`, response)
       if (response.code === 0) {
         this.logger.log(
-          `应援团签到 应援团ID = ${group_id} 拥有者UID = ${owner_uid} 成功, 粉丝勋章亲密度+${response.data.add_num}`
+          `应援团签到 应援团ID = ${group_id} 拥有者UID = ${owner_uid} 成功, 粉丝勋章亲密度+${response.data.add_num}`,
         )
       } else {
         this.logger.error(
           `应援团签到 应援团ID = ${group_id} 拥有者UID = ${owner_uid} 失败`,
-          response.message
+          response.message,
         )
       }
     } catch (error) {
