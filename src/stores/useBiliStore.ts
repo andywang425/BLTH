@@ -11,8 +11,6 @@ export const useBiliStore = defineStore('bili', () => {
   const cookies = ref<BiliCookies>()
   // 用户基本信息
   const userInfo = ref<MainData.Nav.Data>()
-  // 礼物配置信息
-  const giftConfig = ref<LiveData.RoomGiftConfig.Data>()
   // 主站每日任务完成情况
   const dailyRewardInfo = ref<MainData.Reward.Data>()
   // 动态中一页视频的信息
@@ -49,7 +47,6 @@ export const useBiliStore = defineStore('bili', () => {
   return {
     BilibiliLive,
     userInfo,
-    giftConfig,
     cookies,
     dailyRewardInfo,
     dynamicVideos,

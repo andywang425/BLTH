@@ -1,27 +1,6 @@
 import { LiveData, LiveTraceData, MainData, VcData } from './data'
 
 declare namespace Live {
-  interface RoomGiftConfig {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.RoomGiftConfig.Data
-  }
-
-  interface DoSign {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.DoSign.Data
-  }
-
-  interface GetSignInfo {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.GetSignInfo.Data
-  }
-
   interface FansMedalPanel {
     code: number
     message: string
@@ -50,20 +29,6 @@ declare namespace Live {
     data: LiveData.GetInfoByRoom.Data
   }
 
-  interface GetUserTaskProgress {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.GetUserTaskProgress.Data
-  }
-
-  interface UserTaskReceiveRewards {
-    code: number
-    message: string
-    ttl: number
-    data: { num: number }
-  }
-
   interface Silver2coin {
     code: number
     data: LiveData.Silver2coin.Data
@@ -74,13 +39,6 @@ declare namespace Live {
     code: number
     data: { silver: number }
     message: string
-  }
-
-  interface WearMedal {
-    code: number
-    message: string
-    ttl: number
-    data: {}
   }
 }
 

@@ -15,23 +15,6 @@ const request: Requests = {
 
 const BAPI: BapiMethods = {
   live: {
-    roomGiftConfig: (room_id = 0, area_parent_id = 0, area_id = 0, platform = 'pc') => {
-      return request.live.get('/xlive/web-room/v1/giftPanel/roomGiftConfig', {
-        platform,
-        room_id,
-        area_parent_id,
-        area_id,
-      })
-    },
-    doSign: () => {
-      return request.live.get('/xlive/web-ucenter/v1/sign/DoSign')
-    },
-    /**
-     * 网页直播签到功能已不存在，但该API仍可以使用（并且也存在于B站js代码中）
-     */
-    getSignInfo: () => {
-      return request.live.get('/xlive/web-ucenter/v1/sign/WebGetSignInfo')
-    },
     fansMedalPanel: (page, page_size = 10) => {
       // 返回的 room_id 是长号
       return request.live.get('/xlive/app-ucenter/v1/fansMedal/panel', {
@@ -102,28 +85,6 @@ const BAPI: BapiMethods = {
         }),
       )
     },
-    getUserTaskProgress: (target_id = 11153765) => {
-      // 该 API 是 APP API，但也可以使用 web 的身份校验方式
-      const biliStore = useBiliStore()
-      const bili_jct = biliStore.cookies!.bili_jct
-      return request.live.get('/xlive/app-ucenter/v1/userTask/GetUserTaskProgress', {
-        target_id,
-        csrf: bili_jct,
-        ts: ts(),
-      })
-    },
-    userTaskReceiveRewards: (target_id = 11153765) => {
-      // 该 API 是 APP API，但也可以使用 web 的身份校验方式，将 actionKey 设置为 csrf 即可
-      // 而且似乎不需要观看直播5分钟，只要发5条弹幕就行了
-      const biliStore = useBiliStore()
-      const bili_jct = biliStore.cookies!.bili_jct
-      return request.live.post('/xlive/app-ucenter/v1/userTask/UserTaskReceiveRewards', {
-        actionKey: 'csrf',
-        target_id,
-        csrf: bili_jct,
-        ts: ts(),
-      })
-    },
     silver2coin: (visit_id = '') => {
       const bili_jct = useBiliStore().cookies!.bili_jct
       return request.live.post('/xlive/revenue/v1/wallet/silver2coin', {
@@ -140,15 +101,6 @@ const BAPI: BapiMethods = {
         csrf_token: bili_jct,
         platform,
         visit_id,
-      })
-    },
-    wearMedal: (medal_id, visit_id = '') => {
-      const bili_jct = useBiliStore().cookies!.bili_jct
-      return request.live.post('/xlive/web-room/v1/fansMedal/wear', {
-        medal_id,
-        csrf_token: bili_jct,
-        csrf: bili_jct,
-        visit_id: visit_id,
       })
     },
   },
