@@ -34,6 +34,8 @@ const BAPI: BapiMethods = {
       reply_mid = 0,
       reply_attr = 0,
       replay_dmid = '',
+      reply_type = 0,
+      reply_uname = '',
       statistics = '{"appId":100,"platform":5}',
     ) => {
       const biliStore = useBiliStore()
@@ -51,6 +53,8 @@ const BAPI: BapiMethods = {
           reply_attr,
           replay_dmid,
           statistics,
+          reply_type,
+          reply_uname,
           fontsize,
           rnd: ts(),
           roomid,

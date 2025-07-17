@@ -46,6 +46,7 @@ declare namespace LiveData {
       v2_medal_color_border: string
       v2_medal_color_text: string
       v2_medal_color_level: string
+      day_limit_extra: any
     }
 
     interface AnchorInfo {
