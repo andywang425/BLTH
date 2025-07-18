@@ -49,15 +49,18 @@ function addURLParams(url: string, params?: Record<string, any> | string): strin
 }
 
 /**
- * 对请求参数进行 wbi 签名
- * @param params 请求参数
+ * 对象转 Wbi 签名请求使用的 URL 查询参数字符串
+ * @param params 参数对象
+ * @param sort 是否按照键对参数进行排序
  */
-function wbiSign(params: Record<string, {}>): string {
-  // 添加 wts 字段（当前秒级时间戳）
-  params.wts = ts()
-  // 按照键对参数进行排序
-  const query = Object.keys(params)
-    .sort()
+const objectToWbiURLQuery = (params: Record<string, any>, sort: boolean = false): string => {
+  const keys = Object.keys(params)
+
+  if (sort) {
+    keys.sort()
+  }
+
+  return keys
     .map((key) => {
       // 过滤 value 中的 !'()* 字符
       const value = params[key].toString().replace(/[!'()*]/g, '')
@@ -65,10 +68,22 @@ function wbiSign(params: Record<string, {}>): string {
       return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
     })
     .join('&')
-  // 计算 w_rid
-  const wbiSign = CryptoJS.MD5(query + useBiliStore().wbiSalt).toString()
+}
 
-  return query + '&w_rid=' + wbiSign
+/**
+ * 对请求参数进行 wbi 签名
+ * @param params 请求参数
+ */
+function wbiSign(params: Record<string, {}>): string {
+  const wts = ts()
+  // 添加 wts 字段（当前秒级时间戳）
+  const _params = { ...params, wts }
+  // 按照键对参数进行排序
+  const query = objectToWbiURLQuery(_params, true)
+  // 计算 w_rid
+  const w_rid = CryptoJS.MD5(query + useBiliStore().wbiSalt).toString()
+  // 根据官方做法，原请求参数无需排序，末尾添加w_rid和wts
+  return objectToWbiURLQuery(params) + `&w_rid=${w_rid}&wts=${wts}`
 }
 
 /**
