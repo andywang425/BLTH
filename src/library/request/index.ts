@@ -23,7 +23,7 @@ class Request {
    */
   public get<T>(
     url: string,
-    params?: Record<string, any> | string,
+    params?: Record<string, any> | string | null,
     otherDetails?: Partial<GmXmlhttpRequestOption<GmResponseType, any>>,
   ): Promise<T> {
     url = addURLParams(this.url_prefix + url, params)
@@ -60,7 +60,7 @@ class Request {
    */
   public post<T>(
     url: string,
-    data?: Record<string, any> | string,
+    data?: Record<string, any> | FormData | string | null,
     otherDetails?: Partial<
       GmXmlhttpRequestOption<GmResponseType, any> & {
         params: Record<string, any> | string
@@ -75,10 +75,14 @@ class Request {
       'Content-Type': 'application/x-www-form-urlencoded',
     }
 
-    if (data instanceof FormData) {
+    if (_.isNil(data)) {
+      data = ''
+    } else if (data instanceof FormData) {
       // 如果要提交表单，删除 Content-Type 让浏览器自动生成
       delete headers['Content-Type']
-    } else if (typeof data === 'object') {
+    } else if (typeof data === 'string') {
+      // data 类型为 string，不做处理
+    } else {
       // data 类型为 Record，转换为 string
       data = new URLSearchParams(data).toString()
     }

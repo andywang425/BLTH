@@ -37,6 +37,7 @@ const BAPI: BapiMethods = {
       reply_type = 0,
       reply_uname = '',
       statistics = '{"appId":100,"platform":5}',
+      web_location = '444.8',
     ) => {
       const biliStore = useBiliStore()
       const bili_jct = biliStore.cookies!.bili_jct
@@ -61,20 +62,24 @@ const BAPI: BapiMethods = {
           csrf: bili_jct,
           csrf_token: bili_jct,
         }),
+        {
+          params: wbiSign({ web_location }),
+        },
       )
     },
-    likeReport: (room_id, anchor_id, click_time = 1, visit_id = '') => {
+    likeReport: (room_id, anchor_id, click_time = 1, web_location = '444.8') => {
       const biliStore = useBiliStore()
       const bili_jct = biliStore.cookies!.bili_jct
       const uid = biliStore.BilibiliLive!.UID
-      return request.live.post('/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3', {
-        click_time,
-        room_id,
-        uid,
-        anchor_id,
-        csrf_token: bili_jct,
-        csrf: bili_jct,
-        visit_id,
+      return request.live.post('/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3', null, {
+        params: wbiSign({
+          click_time,
+          room_id,
+          uid,
+          anchor_id,
+          web_location,
+          csrf: bili_jct,
+        }),
       })
     },
     /**
@@ -101,9 +106,9 @@ const BAPI: BapiMethods = {
       const bili_jct = useBiliStore().cookies!.bili_jct
       return request.live.post('/xlive/revenue/v1/wallet/coin2silver', {
         num,
+        platform,
         csrf: bili_jct,
         csrf_token: bili_jct,
-        platform,
         visit_id,
       })
     },
@@ -146,15 +151,15 @@ const BAPI: BapiMethods = {
     nav: () => {
       return request.main.get('/x/web-interface/nav')
     },
-    reward: () => {
-      return request.main.get('/x/member/web/exp/reward')
+    reward: (web_location = '333.33') => {
+      return request.main.get('/x/member/web/exp/reward', { web_location })
     },
     dynamicAll: (
       type = 'video',
       page = 1,
       timezone_offset = -480,
       platform = 'web',
-      features = 'itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote,decorationCard,onlyfansAssetsV2,forwardListHidden,ugcDelete',
+      features = 'itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote,decorationCard,onlyfansAssetsV2,forwardListHidden,ugcDelete,onlyfansQaCard,commentsNewVersion,avatarAutoTheme',
       web_location = '333.1365',
       x_bili_device_req_json = '{"platform":"web","device":"pc"}',
       x_bili_web_req_json = '{"spm_id":"333.1365"}',
@@ -174,7 +179,7 @@ const BAPI: BapiMethods = {
         {
           headers: {
             Origin: 'https://t.bilibili.com',
-            Referer: 'https://t.bilibili.com/',
+            Referer: 'https://t.bilibili.com/?tab=video',
           },
         },
       )
@@ -195,10 +200,14 @@ const BAPI: BapiMethods = {
       last_play_progress_time = 62,
       max_play_progress_time = 62,
       outer = 0,
+      statistics = '{"appId":100,"platform":5,"abtest":"","version":""}',
+      mobi_app = 'web',
+      device = 'web',
+      platform = 'web',
       spmid = '333.788.0.0',
       from_spmid = '333.1365.list.card_archive.click',
       session = uuid().replaceAll('-', ''),
-      extra = '{"player_version":"4.8.43"}',
+      extra = '{"player_version":"4.9.40"}',
       web_location = 1315873,
     ) => {
       const biliStore = useBiliStore()
@@ -225,6 +234,10 @@ const BAPI: BapiMethods = {
           last_play_progress_time,
           max_play_progress_time,
           outer,
+          statistics,
+          mobi_app,
+          device,
+          platform,
           spmid,
           from_spmid,
           session,
@@ -265,6 +278,9 @@ const BAPI: BapiMethods = {
       num,
       select_like = 0,
       cross_domain = true,
+      from_spmid = '333.1365.list.card_archive.click',
+      spmid = '333.788.0.0',
+      statistics = '{"appId":100,"platform":5}',
       eab_x = 2,
       ramval = 6,
       source = 'web_normal',
@@ -276,6 +292,9 @@ const BAPI: BapiMethods = {
         multiply: num,
         select_like: select_like,
         cross_domain: cross_domain,
+        from_spmid,
+        spmid,
+        statistics,
         eab_x,
         ramval,
         source,
@@ -344,14 +363,15 @@ const BAPI: BapiMethods = {
     },
   },
   vc: {
-    myGroups: (build = 0, mobi_app = 'web') => {
+    myGroups: (build = 0, mobi_app = 'web', web_location = '333.40164') => {
       return request.vc.get('/link_group/v1/member/my_groups', {
         build,
         mobi_app,
+        web_location,
       })
     },
     signIn: (group_id, owner_id) => {
-      // 此处 v1 也能改成 v2，v3，v4 ...返回的数据略微不同
+      // 该API仅在APP中使用，但是也可以用web端的鉴权方式
       return request.vc.get('/link_setting/v1/link_setting/sign_in', {
         group_id,
         owner_id,

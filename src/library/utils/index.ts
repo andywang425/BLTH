@@ -36,7 +36,7 @@ function getFilenameFromUrl(url: string): string {
  * @param url URL
  * @param params 查询参数
  */
-function addURLParams(url: string, params?: Record<string, any> | string): string {
+function addURLParams(url: string, params?: Record<string, any> | string | null): string {
   if (!params) {
     return url
   }

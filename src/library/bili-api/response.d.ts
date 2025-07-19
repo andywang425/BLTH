@@ -89,7 +89,7 @@ declare namespace Main {
   interface Share {
     code: number
     message: string
-    data: number | string
+    data: number
     ttl: number
   }
 
@@ -119,6 +119,7 @@ declare namespace Main {
       code: number
       message: string
       ttl: number
+      data: MainData.Vip.ReceivePrivilege.Data
     }
 
     interface AddExperience {
@@ -143,6 +144,7 @@ declare namespace Vc {
     code: number
     msg: string
     message: string
+    ttl: number
     data: VcData.SignIn.Data
   }
 }

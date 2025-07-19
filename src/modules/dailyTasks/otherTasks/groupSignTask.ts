@@ -3,6 +3,7 @@ import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/lux
 import BAPI from '@/library/bili-api'
 import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
+import { useBiliStore } from '@/stores/useBiliStore.ts'
 
 class GroupSignTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.groupSign
@@ -56,9 +57,16 @@ class GroupSignTask extends BaseModule {
     // 应援团签到的刷新时间是每天早上8点
     if (!isTimestampToday(this.config._lastCompleteTime, 8, 5)) {
       this.status = 'running'
+      const biliStore = useBiliStore()
+      const uid = biliStore.BilibiliLive!.UID
       const idList = await this.getGroupidOwneruidList()
       if (idList) {
         for (const [group_id, owner_uid] of idList) {
+          if (owner_uid === uid) {
+            // 跳过自己的应援团
+            continue
+          }
+
           await this.sign(group_id, owner_uid)
           await sleep(2000)
         }
