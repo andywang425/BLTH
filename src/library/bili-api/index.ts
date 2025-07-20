@@ -114,36 +114,50 @@ const BAPI: BapiMethods = {
     },
   },
   liveTrace: {
-    E: (id, device, ruid, is_patch = 0, heart_beat = [], visit_id = '') => {
+    E: (id, device, ruid, is_patch = 0, heart_beat = [], web_location = '444.8') => {
       const bili_jct = useBiliStore().cookies!.bili_jct
-      return request.liveTrace.post('/xlive/data-interface/v1/x25Kn/E', {
-        id: JSON.stringify(id),
-        device: JSON.stringify(device),
-        ruid, // 主播 uid
-        ts: tsm(),
-        is_patch,
-        heart_beat: JSON.stringify(heart_beat),
-        ua: navigator.userAgent,
-        csrf_token: bili_jct,
-        csrf: bili_jct,
-        visit_id,
+      return request.liveTrace.post('/xlive/data-interface/v1/x25Kn/E', null, {
+        params: wbiSign({
+          id: JSON.stringify(id),
+          device: JSON.stringify(device),
+          ruid, // 主播 uid
+          ts: tsm(),
+          is_patch,
+          heart_beat: JSON.stringify(heart_beat),
+          ua: navigator.userAgent,
+          web_location,
+          csrf: bili_jct,
+        }),
       })
     },
-    X: (s, id, device, ruid, ets, benchmark, time, ts, visit_id = '') => {
+    X: (
+      s,
+      id,
+      device,
+      ruid,
+      ets,
+      benchmark,
+      time,
+      ts,
+      trackid = '-99998',
+      web_location = '444.8',
+    ) => {
       const bili_jct = useBiliStore().cookies!.bili_jct
-      return request.liveTrace.post('/xlive/data-interface/v1/x25Kn/X', {
-        s,
-        id: JSON.stringify(id),
-        device: JSON.stringify(device),
-        ruid, // 主播 uid
-        ets: ets,
-        benchmark,
-        time,
-        ts,
-        ua: navigator.userAgent,
-        csrf_token: bili_jct,
-        csrf: bili_jct,
-        visit_id,
+      return request.liveTrace.post('/xlive/data-interface/v1/x25Kn/X', null, {
+        params: wbiSign({
+          s,
+          id: JSON.stringify(id),
+          device: JSON.stringify(device),
+          ruid, // 主播 uid
+          ets: ets,
+          benchmark,
+          time,
+          ts,
+          ua: navigator.userAgent,
+          trackid,
+          web_location,
+          csrf: bili_jct,
+        }),
       })
     },
   },

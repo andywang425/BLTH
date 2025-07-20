@@ -47,7 +47,7 @@ interface BapiMethods {
       ruid: number,
       is_patch?: number,
       heart_beat?: any[],
-      visit_id?: string,
+      web_location?: string,
     ) => Promise<LiveTrace.E>
     X: (
       s: string,
@@ -58,7 +58,8 @@ interface BapiMethods {
       benchmark: string,
       time: number,
       ts: number,
-      visit_id?: string,
+      trackid?: string,
+      web_location?: string,
     ) => Promise<LiveTrace.X>
   }
   main: {
