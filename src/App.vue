@@ -104,7 +104,7 @@ if (livePlayer) {
           <el-scrollbar :height="uiStore.scrollBarHeight">
             <KeepAlive>
               <Transition name="fade" mode="out-in">
-                <PanelMain />
+                <PanelMain class="panel-main" />
               </Transition>
             </KeepAlive>
           </el-scrollbar>
@@ -119,9 +119,6 @@ if (livePlayer) {
   z-index: 1003;
   position: absolute;
   background-color: white;
-  border-bottom: 1px solid #e3e5e7;
-  border-left: 1px solid #e3e5e7;
-  border-right: 1px solid #e3e5e7;
 }
 
 .header {
@@ -140,14 +137,12 @@ if (livePlayer) {
   width: auto;
 }
 
-.aside #aside-el-menu:not(.el-menu--collapse) {
-  width: 150px;
+.main {
+  padding: 0;
 }
 
-.main {
-  --main-top-botton-padding: calc(var(--el-main-padding) * 0.625);
-  padding-top: var(--main-top-botton-padding);
-  padding-bottom: var(--main-top-botton-padding);
+.panel-main {
+  padding: calc(var(--el-main-padding) * 0.625) var(--el-main-padding);
 }
 
 /* PanelMain切换时的动画效果 */
