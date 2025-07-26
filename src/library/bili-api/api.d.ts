@@ -25,13 +25,16 @@ interface BapiMethods {
       reply_mid?: number,
       reply_attr?: number,
       replay_dmid?: any,
+      reply_type?: number,
+      reply_uname?: string,
       statistics?: string,
+      web_location?: string,
     ) => Promise<Live.SendMsg>
     likeReport: (
       room_id: number,
       anchor_id: number,
       click_time?: number,
-      visit_id?: string,
+      web_location?: string,
     ) => Promise<Live.LikeReport>
     getInfoByRoom: (room_id: number, web_location?: string) => Promise<Live.GetInfoByRoom>
     silver2coin: (visit_id?: string) => Promise<Live.Silver2coin>
@@ -44,7 +47,7 @@ interface BapiMethods {
       ruid: number,
       is_patch?: number,
       heart_beat?: any[],
-      visit_id?: string,
+      web_location?: string,
     ) => Promise<LiveTrace.E>
     X: (
       s: string,
@@ -55,12 +58,13 @@ interface BapiMethods {
       benchmark: string,
       time: number,
       ts: number,
-      visit_id?: string,
+      trackid?: string,
+      web_location?: string,
     ) => Promise<LiveTrace.X>
   }
   main: {
     nav: () => Promise<Main.Nav>
-    reward: () => Promise<Main.Reward>
+    reward: (web_location?: string) => Promise<Main.Reward>
     dynamicAll: (
       type?: string,
       page?: number,
@@ -87,6 +91,10 @@ interface BapiMethods {
       last_play_progress_time?: number,
       max_play_progress_time?: number,
       outer?: number,
+      statistics?: string,
+      mobi_app?: string,
+      device?: string,
+      platform?: string,
       spmid?: string,
       from_spmid?: string,
       session?: string,
@@ -106,6 +114,9 @@ interface BapiMethods {
       num: number,
       select_like?: number,
       cross_domain?: boolean,
+      from_spmid?: string,
+      spmid?: string,
+      statistics?: string,
       eab_x?: number,
       ramval?: number,
       source?: string,
@@ -119,7 +130,7 @@ interface BapiMethods {
     }
   }
   vc: {
-    myGroups: (build?: number, mobi_app?: string) => Promise<Vc.MyGroups>
+    myGroups: (build?: number, mobi_app?: string, web_location?: string) => Promise<Vc.MyGroups>
     signIn: (group_id: number, owner_id: number) => Promise<Vc.SignIn>
   }
 }

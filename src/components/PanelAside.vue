@@ -92,7 +92,7 @@ const items: MenuItem[] = [
 </template>
 
 <style scoped>
-#aside-el-menu {
-  height: 100%;
+#aside-el-menu:not(.el-menu--collapse) {
+  width: 150px;
 }
 </style>

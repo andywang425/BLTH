@@ -208,11 +208,11 @@ const helpInfo: HelpInfo = {
           h(
             'a',
             {
-              href: 'https://github.com/gorhill/uBlock',
+              href: 'https://github.com/uBlockOrigin/uBOL-home',
               rel: 'noreferrer',
               target: '_blank',
             },
-            'uBlock Origin',
+            'uBlock Origin Lite',
           ),
           h(
             'span',
