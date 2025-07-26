@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.2.1
+// @version         7.2.2
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
@@ -59,7 +59,7 @@
 // @run-at          document-start
 // ==/UserScript==
 
-(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const t=document.createElement("style");t.textContent=e,document.head.append(t)})(" .title[data-v-fe551203]{padding-left:20px;align-items:baseline;display:flex}.header-big-text[data-v-fe551203]{font-size:var(--big-text-size);align-self:unset}.header-small-text[data-v-fe551203]{font-size:var(--small-text-size);align-self:unset;margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-fe551203]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}#aside-el-menu[data-v-8cfebb11]{height:100%}.avatar-wrap[data-v-7ec6464c]{width:80px;height:80px}.avatar[data-v-7ec6464c]{display:flex;justify-content:center;align-items:center;border-radius:50%}.label-text[data-v-1cb0d081]{color:var(--el-text-color-primary);line-height:32px}.base[data-v-c6e79368]{z-index:1003;position:absolute;background-color:#fff;border-bottom:1px solid #e3e5e7;border-left:1px solid #e3e5e7;border-right:1px solid #e3e5e7}.header[data-v-c6e79368]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-c6e79368]{width:auto}.aside #aside-el-menu[data-v-c6e79368]:not(.el-menu--collapse){width:150px}.main[data-v-c6e79368]{--main-top-botton-padding: calc(var(--el-main-padding) * .625);padding-top:var(--main-top-botton-padding);padding-bottom:var(--main-top-botton-padding)}.fade-enter-active[data-v-c6e79368]{animation:fade-in linear .2s}.info-icon[data-v-fcaae38d]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-b4254e0f]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-message-box ul,ol{padding-left:1em!important}.el-message-box ul{list-style:initial!important}.el-message-box ol{list-style:decimal!important}@media screen and (min-width: 1930px){html[lab-style*=adaptive] .base{zoom:.9375}}@media screen and (min-width: 2058px){html[lab-style*=adaptive] .base{zoom:.75}}@media screen and (min-width: 2570px){html[lab-style*=adaptive] .base{zoom:calc(2 / 3)}}@media screen and (min-width: 3210px){html[lab-style*=adaptive] .base{zoom:.5}}@media screen and (min-width: 3850px){html[lab-style*=adaptive] .base{zoom:.46875}} ");
+(e=>{if(typeof GM_addStyle=="function"){GM_addStyle(e);return}const a=document.createElement("style");a.textContent=e,document.head.append(a)})(" .title[data-v-fe551203]{padding-left:20px;align-items:baseline;display:flex}.header-big-text[data-v-fe551203]{font-size:var(--big-text-size);align-self:unset}.header-small-text[data-v-fe551203]{font-size:var(--small-text-size);align-self:unset;margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-fe551203]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}#aside-el-menu[data-v-86e51db8]:not(.el-menu--collapse){width:150px}.avatar-wrap[data-v-7ec6464c]{width:80px;height:80px}.avatar[data-v-7ec6464c]{display:flex;justify-content:center;align-items:center;border-radius:50%}.label-text[data-v-1cb0d081]{color:var(--el-text-color-primary);line-height:32px}.base[data-v-89deebc1]{z-index:1003;position:absolute;background-color:#fff}.header[data-v-89deebc1]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-89deebc1]{width:auto}.main[data-v-89deebc1]{padding:0}.panel-main[data-v-89deebc1]{padding:calc(var(--el-main-padding) * .625) var(--el-main-padding)}.fade-enter-active[data-v-89deebc1]{animation:fade-in linear .2s}.info-icon[data-v-fcaae38d]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-b4254e0f]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-message-box ul,ol{padding-left:1em!important}.el-message-box ul{list-style:initial!important}.el-message-box ol{list-style:decimal!important}@media screen and (min-width: 1930px){html[lab-style*=adaptive] .base{zoom:.9375}}@media screen and (min-width: 2058px){html[lab-style*=adaptive] .base{zoom:.75}}@media screen and (min-width: 2570px){html[lab-style*=adaptive] .base{zoom:calc(2 / 3)}}@media screen and (min-width: 3210px){html[lab-style*=adaptive] .base{zoom:.5}}@media screen and (min-width: 3850px){html[lab-style*=adaptive] .base{zoom:.46875}} ");
 
 (async function (vue, pinia$1, _, CryptoJS, luxon, ElementPlusIconsVue, ElementPlus, vueDraggablePlus, hotkeys) {
   'use strict';
@@ -96,7 +96,7 @@
       isCollapse: false,
       isShowPanel: true,
       activeMenuIndex: "MainSiteTasks",
-      panelWidthPercent: 40,
+      panelWidthPercent: 45,
       medalInfoPanelSortMode: false
     },
     modules: {
@@ -504,7 +504,7 @@
       };
     }
   });
-  const PanelAside = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["__scopeId", "data-v-8cfebb11"]]);
+  const PanelAside = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["__scopeId", "data-v-86e51db8"]]);
   luxon.Settings.defaultZone = "Asia/Shanghai";
   function isTimestampToday(timestamp, hour = 0, minute = 5) {
     const time = luxon.DateTime.fromMillis(timestamp);
@@ -573,14 +573,22 @@
       return url + "?" + new URLSearchParams(params).toString();
     }
   }
-  function wbiSign(params) {
-    params.wts = ts();
-    const query = Object.keys(params).sort().map((key) => {
+  const objectToWbiURLQuery = (params, sort = false) => {
+    const keys = Object.keys(params);
+    if (sort) {
+      keys.sort();
+    }
+    return keys.map((key) => {
       const value = params[key].toString().replace(/[!'()*]/g, "");
       return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
     }).join("&");
-    const wbiSign2 = CryptoJS.MD5(query + useBiliStore().wbiSalt).toString();
-    return query + "&w_rid=" + wbiSign2;
+  };
+  function wbiSign(params) {
+    const wts = ts();
+    const _params = { ...params, wts };
+    const query = objectToWbiURLQuery(_params, true);
+    const w_rid = CryptoJS.MD5(query + useBiliStore().wbiSalt).toString();
+    return objectToWbiURLQuery(params) + `&w_rid=${w_rid}&wts=${wts}`;
   }
   function packFormData(json) {
     const formData = new FormData();
@@ -824,9 +832,12 @@
         "Sec-Fetch-Site": "same-site",
         "Content-Type": "application/x-www-form-urlencoded"
       };
-      if (data instanceof FormData) {
+      if (_.isNil(data)) {
+        data = "";
+      } else if (data instanceof FormData) {
         delete headers["Content-Type"];
-      } else if (typeof data === "object") {
+      } else if (typeof data === "string") ;
+      else {
         data = new URLSearchParams(data).toString();
       }
       url = addURLParams(this.url_prefix + url, otherDetails == null ? void 0 : otherDetails.params);
@@ -864,7 +875,7 @@
           page_size
         });
       },
-      sendMsg: (msg, roomid, room_type = 0, mode = 1, jumpfrom = 0, fontsize = 25, color = 16777215, bubble = 0, reply_mid = 0, reply_attr = 0, replay_dmid = "", statistics = '{"appId":100,"platform":5}') => {
+      sendMsg: (msg, roomid, room_type = 0, mode = 1, jumpfrom = 0, fontsize = 25, color = 16777215, bubble = 0, reply_mid = 0, reply_attr = 0, replay_dmid = "", reply_type = 0, reply_uname = "", statistics = '{"appId":100,"platform":5}', web_location = "444.8") => {
         const biliStore = useBiliStore();
         const bili_jct = biliStore.cookies.bili_jct;
         return request.live.post(
@@ -880,26 +891,32 @@
             reply_attr,
             replay_dmid,
             statistics,
+            reply_type,
+            reply_uname,
             fontsize,
             rnd: ts(),
             roomid,
             csrf: bili_jct,
             csrf_token: bili_jct
-          })
+          }),
+          {
+            params: wbiSign({ web_location })
+          }
         );
       },
-      likeReport: (room_id, anchor_id, click_time = 1, visit_id = "") => {
+      likeReport: (room_id, anchor_id, click_time = 1, web_location = "444.8") => {
         const biliStore = useBiliStore();
         const bili_jct = biliStore.cookies.bili_jct;
         const uid = biliStore.BilibiliLive.UID;
-        return request.live.post("/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3", {
-          click_time,
-          room_id,
-          uid,
-          anchor_id,
-          csrf_token: bili_jct,
-          csrf: bili_jct,
-          visit_id
+        return request.live.post("/xlive/app-ucenter/v1/like_info_v3/like/likeReportV3", null, {
+          params: wbiSign({
+            click_time,
+            room_id,
+            uid,
+            anchor_id,
+            web_location,
+            csrf: bili_jct
+          })
         });
       },
       /**
@@ -926,46 +943,49 @@
         const bili_jct = useBiliStore().cookies.bili_jct;
         return request.live.post("/xlive/revenue/v1/wallet/coin2silver", {
           num,
+          platform,
           csrf: bili_jct,
           csrf_token: bili_jct,
-          platform,
           visit_id
         });
       }
     },
     liveTrace: {
-      E: (id, device, ruid, is_patch = 0, heart_beat = [], visit_id = "") => {
+      E: (id, device, ruid, is_patch = 0, heart_beat = [], web_location = "444.8") => {
         const bili_jct = useBiliStore().cookies.bili_jct;
-        return request.liveTrace.post("/xlive/data-interface/v1/x25Kn/E", {
-          id: JSON.stringify(id),
-          device: JSON.stringify(device),
-          ruid,
-          // 主播 uid
-          ts: tsm(),
-          is_patch,
-          heart_beat: JSON.stringify(heart_beat),
-          ua: navigator.userAgent,
-          csrf_token: bili_jct,
-          csrf: bili_jct,
-          visit_id
+        return request.liveTrace.post("/xlive/data-interface/v1/x25Kn/E", null, {
+          params: wbiSign({
+            id: JSON.stringify(id),
+            device: JSON.stringify(device),
+            ruid,
+            // 主播 uid
+            ts: tsm(),
+            is_patch,
+            heart_beat: JSON.stringify(heart_beat),
+            ua: navigator.userAgent,
+            web_location,
+            csrf: bili_jct
+          })
         });
       },
-      X: (s, id, device, ruid, ets, benchmark, time, ts2, visit_id = "") => {
+      X: (s, id, device, ruid, ets, benchmark, time, ts2, trackid = "-99998", web_location = "444.8") => {
         const bili_jct = useBiliStore().cookies.bili_jct;
-        return request.liveTrace.post("/xlive/data-interface/v1/x25Kn/X", {
-          s,
-          id: JSON.stringify(id),
-          device: JSON.stringify(device),
-          ruid,
-          // 主播 uid
-          ets,
-          benchmark,
-          time,
-          ts: ts2,
-          ua: navigator.userAgent,
-          csrf_token: bili_jct,
-          csrf: bili_jct,
-          visit_id
+        return request.liveTrace.post("/xlive/data-interface/v1/x25Kn/X", null, {
+          params: wbiSign({
+            s,
+            id: JSON.stringify(id),
+            device: JSON.stringify(device),
+            ruid,
+            // 主播 uid
+            ets,
+            benchmark,
+            time,
+            ts: ts2,
+            ua: navigator.userAgent,
+            trackid,
+            web_location,
+            csrf: bili_jct
+          })
         });
       }
     },
@@ -973,10 +993,10 @@
       nav: () => {
         return request.main.get("/x/web-interface/nav");
       },
-      reward: () => {
-        return request.main.get("/x/member/web/exp/reward");
+      reward: (web_location = "333.33") => {
+        return request.main.get("/x/member/web/exp/reward", { web_location });
       },
-      dynamicAll: (type = "video", page = 1, timezone_offset = -480, platform = "web", features = "itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote,decorationCard,onlyfansAssetsV2,forwardListHidden,ugcDelete", web_location = "333.1365", x_bili_device_req_json = '{"platform":"web","device":"pc"}', x_bili_web_req_json = '{"spm_id":"333.1365"}') => {
+      dynamicAll: (type = "video", page = 1, timezone_offset = -480, platform = "web", features = "itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote,decorationCard,onlyfansAssetsV2,forwardListHidden,ugcDelete,onlyfansQaCard,commentsNewVersion,avatarAutoTheme", web_location = "333.1365", x_bili_device_req_json = '{"platform":"web","device":"pc"}', x_bili_web_req_json = '{"spm_id":"333.1365"}') => {
         return request.main.get(
           "/x/polymer/web-dynamic/v1/feed/all",
           {
@@ -992,12 +1012,12 @@
           {
             headers: {
               Origin: "https://t.bilibili.com",
-              Referer: "https://t.bilibili.com/"
+              Referer: "https://t.bilibili.com/?tab=video"
             }
           }
         );
       },
-      videoHeartbeat: (aid, cid = 1e9, type = 3, sub_type = 0, dt = 2, play_type = 1, realtime = 61, played_time = 62, real_played_time = 62, refer_url = "https://t.bilibili.com/?tab=video", quality = 64, video_duration = 180, last_play_progress_time = 62, max_play_progress_time = 62, outer = 0, spmid = "333.788.0.0", from_spmid = "333.1365.list.card_archive.click", session = uuid().replaceAll("-", ""), extra = '{"player_version":"4.8.43"}', web_location = 1315873) => {
+      videoHeartbeat: (aid, cid = 1e9, type = 3, sub_type = 0, dt = 2, play_type = 1, realtime = 61, played_time = 62, real_played_time = 62, refer_url = "https://t.bilibili.com/?tab=video", quality = 64, video_duration = 180, last_play_progress_time = 62, max_play_progress_time = 62, outer = 0, statistics = '{"appId":100,"platform":5,"abtest":"","version":""}', mobi_app = "web", device = "web", platform = "web", spmid = "333.788.0.0", from_spmid = "333.1365.list.card_archive.click", session = uuid().replaceAll("-", ""), extra = '{"player_version":"4.9.40"}', web_location = 1315873) => {
         const biliStore = useBiliStore();
         const start_ts = ts();
         const mid = useBiliStore().userInfo.mid;
@@ -1021,6 +1041,10 @@
             last_play_progress_time,
             max_play_progress_time,
             outer,
+            statistics,
+            mobi_app,
+            device,
+            platform,
             spmid,
             from_spmid,
             session,
@@ -1055,13 +1079,16 @@
           csrf: bili_jct
         });
       },
-      coinAdd: (aid, num, select_like = 0, cross_domain = true, eab_x = 2, ramval = 6, source = "web_normal", ga = 1) => {
+      coinAdd: (aid, num, select_like = 0, cross_domain = true, from_spmid = "333.1365.list.card_archive.click", spmid = "333.788.0.0", statistics = '{"appId":100,"platform":5}', eab_x = 2, ramval = 6, source = "web_normal", ga = 1) => {
         const bili_jct = useBiliStore().cookies.bili_jct;
         return request.main.post("/x/web-interface/coin/add ", {
           aid,
           multiply: num,
           select_like,
           cross_domain,
+          from_spmid,
+          spmid,
+          statistics,
           eab_x,
           ramval,
           source,
@@ -1130,10 +1157,11 @@
       }
     },
     vc: {
-      myGroups: (build = 0, mobi_app = "web") => {
+      myGroups: (build = 0, mobi_app = "web", web_location = "333.40164") => {
         return request.vc.get("/link_group/v1/member/my_groups", {
           build,
-          mobi_app
+          mobi_app,
+          web_location
         });
       },
       signIn: (group_id, owner_id) => {
@@ -1510,11 +1538,11 @@
      * 获取 Cookies
      *
      * bili_jct: 常作为参数 csrf 在请求中出现
-     * LIVE_BUVID: 如果用户以前从来没看过直播，此时可能为 null
+     * LIVE_BUVID: 如果用户以前从来没看过直播，这个 cookie 可能不存在，会在某个 API 的响应中被设置
      * buvid3: 作为参数 buvid 在请求中出现，目前仅在主站 API 中使用
      */
     getCookies() {
-      return Cookie.getAsync(["bili_jct", "LIVE_BUVID", "buvid3"], 300, 1e4);
+      return Cookie.getAsync(["bili_jct", "LIVE_BUVID", "buvid3"], 300, 12e3);
     }
     async run() {
       try {
@@ -2468,9 +2496,14 @@
       this.logger.log("应援团签到模块开始运行");
       if (!isTimestampToday(this.config._lastCompleteTime, 8, 5)) {
         this.status = "running";
+        const biliStore = useBiliStore();
+        const uid = biliStore.BilibiliLive.UID;
         const idList = await this.getGroupidOwneruidList();
         if (idList) {
           for (const [group_id, owner_uid] of idList) {
+            if (owner_uid === uid) {
+              continue;
+            }
             await this.sign(group_id, owner_uid);
             await sleep(2e3);
           }
@@ -4145,11 +4178,11 @@
             vue.h(
               "a",
               {
-                href: "https://github.com/gorhill/uBlock",
+                href: "https://github.com/uBlockOrigin/uBOL-home",
                 rel: "noreferrer",
                 target: "_blank"
               },
-              "uBlock Origin"
+              "uBlock Origin Lite"
             ),
             vue.h(
               "span",
@@ -5604,7 +5637,7 @@
                                 mode: "out-in"
                               }, {
                                 default: vue.withCtx(() => [
-                                  vue.createVNode(_sfc_main$4)
+                                  vue.createVNode(_sfc_main$4, { class: "panel-main" })
                                 ]),
                                 _: 1
                               })
@@ -5629,7 +5662,7 @@
       };
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-c6e79368"]]);
+  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-89deebc1"]]);
   const cssLoader = (e) => {
     const t = GM_getResourceText(e);
     return GM_addStyle(t), t;
