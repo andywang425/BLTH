@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ModuleStatusTypes } from '@/types'
+import { Loading, Select, CloseBold } from '@element-plus/icons-vue'
 
 defineProps<{
   status: ModuleStatusTypes

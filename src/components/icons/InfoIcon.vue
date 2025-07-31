@@ -10,7 +10,7 @@ const props = defineProps<{
  * 显示提示弹窗
  */
 const open = () => {
-  const { title, message }: HelpInfoItem = props.item
+  const { title, message } = props.item
 
   ElMessageBox({
     title: title,
