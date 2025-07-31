@@ -35,7 +35,7 @@ const danmuTableData = computed(() =>
 )
 
 const handleEditDanmu = (index: number, row: { content: string }) => {
-  ElMessageBox.prompt('请输入新的弹幕内容', '修改弹幕', {
+  ElMessageBox.prompt('请输入弹幕内容', '修改弹幕', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     inputPattern: /^.{1,30}$/,
@@ -181,6 +181,13 @@ function handleRowClick(row: MedalInfoRow) {
     <el-row>
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.medalTasks.light.enabled" active-text="点亮熄灭勋章" />
+        <el-button
+          type="primary"
+          size="small"
+          :icon="Edit"
+          @click="medalDanmuPanelVisible = !medalDanmuPanelVisible"
+          >编辑弹幕
+        </el-button>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light" />
         <TaskStatus :status="status.medalTasks.light" />
       </el-space>
