@@ -35,6 +35,13 @@ function updatePosition() {
   uiStore.windowScrollPosition.y = unsafeWindow.scrollY
 }
 /**
+ * 更新主题（深色/浅色）
+ */
+function updateTheme() {
+  const isDark = document.documentElement.getAttribute('lab-style')?.includes('dark') ?? false
+  document.documentElement.classList.toggle('dark', isDark)
+}
+/**
  * 显示/隐藏控制面板按钮被点击
  */
 function buttonOnClick() {
@@ -47,6 +54,7 @@ const throttleButtonOnClick = _.throttle(buttonOnClick, 300)
 const livePlayer = dq('#live-player-ctnr')
 if (livePlayer) {
   updatePosition()
+  updateTheme()
   // 查找播放器上面的 header
   // 节点#player-ctnr在初始html中出现
   waitForElement(dq('#player-ctnr')!, '.left-ctnr.left-header-area', 10e3)
@@ -80,6 +88,9 @@ if (livePlayer) {
   const observer = new MutationObserver(() => updatePosition())
   observer.observe(document.body, { attributes: true })
   observer.observe(document.documentElement, { attributes: true })
+  // 监听B站主题变化
+  const themeObserver = new MutationObserver(() => updateTheme())
+  themeObserver.observe(document.documentElement, { attributes: true })
 
   // 准备完毕，显示控制面板
   if (isShowPanel) {
@@ -118,7 +129,7 @@ if (livePlayer) {
 .base {
   z-index: 1003;
   position: absolute;
-  background-color: white;
+  background-color: var(--el-bg-color);
 }
 
 .header {
