@@ -169,7 +169,7 @@ function handleRowClick(row: MedalInfoRow) {
     // 切换当前行的选择状态
     medalInfoTableRef.value?.toggleRowSelection(row)
     // 更新黑白名单
-    const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows()
+    const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows() ?? []
     config.medalTasks.roomidList = selection.map((row) => row.roomid)
   }
 }
