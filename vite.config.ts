@@ -81,7 +81,6 @@ export default defineConfig({
         },
         externalResource: {
           'element-plus/dist/index.css': cdn.unpkg(),
-          'element-plus/theme-chalk/dark/css-vars.css': cdn.unpkg(),
         },
         metaFileName: true,
       },
