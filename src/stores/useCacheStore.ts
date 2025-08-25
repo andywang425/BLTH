@@ -37,6 +37,7 @@ export const useCacheStore = defineStore('cache', () => {
     window.addEventListener('unload', () => {
       clearInterval(timer)
       cache.lastAliveHeartBeatTime = 0
+      cache.mainScriptLocation = ''
     })
   }
 
@@ -48,16 +49,18 @@ export const useCacheStore = defineStore('cache', () => {
       cache.lastAliveHeartBeatTime !== 0 &&
       Date.now() - cache.lastAliveHeartBeatTime < 8000 // 允许最多3秒的误差
     ) {
-      // 存在 Main BLTH，通过 window.top 下的 flag 来判断当前页面上有没有 Main BLTH
-      if (unsafeWindow.top!.__main_blth_flag) {
+      // 存在 Main BLTH
+      if (cache.mainScriptLocation === unsafeWindow.top!.location.pathname) {
+        // Main BLTH 位于当前页面
         currentScriptType.value = 'SubMain'
       } else {
+        // Main BLTH 在其它页面上
         currentScriptType.value = 'Other'
       }
     } else {
-      // 不存在 Main BLTH，则当前脚本成为 Main BLTH 并记录 flag
+      // 不存在 Main BLTH，则当前脚本成为 Main BLTH 并记录 mainScriptLocation
       currentScriptType.value = 'Main'
-      unsafeWindow.top!.__main_blth_flag = '🚩'
+      cache.mainScriptLocation = unsafeWindow.top!.location.pathname
     }
   }
 
