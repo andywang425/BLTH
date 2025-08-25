@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { reactive, ref, watch } from 'vue'
 import Storage from '@/library/storage'
 import type { Cache } from '@/types'
+import { unsafeWindow } from '$'
 
 type ScriptType = 'Main' | 'SubMain' | 'Other'
 
@@ -47,16 +48,16 @@ export const useCacheStore = defineStore('cache', () => {
       cache.lastAliveHeartBeatTime !== 0 &&
       Date.now() - cache.lastAliveHeartBeatTime < 8000 // 允许最多3秒的误差
     ) {
-      // 存在 Main BLTH，通过 sessionStorage 中的 flag 来判断当前页面上有没有 Main BLTH
-      if (sessionStorage.getItem('main_blth_flag') === null) {
-        currentScriptType.value = 'Other'
-      } else {
+      // 存在 Main BLTH，通过 window.top 下的 flag 来判断当前页面上有没有 Main BLTH
+      if (unsafeWindow.top!.__main_blth_flag) {
         currentScriptType.value = 'SubMain'
+      } else {
+        currentScriptType.value = 'Other'
       }
     } else {
       // 不存在 Main BLTH，则当前脚本成为 Main BLTH 并记录 flag
       currentScriptType.value = 'Main'
-      sessionStorage.setItem('main_blth_flag', '🚩')
+      unsafeWindow.top!.__main_blth_flag = '🚩'
     }
   }
 

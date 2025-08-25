@@ -1,5 +1,7 @@
 declare global {
   interface Window {
+    __main_blth_flag: string
+
     BilibiliLive: {
       INIT_TIME: number
       RND: number
