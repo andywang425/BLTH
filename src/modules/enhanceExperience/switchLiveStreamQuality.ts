@@ -15,7 +15,11 @@ class SwitchLiveStreamQuality extends BaseModule {
   private async switchQuality(livePlayer: Window['livePlayer']) {
     let playerInfo = livePlayer.getPlayerInfo()
 
-    await this.playerStore.waitForLiveStatus(1)
+    await this.playerStore.waitForLiveStatus(1, {
+      onNeedWait: () => {
+        this.logger.log('当前直播间未开播，开播后再切换画质')
+      },
+    })
 
     const targetQuality = playerInfo.qualityCandidates.find(({ desc }) =>
       desc.includes(this.config.qualityDesc),

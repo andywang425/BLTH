@@ -10,6 +10,7 @@ import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { WatchTaskMedalFilters } from '@/modules/dailyTasks/liveTasks/medalTasks/types'
 import type { LiveData } from '@/library/bili-api/data'
+import { usePlayerStore } from '@/stores/usePlayerStore'
 
 interface SpyderData {
   benchmark: string
@@ -258,6 +259,8 @@ class WatchTask extends MedalModule {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
 
+  private playerStore = usePlayerStore()
+
   private MEDAL_FILTERS: WatchTaskMedalFilters = {
     // 等级小于20返回true，否则返回false
     levelLt20: (medal) => medal.medal.level < 20,
@@ -311,6 +314,12 @@ class WatchTask extends MedalModule {
 
   public async run(): Promise<void> {
     this.logger.log('观看直播模块开始运行')
+
+    await this.playerStore.waitForLiveStatus(0, {
+      onNeedWait: () => {
+        this.logger.log('当前直播间正在直播，直播结束后再执行观看直播任务')
+      },
+    })
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
       if (!(await this.waitForFansMedals())) {
