@@ -268,7 +268,7 @@ class WatchTask extends MedalModule {
    * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
    */
   private getMedals(): LiveData.FansMedalPanel.List[] {
-    const fansMedals = [...useBiliStore().filteredFansMedals]
+    const fansMedals = useBiliStore().filteredFansMedals
 
     const result = fansMedals.filter(
       (medal) =>
