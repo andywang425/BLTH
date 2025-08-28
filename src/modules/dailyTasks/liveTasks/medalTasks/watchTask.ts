@@ -50,8 +50,6 @@ class RoomHeart {
   /** 今日当前直播间已观看时间（秒） */
   private watchedSeconds: number
 
-  private timer!: number
-
   private readonly areaID: number
   private readonly parentID: number
   private readonly roomID: number
@@ -173,7 +171,6 @@ class RoomHeart {
         this.updateProgress()
         if (this.watchedSeconds >= this.config.time * 60) {
           // 达到设置的观看时间，结束
-          clearTimeout(this.timer)
           return
         }
         ;({
