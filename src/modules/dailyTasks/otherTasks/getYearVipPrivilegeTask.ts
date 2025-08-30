@@ -38,8 +38,9 @@ class GetYearVipPrivilegeTask extends BaseModule {
    * 19: 能领取但不知道是什么，保险起见不领取；
    * 20: 尝试领取后提示：饿了么领取活动已经过期~；
    * 21: 尝试领取后提示：超大会员身份状态异常
+   * 24,25,26,27: 尝试领取后提示：请求错误
    */
-  private blackList: number[] = [8, 14, 18, 19, 20, 21]
+  private blackList: number[] = [8, 14, 18, 19, 20, 21, 24, 25, 26, 27]
 
   /**
    * 获取会员权益
@@ -143,7 +144,9 @@ class GetYearVipPrivilegeTask extends BaseModule {
                 await this.receivePrivilege(i.type)
               }
             } else if (i.state === 1) {
-              this.logger.log(`该权益（type = ${i.type}）已经领取过了`)
+              this.logger.log(
+                `该权益（type = ${i.type}, ${this.type2Name[i.type] ?? '未知'}）已经领取过了`,
+              )
             } else {
               // 需要完成任务才能领取
               if (i.type === 9) {

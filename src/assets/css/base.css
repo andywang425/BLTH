@@ -11,6 +11,7 @@
   box-shadow: 0 0 2px #00000075;
   line-height: 10px;
   margin-left: 15px;
+  z-index: 1;
 }
 
 .blth_btn:hover {

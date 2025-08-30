@@ -118,7 +118,7 @@ if (livePlayer) {
 .base {
   z-index: 1003;
   position: absolute;
-  background-color: white;
+  background-color: var(--el-bg-color);
 }
 
 .header {

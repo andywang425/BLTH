@@ -10,6 +10,7 @@ import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { WatchTaskMedalFilters } from '@/modules/dailyTasks/liveTasks/medalTasks/types'
 import type { LiveData } from '@/library/bili-api/data'
+import { usePlayerStore } from '@/stores/usePlayerStore'
 
 interface SpyderData {
   benchmark: string
@@ -48,8 +49,6 @@ class RoomHeart {
 
   /** 今日当前直播间已观看时间（秒） */
   private watchedSeconds: number
-
-  private timer!: number
 
   private readonly areaID: number
   private readonly parentID: number
@@ -172,7 +171,6 @@ class RoomHeart {
         this.updateProgress()
         if (this.watchedSeconds >= this.config.time * 60) {
           // 达到设置的观看时间，结束
-          clearTimeout(this.timer)
           return
         }
         ;({
@@ -258,6 +256,8 @@ class WatchTask extends MedalModule {
     this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
 
+  private playerStore = usePlayerStore()
+
   private MEDAL_FILTERS: WatchTaskMedalFilters = {
     // 等级小于20返回true，否则返回false
     levelLt20: (medal) => medal.medal.level < 20,
@@ -268,7 +268,7 @@ class WatchTask extends MedalModule {
    * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
    */
   private getMedals(): LiveData.FansMedalPanel.List[] {
-    const fansMedals = [...useBiliStore().filteredFansMedals]
+    const fansMedals = useBiliStore().filteredFansMedals
 
     const result = fansMedals.filter(
       (medal) =>
@@ -290,10 +290,25 @@ class WatchTask extends MedalModule {
    * @param roomid 房间号
    * @returns [area_id, parent_area_id]
    */
-  private async getAreaInfo(roomid: number): Promise<[number, number]> {
+  private async getAreaInfo(url: string, roomid: number): Promise<[number, number]> {
     try {
+      // 先尝试从 url 中提取 area_id 和 parent_area_id
+      const urlObj = new URL(url)
+      const area_id = Number(urlObj.searchParams.get('area_id'))
+      const parent_area_id = Number(urlObj.searchParams.get('parent_area_id'))
+
+      if (area_id > 0 && parent_area_id > 0) {
+        this.logger.log(
+          `已从直播间链接中（roomid = ${roomid}）获取到分区数据（area_id = ${area_id}，parent_area_id = ${parent_area_id}）`,
+          urlObj,
+        )
+        return [area_id, parent_area_id]
+      }
+
+      // 如果无法从 url 中提取到分区数据，调用 API 获取
       const response = await BAPI.live.getInfoByRoom(roomid)
       this.logger.log(`BAPI.live.getInfoByRoom(${roomid}) response`, response)
+
       if (response.code === 0) {
         const room_info = response.data.room_info
         return [room_info.area_id, room_info.parent_area_id]
@@ -311,6 +326,12 @@ class WatchTask extends MedalModule {
 
   public async run(): Promise<void> {
     this.logger.log('观看直播模块开始运行')
+
+    await this.playerStore.waitForLiveStatus(0, {
+      onNeedWait: () => {
+        this.logger.log('当前直播间正在直播，直播结束后再执行观看直播任务')
+      },
+    })
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
       if (!(await this.waitForFansMedals())) {
@@ -338,21 +359,22 @@ class WatchTask extends MedalModule {
         let i: number
 
         for (i = 0; i < fansMedals.length; i++) {
+          if (isNowIn(23, 55, 0, 5)) {
+            this.logger.log('即将或刚刚发生跨天，提早结束本轮观看直播任务')
+            break
+          }
+
           const medal = fansMedals[i]
           const roomid = medal.room_info.room_id
           const uid = medal.medal.target_id
-          // TODO: 此处可以考虑不调用API，直接解析粉丝勋章 medal.room_info.url 的URL参数来获取
-          const [area_id, parent_area_id] = await this.getAreaInfo(roomid)
+          const [area_id, parent_area_id] = await this.getAreaInfo(medal.room_info.url, roomid)
+
           if (area_id > 0 && parent_area_id > 0) {
             // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
             if (
               !this.config._watchingProgress[roomid] ||
               this.config._watchingProgress[roomid] < this.config.time * 60
             ) {
-              if (isNowIn(23, 55, 0, 5)) {
-                this.logger.log('即将或刚刚发生跨天，提早结束本轮观看直播任务')
-                break
-              }
               // 今日观看时间未达到设置值，开始心跳
               this.logger.log(
                 `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务`,

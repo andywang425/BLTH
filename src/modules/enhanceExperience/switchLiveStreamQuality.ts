@@ -1,6 +1,6 @@
-import { unsafeWindow } from '$'
 import type { OnFrameTypes, RunAtMoment } from '@/types'
 import BaseModule from '../BaseModule'
+import { usePlayerStore } from '@/stores/usePlayerStore'
 
 class SwitchLiveStreamQuality extends BaseModule {
   static runOnMultiplePages: boolean = true
@@ -10,33 +10,16 @@ class SwitchLiveStreamQuality extends BaseModule {
 
   config = this.moduleStore.moduleConfig.EnhanceExperience.switchLiveStreamQuality
 
-  private async waitForPlayer(): Promise<Window['livePlayer']> {
-    return new Promise<Window['livePlayer']>((resolve, reject) => {
-      const findPlayerTimer = setInterval(() => {
-        if (
-          unsafeWindow.livePlayer &&
-          Object.hasOwn(unsafeWindow.livePlayer, 'switchQuality') &&
-          Object.hasOwn(unsafeWindow.livePlayer, 'getPlayerInfo')
-        ) {
-          clearInterval(findPlayerTimer)
-          clearTimeout(timeoutTimer)
-          resolve(unsafeWindow.livePlayer)
-        }
-      }, 200)
-      const timeoutTimer = setTimeout(() => {
-        clearInterval(findPlayerTimer)
-        reject('等待播放器超时')
-      }, 10e3)
-    })
-  }
+  private playerStore = usePlayerStore()
 
-  private switchQuality(livePlayer: Window['livePlayer']) {
+  private async switchQuality(livePlayer: Window['livePlayer']) {
     let playerInfo = livePlayer.getPlayerInfo()
 
-    if (playerInfo.liveStatus === 0) {
-      this.logger.log('当前直播间未开播，无需切换画质')
-      return
-    }
+    await this.playerStore.waitForLiveStatus(1, {
+      onNeedWait: () => {
+        this.logger.log('当前直播间未开播，开播后再切换画质')
+      },
+    })
 
     const targetQuality = playerInfo.qualityCandidates.find(({ desc }) =>
       desc.includes(this.config.qualityDesc),
@@ -69,7 +52,7 @@ class SwitchLiveStreamQuality extends BaseModule {
     this.logger.log('自动切换画质模块开始运行')
 
     try {
-      const livePlayer = await this.waitForPlayer()
+      const livePlayer = await this.playerStore.getPlayer()
       this.switchQuality(livePlayer)
     } catch (e) {
       this.logger.error('自动切换画质模块出错', e)
