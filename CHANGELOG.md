@@ -5,6 +5,7 @@
 ### 新增
 
 - 适配B站深色模式
+- 【领取年度大会员权益】更新权益黑名单，优化日志显示
 - 💻 New Pinia store: `usePlayerStore`
 
 ### 修复
