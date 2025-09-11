@@ -18,7 +18,7 @@
   "dependencies": {
     "ajax-hook": "^3.0.3",
     "crypto-js": "^4.2.0",
-    "element-plus": "^2.10.5",
+    "element-plus": "^2.11.0",
     "hotkeys-js": "^3.13.15",
     "lodash": "^4.17.21",
     "luxon": "^3.7.1",
