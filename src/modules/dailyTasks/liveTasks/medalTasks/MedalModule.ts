@@ -15,6 +15,8 @@ class MedalModule extends BaseModule {
       this.medalTasksConfig.isWhiteList
         ? this.medalTasksConfig.roomidList.includes(m.room_info.room_id)
         : !this.medalTasksConfig.roomidList.includes(m.room_info.room_id),
+    // 等级小于120返回true，否则返回false
+    levelLt120: (medal) => medal.medal.level < 120,
   }
 
   protected sortMedals(medals: LiveData.FansMedalPanel.List[]): LiveData.FansMedalPanel.List[] {

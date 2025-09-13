@@ -8,7 +8,6 @@ import { useModuleStore } from '@/stores/useModuleStore'
 import type { ModuleConfig, ModuleStatusTypes, RunAtMoment } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
-import type { WatchTaskMedalFilters } from '@/modules/dailyTasks/liveTasks/medalTasks/types'
 import type { LiveData } from '@/library/bili-api/data'
 import { usePlayerStore } from '@/stores/usePlayerStore'
 
@@ -258,11 +257,6 @@ class WatchTask extends MedalModule {
 
   private playerStore = usePlayerStore()
 
-  private MEDAL_FILTERS: WatchTaskMedalFilters = {
-    // 等级小于20返回true，否则返回false
-    levelLt20: (medal) => medal.medal.level < 20,
-  }
-
   /**
    * 获取粉丝勋章
    * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
@@ -272,7 +266,8 @@ class WatchTask extends MedalModule {
 
     const result = fansMedals.filter(
       (medal) =>
-        this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) && this.MEDAL_FILTERS.levelLt20(medal),
+        this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) &&
+        this.PUBLIC_MEDAL_FILTERS.levelLt120(medal),
     )
 
     if (this.medalTasksConfig.isWhiteList) {
