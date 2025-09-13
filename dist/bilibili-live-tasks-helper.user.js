@@ -3,7 +3,7 @@
 // @name:en         Bilibili Live Tasks Helper
 // @name:zh         Bilibili Live Tasks Helper
 // @namespace       https://github.com/andywang425
-// @version         7.2.3
+// @version         7.2.4
 // @author          andywang425
 // @description     Enhancing the experience of watching Bilibili live streaming.
 // @description:en  Enhancing the experience of watching Bilibili live streaming.
@@ -33,17 +33,17 @@
 // @match           *://live.bilibili.com/blanc/7*
 // @match           *://live.bilibili.com/blanc/8*
 // @match           *://live.bilibili.com/blanc/9*
-// @require         https://unpkg.com/vue@3.5.18/dist/vue.global.prod.js
+// @require         https://unpkg.com/vue@3.5.21/dist/vue.global.prod.js
 // @require         data:application/javascript,%3Bwindow.Vue%3DVue%3Bwindow.VueDemi%3DVue%3B
-// @require         https://unpkg.com/element-plus@2.10.5/dist/index.full.min.js
+// @require         https://unpkg.com/element-plus@2.11.2/dist/index.full.min.js
 // @require         https://unpkg.com/@element-plus/icons-vue@2.3.1/dist/index.iife.min.js
 // @require         https://unpkg.com/pinia@3.0.3/dist/pinia.iife.prod.js
 // @require         https://unpkg.com/vue-draggable-plus@0.6.0/dist/vue-draggable-plus.iife.js
 // @require         https://unpkg.com/lodash@4.17.21/lodash.min.js
 // @require         https://unpkg.com/hotkeys-js@3.13.15/dist/hotkeys.min.js
-// @require         https://unpkg.com/luxon@3.7.1/build/global/luxon.min.js
+// @require         https://unpkg.com/luxon@3.7.2/build/global/luxon.min.js
 // @require         https://unpkg.com/crypto-js@4.2.0/crypto-js.js
-// @resource        element-plus/dist/index.css  https://unpkg.com/element-plus@2.10.5/dist/index.css
+// @resource        element-plus/dist/index.css  https://unpkg.com/element-plus@2.11.2/dist/index.css
 // @connect         api.bilibili.com
 // @connect         api.live.bilibili.com
 // @connect         api.vc.bilibili.com
@@ -58,8 +58,6 @@
 // @grant           unsafeWindow
 // @run-at          document-start
 // ==/UserScript==
-
-(l=>{if(typeof GM_addStyle=="function"){GM_addStyle(l);return}const e=document.createElement("style");e.textContent=l,document.head.append(e)})(" .title[data-v-903ddd8d]{padding-left:20px;align-items:baseline;display:flex}.header-big-text[data-v-903ddd8d]{font-size:var(--big-text-size);align-self:unset}.header-small-text[data-v-903ddd8d]{font-size:var(--small-text-size);align-self:unset;margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-903ddd8d]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}#aside-el-menu[data-v-86e51db8]:not(.el-menu--collapse){width:150px}.avatar-wrap[data-v-aec3aff8]{width:80px;height:80px}.avatar[data-v-aec3aff8]{display:flex;justify-content:center;align-items:center;border-radius:50%}.label-text[data-v-1cb0d081]{color:var(--el-text-color-primary);line-height:32px}.base[data-v-f514d2f1]{z-index:1003;position:absolute;background-color:var(--el-bg-color)}.header[data-v-f514d2f1]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-f514d2f1]{width:auto}.main[data-v-f514d2f1]{padding:0}.panel-main[data-v-f514d2f1]{padding:calc(var(--el-main-padding) * .625) var(--el-main-padding)}.fade-enter-active[data-v-f514d2f1]{animation:fade-in linear .2s}/*! Modified from element-plus/theme-chalk/dark/css-vars.css */html[lab-style*=dark]{color-scheme:dark;--el-color-primary: #409eff;--el-color-primary-light-3: rgb(51, 117, 185);--el-color-primary-light-5: rgb(42, 89, 138);--el-color-primary-light-7: rgb(33, 61, 91);--el-color-primary-light-8: rgb(29, 48, 67);--el-color-primary-light-9: rgb(24, 34, 43);--el-color-primary-dark-2: rgb(102, 177, 255);--el-color-success: #67c23a;--el-color-success-light-3: rgb(78, 142, 47);--el-color-success-light-5: rgb(62, 107, 39);--el-color-success-light-7: rgb(45, 72, 31);--el-color-success-light-8: rgb(37, 55, 28);--el-color-success-light-9: rgb(28, 37, 24);--el-color-success-dark-2: rgb(133, 206, 97);--el-color-warning: #e6a23c;--el-color-warning-light-3: rgb(167, 119, 48);--el-color-warning-light-5: rgb(125, 91, 40);--el-color-warning-light-7: rgb(83, 63, 32);--el-color-warning-light-8: rgb(62, 48, 28);--el-color-warning-light-9: rgb(41, 34, 24);--el-color-warning-dark-2: rgb(235, 181, 99);--el-color-danger: #f56c6c;--el-color-danger-light-3: rgb(178, 82, 82);--el-color-danger-light-5: rgb(133, 64, 64);--el-color-danger-light-7: rgb(88, 46, 46);--el-color-danger-light-8: rgb(65, 38, 38);--el-color-danger-light-9: rgb(42, 29, 29);--el-color-danger-dark-2: rgb(247, 137, 137);--el-color-error: #f56c6c;--el-color-error-light-3: rgb(178, 82, 82);--el-color-error-light-5: rgb(133, 64, 64);--el-color-error-light-7: rgb(88, 46, 46);--el-color-error-light-8: rgb(65, 38, 38);--el-color-error-light-9: rgb(42, 29, 29);--el-color-error-dark-2: rgb(247, 137, 137);--el-color-info: #909399;--el-color-info-light-3: rgb(107, 109, 113);--el-color-info-light-5: rgb(82, 84, 87);--el-color-info-light-7: rgb(57, 58, 60);--el-color-info-light-8: rgb(45, 45, 47);--el-color-info-light-9: rgb(32, 33, 33);--el-color-info-dark-2: rgb(166, 169, 173);--el-box-shadow: 0px 12px 32px 4px rgba(0, 0, 0, .36), 0px 8px 20px rgba(0, 0, 0, .72);--el-box-shadow-light: 0px 0px 12px rgba(0, 0, 0, .72);--el-box-shadow-lighter: 0px 0px 6px rgba(0, 0, 0, .72);--el-box-shadow-dark: 0px 16px 48px 16px rgba(0, 0, 0, .72), 0px 12px 32px #000000, 0px 8px 16px -8px #000000;--el-bg-color-page: #0a0a0a;--el-bg-color: #141414;--el-bg-color-overlay: #1d1e1f;--el-text-color-primary: #e5eaf3;--el-text-color-regular: #cfd3dc;--el-text-color-secondary: #a3a6ad;--el-text-color-placeholder: #8d9095;--el-text-color-disabled: #6c6e72;--el-border-color-darker: #636466;--el-border-color-dark: #58585b;--el-border-color: #4c4d4f;--el-border-color-light: #414243;--el-border-color-lighter: #363637;--el-border-color-extra-light: #2b2b2c;--el-fill-color-darker: #424243;--el-fill-color-dark: #39393a;--el-fill-color: #303030;--el-fill-color-light: #262727;--el-fill-color-lighter: #1d1d1d;--el-fill-color-extra-light: #191919;--el-fill-color-blank: transparent;--el-mask-color: rgba(0, 0, 0, .8);--el-mask-color-extra-light: rgba(0, 0, 0, .3)}html[lab-style*=dark] .el-button{--el-button-disabled-text-color: rgba(255, 255, 255, .5)}html[lab-style*=dark] .el-card{--el-card-bg-color: var(--el-bg-color-overlay)}html[lab-style*=dark] .el-empty{--el-empty-fill-color-0: var(--el-color-black);--el-empty-fill-color-1: #4b4b52;--el-empty-fill-color-2: #36383d;--el-empty-fill-color-3: #1e1e20;--el-empty-fill-color-4: #262629;--el-empty-fill-color-5: #202124;--el-empty-fill-color-6: #212224;--el-empty-fill-color-7: #1b1c1f;--el-empty-fill-color-8: #1c1d1f;--el-empty-fill-color-9: #18181a}.info-icon[data-v-02b5bf3e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-0e4540e9]{font-size:var(--el-font-size-base)}.blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px;z-index:1}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-message-box ul,ol{padding-left:1em!important}.el-message-box ul{list-style:initial!important}.el-message-box ol{list-style:decimal!important}@media screen and (min-width: 1930px){html[lab-style*=adaptive] .base{zoom:.9375}}@media screen and (min-width: 2058px){html[lab-style*=adaptive] .base{zoom:.75}}@media screen and (min-width: 2570px){html[lab-style*=adaptive] .base{zoom:calc(2 / 3)}}@media screen and (min-width: 3210px){html[lab-style*=adaptive] .base{zoom:.5}}@media screen and (min-width: 3850px){html[lab-style*=adaptive] .base{zoom:.46875}} ");
 
 (async function (vue, pinia$1, _, ElementPlusIconsVue, CryptoJS, luxon, ElementPlus, vueDraggablePlus, hotkeys) {
   'use strict';
@@ -81,13 +79,18 @@
     return Object.freeze(n);
   }
 
-  const ElementPlusIconsVue__namespace = /*#__PURE__*/_interopNamespaceDefault(ElementPlusIconsVue);
+  const ElementPlusIconsVue__namespace = _interopNamespaceDefault(ElementPlusIconsVue);
 
-  var _GM_addStyle = /* @__PURE__ */ (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
-  var _GM_getValue = /* @__PURE__ */ (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
-  var _GM_setValue = /* @__PURE__ */ (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
-  var _GM_xmlhttpRequest = /* @__PURE__ */ (() => typeof GM_xmlhttpRequest != "undefined" ? GM_xmlhttpRequest : void 0)();
-  var _unsafeWindow = /* @__PURE__ */ (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
+  const d=new Set;const importCSS = async e=>{d.has(e)||(d.add(e),(t=>{typeof GM_addStyle=="function"?GM_addStyle(t):document.head.appendChild(document.createElement("style")).append(t);})(e));};
+
+  importCSS(" .title[data-v-903ddd8d]{padding-left:20px;align-items:baseline;display:flex}.header-big-text[data-v-903ddd8d]{font-size:var(--big-text-size);align-self:unset}.header-small-text[data-v-903ddd8d]{font-size:var(--small-text-size);align-self:unset;margin-left:10px;--small-text-size: 18px}.collapse-btn[data-v-903ddd8d]{display:flex;justify-content:center;align-items:center;height:100%;float:left;cursor:pointer}#aside-el-menu[data-v-86e51db8]:not(.el-menu--collapse){width:150px}.avatar-wrap[data-v-aec3aff8]{width:80px;height:80px}.avatar[data-v-aec3aff8]{display:flex;justify-content:center;align-items:center;border-radius:50%}.label-text[data-v-1cb0d081]{color:var(--el-text-color-primary);line-height:32px}.base[data-v-f514d2f1]{z-index:1003;position:absolute;background-color:var(--el-bg-color)}.header[data-v-f514d2f1]{position:relative;box-sizing:border-box;width:100%;font-size:var(--big-text-size);align-items:center;display:flex;border-bottom:1px solid #e3e5e7;height:60px;--big-text-size: 25px}.aside[data-v-f514d2f1]{width:auto}.main[data-v-f514d2f1]{padding:0}.panel-main[data-v-f514d2f1]{padding:calc(var(--el-main-padding) * .625) var(--el-main-padding)}.fade-enter-active[data-v-f514d2f1]{animation:fade-in linear .2s}.info-icon[data-v-02b5bf3e]{font-size:var(--el-font-size-base);cursor:pointer}.status-icon[data-v-0e4540e9]{font-size:var(--el-font-size-base)} ");
+
+  var _GM_addStyle = (() => typeof GM_addStyle != "undefined" ? GM_addStyle : void 0)();
+  var _GM_getResourceText = (() => typeof GM_getResourceText != "undefined" ? GM_getResourceText : void 0)();
+  var _GM_getValue = (() => typeof GM_getValue != "undefined" ? GM_getValue : void 0)();
+  var _GM_setValue = (() => typeof GM_setValue != "undefined" ? GM_setValue : void 0)();
+  var _GM_xmlhttpRequest = (() => typeof GM_xmlhttpRequest != "undefined" ? GM_xmlhttpRequest : void 0)();
+  var _unsafeWindow = (() => typeof unsafeWindow != "undefined" ? unsafeWindow : void 0)();
   const defaultValues = {
     ui: {
       isCollapse: false,
@@ -234,23 +237,7 @@
     }
   };
   class Storage {
-    /**
-     * 递归合并配置项。删除当前配置中不存在于默认配置的键，补上相对于默认配置缺少的键值，其它键值不变
-     *
-     * 该方法不会修改当前配置
-     *
-     * @param currentConfig 当前配置
-     * @param defaultConfig 默认配置
-     * @returns 修改后的当前配置
-     * @example
-     *
-     * const current_config = { enabled: true, details: { type: 'efg', status: 'ok' }, msg: 'hi' };
-     * const default_config = { enabled: false, details: { type: 'abc', num: 1 } };
-     *
-     * mergeConfigs(current_config, default_config);
-     * // => { enabled: true, details: { type: 'efg', num: 1 } }
-     */
-    static mergeConfigs(currentConfig, defaultConfig) {
+static mergeConfigs(currentConfig, defaultConfig) {
       const config = _.pick(currentConfig, _.keys(defaultConfig));
       _.defaults(config, defaultConfig);
       _.forOwn(config, (value, key, object) => {
@@ -298,8 +285,7 @@
     });
     const windowScrollPosition = vue.reactive({ x: 0, y: 0 });
     const panelStyle = vue.computed(() => ({
-      // 此处若使用最新的滚动条位置（window.scrollX/Y），用户在调整控制面板宽度时可能导致面板在垂直方向上错位
-      top: `${livePlayerRect.top + windowScrollPosition.y}px`,
+top: `${livePlayerRect.top + windowScrollPosition.y}px`,
       left: `${livePlayerRect.left + windowScrollPosition.x}px`,
       height: `${livePlayerRect.height}px`,
       width: `${livePlayerRect.width * uiConfig.panelWidthPercent / 100}px`
@@ -335,7 +321,7 @@
     };
   });
   const _hoisted_1$2 = { class: "title" };
-  const _sfc_main$c = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$c = vue.defineComponent({
     __name: "PanelHeader",
     setup(__props) {
       const uiStore = useUIStore();
@@ -345,8 +331,8 @@
         return vue.openBlock(), vue.createElementBlock(vue.Fragment, null, [
           vue.createElementVNode("div", {
             class: "collapse-btn",
-            onClick: _cache[0] || (_cache[0] = //@ts-ignore
-            (...args) => vue.unref(uiStore).changeCollapse && vue.unref(uiStore).changeCollapse(...args))
+            onClick: _cache[0] || (_cache[0] =
+(...args) => vue.unref(uiStore).changeCollapse && vue.unref(uiStore).changeCollapse(...args))
           }, [
             vue.unref(uiStore).uiConfig.isCollapse ? (vue.openBlock(), vue.createBlock(_component_el_icon, { key: 0 }, {
               default: vue.withCtx(() => [
@@ -365,11 +351,10 @@
               tag: "b",
               class: "header-big-text"
             }, {
-              default: vue.withCtx(() => _cache[1] || (_cache[1] = [
+              default: vue.withCtx(() => [..._cache[1] || (_cache[1] = [
                 vue.createTextVNode("控制面板", -1)
-              ])),
-              _: 1,
-              __: [1]
+              ])]),
+              _: 1
             }),
             vue.createVNode(_component_el_text, { class: "header-small-text" }, {
               default: vue.withCtx(() => [
@@ -389,8 +374,8 @@
     }
     return target;
   };
-  const PanelHeader = /* @__PURE__ */ _export_sfc(_sfc_main$c, [["__scopeId", "data-v-903ddd8d"]]);
-  const _sfc_main$b = /* @__PURE__ */ vue.defineComponent({
+  const PanelHeader = _export_sfc(_sfc_main$c, [["__scopeId", "data-v-903ddd8d"]]);
+  const _sfc_main$b = vue.defineComponent({
     __name: "PanelAside",
     setup(__props) {
       const uiStore = useUIStore();
@@ -399,13 +384,11 @@
           icon: "Tasks",
           title: "每日任务",
           index: "DailyTasks",
-          // 有子菜单，index 无所谓
-          subs: [
+subs: [
             {
               title: "主站任务",
               index: "MainSiteTasks"
-              // index 是组件名
-            },
+},
             {
               title: "直播任务",
               index: "LiveTasks"
@@ -500,7 +483,7 @@
       };
     }
   });
-  const PanelAside = /* @__PURE__ */ _export_sfc(_sfc_main$b, [["__scopeId", "data-v-86e51db8"]]);
+  const PanelAside = _export_sfc(_sfc_main$b, [["__scopeId", "data-v-86e51db8"]]);
   luxon.Settings.defaultZone = "Asia/Shanghai";
   function isTimestampToday(timestamp, hour = 0, minute = 5) {
     const time = luxon.DateTime.fromMillis(timestamp);
@@ -526,10 +509,8 @@
     }
     const diff = nextTime.diff(now);
     return {
-      // 时间戳
-      ms: diff.toMillis(),
-      // 便于阅读的字符串，去掉开头的0小时和0分钟
-      str: diff.toFormat("h小时m分钟s秒").replace(/^0小时/, "").replace(/^0分钟/, "")
+ms: diff.toMillis(),
+str: diff.toFormat("h小时m分钟s秒").replace(/^0小时/, "").replace(/^0分钟/, "")
     };
   }
   function isNowIn(startHour, startMinute, endHour, endMinute) {
@@ -771,23 +752,13 @@
     };
   });
   let Request$1 = class Request2 {
-    /** 请求 URL 的前缀 */
-    url_prefix;
-    /**
-     * 请求 Header 中 Origin 的值，为了方便同时也是 Referer 的值
-     */
-    origin;
+url_prefix;
+origin;
     constructor(url_prefix, orgin) {
       this.url_prefix = url_prefix ?? "";
       this.origin = orgin ?? "https://bilibili.com";
     }
-    /**
-     * 发起一个 GET 请求
-     * @param url 请求 URL 除去前缀的部分
-     * @param params URL 参数
-     * @param otherDetails GM_xmlhttpRequest 的 details 参数
-     */
-    get(url, params, otherDetails) {
+get(url, params, otherDetails) {
       url = addURLParams(this.url_prefix + url, params);
       return new Promise((resolve2, reject2) => {
         const defaultDetails = {
@@ -811,13 +782,7 @@
         _GM_xmlhttpRequest(details);
       });
     }
-    /**
-     * 发起一个 POST 请求
-     * @param url 请求 URL 除去前缀的部分
-     * @param data POST data
-     * @param otherDetails GM_xmlhttpRequest 的 details 参数（特别的，可以提供 params 属性作为 URL 参数）
-     */
-    post(url, data, otherDetails) {
+post(url, data, otherDetails) {
       const headers = {
         Accept: "application/json, text/plain, */*",
         Referer: this.origin,
@@ -912,10 +877,7 @@
           })
         });
       },
-      /**
-       * 该API只在带有多层iframe（背景很好看）的直播间中被使用，但参数填任意直播间均可
-       */
-      getInfoByRoom: (room_id, web_location = "444.8") => {
+getInfoByRoom: (room_id, web_location = "444.8") => {
         return request.live.get(
           "/xlive/web-room/v1/index/getInfoByRoom",
           wbiSign({
@@ -951,8 +913,7 @@
             id: JSON.stringify(id),
             device: JSON.stringify(device),
             ruid,
-            // 主播 uid
-            ts: tsm(),
+ts: tsm(),
             is_patch,
             heart_beat: JSON.stringify(heart_beat),
             ua: navigator.userAgent,
@@ -969,8 +930,7 @@
             id: JSON.stringify(id),
             device: JSON.stringify(device),
             ruid,
-            // 主播 uid
-            ets,
+ets,
             benchmark,
             time,
             ts: ts2,
@@ -1171,7 +1131,7 @@
     title;
     get prefix() {
       return [
-        `%c${this.NAME}%c[${(/* @__PURE__ */ new Date()).toLocaleString()}]%c[${this.prefix_title_str}]%c:`,
+        `%c${this.NAME}%c[${( new Date()).toLocaleString()}]%c[${this.prefix_title_str}]%c:`,
         "font-weight: bold; color: white; background-color: #23ade5; padding: 1px 4px; border-radius: 4px;",
         "font-weight: bold; color: #0920e6;",
         "font-weight: bold;",
@@ -1193,102 +1153,25 @@
     }
   }
   class BaseModule {
-    /**
-     * 模块名称，在被导出时定义
-     *
-     * 输出控制台日志时会用到
-     */
-    moduleName;
-    /**
-     * 当脚本在多个页面上运行的时候，该模块是否要在每个页面上运行
-     *
-     * 默认false，即只在Main BLTH运行的页面上运行
-     *
-     * 该选项为 false 时如果要确保模块不会重复运行，还需将 onFrame 设置为 target 或 top
-     */
-    static runOnMultiplePages = false;
-    /**
-     * 模块运行时机，默认 document-body
-     *
-     * `document-start`: 尽可能早，与脚本注入时机相同
-     *
-     * `document-head`: `document.head`刚刚出现后
-     *
-     * `document-body`: `document.body`刚刚出现后
-     *
-     * `document-end`: `document`的`DOMContentLoaded`事件触发后
-     *
-     * `window-load`: `window`的`load`事件触发后
-     *
-     * 默认模块的模块运行时机总是为 document-body
-     */
-    static runAt = "document-body";
-    /**
-     * 模块运行的 frame，默认 target
-     *
-     * `all`: 所有符合脚本`@match`规则的 frame
-     *
-     * `target`: window.BilibiliLive 存在的那个 frame
-     *
-     * `top`: 顶层 frame (`window.top`)
-     *
-     * 如果设置为 target，那么至少要等到`document-body`时刻才能运行
-     *
-     * 默认模块运行的 frame 总是为 target
-     */
-    static onFrame = "target";
-    /**
-     * 是否要等默认模块运行完了再运行，默认 true
-     *
-     * 如果设置为 true，那么就不能保证该模块被及时地执行
-     *
-     * 因为默认模块的运行时机总是 document-body，而且默认模块的运行时间是不确定的
-     */
-    static runAfterDefault = true;
-    /**
-     * 用于在控制台中输出日志信息
-     */
-    logger;
-    /**
-     * 储存所有模块信息的 Pinia Store
-     */
-    moduleStore = useModuleStore();
-    /**
-     * 推荐添加一个 config 属性来表示当前模块的配置项
-     *
-     * @example config: this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
-     */
-    config;
-    /**
-     * 模块是否启用，默认通过 config.enabled 判断
-     *
-     * 如果没有 config.enabled 属性，则默认启用（比如默认模块）
-     */
-    isEnabled() {
+moduleName;
+static runOnMultiplePages = false;
+static runAt = "document-body";
+static onFrame = "target";
+static runAfterDefault = true;
+logger;
+moduleStore = useModuleStore();
+config;
+isEnabled() {
       return this.config?.enabled ?? true;
     }
-    /**
-     * 如果需要在控制面板上显示模块状态，推荐添加一个 status setter 用来设置模块状态
-     *
-     * @example
-     * set status(s: moduleStatus) {
-     *    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
-     * }
-     */
-    set status(_s) {
+set status(_s) {
       throw new Error("Method not implemented.");
     }
     constructor(moduleName) {
       this.moduleName = moduleName;
       this.logger = new Logger(this.moduleName);
     }
-    /**
-     * 运行模块
-     *
-     * 默认模块必须返回一个空的Promise，
-     * 其它模块若需要使用 await 可以返回一个空的Promise，否则无返回值
-     */
-    run() {
+run() {
       throw new Error("Method not implemented.");
     }
   }
@@ -1309,10 +1192,7 @@
     }
   }
   class UserInfo extends BaseModule {
-    /**
-     * 通过 BAPI.main.nav 获取用户基本信息
-     */
-    async getUserInfo() {
+async getUserInfo() {
       try {
         const response = await BAPI.main.nav();
         this.logger.log("BAPI.main.nav response", response);
@@ -1335,10 +1215,7 @@
     }
   }
   class DailyRewardInfo extends BaseModule {
-    /**
-     * 获取今日主站每日任务的完成情况
-     */
-    async getDailyRewardInfo() {
+async getDailyRewardInfo() {
       try {
         const response = await BAPI.main.reward();
         this.logger.log("BAPI.main.reward response", response);
@@ -1366,12 +1243,7 @@
     }
   }
   class DynamicVideos extends BaseModule {
-    /**
-     * 从动态中获取一页视频的信息
-     *
-     * 每日观看视频，每日分享视频，每日投币都会用到
-     */
-    async getDynamicVideos() {
+async getDynamicVideos() {
       try {
         const response = await BAPI.main.dynamicAll("video");
         this.logger.log("BAPI.main.dynamicAll response", response);
@@ -1398,12 +1270,7 @@
     }
   }
   class FansMetals extends BaseModule {
-    /**
-     * 获取粉丝勋章
-     *
-     * @param pages 获取的页数
-     */
-    async getFansMetals(pages = Infinity) {
+async getFansMetals(pages = Infinity) {
       const fansMetalList = [];
       let total_page = 1;
       try {
@@ -1458,10 +1325,7 @@
     }
   }
   class Cookie {
-    /**
-     * 获取所有 cookies
-     */
-    static getAll() {
+static getAll() {
       if (document.cookie === "") return {};
       const cookies = document.cookie.split("; ");
       const result = {};
@@ -1471,12 +1335,7 @@
       }
       return result;
     }
-    /**
-     * 获取指定名称的一个或多个 cookies
-     * @param names cookie 名称或 cookie 名称数组
-     * @param defaultValue 当 cookie 不存在时使用的默认值，默认 undefined
-     */
-    static get(names, defaultValue) {
+static get(names, defaultValue) {
       const cookies = this.getAll();
       if (Array.isArray(names)) {
         const result = {};
@@ -1488,16 +1347,7 @@
         return cookies[names] ? cookies[names] : defaultValue;
       }
     }
-    /**
-     * 获取一组 cookies，如果有 cookie 未获取到，会反复获取直到超时为止
-     *
-     * TODO: 等 cookieStore 普及后使用监听取代轮询
-     *
-     * @param names 要获取的 cookie 名称数组
-     * @param interval 获取间隔，默认 300 毫秒
-     * @param timeout 超时时间，若留空则永不超时
-     */
-    static getAsync(names, interval = 300, timeout) {
+static getAsync(names, interval = 300, timeout) {
       return new Promise((resolve2, reject2) => {
         let remainCookieNames = [...names];
         const cookies = this.get(remainCookieNames);
@@ -1526,14 +1376,7 @@
     }
   }
   class Cookies extends BaseModule {
-    /**
-     * 获取 Cookies
-     *
-     * bili_jct: 常作为参数 csrf 在请求中出现
-     * LIVE_BUVID: 如果用户以前从来没看过直播，这个 cookie 可能不存在，会在某个 API 的响应中被设置
-     * buvid3: 作为参数 buvid 在请求中出现，目前仅在主站 API 中使用
-     */
-    getCookies() {
+getCookies() {
       return Cookie.getAsync(["bili_jct", "LIVE_BUVID", "buvid3"], 300, 12e3);
     }
     async run() {
@@ -1546,10 +1389,7 @@
   }
   class BilibiliLive extends BaseModule {
     static runOnMultiplePages = true;
-    /**
-     * 获取 window.BilibiliLive
-     */
-    getBilibiliLive() {
+getBilibiliLive() {
       this.logger.log("unsafeWindow.BilibiliLive", _unsafeWindow.BilibiliLive);
       return new Promise((resolve2, reject2) => {
         if (_unsafeWindow.BilibiliLive.UID !== 0) {
@@ -1577,7 +1417,7 @@
       }
     }
   }
-  const defaultModules = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  const defaultModules = Object.freeze( Object.defineProperty({
     __proto__: null,
     Default_BilibiliLive: BilibiliLive,
     Default_Cookies: Cookies,
@@ -1631,10 +1471,7 @@
     set status(s) {
       this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.watch = s;
     }
-    /**
-     * 获取第一个视频的 aid
-     */
-    getAid() {
+getAid() {
       return Number(useBiliStore().dynamicVideos[0].modules.module_dynamic.major.archive.aid);
     }
     async watch(aid) {
@@ -1771,16 +1608,12 @@
     set status(s) {
       this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.coin = s;
     }
-    // 暂时先限制每个视频最多投一个币
-    // 因为转载视频只能投一个币，原创视频能投两个币
-    // 但是想查询视频是否为转载，我目前只知道一个 /x/web-interface/wbi/view
-    // 通过其响应的copyright字段（1原创，2转载）来判断
-    // 不过视频数量足够多，所以干脆直接限制每个视频最多投一个币
-    MAX_COIN = 1;
-    /**
-     * 获取动态视频的 aid 和 bvid
-     */
-    getDynamicVideoIds() {
+
+
+
+
+MAX_COIN = 1;
+getDynamicVideoIds() {
       const biliStore = useBiliStore();
       return biliStore.dynamicVideos.map((item) => {
         const archive = item.modules.module_dynamic.major.archive;
@@ -1790,12 +1623,7 @@
         };
       });
     }
-    /**
-     * 获取一个视频的你的已投硬币数量
-     *
-     * @returns 你的已投硬币数
-     */
-    async getVideoCoinInfo(aid, bvid) {
+async getVideoCoinInfo(aid, bvid) {
       try {
         const response = await BAPI.main.videoRelation(aid, bvid);
         this.logger.log(`BAPI.main.videoRelation(${aid}, ${bvid}) response`, response);
@@ -1810,11 +1638,7 @@
         return 0;
       }
     }
-    /**
-     * 给动态中的视频投币
-     * @param left_coin_num 还需要投的硬币数
-     */
-    async coinDynamicVideos(left_coin_num) {
+async coinDynamicVideos(left_coin_num) {
       const ids = this.getDynamicVideoIds();
       for (const { aid, bvid } of ids) {
         const coined_num = await this.getVideoCoinInfo(aid, bvid);
@@ -1842,10 +1666,7 @@
         this.status = "error";
       }
     }
-    /**
-     * 投币
-     */
-    async coin(aid, num) {
+async coin(aid, num) {
       try {
         const response = await BAPI.main.coinAdd(aid, num);
         this.logger.log(`BAPI.main.coinAdd(${aid}) response`, response);
@@ -1864,10 +1685,7 @@
         return 3;
       }
     }
-    /**
-     * 运行前检查
-     */
-    runCheck() {
+runCheck() {
       const biliStore = useBiliStore();
       if (!biliStore.dailyRewardInfo) {
         this.logger.error("主站每日任务完成情况不存在，不执行每日投币任务");
@@ -1920,8 +1738,8 @@
   class MedalModule extends BaseModule {
     medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks;
     PUBLIC_MEDAL_FILTERS = {
-      // 包含在白名单中或不包含在黑名单中返回true，否则返回false
-      whiteBlackList: (m) => this.medalTasksConfig.isWhiteList ? this.medalTasksConfig.roomidList.includes(m.room_info.room_id) : !this.medalTasksConfig.roomidList.includes(m.room_info.room_id)
+whiteBlackList: (m) => this.medalTasksConfig.isWhiteList ? this.medalTasksConfig.roomidList.includes(m.room_info.room_id) : !this.medalTasksConfig.roomidList.includes(m.room_info.room_id),
+levelLt120: (medal) => medal.medal.level < 120
     };
     sortMedals(medals) {
       const orderMap = arrayToMap(this.medalTasksConfig.roomidList);
@@ -1929,12 +1747,7 @@
         (a, b) => orderMap.get(a.room_info.room_id) - orderMap.get(b.room_info.room_id)
       );
     }
-    /**
-     * 等待粉丝勋章数据获取完毕
-     *
-     * @returns 是否获取成功
-     */
-    waitForFansMedals() {
+waitForFansMedals() {
       return new Promise((resolve2) => {
         const { fansMedalsStatus } = pinia$1.storeToRefs(useBiliStore());
         if (fansMedalsStatus.value === "loaded") {
@@ -1959,25 +1772,17 @@
       this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.light = s;
     }
     MEDAL_FILTERS = {
-      // 等级大于20返回true，否则返回false
-      levelGt20: (medal) => medal.medal.level > 20,
-      // 点亮返回true，否则返回false
-      isLighted: (medal) => medal.medal.is_lighted === 1,
-      // 直播中返回on，否则返回off
-      livingStatus: (medal) => medal.room_info.living_status === 1 ? "on" : "off"
+isLighted: (medal) => medal.medal.is_lighted === 1,
+livingStatus: (medal) => medal.room_info.living_status === 1 ? "on" : "off"
     };
-    /**
-     * 获取粉丝勋章
-     * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
-     */
-    getMedals() {
+getMedals() {
       const fansMedals = useBiliStore().filteredFansMedals;
       const result = {
         on: [],
         off: []
       };
       fansMedals.forEach((medal) => {
-        if (!this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) || this.MEDAL_FILTERS.isLighted(medal) || this.MEDAL_FILTERS.levelGt20(medal)) {
+        if (!this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) || this.MEDAL_FILTERS.isLighted(medal)) {
           return;
         }
         const livingStatus = this.MEDAL_FILTERS.livingStatus(medal);
@@ -1989,12 +1794,7 @@
       }
       return result;
     }
-    /**
-     * 点赞
-     * @param medal 粉丝勋章
-     * @param click_time 点赞次数
-     */
-    async like(medal, click_time) {
+async like(medal, click_time) {
       const room_id = medal.room_info.room_id;
       const target_id = medal.medal.target_id;
       const nick_name = medal.anchor_info.nick_name;
@@ -2012,12 +1812,7 @@
         this.logger.error(`点亮熄灭勋章-点赞 ${logMessage} 出错`, error);
       }
     }
-    /**
-     * 发弹幕
-     * @param medal 粉丝勋章
-     * @param danmu 弹幕内容
-     */
-    async sendDanmu(medal, danmu) {
+async sendDanmu(medal, danmu) {
       const room_id = medal.room_info.room_id;
       const target_id = medal.medal.target_id;
       const nick_name = medal.anchor_info.nick_name;
@@ -2041,12 +1836,7 @@
       }
       return false;
     }
-    /**
-     * 给正在直播的直播间点赞
-     * @param medals
-     * @private
-     */
-    async likeTask(medals) {
+async likeTask(medals) {
       for (let i = 0; i < medals.length; i++) {
         const medal = medals[i];
         await this.like(medal, _.random(30, 35));
@@ -2055,12 +1845,7 @@
         }
       }
     }
-    /**
-     * 在未开播的直播间发弹幕
-     * @param medals
-     * @private
-     */
-    async sendDanmuTask(medals) {
+async sendDanmuTask(medals) {
       let danmuIndex = 0;
       for (let i = 0; i < medals.length; i++) {
         const medal = medals[i];
@@ -2188,49 +1973,35 @@
     set status(s) {
       useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s;
     }
-    /** 今日当前直播间已观看时间（秒） */
-    watchedSeconds;
+watchedSeconds;
     areaID;
     parentID;
     roomID;
-    /** 主播的 UID */
-    ruid;
+ruid;
     seq = 0;
-    /** 计算签名和发送请求时均需要 JSON.stringify */
-    get id() {
+get id() {
       return [this.parentID, this.areaID, this.seq, this.roomID];
     }
-    /** 更新当前直播间的观看任务进度 */
-    updateProgress() {
+updateProgress() {
       this.watchedSeconds += this.heartBeatInterval;
       useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress[this.roomID] = this.watchedSeconds;
     }
-    /** Cookie LIVE_BUVID */
-    buvid = useBiliStore().cookies.LIVE_BUVID;
+buvid = useBiliStore().cookies.LIVE_BUVID;
     uuid = uuid();
-    /** 计算签名和发送请求时均需要 JSON.stringify */
-    device = [this.buvid, this.uuid];
-    /** 浏览器 user agent */
-    ua = navigator.userAgent;
+device = [this.buvid, this.uuid];
+ua = navigator.userAgent;
     heartBeatInterval;
     secretKey;
     secretRule;
-    /** ets */
-    timestamp;
-    /**
-     * 开始心跳
-     */
-    start() {
+timestamp;
+start() {
       if (!this.buvid) {
         this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务，请尝试刷新页面`);
         return Promise.resolve();
       }
       return this.E();
     }
-    /**
-     * E心跳，开始时发送一次
-     */
-    async E() {
+async E() {
       try {
         const response = await BAPI.liveTrace.E(this.id, this.device, this.ruid);
         this.logger.log(
@@ -2257,10 +2028,7 @@
         this.logger.error(`BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) 出错`, error);
       }
     }
-    /**
-     * X心跳，E心跳过后都是X心跳
-     */
-    async X() {
+async X() {
       if (isNowIn(23, 59, 0, 5)) {
         this.logger.log(`即将或刚刚发生跨天，停止直播间 ${this.roomID} 的X心跳`);
         return;
@@ -2318,13 +2086,7 @@
         );
       }
     }
-    /**
-     * wasm 导出的 spyder 函数的 javascript 实现
-     * @param str 一个经过 JSON.stringify 的 json 字符串
-     * @param rule secret_rule 数组
-     * @returns s
-     */
-    spyder(str, rule) {
+spyder(str, rule) {
       const data = JSON.parse(str);
       const [parent_id, area_id, seq_id, room_id] = JSON.parse(data.id);
       const [buvid, uuid2] = JSON.parse(data.device);
@@ -2376,33 +2138,17 @@
       this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s;
     }
     playerStore = usePlayerStore();
-    MEDAL_FILTERS = {
-      // 等级小于20返回true，否则返回false
-      levelLt20: (medal) => medal.medal.level < 20
-    };
-    /**
-     * 获取粉丝勋章
-     * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
-     */
-    getMedals() {
+getMedals() {
       const fansMedals = useBiliStore().filteredFansMedals;
       const result = fansMedals.filter(
-        (medal) => this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) && this.MEDAL_FILTERS.levelLt20(medal)
+        (medal) => this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) && this.PUBLIC_MEDAL_FILTERS.levelLt120(medal)
       );
       if (this.medalTasksConfig.isWhiteList) {
         this.sortMedals(result);
       }
       return result;
     }
-    /**
-     * 获取指定直播间的 area_id 和 parent_area_id
-     *
-     * 出错时返回 [-1, -1]
-     *
-     * @param roomid 房间号
-     * @returns [area_id, parent_area_id]
-     */
-    async getAreaInfo(url, roomid) {
+async getAreaInfo(url, roomid) {
       try {
         const urlObj = new URL(url);
         const area_id = Number(urlObj.searchParams.get("area_id"));
@@ -2506,11 +2252,7 @@
     set status(s) {
       this.moduleStore.moduleStatus.DailyTasks.OtherTasks.groupSign = s;
     }
-    /**
-     * 获取应援团 id 和拥有者 uid
-     * @returns 数组，每个元素都是数组：[应援团 id，拥有者 uid]
-     */
-    async getGroupidOwneruidList() {
+async getGroupidOwneruidList() {
       try {
         const response = await BAPI.vc.myGroups();
         this.logger.log(`BAPI.vc.myGroups response`, response);
@@ -2672,28 +2414,12 @@
       5: "年度专享漫画礼包 - 漫画商城优惠券",
       6: "大会员专享会员体验卡",
       7: "大会员专享课堂优惠券",
-      // 9: '专属等级加速包'
-      15: "年度专享会员购星光宝盒88折券",
+15: "年度专享会员购星光宝盒88折券",
       16: "大会员专享会员购10魔晶",
       17: "大会员专享游戏优惠券"
     };
-    /**
-     * 权益类型黑名单
-     *
-     * 8: 可能是游戏礼包兑换，state总是为 1，不领取；
-     * 14: 不清楚是什么，总是无法正确领取；
-     * 18: 尝试领取后提示：淘宝账号查询异常，请退出重试；
-     * 19: 能领取但不知道是什么，保险起见不领取；
-     * 20: 尝试领取后提示：饿了么领取活动已经过期~；
-     * 21: 尝试领取后提示：超大会员身份状态异常
-     * 24,25,26,27: 尝试领取后提示：请求错误
-     */
-    blackList = [8, 14, 18, 19, 20, 21, 24, 25, 26, 27];
-    /**
-     * 获取会员权益
-     * @returns 会员权益列表
-     */
-    async myPrivilege() {
+blackList = [8, 14, 18, 19, 20, 21, 24, 25, 26, 27];
+async myPrivilege() {
       try {
         const response = await BAPI.main.vip.myPrivilege();
         this.logger.log(`BAPI.main.vip.myPrivilege response`, response);
@@ -2708,11 +2434,7 @@
         this.status = "error";
       }
     }
-    /**
-     * 领取权益
-     * @param type 权益种类
-     */
-    async receivePrivilege(type) {
+async receivePrivilege(type) {
       try {
         const response = await BAPI.main.vip.receivePrivilege(type);
         this.logger.log(`BAPI.main.vip.receivePrivilege(${type}) response`, response);
@@ -2733,10 +2455,7 @@
         );
       }
     }
-    /**
-     * 领取专属等级加速包（10主站经验）
-     */
-    async addExperience() {
+async addExperience() {
       try {
         const response = await BAPI.main.vip.addExperience();
         this.logger.log(`BAPI.main.vip.addExperience response`, response);
@@ -2752,10 +2471,7 @@
         this.logger.error(`领取年度大会员权益（type = 9，专属等级加速包（10主站经验））出错`, error);
       }
     }
-    /**
-     * 判断当前账号是否是年度大会员
-     */
-    isYearVip() {
+isYearVip() {
       const biliStore = useBiliStore();
       const userInfo = biliStore.userInfo;
       if (userInfo.vip.status === 1 && userInfo.vip.type === 2) {
@@ -3059,7 +2775,7 @@
     this.xhr = xhr;
     this.xhrProxy = xhr.getProxy();
   }
-  Handler[prototype] = /* @__PURE__ */ Object.create({
+  Handler[prototype] = Object.create({
     resolve: function resolve(response) {
       var xhrProxy = this.xhrProxy;
       var xhr = this.xhr;
@@ -3352,18 +3068,10 @@
     static onFrame = "all";
     static runAfterDefault = false;
     config = this.moduleStore.moduleConfig.EnhanceExperience.noReport;
-    /**
-     * 判断是否是需要拦截的 URL
-     * @param url 需要判断的 URL
-     */
-    static isTargetURL(url) {
+static isTargetURL(url) {
       return url.includes("//data.bilibili.com") || url.includes("//data.bilivideo.com");
     }
-    /**
-     * 劫持一些能减少日志上报的方法
-     * @param win window
-     */
-    hookProperties(win) {
+hookProperties(win) {
       Object.defineProperty(win.navigator, "sendBeacon", {
         value: () => {
         }
@@ -3448,10 +3156,9 @@
           }
         },
         __statisObserver: {
-          // 拦截该属性后会导致一些报错，如：
-          // Error: 数据上报请勿重复初始化!
-          // 但能减少大量日志上报请求，总的来看还是值得的
-          get() {
+
+
+get() {
             return new Proxy(
               {},
               {
@@ -3505,10 +3212,7 @@
         }
       });
     }
-    /**
-     * 劫持 XHR 和 fetch 请求
-     */
-    ajaxHook() {
+ajaxHook() {
       const ajaxHookProxyConfig = {
         onRequest(config, handler) {
           if (NoReport.isTargetURL(config.url)) {
@@ -3706,7 +3410,7 @@
       _GM_addStyle("#web-player-module-area-mask-panel { opacity: 0 !important }");
     }
   }
-  const otherModules = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  const otherModules = Object.freeze( Object.defineProperty({
     __proto__: null,
     DailyTask_LiveTask_LightTask: LightTask,
     DailyTask_LiveTask_WatchTask: WatchTask2,
@@ -3737,7 +3441,7 @@
     RemoveElement_RemoveShopPopover: RemoveShopPopover
   }, Symbol.toStringTag, { value: "Module" }));
   function mitt(n) {
-    return { all: n = n || /* @__PURE__ */ new Map(), on: function(t, e) {
+    return { all: n = n || new Map(), on: function(t, e) {
       var i = n.get(t);
       i ? i.push(e) : n.set(t, [e]);
     }, off: function(t, e) {
@@ -3755,8 +3459,7 @@
   function mittOnce(all) {
     const emitter = mitt(all);
     return {
-      // 继承原生 mitt 的方法
-      ...emitter,
+...emitter,
       once(type, handler) {
         emitter.on(type, function fn(evt) {
           emitter.off(type, fn);
@@ -4064,7 +3767,7 @@
                 vue.h("li", "主播当前是否开播不会影响该任务的完成。"),
                 vue.h(
                   "li",
-                  "根据目前规则，观看15分钟可点亮粉丝勋章，再观看25分钟即可获得全部1500亲密度。"
+                  "根据目前规则，观看15分钟可点亮粉丝勋章，再观看25分钟即可获得全部30亲密度。"
                 ),
                 vue.h("li", "由于计时存在误差，可以在目标基础上适当增加一些观看时长。")
               ]),
@@ -4228,7 +3931,7 @@
       }
     }
   };
-  const _sfc_main$a = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$a = vue.defineComponent({
     __name: "MainSiteTasks",
     setup(__props) {
       const moduleStore2 = useModuleStore();
@@ -4324,11 +4027,10 @@
                     _: 1
                   }, 8, ["modelValue"]),
                   vue.createVNode(_component_el_text, null, {
-                    default: vue.withCtx(() => _cache[5] || (_cache[5] = [
+                    default: vue.withCtx(() => [..._cache[5] || (_cache[5] = [
                       vue.createTextVNode("个", -1)
-                    ])),
-                    _: 1,
-                    __: [5]
+                    ])]),
+                    _: 1
                   }),
                   vue.createVNode(_component_Info, {
                     item: vue.unref(helpInfo).DailyTasks.MainSiteTasks.coin
@@ -4372,11 +4074,10 @@
               vue.createVNode(_component_el_text, null, {
                 default: vue.withCtx(() => [
                   vue.createVNode(_component_el_text, null, {
-                    default: vue.withCtx(() => _cache[6] || (_cache[6] = [
+                    default: vue.withCtx(() => [..._cache[6] || (_cache[6] = [
                       vue.createTextVNode("  主站每日任务的完成情况可在", -1)
-                    ])),
-                    _: 1,
-                    __: [6]
+                    ])]),
+                    _: 1
                   }),
                   vue.createVNode(_component_el_link, {
                     rel: "noreferrer",
@@ -4385,25 +4086,22 @@
                     target: "_blank",
                     style: { "vertical-align": "unset" }
                   }, {
-                    default: vue.withCtx(() => _cache[7] || (_cache[7] = [
+                    default: vue.withCtx(() => [..._cache[7] || (_cache[7] = [
                       vue.createTextVNode("个人中心", -1)
-                    ])),
-                    _: 1,
-                    __: [7]
+                    ])]),
+                    _: 1
                   }),
                   vue.createVNode(_component_el_text, null, {
-                    default: vue.withCtx(() => _cache[8] || (_cache[8] = [
+                    default: vue.withCtx(() => [..._cache[8] || (_cache[8] = [
                       vue.createTextVNode("查看。", -1)
-                    ])),
-                    _: 1,
-                    __: [8]
+                    ])]),
+                    _: 1
                   }),
                   vue.createVNode(_component_el_text, null, {
-                    default: vue.withCtx(() => _cache[9] || (_cache[9] = [
+                    default: vue.withCtx(() => [..._cache[9] || (_cache[9] = [
                       vue.createTextVNode("数据更新可能有一定的延时。", -1)
-                    ])),
-                    _: 1,
-                    __: [9]
+                    ])]),
+                    _: 1
                   })
                 ]),
                 _: 1
@@ -4416,7 +4114,7 @@
     }
   });
   const _hoisted_1$1 = { class: "avatar-wrap" };
-  const _sfc_main$9 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$9 = vue.defineComponent({
     __name: "LiveTasks",
     setup(__props) {
       const moduleStore2 = useModuleStore();
@@ -4577,11 +4275,10 @@
                     icon: vue.unref(ElementPlusIconsVue.Edit),
                     onClick: _cache[1] || (_cache[1] = ($event) => medalDanmuPanelVisible.value = !medalDanmuPanelVisible.value)
                   }, {
-                    default: vue.withCtx(() => _cache[12] || (_cache[12] = [
+                    default: vue.withCtx(() => [..._cache[12] || (_cache[12] = [
                       vue.createTextVNode("编辑弹幕 ", -1)
-                    ])),
-                    _: 1,
-                    __: [12]
+                    ])]),
+                    _: 1
                   }, 8, ["icon"]),
                   vue.createVNode(_component_Info, {
                     item: vue.unref(helpInfo).DailyTasks.LiveTasks.medalTasks.light
@@ -4625,11 +4322,10 @@
                     _: 1
                   }, 8, ["modelValue"]),
                   vue.createVNode(_component_el_text, null, {
-                    default: vue.withCtx(() => _cache[13] || (_cache[13] = [
+                    default: vue.withCtx(() => [..._cache[13] || (_cache[13] = [
                       vue.createTextVNode("分钟 / 直播间", -1)
-                    ])),
-                    _: 1,
-                    __: [13]
+                    ])]),
+                    _: 1
                   }),
                   vue.createVNode(_component_Info, {
                     item: vue.unref(helpInfo).DailyTasks.LiveTasks.medalTasks.watch
@@ -4663,11 +4359,10 @@
                     icon: vue.unref(ElementPlusIconsVue.Edit),
                     onClick: handleEditList
                   }, {
-                    default: vue.withCtx(() => _cache[14] || (_cache[14] = [
+                    default: vue.withCtx(() => [..._cache[14] || (_cache[14] = [
                       vue.createTextVNode("编辑名单 ", -1)
-                    ])),
-                    _: 1,
-                    __: [14]
+                    ])]),
+                    _: 1
                   }, 8, ["icon"]),
                   vue.createVNode(_component_Info, {
                     item: vue.unref(helpInfo).DailyTasks.LiveTasks.medalTasks.list
@@ -4682,11 +4377,10 @@
           vue.createVNode(_component_el_row, null, {
             default: vue.withCtx(() => [
               vue.createVNode(_component_el_text, null, {
-                default: vue.withCtx(() => _cache[15] || (_cache[15] = [
+                default: vue.withCtx(() => [..._cache[15] || (_cache[15] = [
                   vue.createTextVNode("直播任务相关信息可在", -1)
-                ])),
-                _: 1,
-                __: [15]
+                ])]),
+                _: 1
               }),
               vue.createVNode(_component_el_link, {
                 rel: "noreferrer",
@@ -4694,18 +4388,16 @@
                 href: "https://link.bilibili.com/p/help/index#/audience-fans-medal",
                 target: "_blank"
               }, {
-                default: vue.withCtx(() => _cache[16] || (_cache[16] = [
+                default: vue.withCtx(() => [..._cache[16] || (_cache[16] = [
                   vue.createTextVNode("帮助中心 ", -1)
-                ])),
-                _: 1,
-                __: [16]
+                ])]),
+                _: 1
               }),
               vue.createVNode(_component_el_text, null, {
-                default: vue.withCtx(() => _cache[17] || (_cache[17] = [
+                default: vue.withCtx(() => [..._cache[17] || (_cache[17] = [
                   vue.createTextVNode("查看。", -1)
-                ])),
-                _: 1,
-                __: [17]
+                ])]),
+                _: 1
               })
             ]),
             _: 1
@@ -4723,11 +4415,10 @@
                 type: "primary",
                 onClick: handleAddDanmu
               }, {
-                default: vue.withCtx(() => _cache[20] || (_cache[20] = [
+                default: vue.withCtx(() => [..._cache[20] || (_cache[20] = [
                   vue.createTextVNode("新增弹幕", -1)
-                ])),
-                _: 1,
-                __: [20]
+                ])]),
+                _: 1
               })
             ]),
             default: vue.withCtx(() => [
@@ -4755,24 +4446,22 @@
                         icon: vue.unref(ElementPlusIconsVue.Edit),
                         onClick: ($event) => handleEditDanmu(scope.$index, scope.row)
                       }, {
-                        default: vue.withCtx(() => _cache[18] || (_cache[18] = [
+                        default: vue.withCtx(() => [..._cache[18] || (_cache[18] = [
                           vue.createTextVNode(" 修改 ", -1)
-                        ])),
-                        _: 2,
-                        __: [18]
-                      }, 1032, ["icon", "onClick"]),
+                        ])]),
+                        _: 1
+                      }, 8, ["icon", "onClick"]),
                       vue.createVNode(_component_el_button, {
                         text: "",
                         icon: vue.unref(ElementPlusIconsVue.Delete),
                         type: "danger",
                         onClick: ($event) => handleDeleteDanmu(scope.$index)
                       }, {
-                        default: vue.withCtx(() => _cache[19] || (_cache[19] = [
+                        default: vue.withCtx(() => [..._cache[19] || (_cache[19] = [
                           vue.createTextVNode(" 删除 ", -1)
-                        ])),
-                        _: 2,
-                        __: [19]
-                      }, 1032, ["icon", "onClick"])
+                        ])]),
+                        _: 1
+                      }, 8, ["icon", "onClick"])
                     ]),
                     _: 1
                   })
@@ -4853,8 +4542,8 @@
                                   class: "avatar"
                                 })
                               ]),
-                              _: 2
-                            }, 1032, ["src"])
+                              _: 1
+                            }, 8, ["src"])
                           ])
                         ]),
                         _: 1
@@ -4908,8 +4597,8 @@
       };
     }
   });
-  const LiveTasks = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["__scopeId", "data-v-aec3aff8"]]);
-  const _sfc_main$8 = /* @__PURE__ */ vue.defineComponent({
+  const LiveTasks = _export_sfc(_sfc_main$9, [["__scopeId", "data-v-aec3aff8"]]);
+  const _sfc_main$8 = vue.defineComponent({
     __name: "OtherTasks",
     setup(__props) {
       const moduleStore2 = useModuleStore();
@@ -4981,11 +4670,10 @@
                     "active-text": "硬币换银瓜子"
                   }, null, 8, ["modelValue"]),
                   vue.createVNode(_component_el_text, null, {
-                    default: vue.withCtx(() => _cache[5] || (_cache[5] = [
+                    default: vue.withCtx(() => [..._cache[5] || (_cache[5] = [
                       vue.createTextVNode("花费硬币", -1)
-                    ])),
-                    _: 1,
-                    __: [5]
+                    ])]),
+                    _: 1
                   }),
                   vue.createVNode(_component_el_select, {
                     modelValue: vue.unref(config).coinToSilver.num,
@@ -5005,11 +4693,10 @@
                     _: 1
                   }, 8, ["modelValue"]),
                   vue.createVNode(_component_el_text, null, {
-                    default: vue.withCtx(() => _cache[6] || (_cache[6] = [
+                    default: vue.withCtx(() => [..._cache[6] || (_cache[6] = [
                       vue.createTextVNode("个", -1)
-                    ])),
-                    _: 1,
-                    __: [6]
+                    ])]),
+                    _: 1
                   }),
                   vue.createVNode(_component_Info, {
                     item: vue.unref(helpInfo).DailyTasks.OtherTasks.coinToSilver
@@ -5052,7 +4739,7 @@
       };
     }
   });
-  const _sfc_main$7 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$7 = vue.defineComponent({
     __name: "EnhanceExperience",
     setup(__props) {
       const moduleStore2 = useModuleStore();
@@ -5197,7 +4884,7 @@
       };
     }
   });
-  const _sfc_main$6 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$6 = vue.defineComponent({
     __name: "RemoveElement",
     setup(__props) {
       const moduleStore2 = useModuleStore();
@@ -5463,7 +5150,7 @@
       };
     }
   });
-  const _sfc_main$5 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$5 = vue.defineComponent({
     __name: "ScriptSettings",
     setup(__props) {
       const uiConfig = useUIStore().uiConfig;
@@ -5481,11 +5168,10 @@
               }, {
                 default: vue.withCtx(() => [
                   vue.createVNode(_component_el_text, { class: "label-text" }, {
-                    default: vue.withCtx(() => _cache[1] || (_cache[1] = [
+                    default: vue.withCtx(() => [..._cache[1] || (_cache[1] = [
                       vue.createTextVNode("控制面板宽度", -1)
-                    ])),
-                    _: 1,
-                    __: [1]
+                    ])]),
+                    _: 1
                   }),
                   vue.createVNode(_component_el_slider, {
                     style: { "width": "150px" },
@@ -5505,7 +5191,7 @@
       };
     }
   });
-  const ScriptSettings = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["__scopeId", "data-v-1cb0d081"]]);
+  const ScriptSettings = _export_sfc(_sfc_main$5, [["__scopeId", "data-v-1cb0d081"]]);
   const __default__ = vue.defineComponent({
     components: {
       MainSiteTasks: _sfc_main$a,
@@ -5516,7 +5202,7 @@
       ScriptSettings
     }
   });
-  const _sfc_main$4 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$4 = vue.defineComponent({
     ...__default__,
     __name: "PanelMain",
     setup(__props) {
@@ -5526,7 +5212,7 @@
       };
     }
   });
-  const _sfc_main$3 = /* @__PURE__ */ vue.defineComponent({
+  const _sfc_main$3 = vue.defineComponent({
     __name: "App",
     setup(__props) {
       const uiStore = useUIStore();
@@ -5643,12 +5329,11 @@
       };
     }
   });
-  const App = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["__scopeId", "data-v-f514d2f1"]]);
-  const cssLoader = (e) => {
-    const t = GM_getResourceText(e);
-    return GM_addStyle(t), t;
-  };
+  const App = _export_sfc(_sfc_main$3, [["__scopeId", "data-v-f514d2f1"]]);
+  const cssLoader = (e) => _GM_addStyle(_GM_getResourceText(e));
   cssLoader("element-plus/dist/index.css");
+  const elementDarkCssVarsCss = "/*! Modified from element-plus/theme-chalk/dark/css-vars.css */html[lab-style*=dark]{color-scheme:dark;--el-color-primary: #409eff;--el-color-primary-light-3: rgb(51, 117, 185);--el-color-primary-light-5: rgb(42, 89, 138);--el-color-primary-light-7: rgb(33, 61, 91);--el-color-primary-light-8: rgb(29, 48, 67);--el-color-primary-light-9: rgb(24, 34, 43);--el-color-primary-dark-2: rgb(102, 177, 255);--el-color-success: #67c23a;--el-color-success-light-3: rgb(78, 142, 47);--el-color-success-light-5: rgb(62, 107, 39);--el-color-success-light-7: rgb(45, 72, 31);--el-color-success-light-8: rgb(37, 55, 28);--el-color-success-light-9: rgb(28, 37, 24);--el-color-success-dark-2: rgb(133, 206, 97);--el-color-warning: #e6a23c;--el-color-warning-light-3: rgb(167, 119, 48);--el-color-warning-light-5: rgb(125, 91, 40);--el-color-warning-light-7: rgb(83, 63, 32);--el-color-warning-light-8: rgb(62, 48, 28);--el-color-warning-light-9: rgb(41, 34, 24);--el-color-warning-dark-2: rgb(235, 181, 99);--el-color-danger: #f56c6c;--el-color-danger-light-3: rgb(178, 82, 82);--el-color-danger-light-5: rgb(133, 64, 64);--el-color-danger-light-7: rgb(88, 46, 46);--el-color-danger-light-8: rgb(65, 38, 38);--el-color-danger-light-9: rgb(42, 29, 29);--el-color-danger-dark-2: rgb(247, 137, 137);--el-color-error: #f56c6c;--el-color-error-light-3: rgb(178, 82, 82);--el-color-error-light-5: rgb(133, 64, 64);--el-color-error-light-7: rgb(88, 46, 46);--el-color-error-light-8: rgb(65, 38, 38);--el-color-error-light-9: rgb(42, 29, 29);--el-color-error-dark-2: rgb(247, 137, 137);--el-color-info: #909399;--el-color-info-light-3: rgb(107, 109, 113);--el-color-info-light-5: rgb(82, 84, 87);--el-color-info-light-7: rgb(57, 58, 60);--el-color-info-light-8: rgb(45, 45, 47);--el-color-info-light-9: rgb(32, 33, 33);--el-color-info-dark-2: rgb(166, 169, 173);--el-box-shadow: 0px 12px 32px 4px rgba(0, 0, 0, .36), 0px 8px 20px rgba(0, 0, 0, .72);--el-box-shadow-light: 0px 0px 12px rgba(0, 0, 0, .72);--el-box-shadow-lighter: 0px 0px 6px rgba(0, 0, 0, .72);--el-box-shadow-dark: 0px 16px 48px 16px rgba(0, 0, 0, .72), 0px 12px 32px #000000, 0px 8px 16px -8px #000000;--el-bg-color-page: #0a0a0a;--el-bg-color: #141414;--el-bg-color-overlay: #1d1e1f;--el-text-color-primary: #e5eaf3;--el-text-color-regular: #cfd3dc;--el-text-color-secondary: #a3a6ad;--el-text-color-placeholder: #8d9095;--el-text-color-disabled: #6c6e72;--el-border-color-darker: #636466;--el-border-color-dark: #58585b;--el-border-color: #4c4d4f;--el-border-color-light: #414243;--el-border-color-lighter: #363637;--el-border-color-extra-light: #2b2b2c;--el-fill-color-darker: #424243;--el-fill-color-dark: #39393a;--el-fill-color: #303030;--el-fill-color-light: #262727;--el-fill-color-lighter: #1d1d1d;--el-fill-color-extra-light: #191919;--el-fill-color-blank: transparent;--el-mask-color: rgba(0, 0, 0, .8);--el-mask-color-extra-light: rgba(0, 0, 0, .3)}html[lab-style*=dark] .el-button{--el-button-disabled-text-color: rgba(255, 255, 255, .5)}html[lab-style*=dark] .el-card{--el-card-bg-color: var(--el-bg-color-overlay)}html[lab-style*=dark] .el-empty{--el-empty-fill-color-0: var(--el-color-black);--el-empty-fill-color-1: #4b4b52;--el-empty-fill-color-2: #36383d;--el-empty-fill-color-3: #1e1e20;--el-empty-fill-color-4: #262629;--el-empty-fill-color-5: #202124;--el-empty-fill-color-6: #212224;--el-empty-fill-color-7: #1b1c1f;--el-empty-fill-color-8: #1c1d1f;--el-empty-fill-color-9: #18181a}";
+  importCSS(elementDarkCssVarsCss);
   const _sfc_main$2 = {};
   const _hoisted_1 = {
     xmlns: "http://www.w3.org/2000/svg",
@@ -5658,13 +5343,13 @@
     viewBox: "0 0 1024 1024"
   };
   function _sfc_render(_ctx, _cache) {
-    return vue.openBlock(), vue.createElementBlock("svg", _hoisted_1, _cache[0] || (_cache[0] = [
+    return vue.openBlock(), vue.createElementBlock("svg", _hoisted_1, [..._cache[0] || (_cache[0] = [
       vue.createElementVNode("path", { d: "M831.825 63.94H191.94c-70.692 0-128 57.308-128 128v639.885c0 70.692 57.308 128 128 128h639.885c70.692 0 128-57.308 128-128V191.94c0-70.692-57.308-128-128-128zM895.885 832a63.835 63.835 0 0 1-63.973 63.886H192.088c-17.112 0-33.27-6.575-45.372-18.676S127.88 849.112 127.88 832V192a64.236 64.236 0 0 1 64.208-64.12h639.824A64.038 64.038 0 0 1 895.885 192v640z" }, null, -1),
       vue.createElementVNode("path", { d: "M791.998 351.852H536a31.97 31.97 0 0 0 0 63.94h256a31.97 31.97 0 0 0 0-63.94zm0 256.121H536a31.97 31.97 0 0 0 0 63.94h256a31.97 31.97 0 0 0 0-63.94zm-447.996-79.975c-61.856 0-111.986 50.144-111.986 111.985S282.16 751.97 344.002 751.97s111.985-50.144 111.985-111.986-50.13-111.985-111.985-111.985zm33.982 145.982a48.045 48.045 0 1 1 14.088-33.982 47.746 47.746 0 0 1-14.088 33.986zm39.412-376.586L311.999 402.787l-41.391-41.395a31.97 31.97 0 1 0-45.213 45.213l63.997 64.002a31.97 31.97 0 0 0 45.214 0l128-128a31.97 31.97 0 0 0-45.21-45.213z" }, null, -1)
-    ]));
+    ])]);
   }
-  const TasksIcon = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render]]);
-  const _sfc_main$1 = /* @__PURE__ */ vue.defineComponent({
+  const TasksIcon = _export_sfc(_sfc_main$2, [["render", _sfc_render]]);
+  const _sfc_main$1 = vue.defineComponent({
     __name: "InfoIcon",
     props: {
       item: {}
@@ -5688,7 +5373,7 @@
           class: "info-icon",
           onClick: open
         }, {
-          default: vue.withCtx(() => _cache[0] || (_cache[0] = [
+          default: vue.withCtx(() => [..._cache[0] || (_cache[0] = [
             vue.createElementVNode("svg", {
               xmlns: "http://www.w3.org/2000/svg",
               width: "128",
@@ -5705,15 +5390,14 @@
                 d: "M447.29 317.172a63.891 63.959 0 1 0 130.76 0 63.891 63.959 0 1 0-130.76 0Zm64.907 503.047c-30.093 0-54.235-24.416-54.235-54.541V482.062c0-30.126 24.142-54.541 54.235-54.541 30.094 0 54.236 24.416 54.236 54.541v283.616c0 30.125-24.142 54.54-54.236 54.54z"
               })
             ], -1)
-          ])),
-          _: 1,
-          __: [0]
+          ])]),
+          _: 1
         });
       };
     }
   });
-  const InfoIcon = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["__scopeId", "data-v-02b5bf3e"]]);
-  const _sfc_main = /* @__PURE__ */ vue.defineComponent({
+  const InfoIcon = _export_sfc(_sfc_main$1, [["__scopeId", "data-v-02b5bf3e"]]);
+  const _sfc_main = vue.defineComponent({
     __name: "TaskStatusIcon",
     props: {
       status: {}
@@ -5751,13 +5435,15 @@
       };
     }
   });
-  const TaskStatusIcon = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-0e4540e9"]]);
-  const MyIconsVue = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  const TaskStatusIcon = _export_sfc(_sfc_main, [["__scopeId", "data-v-0e4540e9"]]);
+  const MyIconsVue = Object.freeze( Object.defineProperty({
     __proto__: null,
     Info: InfoIcon,
     TaskStatus: TaskStatusIcon,
     Tasks: TasksIcon
   }, Symbol.toStringTag, { value: "Module" }));
+  const baseCss = ".blth_btn{background-color:#23ade5;font-size:small;margin-inline-start:5px;color:#fff;border-radius:4px;border:none;padding:5px;cursor:pointer;box-shadow:0 0 2px #00000075;line-height:10px;margin-left:15px;z-index:1}.blth_btn:hover{background-color:#1097cc}.blth_btn:hover:active{background-color:#0e86b6;position:relative;top:1px}.el-message-box ul,ol{padding-left:1em!important}.el-message-box ul{list-style:initial!important}.el-message-box ol{list-style:decimal!important}@media screen and (min-width: 1930px){html[lab-style*=adaptive] .base{zoom:.9375}}@media screen and (min-width: 2058px){html[lab-style*=adaptive] .base{zoom:.75}}@media screen and (min-width: 2570px){html[lab-style*=adaptive] .base{zoom:calc(2 / 3)}}@media screen and (min-width: 3210px){html[lab-style*=adaptive] .base{zoom:.5}}@media screen and (min-width: 3850px){html[lab-style*=adaptive] .base{zoom:.46875}}";
+  importCSS(baseCss);
   const logger = new Logger("Main");
   logger.log("document.readyState", document.readyState);
   const pinia = pinia$1.createPinia();
