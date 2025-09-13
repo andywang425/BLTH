@@ -16,8 +16,6 @@ class LightTask extends MedalModule {
   }
 
   private MEDAL_FILTERS: LightTaskMedalFilters = {
-    // 等级大于20返回true，否则返回false
-    levelGt20: (medal) => medal.medal.level > 20,
     // 点亮返回true，否则返回false
     isLighted: (medal) => medal.medal.is_lighted === 1,
     // 直播中返回on，否则返回off
@@ -37,12 +35,8 @@ class LightTask extends MedalModule {
     }
 
     fansMedals.forEach((medal) => {
-      if (
-        !this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) ||
-        this.MEDAL_FILTERS.isLighted(medal) ||
-        this.MEDAL_FILTERS.levelGt20(medal)
-      ) {
-        // 跳过被黑白名单过滤的、已经点亮的和等级大于20的粉丝勋章
+      if (!this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) || this.MEDAL_FILTERS.isLighted(medal)) {
+        // 跳过被黑白名单过滤的和已经点亮的粉丝勋章
         return
       }
 
