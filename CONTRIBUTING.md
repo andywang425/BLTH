@@ -73,7 +73,7 @@ BLTH
 首先打开 modules 文件夹，你会发现已经有了 dailyTasks/mainSiteTasks 这个文件夹，那么你只需在这个文件夹下新建一个 ts 文件即可。内容大概如下：
 
 ```ts
-import BaseModule from '../../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 // import ...
 
 class LikeTask extends BaseModule {
