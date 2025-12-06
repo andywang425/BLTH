@@ -22,29 +22,30 @@ const uiStore = useUIStore()
 
 <style scoped>
 .title {
-  padding-left: 20px;
-  align-items: baseline;
   display: flex;
+  align-items: baseline;
+  padding-left: 20px;
 }
 
 .header-big-text {
-  font-size: var(--big-text-size);
   align-self: unset;
+  font-size: var(--big-text-size);
 }
 
 .header-small-text {
-  font-size: var(--small-text-size);
   align-self: unset;
   margin-left: 10px;
+  font-size: var(--small-text-size);
+
   --small-text-size: 18px;
 }
 
 .collapse-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
   float: left;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   cursor: pointer;
 }
 </style>

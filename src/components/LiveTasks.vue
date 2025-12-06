@@ -272,10 +272,10 @@ function handleRowClick(row: MedalInfoRow) {
           :data="medalInfoTableData"
           :max-height="medalTableMaxHeight"
           empty-text="没有粉丝勋章"
+          :row-key="(row: MedalInfoRow) => row.roomid.toString()"
           @select="handleSelect"
           @select-all="handleSelect"
           @row-click="handleRowClick"
-          :row-key="(row: MedalInfoRow) => row.roomid.toString()"
         >
           <template v-if="!uiStore.uiConfig.medalInfoPanelSortMode">
             <el-table-column type="selection" align="center" width="80" />
@@ -324,8 +324,8 @@ function handleRowClick(row: MedalInfoRow) {
       </VueDraggable>
       <template #footer>
         <el-switch
-          :disabled="!config.medalTasks.isWhiteList"
           v-model="uiStore.uiConfig.medalInfoPanelSortMode"
+          :disabled="!config.medalTasks.isWhiteList"
           inactive-text="常规模式"
           active-text="排序模式"
           @change="(val: any) => !val && nextTick(() => initSelection(medalInfoTableData))"
@@ -343,8 +343,8 @@ function handleRowClick(row: MedalInfoRow) {
 
 .avatar {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   border-radius: 50%;
 }
 </style>
