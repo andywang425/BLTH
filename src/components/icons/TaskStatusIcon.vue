@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { ModuleStatusTypes } from '@/types'
-import { Loading, Select, CloseBold } from '@element-plus/icons-vue'
+import { Loading, Select, CloseBold, Refresh } from '@element-plus/icons-vue'
 
 defineProps<{
   status: ModuleStatusTypes
 }>()
+
+defineEmits<{
+  click: []
+}>()
+
+const isHovered = ref(false)
 </script>
 
 <template>
@@ -16,8 +23,16 @@ defineProps<{
   </template>
   <template v-else-if="status === 'done'">
     <!-- 该任务已完成 -->
-    <el-icon class="status-icon" style="color: #1ab059">
-      <Select />
+    <el-icon
+      class="status-icon done-icon"
+      :class="{ 'is-hovered': isHovered }"
+      @mouseenter="isHovered = true"
+      @mouseleave="isHovered = false"
+      @click="$emit('click')"
+    >
+      <Transition name="icon-fade" mode="out-in">
+        <component :is="isHovered ? Refresh : Select" />
+      </Transition>
     </el-icon>
   </template>
   <template v-else-if="status === 'error'">
@@ -33,5 +48,25 @@ defineProps<{
 <style scoped>
 .status-icon {
   font-size: var(--el-font-size-base);
+}
+
+.done-icon {
+  color: #1ab059;
+}
+
+.done-icon.is-hovered {
+  color: #409eff;
+  cursor: pointer;
+}
+
+.icon-fade-enter-active,
+.icon-fade-leave-active {
+  transition: all 0.15s ease;
+}
+
+.icon-fade-enter-from,
+.icon-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.8) rotate(90deg);
 }
 </style>

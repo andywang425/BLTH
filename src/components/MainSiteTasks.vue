@@ -7,6 +7,10 @@ const moduleStore = useModuleStore()
 const config = moduleStore.moduleConfig.DailyTasks.MainSiteTasks
 
 const status = moduleStore.moduleStatus.DailyTasks.MainSiteTasks
+
+function fn() {
+  console.log('click')
+}
 </script>
 
 <template>
@@ -15,7 +19,7 @@ const status = moduleStore.moduleStatus.DailyTasks.MainSiteTasks
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.login.enabled" active-text="每日登录" />
         <Info :item="helpInfo.DailyTasks.MainSiteTasks.login" />
-        <TaskStatus :status="status.login" />
+        <TaskStatus :status="status.login" @click="fn" />
       </el-space>
     </el-row>
     <el-row>
