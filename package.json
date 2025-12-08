@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "lint": "run-s lint:script lint:style",
+    "lint": "run-s -c lint:script lint:style",
     "lint:script": "eslint . --fix",
     "lint:style": "stylelint \"src/**/*.{css,less,scss,vue}\" --fix",
     "format": "prettier --write src/",

@@ -53,7 +53,7 @@ if (livePlayer) {
     .then((playerHeaderLeft) => {
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
-      button.setAttribute('class', 'blth_btn')
+      button.setAttribute('class', 'blth-btn')
       button.onclick = throttleButtonOnClick
       button.innerText = uiStore.isShowPanelButtonText
       playerHeaderLeft.append(button)
