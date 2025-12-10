@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { reactive, ref, watch } from 'vue'
 import Storage from '@/library/storage'
 import type { Cache } from '@/types'
@@ -74,3 +74,7 @@ export const useCacheStore = defineStore('cache', () => {
     checkCurrentScriptType,
   }
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useCacheStore, import.meta.hot))
+}

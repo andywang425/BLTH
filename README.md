@@ -80,7 +80,6 @@
 - [luxon](https://github.com/moment/luxon)
 - [hotkeys-js](https://github.com/jaywcjlove/hotkeys-js)
 - [crypto-js](https://github.com/brix/crypto-js)
-- [mitt](https://github.com/developit/mitt)
 - [ajax-hook](https://github.com/wendux/ajax-hook)
 - [TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS)
 - [transform](https://github.com/ritz078/transform)

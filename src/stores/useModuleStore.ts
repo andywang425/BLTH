@@ -1,19 +1,13 @@
-import { defineStore } from 'pinia'
-import { reactive, watch } from 'vue'
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { ref, watch } from 'vue'
 import Storage from '@/library/storage'
 import _ from 'lodash'
 import type { ModuleConfig, ModuleReset } from '@/types'
 import * as defaultModules from '@/modules/default'
 import * as otherModules from '@/modules'
 import Logger from '@/library/logger'
-import mitt from '@/library/mitt'
 import { delayToNextMoment } from '@/library/luxon'
-import type {
-  ModuleStatus,
-  IsOnTargetFrameTypes,
-  ModuleEmitterEvents,
-  ModuleStatusTypes,
-} from '@/types'
+import type { ModuleStatus, IsOnTargetFrameTypes, ModuleStatusTypes } from '@/types'
 import { deepestIterate, waitForMoment } from '@/library/utils'
 import { useCacheStore } from './useCacheStore'
 import { isSelfTopFrame } from '@/library/dom'
@@ -49,117 +43,70 @@ const allAndTopFrameModuleNames: string[] = []
 
 export const useModuleStore = defineStore('module', () => {
   // 所有模块的配置信息
-  const moduleConfig: ModuleConfig = reactive(Storage.getModuleConfig())
-  // Emitter 实例，用于模块间信息传递和 wait 函数
-  const emitter = mitt<ModuleEmitterEvents>()
+  const moduleConfig = ref<ModuleConfig>(Storage.getModuleConfig())
   // 模块状态，用于显示状态图标
-  const moduleStatus: ModuleStatus = reactive(defaultModuleStatus)
+  const moduleStatus = ref<ModuleStatus>(defaultModuleStatus)
   // 模块实例
-  const moduleInstances: BaseModule[] = []
+  const moduleInstances = ref<BaseModule[]>([])
   // 模块状态、运行记录重置和再运行
   const moduleReset: ModuleReset = {
     DailyTasks: {
       MainSiteTasks: {
-        login: () => {
-          moduleStatus.DailyTasks.MainSiteTasks.login = ''
-          moduleConfig.DailyTasks.MainSiteTasks.login._lastCompleteTime = 0
-          const instance = moduleInstances.find(
-            (ins) => ins.moduleName === 'DailyTask_MainSiteTask_LoginTask',
-          )!
-          console.log('instance moduleInstances', instance, moduleInstances)
-          clearTimeout(instance.nextRunTimer)
-          instance.run()
+        login: async () => {
+          moduleStatus.value.DailyTasks.MainSiteTasks.login = ''
+          moduleConfig.value.DailyTasks.MainSiteTasks.login._lastCompleteTime = 0
+
+          await rerunModule('Default_DailyRewardInfo', true)
+          await rerunModule('DailyTask_MainSiteTask_LoginTask', true)
         },
         watch: async () => {
-          moduleStatus.DailyTasks.MainSiteTasks.watch = ''
-          moduleConfig.DailyTasks.MainSiteTasks.watch._lastCompleteTime = 0
+          moduleStatus.value.DailyTasks.MainSiteTasks.watch = ''
+          moduleConfig.value.DailyTasks.MainSiteTasks.watch._lastCompleteTime = 0
 
-          const dailyRewardInfoInstance = moduleInstances.find(
-            (ins) => ins.moduleName === 'Default_DailyRewardInfo',
-          )!
-          clearTimeout(dailyRewardInfoInstance.nextRunTimer)
-          const p1 = dailyRewardInfoInstance.run(true)
-
-          const dynamicVideosInstance = moduleInstances.find(
-            (ins) => ins.moduleName === 'Default_DynamicVideos',
-          )!
-          clearTimeout(dynamicVideosInstance.nextRunTimer)
-          const p2 = dynamicVideosInstance.run(true)
-
-          await Promise.all([p1, p2])
-
-          const watchInstance = moduleInstances.find(
-            (ins) => ins.moduleName === 'DailyTask_MainSiteTask_WatchTask',
-          )!
-          clearTimeout(watchInstance.nextRunTimer)
-          watchInstance.run()
+          await Promise.all([
+            rerunModule('Default_DailyRewardInfo', true),
+            rerunModule('Default_DynamicVideos', true),
+          ])
+          await rerunModule('DailyTask_MainSiteTask_WatchTask')
         },
         coin: async () => {
-          moduleStatus.DailyTasks.MainSiteTasks.coin = ''
-          moduleConfig.DailyTasks.MainSiteTasks.coin._lastCompleteTime = 0
+          moduleStatus.value.DailyTasks.MainSiteTasks.coin = ''
+          moduleConfig.value.DailyTasks.MainSiteTasks.coin._lastCompleteTime = 0
 
-          const dailyRewardInfoInstance = moduleInstances.find(
-            (ins) => ins.moduleName === 'Default_DailyRewardInfo',
-          )!
-          clearTimeout(dailyRewardInfoInstance.nextRunTimer)
-          const p1 = dailyRewardInfoInstance.run(true)
-
-          const dynamicVideosInstance = moduleInstances.find(
-            (ins) => ins.moduleName === 'Default_DynamicVideos',
-          )!
-          clearTimeout(dynamicVideosInstance.nextRunTimer)
-          const p2 = dynamicVideosInstance.run(true)
-
-          await Promise.all([p1, p2])
-
-          const coinInstance = moduleInstances.find(
-            (ins) => ins.moduleName === 'DailyTask_MainSiteTask_CoinTask',
-          )!
-          clearTimeout(coinInstance.nextRunTimer)
-          coinInstance.run()
+          await Promise.all([
+            rerunModule('Default_DailyRewardInfo', true),
+            rerunModule('Default_DynamicVideos', true),
+          ])
+          rerunModule('DailyTask_MainSiteTask_CoinTask')
         },
         share: async () => {
-          moduleStatus.DailyTasks.MainSiteTasks.share = ''
-          moduleConfig.DailyTasks.MainSiteTasks.share._lastCompleteTime = 0
+          moduleStatus.value.DailyTasks.MainSiteTasks.share = ''
+          moduleConfig.value.DailyTasks.MainSiteTasks.share._lastCompleteTime = 0
 
-          const dailyRewardInfoInstance = moduleInstances.find(
-            (ins) => ins.moduleName === 'Default_DailyRewardInfo',
-          )!
-          clearTimeout(dailyRewardInfoInstance.nextRunTimer)
-          const p1 = dailyRewardInfoInstance.run(true)
-
-          const dynamicVideosInstance = moduleInstances.find(
-            (ins) => ins.moduleName === 'Default_DynamicVideos',
-          )!
-          clearTimeout(dynamicVideosInstance.nextRunTimer)
-          const p2 = dynamicVideosInstance.run(true)
-
-          await Promise.all([p1, p2])
-
-          const shareInstance = moduleInstances.find(
-            (ins) => ins.moduleName === 'DailyTask_MainSiteTask_ShareTask',
-          )!
-          clearTimeout(shareInstance.nextRunTimer)
-          shareInstance.run()
+          await Promise.all([
+            rerunModule('Default_DailyRewardInfo', true),
+            rerunModule('Default_DynamicVideos', true),
+          ])
+          rerunModule('DailyTask_MainSiteTask_ShareTask')
         },
       },
       LiveTasks: {
         medalTasks: {
           light: () => {
-            moduleStatus.DailyTasks.LiveTasks.medalTasks.light = ''
-            moduleConfig.DailyTasks.LiveTasks.medalTasks.light._lastCompleteTime = 0
-            const instance = moduleInstances.find(
+            moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light = ''
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastCompleteTime = 0
+            const instance = moduleInstances.value.find(
               (ins) => ins.moduleName === 'DailyTask_LiveTask_MedalTask_LightTask',
             )!
             clearTimeout(instance.nextRunTimer)
             instance.run()
           },
           watch: () => {
-            moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = ''
-            moduleConfig.DailyTasks.LiveTasks.medalTasks.watch._lastCompleteTime = 0
-            moduleConfig.DailyTasks.LiveTasks.medalTasks.watch._lastWatchTime = 0
-            moduleConfig.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress = {}
-            const instance = moduleInstances.find(
+            moduleStatus.value.DailyTasks.LiveTasks.medalTasks.watch = ''
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastCompleteTime = 0
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastWatchTime = 0
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress = {}
+            const instance = moduleInstances.value.find(
               (ins) => ins.moduleName === 'DailyTask_LiveTask_MedalTask_WatchTask',
             )!
             clearTimeout(instance.nextRunTimer)
@@ -169,36 +116,36 @@ export const useModuleStore = defineStore('module', () => {
       },
       OtherTasks: {
         groupSign: () => {
-          moduleStatus.DailyTasks.OtherTasks.groupSign = ''
-          moduleConfig.DailyTasks.OtherTasks.groupSign._lastCompleteTime = 0
-          const instance = moduleInstances.find(
+          moduleStatus.value.DailyTasks.OtherTasks.groupSign = ''
+          moduleConfig.value.DailyTasks.OtherTasks.groupSign._lastCompleteTime = 0
+          const instance = moduleInstances.value.find(
             (ins) => ins.moduleName === 'DailyTask_OtherTask_GroupSignTask',
           )!
           clearTimeout(instance.nextRunTimer)
           instance.run()
         },
         silverToCoin: () => {
-          moduleStatus.DailyTasks.OtherTasks.silverToCoin = ''
-          moduleConfig.DailyTasks.OtherTasks.silverToCoin._lastCompleteTime = 0
-          const instance = moduleInstances.find(
+          moduleStatus.value.DailyTasks.OtherTasks.silverToCoin = ''
+          moduleConfig.value.DailyTasks.OtherTasks.silverToCoin._lastCompleteTime = 0
+          const instance = moduleInstances.value.find(
             (ins) => ins.moduleName === 'DailyTask_OtherTask_SilverToCoinTask',
           )!
           clearTimeout(instance.nextRunTimer)
           instance.run()
         },
         coinToSilver: () => {
-          moduleStatus.DailyTasks.OtherTasks.coinToSilver = ''
-          moduleConfig.DailyTasks.OtherTasks.coinToSilver._lastCompleteTime = 0
-          const instance = moduleInstances.find(
+          moduleStatus.value.DailyTasks.OtherTasks.coinToSilver = ''
+          moduleConfig.value.DailyTasks.OtherTasks.coinToSilver._lastCompleteTime = 0
+          const instance = moduleInstances.value.find(
             (ins) => ins.moduleName === 'DailyTask_OtherTask_CoinToSilverTask',
           )!
           clearTimeout(instance.nextRunTimer)
           instance.run()
         },
         getYearVipPrivilege: () => {
-          moduleStatus.DailyTasks.OtherTasks.getYearVipPrivilege = ''
-          moduleConfig.DailyTasks.OtherTasks.getYearVipPrivilege._nextReceiveTime = 0
-          const instance = moduleInstances.find(
+          moduleStatus.value.DailyTasks.OtherTasks.getYearVipPrivilege = ''
+          moduleConfig.value.DailyTasks.OtherTasks.getYearVipPrivilege._nextReceiveTime = 0
+          const instance = moduleInstances.value.find(
             (ins) => ins.moduleName === 'DailyTask_OtherTask_GetYearVipPrivilegeTask',
           )!
           clearTimeout(instance.nextRunTimer)
@@ -211,12 +158,13 @@ export const useModuleStore = defineStore('module', () => {
   /**
    * 运行模块
    *
+   * @inner
    * @param module 模块类
    * @param name 模块名称
    */
   function _runModule(module: typeof BaseModule, name: string): Promise<void> | void {
     const moduleInstance = new module(name)
-    moduleInstances.push(moduleInstance)
+    moduleInstances.value.push(moduleInstance)
 
     if (moduleInstance.isEnabled()) {
       return moduleInstance.run()
@@ -225,6 +173,8 @@ export const useModuleStore = defineStore('module', () => {
 
   /**
    * 加载默认模块
+   *
+   * @inner
    */
   function _loadDefaultModules(): Promise<PromiseSettledResult<void>[]> {
     const cacheStore = useCacheStore()
@@ -317,6 +267,23 @@ export const useModuleStore = defineStore('module', () => {
     }
   }
 
+  /**
+   * 重新运行模块
+   *
+   * @param moduleName 模块名称
+   * @param args `run()` 参数
+   */
+  function rerunModule(moduleName: string, ...args: any[]): Promise<void> | void {
+    const moduleInstance = moduleInstances.value.find((m) => m.moduleName === moduleName)
+
+    if (moduleInstance) {
+      clearTimeout(moduleInstance.nextRunTimer)
+      return moduleInstance.run(...args)
+    } else {
+      throw new ModuleError('ModuleStore', `模块 ${moduleName} 不存在`)
+    }
+  }
+
   // 监听模块配置信息的变化，使用防抖降低油猴写配置信息频率
   watch(
     moduleConfig,
@@ -342,8 +309,12 @@ export const useModuleStore = defineStore('module', () => {
     moduleConfig,
     moduleInstances,
     moduleReset,
-    emitter,
     moduleStatus,
     loadModules,
+    rerunModule,
   }
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useModuleStore, import.meta.hot))
+}

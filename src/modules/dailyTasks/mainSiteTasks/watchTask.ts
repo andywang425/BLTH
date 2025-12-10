@@ -4,7 +4,6 @@ import { useBiliStore } from '@/stores/useBiliStore'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
-import { sleep } from '@/library/utils'
 
 class WatchTask extends BaseModule {
   config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch
@@ -65,8 +64,6 @@ class WatchTask extends BaseModule {
 
       const biliStore = useBiliStore()
       this.status = 'running'
-
-      await sleep(2000)
 
       if (!biliStore.dailyRewardInfo!.watch) {
         const aid = this.getAid()

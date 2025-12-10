@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { reactive, computed, type CSSProperties, watch } from 'vue'
 import Storage from '@/library/storage'
 import _ from 'lodash'
@@ -97,3 +97,7 @@ export const useUIStore = defineStore('ui', () => {
     setActiveMenuIndex,
   }
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useUIStore, import.meta.hot))
+}

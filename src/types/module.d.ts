@@ -47,19 +47,12 @@ type OnFrameTypes = 'all' | 'target' | 'top'
 
 type IsOnTargetFrameTypes = 'unknown' | 'yes'
 
-type ModuleEmitterEvents = {
-  Default_FansMedals: {
-    module: string
-  }
-}
-
 export {
   ModuleStatusTypes,
   ModulesNeedStatus,
   ModuleStatus,
   ModuleReset,
   RunAtMoment,
-  ModuleEmitterEvents,
   OnFrameTypes,
   IsOnTargetFrameTypes,
 }
