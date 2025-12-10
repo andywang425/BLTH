@@ -406,7 +406,7 @@ class WatchTask extends MedalModule {
     }
 
     const diff = delayToNextMoment()
-    setTimeout(() => this.run(), diff.ms)
+    this.nextRunTimer = setTimeout(() => this.run(), diff.ms)
     this.logger.log('距离观看直播模块下次运行时间:', diff.str)
   }
 }

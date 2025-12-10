@@ -1,4 +1,4 @@
-import BaseModule from '../../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import { useBiliStore } from '@/stores/useBiliStore'
 import BAPI from '@/library/bili-api'

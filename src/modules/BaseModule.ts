@@ -90,7 +90,7 @@ class BaseModule {
     throw new Error('Method not implemented.')
   }
   /**
-   * 下一次运行的定时器（setTimeout 的返回值）
+   * 下一次运行的定时器（`setTimeout` 返回值）
    */
   public nextRunTimer?: number
 

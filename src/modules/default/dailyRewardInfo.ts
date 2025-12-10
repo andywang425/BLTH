@@ -29,11 +29,11 @@ class DailyRewardInfo extends BaseModule {
 
     if (
       force ||
+      // 开启了任意一项主站功能且该功能今天没完成过
       Object.values(mainSiteTasks).some(
         (t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4),
       )
     ) {
-      // 开启了任意一项主站功能且该功能今天没完成过
       biliStore.dailyRewardInfo = await this.getDailyRewardInfo()
     }
 

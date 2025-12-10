@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { reactive, computed, type CSSProperties, watch } from 'vue'
+import { ref, computed, type CSSProperties, watch } from 'vue'
 import Storage from '@/library/storage'
 import _ from 'lodash'
 import type { UiConfig, MenuIndex } from '@/types'
@@ -28,46 +28,46 @@ const index2name: Record<MenuIndex, string> = {
 
 export const useUIStore = defineStore('ui', () => {
   // 控制面板 UI 相关的设置
-  const uiConfig = reactive<UiConfig>(Storage.getUiConfig())
+  const uiConfig = ref<UiConfig>(Storage.getUiConfig())
   // 被激活的菜单项的名称，用于在 Header 里显示子标题
-  const activeMenuName = computed<string>(() => index2name[uiConfig.activeMenuIndex])
+  const activeMenuName = computed<string>(() => index2name[uiConfig.value.activeMenuIndex])
   // 播放器长、宽、位置信息
-  const livePlayerRect = reactive<LivePlayerRect>({
+  const livePlayerRect = ref<LivePlayerRect>({
     top: 0,
     left: 0,
     height: 0,
     width: 0,
   })
   // 缓存的窗口滚动条位置
-  const windowScrollPosition = reactive<WindowScrollPosition>({ x: 0, y: 0 })
+  const windowScrollPosition = ref<WindowScrollPosition>({ x: 0, y: 0 })
   // 控制面板 css（长、宽、位置信息）
   const panelStyle = computed<CSSProperties>(() => ({
     // 此处若使用最新的滚动条位置（window.scrollX/Y），用户在调整控制面板宽度时可能导致面板在垂直方向上错位
-    top: `${livePlayerRect.top + windowScrollPosition.y}px`,
-    left: `${livePlayerRect.left + windowScrollPosition.x}px`,
-    height: `${livePlayerRect.height}px`,
-    width: `${(livePlayerRect.width * uiConfig.panelWidthPercent) / 100}px`,
+    top: `${livePlayerRect.value.top + windowScrollPosition.value.y}px`,
+    left: `${livePlayerRect.value.left + windowScrollPosition.value.x}px`,
+    height: `${livePlayerRect.value.height}px`,
+    width: `${(livePlayerRect.value.width * uiConfig.value.panelWidthPercent) / 100}px`,
   }))
   // 开关控制面板按钮的文字
   const isShowPanelButtonText = computed<string>(() =>
-    uiConfig.isShowPanel ? '隐藏控制面板' : '显示控制面板',
+    uiConfig.value.isShowPanel ? '隐藏控制面板' : '显示控制面板',
   )
   // 控制面板主体的滚动条窗口高度
   // 因为 header 的高度是固定的 60px，所以用控制面板高度 - 60px
-  const scrollBarHeight = computed<string>(() => `${livePlayerRect.height - 60}px`)
+  const scrollBarHeight = computed<string>(() => `${livePlayerRect.value.height - 60}px`)
 
   /**
    * 切换侧边栏的展开/收起状态
    */
   function changeCollapse() {
-    uiConfig.isCollapse = !uiConfig.isCollapse
+    uiConfig.value.isCollapse = !uiConfig.value.isCollapse
   }
 
   /**
    * 切换控制面板的打开/关闭状态
    */
   function changeShowPanel() {
-    uiConfig.isShowPanel = !uiConfig.isShowPanel
+    uiConfig.value.isShowPanel = !uiConfig.value.isShowPanel
   }
 
   /**
@@ -75,13 +75,14 @@ export const useUIStore = defineStore('ui', () => {
    * @param index 被激活菜单项
    */
   function setActiveMenuIndex(index: MenuIndex) {
-    uiConfig.activeMenuIndex = index
+    uiConfig.value.activeMenuIndex = index
   }
 
   // 监听UI配置信息的变化，使用防抖降低油猴写配置信息频率
   watch(
     uiConfig,
     _.debounce((newUiConfig: UiConfig) => Storage.setUiConfig(newUiConfig), 350),
+    { deep: true },
   )
 
   return {

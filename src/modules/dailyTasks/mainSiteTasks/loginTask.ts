@@ -1,4 +1,4 @@
-import BaseModule from '../../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import { useBiliStore } from '@/stores/useBiliStore'
 import type { ModuleStatusTypes } from '@/types'
@@ -43,6 +43,7 @@ class LoginTask extends BaseModule {
       } else {
         // 用户在运行脚本前已经完成了任务，也记录完成时间
         this.config._lastCompleteTime = tsm()
+        console.log('this.config._lastCompleteTime', this.config._lastCompleteTime, this.config)
         this.status = 'done'
       }
     } else {

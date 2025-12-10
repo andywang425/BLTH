@@ -1,4 +1,4 @@
-import BaseModule from '../../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { ts } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
@@ -180,7 +180,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
           '领取年度大会员权益模块下次运行时间:',
           DateTime.fromSeconds(this.config._nextReceiveTime).toJSDate(),
         )
-        setTimeout(() => this.run(), diff * 1000)
+        this.nextRunTimer = setTimeout(() => this.run(), diff * 1000)
       } else {
         this.logger.log('距离下次领取年度大会员权益的时间超过一天，不计划下次运行')
       }

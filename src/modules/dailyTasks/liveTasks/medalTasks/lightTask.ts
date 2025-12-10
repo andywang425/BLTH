@@ -184,7 +184,7 @@ class LightTask extends MedalModule {
     }
 
     const diff = delayToNextMoment()
-    setTimeout(() => this.run(), diff.ms)
+    this.nextRunTimer = setTimeout(() => this.run(), diff.ms)
     this.logger.log('距离点亮熄灭勋章模块下次运行时间:', diff.str)
   }
 }

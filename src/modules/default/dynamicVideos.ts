@@ -32,9 +32,9 @@ class DynamicVideos extends BaseModule {
 
     if (
       force ||
+      // 开启了每日观看视频、每日分享视频或每日投币功能且今天没完成过
       taskValues.some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4))
     ) {
-      // 开启了每日观看视频、每日分享视频或每日投币功能且今天没完成过
       biliStore.dynamicVideos = await this.getDynamicVideos()
     }
 

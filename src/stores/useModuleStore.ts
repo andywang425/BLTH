@@ -57,7 +57,7 @@ export const useModuleStore = defineStore('module', () => {
           moduleConfig.value.DailyTasks.MainSiteTasks.login._lastCompleteTime = 0
 
           await rerunModule('Default_DailyRewardInfo', true)
-          await rerunModule('DailyTask_MainSiteTask_LoginTask', true)
+          await rerunModule('DailyTask_MainSiteTask_LoginTask')
         },
         watch: async () => {
           moduleStatus.value.DailyTasks.MainSiteTasks.watch = ''
@@ -95,22 +95,18 @@ export const useModuleStore = defineStore('module', () => {
           light: () => {
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light = ''
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastCompleteTime = 0
-            const instance = moduleInstances.value.find(
-              (ins) => ins.moduleName === 'DailyTask_LiveTask_MedalTask_LightTask',
-            )!
-            clearTimeout(instance.nextRunTimer)
-            instance.run()
+
+            rerunModule('Default_FansMedals', true)
+            rerunModule('DailyTask_LiveTask_MedalTask_LightTask')
           },
           watch: () => {
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.watch = ''
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastCompleteTime = 0
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastWatchTime = 0
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress = {}
-            const instance = moduleInstances.value.find(
-              (ins) => ins.moduleName === 'DailyTask_LiveTask_MedalTask_WatchTask',
-            )!
-            clearTimeout(instance.nextRunTimer)
-            instance.run()
+
+            rerunModule('Default_FansMedals', true)
+            rerunModule('DailyTask_LiveTask_MedalTask_WatchTask')
           },
         },
       },
@@ -118,38 +114,26 @@ export const useModuleStore = defineStore('module', () => {
         groupSign: () => {
           moduleStatus.value.DailyTasks.OtherTasks.groupSign = ''
           moduleConfig.value.DailyTasks.OtherTasks.groupSign._lastCompleteTime = 0
-          const instance = moduleInstances.value.find(
-            (ins) => ins.moduleName === 'DailyTask_OtherTask_GroupSignTask',
-          )!
-          clearTimeout(instance.nextRunTimer)
-          instance.run()
+
+          rerunModule('DailyTask_OtherTask_GroupSignTask')
         },
         silverToCoin: () => {
           moduleStatus.value.DailyTasks.OtherTasks.silverToCoin = ''
           moduleConfig.value.DailyTasks.OtherTasks.silverToCoin._lastCompleteTime = 0
-          const instance = moduleInstances.value.find(
-            (ins) => ins.moduleName === 'DailyTask_OtherTask_SilverToCoinTask',
-          )!
-          clearTimeout(instance.nextRunTimer)
-          instance.run()
+
+          rerunModule('DailyTask_OtherTask_SilverToCoinTask')
         },
         coinToSilver: () => {
           moduleStatus.value.DailyTasks.OtherTasks.coinToSilver = ''
           moduleConfig.value.DailyTasks.OtherTasks.coinToSilver._lastCompleteTime = 0
-          const instance = moduleInstances.value.find(
-            (ins) => ins.moduleName === 'DailyTask_OtherTask_CoinToSilverTask',
-          )!
-          clearTimeout(instance.nextRunTimer)
-          instance.run()
+
+          rerunModule('DailyTask_OtherTask_CoinToSilverTask')
         },
         getYearVipPrivilege: () => {
           moduleStatus.value.DailyTasks.OtherTasks.getYearVipPrivilege = ''
           moduleConfig.value.DailyTasks.OtherTasks.getYearVipPrivilege._nextReceiveTime = 0
-          const instance = moduleInstances.value.find(
-            (ins) => ins.moduleName === 'DailyTask_OtherTask_GetYearVipPrivilegeTask',
-          )!
-          clearTimeout(instance.nextRunTimer)
-          instance.run()
+
+          rerunModule('DailyTask_OtherTask_GetYearVipPrivilegeTask')
         },
       },
     },
@@ -291,6 +275,7 @@ export const useModuleStore = defineStore('module', () => {
       leading: true,
       trailing: true,
     }),
+    { deep: true },
   )
 
   /**
