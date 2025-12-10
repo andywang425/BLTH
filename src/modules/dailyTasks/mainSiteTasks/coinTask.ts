@@ -180,7 +180,7 @@ class CoinTask extends BaseModule {
     }
 
     const diff = delayToNextMoment()
-    setTimeout(() => this.run(), diff.ms)
+    this.nextRunTimer = setTimeout(() => this.run(), diff.ms)
     this.logger.log('距离每日投币模块下次运行时间:', diff.str)
   }
 }

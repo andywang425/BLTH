@@ -25,17 +25,20 @@ class DynamicVideos extends BaseModule {
     }
   }
 
-  public async run(): Promise<void> {
+  public async run(force = false): Promise<void> {
     const biliStore = useBiliStore()
     const mainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
     const taskValues = [mainSiteTasks.watch, mainSiteTasks.share, mainSiteTasks.coin]
 
-    if (taskValues.some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4))) {
+    if (
+      force ||
+      taskValues.some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4))
+    ) {
       // 开启了每日观看视频、每日分享视频或每日投币功能且今天没完成过
       biliStore.dynamicVideos = await this.getDynamicVideos()
     }
 
-    setTimeout(
+    this.nextRunTimer = setTimeout(
       () => this.run().catch((reason) => this.logger.error(reason)),
       delayToNextMoment(0, 4).ms,
     )

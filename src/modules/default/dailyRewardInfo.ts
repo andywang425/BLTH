@@ -23,11 +23,12 @@ class DailyRewardInfo extends BaseModule {
     }
   }
 
-  public async run(): Promise<void> {
+  public async run(force = false): Promise<void> {
     const biliStore = useBiliStore()
     const mainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
 
     if (
+      force ||
       Object.values(mainSiteTasks).some(
         (t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4),
       )
@@ -36,7 +37,7 @@ class DailyRewardInfo extends BaseModule {
       biliStore.dailyRewardInfo = await this.getDailyRewardInfo()
     }
 
-    setTimeout(
+    this.nextRunTimer = setTimeout(
       () => this.run().catch((reason) => this.logger.error(reason)),
       delayToNextMoment(0, 4).ms,
     )

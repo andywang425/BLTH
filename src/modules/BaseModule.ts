@@ -89,6 +89,10 @@ class BaseModule {
   protected set status(_s: ModuleStatusTypes) {
     throw new Error('Method not implemented.')
   }
+  /**
+   * 下一次运行的定时器（setTimeout 的返回值）
+   */
+  public nextRunTimer?: number
 
   constructor(moduleName: string) {
     this.moduleName = moduleName
@@ -98,10 +102,12 @@ class BaseModule {
   /**
    * 运行模块
    *
+   * 若有需要可以传入参数
+   *
    * 默认模块必须返回一个空的Promise，
    * 其它模块若需要使用 await 可以返回一个空的Promise，否则无返回值
    */
-  public run(): void | Promise<void> {
+  public run(..._args: any[]): void | Promise<void> {
     throw new Error('Method not implemented.')
   }
 }
