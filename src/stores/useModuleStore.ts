@@ -97,7 +97,7 @@ export const useModuleStore = defineStore('module', () => {
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastCompleteTime = 0
 
             rerunModule('Default_FansMedals', true)
-            rerunModule('DailyTask_LiveTask_MedalTask_LightTask')
+            rerunModule('DailyTask_LiveTask_LightTask')
           },
           watch: () => {
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.watch = ''
@@ -106,7 +106,7 @@ export const useModuleStore = defineStore('module', () => {
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress = {}
 
             rerunModule('Default_FansMedals', true)
-            rerunModule('DailyTask_LiveTask_MedalTask_WatchTask')
+            rerunModule('DailyTask_LiveTask_WatchTask')
           },
         },
       },

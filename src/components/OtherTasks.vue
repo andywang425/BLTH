@@ -5,8 +5,8 @@ import helpInfo from '@/library/help-info'
 const moduleStore = useModuleStore()
 
 const config = moduleStore.moduleConfig.DailyTasks.OtherTasks
-
 const status = moduleStore.moduleStatus.DailyTasks.OtherTasks
+const reset = moduleStore.moduleReset.DailyTasks.OtherTasks
 </script>
 
 <template>
@@ -15,14 +15,14 @@ const status = moduleStore.moduleStatus.DailyTasks.OtherTasks
       <el-space wrap>
         <el-switch v-model="config.groupSign.enabled" active-text="应援团签到" />
         <Info :item="helpInfo.DailyTasks.OtherTasks.groupSign" />
-        <TaskStatus :status="status.groupSign" />
+        <TaskStatus :status="status.groupSign" @click="reset.groupSign" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap>
         <el-switch v-model="config.silverToCoin.enabled" active-text="银瓜子换硬币" />
         <Info :item="helpInfo.DailyTasks.OtherTasks.silverToCoin" />
-        <TaskStatus :status="status.silverToCoin" />
+        <TaskStatus :status="status.silverToCoin" @click="reset.silverToCoin" />
       </el-space>
     </el-row>
     <el-row>
@@ -34,14 +34,14 @@ const status = moduleStore.moduleStatus.DailyTasks.OtherTasks
         </el-select>
         <el-text>个</el-text>
         <Info :item="helpInfo.DailyTasks.OtherTasks.coinToSilver" />
-        <TaskStatus :status="status.coinToSilver" />
+        <TaskStatus :status="status.coinToSilver" @click="reset.coinToSilver" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.getYearVipPrivilege.enabled" active-text="领取年度大会员权益" />
         <Info :item="helpInfo.DailyTasks.OtherTasks.getYearVipPrivilege" />
-        <TaskStatus :status="status.getYearVipPrivilege" />
+        <TaskStatus :status="status.getYearVipPrivilege" @click="reset.getYearVipPrivilege" />
       </el-space>
     </el-row>
     <el-divider />

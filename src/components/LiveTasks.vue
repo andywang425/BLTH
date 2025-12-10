@@ -26,6 +26,7 @@ const danmuTableMaxHeight = screen.height * 0.5
 
 const config = moduleStore.moduleConfig.DailyTasks.LiveTasks
 const status = moduleStore.moduleStatus.DailyTasks.LiveTasks
+const reset = moduleStore.moduleReset.DailyTasks.LiveTasks
 
 const medalDanmuPanelVisible = ref<boolean>(false)
 const danmuTableData = computed(() =>
@@ -186,7 +187,7 @@ function handleRowClick(row: MedalInfoRow) {
           >编辑弹幕
         </el-button>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light" />
-        <TaskStatus :status="status.medalTasks.light" />
+        <TaskStatus :status="status.medalTasks.light" @click="reset.medalTasks.light" />
       </el-space>
     </el-row>
     <el-row>
@@ -197,7 +198,7 @@ function handleRowClick(row: MedalInfoRow) {
         </el-select>
         <el-text>分钟 / 直播间</el-text>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.watch" />
-        <TaskStatus :status="status.medalTasks.watch" />
+        <TaskStatus :status="status.medalTasks.watch" @click="reset.medalTasks.watch" />
       </el-space>
     </el-row>
     <el-row>

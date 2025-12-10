@@ -5,9 +5,7 @@ import helpInfo from '@/library/help-info'
 const moduleStore = useModuleStore()
 
 const config = moduleStore.moduleConfig.DailyTasks.MainSiteTasks
-
 const status = moduleStore.moduleStatus.DailyTasks.MainSiteTasks
-
 const reset = moduleStore.moduleReset.DailyTasks.MainSiteTasks
 </script>
 
