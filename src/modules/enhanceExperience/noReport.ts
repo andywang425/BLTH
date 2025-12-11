@@ -4,12 +4,15 @@ import { type FetchHookProxyConfig, fproxy } from '@/library/fetch-hook'
 import BaseModule from '@/modules/BaseModule'
 import { getUrlFromFetchInput } from '@/library/utils'
 import type { OnFrameTypes, RunAtMoment } from '@/types'
+import { useModuleStore } from '@/stores'
 
 class NoReport extends BaseModule {
   static runOnMultiplePages: boolean = true
   static runAt: RunAtMoment = 'document-start'
   static onFrame: OnFrameTypes = 'all'
   static runAfterDefault: boolean = false
+
+  config = useModuleStore().moduleConfig.EnhanceExperience.noReport
 
   /**
    * 判断是否是需要拦截的 URL

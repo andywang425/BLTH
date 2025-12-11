@@ -1,12 +1,15 @@
 import { unsafeWindow } from '$'
 import type { OnFrameTypes, RunAtMoment } from '@/types'
 import BaseModule from '@/modules/BaseModule'
+import { useModuleStore } from '@/stores'
 
 class BanP2P extends BaseModule {
   static runOnMultiplePages: boolean = true
   static runAt: RunAtMoment = 'document-start'
   static onFrame: OnFrameTypes = 'all'
   static runAfterDefault: boolean = false
+
+  config = useModuleStore().moduleConfig.EnhanceExperience.banp2p
 
   private banP2P(): void {
     const RTClist: string[] = [

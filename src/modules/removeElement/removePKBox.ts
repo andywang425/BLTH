@@ -1,8 +1,11 @@
 import { GM_addStyle } from '$'
 import BaseModule from '@/modules/BaseModule'
+import { useModuleStore } from '@/stores'
 
 class RemovePKBox extends BaseModule {
   static runOnMultiplePages = true
+
+  config = useModuleStore().moduleConfig.RemoveElement.removePKBox
 
   private removePKNode() {
     GM_addStyle('#awesome-pk-vm { display: none !important }')
