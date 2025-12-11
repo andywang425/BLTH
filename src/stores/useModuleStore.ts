@@ -42,12 +42,12 @@ const defaultModuleStatus: ModuleStatus = {
 const allAndTopFrameModuleNames: string[] = []
 
 export const useModuleStore = defineStore('module', () => {
-  // 所有模块的配置信息
+  // 模块配置信息
   const moduleConfig = ref<ModuleConfig>(Storage.getModuleConfig())
-  // 模块状态，用于显示状态图标
+  // 模块状态
   const moduleStatus = ref<ModuleStatus>(defaultModuleStatus)
-  // 模块实例
-  const moduleInstances = ref<BaseModule[]>([])
+  // 模块实例映射（key: 模块名称, value: 模块实例）
+  const moduleInstances = ref<Record<string, BaseModule>>({})
   // 模块状态、运行记录重置和再运行
   const moduleReset = ref<ModuleReset>({
     DailyTasks: {
@@ -148,7 +148,7 @@ export const useModuleStore = defineStore('module', () => {
    */
   function _runModule(module: typeof BaseModule, name: string): Promise<void> | void {
     const moduleInstance = new module(name)
-    moduleInstances.value.push(moduleInstance)
+    moduleInstances.value[name] = moduleInstance
 
     if (moduleInstance.isEnabled()) {
       return moduleInstance.run()
@@ -255,10 +255,10 @@ export const useModuleStore = defineStore('module', () => {
    * 重新运行模块
    *
    * @param moduleName 模块名称
-   * @param args `run()` 参数
+   * @param args `run()` 方法参数
    */
   function rerunModule(moduleName: string, ...args: any[]): Promise<void> | void {
-    const moduleInstance = moduleInstances.value.find((m) => m.moduleName === moduleName)
+    const moduleInstance = moduleInstances.value[moduleName]
 
     if (moduleInstance) {
       clearTimeout(moduleInstance.nextRunTimer)

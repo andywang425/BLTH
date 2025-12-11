@@ -64,7 +64,6 @@ class BaseModule {
    * @example config: useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.login
    */
   protected config?: any
-
   /**
    * 模块是否启用，默认通过 config.enabled 判断
    *
@@ -88,12 +87,6 @@ class BaseModule {
    * 下一次运行的定时器（`setTimeout` 返回值）
    */
   public nextRunTimer?: number
-
-  constructor(moduleName: string) {
-    this.moduleName = moduleName
-    this.logger = new Logger(this.moduleName)
-  }
-
   /**
    * 运行模块
    *
@@ -104,6 +97,11 @@ class BaseModule {
    */
   public run(..._args: any[]): void | Promise<void> {
     throw new Error('Method not implemented.')
+  }
+
+  constructor(moduleName: string) {
+    this.moduleName = moduleName
+    this.logger = new Logger(this.moduleName)
   }
 }
 

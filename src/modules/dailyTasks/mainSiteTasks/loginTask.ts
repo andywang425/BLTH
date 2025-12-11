@@ -43,7 +43,6 @@ class LoginTask extends BaseModule {
       } else {
         // 用户在运行脚本前已经完成了任务，也记录完成时间
         this.config._lastCompleteTime = tsm()
-        console.log('this.config._lastCompleteTime', this.config._lastCompleteTime, this.config)
         this.status = 'done'
       }
     } else {
