@@ -1,6 +1,6 @@
 import type { OnFrameTypes, RunAtMoment } from '@/types'
 import { type XhrRequestConfig, type XhrRequestHandler, proxy } from 'ajax-hook'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { unsafeWindow } from '$'
 
 class Invisibility extends BaseModule {
@@ -8,8 +8,6 @@ class Invisibility extends BaseModule {
   static runAt: RunAtMoment = 'document-start'
   static runAfterDefault: boolean = false
   static onFrame: OnFrameTypes = 'all'
-
-  config = this.moduleStore.moduleConfig.EnhanceExperience.invisibility
 
   public run(): void {
     this.logger.log('隐身入场模块开始运行')

@@ -1,10 +1,8 @@
 import { GM_addStyle } from '$'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 
 class RemoveRank extends BaseModule {
   static runOnMultiplePages = true
-
-  config = this.moduleStore.moduleConfig.RemoveElement.removeRank
 
   public async run() {
     this.logger.log('移除排行榜模块开始运行')

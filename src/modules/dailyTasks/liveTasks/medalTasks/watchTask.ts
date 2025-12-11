@@ -1,15 +1,13 @@
 import { delayToNextMoment, isNowIn, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore, usePlayerStore } from '@/stores'
 import Logger from '@/library/logger'
 import CryptoJS from 'crypto-js'
 import { sleep, uuid } from '@/library/utils'
-import { useModuleStore } from '@/stores/useModuleStore'
 import type { ModuleConfig, ModuleStatusTypes, RunAtMoment } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
-import { usePlayerStore } from '@/stores/usePlayerStore'
 
 interface SpyderData {
   benchmark: string
@@ -252,7 +250,7 @@ class WatchTask extends MedalModule {
   config = this.medalTasksConfig.watch
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
+    useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
 
   private playerStore = usePlayerStore()

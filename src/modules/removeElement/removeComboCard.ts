@@ -1,10 +1,8 @@
 import { GM_addStyle } from '$'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 
 class RemoveComboCard extends BaseModule {
   static runOnMultiplePages = true
-
-  config = this.moduleStore.moduleConfig.RemoveElement.removeComboCard
 
   public async run() {
     this.logger.log('移除直播间相同弹幕连续提示模块开始运行')

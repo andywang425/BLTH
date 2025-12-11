@@ -7,7 +7,7 @@ import PanelHeader from './components/PanelHeader.vue'
 import PanelMain from './components/PanelMain.vue'
 import { dce, dq, isSelfTopFrame, topFrameDocumentElement, waitForElement } from './library/dom'
 import Logger from './library/logger'
-import { useUIStore } from './stores/useUIStore'
+import { useUIStore } from './stores'
 
 const uiStore = useUIStore()
 

@@ -1,9 +1,9 @@
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import BAPI from '@/library/bili-api'
 import type { LiveData } from '@/library/bili-api/data'
 import { delayToNextMoment, isTimestampToday } from '@/library/luxon'
 import { sleep } from '@/library/utils'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import ModuleError from '@/library/error/ModuleError'
 import _ from 'lodash'
 
@@ -52,7 +52,7 @@ class FansMedals extends BaseModule {
   public async run(force = false): Promise<void> {
     const biliStore = useBiliStore()
 
-    const medalTasks = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
+    const medalTasks = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
     const taskValues = [medalTasks.light, medalTasks.watch]
 
     if (

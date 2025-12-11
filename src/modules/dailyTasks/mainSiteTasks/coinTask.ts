@@ -1,14 +1,14 @@
 import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
 
 class CoinTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.coin
+  config = useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.coin
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.coin = s
+    useModuleStore().moduleStatus.DailyTasks.MainSiteTasks.coin = s
   }
 
   // 暂时先限制每个视频最多投一个币

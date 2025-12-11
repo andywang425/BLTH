@@ -3,13 +3,13 @@ import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/lux
 import BAPI from '@/library/bili-api'
 import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
-import { useBiliStore } from '@/stores/useBiliStore.ts'
+import { useBiliStore, useModuleStore } from '@/stores'
 
 class GroupSignTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.groupSign
+  config = useModuleStore().moduleConfig.DailyTasks.OtherTasks.groupSign
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.OtherTasks.groupSign = s
+    useModuleStore().moduleStatus.DailyTasks.OtherTasks.groupSign = s
   }
 
   /**

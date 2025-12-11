@@ -1,4 +1,3 @@
-import { useModuleStore } from '@/stores/useModuleStore'
 import Logger from '@/library/logger'
 import type { ModuleStatusTypes, OnFrameTypes, RunAtMoment } from '@/types'
 
@@ -60,13 +59,9 @@ class BaseModule {
    */
   protected logger: Logger
   /**
-   * 储存所有模块信息的 Pinia Store
-   */
-  protected moduleStore = useModuleStore()
-  /**
    * 推荐添加一个 config 属性来表示当前模块的配置项
    *
-   * @example config: this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
+   * @example config: useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.login
    */
   protected config?: any
 
@@ -83,7 +78,7 @@ class BaseModule {
    *
    * @example
    * set status(s: moduleStatus) {
-   *    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
+   *    useModuleStore().moduleStatus.DailyTasks.MainSiteTasks.login = s
    * }
    */
   protected set status(_s: ModuleStatusTypes) {

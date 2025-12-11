@@ -1,15 +1,15 @@
 import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
 
 class WatchTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch
+  config = useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.watch
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.watch = s
+    useModuleStore().moduleStatus.DailyTasks.MainSiteTasks.watch = s
   }
 
   /**

@@ -1,6 +1,6 @@
 import { delayToNextMoment, isNowIn, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
@@ -12,7 +12,7 @@ class LightTask extends MedalModule {
   config = this.medalTasksConfig.light
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.light = s
+    useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.light = s
   }
 
   private MEDAL_FILTERS: LightTaskMedalFilters = {

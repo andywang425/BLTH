@@ -1,8 +1,8 @@
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore } from '@/stores'
 import BAPI from '@/library/bili-api'
 import type { MainData } from '@/library/bili-api/data'
 import { delayToNextMoment } from '@/library/luxon'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import ModuleCriticalError from '@/library/error/ModuleCriticalError'
 
 class UserInfo extends BaseModule {

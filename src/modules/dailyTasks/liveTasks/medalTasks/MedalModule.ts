@@ -1,13 +1,13 @@
 import BaseModule from '@/modules/BaseModule'
 import { storeToRefs } from 'pinia'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import { watch } from 'vue'
 import type { PublicMedalFilters } from './types'
 import { arrayToMap } from '@/library/utils'
 import type { LiveData } from '@/library/bili-api/data'
 
 class MedalModule extends BaseModule {
-  medalTasksConfig = this.moduleStore.moduleConfig.DailyTasks.LiveTasks.medalTasks
+  medalTasksConfig = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
 
   protected PUBLIC_MEDAL_FILTERS: PublicMedalFilters = {
     // 包含在白名单中或不包含在黑名单中返回true，否则返回false

@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { useModuleStore } from '@/stores/useModuleStore'
+import { useModuleStore, useBiliStore, useUIStore } from '@/stores'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
-import { useBiliStore } from '@/stores/useBiliStore'
 import helpInfo from '@/library/help-info'
 import { VueDraggable } from 'vue-draggable-plus'
-import { useUIStore } from '@/stores/useUIStore'
 import { arrayToMap } from '@/library/utils'
 
 interface MedalInfoRow {

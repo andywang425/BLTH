@@ -1,13 +1,13 @@
 import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import type { ModuleStatusTypes } from '@/types'
 
 class LoginTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
+  config = useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.login
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
+    useModuleStore().moduleStatus.DailyTasks.MainSiteTasks.login = s
   }
 
   private async login(): Promise<void> {

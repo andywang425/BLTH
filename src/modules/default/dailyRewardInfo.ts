@@ -1,8 +1,8 @@
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import BAPI from '@/library/bili-api'
 import type { MainData } from '@/library/bili-api/data'
 import { delayToNextMoment, isTimestampToday } from '@/library/luxon'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import ModuleError from '@/library/error/ModuleError'
 
 class DailyRewardInfo extends BaseModule {
@@ -25,7 +25,7 @@ class DailyRewardInfo extends BaseModule {
 
   public async run(force = false): Promise<void> {
     const biliStore = useBiliStore()
-    const mainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
+    const mainSiteTasks = useModuleStore().moduleConfig.DailyTasks.MainSiteTasks
 
     if (
       force ||

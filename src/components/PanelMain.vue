@@ -21,7 +21,7 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { useUIStore } from '@/stores/useUIStore'
+import { useUIStore } from '@/stores'
 const uiStore = useUIStore()
 </script>
 

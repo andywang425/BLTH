@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useModuleStore } from '@/stores/useModuleStore'
+import { useModuleStore } from '@/stores'
 import helpInfo from '@/library/help-info'
 
 const moduleStore = useModuleStore()

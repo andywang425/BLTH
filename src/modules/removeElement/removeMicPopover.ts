@@ -1,10 +1,8 @@
 import { GM_addStyle } from '$'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 
 class removeMicPopover extends BaseModule {
   static runOnMultiplePages = true
-
-  config = this.moduleStore.moduleConfig.RemoveElement.removeMicPopover
 
   public async run() {
     this.logger.log('移除连麦状态提示模块开始运行')

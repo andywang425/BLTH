@@ -49,7 +49,7 @@ export const useModuleStore = defineStore('module', () => {
   // 模块实例
   const moduleInstances = ref<BaseModule[]>([])
   // 模块状态、运行记录重置和再运行
-  const moduleReset: ModuleReset = {
+  const moduleReset = ref<ModuleReset>({
     DailyTasks: {
       MainSiteTasks: {
         login: async () => {
@@ -137,7 +137,7 @@ export const useModuleStore = defineStore('module', () => {
         },
       },
     },
-  }
+  })
 
   /**
    * 运行模块

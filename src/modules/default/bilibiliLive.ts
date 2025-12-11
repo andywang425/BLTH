@@ -1,6 +1,6 @@
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore } from '@/stores'
 import { unsafeWindow } from '$'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import ModuleCriticalError from '@/library/error/ModuleCriticalError'
 
 class BilibiliLive extends BaseModule {

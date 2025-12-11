@@ -2,12 +2,13 @@ import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
+import { useModuleStore } from '@/stores'
 
 class SilverToCoinTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.silverToCoin
+  config = useModuleStore().moduleConfig.DailyTasks.OtherTasks.silverToCoin
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.OtherTasks.silverToCoin = s
+    useModuleStore().moduleStatus.DailyTasks.OtherTasks.silverToCoin = s
   }
 
   private async exchange(): Promise<void> {

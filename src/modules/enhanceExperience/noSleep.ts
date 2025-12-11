@@ -1,13 +1,11 @@
 import type { OnFrameTypes, RunAtMoment } from '@/types'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 
 class NoSleep extends BaseModule {
   static runOnMultiplePages: boolean = true
   static runAt: RunAtMoment = 'window-load'
   static onFrame: OnFrameTypes = 'top'
   static runAfterDefault: boolean = false
-
-  config = this.moduleStore.moduleConfig.EnhanceExperience.noSleep
 
   public run(): void {
     this.logger.log('屏蔽挂机检测模块开始运行')
