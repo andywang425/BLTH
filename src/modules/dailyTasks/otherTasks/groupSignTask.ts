@@ -1,15 +1,15 @@
-import BaseModule from '../../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
-import { useBiliStore } from '@/stores/useBiliStore.ts'
+import { useBiliStore, useModuleStore } from '@/stores'
 
 class GroupSignTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.groupSign
+  config = useModuleStore().moduleConfig.DailyTasks.OtherTasks.groupSign
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.OtherTasks.groupSign = s
+    useModuleStore().moduleStatus.DailyTasks.OtherTasks.groupSign = s
   }
 
   /**
@@ -86,7 +86,7 @@ class GroupSignTask extends BaseModule {
 
     // 下一个早上 08:05 再运行
     const diff = delayToNextMoment(8, 5)
-    setTimeout(() => this.run(), diff.ms)
+    this.nextRunTimer = setTimeout(() => this.run(), diff.ms)
     this.logger.log('距离应援团签到模块下次运行时间:', diff.str)
   }
 }

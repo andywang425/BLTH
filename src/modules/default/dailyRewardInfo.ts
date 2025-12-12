@@ -1,8 +1,8 @@
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import BAPI from '@/library/bili-api'
 import type { MainData } from '@/library/bili-api/data'
 import { delayToNextMoment, isTimestampToday } from '@/library/luxon'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import ModuleError from '@/library/error/ModuleError'
 
 class DailyRewardInfo extends BaseModule {
@@ -23,20 +23,21 @@ class DailyRewardInfo extends BaseModule {
     }
   }
 
-  public async run(): Promise<void> {
+  public async run(force = false): Promise<void> {
     const biliStore = useBiliStore()
-    const mainSiteTasks = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks
+    const mainSiteTasks = useModuleStore().moduleConfig.DailyTasks.MainSiteTasks
 
     if (
+      force ||
+      // 开启了任意一项主站功能且该功能今天没完成过
       Object.values(mainSiteTasks).some(
         (t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4),
       )
     ) {
-      // 开启了任意一项主站功能且该功能今天没完成过
       biliStore.dailyRewardInfo = await this.getDailyRewardInfo()
     }
 
-    setTimeout(
+    this.nextRunTimer = setTimeout(
       () => this.run().catch((reason) => this.logger.error(reason)),
       delayToNextMoment(0, 4).ms,
     )

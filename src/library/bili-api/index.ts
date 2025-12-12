@@ -1,6 +1,6 @@
 import Request from '../request'
 import type { Requests, BapiMethods } from './api'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore } from '@/stores'
 import { packFormData, uuid, wbiSign } from '../utils'
 import { ts, tsm } from '../luxon'
 

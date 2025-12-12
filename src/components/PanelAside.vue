@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useUIStore } from '@/stores/useUIStore'
+import { useUIStore } from '@/stores'
 import type { MenuIndex } from '@/types'
 
 const uiStore = useUIStore()
@@ -56,29 +56,29 @@ const items: MenuItem[] = [
 
 <template>
   <el-menu
+    id="aside-el-menu"
     :default-active="uiStore.uiConfig.activeMenuIndex"
     :style="{ 'min-height': uiStore.scrollBarHeight }"
     :collapse="uiStore.uiConfig.isCollapse"
     unique-opened
     @select="(index: string) => uiStore.setActiveMenuIndex(index as MenuIndex)"
-    id="aside-el-menu"
   >
     <template v-for="item in items">
       <template v-if="item.subs">
-        <el-sub-menu :index="item.index" :key="item.index">
+        <el-sub-menu :key="item.index" :index="item.index">
           <template #title>
             <el-icon>
               <component :is="item.icon"></component>
             </el-icon>
             <span>{{ item.title }}</span>
           </template>
-          <el-menu-item v-for="subItem in item.subs" :index="subItem.index" :key="subItem.index">
+          <el-menu-item v-for="subItem in item.subs" :key="subItem.index" :index="subItem.index">
             {{ subItem.title }}
           </el-menu-item>
         </el-sub-menu>
       </template>
       <template v-else>
-        <el-menu-item :index="item.index" :key="item.index">
+        <el-menu-item :key="item.index" :index="item.index">
           <el-icon>
             <component :is="item.icon"></component>
           </el-icon>

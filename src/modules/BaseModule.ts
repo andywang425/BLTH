@@ -1,4 +1,3 @@
-import { useModuleStore } from '@/stores/useModuleStore'
 import Logger from '@/library/logger'
 import type { ModuleStatusTypes, OnFrameTypes, RunAtMoment } from '@/types'
 
@@ -60,16 +59,11 @@ class BaseModule {
    */
   protected logger: Logger
   /**
-   * 储存所有模块信息的 Pinia Store
-   */
-  protected moduleStore = useModuleStore()
-  /**
    * 推荐添加一个 config 属性来表示当前模块的配置项
    *
-   * @example config: this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
+   * @example config: useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.login
    */
   protected config?: any
-
   /**
    * 模块是否启用，默认通过 config.enabled 判断
    *
@@ -83,26 +77,31 @@ class BaseModule {
    *
    * @example
    * set status(s: moduleStatus) {
-   *    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
+   *    useModuleStore().moduleStatus.DailyTasks.MainSiteTasks.login = s
    * }
    */
   protected set status(_s: ModuleStatusTypes) {
+    throw new Error('Method not implemented.')
+  }
+  /**
+   * 下一次运行的定时器（`setTimeout` 返回值）
+   */
+  public nextRunTimer?: number
+  /**
+   * 运行模块
+   *
+   * 若有需要可以传入参数
+   *
+   * 默认模块必须返回一个空的Promise，
+   * 其它模块若需要使用 await 可以返回一个空的Promise，否则无返回值
+   */
+  public run(..._args: any[]): void | Promise<void> {
     throw new Error('Method not implemented.')
   }
 
   constructor(moduleName: string) {
     this.moduleName = moduleName
     this.logger = new Logger(this.moduleName)
-  }
-
-  /**
-   * 运行模块
-   *
-   * 默认模块必须返回一个空的Promise，
-   * 其它模块若需要使用 await 可以返回一个空的Promise，否则无返回值
-   */
-  public run(): void | Promise<void> {
-    throw new Error('Method not implemented.')
   }
 }
 

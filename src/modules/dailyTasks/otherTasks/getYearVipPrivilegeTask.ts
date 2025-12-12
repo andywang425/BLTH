@@ -1,18 +1,18 @@
-import BaseModule from '../../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { ts } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import type { MainData } from '@/library/bili-api/data'
 import { DateTime } from 'luxon'
 import { sleep } from '@/library/utils'
 import { watch } from 'vue'
 
 class GetYearVipPrivilegeTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.getYearVipPrivilege
+  config = useModuleStore().moduleConfig.DailyTasks.OtherTasks.getYearVipPrivilege
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.OtherTasks.getYearVipPrivilege = s
+    useModuleStore().moduleStatus.DailyTasks.OtherTasks.getYearVipPrivilege = s
   }
 
   private type2Name: Record<string, string> = {
@@ -150,7 +150,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
             } else {
               // 需要完成任务才能领取
               if (i.type === 9) {
-                const watchTaskConfig = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.watch
+                const watchTaskConfig = useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.watch
                 if (watchTaskConfig.enabled) {
                   this.logger.log('等待观看视频任务完成后再领取专属等级加速包（10主站经验）...')
                   watch(
@@ -180,7 +180,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
           '领取年度大会员权益模块下次运行时间:',
           DateTime.fromSeconds(this.config._nextReceiveTime).toJSDate(),
         )
-        setTimeout(() => this.run(), diff * 1000)
+        this.nextRunTimer = setTimeout(() => this.run(), diff * 1000)
       } else {
         this.logger.log('距离下次领取年度大会员权益的时间超过一天，不计划下次运行')
       }

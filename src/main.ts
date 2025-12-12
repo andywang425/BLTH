@@ -5,12 +5,11 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { createPinia } from 'pinia'
 import 'element-plus/dist/index.css'
 import './assets/css/element-dark-css-vars.css'
-import { useCacheStore } from './stores/useCacheStore'
+import { useCacheStore, useModuleStore } from './stores'
 import { dce, isTargetFrame } from './library/dom'
 import * as MyIconsVue from './components/icons'
 import './assets/css/base.css'
 import Logger from './library/logger'
-import { useModuleStore } from './stores/useModuleStore'
 import { waitForMoment } from './library/utils'
 
 const logger = new Logger('Main')

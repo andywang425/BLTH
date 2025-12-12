@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useUIStore } from './stores/useUIStore'
-import PanelHeader from './components/PanelHeader.vue'
-import PanelAside from './components/PanelAside.vue'
-import PanelMain from './components/PanelMain.vue'
-import { dce, dq, waitForElement, isSelfTopFrame, topFrameDocumentElement } from './library/dom'
+import { unsafeWindow } from '$'
 import hotkeys from 'hotkeys-js'
 import _ from 'lodash'
+import PanelAside from './components/PanelAside.vue'
+import PanelHeader from './components/PanelHeader.vue'
+import PanelMain from './components/PanelMain.vue'
+import { dce, dq, isSelfTopFrame, topFrameDocumentElement, waitForElement } from './library/dom'
 import Logger from './library/logger'
-import { unsafeWindow } from '$'
+import { useUIStore } from './stores'
 
 const uiStore = useUIStore()
 
@@ -53,7 +53,7 @@ if (livePlayer) {
     .then((playerHeaderLeft) => {
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
-      button.setAttribute('class', 'blth_btn')
+      button.setAttribute('class', 'blth-btn')
       button.onclick = throttleButtonOnClick
       button.innerText = uiStore.isShowPanelButtonText
       playerHeaderLeft.append(button)
@@ -92,7 +92,7 @@ if (livePlayer) {
 
 <template>
   <el-collapse-transition>
-    <el-container :style="uiStore.panelStyle" class="base" v-show="uiStore.uiConfig.isShowPanel">
+    <el-container v-show="uiStore.uiConfig.isShowPanel" :style="uiStore.panelStyle" class="base">
       <el-header class="header">
         <PanelHeader />
       </el-header>
@@ -116,20 +116,21 @@ if (livePlayer) {
 
 <style scoped>
 .base {
-  z-index: 1003;
   position: absolute;
+  z-index: 1003;
   background-color: var(--el-bg-color);
 }
 
 .header {
   position: relative;
   box-sizing: border-box;
-  width: 100%;
-  font-size: var(--big-text-size);
-  align-items: center;
   display: flex;
-  border-bottom: 1px solid #e3e5e7;
+  align-items: center;
+  width: 100%;
   height: 60px;
+  font-size: var(--big-text-size);
+  border-bottom: 1px solid #e3e5e7;
+
   --big-text-size: 25px;
 }
 

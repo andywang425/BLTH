@@ -1,13 +1,14 @@
-import BaseModule from '../../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
+import { useModuleStore } from '@/stores'
 
 class SilverToCoinTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.OtherTasks.silverToCoin
+  config = useModuleStore().moduleConfig.DailyTasks.OtherTasks.silverToCoin
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.OtherTasks.silverToCoin = s
+    useModuleStore().moduleStatus.DailyTasks.OtherTasks.silverToCoin = s
   }
 
   private async exchange(): Promise<void> {
@@ -49,7 +50,7 @@ class SilverToCoinTask extends BaseModule {
     }
 
     const diff = delayToNextMoment()
-    setTimeout(() => this.run(), diff.ms)
+    this.nextRunTimer = setTimeout(() => this.run(), diff.ms)
     this.logger.log('银瓜子换硬币模块下次运行时间:', diff.str)
   }
 }

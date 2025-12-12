@@ -1,5 +1,5 @@
 import { unsafeWindow } from '$'
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { waitForMoment } from '@/library/utils'
 import { ref } from 'vue'
 import _ from 'lodash'
@@ -127,3 +127,7 @@ export const usePlayerStore = defineStore('player', () => {
     waitForLiveStatus,
   }
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(usePlayerStore, import.meta.hot))
+}

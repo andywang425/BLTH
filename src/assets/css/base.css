@@ -1,27 +1,27 @@
 /* 显示/隐藏控制面板按钮 */
-.blth_btn {
-  background-color: #23ade5;
-  font-size: small;
-  margin-inline-start: 5px;
-  color: #fff;
-  border-radius: 4px;
-  border: none;
-  padding: 5px;
-  cursor: pointer;
-  box-shadow: 0 0 2px #00000075;
-  line-height: 10px;
-  margin-left: 15px;
+.blth-btn {
   z-index: 1;
+  padding: 5px;
+  margin-inline-start: 5px;
+  margin-left: 15px;
+  font-size: small;
+  line-height: 10px;
+  color: #fff;
+  cursor: pointer;
+  background-color: #23ade5;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 0 2px #00000075;
 }
 
-.blth_btn:hover {
+.blth-btn:hover {
   background-color: #1097cc;
 }
 
-.blth_btn:hover:active {
-  background-color: #0e86b6;
+.blth-btn:hover:active {
   position: relative;
   top: 1px;
+  background-color: #0e86b6;
 }
 
 /**
@@ -45,31 +45,31 @@ ol {
   原理：屏幕适配css中的zoom值为n，此处就设置为1/n
  */
 html[lab-style*='adaptive'] {
-  @media screen and (min-width: 1930px) {
+  @media screen and (width >= 1930px) {
     .base {
       zoom: calc(15 / 16);
     }
   }
 
-  @media screen and (min-width: 2058px) {
+  @media screen and (width >= 2058px) {
     .base {
       zoom: calc(3 / 4);
     }
   }
 
-  @media screen and (min-width: 2570px) {
+  @media screen and (width >= 2570px) {
     .base {
       zoom: calc(2 / 3);
     }
   }
 
-  @media screen and (min-width: 3210px) {
+  @media screen and (width >= 3210px) {
     .base {
       zoom: calc(1 / 2);
     }
   }
 
-  @media screen and (min-width: 3850px) {
+  @media screen and (width >= 3850px) {
     .base {
       zoom: calc(15 / 32);
     }

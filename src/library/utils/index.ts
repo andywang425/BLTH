@@ -2,7 +2,7 @@ import _ from 'lodash'
 import CryptoJS from 'crypto-js'
 import type { RunAtMoment } from '@/types'
 import { ts } from '@/library/luxon'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore } from '@/stores'
 
 /**
  * 生成一个 version 4 uuid

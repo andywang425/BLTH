@@ -7,5 +7,3 @@ declare module 'vue' {
     TaskStatus: typeof TaskStatus
   }
 }
-
-export {}

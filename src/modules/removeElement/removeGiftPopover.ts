@@ -1,10 +1,11 @@
 import { GM_addStyle } from '$'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
+import { useModuleStore } from '@/stores'
 
-class removeGiftPopover extends BaseModule {
+class RemoveGiftPopover extends BaseModule {
   static runOnMultiplePages = true
 
-  config = this.moduleStore.moduleConfig.RemoveElement.removeGiftPopover
+  config = useModuleStore().moduleConfig.RemoveElement.removeGiftPopover
 
   public async run() {
     this.logger.log('移除礼物赠送提示弹窗模块开始运行')
@@ -13,4 +14,4 @@ class removeGiftPopover extends BaseModule {
   }
 }
 
-export default removeGiftPopover
+export default RemoveGiftPopover

@@ -1,7 +1,8 @@
 import type { OnFrameTypes, RunAtMoment } from '@/types'
 import { type XhrRequestConfig, type XhrRequestHandler, proxy } from 'ajax-hook'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { unsafeWindow } from '$'
+import { useModuleStore } from '@/stores'
 
 class Invisibility extends BaseModule {
   static runOnMultiplePages: boolean = true
@@ -9,7 +10,7 @@ class Invisibility extends BaseModule {
   static runAfterDefault: boolean = false
   static onFrame: OnFrameTypes = 'all'
 
-  config = this.moduleStore.moduleConfig.EnhanceExperience.invisibility
+  config = useModuleStore().moduleConfig.EnhanceExperience.invisibility
 
   public run(): void {
     this.logger.log('隐身入场模块开始运行')

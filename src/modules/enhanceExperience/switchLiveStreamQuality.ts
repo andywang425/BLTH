@@ -1,14 +1,13 @@
 import type { OnFrameTypes, RunAtMoment } from '@/types'
-import BaseModule from '../BaseModule'
-import { usePlayerStore } from '@/stores/usePlayerStore'
-
+import BaseModule from '@/modules/BaseModule'
+import { usePlayerStore, useModuleStore } from '@/stores'
 class SwitchLiveStreamQuality extends BaseModule {
   static runOnMultiplePages: boolean = true
   static runAt: RunAtMoment = 'window-load'
   static runAfterDefault: boolean = false
   static onFrame: OnFrameTypes = 'top'
 
-  config = this.moduleStore.moduleConfig.EnhanceExperience.switchLiveStreamQuality
+  config = useModuleStore().moduleConfig.EnhanceExperience.switchLiveStreamQuality
 
   private playerStore = usePlayerStore()
 

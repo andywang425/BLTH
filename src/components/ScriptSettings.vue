@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useUIStore } from '@/stores/useUIStore'
+import { useUIStore } from '@/stores'
 
 const uiConfig = useUIStore().uiConfig
 </script>
@@ -10,9 +10,9 @@ const uiConfig = useUIStore().uiConfig
       <el-space wrap :size="[16, 0]">
         <el-text class="label-text">控制面板宽度</el-text>
         <el-slider
+          v-model="uiConfig.panelWidthPercent"
           style="width: 150px"
           class="slider"
-          v-model="uiConfig.panelWidthPercent"
           :min="30"
           :max="60"
         />
@@ -23,7 +23,7 @@ const uiConfig = useUIStore().uiConfig
 
 <style scoped>
 .label-text {
-  color: var(--el-text-color-primary);
   line-height: 32px;
+  color: var(--el-text-color-primary);
 }
 </style>

@@ -1,13 +1,13 @@
-import BaseModule from '../../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
-import { useBiliStore } from '@/stores/useBiliStore'
+import { useBiliStore, useModuleStore } from '@/stores'
 import type { ModuleStatusTypes } from '@/types'
 
 class LoginTask extends BaseModule {
-  config = this.moduleStore.moduleConfig.DailyTasks.MainSiteTasks.login
+  config = useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.login
 
   set status(s: ModuleStatusTypes) {
-    this.moduleStore.moduleStatus.DailyTasks.MainSiteTasks.login = s
+    useModuleStore().moduleStatus.DailyTasks.MainSiteTasks.login = s
   }
 
   private async login(): Promise<void> {
@@ -56,7 +56,7 @@ class LoginTask extends BaseModule {
 
     // 明天半夜再运行
     const diff = delayToNextMoment()
-    setTimeout(() => this.run(), diff.ms)
+    this.nextRunTimer = setTimeout(() => this.run(), diff.ms)
     this.logger.log('距离每日登录模块下次运行时间:', diff.str)
   }
 }

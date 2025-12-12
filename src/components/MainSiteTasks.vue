@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useModuleStore } from '@/stores/useModuleStore'
+import { useModuleStore } from '@/stores'
 import helpInfo from '@/library/help-info'
 
 const moduleStore = useModuleStore()
 
 const config = moduleStore.moduleConfig.DailyTasks.MainSiteTasks
-
 const status = moduleStore.moduleStatus.DailyTasks.MainSiteTasks
+const reset = moduleStore.moduleReset.DailyTasks.MainSiteTasks
 </script>
 
 <template>
@@ -15,14 +15,14 @@ const status = moduleStore.moduleStatus.DailyTasks.MainSiteTasks
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.login.enabled" active-text="每日登录" />
         <Info :item="helpInfo.DailyTasks.MainSiteTasks.login" />
-        <TaskStatus :status="status.login" />
+        <TaskStatus :status="status.login" @click="reset.login" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.watch.enabled" active-text="每日观看视频" />
         <Info :item="helpInfo.DailyTasks.MainSiteTasks.watch" />
-        <TaskStatus :status="status.watch" />
+        <TaskStatus :status="status.watch" @click="reset.watch" />
       </el-space>
     </el-row>
     <el-row>
@@ -33,14 +33,14 @@ const status = moduleStore.moduleStatus.DailyTasks.MainSiteTasks
         </el-select>
         <el-text>个</el-text>
         <Info :item="helpInfo.DailyTasks.MainSiteTasks.coin" />
-        <TaskStatus :status="status.coin" />
+        <TaskStatus :status="status.coin" @click="reset.coin" />
       </el-space>
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.share.enabled" active-text="每日分享视频" />
         <Info :item="helpInfo.DailyTasks.MainSiteTasks.share" />
-        <TaskStatus :status="status.share" />
+        <TaskStatus :status="status.share" @click="reset.share" />
       </el-space>
     </el-row>
     <el-divider />

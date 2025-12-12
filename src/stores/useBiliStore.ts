@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { LiveData, MainData } from '@/library/bili-api/data'
 import type { BiliCookies, FansMedalsStatus } from '@/types'
@@ -56,3 +56,7 @@ export const useBiliStore = defineStore('bili', () => {
     wbiSalt,
   }
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useBiliStore, import.meta.hot))
+}

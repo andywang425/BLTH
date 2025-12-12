@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
-import { useModuleStore } from '@/stores/useModuleStore'
+import { useModuleStore, useBiliStore, useUIStore } from '@/stores'
 import { Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
-import { useBiliStore } from '@/stores/useBiliStore'
 import helpInfo from '@/library/help-info'
 import { VueDraggable } from 'vue-draggable-plus'
-import { useUIStore } from '@/stores/useUIStore'
 import { arrayToMap } from '@/library/utils'
 
 interface MedalInfoRow {
@@ -26,6 +24,7 @@ const danmuTableMaxHeight = screen.height * 0.5
 
 const config = moduleStore.moduleConfig.DailyTasks.LiveTasks
 const status = moduleStore.moduleStatus.DailyTasks.LiveTasks
+const reset = moduleStore.moduleReset.DailyTasks.LiveTasks
 
 const medalDanmuPanelVisible = ref<boolean>(false)
 const danmuTableData = computed(() =>
@@ -129,10 +128,7 @@ const handleEditList = async () => {
         { once: true },
       )
       if (!biliStore.fansMedalsStatus) {
-        // FansMedals 模块没有获取过粉丝勋章数据，利用 emitter 通知该模块去获取
-        moduleStore.emitter.emit('Default_FansMedals', {
-          module: 'LiveTasks',
-        })
+        moduleStore.rerunModule('Default_FansMedals', true)
       }
     } else {
       initSelection(medalInfoTableData.value)
@@ -189,7 +185,7 @@ function handleRowClick(row: MedalInfoRow) {
           >编辑弹幕
         </el-button>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.light" />
-        <TaskStatus :status="status.medalTasks.light" />
+        <TaskStatus :status="status.medalTasks.light" @click="reset.medalTasks.light" />
       </el-space>
     </el-row>
     <el-row>
@@ -200,7 +196,7 @@ function handleRowClick(row: MedalInfoRow) {
         </el-select>
         <el-text>分钟 / 直播间</el-text>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.watch" />
-        <TaskStatus :status="status.medalTasks.watch" />
+        <TaskStatus :status="status.medalTasks.watch" @click="reset.medalTasks.watch" />
       </el-space>
     </el-row>
     <el-row>
@@ -272,10 +268,10 @@ function handleRowClick(row: MedalInfoRow) {
           :data="medalInfoTableData"
           :max-height="medalTableMaxHeight"
           empty-text="没有粉丝勋章"
+          :row-key="(row: MedalInfoRow) => row.roomid.toString()"
           @select="handleSelect"
           @select-all="handleSelect"
           @row-click="handleRowClick"
-          :row-key="(row: MedalInfoRow) => row.roomid.toString()"
         >
           <template v-if="!uiStore.uiConfig.medalInfoPanelSortMode">
             <el-table-column type="selection" align="center" width="80" />
@@ -324,8 +320,8 @@ function handleRowClick(row: MedalInfoRow) {
       </VueDraggable>
       <template #footer>
         <el-switch
-          :disabled="!config.medalTasks.isWhiteList"
           v-model="uiStore.uiConfig.medalInfoPanelSortMode"
+          :disabled="!config.medalTasks.isWhiteList"
           inactive-text="常规模式"
           active-text="排序模式"
           @change="(val: any) => !val && nextTick(() => initSelection(medalInfoTableData))"
@@ -343,8 +339,8 @@ function handleRowClick(row: MedalInfoRow) {
 
 .avatar {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   border-radius: 50%;
 }
 </style>

@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+## [7.2.5] - 2025-12-12
+
+### 新增
+
+- 再次运行任务：将鼠标悬停在任务已完成（✔）图标上，该图标会变为再次运行图标（🔄️）；点击后会清空今日运行记录并再执行该任务
+- 【移除直播间水印模块】支持移除聊天电台直播间的特有水印
+- 💻 引入 stylelint
+- 💻 useModuleStore 新增模块实例列表 moduleInstances，模块再运行工具 moduleReset 和重新运行模块函数 rerunModule
+
+### 调整
+
+- 💻 eslint 规则调整（no-unused-vars）：允许下划线开头的未使用变量
+- 💻 所有 pinia stores 已支持热重载且统一在 stores/index.ts 中导出
+- 💻 BaseModule 移除 moduleStore 属性，增加 nextRunTimer 属性，run 方法支持传参
+
 ## [7.2.4] - 2025-9-13
 
 ### 新增

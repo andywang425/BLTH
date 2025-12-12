@@ -10,10 +10,10 @@ BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [Element Plus](https://elemen
 
 ## 环境搭建
 
-- 安装 [Node.js](https://nodejs.org/), [Visual Studio Code](https://code.visualstudio.com/) 或 [WebStorm](https://www.jetbrains.com/webstorm/)。
+- 安装 [Node.js](https://nodejs.org/), [Visual Studio Code](https://code.visualstudio.com/)。
 - Fork 本项目（取消勾选 Copy the `master` branch only），然后 Clone 至本地。
 - 切换到项目根目录，安装依赖 `npm install`。
-- 如果使用 vscode，安装以下几个拓展（打开项目时会提示你安装）：[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。
+- 如果使用 vscode，安装以下几个拓展（打开项目时会提示你安装）：[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Styleint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint), [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)。
 
 ## 开始
 
@@ -73,7 +73,7 @@ BLTH
 首先打开 modules 文件夹，你会发现已经有了 dailyTasks/mainSiteTasks 这个文件夹，那么你只需在这个文件夹下新建一个 ts 文件即可。内容大概如下：
 
 ```ts
-import BaseModule from '../../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 // import ...
 
 class LikeTask extends BaseModule {
@@ -93,11 +93,15 @@ export default LikeTask
 
 点赞的视频从哪来？如果仔细阅读代码你会发现 useBiliStore 的 dynamicVideos 里已经存储了许多动态视频，你可以直接用。如果有特殊需求，自己获取视频当然也是可以的。
 
-完成模块的编写后，记得在 dailyTasks/mainSiteTasks/index.ts 中添加新模块的导出。
+完成模块的编写后，在 dailyTasks/mainSiteTasks/index.ts 中添加新模块的导出。
+
+因为脚本已经有了主站任务界面 components/MainSiteTasks.vue，所以你只需要在该组件中加上新功能的 UI 即可。
+
+为了更好的用户体验，建议加上帮助信息（Info组件）、模块状态和模块再运行功能（TaskStatus组件）。参考已有的模块即可。
 
 ## 代码风格
 
-编写的代码需要能够通过 ESlint 检查。在你编写代码的过程中 [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) 拓展会实时地检查打开的代码文件。
+编写的代码需要能够通过 ESlint 和 Stylelint 检查。在你编写代码的过程中 [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) 和 [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint) 拓展会实时地检查打开的代码文件。
 
 你也可以使用以下命令检查所有文件：
 

@@ -1,9 +1,10 @@
 import { unsafeWindow } from '$'
 import { type XhrRequestConfig, type XhrRequestHandler, proxy } from 'ajax-hook'
 import { type FetchHookProxyConfig, fproxy } from '@/library/fetch-hook'
-import BaseModule from '../BaseModule'
+import BaseModule from '@/modules/BaseModule'
 import { getUrlFromFetchInput } from '@/library/utils'
 import type { OnFrameTypes, RunAtMoment } from '@/types'
+import { useModuleStore } from '@/stores'
 
 class NoReport extends BaseModule {
   static runOnMultiplePages: boolean = true
@@ -11,7 +12,7 @@ class NoReport extends BaseModule {
   static onFrame: OnFrameTypes = 'all'
   static runAfterDefault: boolean = false
 
-  config = this.moduleStore.moduleConfig.EnhanceExperience.noReport
+  config = useModuleStore().moduleConfig.EnhanceExperience.noReport
 
   /**
    * 判断是否是需要拦截的 URL

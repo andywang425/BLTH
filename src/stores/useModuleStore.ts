@@ -1,19 +1,13 @@
-import { defineStore } from 'pinia'
-import { reactive, watch } from 'vue'
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { ref, watch } from 'vue'
 import Storage from '@/library/storage'
 import _ from 'lodash'
-import type { ModuleConfig } from '@/types'
+import type { ModuleConfig, ModuleReset } from '@/types'
 import * as defaultModules from '@/modules/default'
 import * as otherModules from '@/modules'
 import Logger from '@/library/logger'
-import mitt from '@/library/mitt'
 import { delayToNextMoment } from '@/library/luxon'
-import type {
-  ModuleStatus,
-  IsOnTargetFrameTypes,
-  ModuleEmitterEvents,
-  ModuleStatusTypes,
-} from '@/types'
+import type { ModuleStatus, IsOnTargetFrameTypes, ModuleStatusTypes } from '@/types'
 import { deepestIterate, waitForMoment } from '@/library/utils'
 import { useCacheStore } from './useCacheStore'
 import { isSelfTopFrame } from '@/library/dom'
@@ -30,7 +24,6 @@ const defaultModuleStatus: ModuleStatus = {
       share: '',
     },
     LiveTasks: {
-      sign: '',
       medalTasks: {
         light: '',
         watch: '',
@@ -48,40 +41,136 @@ const defaultModuleStatus: ModuleStatus = {
 // 在所有 frame 或顶层 frame 上运行的被加载的模块名称
 const allAndTopFrameModuleNames: string[] = []
 
-/**
- * 加载默认模块
- */
-function loadDefaultModules(): Promise<PromiseSettledResult<void>[]> {
-  const cacheStore = useCacheStore()
-  const promiseArray: Promise<void>[] = []
-  for (const [name, module] of Object.entries(defaultModules)) {
-    if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
-      promiseArray.push(runModule(module, name)!)
+export const useModuleStore = defineStore('module', () => {
+  // 模块配置信息
+  const moduleConfig = ref<ModuleConfig>(Storage.getModuleConfig())
+  // 模块状态
+  const moduleStatus = ref<ModuleStatus>(defaultModuleStatus)
+  // 模块实例映射（key: 模块名称, value: 模块实例）
+  const moduleInstances = ref<Record<string, BaseModule>>({})
+  // 模块状态、运行记录重置和再运行
+  const moduleReset = ref<ModuleReset>({
+    DailyTasks: {
+      MainSiteTasks: {
+        login: async () => {
+          moduleStatus.value.DailyTasks.MainSiteTasks.login = ''
+          moduleConfig.value.DailyTasks.MainSiteTasks.login._lastCompleteTime = 0
+
+          await rerunModule('Default_DailyRewardInfo', true)
+          await rerunModule('DailyTask_MainSiteTask_LoginTask')
+        },
+        watch: async () => {
+          moduleStatus.value.DailyTasks.MainSiteTasks.watch = ''
+          moduleConfig.value.DailyTasks.MainSiteTasks.watch._lastCompleteTime = 0
+
+          await Promise.all([
+            rerunModule('Default_DailyRewardInfo', true),
+            rerunModule('Default_DynamicVideos', true),
+          ])
+          await rerunModule('DailyTask_MainSiteTask_WatchTask')
+        },
+        coin: async () => {
+          moduleStatus.value.DailyTasks.MainSiteTasks.coin = ''
+          moduleConfig.value.DailyTasks.MainSiteTasks.coin._lastCompleteTime = 0
+
+          await Promise.all([
+            rerunModule('Default_DailyRewardInfo', true),
+            rerunModule('Default_DynamicVideos', true),
+          ])
+          rerunModule('DailyTask_MainSiteTask_CoinTask')
+        },
+        share: async () => {
+          moduleStatus.value.DailyTasks.MainSiteTasks.share = ''
+          moduleConfig.value.DailyTasks.MainSiteTasks.share._lastCompleteTime = 0
+
+          await Promise.all([
+            rerunModule('Default_DailyRewardInfo', true),
+            rerunModule('Default_DynamicVideos', true),
+          ])
+          rerunModule('DailyTask_MainSiteTask_ShareTask')
+        },
+      },
+      LiveTasks: {
+        medalTasks: {
+          light: () => {
+            moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light = ''
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastCompleteTime = 0
+
+            rerunModule('Default_FansMedals', true)
+            rerunModule('DailyTask_LiveTask_LightTask')
+          },
+          watch: () => {
+            moduleStatus.value.DailyTasks.LiveTasks.medalTasks.watch = ''
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastCompleteTime = 0
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastWatchTime = 0
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress = {}
+
+            rerunModule('Default_FansMedals', true)
+            rerunModule('DailyTask_LiveTask_WatchTask')
+          },
+        },
+      },
+      OtherTasks: {
+        groupSign: () => {
+          moduleStatus.value.DailyTasks.OtherTasks.groupSign = ''
+          moduleConfig.value.DailyTasks.OtherTasks.groupSign._lastCompleteTime = 0
+
+          rerunModule('DailyTask_OtherTask_GroupSignTask')
+        },
+        silverToCoin: () => {
+          moduleStatus.value.DailyTasks.OtherTasks.silverToCoin = ''
+          moduleConfig.value.DailyTasks.OtherTasks.silverToCoin._lastCompleteTime = 0
+
+          rerunModule('DailyTask_OtherTask_SilverToCoinTask')
+        },
+        coinToSilver: () => {
+          moduleStatus.value.DailyTasks.OtherTasks.coinToSilver = ''
+          moduleConfig.value.DailyTasks.OtherTasks.coinToSilver._lastCompleteTime = 0
+
+          rerunModule('DailyTask_OtherTask_CoinToSilverTask')
+        },
+        getYearVipPrivilege: () => {
+          moduleStatus.value.DailyTasks.OtherTasks.getYearVipPrivilege = ''
+          moduleConfig.value.DailyTasks.OtherTasks.getYearVipPrivilege._nextReceiveTime = 0
+
+          rerunModule('DailyTask_OtherTask_GetYearVipPrivilegeTask')
+        },
+      },
+    },
+  })
+
+  /**
+   * 运行模块
+   *
+   * @inner
+   * @param module 模块类
+   * @param name 模块名称
+   */
+  function _runModule(module: typeof BaseModule, name: string): Promise<void> | void {
+    const moduleInstance = new module(name)
+    moduleInstances.value[name] = moduleInstance
+
+    if (moduleInstance.isEnabled()) {
+      return moduleInstance.run()
     }
   }
-  return Promise.allSettled<Promise<void>[]>(promiseArray)
-}
 
-/**
- * 运行模块
- *
- * @param module 模块类
- * @param name 模块名称
- */
-function runModule(module: typeof BaseModule, name: string): Promise<void> | void {
-  const moduleInstance = new module(name)
-  if (moduleInstance.isEnabled()) {
-    return moduleInstance.run()
+  /**
+   * 加载默认模块
+   *
+   * @inner
+   */
+  function _loadDefaultModules(): Promise<PromiseSettledResult<void>[]> {
+    const cacheStore = useCacheStore()
+    const promiseArray: Promise<void>[] = []
+    for (const [name, module] of Object.entries(defaultModules)) {
+      if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
+        promiseArray.push(_runModule(module, name)!)
+      }
+    }
+    return Promise.allSettled<Promise<void>[]>(promiseArray)
   }
-}
 
-export const useModuleStore = defineStore('module', () => {
-  // 所有模块的配置信息
-  const moduleConfig: ModuleConfig = reactive(Storage.getModuleConfig())
-  // Emitter 实例，用于模块间信息传递和 wait 函数
-  const emitter = mitt<ModuleEmitterEvents>()
-  // 模块状态，用于显示状态图标
-  const moduleStatus: ModuleStatus = reactive(defaultModuleStatus)
   /**
    * 加载模块
    *
@@ -99,7 +188,7 @@ export const useModuleStore = defineStore('module', () => {
             if (!module.runAfterDefault) {
               // 如果不需要等默认模块运行完了再运行，现在就加载并记录
               // 否则不做记录，等之后（isOnTargetFrame 为 yes 时）再加载
-              waitForMoment(module.runAt).then(() => runModule(module, name))
+              waitForMoment(module.runAt).then(() => _runModule(module, name))
               // 记录被加载的 onFrame 为 all 或 top 的模块名称
               allAndTopFrameModuleNames.push(name)
             }
@@ -111,7 +200,7 @@ export const useModuleStore = defineStore('module', () => {
       const moduleAfterDefault: Record<string, typeof BaseModule> = {}
       // 加载默认模块
       const defaultModulesLoadingResult: Promise<PromiseSettledResult<void>[]> =
-        loadDefaultModules()
+        _loadDefaultModules()
       // 加载其它模块
       for (const [name, module] of Object.entries(otherModules)) {
         // 对 onFrame 为 all 或 top 的模块来说，如果之前运行过，现在就不运行了
@@ -127,7 +216,7 @@ export const useModuleStore = defineStore('module', () => {
               // 记录需要等默认模块运行完后再运行的模块，暂时不运行
               moduleAfterDefault[name] = module
             } else {
-              waitForMoment(module.runAt).then(() => runModule(module, name))
+              waitForMoment(module.runAt).then(() => _runModule(module, name))
             }
           }
         }
@@ -156,9 +245,26 @@ export const useModuleStore = defineStore('module', () => {
         }
         // 一切正常或只有一般错误，运行模块
         for (const [name, module] of Object.entries(moduleAfterDefault)) {
-          waitForMoment(module.runAt).then(() => runModule(module, name))
+          waitForMoment(module.runAt).then(() => _runModule(module, name))
         }
       })
+    }
+  }
+
+  /**
+   * 重新运行模块
+   *
+   * @param moduleName 模块名称
+   * @param args `run()` 方法参数
+   */
+  function rerunModule(moduleName: string, ...args: any[]): Promise<void> | void {
+    const moduleInstance = moduleInstances.value[moduleName]
+
+    if (moduleInstance) {
+      clearTimeout(moduleInstance.nextRunTimer)
+      return moduleInstance.run(...args)
+    } else {
+      throw new ModuleError('ModuleStore', `模块 ${moduleName} 不存在`)
     }
   }
 
@@ -169,6 +275,7 @@ export const useModuleStore = defineStore('module', () => {
       leading: true,
       trailing: true,
     }),
+    { deep: true },
   )
 
   /**
@@ -185,8 +292,14 @@ export const useModuleStore = defineStore('module', () => {
 
   return {
     moduleConfig,
-    emitter,
+    moduleInstances,
+    moduleReset,
     moduleStatus,
     loadModules,
+    rerunModule,
   }
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useModuleStore, import.meta.hot))
+}
