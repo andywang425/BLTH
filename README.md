@@ -15,11 +15,11 @@
 
 点击下方表格中的任一链接即可从你喜欢的源安装脚本：
 
-| Github min（推荐）                                                                                            | Github                                                                                                    | GreasyFork                                                                         |
-| ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [安装](https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.min.user.js) | [安装](https://raw.githubusercontent.com/andywang425/BLTH/master/dist/bilibili-live-tasks-helper.user.js) | [前往安装](https://greasyfork.org/zh-CN/scripts/406048-bilibili-live-tasks-helper) |
+| Github min（推荐）                                                                                          | Github                                                                                                  | GreasyFork                                                                         |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [安装](https://github.com/andywang425/BLTH/releases/latest/download/bilibili-live-tasks-helper.min.user.js) | [安装](https://github.com/andywang425/BLTH/releases/latest/download/bilibili-live-tasks-helper.user.js) | [前往安装](https://greasyfork.org/zh-CN/scripts/406048-bilibili-live-tasks-helper) |
 
-- Github min: Github 源，代码经过压缩，运行效率最高。以后脚本也会从 Github 更新（可能存在网络问题）。
+- Github min: Github 源，代码经过压缩，运行效率最高。以后脚本也会从 Github 更新。
 - Github: 同上，唯一的区别是代码没经过压缩。而且更新后代码会变成压缩的。
 
 如果你是在 GreasyFork 上看到的这份说明，请忽略以上链接，直接点击 GreasyFork 给出的安装按钮即可。
