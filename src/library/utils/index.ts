@@ -28,7 +28,7 @@ function sleep(milliseconds: number): Promise<void> {
  * @param url
  */
 function getFilenameFromUrl(url: string): string {
-  return url.substring(url.lastIndexOf('/') + 1).split('.')[0]
+  return url.substring(url.lastIndexOf('/') + 1).split('.')[0]!
 }
 
 /**

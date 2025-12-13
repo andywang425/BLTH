@@ -14,7 +14,7 @@ class ShareTask extends BaseModule {
   private getAid(): string {
     const biliStore = useBiliStore()
     // 返回第一个视频的 aid
-    return biliStore.dynamicVideos![0].modules.module_dynamic.major.archive.aid
+    return biliStore.dynamicVideos![0]!.modules.module_dynamic.major.archive.aid
   }
 
   private async share(aid: string): Promise<void> {

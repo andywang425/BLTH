@@ -10,7 +10,7 @@ const qualityDescList = ['原画', '蓝光', '超清', '高清']
 
 // 修改画质名称列表后用户配置如果不合法，回退到第一个画质
 if (!qualityDescList.includes(config.switchLiveStreamQuality.qualityDesc)) {
-  config.switchLiveStreamQuality.qualityDesc = qualityDescList[0]
+  config.switchLiveStreamQuality.qualityDesc = qualityDescList[0]!
 }
 </script>
 

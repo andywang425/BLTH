@@ -16,7 +16,7 @@ class WatchTask extends BaseModule {
    * 获取第一个视频的 aid
    */
   private getAid(): number {
-    return Number(useBiliStore().dynamicVideos![0].modules.module_dynamic.major.archive.aid)
+    return Number(useBiliStore().dynamicVideos![0]!.modules.module_dynamic.major.archive.aid)
   }
 
   private async watch(aid: number) {

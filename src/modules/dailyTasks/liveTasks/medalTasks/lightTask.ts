@@ -117,7 +117,7 @@ class LightTask extends MedalModule {
    */
   private async likeTask(medals: LiveData.FansMedalPanel.List[]) {
     for (let i = 0; i < medals.length; i++) {
-      const medal = medals[i]
+      const medal = medals[i]!
       await this.like(medal, _.random(30, 35))
 
       if (i < medals.length - 1) {
@@ -135,16 +135,13 @@ class LightTask extends MedalModule {
     let danmuIndex = 0
 
     for (let i = 0; i < medals.length; i++) {
-      const medal = medals[i]
+      const medal = medals[i]!
       let target = 10
 
       for (let j = 0; j < target; j++) {
-        if (
-          !(await this.sendDanmu(
-            medal,
-            this.config.danmuList[danmuIndex++ % this.config.danmuList.length],
-          ))
-        ) {
+        const danmuText = this.config.danmuList[danmuIndex++ % this.config.danmuList.length]!
+
+        if (!(await this.sendDanmu(medal, danmuText))) {
           // 弹幕发送失败，多尝试一次，每个直播间最多发13条
           target = Math.min(target + 1, 13)
         }

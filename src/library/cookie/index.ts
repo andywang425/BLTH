@@ -10,7 +10,7 @@ class Cookie {
 
     for (const cookie of cookies) {
       const [name, value] = cookie.split('=', 2)
-      result[decodeURIComponent(name)] = decodeURIComponent(value)
+      result[decodeURIComponent(name!)] = decodeURIComponent(value ?? '')
     }
 
     return result

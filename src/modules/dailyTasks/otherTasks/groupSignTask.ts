@@ -67,7 +67,7 @@ class GroupSignTask extends BaseModule {
             continue
           }
 
-          await this.sign(group_id, owner_uid)
+          await this.sign(group_id!, owner_uid!)
           await sleep(2000)
         }
         this.config._lastCompleteTime = tsm()

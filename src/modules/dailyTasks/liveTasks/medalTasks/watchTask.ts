@@ -341,7 +341,7 @@ class WatchTask extends MedalModule {
       } else {
         // 因为连续看 5 分钟（300秒）才能加亲密度，所以上一次观看时最后不足 5 分钟的时间是无效的
         _.forOwn(this.config._watchingProgress, (value, key, object) => {
-          object[key] -= value % 300
+          object[key]! -= value % 300
         })
       }
 
@@ -357,7 +357,7 @@ class WatchTask extends MedalModule {
             break
           }
 
-          const medal = fansMedals[i]
+          const medal = fansMedals[i]!
           const roomid = medal.room_info.room_id
           const uid = medal.medal.target_id
           const [area_id, parent_area_id] = await this.getAreaInfo(medal.room_info.url, roomid)
