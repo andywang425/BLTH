@@ -47,17 +47,22 @@ const throttleButtonOnClick = _.throttle(buttonOnClick, 300)
 const livePlayer = dq('.player-section')
 if (livePlayer) {
   updatePosition()
-   // 查找 normal-row-ctnr 下的 right-section 位置
-  // 节点#player-ctnr在初始html中出现
-  waitForElement(dq('#player-ctnr')!, '.normal-row-ctnr .right-section', 10e3)
-    .then((rightSection) => {
+  // 节点 #player-ctnr 在初始 html 中出现
+  waitForElement(dq('#player-ctnr')!, '.header-info-ctnr .normal-row-ctnr', 10e3)
+    .then((normalRowCtnr) => {
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
       button.setAttribute('class', 'blth-btn')
       button.onclick = throttleButtonOnClick
       button.innerText = uiStore.isShowPanelButtonText
-      // 把按钮作为 right-section 的第一个子元素插入
-      rightSection.prepend(button)
+      // 把按钮插入到 normal-row-ctnr 的第一个子节点后面
+      const firstChild = normalRowCtnr.firstChild
+      if (firstChild) {
+        firstChild.after(button)
+      } else {
+        logger.warn('.normal-row-ctnr 没有子节点', normalRowCtnr)
+        normalRowCtnr.appendChild(button)
+      }
       if (!isSelfTopFrame()) {
         // 在特殊直播间，脚本所在的目标 frame 只占屏幕中间一块地方
         // 如果焦点不在里面，快捷键会失效
