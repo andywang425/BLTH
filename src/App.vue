@@ -47,17 +47,17 @@ const throttleButtonOnClick = _.throttle(buttonOnClick, 300)
 const livePlayer = dq('.player-section')
 if (livePlayer) {
   updatePosition()
-  // 查找任务盒子区域的 task-gather-entry 位置
+   // 查找 normal-row-ctnr 下的 right-section 位置
   // 节点#player-ctnr在初始html中出现
-  waitForElement(dq('#player-ctnr')!, '.task-box .task-gather-entry', 10e3)
-    .then((taskGatherEntry) => {
+  waitForElement(dq('#player-ctnr')!, '.normal-row-ctnr .right-section', 10e3)
+    .then((rightSection) => {
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
       button.setAttribute('class', 'blth-btn')
       button.onclick = throttleButtonOnClick
       button.innerText = uiStore.isShowPanelButtonText
-      // 把按钮作为 task-gather-entry 的兄长元素插入到 task-box 中
-      taskGatherEntry.before(button)
+      // 把按钮作为 right-section 的第一个子元素插入
+      rightSection.prepend(button)
       if (!isSelfTopFrame()) {
         // 在特殊直播间，脚本所在的目标 frame 只占屏幕中间一块地方
         // 如果焦点不在里面，快捷键会失效
