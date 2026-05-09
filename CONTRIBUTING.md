@@ -56,7 +56,7 @@ npm run dev
 ### 分支
 
 - **master**: `master` 分支是发布分支，准备发版时会通过 Pull Request 将 `dev` 合并到 `master`，合并后会触发 GitHub Actions 构建并创建 Release。
-- **dev**: `dev` 分支是开发分支，日常开发请基于 `upstream/dev` 创建分支，发起 PR 时以主仓库的 `dev` 分支为合并目标。
+- **dev**: `dev` 分支是开发分支。日常开发请基于 `upstream/dev` 创建独立的功能分支（不要直接在 fork 的 `master` 上改动），发起 PR 时记得把目标分支设置为 `dev`。
 
 ### 目录结构
 
