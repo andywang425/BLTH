@@ -2,7 +2,7 @@ import { globalIgnores } from 'eslint/config'
 import { includeIgnoreFile } from '@eslint/compat'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import pluginVue from 'eslint-plugin-vue'
-import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
+import skipFormatting from 'eslint-config-prettier/flat'
 import path from 'node:path'
 
 // To allow more languages other than `ts` in `.vue` files, uncomment the following lines:
@@ -15,7 +15,7 @@ const gitignorePath = path.resolve(import.meta.dirname, '.gitignore')
 export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue}'],
+    files: ['**/*.{vue,ts,mts,tsx}'],
   },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
