@@ -85,7 +85,7 @@ BLTH
 
 假设现在B站给主站每日任务新添加了一个任务：给视频点赞。
 
-首先打开 modules 文件夹，你会发现已经有了 dailyTasks/mainSiteTasks 这个文件夹，那么你只需在这个文件夹下新建一个 ts 文件即可。内容大概如下：
+首先打开 `src/modules` 文件夹，你会发现已经有了 `dailyTasks/mainSiteTasks` 这个文件夹，那么你只需在这个文件夹下新建一个 ts 文件即可。内容大概如下：
 
 ```ts
 import BaseModule from '@/modules/BaseModule'
@@ -98,21 +98,21 @@ class LikeTask extends BaseModule {
 export default LikeTask
 ```
 
-可以参考已经写好的模块，尤其是 dailyTasks/mainSiteTasks 中的那几个，注释写得很详细。
+具体写法可以参考已经写好的模块。
 
-你写的这个模块肯定会有相关的配置项（至少得有一个开启/关闭的选项吧），打开 types/storage.d.ts，加上该模块配置信息的类型声明。
+你写的这个模块肯定会有相关的配置项（至少得有一个开启/关闭的选项吧），打开 `src/types/storage.d.ts`，加上该模块配置信息的类型声明。
 
-接着打开 library/storage/defaultValue.ts，加上该模块配置信息的默认值。
+接着打开 `src/library/storage/defaultValue.ts`，加上该模块配置信息的默认值。
 
-点赞涉及到对B站API的请求。在 library/bili-api 中找找看有没有给视频点赞的API，如果没有得自己添加。参考已有的API即可。
+点赞涉及到对B站API的请求。在 `src/library/bili-api` 中找找看有没有给视频点赞的API，如果没有得自己添加。参考已有的API即可。
 
-点赞的视频从哪来？如果仔细阅读代码你会发现 useBiliStore 的 dynamicVideos 里已经存储了许多动态视频，你可以直接用。如果有特殊需求，自己获取视频当然也是可以的。
+点赞的视频从哪来？如果仔细阅读代码你会发现 `src/stores/useBiliStore` 的 `dynamicVideos` 里已经存储了许多动态视频，你可以直接用。如果有特殊需求，自己获取视频当然也是可以的。
 
-完成模块的编写后，在 dailyTasks/mainSiteTasks/index.ts 中添加新模块的导出。
+完成模块的编写后，在 `src/modules/dailyTasks/mainSiteTasks/index.ts` 中添加新模块的导出。
 
-因为脚本已经有了主站任务界面 components/MainSiteTasks.vue，所以你只需要在该组件中加上新功能的 UI 即可。
+因为脚本已经有了主站任务界面 `src/components/MainSiteTasks.vue`，所以你只需要在该组件中加上新功能的 UI 即可。
 
-为了更好的用户体验，建议加上帮助信息（Info组件）、模块状态和模块再运行功能（TaskStatus组件）。参考已有的模块即可。
+为了更好的用户体验，建议加上帮助信息（`Info` 组件）、模块状态和模块再运行功能（`TaskStatus` 组件）。参考已有的模块即可。
 
 ## 代码风格
 
