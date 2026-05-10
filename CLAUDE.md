@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-BLTH（Bilibili Live Tasks Helper）是一个基于 Vue 3 + Vite 的浏览器用户脚本，运行在 Bilibili 直播页面（如 `live.bilibili.com/直播间号`），通过 Tampermonkey/Violentmonkey 实现直播相关每日任务、观看体验优化和页面元素清理。
+BLTH（Bilibili Live Tasks Helper）是一个基于 Vue 3 + Vite 的浏览器用户脚本，运行在 Bilibili 直播页面（如 `live.bilibili.com/直播间号`），通过 Tampermonkey/Violentmonkey 实现自动完成每日任务、观看体验优化和页面元素清理。
 
 ## 常用命令
 
@@ -23,7 +23,7 @@ npm run format       # 使用 Prettier 格式化 src/
 
 ### 模块系统
 
-所有功能以模块形式实现，继承自 [src/modules/BaseModule.ts](src/modules/BaseModule.ts)。由 `useModuleStore` 管理生命周期。
+所有功能以模块形式实现，继承自 `src/modules/BaseModule.ts`。由 `useModuleStore` 管理生命周期。
 
 模块分类：
 
@@ -32,7 +32,7 @@ npm run format       # 使用 Prettier 格式化 src/
 - `enhanceExperience/` — 体验优化
 - `removeElement/` — 移除页面元素
 
-模块通常通过各级 `index.ts` 桶文件导出；其中 `src/modules/index.ts` 只导出非默认模块。
+模块通过各级 `index.ts` 桶文件导出；其中 `src/modules/index.ts` 只导出非默认模块。
 
 ### 新增模块流程
 
@@ -55,11 +55,11 @@ npm run format       # 使用 Prettier 格式化 src/
 
 ### 存储
 
-通过 `GM_getValue`/`GM_setValue` 持久化 `ui`、`modules` 和 `cache` 数据（[src/library/storage/](src/library/storage/)）。
+通过 `GM_getValue`/`GM_setValue` 持久化 `ui`、`modules` 和 `cache` 数据（`src/library/storage/`）。
 
 ### 构建
 
-[vite.config.ts](vite.config.ts) 使用 `vite-plugin-monkey` 生成 `.user.js` 用户脚本。外部依赖通过 CDN `@require` 引入而非打包。新增第三方库必须加到 `vite.config.ts` 的 `externalGlobals` 或 `externalResource` 中。
+`vite.config.ts` 使用 `vite-plugin-monkey` 生成 `.user.js` 用户脚本。外部依赖通过 CDN `@require` 引入而非打包。新增第三方库必须加到 `vite.config.ts` 的 `externalGlobals` 或 `externalResource` 中。
 
 ### 路径别名
 
