@@ -63,9 +63,7 @@ npm run dev
 ```
 BLTH
 ├─.vscode
-├─dist                     仅存在于master分支，存放Github Actions编译得到的用户脚本
-├─node_modules
-├─notes                    用来记录些东西，提交时会被忽略
+├─dist                     npm run build 得到的用户脚本
 ├─scripts                  一些npm scripts，通过 npm run ... 调用
 └─src
     ├─assets               资源文件
