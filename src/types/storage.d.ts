@@ -93,16 +93,10 @@ interface ModuleConfig {
     removeComboCard: {
       enabled: boolean
     }
-    removeRank: {
-      enabled: boolean
-    }
     removeHeaderStuff: {
       enabled: boolean
     }
     removeFlipView: {
-      enabled: boolean
-    }
-    removeRecommendRoom: {
       enabled: boolean
     }
     removeLiveMosaic: {

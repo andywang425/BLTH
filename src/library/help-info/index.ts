@@ -259,10 +259,6 @@ const helpInfo: HelpInfo = {
       title: '移除直播间相同弹幕连续提示',
       message: '移除直播间相同弹幕连续提示。',
     },
-    removeRank: {
-      title: '移除排行榜',
-      message: '移除直播画面上方的人气榜/航海榜，赠送人气票的入口也在这里。',
-    },
     removeHeaderStuff: {
       title: '移除直播画面上方杂项',
       message: '移除直播画面上方各种杂七杂八的东西，比如排行榜、活动轮播图等。',
@@ -270,10 +266,6 @@ const helpInfo: HelpInfo = {
     removeFlipView: {
       title: '移除礼物栏下方广告',
       message: '移除礼物栏下方广告。',
-    },
-    removeRecommendRoom: {
-      title: '移除礼物栏下方推荐直播间',
-      message: '移除礼物栏下方推荐直播间。',
     },
     removeLiveMosaic: {
       title: '移除直播间马赛克',

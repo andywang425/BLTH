@@ -41,10 +41,8 @@ interface HelpInfo {
     removeGiftPopover: HelpInfoItem
     removeMicPopover: HelpInfoItem
     removeComboCard: HelpInfoItem
-    removeRank: HelpInfoItem
     removeHeaderStuff: HelpInfoItem
     removeFlipView: HelpInfoItem
-    removeRecommendRoom: HelpInfoItem
     removeLiveMosaic: HelpInfoItem
   }
 }
