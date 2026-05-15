@@ -47,9 +47,9 @@ const throttleButtonOnClick = _.throttle(buttonOnClick, 300)
 const livePlayer = dq('.player-section')
 if (livePlayer) {
   updatePosition()
-   // 查找 normal-row-ctnr 下的 right-section 位置
+  // 查找 head-info-vm 下 rows-ctnr rows-content 下的 right-section 位置
   // 节点#player-ctnr在初始html中出现
-  waitForElement(dq('#player-ctnr')!, '.normal-row-ctnr .right-section', 10e3)
+  waitForElement(dq('#player-ctnr')!, '#head-info-vm .rows-ctnr.rows-content .right-section', 10e3)
     .then((rightSection) => {
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
@@ -71,6 +71,10 @@ if (livePlayer) {
         )
       }
       hotkeys('alt+b', throttleButtonOnClick)
+      // 准备完毕，显示控制面板（在 DOM 元素准备好之后）
+      if (isShowPanel) {
+        uiStore.uiConfig.isShowPanel = true
+      }
     })
     .catch((e: Error) => logger.error(e))
   // 监听页面缩放，调整控制面板大小
@@ -81,11 +85,6 @@ if (livePlayer) {
   const observer = new MutationObserver(() => updatePosition())
   observer.observe(document.body, { attributes: true })
   observer.observe(document.documentElement, { attributes: true })
-
-  // 准备完毕，显示控制面板
-  if (isShowPanel) {
-    uiStore.uiConfig.isShowPanel = true
-  }
 } else {
   logger.error('livePlayer not found')
 }
