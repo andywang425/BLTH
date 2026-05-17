@@ -8,6 +8,13 @@ declare namespace Live {
     data: LiveData.FansMedalPanel.Data
   }
 
+  interface GetActivatedMedalInfo {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.GetActivatedMedalInfo.Data
+  }
+
   interface SendMsg {
     code: number
     data: LiveData.SendMsg.Data

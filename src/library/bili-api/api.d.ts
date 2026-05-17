@@ -12,6 +12,10 @@ interface Requests {
 interface BapiMethods {
   live: {
     fansMedalPanel: (page: number, page_size?: number) => Promise<Live.FansMedalPanel>
+    getActivatedMedalInfo: (
+      target_id: number,
+      web_location?: string,
+    ) => Promise<Live.GetActivatedMedalInfo>
     sendMsg: (
       msg: string,
       room_id: number,

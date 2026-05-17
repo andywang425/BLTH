@@ -102,6 +102,48 @@ declare namespace LiveData {
     }
   }
 
+  namespace GetActivatedMedalInfo {
+    interface Data {
+      face: string
+      name: string
+      medal_name: string
+      fans_medal_count: number
+      level: number
+      is_lighted: boolean
+      intimacy: number
+      next_intimacy: number
+      task_light_days: number
+      task_info: TaskInfo[]
+      fans_club_gift_info: FansClubGiftInfo
+      medal_color_border: string
+      medal_color: string
+      medal_color_text: string
+      medal_color_level: string
+      guard_level: number
+      light_source: number
+      free_intimacy: number
+      reach_free_intimacy_limit: boolean
+    }
+
+    interface TaskInfo {
+      icon: string
+      title: string
+      sub_title: string
+      add_text: string
+      jump_type: string
+      is_done: boolean
+      icon_guard: string
+      icon_admiral: string
+      icon_captain: string
+    }
+
+    interface FansClubGiftInfo {
+      gift_id: number
+      price: number
+      gift_discount_info: any
+    }
+  }
+
   namespace SendMsg {
     interface Data {
       mode_info: ModeInfo

@@ -22,6 +22,14 @@ const BAPI: BapiMethods = {
         page_size,
       })
     },
+    getActivatedMedalInfo: (target_id, web_location = '444.260') => {
+      const bili_jct = useBiliStore().cookies!.bili_jct
+      return request.live.get('/xlive/app-ucenter/v1/fansMedal/GetActivatedMedalInfo', {
+        csrf: bili_jct,
+        target_id, // 主播 uid
+        web_location,
+      })
+    },
     sendMsg: (
       msg,
       roomid,
