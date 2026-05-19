@@ -2,6 +2,11 @@ import type { LiveData } from '@/library/bili-api/data'
 
 type LiveStatus = 'on' | 'off'
 
+interface MedalTaskSharedConfig {
+  isWhiteList: boolean
+  roomidList: number[]
+}
+
 interface PublicMedalFilters {
   whiteBlackList: (medal: LiveData.FansMedalPanel.List) => boolean
   levelLt120: (medal: LiveData.FansMedalPanel.List) => boolean
@@ -14,4 +19,4 @@ interface LightTaskMedalFilters {
 
 type MedalsByLivingStatus = Record<LiveStatus, LiveData.FansMedalPanel.List[]>
 
-export { PublicMedalFilters, LightTaskMedalFilters, MedalsByLivingStatus }
+export { MedalTaskSharedConfig, PublicMedalFilters, LightTaskMedalFilters, MedalsByLivingStatus }

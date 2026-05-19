@@ -11,6 +11,10 @@ import type { LiveData } from '@/library/bili-api/data'
 class LightTask extends MedalModule {
   config = this.medalTasksConfig.light
 
+  protected get taskConfig() {
+    return this.config
+  }
+
   set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.light = s
   }
@@ -44,7 +48,7 @@ class LightTask extends MedalModule {
       result[livingStatus].push(medal)
     })
 
-    if (this.medalTasksConfig.isWhiteList) {
+    if (this.taskConfig.isWhiteList) {
       // 白名单排序
       this.sortMedals(result.on)
       this.sortMedals(result.off)
@@ -118,7 +122,11 @@ class LightTask extends MedalModule {
   private async likeTask(medals: LiveData.FansMedalPanel.List[]) {
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
-      await this.like(medal, _.random(30, 35))
+      const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
+      const item = MedalModule.findTaskInfo(taskInfo, 'like')
+      // 从 title 解析点亮所需点赞次数（如 "点赞30次" → 30），失败时 fallback 到 30
+      const baseCount = MedalModule.parseTitleCount(item?.title) ?? 30
+      await this.like(medal, _.random(baseCount, baseCount + 5))
 
       if (i < medals.length - 1) {
         await sleep(_.random(30000, 35000))
@@ -136,14 +144,18 @@ class LightTask extends MedalModule {
 
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
-      let target = 10
+      const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
+      const item = MedalModule.findTaskInfo(taskInfo, 'sendDanmu')
+      // 从 title 解析点亮所需弹幕条数（如 "发弹幕10次" → 10），失败时 fallback 到 10
+      const baseTarget = MedalModule.parseTitleCount(item?.title) ?? 10
+      let target = baseTarget
+      const maxTarget = baseTarget + 3 // 失败补偿，最多多发 3 条
 
       for (let j = 0; j < target; j++) {
         const danmuText = this.config.danmuList[danmuIndex++ % this.config.danmuList.length]
 
         if (!(await this.sendDanmu(medal, danmuText))) {
-          // 弹幕发送失败，多尝试一次，每个直播间最多发13条
-          target = Math.min(target + 1, 13)
+          target = Math.min(target + 1, maxTarget)
         }
 
         if (i < medals.length - 1 || j < target - 1) {
@@ -164,6 +176,7 @@ class LightTask extends MedalModule {
       }
 
       this.status = 'running'
+      this.resetTaskInfoCache()
       const fansMedals = this.getMedals()
 
       await Promise.allSettled([this.likeTask(fansMedals.on), this.sendDanmuTask(fansMedals.off)])

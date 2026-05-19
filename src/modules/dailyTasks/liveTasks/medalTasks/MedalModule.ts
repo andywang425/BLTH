@@ -2,25 +2,37 @@ import BaseModule from '@/modules/BaseModule'
 import { storeToRefs } from 'pinia'
 import { useBiliStore, useModuleStore } from '@/stores'
 import { watch } from 'vue'
-import type { PublicMedalFilters } from './types'
-import { arrayToMap } from '@/library/utils'
+import type { MedalTaskSharedConfig, PublicMedalFilters } from './types'
+import { arrayToMap, sleep } from '@/library/utils'
 import type { LiveData } from '@/library/bili-api/data'
+import BAPI from '@/library/bili-api'
+import { isTimestampToday } from '@/library/luxon'
+import _ from 'lodash'
+
+type JumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
 
 class MedalModule extends BaseModule {
   medalTasksConfig = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
 
+  /**
+   * 子类需要重写此 getter，返回该任务对应的 `isWhiteList` 与 `roomidList`
+   */
+  protected get taskConfig(): MedalTaskSharedConfig {
+    throw new Error('Method not implemented.')
+  }
+
   protected PUBLIC_MEDAL_FILTERS: PublicMedalFilters = {
     // 包含在白名单中或不包含在黑名单中返回true，否则返回false
     whiteBlackList: (m) =>
-      this.medalTasksConfig.isWhiteList
-        ? this.medalTasksConfig.roomidList.includes(m.room_info.room_id)
-        : !this.medalTasksConfig.roomidList.includes(m.room_info.room_id),
+      this.taskConfig.isWhiteList
+        ? this.taskConfig.roomidList.includes(m.room_info.room_id)
+        : !this.taskConfig.roomidList.includes(m.room_info.room_id),
     // 等级小于120返回true，否则返回false
     levelLt120: (medal) => medal.medal.level < 120,
   }
 
   protected sortMedals(medals: LiveData.FansMedalPanel.List[]): LiveData.FansMedalPanel.List[] {
-    const orderMap = arrayToMap(this.medalTasksConfig.roomidList)
+    const orderMap = arrayToMap(this.taskConfig.roomidList)
     return medals.sort(
       (a, b) => orderMap.get(a.room_info.room_id)! - orderMap.get(b.room_info.room_id)!,
     )
@@ -47,6 +59,120 @@ class MedalModule extends BaseModule {
           }
         })
       }
+    })
+  }
+
+  /**
+   * 解析每日任务进度文案 "每日上限 X/Y"
+   *
+   * @param sub_title API 返回的 sub_title
+   * @returns 解析成功返回 `{ current, limit }`，否则返回 `null`
+   */
+  protected static parseDailyLimit(
+    sub_title: string | undefined,
+  ): { current: number; limit: number } | null {
+    if (!sub_title) return null
+    const match = sub_title.match(/(\d+)\s*\/\s*(\d+)/)
+    if (!match) return null
+    return { current: Number(match[1]), limit: Number(match[2]) }
+  }
+
+  /**
+   * 按 jump_type 在 task_info 中查找任务项
+   */
+  protected static findTaskInfo(
+    task_info: LiveData.GetActivatedMedalInfo.TaskInfo[] | null | undefined,
+    jump_type: JumpType,
+  ): LiveData.GetActivatedMedalInfo.TaskInfo | undefined {
+    return task_info?.find((t) => t.jump_type === jump_type)
+  }
+
+  /**
+   * 从任务 title 中解析数字（如 "点赞30次" → 30，"发弹幕10次" → 10）
+   *
+   * @returns 解析成功返回数字，否则返回 null
+   */
+  protected static parseTitleCount(title: string | undefined): number | null {
+    if (!title) return null
+    const match = title.match(/\d+/)
+    if (!match) return null
+    return Number(match[0])
+  }
+
+  /** 任务内缓存：target_id -> task_info（缓存 Promise 避免并发重复请求） */
+  private taskInfoCache = new Map<
+    number,
+    Promise<LiveData.GetActivatedMedalInfo.TaskInfo[] | null>
+  >()
+
+  /** 在 `run()` 入口调用以清空缓存 */
+  protected resetTaskInfoCache(): void {
+    this.taskInfoCache.clear()
+  }
+
+  /**
+   * 获取指定粉丝勋章的 task_info。调用前会先 `sleep` 一段时间避免风控。
+   *
+   * 同一 target_id 的并发请求会共享同一个 Promise。
+   *
+   * @param target_id 主播 uid
+   * @returns 成功返回 task_info 数组，失败返回 null
+   */
+  protected fetchTaskInfo(
+    target_id: number,
+  ): Promise<LiveData.GetActivatedMedalInfo.TaskInfo[] | null> {
+    const cached = this.taskInfoCache.get(target_id)
+    if (cached) return cached
+
+    const promise = (async () => {
+      await sleep(_.random(300, 500))
+      try {
+        const response = await BAPI.live.getActivatedMedalInfo(target_id)
+        this.logger.log(`BAPI.live.getActivatedMedalInfo(${target_id}) response`, response)
+        if (response.code === 0) {
+          return response.data.task_info
+        } else {
+          this.logger.error(`BAPI.live.getActivatedMedalInfo(${target_id}) 失败`, response.message)
+          return null
+        }
+      } catch (error) {
+        this.logger.error(`BAPI.live.getActivatedMedalInfo(${target_id}) 出错`, error)
+        return null
+      }
+    })()
+
+    this.taskInfoCache.set(target_id, promise)
+    return promise
+  }
+
+  /**
+   * 若点亮熄灭勋章任务已启用且今天未完成，等待其结束后再继续。
+   *
+   * 用于让 like/danmu/watch 在 light 任务完成后再执行，避免与点亮逻辑产生竞争。
+   */
+  protected async waitForLightTask(): Promise<void> {
+    const lightConfig = this.medalTasksConfig.light
+    if (!lightConfig.enabled) return
+    if (isTimestampToday(lightConfig._lastCompleteTime)) return
+
+    const moduleStore = useModuleStore()
+    const currentStatus = moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.light
+    if (currentStatus === 'done' || currentStatus === 'error') return
+
+    this.logger.log('等待点亮熄灭勋章任务完成后再执行')
+
+    return new Promise<void>((resolve) => {
+      const stopWatch = watch(
+        () => moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.light,
+        (newStatus) => {
+          if (newStatus === 'done' || newStatus === 'error') {
+            stopWatch()
+            // 重新获取粉丝勋章（主要是为了获取最新的点亮状态、是否正在直播状态）
+            moduleStore.rerunModule('Default_FansMedals')
+            resolve()
+          }
+        },
+      )
     })
   }
 }

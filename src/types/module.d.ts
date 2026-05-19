@@ -20,6 +20,8 @@ interface ModulesNeedStatus<T> {
     LiveTasks: {
       medalTasks: {
         light: T
+        like: T
+        danmu: T
         watch: T
       }
     }

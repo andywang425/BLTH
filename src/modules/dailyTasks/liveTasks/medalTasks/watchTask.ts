@@ -4,7 +4,7 @@ import { useBiliStore, useModuleStore, usePlayerStore } from '@/stores'
 import Logger from '@/library/logger'
 import CryptoJS from 'crypto-js'
 import { sleep, uuid } from '@/library/utils'
-import type { ModuleConfig, ModuleStatusTypes, RunAtMoment } from '@/types'
+import type { ModuleStatusTypes, RunAtMoment } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
@@ -26,19 +26,17 @@ class RoomHeart {
     parentID: number,
     ruid: number,
     watchedSeconds: number,
+    targetSeconds: number,
   ) {
     this.roomID = roomID
     this.areaID = areaID
     this.parentID = parentID
     this.ruid = ruid
     this.watchedSeconds = watchedSeconds
-
-    this.config = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks.watch
+    this.targetSeconds = targetSeconds
   }
 
   private logger = new Logger('RoomHeart')
-
-  private config: ModuleConfig['DailyTasks']['LiveTasks']['medalTasks']['watch']
 
   set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
@@ -46,6 +44,9 @@ class RoomHeart {
 
   /** 今日当前直播间已观看时间（秒） */
   private watchedSeconds: number
+
+  /** 当前直播间观看目标秒数 */
+  private readonly targetSeconds: number
 
   private readonly areaID: number
   private readonly parentID: number
@@ -166,8 +167,8 @@ class RoomHeart {
       if (response.code === 0) {
         this.seq += 1
         this.updateProgress()
-        if (this.watchedSeconds >= this.config.time * 60) {
-          // 达到设置的观看时间，结束
+        if (this.watchedSeconds >= this.targetSeconds) {
+          // 达到目标观看时间，结束
           return
         }
         ;({
@@ -249,6 +250,10 @@ class WatchTask extends MedalModule {
 
   config = this.medalTasksConfig.watch
 
+  protected get taskConfig() {
+    return this.config
+  }
+
   set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
@@ -256,8 +261,8 @@ class WatchTask extends MedalModule {
   private playerStore = usePlayerStore()
 
   /**
-   * 获取粉丝勋章
-   * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
+   * 获取已点亮的粉丝勋章
+   * @returns 经过排序和过滤的粉丝勋章
    */
   private getMedals(): LiveData.FansMedalPanel.List[] {
     const fansMedals = useBiliStore().filteredFansMedals
@@ -265,10 +270,11 @@ class WatchTask extends MedalModule {
     const result = fansMedals.filter(
       (medal) =>
         this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) &&
-        this.PUBLIC_MEDAL_FILTERS.levelLt120(medal),
+        this.PUBLIC_MEDAL_FILTERS.levelLt120(medal) &&
+        medal.medal.is_lighted === 1,
     )
 
-    if (this.medalTasksConfig.isWhiteList) {
+    if (this.taskConfig.isWhiteList) {
       this.sortMedals(result)
     }
 
@@ -327,6 +333,8 @@ class WatchTask extends MedalModule {
     })
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
+      await this.waitForLightTask()
+
       if (!(await this.waitForFansMedals())) {
         this.logger.error('粉丝勋章数据不存在，不执行观看直播任务')
         this.status = 'error'
@@ -334,6 +342,7 @@ class WatchTask extends MedalModule {
       }
 
       this.status = 'running'
+      this.resetTaskInfoCache()
 
       if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
         // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0
@@ -360,27 +369,43 @@ class WatchTask extends MedalModule {
           const medal = fansMedals[i]
           const roomid = medal.room_info.room_id
           const uid = medal.medal.target_id
+
+          const taskInfo = await this.fetchTaskInfo(uid)
+          if (!taskInfo) continue
+
+          const item = MedalModule.findTaskInfo(taskInfo, 'watchLive')
+          if (!item) continue
+
+          const parsed = MedalModule.parseDailyLimit(item.sub_title)
+          if (!parsed) continue
+          if (item.is_done || parsed.current >= parsed.limit) continue
+
+          const minutes = MedalModule.parseTitleCount(item.title) ?? 15
+
+          // 目标秒数 = 每日上限 × minutes 分钟 + 60s 缓冲（补偿心跳计时误差）
+          const targetSeconds = parsed.limit * minutes * 60 + 60
+
+          if ((this.config._watchingProgress[roomid] ?? 0) >= targetSeconds) {
+            // 今日观看时间已达到目标值，跳过
+            continue
+          }
+
           const [area_id, parent_area_id] = await this.getAreaInfo(medal.room_info.url, roomid)
 
           if (area_id > 0 && parent_area_id > 0) {
             // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
-            if (
-              !this.config._watchingProgress[roomid] ||
-              this.config._watchingProgress[roomid] < this.config.time * 60
-            ) {
-              // 今日观看时间未达到设置值，开始心跳
-              this.logger.log(
-                `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务`,
-              )
+            this.logger.log(
+              `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds} 秒`,
+            )
 
-              await new RoomHeart(
-                roomid,
-                area_id,
-                parent_area_id,
-                uid,
-                this.config._watchingProgress[roomid] ?? 0,
-              ).start()
-            }
+            await new RoomHeart(
+              roomid,
+              area_id,
+              parent_area_id,
+              uid,
+              this.config._watchingProgress[roomid] ?? 0,
+              targetSeconds,
+            ).start()
           }
         }
 
