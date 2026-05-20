@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useModuleStore, useBiliStore, useUIStore } from '@/stores'
-import { Edit, Delete } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox, ElTable } from 'element-plus'
+import { Edit, Delete, SemiSelect } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox, ElTable, type TableInstance } from 'element-plus'
 import helpInfo from '@/library/help-info'
 import { VueDraggable } from 'vue-draggable-plus'
 import { arrayToMap } from '@/library/utils'
@@ -20,8 +20,8 @@ type DanmuTaskKey = 'light' | 'danmu'
 
 const TASK_LABELS: Record<MedalTaskKey, string> = {
   light: '点亮熄灭勋章',
-  like: '粉丝团点赞',
-  danmu: '粉丝团发弹幕',
+  like: '点赞',
+  danmu: '发弹幕',
   watch: '观看直播',
 }
 
@@ -36,12 +36,11 @@ const config = moduleStore.moduleConfig.DailyTasks.LiveTasks
 const status = moduleStore.moduleStatus.DailyTasks.LiveTasks
 const reset = moduleStore.moduleReset.DailyTasks.LiveTasks
 
-// ─── 编辑弹幕 ─────────────────────────────────────────────
+// ───── 编辑弹幕 ─────
 const medalDanmuPanelVisible = ref<boolean>(false)
 const currentEditingDanmuTask = ref<DanmuTaskKey>('light')
-const currentDanmuList = computed(() => config.medalTasks[currentEditingDanmuTask.value].danmuList)
 const danmuTableData = computed(() =>
-  currentDanmuList.value.map((danmu) => {
+  config.medalTasks[currentEditingDanmuTask.value].danmuList.map((danmu) => {
     return { content: danmu }
   }),
 )
@@ -92,11 +91,19 @@ const handleAddDanmu = () => {
     .catch(() => {})
 }
 
-// ─── 编辑名单 ─────────────────────────────────────────────
+// ───── 编辑名单 ─────
 const medalInfoPanelVisible = ref<boolean>(false)
 const currentEditingTask = ref<MedalTaskKey>('light')
 const currentTaskConfig = computed(() => config.medalTasks[currentEditingTask.value])
 const currentTaskLabel = computed(() => TASK_LABELS[currentEditingTask.value])
+const currentTaskIsSortMode = computed({
+  get() {
+    return uiStore.uiConfig.medalInfoPanelIsSortMode[currentEditingTask.value]
+  },
+  set(newValue: boolean) {
+    uiStore.uiConfig.medalInfoPanelIsSortMode[currentEditingTask.value] = newValue
+  },
+})
 
 const medalInfoTableData = computed({
   get() {
@@ -107,7 +114,7 @@ const medalInfoTableData = computed({
       medal_level: medal.medal.level,
       roomid: medal.room_info.room_id,
     }))
-    if (uiStore.uiConfig.medalInfoPanelSortMode) {
+    if (currentTaskIsSortMode.value) {
       const taskConf = currentTaskConfig.value
       const filteredMedals = medals.filter((medal) =>
         taskConf.isWhiteList
@@ -125,21 +132,13 @@ const medalInfoTableData = computed({
 })
 /** 是否显示加载中图标 */
 const medalInfoLoading = ref<boolean>(false)
-/** 记录已初始化过多选框的任务，避免重复初始化 */
-const editListInitialized = new Set<MedalTaskKey>()
 /**
  * 编辑名单
  */
 const handleEditList = async (key: MedalTaskKey) => {
-  // 切换编辑目标时，关闭排序模式（排序模式仅在白名单下有意义）
-  if (currentEditingTask.value !== key) {
-    uiStore.uiConfig.medalInfoPanelSortMode = false
-  }
   currentEditingTask.value = key
   medalInfoPanelVisible.value = true
-
   await nextTick()
-
   // 如果没有粉丝勋章信息，先获取
   if (!biliStore.fansMedals) {
     medalInfoLoading.value = true
@@ -148,7 +147,6 @@ const handleEditList = async (key: MedalTaskKey) => {
       (newData) => {
         nextTick(() => {
           refreshSelection(newData)
-          editListInitialized.add(key)
           medalInfoLoading.value = false
         })
       },
@@ -159,15 +157,16 @@ const handleEditList = async (key: MedalTaskKey) => {
     }
   } else {
     refreshSelection(medalInfoTableData.value)
-    editListInitialized.add(key)
   }
 }
 /** 用来管理多选框状态的表格Ref */
-const medalInfoTableRef = ref<InstanceType<typeof ElTable>>()
+const medalInfoTableRef = ref<TableInstance>()
 
 /** 根据当前任务的 roomidList 刷新多选框选择状态 */
 const refreshSelection = (rows?: MedalInfoRow[]) => {
-  if (!rows || uiStore.uiConfig.medalInfoPanelSortMode) return
+  // 排序模式下不更新多选框选择状态
+  if (!rows || currentTaskIsSortMode.value) return
+
   medalInfoTableRef.value?.clearSelection()
   const taskConf = currentTaskConfig.value
   taskConf.roomidList.forEach((roomid, index) => {
@@ -188,11 +187,11 @@ function handleSelect(selection: MedalInfoRow[]) {
 
 function handleRowClick(row: MedalInfoRow) {
   // 排序模式下不切换选择状态
-  if (!uiStore.uiConfig.medalInfoPanelSortMode) {
-    medalInfoTableRef.value?.toggleRowSelection(row)
-    const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows() ?? []
-    currentTaskConfig.value.roomidList = selection.map((row) => row.roomid)
-  }
+  if (currentTaskIsSortMode.value) return
+
+  medalInfoTableRef.value?.toggleRowSelection(row)
+  const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows() ?? []
+  currentTaskConfig.value.roomidList = selection.map((row) => row.roomid)
 }
 </script>
 
@@ -215,20 +214,21 @@ function handleRowClick(row: MedalInfoRow) {
           v-model="config.medalTasks.light.isWhiteList"
           active-text="白名单"
           inactive-text="黑名单"
-          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelSortMode = false)"
+          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelIsSortMode.light = false)"
         />
         <el-button type="primary" size="small" :icon="Edit" @click="handleEditList('light')"
           >编辑名单
         </el-button>
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.list" />
       </el-space>
     </el-row>
 
     <el-divider />
 
-    <!-- 粉丝团点赞 -->
+    <!-- 点赞 -->
     <el-row>
       <el-space wrap :size="[8, 0]">
-        <el-switch v-model="config.medalTasks.like.enabled" active-text="粉丝团点赞" />
+        <el-switch v-model="config.medalTasks.like.enabled" active-text="点赞" />
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.like" />
         <TaskStatus :status="status.medalTasks.like" @click="reset.medalTasks.like" />
       </el-space>
@@ -239,24 +239,21 @@ function handleRowClick(row: MedalInfoRow) {
           v-model="config.medalTasks.like.isWhiteList"
           active-text="白名单"
           inactive-text="黑名单"
-          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelSortMode = false)"
+          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelIsSortMode.like = false)"
         />
         <el-button type="primary" size="small" :icon="Edit" @click="handleEditList('like')"
           >编辑名单
         </el-button>
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.list" />
       </el-space>
     </el-row>
 
     <el-divider />
 
-    <!-- 粉丝团发弹幕 -->
+    <!-- 发弹幕 -->
     <el-row>
       <el-space wrap :size="[8, 0]">
-        <el-switch v-model="config.medalTasks.danmu.enabled" active-text="粉丝团发弹幕" />
-        <el-switch
-          v-model="config.medalTasks.danmu.onlyWhenNotLiving"
-          active-text="仅在未开播的直播间发弹幕"
-        />
+        <el-switch v-model="config.medalTasks.danmu.enabled" active-text="发弹幕" />
         <el-button type="primary" size="small" :icon="Edit" @click="handleOpenDanmuPanel('danmu')"
           >编辑弹幕
         </el-button>
@@ -266,15 +263,25 @@ function handleRowClick(row: MedalInfoRow) {
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
+        <el-icon><SemiSelect /></el-icon>
+        <el-switch
+          v-model="config.medalTasks.danmu.onlyWhenNotLiving"
+          active-text="仅在未开播的直播间发弹幕"
+        />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap :size="[8, 0]">
         <el-switch
           v-model="config.medalTasks.danmu.isWhiteList"
           active-text="白名单"
           inactive-text="黑名单"
-          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelSortMode = false)"
+          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelIsSortMode.danmu = false)"
         />
         <el-button type="primary" size="small" :icon="Edit" @click="handleEditList('danmu')"
           >编辑名单
         </el-button>
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.list" />
       </el-space>
     </el-row>
 
@@ -294,7 +301,7 @@ function handleRowClick(row: MedalInfoRow) {
           v-model="config.medalTasks.watch.isWhiteList"
           active-text="白名单"
           inactive-text="黑名单"
-          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelSortMode = false)"
+          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelIsSortMode.watch = false)"
         />
         <el-button type="primary" size="small" :icon="Edit" @click="handleEditList('watch')"
           >编辑名单
@@ -354,7 +361,7 @@ function handleRowClick(row: MedalInfoRow) {
       <VueDraggable
         v-model="medalInfoTableData"
         target="#draggable-fans-medal-table table tbody"
-        :disabled="!uiStore.uiConfig.medalInfoPanelSortMode"
+        :disabled="!currentTaskIsSortMode"
         :animation="150"
         :scroll-sensitivity="36"
         :scroll-speed="8"
@@ -371,7 +378,7 @@ function handleRowClick(row: MedalInfoRow) {
           @select-all="handleSelect"
           @row-click="handleRowClick"
         >
-          <template v-if="!uiStore.uiConfig.medalInfoPanelSortMode">
+          <template v-if="!currentTaskIsSortMode">
             <el-table-column type="selection" align="center" width="80" />
           </template>
           <template v-else>
@@ -418,7 +425,7 @@ function handleRowClick(row: MedalInfoRow) {
       </VueDraggable>
       <template #footer>
         <el-switch
-          v-model="uiStore.uiConfig.medalInfoPanelSortMode"
+          v-model="currentTaskIsSortMode"
           :disabled="!currentTaskConfig.isWhiteList"
           inactive-text="常规模式"
           active-text="排序模式"

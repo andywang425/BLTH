@@ -52,23 +52,23 @@ class LikeTask extends MedalModule {
       const response = await BAPI.live.likeReport(room_id, target_id, click_time)
       this.logger.log(`BAPI.live.likeReport(${room_id}, ${target_id}, ${click_time})`, response)
       if (response.code === 0) {
-        this.logger.log(`粉丝团点赞 ${logMessage} 成功`)
+        this.logger.log(`点赞 ${logMessage} 成功`)
       } else {
-        this.logger.error(`粉丝团点赞 ${logMessage} 失败`, response.message)
+        this.logger.error(`点赞 ${logMessage} 失败`, response.message)
       }
     } catch (error) {
-      this.logger.error(`粉丝团点赞 ${logMessage} 出错`, error)
+      this.logger.error(`点赞 ${logMessage} 出错`, error)
     }
   }
 
   public async run(): Promise<void> {
-    this.logger.log('粉丝团点赞模块开始运行')
+    this.logger.log('点赞模块开始运行')
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
       await this.waitForLightTask()
 
       if (!(await this.waitForFansMedals())) {
-        this.logger.error('粉丝勋章数据不存在，不执行粉丝团点赞任务')
+        this.logger.error('粉丝勋章数据不存在，不执行点赞任务')
         this.status = 'error'
         return
       }
@@ -80,7 +80,7 @@ class LikeTask extends MedalModule {
 
       outer: for (let i = 0; i < fansMedals.length; i++) {
         if (isNowIn(23, 55, 0, 5)) {
-          this.logger.log('即将或刚刚发生跨天，提早结束本轮粉丝团点赞任务')
+          this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
           allCompleted = false
           break
         }
@@ -100,7 +100,7 @@ class LikeTask extends MedalModule {
         const remaining = parsed.limit - parsed.current
         for (let j = 0; j < remaining; j++) {
           if (isNowIn(23, 55, 0, 5)) {
-            this.logger.log('即将或刚刚发生跨天，提早结束本轮粉丝团点赞任务')
+            this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
             allCompleted = false
             break outer
           }
@@ -116,22 +116,22 @@ class LikeTask extends MedalModule {
       if (allCompleted) {
         this.config._lastCompleteTime = tsm()
         this.status = 'done'
-        this.logger.log('粉丝团点赞任务已完成')
+        this.logger.log('点赞任务已完成')
       } else {
         this.status = ''
       }
     } else {
       if (isNowIn(0, 0, 0, 5)) {
-        this.logger.log('昨天的粉丝团点赞任务已经完成过了，等到今天的00:05再执行')
+        this.logger.log('昨天的点赞任务已经完成过了，等到今天的00:05再执行')
       } else {
-        this.logger.log('今天已经完成过粉丝团点赞任务了')
+        this.logger.log('今天已经完成过点赞任务了')
         this.status = 'done'
       }
     }
 
     const diff = delayToNextMoment()
     this.nextRunTimer = setTimeout(() => this.run(), diff.ms)
-    this.logger.log('距离粉丝团点赞模块下次运行时间:', diff.str)
+    this.logger.log('距离点赞模块下次运行时间:', diff.str)
   }
 }
 

@@ -54,29 +54,29 @@ class DanmuTask extends MedalModule {
       this.logger.log(`BAPI.live.sendMsg(${danmu}, ${room_id})`, response)
       if (response.code === 0) {
         if (response.msg === 'k') {
-          this.logger.warn(`粉丝团发弹幕 ${logMessage} 异常，弹幕可能包含屏蔽词`)
+          this.logger.warn(`发弹幕 ${logMessage} 异常，弹幕可能包含屏蔽词`)
         } else {
-          this.logger.log(`粉丝团发弹幕 ${logMessage} 成功`)
+          this.logger.log(`发弹幕 ${logMessage} 成功`)
           return true
         }
       } else {
-        this.logger.error(`粉丝团发弹幕 ${logMessage} 失败`, response.message)
+        this.logger.error(`发弹幕 ${logMessage} 失败`, response.message)
       }
     } catch (error) {
-      this.logger.error(`粉丝团发弹幕 ${logMessage} 出错`, error)
+      this.logger.error(`发弹幕 ${logMessage} 出错`, error)
     }
 
     return false
   }
 
   public async run(): Promise<void> {
-    this.logger.log('粉丝团发弹幕模块开始运行')
+    this.logger.log('发弹幕模块开始运行')
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
       await this.waitForLightTask()
 
       if (!(await this.waitForFansMedals())) {
-        this.logger.error('粉丝勋章数据不存在，不执行粉丝团发弹幕任务')
+        this.logger.error('粉丝勋章数据不存在，不执行发弹幕任务')
         this.status = 'error'
         return
       }
@@ -89,7 +89,7 @@ class DanmuTask extends MedalModule {
 
       outer: for (let i = 0; i < fansMedals.length; i++) {
         if (isNowIn(23, 55, 0, 5)) {
-          this.logger.log('即将或刚刚发生跨天，提早结束本轮粉丝团发弹幕任务')
+          this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
           allCompleted = false
           break
         }
@@ -111,7 +111,7 @@ class DanmuTask extends MedalModule {
 
         for (let j = 0; j < target; j++) {
           if (isNowIn(23, 55, 0, 5)) {
-            this.logger.log('即将或刚刚发生跨天，提早结束本轮粉丝团发弹幕任务')
+            this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
             allCompleted = false
             break outer
           }
@@ -131,22 +131,22 @@ class DanmuTask extends MedalModule {
       if (allCompleted) {
         this.config._lastCompleteTime = tsm()
         this.status = 'done'
-        this.logger.log('粉丝团发弹幕任务已完成')
+        this.logger.log('发弹幕任务已完成')
       } else {
         this.status = ''
       }
     } else {
       if (isNowIn(0, 0, 0, 5)) {
-        this.logger.log('昨天的粉丝团发弹幕任务已经完成过了，等到今天的00:05再执行')
+        this.logger.log('昨天的发弹幕任务已经完成过了，等到今天的00:05再执行')
       } else {
-        this.logger.log('今天已经完成过粉丝团发弹幕任务了')
+        this.logger.log('今天已经完成过发弹幕任务了')
         this.status = 'done'
       }
     }
 
     const diff = delayToNextMoment()
     this.nextRunTimer = setTimeout(() => this.run(), diff.ms)
-    this.logger.log('距离粉丝团发弹幕模块下次运行时间:', diff.str)
+    this.logger.log('距离发弹幕模块下次运行时间:', diff.str)
   }
 }
 

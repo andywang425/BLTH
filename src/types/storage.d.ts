@@ -133,7 +133,12 @@ interface UiConfig {
   isShowPanel: boolean
   activeMenuIndex: MenuIndex
   panelWidthPercent: number
-  medalInfoPanelSortMode: boolean
+  medalInfoPanelIsSortMode: {
+    light: boolean
+    like: boolean
+    danmu: boolean
+    watch: boolean
+  }
 }
 
 interface Cache {

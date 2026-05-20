@@ -18,6 +18,7 @@ const open = () => {
     lockScroll: false,
     autofocus: true,
     confirmButtonText: 'OK',
+    customStyle: { '--el-messagebox-width': '28vw' },
   }).catch(() => {})
 }
 </script>
