@@ -37,10 +37,10 @@
   - 一个旋转的加载中图标：该任务正在执行中。
   - 没有图标：该功能不显示任务状态、功能未开启或该任务正在等待即将到来的下一次运行。
 - 打开某一项功能后，如果你希望它立刻执行，需要刷新页面。
-  但是刷新页面会打断目前正在执行的任务，下次运行时能否根据上次的进度继续执行取决于功能模块的具体实现（目前大部分都不行）。
+  但是刷新页面会打断目前正在执行的任务，下次运行时能否根据上次的进度继续执行取决于功能模块的具体实现（目前仅观看直播模块支持）。
   建议首次使用时仔细阅读各项功能的说明，然后一次完成所有功能的设置。
 - 打开多个直播间页面时，每日任务中的功能仅会在第一个直播间页面生效以防止任务被重复执行。体验优化、移除元素中的功能总是会生效。
-- 每日任务中大部分任务的任务周期是从每天半夜00:05到下一个半夜00:05，即只要过了每天的00:05就会自动执行下一轮。有个别任务的周期是每天早上08:05到下一个早上08:05。
+- 每日任务中大部分任务的任务周期是每天半夜00:05到下一个半夜00:05，即只要过了每天的00:05就会自动执行下一轮。
 - 控制台日志：如果想查看控制台日志，请打开浏览器的开发者工具（快捷键`ctrl+shift+i`或`F12`）并切换到控制台（`Console`）。开头为`BLTH`的日志即为脚本日志。
   部分日志可能只有高级用户才看得懂，大家各取所需看自己想看的即可。善用过滤（`Filter`）和搜索（快捷键`ctrl+f`）功能。
 
@@ -48,11 +48,11 @@
 
 [BLTH](https://github.com/andywang425/BLTH)在设计上希望与[Bilibili Evolved](https://github.com/the1812/Bilibili-Evolved)和[bilibili 直播净化](https://greasyfork.org/zh-CN/scripts/21416-bilibili%E7%9B%B4%E6%92%AD%E5%87%80%E5%8C%96)兼容，即三个脚本能同时正常运行。
 
-如果你发现存在兼容性问题可以[新建一个空白issue](https://github.com/andywang425/BLTH/issues/new)来反馈。
+如果你发现存在兼容性问题可以[创建一个issue](https://github.com/andywang425/BLTH/issues/new?template=bug_report.yaml)来反馈。
 
 # 反馈
 
-如果想反馈 Bug 或者提出建议，请点击[new issue](https://github.com/andywang425/BLTH/issues/new/choose)然后选择对应的 issue 模板。
+如果想反馈 Bug 或者提出建议，请在[Issues](https://github.com/andywang425/BLTH/issues)页面点击[New issue](https://github.com/andywang425/BLTH/issues/new/choose)，然后选择对应的 issue 模板。
 
 为了方便管理issue，请在 GreasyFork 安装脚本的用户尽量到 Github 反馈。
 
@@ -108,8 +108,8 @@
 - [Github](https://github.com/lzghzr/TampermonkeyJS/blob/master/BiLiveNoVIP/BiLiveNoVIP.user.js)
 - [GreasyFork](https://greasyfork.org/zh-CN/scripts/21416-bilibili%E7%9B%B4%E6%92%AD%E5%87%80%E5%8C%96)
 
-## 新 B 站粉丝牌助手
+## 新 B 站粉丝牌助手（持续更新版）
 
-作者：[一心向晚](https://github.com/XiaoMiku01)
+作者：[飞小RAN](https://github.com/xiaofeiTM233) （原作者：[一心向晚](https://github.com/XiaoMiku01)）
 
-- [Github](https://github.com/XiaoMiku01/fansMedalHelper)
+- [Github](https://github.com/xiaofeiTM233/fansMedalHelper)（[原仓库](https://github.com/XiaoMiku01/fansMedalHelper)已归档）
