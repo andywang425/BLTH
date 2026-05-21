@@ -250,10 +250,6 @@ class WatchTask extends MedalModule {
 
   config = this.medalTasksConfig.watch
 
-  protected get taskConfig() {
-    return this.config
-  }
-
   set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
   }
@@ -262,19 +258,18 @@ class WatchTask extends MedalModule {
 
   /**
    * 获取已点亮的粉丝勋章
-   * @returns 经过排序和过滤的粉丝勋章
    */
   private getMedals(): LiveData.FansMedalPanel.List[] {
     const fansMedals = useBiliStore().filteredFansMedals
 
     const result = fansMedals.filter(
       (medal) =>
-        this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) &&
-        this.PUBLIC_MEDAL_FILTERS.levelLt120(medal) &&
-        medal.medal.is_lighted === 1,
+        this.SHARED_MEDAL_FILTERS.meetWhiteOrBlackList(medal) &&
+        this.SHARED_MEDAL_FILTERS.levelLt120(medal) &&
+        this.SHARED_MEDAL_FILTERS.isLighted(medal),
     )
 
-    if (this.taskConfig.isWhiteList) {
+    if (this.config.isWhiteList) {
       this.sortMedals(result)
     }
 

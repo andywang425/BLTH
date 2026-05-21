@@ -10,10 +10,6 @@ import type { LiveData } from '@/library/bili-api/data'
 class LikeTask extends MedalModule {
   config = this.medalTasksConfig.like
 
-  protected get taskConfig() {
-    return this.config
-  }
-
   set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.like = s
   }
@@ -25,13 +21,13 @@ class LikeTask extends MedalModule {
     const fansMedals = useBiliStore().filteredFansMedals
     const result = fansMedals.filter(
       (medal) =>
-        this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) &&
-        this.PUBLIC_MEDAL_FILTERS.levelLt120(medal) &&
-        medal.medal.is_lighted === 1 &&
-        medal.room_info.living_status === 1,
+        this.SHARED_MEDAL_FILTERS.meetWhiteOrBlackList(medal) &&
+        this.SHARED_MEDAL_FILTERS.levelLt120(medal) &&
+        this.SHARED_MEDAL_FILTERS.isLighted(medal) &&
+        this.SHARED_MEDAL_FILTERS.isLiving(medal),
     )
 
-    if (this.taskConfig.isWhiteList) {
+    if (this.config.isWhiteList) {
       this.sortMedals(result)
     }
 

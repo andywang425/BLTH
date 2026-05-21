@@ -2,7 +2,7 @@ import BaseModule from '@/modules/BaseModule'
 import { storeToRefs } from 'pinia'
 import { useBiliStore, useModuleStore } from '@/stores'
 import { watch } from 'vue'
-import type { MedalTaskSharedConfig, PublicMedalFilters } from './types'
+import type { MedalTaskSharedConfig, SharedMedalFilters } from './types'
 import { arrayToMap, sleep } from '@/library/utils'
 import type { LiveData } from '@/library/bili-api/data'
 import BAPI from '@/library/bili-api'
@@ -14,25 +14,25 @@ type JumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
 class MedalModule extends BaseModule {
   medalTasksConfig = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
 
-  /**
-   * 子类需要重写此 getter，返回该任务对应的 `isWhiteList` 与 `roomidList`
-   */
-  protected get taskConfig(): MedalTaskSharedConfig {
-    throw new Error('Method not implemented.')
-  }
+  /** 所有粉丝勋章任务的公共配置 */
+  declare protected config: MedalTaskSharedConfig
 
-  protected PUBLIC_MEDAL_FILTERS: PublicMedalFilters = {
+  protected SHARED_MEDAL_FILTERS: SharedMedalFilters = {
     // 包含在白名单中或不包含在黑名单中返回true，否则返回false
-    whiteBlackList: (m) =>
-      this.taskConfig.isWhiteList
-        ? this.taskConfig.roomidList.includes(m.room_info.room_id)
-        : !this.taskConfig.roomidList.includes(m.room_info.room_id),
+    meetWhiteOrBlackList: (m) =>
+      this.config.isWhiteList
+        ? this.config.roomidList.includes(m.room_info.room_id)
+        : !this.config.roomidList.includes(m.room_info.room_id),
     // 等级小于120返回true，否则返回false
     levelLt120: (medal) => medal.medal.level < 120,
+    // 点亮返回true，否则返回false
+    isLighted: (medal) => medal.medal.is_lighted === 1,
+    // 直播中返回true，否则返回false
+    isLiving: (medal) => medal.room_info.living_status === 1,
   }
 
   protected sortMedals(medals: LiveData.FansMedalPanel.List[]): LiveData.FansMedalPanel.List[] {
-    const orderMap = arrayToMap(this.taskConfig.roomidList)
+    const orderMap = arrayToMap(this.config.roomidList)
     return medals.sort(
       (a, b) => orderMap.get(a.room_info.room_id)! - orderMap.get(b.room_info.room_id)!,
     )
@@ -146,9 +146,9 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 若点亮熄灭勋章任务已启用且今天未完成，等待其结束后再继续。
+   * 若点亮熄灭勋章任务已启用且今天未完成，等待其结束后再继续
    *
-   * 用于让 like/danmu/watch 在 light 任务完成后再执行，避免与点亮逻辑产生竞争。
+   * 用于让 点赞/发弹幕/观看直播 在 点亮熄灭勋章 任务完成后再执行
    */
   protected async waitForLightTask(): Promise<void> {
     const lightConfig = this.medalTasksConfig.light

@@ -5,53 +5,44 @@ import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
-import type { LightTaskMedalFilters, MedalsByLivingStatus } from './types'
 import type { LiveData } from '@/library/bili-api/data'
+
+type MedalsByLiving = [LiveData.FansMedalPanel.List[], LiveData.FansMedalPanel.List[]]
 
 class LightTask extends MedalModule {
   config = this.medalTasksConfig.light
-
-  protected get taskConfig() {
-    return this.config
-  }
 
   set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.light = s
   }
 
-  private MEDAL_FILTERS: LightTaskMedalFilters = {
-    // 点亮返回true，否则返回false
-    isLighted: (medal) => medal.medal.is_lighted === 1,
-    // 直播中返回on，否则返回off
-    livingStatus: (medal) => (medal.room_info.living_status === 1 ? 'on' : 'off'),
-  }
-
   /**
-   * 获取粉丝勋章
-   * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
+   * 获取未点亮的粉丝勋章
+   *
+   * @returns [[主播未开播的粉丝勋章], [主播开播中的粉丝勋章]]
    */
-  private getMedals(): MedalsByLivingStatus {
+  private getMedals(): MedalsByLiving {
     const fansMedals = useBiliStore().filteredFansMedals
-
-    const result: MedalsByLivingStatus = {
-      on: [],
-      off: [],
-    }
+    const result: MedalsByLiving = [[], []]
 
     fansMedals.forEach((medal) => {
-      if (!this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) || this.MEDAL_FILTERS.isLighted(medal)) {
+      if (
+        !this.SHARED_MEDAL_FILTERS.meetWhiteOrBlackList(medal) ||
+        this.SHARED_MEDAL_FILTERS.isLighted(medal)
+      ) {
         // 跳过被黑白名单过滤的和已经点亮的粉丝勋章
         return
       }
 
-      const livingStatus = this.MEDAL_FILTERS.livingStatus(medal)
-      result[livingStatus].push(medal)
+      // 根据直播状态划分
+      const index = this.SHARED_MEDAL_FILTERS.isLiving(medal) ? 1 : 0
+      result[index].push(medal)
     })
 
-    if (this.taskConfig.isWhiteList) {
+    if (this.config.isWhiteList) {
       // 白名单排序
-      this.sortMedals(result.on)
-      this.sortMedals(result.off)
+      this.sortMedals(result[0])
+      this.sortMedals(result[1])
     }
 
     return result
@@ -179,7 +170,7 @@ class LightTask extends MedalModule {
       this.resetTaskInfoCache()
       const fansMedals = this.getMedals()
 
-      await Promise.allSettled([this.likeTask(fansMedals.on), this.sendDanmuTask(fansMedals.off)])
+      await Promise.allSettled([this.sendDanmuTask(fansMedals[0]), this.likeTask(fansMedals[1])])
 
       this.config._lastCompleteTime = tsm()
       this.status = 'done'
