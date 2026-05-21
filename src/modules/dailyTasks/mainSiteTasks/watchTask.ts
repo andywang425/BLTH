@@ -1,5 +1,5 @@
 import BaseModule from '@/modules/BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import { isTimestampToday, delayToNextMoment, tsm, isNowBefore } from '@/library/luxon'
 import { useBiliStore, useModuleStore } from '@/stores'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
@@ -74,7 +74,7 @@ class WatchTask extends BaseModule {
         this.logger.log('每日观看视频任务已完成')
       }
     } else {
-      if (isNowIn(0, 0, 0, 5)) {
+      if (isNowBefore(0, 5)) {
         this.logger.log('昨天的每日观看视频任务已经完成过了，等到今天的00:05再执行')
       } else {
         this.logger.log('今天已经完成过每日观看视频任务了')

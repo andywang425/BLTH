@@ -1,4 +1,4 @@
-import { delayToNextMoment, isNowIn, isTimestampToday, tsm } from '@/library/luxon'
+import { delayToNextMoment, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore } from '@/stores'
 import { sleep } from '@/library/utils'
@@ -176,7 +176,7 @@ class LightTask extends MedalModule {
       this.status = 'done'
       this.logger.log('点亮熄灭勋章任务已完成')
     } else {
-      if (isNowIn(0, 0, 0, 5)) {
+      if (isNowBefore(0, 5)) {
         this.logger.log('昨天的给点亮熄灭勋章任务已经完成过了，等到今天的00:05再执行')
       } else {
         this.logger.log('今天已经完成过点亮熄灭勋章任务了')

@@ -1,4 +1,4 @@
-import { delayToNextMoment, isNowIn, isTimestampToday, tsm } from '@/library/luxon'
+import { delayToNextMoment, isNowAfter, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore, usePlayerStore } from '@/stores'
 import Logger from '@/library/logger'
@@ -132,7 +132,7 @@ class RoomHeart {
    * X心跳，E心跳过后都是X心跳
    */
   private async X(): Promise<void> {
-    if (isNowIn(23, 59, 0, 5)) {
+    if (isNowAfter(23, 58) || isNowBefore(0, 5)) {
       this.logger.log(`即将或刚刚发生跨天，停止直播间 ${this.roomID} 的X心跳`)
       return
     }
@@ -356,7 +356,7 @@ class WatchTask extends MedalModule {
         let i: number
 
         for (i = 0; i < fansMedals.length; i++) {
-          if (isNowIn(23, 55, 0, 5)) {
+          if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
             this.logger.log('即将或刚刚发生跨天，提早结束本轮观看直播任务')
             break
           }
@@ -417,7 +417,7 @@ class WatchTask extends MedalModule {
         this.config._lastCompleteTime = tsm()
       }
     } else {
-      if (isNowIn(0, 0, 0, 5)) {
+      if (isNowBefore(0, 5)) {
         this.logger.log('昨天的观看直播任务已经完成过了，等到今天的00:05再执行')
       } else {
         this.logger.log('今天已经完成过观看直播任务了')

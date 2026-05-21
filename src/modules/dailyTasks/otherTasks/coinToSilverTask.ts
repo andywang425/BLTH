@@ -1,5 +1,5 @@
 import BaseModule from '@/modules/BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import { isTimestampToday, delayToNextMoment, tsm, isNowAfter } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
 import { useModuleStore } from '@/stores'
@@ -36,7 +36,7 @@ class CoinToSilverTask extends BaseModule {
       this.status = 'running'
       await this.exchange()
     } else {
-      if (!isNowIn(0, 0, 0, 5)) {
+      if (isNowAfter(0, 5)) {
         this.logger.log('今天已经完成过硬币换银瓜子任务了')
         this.status = 'done'
       } else {

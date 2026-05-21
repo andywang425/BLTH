@@ -1,4 +1,4 @@
-import { delayToNextMoment, isNowIn, isTimestampToday, tsm } from '@/library/luxon'
+import { delayToNextMoment, isNowAfter, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore } from '@/stores'
 import { sleep } from '@/library/utils'
@@ -75,7 +75,7 @@ class LikeTask extends MedalModule {
       let allCompleted = true
 
       outer: for (let i = 0; i < fansMedals.length; i++) {
-        if (isNowIn(23, 55, 0, 5)) {
+        if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
           this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
           allCompleted = false
           break
@@ -95,7 +95,7 @@ class LikeTask extends MedalModule {
 
         const remaining = parsed.limit - parsed.current
         for (let j = 0; j < remaining; j++) {
-          if (isNowIn(23, 55, 0, 5)) {
+          if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
             this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
             allCompleted = false
             break outer
@@ -117,7 +117,7 @@ class LikeTask extends MedalModule {
         this.status = ''
       }
     } else {
-      if (isNowIn(0, 0, 0, 5)) {
+      if (isNowBefore(0, 5)) {
         this.logger.log('昨天的点赞任务已经完成过了，等到今天的00:05再执行')
       } else {
         this.logger.log('今天已经完成过点赞任务了')
