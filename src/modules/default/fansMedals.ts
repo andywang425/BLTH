@@ -9,6 +9,11 @@ import _ from 'lodash'
 
 class FansMedals extends BaseModule {
   /**
+   * 是否正在运行
+   */
+  private isRunning = false
+
+  /**
    * 获取粉丝勋章
    *
    * @param pages 获取的页数
@@ -50,27 +55,36 @@ class FansMedals extends BaseModule {
   }
 
   public async run(force = false): Promise<void> {
-    const biliStore = useBiliStore()
-
-    const medalTasks = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
-    const taskValues = [medalTasks.light, medalTasks.like, medalTasks.danmu, medalTasks.watch]
-
-    if (
-      (force ||
-        // 开启了点亮熄灭勋章或观看直播功能且今天没完成过
-        taskValues.some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4))) &&
-      // 如果正在获取粉丝勋章，不重复获取
-      biliStore.fansMedalsStatus !== 'loading'
-    ) {
-      biliStore.fansMedalsStatus = 'loading'
-      biliStore.fansMedals = await this.getFansMedals()
-      biliStore.fansMedalsStatus = 'loaded'
+    if (this.isRunning) {
+      return
     }
+    this.isRunning = true
 
-    this.nextRunTimer = setTimeout(
-      () => this.run().catch((reason) => this.logger.error(reason)),
-      delayToNextMoment(0, 4).ms,
-    )
+    try {
+      const biliStore = useBiliStore()
+
+      const medalTasks = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
+      const taskValues = [medalTasks.light, medalTasks.like, medalTasks.danmu, medalTasks.watch]
+
+      if (
+        (force ||
+          // 开启了任意粉丝勋章相关功能且今天没完成过
+          taskValues.some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4))) &&
+        // 如果正在获取粉丝勋章，不重复获取
+        biliStore.fansMedalsStatus !== 'loading'
+      ) {
+        biliStore.fansMedalsStatus = 'loading'
+        biliStore.fansMedals = await this.getFansMedals()
+        biliStore.fansMedalsStatus = 'loaded'
+      }
+
+      this.nextRunTimer = setTimeout(
+        () => this.run().catch((reason) => this.logger.error(reason)),
+        delayToNextMoment(0, 4).ms,
+      )
+    } finally {
+      this.isRunning = false
+    }
   }
 }
 

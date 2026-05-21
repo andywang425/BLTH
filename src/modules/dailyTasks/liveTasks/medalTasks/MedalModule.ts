@@ -168,6 +168,7 @@ class MedalModule extends BaseModule {
           if (newStatus === 'done' || newStatus === 'error') {
             stopWatch()
             // 重新获取粉丝勋章（主要是为了获取最新的点亮状态、是否正在直播状态）
+            // FansMedals 模块内部做了防重入，因此无需担心会重复获取
             moduleStore.rerunModule('Default_FansMedals')
             resolve()
           }
