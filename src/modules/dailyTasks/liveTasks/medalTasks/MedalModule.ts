@@ -12,6 +12,23 @@ import _ from 'lodash'
 type JumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
 
 class MedalModule extends BaseModule {
+  /**
+   * 任务信息共享缓存
+   *
+   * target_id -> task_info Promise
+   */
+  private static taskInfoCache = new Map<
+    number,
+    Promise<LiveData.GetActivatedMedalInfo.TaskInfo[] | null>
+  >()
+
+  /**
+   * 简单限流队列
+   *
+   * 串行执行任务信息获取请求
+   */
+  private static taskInfoRequestQueue: Promise<void> = Promise.resolve()
+
   medalTasksConfig = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
 
   /** 所有粉丝勋章任务的公共配置 */
@@ -81,7 +98,7 @@ class MedalModule extends BaseModule {
    * 按 jump_type 在 task_info 中查找任务项
    */
   protected static findTaskInfo(
-    task_info: LiveData.GetActivatedMedalInfo.TaskInfo[] | null | undefined,
+    task_info: LiveData.GetActivatedMedalInfo.TaskInfo[] | null,
     jump_type: JumpType,
   ): LiveData.GetActivatedMedalInfo.TaskInfo | undefined {
     return task_info?.find((t) => t.jump_type === jump_type)
@@ -99,33 +116,46 @@ class MedalModule extends BaseModule {
     return Number(match[0])
   }
 
-  /** 任务内缓存：target_id -> task_info（缓存 Promise 避免并发重复请求） */
-  private taskInfoCache = new Map<
-    number,
-    Promise<LiveData.GetActivatedMedalInfo.TaskInfo[] | null>
-  >()
+  /**
+   * 清空任务信息共享缓存
+   */
+  protected static clearTaskInfoCache(): void {
+    MedalModule.taskInfoCache.clear()
+  }
 
-  /** 在 `run()` 入口调用以清空缓存 */
-  protected resetTaskInfoCache(): void {
-    this.taskInfoCache.clear()
+  /** 将请求加入全局串行队列，并在真正发请求前等待一小段随机时间 */
+  private static enqueueTaskInfoRequest<T>(requester: () => Promise<T>): Promise<T> {
+    const task = MedalModule.taskInfoRequestQueue
+      .catch(() => undefined)
+      .then(async () => {
+        await sleep(_.random(300, 500))
+        return requester()
+      })
+
+    MedalModule.taskInfoRequestQueue = task.then(
+      () => undefined,
+      () => undefined,
+    )
+
+    return task
   }
 
   /**
-   * 获取指定粉丝勋章的 task_info。调用前会先 `sleep` 一段时间避免风控。
+   * 获取指定粉丝勋章的任务信息
    *
-   * 同一 target_id 的并发请求会共享同一个 Promise。
+   * 同一 target_id 的并发请求会共享同一个 Promise；
+   * 不同 target_id 的请求会进入全局串行队列，避免短时间内并发触发过多请求
    *
    * @param target_id 主播 uid
-   * @returns 成功返回 task_info 数组，失败返回 null
+   * @returns 成功返回任务信息数组，失败返回 null
    */
   protected fetchTaskInfo(
     target_id: number,
   ): Promise<LiveData.GetActivatedMedalInfo.TaskInfo[] | null> {
-    const cached = this.taskInfoCache.get(target_id)
+    const cached = MedalModule.taskInfoCache.get(target_id)
     if (cached) return cached
 
-    const promise = (async () => {
-      await sleep(_.random(300, 500))
+    const promise = MedalModule.enqueueTaskInfoRequest(async () => {
       try {
         const response = await BAPI.live.getActivatedMedalInfo(target_id)
         this.logger.log(`BAPI.live.getActivatedMedalInfo(${target_id}) response`, response)
@@ -133,15 +163,17 @@ class MedalModule extends BaseModule {
           return response.data.task_info
         } else {
           this.logger.error(`BAPI.live.getActivatedMedalInfo(${target_id}) 失败`, response.message)
+          MedalModule.taskInfoCache.delete(target_id)
           return null
         }
       } catch (error) {
         this.logger.error(`BAPI.live.getActivatedMedalInfo(${target_id}) 出错`, error)
+        MedalModule.taskInfoCache.delete(target_id)
         return null
       }
-    })()
+    })
 
-    this.taskInfoCache.set(target_id, promise)
+    MedalModule.taskInfoCache.set(target_id, promise)
     return promise
   }
 
@@ -162,11 +194,11 @@ class MedalModule extends BaseModule {
     this.logger.log('等待点亮熄灭勋章任务完成后再执行')
 
     return new Promise<void>((resolve) => {
-      const stopWatch = watch(
+      const unwatch = watch(
         () => moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.light,
         (newStatus) => {
           if (newStatus === 'done' || newStatus === 'error') {
-            stopWatch()
+            unwatch()
             // 重新获取粉丝勋章（主要是为了获取最新的点亮状态、是否正在直播状态）
             // FansMedals 模块内部做了防重入，因此无需担心会重复获取
             moduleStore.rerunModule('Default_FansMedals')

@@ -70,7 +70,7 @@ class LikeTask extends MedalModule {
       }
 
       this.status = 'running'
-      this.resetTaskInfoCache()
+      MedalModule.clearTaskInfoCache()
       const fansMedals = this.getMedals()
       let allCompleted = true
 

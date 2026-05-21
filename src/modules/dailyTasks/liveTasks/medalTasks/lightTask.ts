@@ -167,7 +167,7 @@ class LightTask extends MedalModule {
       }
 
       this.status = 'running'
-      this.resetTaskInfoCache()
+      MedalModule.clearTaskInfoCache()
       const fansMedals = this.getMedals()
 
       await Promise.allSettled([this.sendDanmuTask(fansMedals[0]), this.likeTask(fansMedals[1])])
