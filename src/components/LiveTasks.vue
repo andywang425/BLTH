@@ -132,23 +132,23 @@ const medalInfoTableData = computed({
 })
 /** 是否显示加载中图标 */
 const medalInfoLoading = ref<boolean>(false)
+/** 取消监听 biliStore.fansMedals */
+let unwatchFansMedals: () => void = () => {}
 /**
  * 编辑名单
  */
 const handleEditList = async (key: MedalTaskKey) => {
   currentEditingTask.value = key
   medalInfoPanelVisible.value = true
-  await nextTick()
+
   // 如果没有粉丝勋章信息，先获取
   if (!biliStore.fansMedals) {
     medalInfoLoading.value = true
-    watch(
-      medalInfoTableData,
-      (newData) => {
-        nextTick(() => {
-          refreshSelection(newData)
-          medalInfoLoading.value = false
-        })
+    unwatchFansMedals = watch(
+      () => biliStore.fansMedals,
+      async () => {
+        await nextTick()
+        refreshSelection()
       },
       { once: true },
     )
@@ -156,27 +156,29 @@ const handleEditList = async (key: MedalTaskKey) => {
       moduleStore.rerunModule('Default_FansMedals', true)
     }
   } else {
-    refreshSelection(medalInfoTableData.value)
+    await nextTick()
+    refreshSelection()
   }
 }
 /** 用来管理多选框状态的表格Ref */
 const medalInfoTableRef = ref<TableInstance>()
 
 /** 根据当前任务的 roomidList 刷新多选框选择状态 */
-const refreshSelection = (rows?: MedalInfoRow[]) => {
+const refreshSelection = () => {
+  medalInfoLoading.value = false
   // 排序模式下不更新多选框选择状态
-  if (!rows || currentTaskIsSortMode.value) return
+  if (medalInfoTableData.value.length === 0 || currentTaskIsSortMode.value) return
 
   medalInfoTableRef.value?.clearSelection()
   const taskConf = currentTaskConfig.value
-  taskConf.roomidList.forEach((roomid, index) => {
-    const row = rows.find((row) => row.roomid === roomid)
+  taskConf.roomidList.forEach((roomid) => {
+    // 此处有可能无法找到直播间号为 roomid 的粉丝勋章（row 为 undefined）
+    // 比如用户曾经拥有某个粉丝勋章，并且在编辑名单弹窗里勾选过该勋章，但他后来把这个粉丝勋章删了
+    // 这些找不到的 roomid 不影响脚本运行
+    // 当用户修改名单时，会自动更新 roomidList，所以这里无需处理
+    const row = medalInfoTableData.value.find((row) => row.roomid === roomid)
     if (row) {
       medalInfoTableRef.value?.toggleRowSelection(row, true)
-    } else {
-      // 没有找到直播间号为 roomid 的粉丝勋章，可能是因为该粉丝勋章已被删除或是过滤
-      // 从名单中去掉这个 roomid
-      taskConf.roomidList.splice(index, 1)
     }
   })
 }
@@ -357,6 +359,7 @@ function handleRowClick(row: MedalInfoRow) {
       v-model="medalInfoPanelVisible"
       :title="`编辑粉丝勋章名单 - ${currentTaskLabel}`"
       :lock-scroll="false"
+      @close="unwatchFansMedals"
     >
       <VueDraggable
         v-model="medalInfoTableData"
@@ -429,7 +432,7 @@ function handleRowClick(row: MedalInfoRow) {
           :disabled="!currentTaskConfig.isWhiteList"
           inactive-text="常规模式"
           active-text="排序模式"
-          @change="(val) => !val && nextTick(() => refreshSelection(medalInfoTableData))"
+          @change="(val) => !val && nextTick(() => refreshSelection())"
         />
       </template>
     </el-dialog>
