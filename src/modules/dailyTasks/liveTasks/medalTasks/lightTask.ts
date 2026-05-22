@@ -120,7 +120,7 @@ class LightTask extends MedalModule {
       await this.like(medal, _.random(baseCount, baseCount + 5))
 
       if (i < medals.length - 1) {
-        await sleep(_.random(30000, 35000))
+        await sleep(_.random(15000, 20000))
       }
     }
   }

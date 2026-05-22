@@ -92,13 +92,32 @@ class DanmuTask extends MedalModule {
 
         const medal = fansMedals[i]
         const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
-        if (!taskInfo) continue
+        if (!taskInfo) {
+          this.logger.error(
+            `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过发弹幕任务`,
+          )
+          continue
+        }
 
         const item = MedalModule.findTaskInfo(taskInfo, 'sendDanmu')
-        if (!item || item.is_done) continue
+        if (!item) {
+          this.logger.error(
+            `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到发弹幕任务，跳过发弹幕任务`,
+          )
+          continue
+        }
+
+        if (item.is_done) continue
 
         const parsed = MedalModule.parseDailyLimit(item.sub_title)
-        if (!parsed || parsed.current >= parsed.limit) continue
+        if (!parsed) {
+          this.logger.error(
+            `无法解析主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的发弹幕任务的每日上限信息，跳过发弹幕任务`,
+          )
+          continue
+        }
+
+        if (parsed.current >= parsed.limit) continue
 
         const remaining = parsed.limit - parsed.current
         // 失败补偿：最多额外发 3 条

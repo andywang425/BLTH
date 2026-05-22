@@ -316,7 +316,7 @@ function handleRowClick(row: MedalInfoRow) {
 
     <!-- 说明 -->
     <el-row>
-      <el-text>直播任务相关信息可在</el-text>
+      <el-text>粉丝团任务相关信息可在</el-text>
       <el-link
         rel="noreferrer"
         type="primary"

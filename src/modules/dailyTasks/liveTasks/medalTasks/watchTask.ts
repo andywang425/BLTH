@@ -366,18 +366,35 @@ class WatchTask extends MedalModule {
           const uid = medal.medal.target_id
 
           const taskInfo = await this.fetchTaskInfo(uid)
-          if (!taskInfo) continue
+          if (!taskInfo) {
+            this.logger.error(
+              `无法获取主播【${medal.anchor_info.nick_name}】（UID：${uid}）的粉丝团升级任务信息，跳过观看直播任务`,
+            )
+            continue
+          }
 
           const item = MedalModule.findTaskInfo(taskInfo, 'watchLive')
-          if (!item) continue
+          if (!item) {
+            this.logger.error(
+              `无法在主播【${medal.anchor_info.nick_name}】（UID：${uid}）的粉丝团升级任务信息中找到观看直播任务，跳过观看直播任务`,
+            )
+            continue
+          }
+
+          if (item.is_done) continue
 
           const parsed = MedalModule.parseDailyLimit(item.sub_title)
-          if (!parsed) continue
-          if (item.is_done || parsed.current >= parsed.limit) continue
+          if (!parsed) {
+            this.logger.error(
+              `无法解析主播【${medal.anchor_info.nick_name}】（UID：${uid}）的观看直播任务的每日上限信息，跳过观看直播任务`,
+            )
+            continue
+          }
+          if (parsed.current >= parsed.limit) continue
 
           const minutes = MedalModule.parseTitleCount(item.title) ?? 15
 
-          // 目标秒数 = 每日上限 × minutes 分钟 + 60s 缓冲（补偿心跳计时误差）
+          // 目标秒数 = 每日上限 × minutes × 60s + 60s 缓冲（补偿心跳计时误差）
           const targetSeconds = parsed.limit * minutes * 60 + 60
 
           if ((this.config._watchingProgress[roomid] ?? 0) >= targetSeconds) {
@@ -390,7 +407,7 @@ class WatchTask extends MedalModule {
           if (area_id > 0 && parent_area_id > 0) {
             // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
             this.logger.log(
-              `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds} 秒`,
+              `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds / 60} 分钟）`,
             )
 
             await new RoomHeart(

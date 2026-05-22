@@ -83,16 +83,36 @@ class LikeTask extends MedalModule {
 
         const medal = fansMedals[i]
         const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
-        if (!taskInfo) continue
+        if (!taskInfo) {
+          this.logger.error(
+            `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过点赞任务`,
+          )
+          continue
+        }
 
         const item = MedalModule.findTaskInfo(taskInfo, 'like')
-        if (!item || item.is_done) continue
+        if (!item) {
+          this.logger.error(
+            `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
+          )
+          continue
+        }
+
+        if (item.is_done) continue
 
         const parsed = MedalModule.parseDailyLimit(item.sub_title)
-        if (!parsed || parsed.current >= parsed.limit) continue
+        if (!parsed) {
+          this.logger.error(
+            `无法解析主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的点赞任务的每日上限信息，跳过点赞任务`,
+          )
+          continue
+        }
 
+        if (parsed.current >= parsed.limit) continue
+
+        // 每轮点赞次数
         const times = MedalModule.parseTitleCount(item.title) ?? 30
-
+        // 剩余点赞轮数
         const remaining = parsed.limit - parsed.current
         for (let j = 0; j < remaining; j++) {
           if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
@@ -104,7 +124,7 @@ class LikeTask extends MedalModule {
           await this.like(medal, _.random(times, times + 5))
 
           if (j < remaining - 1 || i < fansMedals.length - 1) {
-            await sleep(_.random(30000, 35000))
+            await sleep(_.random(15000, 20000))
           }
         }
       }
