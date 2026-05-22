@@ -63,6 +63,7 @@ const defaultValues: DefaultValues = {
             ],
             isWhiteList: false,
             roomidList: [],
+            _lastEffectiveCompleteTime: 0,
             _lastCompleteTime: 0,
           },
           like: {

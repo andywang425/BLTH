@@ -188,8 +188,8 @@ class MedalModule extends BaseModule {
     if (isTimestampToday(lightConfig._lastCompleteTime)) return
 
     const moduleStore = useModuleStore()
-    const currentStatus = moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.light
-    if (currentStatus === 'done' || currentStatus === 'error') return
+    const lightStatus = moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.light
+    if (lightStatus === 'done' || lightStatus === 'error') return
 
     this.logger.log('等待点亮熄灭勋章任务完成后再执行')
 
@@ -199,9 +199,13 @@ class MedalModule extends BaseModule {
         (newStatus) => {
           if (newStatus === 'done' || newStatus === 'error') {
             unwatch()
-            // 重新获取粉丝勋章（主要是为了获取最新的点亮状态、是否正在直播状态）
-            // FansMedals 模块内部做了防重入，因此无需担心会重复获取
-            moduleStore.rerunModule('Default_FansMedals')
+
+            if (lightConfig._lastEffectiveCompleteTime === lightConfig._lastCompleteTime) {
+              // 如果点亮熄灭勋章模块确实进行了点亮操作
+              // 重新获取粉丝勋章（主要是为了获取最新的点亮状态和直播状态）
+              // FansMedals 模块内部做了防重入，因此无需担心会重复获取
+              moduleStore.rerunModule('Default_FansMedals')
+            }
             resolve()
           }
         },

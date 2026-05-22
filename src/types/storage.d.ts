@@ -26,6 +26,7 @@ interface ModuleConfig {
           danmuList: string[]
           isWhiteList: boolean
           roomidList: number[]
+          _lastEffectiveCompleteTime: number
           _lastCompleteTime: number
         }
         like: {

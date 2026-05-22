@@ -110,7 +110,7 @@ class LightTask extends MedalModule {
    * @param medals
    * @private
    */
-  private async likeTask(medals: LiveData.FansMedalPanel.List[]) {
+  private async likeTask(medals: LiveData.FansMedalPanel.List[]): Promise<void> {
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
       const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
@@ -130,7 +130,7 @@ class LightTask extends MedalModule {
    * @param medals
    * @private
    */
-  private async sendDanmuTask(medals: LiveData.FansMedalPanel.List[]) {
+  private async sendDanmuTask(medals: LiveData.FansMedalPanel.List[]): Promise<void> {
     let danmuIndex = 0
 
     for (let i = 0; i < medals.length; i++) {
@@ -169,10 +169,16 @@ class LightTask extends MedalModule {
       this.status = 'running'
       MedalModule.clearTaskInfoCache()
       const fansMedals = this.getMedals()
-
-      await Promise.allSettled([this.sendDanmuTask(fansMedals[0]), this.likeTask(fansMedals[1])])
+      // 是否有需要点亮的粉丝勋章（是不是一次有效运行？）
+      const isEffectiveRun = fansMedals.some((medals) => medals.length > 0)
+      if (isEffectiveRun) {
+        await Promise.allSettled([this.sendDanmuTask(fansMedals[0]), this.likeTask(fansMedals[1])])
+      }
 
       this.config._lastCompleteTime = tsm()
+      if (isEffectiveRun) {
+        this.config._lastEffectiveCompleteTime = this.config._lastCompleteTime
+      }
       this.status = 'done'
       this.logger.log('点亮熄灭勋章任务已完成')
     } else {
