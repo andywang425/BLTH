@@ -25,7 +25,7 @@ class MedalModule extends BaseModule {
   /**
    * 简单限流队列
    *
-   * 串行执行任务信息获取请求
+   * 串行执行获取任务信息请求
    */
   private static taskInfoRequestQueue: Promise<void> = Promise.resolve()
 
@@ -123,7 +123,9 @@ class MedalModule extends BaseModule {
     MedalModule.taskInfoCache.clear()
   }
 
-  /** 将请求加入全局串行队列，并在真正发请求前等待一小段随机时间 */
+  /**
+   * 将获取任务信息请求加入全局串行队列
+   */
   private static enqueueTaskInfoRequest<T>(requester: () => Promise<T>): Promise<T> {
     const task = MedalModule.taskInfoRequestQueue
       .catch(() => undefined)

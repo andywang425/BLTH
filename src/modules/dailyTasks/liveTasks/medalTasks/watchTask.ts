@@ -284,22 +284,8 @@ class WatchTask extends MedalModule {
    * @param roomid 房间号
    * @returns [area_id, parent_area_id]
    */
-  private async getAreaInfo(url: string, roomid: number): Promise<[number, number]> {
+  private async getAreaInfo(roomid: number): Promise<[number, number]> {
     try {
-      // 先尝试从 url 中提取 area_id 和 parent_area_id
-      const urlObj = new URL(url)
-      const area_id = Number(urlObj.searchParams.get('area_id'))
-      const parent_area_id = Number(urlObj.searchParams.get('parent_area_id'))
-
-      if (area_id > 0 && parent_area_id > 0) {
-        this.logger.log(
-          `已从直播间链接中（roomid = ${roomid}）获取到分区数据（area_id = ${area_id}，parent_area_id = ${parent_area_id}）`,
-          urlObj,
-        )
-        return [area_id, parent_area_id]
-      }
-
-      // 如果无法从 url 中提取到分区数据，调用 API 获取
       const response = await BAPI.live.getInfoByRoom(roomid)
       this.logger.log(`BAPI.live.getInfoByRoom(${roomid}) response`, response)
 
@@ -402,7 +388,7 @@ class WatchTask extends MedalModule {
             continue
           }
 
-          const [area_id, parent_area_id] = await this.getAreaInfo(medal.room_info.url, roomid)
+          const [area_id, parent_area_id] = await this.getAreaInfo(roomid)
 
           if (area_id > 0 && parent_area_id > 0) {
             // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
