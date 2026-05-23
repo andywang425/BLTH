@@ -14,7 +14,7 @@ class CoinToSilverTask extends BaseModule {
   private async exchange() {
     try {
       const response = await BAPI.live.coin2silver(this.config.num)
-      this.logger.log(`BAPI.live.coin2silver{${this.config.num}} response`, response)
+      this.logger.log(`BAPI.live.coin2silver(${this.config.num}) response`, response)
       if (response.code === 0) {
         this.logger.log('硬币换银瓜子已完成，获得银瓜子:', response.data.silver)
         this.config._lastCompleteTime = tsm()

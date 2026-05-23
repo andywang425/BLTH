@@ -49,11 +49,15 @@ class DanmuTask extends MedalModule {
       const response = await BAPI.live.sendMsg(danmu, room_id)
       this.logger.log(`BAPI.live.sendMsg(${danmu}, ${room_id})`, response)
       if (response.code === 0) {
-        if (response.msg === 'k') {
-          this.logger.warn(`发弹幕 ${logMessage} 异常，弹幕可能包含屏蔽词`)
-        } else {
+        if (response.msg === '') {
           this.logger.log(`发弹幕 ${logMessage} 成功`)
           return true
+        } else if (response.msg === 'k') {
+          this.logger.warn(`发弹幕 ${logMessage} 异常，弹幕可能包含屏蔽词`)
+        } else if (response.msg === 'f') {
+          this.logger.warn(`发弹幕 ${logMessage} 异常，弹幕被过滤`)
+        } else {
+          this.logger.warn(`发弹幕 ${logMessage} 异常，未知错误：${response.msg}`)
         }
       } else {
         this.logger.error(`发弹幕 ${logMessage} 失败`, response.message)
