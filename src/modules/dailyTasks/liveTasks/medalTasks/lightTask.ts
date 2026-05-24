@@ -142,15 +142,19 @@ class LightTask extends MedalModule {
       const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
       const item = MedalModule.findTaskInfo(taskInfo, 'sendDanmu')
       // 从 title 解析点亮所需弹幕条数（如 "发弹幕10次" → 10），失败时 fallback 到 10
-      const baseTarget = MedalModule.parseTitleCount(item?.title) ?? 10
-      let target = baseTarget
-      const maxTarget = baseTarget + 3 // 失败补偿，最多多发 3 条
+      let target = MedalModule.parseTitleCount(item?.title) ?? 10
+      let failedCount = 0
 
       for (let j = 0; j < target; j++) {
         const danmuText = this.config.danmuList[danmuIndex++ % this.config.danmuList.length]
 
         if (!(await this.sendDanmu(medal, danmuText))) {
-          target = Math.min(target + 1, maxTarget)
+          if (++failedCount > MedalModule.DANMU_RETRY_LIMIT) {
+            this.logger.warn(`当前直播间（${medal.room_info.room_id}）弹幕发送失败次数过多，跳过`)
+            await sleep(_.random(6000, 8000))
+            break
+          }
+          target++
         }
 
         if (i < medals.length - 1 || j < target - 1) {

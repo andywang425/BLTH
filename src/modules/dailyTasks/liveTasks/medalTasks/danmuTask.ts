@@ -123,10 +123,8 @@ class DanmuTask extends MedalModule {
 
         if (parsed.current >= parsed.limit) continue
 
-        const remaining = parsed.limit - parsed.current
-        // 失败补偿：最多额外发 3 条
-        let target = remaining
-        const maxTarget = remaining + 3
+        let target = parsed.limit - parsed.current
+        let failedCount = 0
 
         for (let j = 0; j < target; j++) {
           if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
@@ -136,9 +134,13 @@ class DanmuTask extends MedalModule {
           }
 
           const danmuText = this.config.danmuList[danmuIndex++ % this.config.danmuList.length]
-          const ok = await this.sendDanmu(medal, danmuText)
-          if (!ok) {
-            target = Math.min(target + 1, maxTarget)
+          if (!(await this.sendDanmu(medal, danmuText))) {
+            if (++failedCount > MedalModule.DANMU_RETRY_LIMIT) {
+              this.logger.warn(`当前直播间（${medal.room_info.room_id}）弹幕发送失败次数过多，跳过`)
+              await sleep(_.random(6000, 8000))
+              break
+            }
+            target++
           }
 
           if (j < target - 1 || i < fansMedals.length - 1) {

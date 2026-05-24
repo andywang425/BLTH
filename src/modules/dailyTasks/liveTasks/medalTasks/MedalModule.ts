@@ -11,6 +11,9 @@ import _ from 'lodash'
 type JumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
 
 class MedalModule extends BaseModule {
+  /** 最大弹幕补发次数 */
+  protected static readonly DANMU_RETRY_LIMIT = 3
+
   /**
    * 任务信息共享缓存
    *
