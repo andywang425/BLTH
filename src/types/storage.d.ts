@@ -24,17 +24,33 @@ interface ModuleConfig {
         light: {
           enabled: boolean
           danmuList: string[]
+          isWhiteList: boolean
+          roomidList: number[]
+          _lastEffectiveCompleteTime: number
+          _lastCompleteTime: number
+        }
+        like: {
+          enabled: boolean
+          isWhiteList: boolean
+          roomidList: number[]
+          _lastCompleteTime: number
+        }
+        danmu: {
+          enabled: boolean
+          danmuList: string[]
+          onlyWhenNotLiving: boolean
+          isWhiteList: boolean
+          roomidList: number[]
           _lastCompleteTime: number
         }
         watch: {
           enabled: boolean
-          time: number
+          isWhiteList: boolean
+          roomidList: number[]
           _watchingProgress: Record<string, number>
           _lastWatchTime: number
           _lastCompleteTime: number
         }
-        isWhiteList: boolean
-        roomidList: number[]
       }
     }
     OtherTasks: {
@@ -93,16 +109,10 @@ interface ModuleConfig {
     removeComboCard: {
       enabled: boolean
     }
-    removeRank: {
-      enabled: boolean
-    }
     removeHeaderStuff: {
       enabled: boolean
     }
     removeFlipView: {
-      enabled: boolean
-    }
-    removeRecommendRoom: {
       enabled: boolean
     }
     removeLiveMosaic: {
@@ -124,7 +134,12 @@ interface UiConfig {
   isShowPanel: boolean
   activeMenuIndex: MenuIndex
   panelWidthPercent: number
-  medalInfoPanelSortMode: boolean
+  medalInfoPanelIsSortMode: {
+    light: boolean
+    like: boolean
+    danmu: boolean
+    watch: boolean
+  }
 }
 
 interface Cache {

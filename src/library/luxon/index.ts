@@ -75,30 +75,27 @@ function delayToNextMoment(hour: number = 0, minute: number = 5): Duration {
 }
 
 /**
- * 判断现在是不是处在目标时间范围内
+ * 判断现在是不是在目标时间之前
  *
- * 如果开始时间晚于结束时间，则将结束时间视为第二天的时间
- *
- * @param startHour 开始小时
- * @param startMinute 开始分钟
- * @param endHour 结束小时
- * @param endMinute 结束分钟
+ * @param hour 小时（0-23）
+ * @param minute 分钟（0-59）
  */
-function isNowIn(
-  startHour: number,
-  startMinute: number,
-  endHour: number,
-  endMinute: number,
-): boolean {
+function isNowBefore(hour: number, minute: number): boolean {
   const now = DateTime.now()
-  const start = DateTime.local(now.year, now.month, now.day, startHour, startMinute)
-  let end = DateTime.local(now.year, now.month, now.day, endHour, endMinute)
+  const target = DateTime.local(now.year, now.month, now.day, hour, minute, 0, 0)
+  return now < target
+}
 
-  if (start > end) {
-    end = end.plus({ days: 1 })
-  }
-
-  return now >= start && now < end
+/**
+ * 判断现在是不是在目标时间之后
+ *
+ * @param hour 小时（0-23）
+ * @param minute 分钟（0-59）
+ */
+function isNowAfter(hour: number, minute: number): boolean {
+  const now = DateTime.now()
+  const target = DateTime.local(now.year, now.month, now.day, hour, minute, 0, 0)
+  return now > target
 }
 
 /**
@@ -115,4 +112,4 @@ function tsm(): number {
   return DateTime.now().toMillis()
 }
 
-export { isTimestampToday, delayToNextMoment, isNowIn, ts, tsm }
+export { isTimestampToday, delayToNextMoment, isNowBefore, isNowAfter, ts, tsm }

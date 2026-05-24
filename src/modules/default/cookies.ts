@@ -13,7 +13,7 @@ class Cookies extends BaseModule {
    * buvid3: 作为参数 buvid 在请求中出现，目前仅在主站 API 中使用
    */
   private getCookies(): Promise<BiliCookies> {
-    return Cookie.getAsync(['bili_jct', 'LIVE_BUVID', 'buvid3'], 300, 12e3)
+    return Cookie.getAsync(['bili_jct', 'LIVE_BUVID', 'buvid3'], 12e3)
   }
 
   public async run(): Promise<void> {

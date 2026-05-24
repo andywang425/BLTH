@@ -1,12 +1,13 @@
-import { delayToNextMoment, isNowIn, isTimestampToday, tsm } from '@/library/luxon'
+import { delayToNextMoment, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore } from '@/stores'
 import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
-import type { LightTaskMedalFilters, MedalsByLivingStatus } from './types'
 import type { LiveData } from '@/library/bili-api/data'
+
+type MedalsByLiving = [LiveData.FansMedalPanel.List[], LiveData.FansMedalPanel.List[]]
 
 class LightTask extends MedalModule {
   config = this.medalTasksConfig.light
@@ -15,39 +16,33 @@ class LightTask extends MedalModule {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.light = s
   }
 
-  private MEDAL_FILTERS: LightTaskMedalFilters = {
-    // 点亮返回true，否则返回false
-    isLighted: (medal) => medal.medal.is_lighted === 1,
-    // 直播中返回on，否则返回off
-    livingStatus: (medal) => (medal.room_info.living_status === 1 ? 'on' : 'off'),
-  }
-
   /**
-   * 获取粉丝勋章
-   * @returns 根据直播状态划分、经过排序和过滤的粉丝勋章
+   * 获取未点亮的粉丝勋章
+   *
+   * @returns [[主播未开播的粉丝勋章], [主播开播中的粉丝勋章]]
    */
-  private getMedals(): MedalsByLivingStatus {
+  private getMedals(): MedalsByLiving {
     const fansMedals = useBiliStore().filteredFansMedals
-
-    const result: MedalsByLivingStatus = {
-      on: [],
-      off: [],
-    }
+    const result: MedalsByLiving = [[], []]
 
     fansMedals.forEach((medal) => {
-      if (!this.PUBLIC_MEDAL_FILTERS.whiteBlackList(medal) || this.MEDAL_FILTERS.isLighted(medal)) {
+      if (
+        !this.SHARED_MEDAL_FILTERS.meetWhiteOrBlackList(medal) ||
+        this.SHARED_MEDAL_FILTERS.isLighted(medal)
+      ) {
         // 跳过被黑白名单过滤的和已经点亮的粉丝勋章
         return
       }
 
-      const livingStatus = this.MEDAL_FILTERS.livingStatus(medal)
-      result[livingStatus].push(medal)
+      // 根据直播状态划分
+      const index = this.SHARED_MEDAL_FILTERS.isLiving(medal) ? 1 : 0
+      result[index].push(medal)
     })
 
-    if (this.medalTasksConfig.isWhiteList) {
+    if (this.config.isWhiteList) {
       // 白名单排序
-      this.sortMedals(result.on)
-      this.sortMedals(result.off)
+      this.sortMedals(result[0])
+      this.sortMedals(result[1])
     }
 
     return result
@@ -94,11 +89,15 @@ class LightTask extends MedalModule {
       const response = await BAPI.live.sendMsg(danmu, room_id)
       this.logger.log(`BAPI.live.sendMsg(${danmu}, ${room_id})`, response)
       if (response.code === 0) {
-        if (response.msg === 'k') {
-          this.logger.warn(`点亮熄灭勋章-发送弹幕 ${logMessage} 异常，弹幕可能包含屏蔽词`)
-        } else {
-          this.logger.log(`点亮熄灭勋章-发送弹幕 ${logMessage} 成功`)
+        if (response.msg === '') {
+          this.logger.log(`点亮熄灭勋章-发弹幕 ${logMessage} 成功`)
           return true
+        } else if (response.msg === 'k') {
+          this.logger.warn(`点亮熄灭勋章-发弹幕 ${logMessage} 异常，弹幕可能包含屏蔽词`)
+        } else if (response.msg === 'f') {
+          this.logger.warn(`点亮熄灭勋章-发弹幕 ${logMessage} 异常，弹幕被过滤`)
+        } else {
+          this.logger.warn(`点亮熄灭勋章-发弹幕 ${logMessage} 异常，未知错误：${response.msg}`)
         }
       } else {
         this.logger.error(`点亮熄灭勋章-发送弹幕 ${logMessage} 失败`, response.message)
@@ -115,13 +114,17 @@ class LightTask extends MedalModule {
    * @param medals
    * @private
    */
-  private async likeTask(medals: LiveData.FansMedalPanel.List[]) {
+  private async likeTask(medals: LiveData.FansMedalPanel.List[]): Promise<void> {
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
-      await this.like(medal, _.random(30, 35))
+      const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
+      const item = MedalModule.findTaskInfo(taskInfo, 'like')
+      // 从 title 解析点亮所需点赞次数（如 "点赞30次" → 30），失败时 fallback 到 30
+      const baseCount = MedalModule.parseTitleCount(item?.title) ?? 30
+      await this.like(medal, _.random(baseCount, baseCount + 5))
 
       if (i < medals.length - 1) {
-        await sleep(_.random(30000, 35000))
+        await sleep(_.random(15000, 20000))
       }
     }
   }
@@ -131,19 +134,27 @@ class LightTask extends MedalModule {
    * @param medals
    * @private
    */
-  private async sendDanmuTask(medals: LiveData.FansMedalPanel.List[]) {
+  private async sendDanmuTask(medals: LiveData.FansMedalPanel.List[]): Promise<void> {
     let danmuIndex = 0
 
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
-      let target = 10
+      const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
+      const item = MedalModule.findTaskInfo(taskInfo, 'sendDanmu')
+      // 从 title 解析点亮所需弹幕条数（如 "发弹幕10次" → 10），失败时 fallback 到 10
+      let target = MedalModule.parseTitleCount(item?.title) ?? 10
+      let failedCount = 0
 
       for (let j = 0; j < target; j++) {
         const danmuText = this.config.danmuList[danmuIndex++ % this.config.danmuList.length]
 
         if (!(await this.sendDanmu(medal, danmuText))) {
-          // 弹幕发送失败，多尝试一次，每个直播间最多发13条
-          target = Math.min(target + 1, 13)
+          if (++failedCount > MedalModule.DANMU_RETRY_LIMIT) {
+            this.logger.warn(`当前直播间（${medal.room_info.room_id}）弹幕发送失败次数过多，跳过`)
+            await sleep(_.random(6000, 8000))
+            break
+          }
+          target++
         }
 
         if (i < medals.length - 1 || j < target - 1) {
@@ -164,15 +175,22 @@ class LightTask extends MedalModule {
       }
 
       this.status = 'running'
+      MedalModule.clearTaskInfoCache()
       const fansMedals = this.getMedals()
-
-      await Promise.allSettled([this.likeTask(fansMedals.on), this.sendDanmuTask(fansMedals.off)])
+      // 是否有需要点亮的粉丝勋章（是不是一次有效运行？）
+      const isEffectiveRun = fansMedals.some((medals) => medals.length > 0)
+      if (isEffectiveRun) {
+        await Promise.allSettled([this.sendDanmuTask(fansMedals[0]), this.likeTask(fansMedals[1])])
+      }
 
       this.config._lastCompleteTime = tsm()
+      if (isEffectiveRun) {
+        this.config._lastEffectiveCompleteTime = this.config._lastCompleteTime
+      }
       this.status = 'done'
       this.logger.log('点亮熄灭勋章任务已完成')
     } else {
-      if (isNowIn(0, 0, 0, 5)) {
+      if (isNowBefore(0, 5)) {
         this.logger.log('昨天的给点亮熄灭勋章任务已经完成过了，等到今天的00:05再执行')
       } else {
         this.logger.log('今天已经完成过点亮熄灭勋章任务了')

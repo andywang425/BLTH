@@ -55,12 +55,6 @@ const config = moduleStore.moduleConfig.RemoveElement
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
-        <el-switch v-model="config.removeRank.enabled" active-text="移除排行榜" />
-        <Info :item="helpInfo.RemoveElement.removeRank" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.removeHeaderStuff.enabled" active-text="移除直播画面上方杂项" />
         <Info :item="helpInfo.RemoveElement.removeHeaderStuff" />
       </el-space>
@@ -69,15 +63,6 @@ const config = moduleStore.moduleConfig.RemoveElement
       <el-space wrap :size="[8, 0]">
         <el-switch v-model="config.removeFlipView.enabled" active-text="移除礼物栏下方广告" />
         <Info :item="helpInfo.RemoveElement.removeFlipView" />
-      </el-space>
-    </el-row>
-    <el-row>
-      <el-space wrap:size="[8, 0]">
-        <el-switch
-          v-model="config.removeRecommendRoom.enabled"
-          active-text="移除礼物栏下方推荐直播间"
-        />
-        <Info :item="helpInfo.RemoveElement.removeRecommendRoom" />
       </el-space>
     </el-row>
     <el-row>

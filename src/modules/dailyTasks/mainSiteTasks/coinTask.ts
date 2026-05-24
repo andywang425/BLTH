@@ -1,5 +1,5 @@
 import BaseModule from '@/modules/BaseModule'
-import { isTimestampToday, delayToNextMoment, tsm, isNowIn } from '@/library/luxon'
+import { isTimestampToday, delayToNextMoment, tsm, isNowBefore } from '@/library/luxon'
 import { useBiliStore, useModuleStore } from '@/stores'
 import BAPI from '@/library/bili-api'
 import type { ModuleStatusTypes } from '@/types'
@@ -169,7 +169,7 @@ class CoinTask extends BaseModule {
     } else {
       // 为了更加准确的语言描述和任务状态图标显示，需要判断当前所处的时间段
       // 下面文字中的今天、昨天是指真实的今天、昨天而非在 isTimestampToday 函数中重新定义的
-      if (isNowIn(0, 0, 0, 5)) {
+      if (isNowBefore(0, 5)) {
         // 在半夜00:00 ~ 00:05
         this.logger.log('昨天的每日投币任务已经完成过了，等到今天的00:05再执行')
       } else {

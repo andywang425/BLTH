@@ -26,6 +26,8 @@ const defaultModuleStatus: ModuleStatus = {
     LiveTasks: {
       medalTasks: {
         light: '',
+        like: '',
+        danmu: '',
         watch: '',
       },
     },
@@ -93,10 +95,25 @@ export const useModuleStore = defineStore('module', () => {
         medalTasks: {
           light: () => {
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light = ''
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastEffectiveCompleteTime = 0
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastCompleteTime = 0
 
             rerunModule('Default_FansMedals', true)
             rerunModule('DailyTask_LiveTask_LightTask')
+          },
+          like: () => {
+            moduleStatus.value.DailyTasks.LiveTasks.medalTasks.like = ''
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.like._lastCompleteTime = 0
+
+            rerunModule('Default_FansMedals', true)
+            rerunModule('DailyTask_LiveTask_LikeTask')
+          },
+          danmu: () => {
+            moduleStatus.value.DailyTasks.LiveTasks.medalTasks.danmu = ''
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.danmu._lastCompleteTime = 0
+
+            rerunModule('Default_FansMedals', true)
+            rerunModule('DailyTask_LiveTask_DanmuTask')
           },
           watch: () => {
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.watch = ''

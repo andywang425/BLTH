@@ -17,6 +17,8 @@ interface HelpInfo {
       medalTasks: {
         list: HelpInfoItem
         light: HelpInfoItem
+        like: HelpInfoItem
+        danmu: HelpInfoItem
         watch: HelpInfoItem
       }
     }
@@ -41,10 +43,8 @@ interface HelpInfo {
     removeGiftPopover: HelpInfoItem
     removeMicPopover: HelpInfoItem
     removeComboCard: HelpInfoItem
-    removeRank: HelpInfoItem
     removeHeaderStuff: HelpInfoItem
     removeFlipView: HelpInfoItem
-    removeRecommendRoom: HelpInfoItem
     removeLiveMosaic: HelpInfoItem
   }
 }
