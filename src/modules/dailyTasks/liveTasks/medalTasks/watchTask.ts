@@ -38,10 +38,6 @@ class RoomHeart {
 
   private logger = new Logger('RoomHeart')
 
-  set status(s: ModuleStatusTypes) {
-    useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.watch = s
-  }
-
   /** 今日当前直播间已观看时间（秒） */
   private watchedSeconds: number
 

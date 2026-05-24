@@ -1,5 +1,4 @@
 import BaseModule from '@/modules/BaseModule'
-import { storeToRefs } from 'pinia'
 import { useBiliStore, useModuleStore } from '@/stores'
 import { watch } from 'vue'
 import type { MedalTaskSharedConfig, SharedMedalFilters } from './types'
@@ -48,11 +47,14 @@ class MedalModule extends BaseModule {
     isLiving: (medal) => medal.room_info.living_status === 1,
   }
 
-  protected sortMedals(medals: LiveData.FansMedalPanel.List[]): LiveData.FansMedalPanel.List[] {
+  /**
+   * 对粉丝勋章列表进行排序
+   *
+   * 注意：该方法会修改传入的 medals 数组
+   */
+  protected sortMedals(medals: LiveData.FansMedalPanel.List[]): void {
     const orderMap = arrayToMap(this.config.roomidList)
-    return medals.sort(
-      (a, b) => orderMap.get(a.room_info.room_id)! - orderMap.get(b.room_info.room_id)!,
-    )
+    medals.sort((a, b) => orderMap.get(a.room_info.room_id)! - orderMap.get(b.room_info.room_id)!)
   }
 
   /**
@@ -62,19 +64,22 @@ class MedalModule extends BaseModule {
    */
   protected waitForFansMedals(): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      const { fansMedalsStatus } = storeToRefs(useBiliStore())
-      if (fansMedalsStatus.value === 'loaded') {
+      const biliStore = useBiliStore()
+      if (biliStore.fansMedalsStatus === 'loaded') {
         resolve(true)
       } else {
-        const unwatch = watch(fansMedalsStatus, (newValue) => {
-          if (newValue === 'loaded') {
-            unwatch()
-            resolve(true)
-          } else if (newValue === 'error') {
-            unwatch()
-            resolve(false)
-          }
-        })
+        const unwatch = watch(
+          () => biliStore.fansMedalsStatus,
+          (newValue) => {
+            if (newValue === 'loaded') {
+              unwatch()
+              resolve(true)
+            } else if (newValue === 'error') {
+              unwatch()
+              resolve(false)
+            }
+          },
+        )
       }
     })
   }
