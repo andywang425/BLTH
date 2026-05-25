@@ -15,16 +15,6 @@ class MedalModule extends BaseModule {
   protected static readonly DANMU_RETRY_LIMIT = 3
 
   /**
-   * 任务信息共享缓存
-   *
-   * target_id -> task_info Promise
-   */
-  private static taskInfoCache = new Map<
-    number,
-    Promise<LiveData.GetActivatedMedalInfo.TaskInfo[] | null>
-  >()
-
-  /**
    * 简单限流队列
    *
    * 串行执行获取任务信息请求
@@ -125,26 +115,19 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 清空任务信息共享缓存
-   */
-  protected static clearTaskInfoCache(): void {
-    MedalModule.taskInfoCache.clear()
-  }
-
-  /**
    * 将获取任务信息请求加入全局串行队列
    */
   private static enqueueTaskInfoRequest<T>(requester: () => Promise<T>): Promise<T> {
     const task = MedalModule.taskInfoRequestQueue
-      .catch(() => undefined)
+      .catch(() => {})
       .then(async () => {
         await sleep(_.random(300, 500))
         return requester()
       })
 
     MedalModule.taskInfoRequestQueue = task.then(
-      () => undefined,
-      () => undefined,
+      () => {},
+      () => {},
     )
 
     return task
@@ -153,8 +136,7 @@ class MedalModule extends BaseModule {
   /**
    * 获取指定粉丝勋章的任务信息
    *
-   * 同一 target_id 的并发请求会共享同一个 Promise；
-   * 不同 target_id 的请求会进入全局串行队列，避免短时间内并发触发过多请求
+   * 请求会进入全局串行队列，避免短时间内并发触发过多请求
    *
    * @param target_id 主播 uid
    * @returns 成功返回任务信息数组，失败返回 null
@@ -162,10 +144,7 @@ class MedalModule extends BaseModule {
   protected fetchTaskInfo(
     target_id: number,
   ): Promise<LiveData.GetActivatedMedalInfo.TaskInfo[] | null> {
-    const cached = MedalModule.taskInfoCache.get(target_id)
-    if (cached) return cached
-
-    const promise = MedalModule.enqueueTaskInfoRequest(async () => {
+    return MedalModule.enqueueTaskInfoRequest(async () => {
       try {
         const response = await BAPI.live.getActivatedMedalInfo(target_id)
         this.logger.log(`BAPI.live.getActivatedMedalInfo(${target_id}) response`, response)
@@ -173,18 +152,13 @@ class MedalModule extends BaseModule {
           return response.data.task_info
         } else {
           this.logger.error(`BAPI.live.getActivatedMedalInfo(${target_id}) 失败`, response.message)
-          MedalModule.taskInfoCache.delete(target_id)
           return null
         }
       } catch (error) {
         this.logger.error(`BAPI.live.getActivatedMedalInfo(${target_id}) 出错`, error)
-        MedalModule.taskInfoCache.delete(target_id)
         return null
       }
     })
-
-    MedalModule.taskInfoCache.set(target_id, promise)
-    return promise
   }
 
   /**

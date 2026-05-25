@@ -319,7 +319,6 @@ class WatchTask extends MedalModule {
       }
 
       this.status = 'running'
-      MedalModule.clearTaskInfoCache()
 
       if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
         // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0

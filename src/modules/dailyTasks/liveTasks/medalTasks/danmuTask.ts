@@ -82,7 +82,6 @@ class DanmuTask extends MedalModule {
       }
 
       this.status = 'running'
-      MedalModule.clearTaskInfoCache()
       const fansMedals = this.getMedals()
       let allCompleted = true
       let danmuIndex = 0

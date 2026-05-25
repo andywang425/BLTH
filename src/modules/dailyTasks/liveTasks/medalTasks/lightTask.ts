@@ -175,7 +175,6 @@ class LightTask extends MedalModule {
       }
 
       this.status = 'running'
-      MedalModule.clearTaskInfoCache()
       const fansMedals = this.getMedals()
       // 是否有需要点亮的粉丝勋章（是不是一次有效运行？）
       const isEffectiveRun = fansMedals.some((medals) => medals.length > 0)
