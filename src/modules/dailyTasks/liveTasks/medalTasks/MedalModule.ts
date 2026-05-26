@@ -134,22 +134,20 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 获取指定粉丝勋章的任务信息
+   * 获取指定粉丝勋章的信息
    *
    * 请求会进入全局串行队列，避免短时间内并发触发过多请求
    *
    * @param target_id 主播 uid
-   * @returns 成功返回任务信息数组，失败返回 null
+   * @returns 成功返回完整 Data，失败返回 null
    */
-  protected fetchTaskInfo(
-    target_id: number,
-  ): Promise<LiveData.GetActivatedMedalInfo.TaskInfo[] | null> {
+  protected fetchMedalData(target_id: number): Promise<LiveData.GetActivatedMedalInfo.Data | null> {
     return MedalModule.enqueueTaskInfoRequest(async () => {
       try {
         const response = await BAPI.live.getActivatedMedalInfo(target_id)
         this.logger.log(`BAPI.live.getActivatedMedalInfo(${target_id}) response`, response)
         if (response.code === 0) {
-          return response.data.task_info
+          return response.data
         } else {
           this.logger.error(`BAPI.live.getActivatedMedalInfo(${target_id}) 失败`, response.message)
           return null
@@ -159,6 +157,20 @@ class MedalModule extends BaseModule {
         return null
       }
     })
+  }
+
+  /**
+   * 完成某粉丝勋章任务后，重新调用 fetchMedalData 检查储蓄亲密度，若存在则提示用户
+   */
+  protected async logFreeIntimacy(medal: LiveData.FansMedalPanel.List): Promise<void> {
+    const data = await this.fetchMedalData(medal.medal.target_id)
+
+    if (data && data.free_intimacy > 0) {
+      const reachLimitText = data.reach_free_intimacy_limit ? '（已达到储蓄亲密度上限）' : ''
+      this.logger.log(
+        `粉丝勋章【${medal.medal.medal_name}】储蓄了 ${data.free_intimacy} 亲密度${reachLimitText}，投喂一个粉丝灯牌即可领取这些亲密度`,
+      )
+    }
   }
 
   /**

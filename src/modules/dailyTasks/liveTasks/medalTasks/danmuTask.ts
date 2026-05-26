@@ -94,15 +94,15 @@ class DanmuTask extends MedalModule {
         }
 
         const medal = fansMedals[i]
-        const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
-        if (!taskInfo) {
+        const medalData = await this.fetchMedalData(medal.medal.target_id)
+        if (!medalData) {
           this.logger.error(
             `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过发弹幕任务`,
           )
           continue
         }
 
-        const item = MedalModule.findTaskInfo(taskInfo, 'sendDanmu')
+        const item = MedalModule.findTaskInfo(medalData.task_info, 'sendDanmu')
         if (!item) {
           this.logger.error(
             `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到发弹幕任务，跳过发弹幕任务`,
@@ -146,6 +146,8 @@ class DanmuTask extends MedalModule {
             await sleep(_.random(6000, 8000))
           }
         }
+
+        await this.logFreeIntimacy(medal)
       }
 
       if (allCompleted) {

@@ -112,16 +112,21 @@ class LightTask extends MedalModule {
   /**
    * 给正在直播的直播间点赞
    * @param medals
-   * @private
    */
   private async likeTask(medals: LiveData.FansMedalPanel.List[]): Promise<void> {
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
-      const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
-      const item = MedalModule.findTaskInfo(taskInfo, 'like')
-      // 从 title 解析点亮所需点赞次数（如 "点赞30次" → 30），失败时 fallback 到 30
+      const medalData = await this.fetchMedalData(medal.medal.target_id)
+      if (!medalData) {
+        this.logger.error(
+          `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团点亮任务信息，跳过点赞任务`,
+        )
+        continue
+      }
+
+      const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
       const baseCount = MedalModule.parseTitleCount(item?.title) ?? 30
-      await this.like(medal, _.random(baseCount, baseCount + 5))
+      await this.like(medal, _.random(baseCount, baseCount + 3))
 
       if (i < medals.length - 1) {
         await sleep(_.random(15000, 20000))
@@ -132,16 +137,21 @@ class LightTask extends MedalModule {
   /**
    * 在未开播的直播间发弹幕
    * @param medals
-   * @private
    */
   private async sendDanmuTask(medals: LiveData.FansMedalPanel.List[]): Promise<void> {
     let danmuIndex = 0
 
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
-      const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
-      const item = MedalModule.findTaskInfo(taskInfo, 'sendDanmu')
-      // 从 title 解析点亮所需弹幕条数（如 "发弹幕10次" → 10），失败时 fallback 到 10
+      const medalData = await this.fetchMedalData(medal.medal.target_id)
+      if (!medalData) {
+        this.logger.error(
+          `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团点亮任务信息，跳过发弹幕任务`,
+        )
+        continue
+      }
+
+      const item = MedalModule.findTaskInfo(medalData.task_info, 'sendDanmu')
       let target = MedalModule.parseTitleCount(item?.title) ?? 10
       let failedCount = 0
 

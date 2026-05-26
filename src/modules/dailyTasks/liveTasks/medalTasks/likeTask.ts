@@ -81,15 +81,15 @@ class LikeTask extends MedalModule {
         }
 
         const medal = fansMedals[i]
-        const taskInfo = await this.fetchTaskInfo(medal.medal.target_id)
-        if (!taskInfo) {
+        const medalData = await this.fetchMedalData(medal.medal.target_id)
+        if (!medalData) {
           this.logger.error(
             `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过点赞任务`,
           )
           continue
         }
 
-        const item = MedalModule.findTaskInfo(taskInfo, 'like')
+        const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
         if (!item) {
           this.logger.error(
             `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
@@ -120,12 +120,14 @@ class LikeTask extends MedalModule {
             break outer
           }
 
-          await this.like(medal, _.random(times, times + 5))
+          await this.like(medal, _.random(times, times + 3))
 
           if (j < remaining - 1 || i < fansMedals.length - 1) {
             await sleep(_.random(15000, 20000))
           }
         }
+
+        await this.logFreeIntimacy(medal)
       }
 
       if (allCompleted) {
