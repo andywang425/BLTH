@@ -43,6 +43,21 @@ interface BapiMethods {
     getInfoByRoom: (room_id: number, web_location?: string) => Promise<Live.GetInfoByRoom>
     silver2coin: (visit_id?: string) => Promise<Live.Silver2coin>
     coin2silver: (num: number, platform?: string, visit_id?: string) => Promise<Live.Coin2silver>
+    getRoomPlayInfo: (
+      room_id: number,
+      qn?: number,
+      protocol?: string,
+      format?: string,
+      codec?: string,
+      platform?: string,
+      ptype?: number,
+      dolby?: number,
+      panorama?: number,
+      eotf?: string,
+      req_reason?: number,
+      supported_drms?: string,
+      web_location?: string,
+    ) => Promise<Live.GetRoomPlayInfo>
   }
   liveTrace: {
     E: (

@@ -122,6 +122,40 @@ const BAPI: BapiMethods = {
         visit_id,
       })
     },
+    getRoomPlayInfo: (
+      room_id,
+      qn = 0,
+      protocol = '0,1',
+      format = '0,1,2',
+      codec = '0,1,2',
+      platform = 'web',
+      ptype = 8,
+      dolby = 5,
+      panorama = 1,
+      eotf = '0,1,2',
+      req_reason = 0,
+      supported_drms = '0,1,2,3',
+      web_location = '444.8',
+    ) => {
+      return request.live.get(
+        '/xlive/web-room/v2/index/getRoomPlayInfo',
+        wbiSign({
+          room_id,
+          protocol,
+          format,
+          codec,
+          qn,
+          platform,
+          ptype,
+          dolby,
+          panorama,
+          eotf,
+          req_reason,
+          supported_drms,
+          web_location,
+        }),
+      )
+    },
   },
   liveTrace: {
     E: (id, device, ruid, is_patch = 0, heart_beat = [], web_location = '444.8') => {

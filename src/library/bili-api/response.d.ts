@@ -47,6 +47,13 @@ declare namespace Live {
     data: { silver: number }
     message: string
   }
+
+  interface GetRoomPlayInfo {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.GetRoomPlayInfo.Data
+  }
 }
 
 declare namespace LiveTrace {
