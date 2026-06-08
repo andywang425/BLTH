@@ -7,6 +7,7 @@ import type {
   TaskJumpType,
   WaitProbeResult,
   WaitProbeSnapshot,
+  WaitProbeSnapshotReusability,
   WaitStrategy,
 } from './types'
 import { arrayToMap, sleep } from '@/library/utils'
@@ -237,6 +238,8 @@ class MedalModule extends BaseModule {
 
   /**
    * 计算等待探测策略
+   *
+   * @param pendingCount 当前待探测的直播间数量
    */
   protected decideWaitStrategy(pendingCount: number): WaitStrategy {
     const totalMedalCount = useBiliStore().filteredFansMedals.length
@@ -245,21 +248,45 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 判断快照是否仍可复用
+   * 判断等待探测快照是否可复用
+   *
+   * @param snapshot 待判断的快照
+   * @param roomids 当前待探测的直播间ID列表
    */
-  private static canReuseWaitProbeSnapshot(
+  private static waitProbeSnapshotReuseCheck(
     snapshot: WaitProbeSnapshot,
     roomids: number[],
-    skipTTL = false,
-  ): boolean {
-    const uncovered = MedalModule.getUncoveredRoomidsFromSnapshot(snapshot, roomids, skipTTL)
-    return uncovered !== null && uncovered.length === 0
+  ): WaitProbeSnapshotReusability {
+    const uncovered = MedalModule.getUncoveredRoomidsFromSnapshot(snapshot, roomids)
+    if (uncovered === null) return 'none'
+    return uncovered.length === 0 ? 'full' : 'partial'
   }
 
   /**
-   * 获取快照中尚未覆盖的房间列表
+   * 检查等待探测快照是否在有效期内
    *
-   * 仅成功快照才允许参与部分复用
+   * @param snapshot 待判断的快照
+   * @param skipTTL 是否跳过快照有效时间的判断
+   * @returns 快照在有效期内返回 true，否则返回 false
+   */
+  private static waitProbeSnapshotTimeCheck(snapshot: WaitProbeSnapshot, skipTTL = false): boolean {
+    if (skipTTL || Date.now() - snapshot.createdAt < MedalModule.WAIT_PROBE_SNAPSHOT_TTL) {
+      return true
+    }
+
+    return false
+  }
+
+  /**
+   * 获取等待探测快照中尚未覆盖的房间列表
+   *
+   * 仅有效（成功且未过期）快照才允许参与部分复用
+   *
+   * @param snapshot 待判断的快照
+   * @param roomids 当前待探测的直播间ID列表
+   * @param skipTTL 是否跳过快照有效时间的判断
+   *
+   * @returns 快照不可用返回 null，否则返回尚未覆盖的房间ID列表
    */
   private static getUncoveredRoomidsFromSnapshot(
     snapshot: WaitProbeSnapshot,
@@ -269,7 +296,8 @@ class MedalModule extends BaseModule {
     if (!snapshot.isSuccessful) {
       return null
     }
-    if (!skipTTL && Date.now() - snapshot.createdAt > MedalModule.WAIT_PROBE_SNAPSHOT_TTL) {
+
+    if (!MedalModule.waitProbeSnapshotTimeCheck(snapshot, skipTTL)) {
       return null
     }
 
@@ -283,10 +311,10 @@ class MedalModule extends BaseModule {
    * 后面的快照会覆盖前面的同房间数据
    */
   private static mergeWaitProbeSnapshots(...snapshots: WaitProbeSnapshot[]): WaitProbeSnapshot {
-    const roomids = [...new Set(snapshots.flatMap((snapshot) => snapshot.roomids))]
-    const createdAt = Math.min(...snapshots.map((snapshot) => snapshot.createdAt))
-    const strategy = snapshots.at(-1)!.strategy
-    const isSuccessful = snapshots.some((snapshot) => snapshot.isSuccessful)
+    const roomids = [...new Set(snapshots.flatMap((snapshot) => snapshot.roomids))] // 合并房间列表并去重
+    const createdAt = Math.min(...snapshots.map((snapshot) => snapshot.createdAt)) // 取最早的创建时间
+    const strategy = snapshots.at(-1)!.strategy // 取最后一个快照的策略
+    const isSuccessful = snapshots.some((snapshot) => snapshot.isSuccessful) // 只要有一份快照成功就认为合并后的快照成功（方便部分复用快照）
     const liveStatusMap = new Map<number, number | null>()
     const medalMap = new Map<number, LiveData.FansMedalPanel.List>()
 
@@ -378,28 +406,41 @@ class MedalModule extends BaseModule {
    * 获取可在多个任务模块之间复用的一轮等待探测快照
    */
   private async getSharedWaitProbeSnapshot(roomids: number[]): Promise<WaitProbeSnapshot> {
+    // 可复用快照列表，最多包含两份快照：[旧快照 cachedSnapshot, 先前正在探测中、刚刚完成探测的快照 inflightSnapshot]
     const reusableSnapshots: WaitProbeSnapshot[] = []
+    // 旧快照（最近一次等待探测快照）
     const cachedSnapshot = MedalModule.sharedWaitProbeSnapshot
-    if (cachedSnapshot && MedalModule.canReuseWaitProbeSnapshot(cachedSnapshot, roomids)) {
-      // 旧快照可以完全复用
-      return cachedSnapshot
-    }
-    if (
-      cachedSnapshot &&
-      MedalModule.getUncoveredRoomidsFromSnapshot(cachedSnapshot, roomids) !== null
-    ) {
-      reusableSnapshots.push(cachedSnapshot)
+
+    if (cachedSnapshot) {
+      const cachedSnapshotReusability = MedalModule.waitProbeSnapshotReuseCheck(
+        cachedSnapshot,
+        roomids,
+      )
+
+      if (cachedSnapshotReusability === 'full') {
+        // 旧快照可以完全复用
+        return cachedSnapshot
+      }
+      if (cachedSnapshotReusability === 'partial') {
+        // 旧快照可以部分复用
+        reusableSnapshots.push(cachedSnapshot)
+      }
     }
 
     if (MedalModule.sharedWaitProbePromise) {
+      // 存在正在进行中的等待探测，先等该探测完成
       const inflightSnapshot = await MedalModule.sharedWaitProbePromise
-      if (MedalModule.canReuseWaitProbeSnapshot(inflightSnapshot, roomids, true)) {
+      const inflightSnapshotReusability = MedalModule.waitProbeSnapshotReuseCheck(
+        inflightSnapshot,
+        roomids,
+      )
+
+      if (inflightSnapshotReusability === 'full') {
+        // 该轮探测结果可以完全复用
         return inflightSnapshot
       }
-      if (
-        inflightSnapshot !== cachedSnapshot &&
-        MedalModule.getUncoveredRoomidsFromSnapshot(inflightSnapshot, roomids, true) !== null
-      ) {
+      if (inflightSnapshotReusability === 'partial') {
+        // 该轮探测结果可以部分复用
         reusableSnapshots.push(inflightSnapshot)
       }
     }
@@ -408,28 +449,40 @@ class MedalModule extends BaseModule {
       this.decideWaitStrategy(roomids.length) === 'single-probe' &&
       reusableSnapshots.length > 0
     ) {
+      // 使用单房间探测策略且存在可复用的探测结果快照，先合并这些快照
       const mergedReusableSnapshot = MedalModule.mergeWaitProbeSnapshots(...reusableSnapshots)
+      // 计算合并后的快照尚未覆盖的房间列表
       const uncoveredRoomids = MedalModule.getUncoveredRoomidsFromSnapshot(
         mergedReusableSnapshot,
         roomids,
-        true,
+        true, // 此时旧快照可能已经过期，最后使用它一次，跳过快照有效时间的判断
       )
 
       if (uncoveredRoomids && uncoveredRoomids.length === 0) {
-        MedalModule.sharedWaitProbeSnapshot = mergedReusableSnapshot
+        // 合并后的快照已经覆盖了所有待探测的房间，直接使用该快照，无需再发起新的探测
+        if (MedalModule.waitProbeSnapshotTimeCheck(mergedReusableSnapshot)) {
+          // 合并后的快照在有效期内，更新“最近一次等待探测快照”为合并后的快照
+          MedalModule.sharedWaitProbeSnapshot = mergedReusableSnapshot
+        } else {
+          // 否则取最近一次等待探测快照，可能是过期的旧快照，也可能是先前正在探测中、刚刚完成探测的快照（这份新鲜出炉的快照一定没过期）
+          MedalModule.sharedWaitProbeSnapshot = reusableSnapshots.at(-1)!
+        }
+
         return mergedReusableSnapshot
       }
 
       if (uncoveredRoomids && uncoveredRoomids.length > 0) {
-        const probePromise = this.createWaitProbeSnapshot(uncoveredRoomids).then((patchSnapshot) =>
-          MedalModule.mergeWaitProbeSnapshots(mergedReusableSnapshot, patchSnapshot),
-        )
+        // 合并后的快照尚未覆盖所有待探测的房间，对尚未覆盖的房间发起新的探测
+        const probePromise = this.createWaitProbeSnapshot(uncoveredRoomids)
         MedalModule.sharedWaitProbePromise = probePromise
-
         try {
-          const mergedSnapshot = await probePromise
-          MedalModule.sharedWaitProbeSnapshot = mergedSnapshot
-          return mergedSnapshot
+          const patchSnapshot = await probePromise
+          // 将“最近一次等待探测快照”更新为刚刚对尚未覆盖的房间发起新的探测得到的快照
+          // 这里舍弃了之前合并得到的快照 mergedReusableSnapshot，原因是我们刚刚等“尚未覆盖的房间发起新的探测”完成导致又流逝了一段时间，
+          // 此时 mergedReusableSnapshot 要么已经过期，要么接近过期了（虽然这点在小数据量下可能不成立），不如直接使用新鲜出炉的 patchSnapshot
+          MedalModule.sharedWaitProbeSnapshot = patchSnapshot
+          // 此处最后使用一次 mergedReusableSnapshot 中的数据，将它和 patchSnapshot 合并后返回，避免之前可复用的探测结果数据被浪费
+          return MedalModule.mergeWaitProbeSnapshots(mergedReusableSnapshot, patchSnapshot)
         } finally {
           if (MedalModule.sharedWaitProbePromise === probePromise) {
             MedalModule.sharedWaitProbePromise = null
