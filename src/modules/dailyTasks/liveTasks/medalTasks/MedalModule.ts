@@ -1,32 +1,43 @@
 import BaseModule from '@/modules/BaseModule'
 import { useBiliStore, useModuleStore } from '@/stores'
 import { watch } from 'vue'
-import type { MedalTaskSharedConfig, SharedMedalFilters } from './types'
+import type {
+  MedalTaskSharedConfig,
+  SharedMedalFilters,
+  TaskJumpType,
+  WaitProbeResult,
+  WaitProbeSnapshot,
+  WaitStrategy,
+} from './types'
 import { arrayToMap, sleep } from '@/library/utils'
 import type { LiveData } from '@/library/bili-api/data'
 import BAPI from '@/library/bili-api'
-import { isTimestampToday } from '@/library/luxon'
+import { isNowAfter, isNowBefore, isTimestampToday } from '@/library/luxon'
 import _ from 'lodash'
-
-type JumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
 
 class MedalModule extends BaseModule {
   /** 最大弹幕补发次数 */
   protected static readonly DANMU_RETRY_LIMIT = 3
-
-  /**
-   * 简单限流队列
-   *
-   * 串行执行获取任务信息请求
-   */
-  private static taskInfoRequestQueue: Promise<void> = Promise.resolve()
-
-  medalTasksConfig = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
-
-  /** 所有粉丝勋章任务的公共配置 */
-  declare protected config: MedalTaskSharedConfig
-
-  protected SHARED_MEDAL_FILTERS: SharedMedalFilters = {
+  /** 等待开播/下播时单房间探测的间隔 */
+  protected static readonly WAIT_POLL_INTERVAL = 120_000
+  /** 共享等待探测快照的短期有效时间 */
+  private static readonly WAIT_PROBE_SNAPSHOT_TTL = 60_000
+  /** 单房间探测时相邻请求间的随机延迟 */
+  private static get ROOM_STATUS_PROBE_DYNAMIC_DELAY() {
+    return _.random(600, 1000)
+  }
+  /** 等待B站更新粉丝勋章数据的延迟 */
+  protected static readonly WAIT_MEDAL_UPDATE_DELAY = 3000
+  /** 发弹幕动态间隔时间 */
+  protected static get SEND_DANMU_DYNAMIC_INTERVAL() {
+    return _.random(6000, 8000)
+  }
+  /** 点赞动态间隔时间 */
+  protected static get LIKE_DYNAMIC_INTERVAL() {
+    return _.random(15000, 20000)
+  }
+  /** 共享的粉丝勋章过滤器 */
+  protected readonly SHARED_MEDAL_FILTERS: SharedMedalFilters = {
     // 包含在白名单中或不包含在黑名单中返回true，否则返回false
     meetWhiteOrBlackList: (m) =>
       this.config.isWhiteList
@@ -39,6 +50,52 @@ class MedalModule extends BaseModule {
     // 直播中返回true，否则返回false
     isLiving: (medal) => medal.room_info.living_status === 1,
   }
+  /** 直播间直播状态获取函数列表（获取失败时返回null） */
+  private readonly ROOM_LIVE_STATUS_FETCHERS: Array<(roomid: number) => Promise<number | null>> = [
+    async (roomid) => {
+      try {
+        const response = await BAPI.live.getInfoByRoom(roomid)
+        this.logger.log(`BAPI.live.getInfoByRoom(${roomid}) response`, response)
+        if (response.code === 0) {
+          return response.data.room_info.live_status
+        }
+        this.logger.warn(`BAPI.live.getInfoByRoom(${roomid}) 失败`, response.message)
+      } catch (error) {
+        this.logger.warn(`BAPI.live.getInfoByRoom(${roomid}) 出错`, error)
+      }
+
+      return null
+    },
+    async (roomid) => {
+      try {
+        const response = await BAPI.live.getRoomPlayInfo(roomid)
+        this.logger.log(`BAPI.live.getRoomPlayInfo(${roomid}) response`, response)
+        if (response.code === 0) {
+          return response.data.live_status
+        }
+        this.logger.warn(`BAPI.live.getRoomPlayInfo(${roomid}) 失败`, response.message)
+      } catch (error) {
+        this.logger.warn(`BAPI.live.getRoomPlayInfo(${roomid}) 出错`, error)
+      }
+
+      return null
+    },
+  ]
+  /**
+   * 简单限流队列
+   *
+   * 串行执行获取任务信息请求
+   */
+  private static taskInfoRequestQueue: Promise<void> = Promise.resolve()
+  /** 当前进行中的等待探测 */
+  private static sharedWaitProbePromise: Promise<WaitProbeSnapshot> | null = null
+  /** 最近一次等待探测快照 */
+  private static sharedWaitProbeSnapshot: WaitProbeSnapshot | null = null
+
+  medalTasksConfig = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
+
+  /** 所有粉丝勋章任务的公共配置 */
+  declare protected config: MedalTaskSharedConfig
 
   /**
    * 对粉丝勋章列表进行排序
@@ -48,6 +105,13 @@ class MedalModule extends BaseModule {
   protected sortMedals(medals: LiveData.FansMedalPanel.List[]): void {
     const orderMap = arrayToMap(this.config.roomidList)
     medals.sort((a, b) => orderMap.get(a.room_info.room_id)! - orderMap.get(b.room_info.room_id)!)
+  }
+
+  /**
+   * 是否需要因跨天而提前停止
+   */
+  protected shouldStopForCrossDay(): boolean {
+    return isNowAfter(23, 55) || isNowBefore(0, 5)
   }
 
   /**
@@ -93,11 +157,11 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 按 jump_type 在 task_info 中查找任务项
+   * 按 jump_type 在粉丝勋章任务信息 task_info 中查找任务项
    */
   protected static findTaskInfo(
     task_info: LiveData.GetActivatedMedalInfo.TaskInfo[] | null,
-    jump_type: JumpType,
+    jump_type: TaskJumpType,
   ): LiveData.GetActivatedMedalInfo.TaskInfo | undefined {
     return task_info?.find((t) => t.jump_type === jump_type)
   }
@@ -131,6 +195,312 @@ class MedalModule extends BaseModule {
     )
 
     return task
+  }
+
+  /**
+   * 刷新粉丝勋章列表
+   *
+   * @returns 是否刷新成功
+   */
+  protected async refreshFansMedals(): Promise<boolean> {
+    const moduleStore = useModuleStore()
+    try {
+      await moduleStore.rerunModule('Default_FansMedals', true)
+      return useBiliStore().fansMedalsStatus === 'loaded'
+    } catch (error) {
+      this.logger.error('刷新粉丝勋章列表失败', error)
+      return false
+    }
+  }
+
+  /**
+   * 以随机顺序尝试多个接口，获取单个直播间的直播状态
+   *
+   * @returns
+   * - `1`：直播中
+   * - `0`/`2`：未开播/轮播中
+   * - `null`：两个接口都获取失败
+   */
+  protected async fetchRoomLiveStatus(roomid: number): Promise<number | null> {
+    const fetchers = _.shuffle(this.ROOM_LIVE_STATUS_FETCHERS)
+
+    for (const fetchStatus of fetchers) {
+      const liveStatus = await fetchStatus(roomid)
+      if (liveStatus !== null) {
+        return liveStatus
+      }
+      await sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY)
+    }
+
+    return null
+  }
+
+  /**
+   * 计算等待探测策略
+   */
+  protected decideWaitStrategy(pendingCount: number): WaitStrategy {
+    const totalMedalCount = useBiliStore().filteredFansMedals.length
+    const fullRefreshCost = Math.ceil(totalMedalCount / 10)
+    return pendingCount <= fullRefreshCost ? 'single-probe' : 'refresh-fans-medals'
+  }
+
+  /**
+   * 判断快照是否仍可复用
+   */
+  private static canReuseWaitProbeSnapshot(
+    snapshot: WaitProbeSnapshot,
+    roomids: number[],
+    skipTTL = false,
+  ): boolean {
+    const uncovered = MedalModule.getUncoveredRoomidsFromSnapshot(snapshot, roomids, skipTTL)
+    return uncovered !== null && uncovered.length === 0
+  }
+
+  /**
+   * 获取快照中尚未覆盖的房间列表
+   *
+   * 仅成功快照才允许参与部分复用
+   */
+  private static getUncoveredRoomidsFromSnapshot(
+    snapshot: WaitProbeSnapshot,
+    roomids: number[],
+    skipTTL = false,
+  ): number[] | null {
+    if (!snapshot.isSuccessful) {
+      return null
+    }
+    if (!skipTTL && Date.now() - snapshot.createdAt > MedalModule.WAIT_PROBE_SNAPSHOT_TTL) {
+      return null
+    }
+
+    const coveredRoomids = new Set(snapshot.roomids)
+    return roomids.filter((roomid) => !coveredRoomids.has(roomid))
+  }
+
+  /**
+   * 合并多份等待探测快照
+   *
+   * 后面的快照会覆盖前面的同房间数据
+   */
+  private static mergeWaitProbeSnapshots(...snapshots: WaitProbeSnapshot[]): WaitProbeSnapshot {
+    const roomids = [...new Set(snapshots.flatMap((snapshot) => snapshot.roomids))]
+    const createdAt = Math.min(...snapshots.map((snapshot) => snapshot.createdAt))
+    const strategy = snapshots.at(-1)!.strategy
+    const isSuccessful = snapshots.some((snapshot) => snapshot.isSuccessful)
+    const liveStatusMap = new Map<number, number | null>()
+    const medalMap = new Map<number, LiveData.FansMedalPanel.List>()
+
+    snapshots.forEach((snapshot) => {
+      snapshot.liveStatusMap.forEach((liveStatus, roomid) => {
+        liveStatusMap.set(roomid, liveStatus)
+      })
+      snapshot.medalMap.forEach((medal, roomid) => {
+        medalMap.set(roomid, medal)
+      })
+    })
+
+    return {
+      createdAt,
+      roomids,
+      strategy,
+      isSuccessful,
+      liveStatusMap,
+      medalMap,
+    }
+  }
+
+  /**
+   * 生成一轮新的等待探测快照
+   */
+  private async createWaitProbeSnapshot(roomids: number[]): Promise<WaitProbeSnapshot> {
+    const strategy = this.decideWaitStrategy(roomids.length)
+    const medalMap = new Map<number, LiveData.FansMedalPanel.List>()
+    const liveStatusMap = new Map<number, number | null>()
+
+    if (strategy === 'refresh-fans-medals') {
+      if (!(await this.refreshFansMedals())) {
+        return {
+          createdAt: Date.now(),
+          roomids,
+          strategy,
+          isSuccessful: false,
+          liveStatusMap,
+          medalMap,
+        }
+      }
+
+      const latestMedalMap = useBiliStore().filteredFansMedalsMap
+      roomids.forEach((roomid) => {
+        const medal = latestMedalMap.get(roomid)
+        if (medal) {
+          medalMap.set(roomid, medal)
+          liveStatusMap.set(roomid, medal.room_info.living_status)
+        }
+      })
+
+      return {
+        createdAt: Date.now(),
+        roomids,
+        strategy,
+        isSuccessful: true,
+        liveStatusMap,
+        medalMap,
+      }
+    }
+
+    const currentMedalMap = useBiliStore().filteredFansMedalsMap
+
+    for (let i = 0; i < roomids.length; i++) {
+      const roomid = roomids[i]
+      const medal = currentMedalMap.get(roomid)
+
+      if (medal) {
+        medalMap.set(roomid, medal)
+        liveStatusMap.set(roomid, await this.fetchRoomLiveStatus(roomid))
+      }
+
+      if (i < roomids.length - 1) {
+        await sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY)
+      }
+    }
+
+    return {
+      createdAt: Date.now(),
+      roomids,
+      strategy,
+      isSuccessful: true,
+      liveStatusMap,
+      medalMap,
+    }
+  }
+
+  /**
+   * 获取可在多个任务模块之间复用的一轮等待探测快照
+   */
+  private async getSharedWaitProbeSnapshot(roomids: number[]): Promise<WaitProbeSnapshot> {
+    const reusableSnapshots: WaitProbeSnapshot[] = []
+    const cachedSnapshot = MedalModule.sharedWaitProbeSnapshot
+    if (cachedSnapshot && MedalModule.canReuseWaitProbeSnapshot(cachedSnapshot, roomids)) {
+      // 旧快照可以完全复用
+      return cachedSnapshot
+    }
+    if (
+      cachedSnapshot &&
+      MedalModule.getUncoveredRoomidsFromSnapshot(cachedSnapshot, roomids) !== null
+    ) {
+      reusableSnapshots.push(cachedSnapshot)
+    }
+
+    if (MedalModule.sharedWaitProbePromise) {
+      const inflightSnapshot = await MedalModule.sharedWaitProbePromise
+      if (MedalModule.canReuseWaitProbeSnapshot(inflightSnapshot, roomids, true)) {
+        return inflightSnapshot
+      }
+      if (
+        inflightSnapshot !== cachedSnapshot &&
+        MedalModule.getUncoveredRoomidsFromSnapshot(inflightSnapshot, roomids, true) !== null
+      ) {
+        reusableSnapshots.push(inflightSnapshot)
+      }
+    }
+
+    if (
+      this.decideWaitStrategy(roomids.length) === 'single-probe' &&
+      reusableSnapshots.length > 0
+    ) {
+      const mergedReusableSnapshot = MedalModule.mergeWaitProbeSnapshots(...reusableSnapshots)
+      const uncoveredRoomids = MedalModule.getUncoveredRoomidsFromSnapshot(
+        mergedReusableSnapshot,
+        roomids,
+        true,
+      )
+
+      if (uncoveredRoomids && uncoveredRoomids.length === 0) {
+        MedalModule.sharedWaitProbeSnapshot = mergedReusableSnapshot
+        return mergedReusableSnapshot
+      }
+
+      if (uncoveredRoomids && uncoveredRoomids.length > 0) {
+        const probePromise = this.createWaitProbeSnapshot(uncoveredRoomids).then((patchSnapshot) =>
+          MedalModule.mergeWaitProbeSnapshots(mergedReusableSnapshot, patchSnapshot),
+        )
+        MedalModule.sharedWaitProbePromise = probePromise
+
+        try {
+          const mergedSnapshot = await probePromise
+          MedalModule.sharedWaitProbeSnapshot = mergedSnapshot
+          return mergedSnapshot
+        } finally {
+          if (MedalModule.sharedWaitProbePromise === probePromise) {
+            MedalModule.sharedWaitProbePromise = null
+          }
+        }
+      }
+    }
+
+    const probePromise = this.createWaitProbeSnapshot(roomids)
+    MedalModule.sharedWaitProbePromise = probePromise
+
+    try {
+      const snapshot = await probePromise
+      MedalModule.sharedWaitProbeSnapshot = snapshot
+      return snapshot
+    } finally {
+      if (MedalModule.sharedWaitProbePromise === probePromise) {
+        MedalModule.sharedWaitProbePromise = null
+      }
+    }
+  }
+
+  /**
+   * 对等待中的直播间做一轮探测
+   *
+   * @param roomids 待探测的直播间ID列表
+   * @param targetPredicate 直播状态判断函数，返回“是否符合目标状态“
+   *
+   * @returns 探测结果，包含符合目标状态的粉丝勋章列表和待处理的直播间ID列表
+   */
+  protected async probeWaitingMedals(
+    roomids: number[],
+    targetPredicate: (liveStatus?: number | null) => boolean,
+  ): Promise<WaitProbeResult> {
+    const snapshot = await this.getSharedWaitProbeSnapshot(roomids)
+    this.logger.log(
+      `待处理房间 ${roomids.length} 个，本轮使用${snapshot.strategy === 'single-probe' ? '单房间探测' : '刷新粉丝勋章'}策略`,
+    )
+
+    const readyMedals: LiveData.FansMedalPanel.List[] = []
+    const pendingRoomids: number[] = []
+
+    if (!snapshot.isSuccessful) {
+      return { readyMedals, pendingRoomids: roomids }
+    }
+
+    for (const roomid of roomids) {
+      const medal = snapshot.medalMap.get(roomid)
+
+      if (!medal) {
+        this.logger.warn(`直播间 ${roomid} 未在粉丝勋章列表中找到，停止等待该房间`)
+        continue
+      }
+      if (!this.SHARED_MEDAL_FILTERS.isLighted(medal)) {
+        this.logger.log(`直播间 ${roomid} 对应的粉丝勋章已熄灭，停止等待该房间`)
+        continue
+      }
+
+      const liveStatus = snapshot.liveStatusMap.get(roomid)
+
+      if (targetPredicate(liveStatus)) {
+        readyMedals.push(medal)
+      } else {
+        pendingRoomids.push(roomid)
+      }
+    }
+
+    return {
+      readyMedals,
+      pendingRoomids,
+    }
   }
 
   /**
@@ -192,7 +562,7 @@ class MedalModule extends BaseModule {
     return new Promise<void>((resolve) => {
       const unwatch = watch(
         () => moduleStore.moduleStatus.DailyTasks.LiveTasks.medalTasks.light,
-        (newStatus) => {
+        async (newStatus) => {
           if (newStatus === 'done' || newStatus === 'error') {
             unwatch()
 
@@ -200,7 +570,8 @@ class MedalModule extends BaseModule {
               // 如果点亮熄灭勋章模块确实进行了点亮操作
               // 重新获取粉丝勋章（主要是为了获取最新的点亮状态和直播状态）
               // FansMedals 模块内部做了防重入，因此无需担心会重复获取
-              moduleStore.rerunModule('Default_FansMedals')
+              await sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY)
+              moduleStore.rerunModule('Default_FansMedals', true)
             }
             resolve()
           }

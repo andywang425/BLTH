@@ -21,6 +21,10 @@ export const useBiliStore = defineStore('bili', () => {
   const filteredFansMedals = computed<LiveData.FansMedalPanel.List[]>(
     () => fansMedals.value?.filter((m) => m.room_info.room_id !== 0) ?? [],
   )
+  // 过滤了不存在直播间的粉丝勋章Map（key：直播间号，value：粉丝勋章对象）
+  const filteredFansMedalsMap = computed<Map<number, LiveData.FansMedalPanel.List>>(
+    () => new Map(filteredFansMedals.value.map((m) => [m.room_info.room_id, m])),
+  )
   // 粉丝勋章获取状态（初始值：undefined，获取中：loading，获取成功：loaded，获取失败：error）
   const fansMedalsStatus = ref<FansMedalsStatus>()
   // wbi 签名所需的盐值
@@ -52,6 +56,7 @@ export const useBiliStore = defineStore('bili', () => {
     dynamicVideos,
     fansMedals,
     filteredFansMedals,
+    filteredFansMedalsMap,
     fansMedalsStatus,
     wbiSalt,
   }

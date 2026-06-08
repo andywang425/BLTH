@@ -1,11 +1,12 @@
-import { delayToNextMoment, isNowAfter, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
+import { delayToNextMoment, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore } from '@/stores'
-import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
+import { sleep } from '@/library/utils'
+import type { GroupedMedals } from './types'
 
 class DanmuTask extends MedalModule {
   config = this.medalTasksConfig.danmu
@@ -15,20 +16,34 @@ class DanmuTask extends MedalModule {
   }
 
   /**
-   * 获取已点亮的粉丝勋章；开启 `onlyWhenNotLiving` 时排除开播中的
+   * 获取已点亮的粉丝勋章，并按是否可立即发弹幕分组
    */
-  private getMedals(): LiveData.FansMedalPanel.List[] {
+  private getMedals(): GroupedMedals<'readyMedals' | 'waitingMedals'> {
     const fansMedals = useBiliStore().filteredFansMedals
-    const result = fansMedals.filter(
-      (medal) =>
+    const result: GroupedMedals<'readyMedals' | 'waitingMedals'> = {
+      readyMedals: [],
+      waitingMedals: [],
+    }
+
+    fansMedals.forEach((medal) => {
+      if (
         this.SHARED_MEDAL_FILTERS.meetWhiteOrBlackList(medal) &&
         this.SHARED_MEDAL_FILTERS.levelLt120(medal) &&
-        this.SHARED_MEDAL_FILTERS.isLighted(medal) &&
-        (!this.config.onlyWhenNotLiving || !this.SHARED_MEDAL_FILTERS.isLiving(medal)),
-    )
+        this.SHARED_MEDAL_FILTERS.isLighted(medal)
+      ) {
+        if (this.config.onlyWhenNotLiving && this.SHARED_MEDAL_FILTERS.isLiving(medal)) {
+          // 如果开启了“仅在未开播的直播间发弹幕”且当前直播间正在直播，需要等到下播后再发弹幕
+          result.waitingMedals.push(medal)
+        } else if (this.config.waitUntilNotLiving) {
+          // 否则可立即发弹幕
+          result.readyMedals.push(medal)
+        }
+      }
+    })
 
     if (this.config.isWhiteList) {
-      this.sortMedals(result)
+      this.sortMedals(result.readyMedals)
+      this.sortMedals(result.waitingMedals)
     }
 
     return result
@@ -69,6 +84,100 @@ class DanmuTask extends MedalModule {
     return false
   }
 
+  /**
+   * 执行单个直播间的发弹幕任务
+   *
+   * @returns 是否中断任务
+   */
+  private async executeDanmuTask(
+    medal: LiveData.FansMedalPanel.List,
+    danmuIndexRef: { value: number },
+  ): Promise<boolean> {
+    if (this.shouldStopForCrossDay()) {
+      this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
+      return true
+    }
+
+    const medalData = await this.fetchMedalData(medal.medal.target_id)
+    if (!medalData) {
+      this.logger.error(
+        `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过发弹幕任务`,
+      )
+      return false
+    }
+
+    const item = MedalModule.findTaskInfo(medalData.task_info, 'sendDanmu')
+    if (!item) {
+      this.logger.error(
+        `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到发弹幕任务，跳过发弹幕任务`,
+      )
+      return false
+    }
+
+    if (item.is_done) return false
+
+    const parsed = MedalModule.parseDailyLimit(item.sub_title)
+    if (!parsed) {
+      this.logger.error(
+        `无法解析主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的发弹幕任务的每日上限信息，跳过发弹幕任务`,
+      )
+      return false
+    }
+
+    if (parsed.current >= parsed.limit) return false
+
+    const target = this.config.dailyLimitOrTargetRounds
+      ? Math.min(parsed.limit, this.config.targetRounds)
+      : parsed.limit
+    let remaining = target - parsed.current
+    let failedCount = 0
+
+    for (let j = 0; j < remaining; j++) {
+      if (this.shouldStopForCrossDay()) {
+        this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
+        return true
+      }
+
+      const danmuText = this.config.danmuList[danmuIndexRef.value++ % this.config.danmuList.length]
+      if (!(await this.sendDanmu(medal, danmuText))) {
+        if (++failedCount > MedalModule.DANMU_RETRY_LIMIT) {
+          this.logger.warn(`当前直播间（${medal.room_info.room_id}）弹幕发送失败次数过多，跳过`)
+          await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
+          break
+        }
+        remaining += 1
+      }
+
+      if (j < remaining - 1) {
+        await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
+      }
+    }
+
+    sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+    return false
+  }
+
+  /**
+   * 顺序执行多个直播间的发弹幕任务
+   *
+   * @returns 是否中断任务
+   */
+  private async executeDanmuTasks(
+    medals: LiveData.FansMedalPanel.List[],
+    danmuIndexRef: { value: number },
+  ): Promise<boolean> {
+    for (let i = 0; i < medals.length; i++) {
+      const isInterrupted = await this.executeDanmuTask(medals[i], danmuIndexRef)
+      if (isInterrupted) return true
+
+      if (i < medals.length - 1) {
+        await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
+      }
+    }
+
+    return false
+  }
+
   public async run(): Promise<void> {
     this.logger.log('发弹幕模块开始运行')
 
@@ -82,72 +191,52 @@ class DanmuTask extends MedalModule {
       }
 
       this.status = 'running'
-      const fansMedals = this.getMedals()
+      const { readyMedals, waitingMedals } = this.getMedals()
       let allCompleted = true
-      let danmuIndex = 0
+      const danmuIndexRef = { value: 0 }
+      let pendingRoomids =
+        this.config.onlyWhenNotLiving && this.config.waitUntilNotLiving
+          ? waitingMedals.map((medal) => medal.room_info.room_id)
+          : []
 
-      outer: for (let i = 0; i < fansMedals.length; i++) {
-        if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
+      const isInitialInterrupted = await this.executeDanmuTasks(readyMedals, danmuIndexRef)
+      if (isInitialInterrupted) {
+        allCompleted = false
+      }
+
+      while (allCompleted && pendingRoomids.length > 0) {
+        if (!this.config.onlyWhenNotLiving || !this.config.waitUntilNotLiving) {
+          allCompleted = false
+          this.logger.log('等待下播后再发弹幕已关闭，结束本轮等待')
+          break
+        }
+        if (this.shouldStopForCrossDay()) {
           this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
           allCompleted = false
           break
         }
 
-        const medal = fansMedals[i]
-        const medalData = await this.fetchMedalData(medal.medal.target_id)
-        if (!medalData) {
-          this.logger.error(
-            `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过发弹幕任务`,
+        const { readyMedals: newlyReadyMedals, pendingRoomids: nextPendingRoomids } =
+          await this.probeWaitingMedals(pendingRoomids, (liveStatus) => liveStatus !== 1)
+
+        pendingRoomids = nextPendingRoomids
+
+        const isWaitInterrupted = await this.executeDanmuTasks(newlyReadyMedals, danmuIndexRef)
+        if (isWaitInterrupted) {
+          allCompleted = false
+          break
+        }
+
+        if (pendingRoomids.length > 0) {
+          this.logger.log(
+            `仍有 ${pendingRoomids.length} 个直播间未下播，${MedalModule.WAIT_POLL_INTERVAL / 1000} 秒后继续检查`,
           )
-          continue
+          await sleep(MedalModule.WAIT_POLL_INTERVAL)
         }
+      }
 
-        const item = MedalModule.findTaskInfo(medalData.task_info, 'sendDanmu')
-        if (!item) {
-          this.logger.error(
-            `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到发弹幕任务，跳过发弹幕任务`,
-          )
-          continue
-        }
-
-        if (item.is_done) continue
-
-        const parsed = MedalModule.parseDailyLimit(item.sub_title)
-        if (!parsed) {
-          this.logger.error(
-            `无法解析主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的发弹幕任务的每日上限信息，跳过发弹幕任务`,
-          )
-          continue
-        }
-
-        if (parsed.current >= parsed.limit) continue
-
-        let target = parsed.limit - parsed.current
-        let failedCount = 0
-
-        for (let j = 0; j < target; j++) {
-          if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
-            this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
-            allCompleted = false
-            break outer
-          }
-
-          const danmuText = this.config.danmuList[danmuIndex++ % this.config.danmuList.length]
-          if (!(await this.sendDanmu(medal, danmuText))) {
-            if (++failedCount > MedalModule.DANMU_RETRY_LIMIT) {
-              this.logger.warn(`当前直播间（${medal.room_info.room_id}）弹幕发送失败次数过多，跳过`)
-              await sleep(_.random(6000, 8000))
-              break
-            }
-            target++
-          }
-
-          if (j < target - 1 || i < fansMedals.length - 1) {
-            await sleep(_.random(6000, 8000))
-          }
-        }
-
-        await this.logFreeIntimacy(medal)
+      if (pendingRoomids.length > 0) {
+        allCompleted = false
       }
 
       if (allCompleted) {

@@ -237,6 +237,37 @@ function handleRowClick(row: MedalInfoRow) {
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
+        <el-icon color="var(--el-text-color-secondary)"><SemiSelect /></el-icon>
+        <el-switch
+          v-model="config.medalTasks.like.dailyLimitOrTargetRounds"
+          inactive-text="跟随每日上限"
+          active-text="完成目标轮次"
+        />
+        <el-input-number
+          class="round-input"
+          v-model="config.medalTasks.like.targetRounds"
+          :min="1"
+          :step="1"
+          step-strictly
+          :controls="false"
+          :disabled="!config.medalTasks.like.dailyLimitOrTargetRounds"
+        />
+        <el-text>轮</el-text>
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.rounds" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap :size="[8, 0]">
+        <el-icon color="var(--el-text-color-secondary)"><SemiSelect /></el-icon>
+        <el-switch
+          v-model="config.medalTasks.like.waitUntilLiving"
+          active-text="等待开播后再点赞"
+        />
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.likeWaitUntilLiving" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap :size="[8, 0]">
         <el-switch
           v-model="config.medalTasks.like.isWhiteList"
           active-text="白名单"
@@ -265,11 +296,43 @@ function handleRowClick(row: MedalInfoRow) {
     </el-row>
     <el-row>
       <el-space wrap :size="[8, 0]">
-        <el-icon><SemiSelect /></el-icon>
+        <el-icon color="var(--el-text-color-secondary)"><SemiSelect /></el-icon>
+        <el-switch
+          v-model="config.medalTasks.danmu.dailyLimitOrTargetRounds"
+          inactive-text="跟随每日上限"
+          active-text="完成目标轮次"
+        />
+        <el-input-number
+          class="round-input"
+          v-model="config.medalTasks.danmu.targetRounds"
+          :min="1"
+          :step="1"
+          step-strictly
+          :controls="false"
+          :disabled="!config.medalTasks.danmu.dailyLimitOrTargetRounds"
+        />
+        <el-text>轮</el-text>
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.rounds" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap :size="[8, 0]">
+        <el-icon color="var(--el-text-color-secondary)"><SemiSelect /></el-icon>
         <el-switch
           v-model="config.medalTasks.danmu.onlyWhenNotLiving"
           active-text="仅在未开播的直播间发弹幕"
         />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap :size="[8, 0]">
+        <el-icon color="var(--el-text-color-secondary)"><SemiSelect /></el-icon>
+        <el-switch
+          v-model="config.medalTasks.danmu.waitUntilNotLiving"
+          active-text="等待下播后再发弹幕"
+          :disabled="!config.medalTasks.danmu.onlyWhenNotLiving"
+        />
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.danmuWaitUntilNotLiving" />
       </el-space>
     </el-row>
     <el-row>
@@ -295,6 +358,27 @@ function handleRowClick(row: MedalInfoRow) {
         <el-switch v-model="config.medalTasks.watch.enabled" active-text="观看直播" />
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.watch" />
         <TaskStatus :status="status.medalTasks.watch" @click="reset.medalTasks.watch" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap :size="[8, 0]">
+        <el-icon color="var(--el-text-color-secondary)"><SemiSelect /></el-icon>
+        <el-switch
+          v-model="config.medalTasks.watch.dailyLimitOrTargetRounds"
+          inactive-text="跟随每日上限"
+          active-text="完成目标轮次"
+        />
+        <el-input-number
+          class="round-input"
+          v-model="config.medalTasks.watch.targetRounds"
+          :min="1"
+          :step="1"
+          step-strictly
+          :controls="false"
+          :disabled="!config.medalTasks.watch.dailyLimitOrTargetRounds"
+        />
+        <el-text>轮</el-text>
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.rounds" />
       </el-space>
     </el-row>
     <el-row>
@@ -450,5 +534,9 @@ function handleRowClick(row: MedalInfoRow) {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
+}
+
+.round-input {
+  width: 60px;
 }
 </style>

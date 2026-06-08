@@ -6,8 +6,7 @@ import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
-
-type MedalsByLiving = [LiveData.FansMedalPanel.List[], LiveData.FansMedalPanel.List[]]
+import type { GroupedMedals } from './types'
 
 class LightTask extends MedalModule {
   config = this.medalTasksConfig.light
@@ -17,13 +16,14 @@ class LightTask extends MedalModule {
   }
 
   /**
-   * 获取未点亮的粉丝勋章
-   *
-   * @returns [[主播未开播的粉丝勋章], [主播开播中的粉丝勋章]]
+   * 获取未点亮的粉丝勋章，并按是否开播分组
    */
-  private getMedals(): MedalsByLiving {
+  private getMedals(): GroupedMedals<'notLivingMedals' | 'livingMedals'> {
     const fansMedals = useBiliStore().filteredFansMedals
-    const result: MedalsByLiving = [[], []]
+    const result: GroupedMedals<'notLivingMedals' | 'livingMedals'> = {
+      notLivingMedals: [],
+      livingMedals: [],
+    }
 
     fansMedals.forEach((medal) => {
       if (
@@ -34,15 +34,18 @@ class LightTask extends MedalModule {
         return
       }
 
-      // 根据直播状态划分
-      const index = this.SHARED_MEDAL_FILTERS.isLiving(medal) ? 1 : 0
-      result[index].push(medal)
+      // 根据直播状态分组
+      if (this.SHARED_MEDAL_FILTERS.isLiving(medal)) {
+        result.livingMedals.push(medal)
+      } else {
+        result.notLivingMedals.push(medal)
+      }
     })
 
     if (this.config.isWhiteList) {
       // 白名单排序
-      this.sortMedals(result[0])
-      this.sortMedals(result[1])
+      this.sortMedals(result.livingMedals)
+      this.sortMedals(result.notLivingMedals)
     }
 
     return result
@@ -125,11 +128,11 @@ class LightTask extends MedalModule {
       }
 
       const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
-      const baseCount = MedalModule.parseTitleCount(item?.title) ?? 30
-      await this.like(medal, _.random(baseCount, baseCount + 3))
+      const times = MedalModule.parseTitleCount(item?.title) ?? 30
+      await this.like(medal, times)
 
       if (i < medals.length - 1) {
-        await sleep(_.random(15000, 20000))
+        await sleep(MedalModule.LIKE_DYNAMIC_INTERVAL)
       }
     }
   }
@@ -161,14 +164,14 @@ class LightTask extends MedalModule {
         if (!(await this.sendDanmu(medal, danmuText))) {
           if (++failedCount > MedalModule.DANMU_RETRY_LIMIT) {
             this.logger.warn(`当前直播间（${medal.room_info.room_id}）弹幕发送失败次数过多，跳过`)
-            await sleep(_.random(6000, 8000))
+            await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
             break
           }
           target++
         }
 
         if (i < medals.length - 1 || j < target - 1) {
-          await sleep(_.random(6000, 8000))
+          await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
         }
       }
     }
@@ -185,11 +188,11 @@ class LightTask extends MedalModule {
       }
 
       this.status = 'running'
-      const fansMedals = this.getMedals()
+      const { notLivingMedals, livingMedals } = this.getMedals()
       // 是否有需要点亮的粉丝勋章（是不是一次有效运行？）
-      const isEffectiveRun = fansMedals.some((medals) => medals.length > 0)
+      const isEffectiveRun = notLivingMedals.length > 0 || livingMedals.length > 0
       if (isEffectiveRun) {
-        await Promise.allSettled([this.sendDanmuTask(fansMedals[0]), this.likeTask(fansMedals[1])])
+        await Promise.allSettled([this.sendDanmuTask(notLivingMedals), this.likeTask(livingMedals)])
       }
 
       this.config._lastCompleteTime = tsm()

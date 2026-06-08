@@ -1,11 +1,12 @@
-import { delayToNextMoment, isNowAfter, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
+import { delayToNextMoment, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
 import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore } from '@/stores'
-import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
+import { sleep } from '@/library/utils'
+import type { GroupedMedals } from './types'
 
 class LikeTask extends MedalModule {
   config = this.medalTasksConfig.like
@@ -15,20 +16,34 @@ class LikeTask extends MedalModule {
   }
 
   /**
-   * 获取已点亮且主播开播中的粉丝勋章
+   * 获取已点亮的粉丝勋章，并按是否可立即点赞分组
    */
-  private getMedals(): LiveData.FansMedalPanel.List[] {
+  private getMedals(): GroupedMedals<'readyMedals' | 'waitingMedals'> {
     const fansMedals = useBiliStore().filteredFansMedals
-    const result = fansMedals.filter(
-      (medal) =>
+    const result: GroupedMedals<'readyMedals' | 'waitingMedals'> = {
+      readyMedals: [],
+      waitingMedals: [],
+    }
+
+    fansMedals.forEach((medal) => {
+      if (
         this.SHARED_MEDAL_FILTERS.meetWhiteOrBlackList(medal) &&
         this.SHARED_MEDAL_FILTERS.levelLt120(medal) &&
-        this.SHARED_MEDAL_FILTERS.isLighted(medal) &&
-        this.SHARED_MEDAL_FILTERS.isLiving(medal),
-    )
+        this.SHARED_MEDAL_FILTERS.isLighted(medal)
+      ) {
+        if (this.SHARED_MEDAL_FILTERS.isLiving(medal)) {
+          // 如果当前直播间正在直播，可立即点赞
+          result.readyMedals.push(medal)
+        } else if (this.config.waitUntilLiving) {
+          // 否则需要等到直播间开播后再点赞
+          result.waitingMedals.push(medal)
+        }
+      }
+    })
 
     if (this.config.isWhiteList) {
-      this.sortMedals(result)
+      this.sortMedals(result.readyMedals)
+      this.sortMedals(result.waitingMedals)
     }
 
     return result
@@ -57,6 +72,85 @@ class LikeTask extends MedalModule {
     }
   }
 
+  /**
+   * 执行单个直播间的点赞任务
+   *
+   * @returns 是否中断任务
+   */
+  private async executeLikeTask(medal: LiveData.FansMedalPanel.List): Promise<boolean> {
+    if (this.shouldStopForCrossDay()) {
+      this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
+      return true
+    }
+
+    const medalData = await this.fetchMedalData(medal.medal.target_id)
+    if (!medalData) {
+      this.logger.error(
+        `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过点赞任务`,
+      )
+      return false
+    }
+
+    const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
+    if (!item) {
+      this.logger.error(
+        `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
+      )
+      return false
+    }
+
+    if (item.is_done) return false
+
+    const parsed = MedalModule.parseDailyLimit(item.sub_title)
+    if (!parsed) {
+      this.logger.error(
+        `无法解析主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的点赞任务的每日上限信息，跳过点赞任务`,
+      )
+      return false
+    }
+
+    if (parsed.current >= parsed.limit) return false
+
+    const times = MedalModule.parseTitleCount(item.title) ?? 30
+    const target = this.config.dailyLimitOrTargetRounds
+      ? Math.min(parsed.limit, this.config.targetRounds)
+      : parsed.limit
+    const remaining = target - parsed.current
+    for (let j = 0; j < remaining; j++) {
+      if (this.shouldStopForCrossDay()) {
+        this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
+        return true
+      }
+
+      await this.like(medal, times)
+
+      if (j < remaining - 1) {
+        await sleep(MedalModule.LIKE_DYNAMIC_INTERVAL)
+      }
+    }
+
+    sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+    return false
+  }
+
+  /**
+   * 顺序执行多个直播间的点赞任务
+   *
+   * @returns 是否中断任务
+   */
+  private async executeLikeTasks(medals: LiveData.FansMedalPanel.List[]): Promise<boolean> {
+    for (let i = 0; i < medals.length; i++) {
+      const isInterrupted = await this.executeLikeTask(medals[i])
+      if (isInterrupted) return true
+
+      if (i < medals.length - 1) {
+        await sleep(MedalModule.LIKE_DYNAMIC_INTERVAL)
+      }
+    }
+
+    return false
+  }
+
   public async run(): Promise<void> {
     this.logger.log('点赞模块开始运行')
 
@@ -70,64 +164,48 @@ class LikeTask extends MedalModule {
       }
 
       this.status = 'running'
-      const fansMedals = this.getMedals()
+      const { readyMedals, waitingMedals } = this.getMedals()
+      let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
       let allCompleted = true
 
-      outer: for (let i = 0; i < fansMedals.length; i++) {
-        if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
+      const isInitialInterrupted = await this.executeLikeTasks(readyMedals)
+      if (isInitialInterrupted) {
+        allCompleted = false
+      }
+
+      while (allCompleted && pendingRoomids.length > 0) {
+        if (!this.config.waitUntilLiving) {
+          allCompleted = false
+          this.logger.log('等待开播后再点赞已关闭，结束本轮等待')
+          break
+        }
+        if (this.shouldStopForCrossDay()) {
           this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
           allCompleted = false
           break
         }
 
-        const medal = fansMedals[i]
-        const medalData = await this.fetchMedalData(medal.medal.target_id)
-        if (!medalData) {
-          this.logger.error(
-            `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过点赞任务`,
+        const { readyMedals: newlyReadyMedals, pendingRoomids: nextPendingRoomids } =
+          await this.probeWaitingMedals(pendingRoomids, (liveStatus) => liveStatus === 1)
+
+        pendingRoomids = nextPendingRoomids
+
+        const isWaitInterrupted = await this.executeLikeTasks(newlyReadyMedals)
+        if (isWaitInterrupted) {
+          allCompleted = false
+          break
+        }
+
+        if (pendingRoomids.length > 0) {
+          this.logger.log(
+            `仍有 ${pendingRoomids.length} 个直播间未开播，${MedalModule.WAIT_POLL_INTERVAL / 1000} 秒后继续检查`,
           )
-          continue
+          await sleep(MedalModule.WAIT_POLL_INTERVAL)
         }
+      }
 
-        const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
-        if (!item) {
-          this.logger.error(
-            `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
-          )
-          continue
-        }
-
-        if (item.is_done) continue
-
-        const parsed = MedalModule.parseDailyLimit(item.sub_title)
-        if (!parsed) {
-          this.logger.error(
-            `无法解析主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的点赞任务的每日上限信息，跳过点赞任务`,
-          )
-          continue
-        }
-
-        if (parsed.current >= parsed.limit) continue
-
-        // 每轮点赞次数
-        const times = MedalModule.parseTitleCount(item.title) ?? 30
-        // 剩余点赞轮数
-        const remaining = parsed.limit - parsed.current
-        for (let j = 0; j < remaining; j++) {
-          if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
-            this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
-            allCompleted = false
-            break outer
-          }
-
-          await this.like(medal, _.random(times, times + 3))
-
-          if (j < remaining - 1 || i < fansMedals.length - 1) {
-            await sleep(_.random(15000, 20000))
-          }
-        }
-
-        await this.logFreeIntimacy(medal)
+      if (pendingRoomids.length > 0) {
+        allCompleted = false
       }
 
       if (allCompleted) {

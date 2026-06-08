@@ -323,11 +323,6 @@ class WatchTask extends MedalModule {
       if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
         // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0
         this.config._watchingProgress = {}
-      } else {
-        // 因为连续看 5 分钟（300秒）才能加亲密度，所以上一次观看时最后不足 5 分钟的时间是无效的
-        _.forOwn(this.config._watchingProgress, (value, key, object) => {
-          object[key] -= value % 300
-        })
       }
 
       this.config._lastWatchTime = tsm()
@@ -373,10 +368,14 @@ class WatchTask extends MedalModule {
           }
           if (parsed.current >= parsed.limit) continue
 
+          // 一轮的观看时间（默认 15 分钟）
           const minutes = MedalModule.parseTitleCount(item.title) ?? 15
-
-          // 目标秒数 = 每日上限 × minutes × 60s + 60s 缓冲（补偿心跳计时误差）
-          const targetSeconds = parsed.limit * minutes * 60 + 60
+          // 目标轮次（每日上限或配置的目标轮次）
+          const target = this.config.dailyLimitOrTargetRounds
+            ? Math.min(parsed.limit, this.config.targetRounds)
+            : parsed.limit
+          // 目标秒数 = 目标轮次 × minutes × 60s
+          const targetSeconds = target * minutes * 60
 
           if ((this.config._watchingProgress[roomid] ?? 0) >= targetSeconds) {
             // 今日观看时间已达到目标值，跳过
@@ -400,7 +399,7 @@ class WatchTask extends MedalModule {
               targetSeconds,
             ).start()
 
-            await this.logFreeIntimacy(medal)
+            sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
           }
         }
 

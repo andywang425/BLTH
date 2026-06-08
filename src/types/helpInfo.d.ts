@@ -17,8 +17,11 @@ interface HelpInfo {
       medalTasks: {
         list: HelpInfoItem
         light: HelpInfoItem
+        rounds: HelpInfoItem
         like: HelpInfoItem
+        likeWaitUntilLiving: HelpInfoItem
         danmu: HelpInfoItem
+        danmuWaitUntilNotLiving: HelpInfoItem
         watch: HelpInfoItem
       }
     }

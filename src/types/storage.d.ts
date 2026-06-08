@@ -31,6 +31,9 @@ interface ModuleConfig {
         }
         like: {
           enabled: boolean
+          dailyLimitOrTargetRounds: boolean
+          targetRounds: number
+          waitUntilLiving: boolean
           isWhiteList: boolean
           roomidList: number[]
           _lastCompleteTime: number
@@ -38,13 +41,18 @@ interface ModuleConfig {
         danmu: {
           enabled: boolean
           danmuList: string[]
+          dailyLimitOrTargetRounds: boolean
+          targetRounds: number
           onlyWhenNotLiving: boolean
+          waitUntilNotLiving: boolean
           isWhiteList: boolean
           roomidList: number[]
           _lastCompleteTime: number
         }
         watch: {
           enabled: boolean
+          dailyLimitOrTargetRounds: boolean
+          targetRounds: number
           isWhiteList: boolean
           roomidList: number[]
           _watchingProgress: Record<string, number>
