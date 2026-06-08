@@ -462,7 +462,7 @@ class MedalModule extends BaseModule {
    */
   protected async probeWaitingMedals(
     roomids: number[],
-    targetPredicate: (liveStatus?: number | null) => boolean,
+    targetPredicate: (liveStatus: number) => boolean,
   ): Promise<WaitProbeResult> {
     const snapshot = await this.getSharedWaitProbeSnapshot(roomids)
     this.logger.log(
@@ -490,7 +490,7 @@ class MedalModule extends BaseModule {
 
       const liveStatus = snapshot.liveStatusMap.get(roomid)
 
-      if (targetPredicate(liveStatus)) {
+      if (!_.isNil(liveStatus) && targetPredicate(liveStatus)) {
         readyMedals.push(medal)
       } else {
         pendingRoomids.push(roomid)

@@ -2,7 +2,6 @@ import { delayToNextMoment, isNowBefore, isTimestampToday, tsm } from '@/library
 import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore } from '@/stores'
 import type { ModuleStatusTypes } from '@/types'
-import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
 import { sleep } from '@/library/utils'
@@ -32,10 +31,10 @@ class LikeTask extends MedalModule {
         this.SHARED_MEDAL_FILTERS.isLighted(medal)
       ) {
         if (this.SHARED_MEDAL_FILTERS.isLiving(medal)) {
-          // 如果当前直播间正在直播，可立即点赞
+          // 当前直播间正在直播，可立即点赞
           result.readyMedals.push(medal)
         } else if (this.config.waitUntilLiving) {
-          // 否则需要等到直播间开播后再点赞
+          // 当前直播未开播但开启了“等待开播后再点赞”，等直播间开播后再点赞
           result.waitingMedals.push(medal)
         }
       }
@@ -174,11 +173,6 @@ class LikeTask extends MedalModule {
       }
 
       while (allCompleted && pendingRoomids.length > 0) {
-        if (!this.config.waitUntilLiving) {
-          allCompleted = false
-          this.logger.log('等待开播后再点赞已关闭，结束本轮等待')
-          break
-        }
         if (this.shouldStopForCrossDay()) {
           this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
           allCompleted = false

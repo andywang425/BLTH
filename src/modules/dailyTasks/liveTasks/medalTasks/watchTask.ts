@@ -5,7 +5,6 @@ import Logger from '@/library/logger'
 import CryptoJS from 'crypto-js'
 import { sleep, uuid } from '@/library/utils'
 import type { ModuleStatusTypes, RunAtMoment } from '@/types'
-import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
 

@@ -2,7 +2,6 @@ import { delayToNextMoment, isNowBefore, isTimestampToday, tsm } from '@/library
 import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore } from '@/stores'
 import type { ModuleStatusTypes } from '@/types'
-import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
 import { sleep } from '@/library/utils'
@@ -32,10 +31,14 @@ class DanmuTask extends MedalModule {
         this.SHARED_MEDAL_FILTERS.isLighted(medal)
       ) {
         if (this.config.onlyWhenNotLiving && this.SHARED_MEDAL_FILTERS.isLiving(medal)) {
-          // 如果开启了“仅在未开播的直播间发弹幕”且当前直播间正在直播，需要等到下播后再发弹幕
-          result.waitingMedals.push(medal)
-        } else if (this.config.waitUntilNotLiving) {
-          // 否则可立即发弹幕
+          // 开启了“仅在未开播的直播间发弹幕”且正在直播
+          if (this.config.waitUntilNotLiving) {
+            // 开启了“等待下播后再发弹幕”，等下播了再发弹幕
+            result.waitingMedals.push(medal)
+          }
+          // 没开“等待下播后再发弹幕”，跳过
+        } else {
+          // 没开“仅在未开播的直播间发弹幕”或者直播间未开播，可立即发弹幕
           result.readyMedals.push(medal)
         }
       }
@@ -194,10 +197,7 @@ class DanmuTask extends MedalModule {
       const { readyMedals, waitingMedals } = this.getMedals()
       let allCompleted = true
       const danmuIndexRef = { value: 0 }
-      let pendingRoomids =
-        this.config.onlyWhenNotLiving && this.config.waitUntilNotLiving
-          ? waitingMedals.map((medal) => medal.room_info.room_id)
-          : []
+      let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
 
       const isInitialInterrupted = await this.executeDanmuTasks(readyMedals, danmuIndexRef)
       if (isInitialInterrupted) {
@@ -205,11 +205,6 @@ class DanmuTask extends MedalModule {
       }
 
       while (allCompleted && pendingRoomids.length > 0) {
-        if (!this.config.onlyWhenNotLiving || !this.config.waitUntilNotLiving) {
-          allCompleted = false
-          this.logger.log('等待下播后再发弹幕已关闭，结束本轮等待')
-          break
-        }
         if (this.shouldStopForCrossDay()) {
           this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
           allCompleted = false
