@@ -34,7 +34,7 @@ export default defineConfigWithVueTs(
           argsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
           destructuredArrayIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
+          varsIgnorePattern: '^_.+',
           ignoreRestSiblings: true,
         },
       ],
