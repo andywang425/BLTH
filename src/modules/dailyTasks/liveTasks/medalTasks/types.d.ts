@@ -30,8 +30,6 @@ interface WaitProbeSnapshot {
   medalMap: Map<number, LiveData.FansMedalPanel.List>
 }
 
-type WaitProbeSnapshotReusability = 'full' | 'partial' | 'none'
-
 interface WaitProbeResult {
   readyMedals: LiveData.FansMedalPanel.List[]
   pendingRoomids: number[]
@@ -44,6 +42,5 @@ export {
   TaskJumpType,
   WaitStrategy,
   WaitProbeSnapshot,
-  WaitProbeSnapshotReusability,
   WaitProbeResult,
 }
