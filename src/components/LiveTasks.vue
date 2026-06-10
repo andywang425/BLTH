@@ -152,7 +152,7 @@ const handleEditList = async (key: MedalTaskKey) => {
       },
       { once: true },
     )
-    if (!biliStore.fansMedalsStatus) {
+    if (!biliStore.fansMedalsMeta.status) {
       moduleStore.rerunModule('Default_FansMedals', true)
     }
   } else {

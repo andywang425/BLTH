@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import Storage from '@/library/storage'
 import type { Cache } from '@/types'
 import { unsafeWindow } from '$'
+import { tsm } from '@/library/luxon'
 
 type ScriptType = 'Main' | 'SubMain' | 'Other'
 
@@ -28,11 +29,11 @@ export const useCacheStore = defineStore('cache', () => {
    * Main BLTH 存活心跳
    */
   function startMainBLTHAliveHeartBeat(): void {
-    cache.value.lastAliveHeartBeatTime = Date.now()
+    cache.value.lastAliveHeartBeatTime = tsm()
     // 每隔5秒写一次时间戳，表示有一个Main BLTH正在运行
     // 之所以写时间戳而不是布尔值，是因为出现类似于浏览器崩溃的情况时 window.onunload 不会触发
     // 那样就会留下一个永久的有脚本在运行的标记
-    const timer = setInterval(() => (cache.value.lastAliveHeartBeatTime = Date.now()), 5000)
+    const timer = setInterval(() => (cache.value.lastAliveHeartBeatTime = tsm()), 5000)
 
     window.addEventListener('unload', () => {
       clearInterval(timer)
@@ -47,7 +48,7 @@ export const useCacheStore = defineStore('cache', () => {
   function checkCurrentScriptType(): void {
     if (
       cache.value.lastAliveHeartBeatTime !== 0 &&
-      Date.now() - cache.value.lastAliveHeartBeatTime < 8000 // 允许最多3秒的误差
+      tsm() - cache.value.lastAliveHeartBeatTime < 8000 // 允许最多3秒的误差
     ) {
       // 存在 Main BLTH
       if (cache.value.mainScriptLocation === unsafeWindow.top!.location.pathname) {

@@ -12,7 +12,7 @@ import type {
 import { arrayToMap, sleep } from '@/library/utils'
 import type { LiveData } from '@/library/bili-api/data'
 import BAPI from '@/library/bili-api'
-import { isNowAfter, isNowBefore, isTimestampToday } from '@/library/luxon'
+import { isNowAfter, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
 import _ from 'lodash'
 
 class MedalModule extends BaseModule {
@@ -122,11 +122,11 @@ class MedalModule extends BaseModule {
   protected waitForFansMedals(): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       const biliStore = useBiliStore()
-      if (biliStore.fansMedalsStatus === 'loaded') {
+      if (biliStore.fansMedalsMeta.status === 'loaded') {
         resolve(true)
       } else {
         const unwatch = watch(
-          () => biliStore.fansMedalsStatus,
+          () => biliStore.fansMedalsMeta.status,
           (newValue) => {
             if (newValue === 'loaded') {
               unwatch()
@@ -206,7 +206,7 @@ class MedalModule extends BaseModule {
     const moduleStore = useModuleStore()
     try {
       await moduleStore.rerunModule('Default_FansMedals', true)
-      return useBiliStore().fansMedalsStatus === 'loaded'
+      return useBiliStore().fansMedalsMeta.status === 'loaded'
     } catch (error) {
       this.logger.error('刷新粉丝勋章列表失败', error)
       return false
@@ -277,7 +277,7 @@ class MedalModule extends BaseModule {
    * @returns 快照在有效期内返回 true，否则返回 false
    */
   private static waitProbeSnapshotTimeCheck(snapshot: WaitProbeSnapshot): boolean {
-    return Date.now() - snapshot.createdAt < MedalModule.WAIT_PROBE_SNAPSHOT_TTL
+    return tsm() - snapshot.createdAt < MedalModule.WAIT_PROBE_SNAPSHOT_TTL
   }
 
   /**
@@ -291,7 +291,7 @@ class MedalModule extends BaseModule {
     if (strategy === 'refresh-fans-medals') {
       if (!(await this.refreshFansMedals())) {
         return {
-          createdAt: Date.now(),
+          createdAt: tsm(),
           roomids,
           strategy,
           isSuccessful: false,
@@ -309,7 +309,7 @@ class MedalModule extends BaseModule {
       })
 
       return {
-        createdAt: Date.now(),
+        createdAt: tsm(),
         roomids: snapshotRoomids,
         strategy,
         isSuccessful: true,
@@ -335,7 +335,7 @@ class MedalModule extends BaseModule {
     }
 
     return {
-      createdAt: Date.now(),
+      createdAt: tsm(),
       roomids,
       strategy,
       isSuccessful: true,
