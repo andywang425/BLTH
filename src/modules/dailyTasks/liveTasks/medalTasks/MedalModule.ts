@@ -6,7 +6,6 @@ import type {
   SharedMedalFilters,
   TaskJumpType,
   WaitProbeResult,
-  WaitProbeSnapshot,
   WaitStrategy,
 } from './types'
 import { arrayToMap, sleep } from '@/library/utils'
@@ -20,8 +19,6 @@ class MedalModule extends BaseModule {
   protected static readonly DANMU_RETRY_LIMIT = 3
   /** 等待开播/下播时单房间探测的间隔 */
   protected static readonly WAIT_POLL_INTERVAL = 120_000
-  /** 共享等待探测快照的短期有效时间 */
-  private static readonly WAIT_PROBE_SNAPSHOT_TTL = 90_000
   /** 单房间探测时相邻请求间的随机延迟 */
   private static get ROOM_STATUS_PROBE_DYNAMIC_DELAY() {
     return _.random(600, 1000)
@@ -87,10 +84,12 @@ class MedalModule extends BaseModule {
    * 串行执行获取任务信息请求
    */
   private static taskInfoRequestQueue: Promise<void> = Promise.resolve()
-  /** 当前进行中的等待探测 */
-  private static sharedWaitProbePromise: Promise<WaitProbeSnapshot> | null = null
-  /** 最近一次等待探测快照 */
-  private static sharedWaitProbeSnapshot: WaitProbeSnapshot | null = null
+  /** 粉丝勋章数据在多久内视为新鲜（毫秒） */
+  private static readonly RECENT_FETCH_THRESHOLD = 90_000
+  /** 进行中的全量刷新粉丝勋章 Promise */
+  private static ongoingFullRefreshPromise: Promise<boolean> | null = null
+  /** 单房间直播状态探测限流队列 */
+  private static roomStatusProbeQueue: Promise<void> = Promise.resolve()
 
   medalTasksConfig = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
 
@@ -198,6 +197,25 @@ class MedalModule extends BaseModule {
   }
 
   /**
+   * 将单房间直播状态探测请求加入串行限流队列
+   */
+  private static enqueueRoomStatusProbe<T>(requester: () => Promise<T>): Promise<T> {
+    const task = MedalModule.roomStatusProbeQueue
+      .catch(() => {})
+      .then(async () => {
+        await sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY)
+        return requester()
+      })
+
+    MedalModule.roomStatusProbeQueue = task.then(
+      () => {},
+      () => {},
+    )
+
+    return task
+  }
+
+  /**
    * 刷新粉丝勋章列表
    *
    * @returns 是否刷新成功
@@ -247,160 +265,37 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 判断等待探测快照是否可完全复用
-   *
-   * 仅成功且未过期，且已覆盖所有待探测房间的快照允许复用
-   *
-   * @param snapshot 待判断的快照
-   * @param roomids 当前待探测的直播间ID列表
+   * 判断粉丝勋章数据是否足够新鲜
    */
-  private static canFullyReuseWaitProbeSnapshot(
-    snapshot: WaitProbeSnapshot,
-    roomids: number[],
-  ): boolean {
-    if (!snapshot.isSuccessful) {
-      return false
-    }
-
-    if (!MedalModule.waitProbeSnapshotTimeCheck(snapshot)) {
-      return false
-    }
-
-    const coveredRoomids = new Set(snapshot.roomids)
-    return roomids.every((roomid) => coveredRoomids.has(roomid))
+  private isMedalDataFresh(): boolean {
+    const meta = useBiliStore().fansMedalsMeta
+    return (
+      meta.status === 'loaded' &&
+      tsm() - meta.lastFetchFinishedAt! < MedalModule.RECENT_FETCH_THRESHOLD
+    )
   }
 
   /**
-   * 检查等待探测快照是否在有效期内
-   *
-   * @param snapshot 待判断的快照
-   * @returns 快照在有效期内返回 true，否则返回 false
-   */
-  private static waitProbeSnapshotTimeCheck(snapshot: WaitProbeSnapshot): boolean {
-    return tsm() - snapshot.createdAt < MedalModule.WAIT_PROBE_SNAPSHOT_TTL
-  }
-
-  /**
-   * 生成一轮新的等待探测快照
-   */
-  private async createWaitProbeSnapshot(roomids: number[]): Promise<WaitProbeSnapshot> {
-    const strategy = this.decideWaitStrategy(roomids.length)
-    const medalMap = new Map<number, LiveData.FansMedalPanel.List>()
-    const liveStatusMap = new Map<number, number | null>()
-
-    if (strategy === 'refresh-fans-medals') {
-      if (!(await this.refreshFansMedals())) {
-        return {
-          createdAt: tsm(),
-          roomids,
-          strategy,
-          isSuccessful: false,
-          liveStatusMap,
-          medalMap,
-        }
-      }
-
-      const latestMedalMap = useBiliStore().filteredFansMedalsMap
-      const snapshotRoomids = [...latestMedalMap.keys()]
-      // 将所有粉丝勋章数据放入快照，充分利用刷新粉丝勋章得到的数据
-      latestMedalMap.forEach((medal, roomid) => {
-        medalMap.set(roomid, medal)
-        liveStatusMap.set(roomid, medal.room_info.living_status)
-      })
-
-      return {
-        createdAt: tsm(),
-        roomids: snapshotRoomids,
-        strategy,
-        isSuccessful: true,
-        liveStatusMap,
-        medalMap,
-      }
-    }
-
-    const currentMedalMap = useBiliStore().filteredFansMedalsMap
-
-    for (let i = 0; i < roomids.length; i++) {
-      const roomid = roomids[i]
-      const medal = currentMedalMap.get(roomid)
-
-      if (medal) {
-        medalMap.set(roomid, medal)
-        liveStatusMap.set(roomid, await this.fetchRoomLiveStatus(roomid))
-      }
-
-      if (i < roomids.length - 1) {
-        await sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY)
-      }
-    }
-
-    return {
-      createdAt: tsm(),
-      roomids,
-      strategy,
-      isSuccessful: true,
-      liveStatusMap,
-      medalMap,
-    }
-  }
-
-  /**
-   * 获取可在多个任务模块之间复用的一轮等待探测快照
-   */
-  private async getSharedWaitProbeSnapshot(roomids: number[]): Promise<WaitProbeSnapshot> {
-    const cachedSnapshot = MedalModule.sharedWaitProbeSnapshot
-
-    if (cachedSnapshot && MedalModule.canFullyReuseWaitProbeSnapshot(cachedSnapshot, roomids)) {
-      return cachedSnapshot
-    }
-
-    if (MedalModule.sharedWaitProbePromise) {
-      const inflightSnapshot = await MedalModule.sharedWaitProbePromise
-      if (MedalModule.canFullyReuseWaitProbeSnapshot(inflightSnapshot, roomids)) {
-        return inflightSnapshot
-      }
-    }
-
-    const probePromise = this.createWaitProbeSnapshot(roomids)
-    MedalModule.sharedWaitProbePromise = probePromise
-
-    try {
-      const snapshot = await probePromise
-      MedalModule.sharedWaitProbeSnapshot = snapshot
-      return snapshot
-    } finally {
-      if (MedalModule.sharedWaitProbePromise === probePromise) {
-        MedalModule.sharedWaitProbePromise = null
-      }
-    }
-  }
-
-  /**
-   * 对等待中的直播间做一轮探测
+   * 从粉丝勋章 Map 构建探测结果
    *
    * @param roomids 待探测的直播间ID列表
-   * @param targetPredicate 直播状态判断函数，返回“是否符合目标状态“
-   *
-   * @returns 探测结果，包含符合目标状态的粉丝勋章列表和待处理的直播间ID列表
+   * @param targetPredicate 直播状态判断函数
+   * @param medalMap 粉丝勋章 Map
+   * @param probedLiveStatusMap 探测到的直播状态 Map
+   * - 为 undefined 时：使用 medal.room_info.living_status
+   * - 存在键 roomid 但值为 null 时：表示本轮实时探测失败，继续等待
    */
-  protected async probeWaitingMedals(
+  private buildResultFromMedalMap(
     roomids: number[],
     targetPredicate: (liveStatus: number) => boolean,
-  ): Promise<WaitProbeResult> {
-    const snapshot = await this.getSharedWaitProbeSnapshot(roomids)
-    this.logger.log(
-      `待处理房间 ${roomids.length} 个，本轮使用${snapshot.strategy === 'single-probe' ? '单房间探测' : '刷新粉丝勋章'}策略`,
-    )
-
+    medalMap: Map<number, LiveData.FansMedalPanel.List>,
+    probedLiveStatusMap?: Map<number, number | null>,
+  ): WaitProbeResult {
     const readyMedals: LiveData.FansMedalPanel.List[] = []
     const pendingRoomids: number[] = []
 
-    if (!snapshot.isSuccessful) {
-      return { readyMedals, pendingRoomids: roomids }
-    }
-
     for (const roomid of roomids) {
-      const medal = snapshot.medalMap.get(roomid)
+      const medal = medalMap.get(roomid)
 
       if (!medal) {
         this.logger.warn(`直播间 ${roomid} 未在粉丝勋章列表中找到，停止等待该房间`)
@@ -411,9 +306,17 @@ class MedalModule extends BaseModule {
         continue
       }
 
-      const liveStatus = snapshot.liveStatusMap.get(roomid)
+      // 是否有探测到的直播状态 Map
+      const hasProbedStatus = probedLiveStatusMap !== undefined
+      // 直播状态：有直播状态 Map 就从中取，否则使用粉丝勋章 Map 中的值
+      const liveStatus = hasProbedStatus
+        ? probedLiveStatusMap.get(roomid)
+        : medal.room_info.living_status
 
-      if (!_.isNil(liveStatus) && targetPredicate(liveStatus)) {
+      if (hasProbedStatus && _.isNil(liveStatus)) {
+        this.logger.warn(`直播间 ${roomid} 本轮实时探测失败，继续等待下次检查`)
+        pendingRoomids.push(roomid)
+      } else if (!_.isNil(liveStatus) && targetPredicate(liveStatus)) {
         readyMedals.push(medal)
       } else {
         pendingRoomids.push(roomid)
@@ -424,6 +327,84 @@ class MedalModule extends BaseModule {
       readyMedals,
       pendingRoomids,
     }
+  }
+
+  /**
+   * 对等待中的直播间做一轮探测
+   *
+   * @param roomids 待探测的直播间ID列表
+   * @param targetPredicate 直播状态判断函数，返回"是否符合目标状态"
+   *
+   * @returns 探测结果，包含符合目标状态的粉丝勋章列表和待处理的直播间ID列表
+   */
+  protected async probeWaitingMedals(
+    roomids: number[],
+    targetPredicate: (liveStatus: number) => boolean,
+  ): Promise<WaitProbeResult> {
+    const biliStore = useBiliStore()
+
+    // 如果有进行中的全量刷新，等待其完成
+    if (MedalModule.ongoingFullRefreshPromise) {
+      this.logger.log('等待进行中的粉丝勋章刷新完成...')
+      await MedalModule.ongoingFullRefreshPromise
+    }
+
+    // 检查粉丝勋章数据是否新鲜
+    if (this.isMedalDataFresh()) {
+      this.logger.log('粉丝勋章数据较新，直接使用缓存数据')
+      return this.buildResultFromMedalMap(roomids, targetPredicate, biliStore.filteredFansMedalsMap)
+    }
+
+    // 数据不新鲜，决定探测策略
+    const strategy = this.decideWaitStrategy(roomids.length)
+    this.logger.log(
+      `待处理房间 ${roomids.length} 个，粉丝勋章数据不新鲜，使用${strategy === 'single-probe' ? '单房间探测' : '刷新粉丝勋章'}策略`,
+    )
+
+    if (strategy === 'refresh-fans-medals') {
+      const promise = this.refreshFansMedals()
+      MedalModule.ongoingFullRefreshPromise = promise
+      try {
+        await promise
+      } finally {
+        if (MedalModule.ongoingFullRefreshPromise === promise) {
+          MedalModule.ongoingFullRefreshPromise = null
+        }
+      }
+
+      if (biliStore.fansMedalsMeta.status === 'loaded') {
+        return this.buildResultFromMedalMap(
+          roomids,
+          targetPredicate,
+          biliStore.filteredFansMedalsMap,
+        )
+      }
+
+      return { readyMedals: [], pendingRoomids: roomids }
+    }
+
+    // 单房间探测策略
+    const currentMedalMap = biliStore.filteredFansMedalsMap
+    const probedLiveStatusMap = new Map<number, number | null>()
+
+    for (let i = 0; i < roomids.length; i++) {
+      const roomid = roomids[i]
+      const medal = currentMedalMap.get(roomid)
+
+      if (medal) {
+        probedLiveStatusMap.set(
+          roomid,
+          await MedalModule.enqueueRoomStatusProbe(() => this.fetchRoomLiveStatus(roomid)),
+        )
+      }
+    }
+
+    return this.buildResultFromMedalMap(
+      roomids,
+      targetPredicate,
+      currentMedalMap,
+      probedLiveStatusMap,
+    )
   }
 
   /**

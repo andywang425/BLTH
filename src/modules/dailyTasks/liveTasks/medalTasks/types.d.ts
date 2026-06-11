@@ -21,15 +21,6 @@ type GroupedMedals<K extends string> = Record<K, LiveData.FansMedalPanel.List[]>
 type TaskJumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
 type WaitStrategy = 'single-probe' | 'refresh-fans-medals'
 
-interface WaitProbeSnapshot {
-  createdAt: number
-  roomids: number[]
-  strategy: WaitStrategy
-  isSuccessful: boolean
-  liveStatusMap: Map<number, number | null>
-  medalMap: Map<number, LiveData.FansMedalPanel.List>
-}
-
 interface WaitProbeResult {
   readyMedals: LiveData.FansMedalPanel.List[]
   pendingRoomids: number[]
@@ -41,6 +32,5 @@ export {
   GroupedMedals,
   TaskJumpType,
   WaitStrategy,
-  WaitProbeSnapshot,
   WaitProbeResult,
 }
