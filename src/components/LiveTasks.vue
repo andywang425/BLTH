@@ -239,7 +239,7 @@ function handleRowClick(row: MedalInfoRow) {
       <el-space wrap :size="[8, 0]">
         <el-icon color="var(--el-text-color-secondary)"><SemiSelect /></el-icon>
         <el-switch
-          v-model="config.medalTasks.like.dailyLimitOrTargetRounds"
+          v-model="config.medalTasks.like.useTargetRounds"
           inactive-text="跟随每日上限"
           active-text="完成目标轮次"
         />
@@ -250,7 +250,7 @@ function handleRowClick(row: MedalInfoRow) {
           :step="1"
           step-strictly
           :controls="false"
-          :disabled="!config.medalTasks.like.dailyLimitOrTargetRounds"
+          :disabled="!config.medalTasks.like.useTargetRounds"
         />
         <el-text>轮</el-text>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.rounds" />
@@ -298,7 +298,7 @@ function handleRowClick(row: MedalInfoRow) {
       <el-space wrap :size="[8, 0]">
         <el-icon color="var(--el-text-color-secondary)"><SemiSelect /></el-icon>
         <el-switch
-          v-model="config.medalTasks.danmu.dailyLimitOrTargetRounds"
+          v-model="config.medalTasks.danmu.useTargetRounds"
           inactive-text="跟随每日上限"
           active-text="完成目标轮次"
         />
@@ -309,7 +309,7 @@ function handleRowClick(row: MedalInfoRow) {
           :step="1"
           step-strictly
           :controls="false"
-          :disabled="!config.medalTasks.danmu.dailyLimitOrTargetRounds"
+          :disabled="!config.medalTasks.danmu.useTargetRounds"
         />
         <el-text>轮</el-text>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.rounds" />
@@ -364,7 +364,7 @@ function handleRowClick(row: MedalInfoRow) {
       <el-space wrap :size="[8, 0]">
         <el-icon color="var(--el-text-color-secondary)"><SemiSelect /></el-icon>
         <el-switch
-          v-model="config.medalTasks.watch.dailyLimitOrTargetRounds"
+          v-model="config.medalTasks.watch.useTargetRounds"
           inactive-text="跟随每日上限"
           active-text="完成目标轮次"
         />
@@ -375,7 +375,7 @@ function handleRowClick(row: MedalInfoRow) {
           :step="1"
           step-strictly
           :controls="false"
-          :disabled="!config.medalTasks.watch.dailyLimitOrTargetRounds"
+          :disabled="!config.medalTasks.watch.useTargetRounds"
         />
         <el-text>轮</el-text>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.rounds" />

@@ -51,6 +51,16 @@ class LightTask extends MedalModule {
   }
 
   /**
+   * 点亮任务完成后，是否仍有任务需要最新的粉丝勋章点亮状态
+   */
+  private shouldRefreshFansMedals(): boolean {
+    const { like, danmu, watch } = this.medalTasksConfig
+    const downstreamTasks = [like, danmu, watch]
+
+    return downstreamTasks.some((task) => task.enabled && !isTimestampToday(task._lastCompleteTime))
+  }
+
+  /**
    * 点赞
    * @param medal 粉丝勋章
    * @param click_time 点赞次数
@@ -195,8 +205,11 @@ class LightTask extends MedalModule {
       }
 
       this.config._lastCompleteTime = tsm()
-      if (isEffectiveRun) {
-        this.config._lastEffectiveCompleteTime = this.config._lastCompleteTime
+
+      if (isEffectiveRun && this.shouldRefreshFansMedals()) {
+        // 刷新粉丝勋章，确保 点赞/发弹幕/观看直播 任务运行时能获取到最新的点亮状态和直播状态
+        await sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY)
+        await this.refreshFansMedals()
       }
       this.status = 'done'
       this.logger.log('点亮熄灭勋章任务已完成')

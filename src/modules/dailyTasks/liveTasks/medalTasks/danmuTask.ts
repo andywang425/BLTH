@@ -54,6 +54,7 @@ class DanmuTask extends MedalModule {
 
   /**
    * 发弹幕
+   *
    * @returns 是否发送成功
    */
   private async sendDanmu(medal: LiveData.FansMedalPanel.List, danmu: string): Promise<boolean> {
@@ -129,11 +130,12 @@ class DanmuTask extends MedalModule {
 
     if (parsed.current >= parsed.limit) return false
 
-    const target = this.config.dailyLimitOrTargetRounds
+    const target = this.config.useTargetRounds
       ? Math.min(parsed.limit, this.config.targetRounds)
       : parsed.limit
     let remaining = target - parsed.current
     let failedCount = 0
+    let hasSuccessfulDanmu = false
 
     for (let j = 0; j < remaining; j++) {
       if (this.shouldStopForCrossDay()) {
@@ -142,10 +144,11 @@ class DanmuTask extends MedalModule {
       }
 
       const danmuText = this.config.danmuList[danmuIndexRef.value++ % this.config.danmuList.length]
-      if (!(await this.sendDanmu(medal, danmuText))) {
+      if (await this.sendDanmu(medal, danmuText)) {
+        hasSuccessfulDanmu = true
+      } else {
         if (++failedCount > MedalModule.DANMU_RETRY_LIMIT) {
           this.logger.warn(`当前直播间（${medal.room_info.room_id}）弹幕发送失败次数过多，跳过`)
-          await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
           break
         }
         remaining += 1
@@ -156,7 +159,9 @@ class DanmuTask extends MedalModule {
       }
     }
 
-    sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+    if (hasSuccessfulDanmu) {
+      sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+    }
     return false
   }
 

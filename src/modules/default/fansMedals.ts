@@ -34,13 +34,10 @@ class FansMedals extends BaseModule {
       for (let page = 2; page <= Math.min(total_page, pages); page++) {
         const response = await BAPI.live.fansMedalPanel(page)
         this.logger.log(`BAPI.live.fansMedalPanel(${page}) response`, response)
-        if (firstPageResponse.code === 0) {
+        if (response.code === 0) {
           fansMedalList.push(...response.data.list)
         } else {
-          this.logger.error(
-            `获取粉丝勋章列表第${page}页失败，提前结束获取`,
-            firstPageResponse.message,
-          )
+          this.logger.error(`获取粉丝勋章列表第${page}页失败，提前结束获取`, response.message)
           // 中途出错，返回已获取的粉丝勋章列表，不抛出错误
           return fansMedalList
         }

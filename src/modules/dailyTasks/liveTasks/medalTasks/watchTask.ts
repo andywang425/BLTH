@@ -83,13 +83,16 @@ class RoomHeart {
 
   /**
    * 开始心跳
+   *
+   * @returns 是否成功观看过任意时长
    */
-  public start(): Promise<void> {
+  public async start(): Promise<boolean> {
     if (!this.buvid) {
       this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务，请尝试刷新页面`)
-      return Promise.resolve()
+      return false
     }
-    return this.E()
+    await this.E()
+    return this.watchedSeconds > 0
   }
 
   /**
@@ -370,7 +373,7 @@ class WatchTask extends MedalModule {
           // 一轮的观看时间（默认 15 分钟）
           const minutes = MedalModule.parseTitleCount(item.title) ?? 15
           // 目标轮次（每日上限或配置的目标轮次）
-          const target = this.config.dailyLimitOrTargetRounds
+          const target = this.config.useTargetRounds
             ? Math.min(parsed.limit, this.config.targetRounds)
             : parsed.limit
           // 目标秒数 = 目标轮次 × minutes × 60s
@@ -389,7 +392,7 @@ class WatchTask extends MedalModule {
               `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds / 60} 分钟）`,
             )
 
-            await new RoomHeart(
+            const hasWatchingProgress = await new RoomHeart(
               roomid,
               area_id,
               parent_area_id,
@@ -398,7 +401,9 @@ class WatchTask extends MedalModule {
               targetSeconds,
             ).start()
 
-            sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+            if (hasWatchingProgress) {
+              sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+            }
           }
         }
 

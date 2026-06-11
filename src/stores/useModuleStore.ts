@@ -104,7 +104,6 @@ export const useModuleStore = defineStore('module', () => {
             }
 
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light = ''
-            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastEffectiveCompleteTime = 0
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastCompleteTime = 0
 
             rerunModule('Default_FansMedals', true)

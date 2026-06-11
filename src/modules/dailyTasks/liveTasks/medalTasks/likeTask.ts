@@ -50,8 +50,10 @@ class LikeTask extends MedalModule {
 
   /**
    * 点赞
+   *
+   * @returns 是否点赞成功
    */
-  private async like(medal: LiveData.FansMedalPanel.List, click_time: number): Promise<void> {
+  private async like(medal: LiveData.FansMedalPanel.List, click_time: number): Promise<boolean> {
     const room_id = medal.room_info.room_id
     const target_id = medal.medal.target_id
     const nick_name = medal.anchor_info.nick_name
@@ -63,12 +65,15 @@ class LikeTask extends MedalModule {
       this.logger.log(`BAPI.live.likeReport(${room_id}, ${target_id}, ${click_time})`, response)
       if (response.code === 0) {
         this.logger.log(`点赞 ${logMessage} 成功`)
+        return true
       } else {
         this.logger.error(`点赞 ${logMessage} 失败`, response.message)
       }
     } catch (error) {
       this.logger.error(`点赞 ${logMessage} 出错`, error)
     }
+
+    return false
   }
 
   /**
@@ -111,24 +116,29 @@ class LikeTask extends MedalModule {
     if (parsed.current >= parsed.limit) return false
 
     const times = MedalModule.parseTitleCount(item.title) ?? 30
-    const target = this.config.dailyLimitOrTargetRounds
+    const target = this.config.useTargetRounds
       ? Math.min(parsed.limit, this.config.targetRounds)
       : parsed.limit
     const remaining = target - parsed.current
+    let hasSuccessfulLike = false
     for (let j = 0; j < remaining; j++) {
       if (this.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
         return true
       }
 
-      await this.like(medal, times)
+      if (await this.like(medal, times)) {
+        hasSuccessfulLike = true
+      }
 
       if (j < remaining - 1) {
         await sleep(MedalModule.LIKE_DYNAMIC_INTERVAL)
       }
     }
 
-    sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+    if (hasSuccessfulLike) {
+      sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+    }
     return false
   }
 
