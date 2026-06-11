@@ -39,6 +39,8 @@ const defaultModuleStatus: ModuleStatus = {
   },
 }
 
+const logger = new Logger('ModuleStore')
+
 // 在所有 frame 或顶层 frame 上运行的被加载的模块名称
 const allAndTopFrameModuleNames: string[] = []
 
@@ -94,6 +96,13 @@ export const useModuleStore = defineStore('module', () => {
       LiveTasks: {
         medalTasks: {
           light: () => {
+            const medalTasksStatus = moduleStatus.value.DailyTasks.LiveTasks.medalTasks
+
+            if (medalTasksStatus.like === 'running' || medalTasksStatus.danmu === 'running') {
+              logger.warn('【点赞】或【发弹幕】模块仍在运行中，无法重新运行【点亮熄灭勋章】模块')
+              return
+            }
+
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light = ''
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastEffectiveCompleteTime = 0
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastCompleteTime = 0
@@ -102,6 +111,11 @@ export const useModuleStore = defineStore('module', () => {
             rerunModule('DailyTask_LiveTask_LightTask')
           },
           like: () => {
+            if (moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light === 'running') {
+              logger.warn('【点亮熄灭勋章】模块仍在运行中，无法重新运行【点赞】模块')
+              return
+            }
+
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.like = ''
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.like._lastCompleteTime = 0
 
@@ -109,6 +123,11 @@ export const useModuleStore = defineStore('module', () => {
             rerunModule('DailyTask_LiveTask_LikeTask')
           },
           danmu: () => {
+            if (moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light === 'running') {
+              logger.warn('【点亮熄灭勋章】模块仍在运行中，无法重新运行【发弹幕】模块')
+              return
+            }
+
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.danmu = ''
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.danmu._lastCompleteTime = 0
 
@@ -248,7 +267,7 @@ export const useModuleStore = defineStore('module', () => {
               new Logger(error.moduleName).error(error.message)
             } else {
               // 意外错误，停止运行（可能是默认模块编写有误）
-              new Logger('ModuleStore').error(`意外错误: ${error.message}`)
+              logger.error(`意外错误: ${error.message}`)
               return
             }
           }

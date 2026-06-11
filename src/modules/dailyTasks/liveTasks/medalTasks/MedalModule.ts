@@ -224,7 +224,8 @@ class MedalModule extends BaseModule {
     const moduleStore = useModuleStore()
     try {
       await moduleStore.rerunModule('Default_FansMedals', true)
-      return useBiliStore().fansMedalsMeta.status === 'loaded'
+      const status = useBiliStore().fansMedalsMeta.status
+      return status === 'loading' ? await this.waitForFansMedals() : status === 'loaded'
     } catch (error) {
       this.logger.error('刷新粉丝勋章列表失败', error)
       return false
