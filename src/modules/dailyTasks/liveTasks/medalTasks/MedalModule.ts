@@ -21,7 +21,11 @@ class MedalModule extends BaseModule {
   protected static readonly WAIT_POLL_INTERVAL = 120_000
   /** 单房间探测时相邻请求间的随机延迟 */
   private static get ROOM_STATUS_PROBE_DYNAMIC_DELAY() {
-    return _.random(600, 1000)
+    return _.random(600, 800)
+  }
+  /** 任务信息请求队列中相邻请求间的随机延迟 */
+  private static get TASK_INFO_REQUEST_DYNAMIC_DELAY() {
+    return _.random(300, 500)
   }
   /** 等待B站更新粉丝勋章数据的延迟 */
   protected static readonly WAIT_MEDAL_UPDATE_DELAY = 3000
@@ -181,17 +185,11 @@ class MedalModule extends BaseModule {
    * 将获取任务信息请求加入全局串行队列
    */
   private static enqueueTaskInfoRequest<T>(requester: () => Promise<T>): Promise<T> {
-    const task = MedalModule.taskInfoRequestQueue
-      .catch(() => {})
-      .then(async () => {
-        await sleep(_.random(300, 500))
-        return requester()
-      })
+    const task = MedalModule.taskInfoRequestQueue.catch(() => {}).then(() => requester())
 
-    MedalModule.taskInfoRequestQueue = task.then(
-      () => {},
-      () => {},
-    )
+    MedalModule.taskInfoRequestQueue = task
+      .catch(() => {})
+      .then(() => sleep(MedalModule.TASK_INFO_REQUEST_DYNAMIC_DELAY))
 
     return task
   }
@@ -200,17 +198,11 @@ class MedalModule extends BaseModule {
    * 将单房间直播状态探测请求加入串行限流队列
    */
   private static enqueueRoomStatusProbe<T>(requester: () => Promise<T>): Promise<T> {
-    const task = MedalModule.roomStatusProbeQueue
-      .catch(() => {})
-      .then(async () => {
-        await sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY)
-        return requester()
-      })
+    const task = MedalModule.roomStatusProbeQueue.catch(() => {}).then(() => requester())
 
-    MedalModule.roomStatusProbeQueue = task.then(
-      () => {},
-      () => {},
-    )
+    MedalModule.roomStatusProbeQueue = task
+      .catch(() => {})
+      .then(() => sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY))
 
     return task
   }
@@ -243,12 +235,14 @@ class MedalModule extends BaseModule {
   protected async fetchRoomLiveStatus(roomid: number): Promise<number | null> {
     const fetchers = _.shuffle(this.ROOM_LIVE_STATUS_FETCHERS)
 
-    for (const fetchStatus of fetchers) {
-      const liveStatus = await fetchStatus(roomid)
+    for (let i = 0; i < fetchers.length; i++) {
+      const liveStatus = await fetchers[i](roomid)
       if (liveStatus !== null) {
         return liveStatus
       }
-      await sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY)
+      if (i < fetchers.length - 1) {
+        await sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY)
+      }
     }
 
     return null
