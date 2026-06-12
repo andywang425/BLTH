@@ -331,11 +331,12 @@ class WatchTask extends MedalModule {
       const fansMedals = this.getMedals()
 
       if (fansMedals.length > 0) {
-        let i: number
+        let allCompleted = true
 
-        for (i = 0; i < fansMedals.length; i++) {
+        for (let i = 0; i < fansMedals.length; i++) {
           if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
             this.logger.log('即将或刚刚发生跨天，提早结束本轮观看直播任务')
+            allCompleted = false
             break
           }
 
@@ -402,13 +403,20 @@ class WatchTask extends MedalModule {
             ).start()
 
             if (hasWatchingProgress) {
-              sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+              const verifiedCompleted = await this.confirmTaskCompletedAfterUpdate(
+                medal,
+                'watchLive',
+              )
+              if (!verifiedCompleted) {
+                allCompleted = false
+              }
+            } else {
+              allCompleted = false
             }
           }
         }
 
-        if (i === fansMedals.length) {
-          // 没有提早跳出循环，说明所有直播间的观看任务均已完成
+        if (allCompleted) {
           this.config._lastCompleteTime = tsm()
           this.logger.log('观看直播任务已完成')
           this.status = 'done'

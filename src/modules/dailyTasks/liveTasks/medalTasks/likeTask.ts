@@ -5,7 +5,7 @@ import type { ModuleStatusTypes } from '@/types'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
 import { sleep } from '@/library/utils'
-import type { GroupedMedals } from './types'
+import type { GroupedMedals, TaskExecutionResult } from './types'
 
 class LikeTask extends MedalModule {
   config = this.medalTasksConfig.like
@@ -79,12 +79,12 @@ class LikeTask extends MedalModule {
   /**
    * 执行单个直播间的点赞任务
    *
-   * @returns 是否中断任务
+   * @returns 执行结果，包含是否中断以及是否确认完成
    */
-  private async executeLikeTask(medal: LiveData.FansMedalPanel.List): Promise<boolean> {
+  private async executeLikeTask(medal: LiveData.FansMedalPanel.List): Promise<TaskExecutionResult> {
     if (this.shouldStopForCrossDay()) {
       this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
-      return true
+      return { interrupted: true, verifiedCompleted: false }
     }
 
     const medalData = await this.fetchMedalData(medal.medal.target_id)
@@ -92,7 +92,7 @@ class LikeTask extends MedalModule {
       this.logger.error(
         `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过点赞任务`,
       )
-      return false
+      return { interrupted: false, verifiedCompleted: true }
     }
 
     const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
@@ -100,20 +100,20 @@ class LikeTask extends MedalModule {
       this.logger.error(
         `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
       )
-      return false
+      return { interrupted: false, verifiedCompleted: true }
     }
 
-    if (item.is_done) return false
+    if (item.is_done) return { interrupted: false, verifiedCompleted: true }
 
     const parsed = MedalModule.parseDailyLimit(item.sub_title)
     if (!parsed) {
       this.logger.error(
         `无法解析主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的点赞任务的每日上限信息，跳过点赞任务`,
       )
-      return false
+      return { interrupted: false, verifiedCompleted: true }
     }
 
-    if (parsed.current >= parsed.limit) return false
+    if (parsed.current >= parsed.limit) return { interrupted: false, verifiedCompleted: true }
 
     const times = MedalModule.parseTitleCount(item.title) ?? 30
     const target = this.config.useTargetRounds
@@ -124,7 +124,7 @@ class LikeTask extends MedalModule {
     for (let j = 0; j < remaining; j++) {
       if (this.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
-        return true
+        return { interrupted: true, verifiedCompleted: false }
       }
 
       if (await this.like(medal, times)) {
@@ -137,27 +137,38 @@ class LikeTask extends MedalModule {
     }
 
     if (hasSuccessfulLike) {
-      sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+      return {
+        interrupted: false,
+        verifiedCompleted: await this.confirmTaskCompletedAfterUpdate(medal, 'like'),
+      }
     }
-    return false
+
+    return { interrupted: false, verifiedCompleted: true }
   }
 
   /**
    * 顺序执行多个直播间的点赞任务
    *
-   * @returns 是否中断任务
+   * @returns 执行结果，包含是否中断以及是否都确认完成
    */
-  private async executeLikeTasks(medals: LiveData.FansMedalPanel.List[]): Promise<boolean> {
+  private async executeLikeTasks(
+    medals: LiveData.FansMedalPanel.List[],
+  ): Promise<TaskExecutionResult> {
+    let verifiedCompleted = true
+
     for (let i = 0; i < medals.length; i++) {
-      const isInterrupted = await this.executeLikeTask(medals[i])
-      if (isInterrupted) return true
+      const result = await this.executeLikeTask(medals[i])
+      if (result.interrupted) return result
+      if (!result.verifiedCompleted) {
+        verifiedCompleted = false
+      }
 
       if (i < medals.length - 1) {
         await sleep(MedalModule.LIKE_DYNAMIC_INTERVAL)
       }
     }
 
-    return false
+    return { interrupted: false, verifiedCompleted }
   }
 
   public async run(): Promise<void> {
@@ -177,8 +188,10 @@ class LikeTask extends MedalModule {
       let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
       let allCompleted = true
 
-      const isInitialInterrupted = await this.executeLikeTasks(readyMedals)
-      if (isInitialInterrupted) {
+      const initialResult = await this.executeLikeTasks(readyMedals)
+      if (initialResult.interrupted) {
+        allCompleted = false
+      } else if (!initialResult.verifiedCompleted) {
         allCompleted = false
       }
 
@@ -194,8 +207,12 @@ class LikeTask extends MedalModule {
 
         pendingRoomids = nextPendingRoomids
 
-        const isWaitInterrupted = await this.executeLikeTasks(newlyReadyMedals)
-        if (isWaitInterrupted) {
+        const waitResult = await this.executeLikeTasks(newlyReadyMedals)
+        if (waitResult.interrupted) {
+          allCompleted = false
+          break
+        }
+        if (!waitResult.verifiedCompleted) {
           allCompleted = false
           break
         }

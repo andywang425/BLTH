@@ -17,6 +17,14 @@ import _ from 'lodash'
 class MedalModule extends BaseModule {
   /** 最大弹幕补发次数 */
   protected static readonly DANMU_RETRY_LIMIT = 3
+  /** 粉丝团升级任务 jump_type 对应的中文文案 */
+  private static readonly TASK_ACTION_TEXT_MAP: Record<TaskJumpType, string> = {
+    like: '点赞',
+    sendDanmu: '发弹幕',
+    watchLive: '观看直播',
+    feedLight: '投喂粉丝灯牌', // unused
+    sendGift: '投喂礼物', // unused
+  }
   /** 等待开播/下播时单房间探测的间隔 */
   protected static readonly WAIT_POLL_INTERVAL = 120_000
   /** 单房间探测时相邻请求间的随机延迟 */
@@ -85,7 +93,7 @@ class MedalModule extends BaseModule {
   /**
    * 简单限流队列
    *
-   * 串行执行获取任务信息请求
+   * 串行执行获取粉丝团升级任务信息请求
    */
   private static taskInfoRequestQueue: Promise<void> = Promise.resolve()
   /** 粉丝勋章数据在多久内视为新鲜（毫秒） */
@@ -145,14 +153,12 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 解析每日任务进度文案 "每日上限 X/Y"
+   * 从粉丝团升级任务 sub_title 解析每日任务进度文案 "每日上限 X/Y"
    *
    * @param sub_title API 返回的 sub_title
    * @returns 解析成功返回 `{ current, limit }`，否则返回 `null`
    */
-  protected static parseDailyLimit(
-    sub_title: string | undefined,
-  ): { current: number; limit: number } | null {
+  protected static parseDailyLimit(sub_title?: string): { current: number; limit: number } | null {
     if (!sub_title) return null
     const match = sub_title.match(/(\d+)\s*\/\s*(\d+)/)
     if (!match) return null
@@ -160,7 +166,7 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 按 jump_type 在粉丝勋章任务信息 task_info 中查找任务项
+   * 按 jump_type 在粉丝团升级任务信息 task_info 中查找任务项
    */
   protected static findTaskInfo(
     task_info: LiveData.GetActivatedMedalInfo.TaskInfo[] | null,
@@ -170,11 +176,11 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 从任务 title 中解析数字（如 "点赞30次" → 30，"发弹幕10次" → 10）
+   * 从粉丝团升级任务 title 中解析数字（如 "点赞30次" → 30，"发弹幕10次" → 10）
    *
    * @returns 解析成功返回数字，否则返回 null
    */
-  protected static parseTitleCount(title: string | undefined): number | null {
+  protected static parseTitleCount(title?: string): number | null {
     if (!title) return null
     const match = title.match(/\d+/)
     if (!match) return null
@@ -182,7 +188,7 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 将获取任务信息请求加入全局串行队列
+   * 将获取粉丝团升级任务信息请求加入全局串行队列
    */
   private static enqueueTaskInfoRequest<T>(requester: () => Promise<T>): Promise<T> {
     const task = MedalModule.taskInfoRequestQueue.catch(() => {}).then(() => requester())
@@ -429,17 +435,58 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 完成某粉丝勋章任务后，重新调用 fetchMedalData 检查储蓄亲密度，若存在则提示用户
+   * 记录储蓄亲密度信息日志
    */
-  protected async logFreeIntimacy(medal: LiveData.FansMedalPanel.List): Promise<void> {
-    const data = await this.fetchMedalData(medal.medal.target_id)
-
-    if (data && data.free_intimacy > 0) {
+  private logFreeIntimacyFromData(
+    medal: LiveData.FansMedalPanel.List,
+    data: LiveData.GetActivatedMedalInfo.Data,
+  ): void {
+    if (data.free_intimacy > 0) {
       const reachLimitText = data.reach_free_intimacy_limit ? '（已达到储蓄亲密度上限）' : ''
       this.logger.log(
         `粉丝勋章【${medal.medal.medal_name}】储蓄了 ${data.free_intimacy} 亲密度${reachLimitText}，投喂一个粉丝灯牌即可领取这些亲密度`,
       )
     }
+  }
+
+  /**
+   * 等待B站更新任务状态后，重新获取粉丝团升级任务信息确认任务是否真的完成
+   *
+   * @returns 任务实际是否完成
+   */
+  protected async confirmTaskCompletedAfterUpdate(
+    medal: LiveData.FansMedalPanel.List,
+    jump_type: TaskJumpType,
+  ): Promise<boolean> {
+    await sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY)
+
+    const actionText = MedalModule.TASK_ACTION_TEXT_MAP[jump_type]
+    const data = await this.fetchMedalData(medal.medal.target_id)
+    if (!data) {
+      this.logger.error(
+        `粉丝勋章【${medal.medal.medal_name}】${actionText}后，无法获取最新粉丝团升级任务信息确认任务是否完成，默认已完成`,
+      )
+      return true
+    }
+
+    this.logFreeIntimacyFromData(medal, data)
+
+    const item = MedalModule.findTaskInfo(data.task_info, jump_type)
+    if (!item) {
+      this.logger.error(
+        `粉丝勋章【${medal.medal.medal_name}】${actionText}后，最新粉丝团升级任务信息中缺少对应任务，默认已完成`,
+      )
+      return true
+    }
+
+    if (!item.is_done) {
+      this.logger.warn(
+        `粉丝勋章【${medal.medal.medal_name}】已执行 ${actionText} 任务，但B站仍认为该任务未完成（实际进度：${item.sub_title}），下次运行会继续尝试`,
+      )
+      return false
+    }
+
+    return true
   }
 
   /**

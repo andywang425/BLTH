@@ -5,7 +5,7 @@ import type { ModuleStatusTypes } from '@/types'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
 import { sleep } from '@/library/utils'
-import type { GroupedMedals } from './types'
+import type { GroupedMedals, TaskExecutionResult } from './types'
 
 class DanmuTask extends MedalModule {
   config = this.medalTasksConfig.danmu
@@ -91,15 +91,15 @@ class DanmuTask extends MedalModule {
   /**
    * 执行单个直播间的发弹幕任务
    *
-   * @returns 是否中断任务
+   * @returns 执行结果，包含是否中断以及是否确认完成
    */
   private async executeDanmuTask(
     medal: LiveData.FansMedalPanel.List,
     danmuIndexRef: { value: number },
-  ): Promise<boolean> {
+  ): Promise<TaskExecutionResult> {
     if (this.shouldStopForCrossDay()) {
       this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
-      return true
+      return { interrupted: true, verifiedCompleted: false }
     }
 
     const medalData = await this.fetchMedalData(medal.medal.target_id)
@@ -107,7 +107,7 @@ class DanmuTask extends MedalModule {
       this.logger.error(
         `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过发弹幕任务`,
       )
-      return false
+      return { interrupted: false, verifiedCompleted: true }
     }
 
     const item = MedalModule.findTaskInfo(medalData.task_info, 'sendDanmu')
@@ -115,20 +115,20 @@ class DanmuTask extends MedalModule {
       this.logger.error(
         `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到发弹幕任务，跳过发弹幕任务`,
       )
-      return false
+      return { interrupted: false, verifiedCompleted: true }
     }
 
-    if (item.is_done) return false
+    if (item.is_done) return { interrupted: false, verifiedCompleted: true }
 
     const parsed = MedalModule.parseDailyLimit(item.sub_title)
     if (!parsed) {
       this.logger.error(
         `无法解析主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的发弹幕任务的每日上限信息，跳过发弹幕任务`,
       )
-      return false
+      return { interrupted: false, verifiedCompleted: true }
     }
 
-    if (parsed.current >= parsed.limit) return false
+    if (parsed.current >= parsed.limit) return { interrupted: false, verifiedCompleted: true }
 
     const target = this.config.useTargetRounds
       ? Math.min(parsed.limit, this.config.targetRounds)
@@ -140,7 +140,7 @@ class DanmuTask extends MedalModule {
     for (let j = 0; j < remaining; j++) {
       if (this.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
-        return true
+        return { interrupted: true, verifiedCompleted: false }
       }
 
       const danmuText = this.config.danmuList[danmuIndexRef.value++ % this.config.danmuList.length]
@@ -160,30 +160,39 @@ class DanmuTask extends MedalModule {
     }
 
     if (hasSuccessfulDanmu) {
-      sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY).then(() => this.logFreeIntimacy(medal))
+      return {
+        interrupted: false,
+        verifiedCompleted: await this.confirmTaskCompletedAfterUpdate(medal, 'sendDanmu'),
+      }
     }
-    return false
+
+    return { interrupted: false, verifiedCompleted: true }
   }
 
   /**
    * 顺序执行多个直播间的发弹幕任务
    *
-   * @returns 是否中断任务
+   * @returns 执行结果，包含是否中断以及是否都确认完成
    */
   private async executeDanmuTasks(
     medals: LiveData.FansMedalPanel.List[],
     danmuIndexRef: { value: number },
-  ): Promise<boolean> {
+  ): Promise<TaskExecutionResult> {
+    let verifiedCompleted = true
+
     for (let i = 0; i < medals.length; i++) {
-      const isInterrupted = await this.executeDanmuTask(medals[i], danmuIndexRef)
-      if (isInterrupted) return true
+      const result = await this.executeDanmuTask(medals[i], danmuIndexRef)
+      if (result.interrupted) return result
+      if (!result.verifiedCompleted) {
+        verifiedCompleted = false
+      }
 
       if (i < medals.length - 1) {
         await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
       }
     }
 
-    return false
+    return { interrupted: false, verifiedCompleted }
   }
 
   public async run(): Promise<void> {
@@ -204,8 +213,10 @@ class DanmuTask extends MedalModule {
       const danmuIndexRef = { value: 0 }
       let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
 
-      const isInitialInterrupted = await this.executeDanmuTasks(readyMedals, danmuIndexRef)
-      if (isInitialInterrupted) {
+      const initialResult = await this.executeDanmuTasks(readyMedals, danmuIndexRef)
+      if (initialResult.interrupted) {
+        allCompleted = false
+      } else if (!initialResult.verifiedCompleted) {
         allCompleted = false
       }
 
@@ -221,8 +232,12 @@ class DanmuTask extends MedalModule {
 
         pendingRoomids = nextPendingRoomids
 
-        const isWaitInterrupted = await this.executeDanmuTasks(newlyReadyMedals, danmuIndexRef)
-        if (isWaitInterrupted) {
+        const waitResult = await this.executeDanmuTasks(newlyReadyMedals, danmuIndexRef)
+        if (waitResult.interrupted) {
+          allCompleted = false
+          break
+        }
+        if (!waitResult.verifiedCompleted) {
           allCompleted = false
           break
         }

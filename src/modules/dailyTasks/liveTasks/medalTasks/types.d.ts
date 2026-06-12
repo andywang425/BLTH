@@ -26,6 +26,11 @@ interface WaitProbeResult {
   pendingRoomids: number[]
 }
 
+interface TaskExecutionResult {
+  interrupted: boolean
+  verifiedCompleted: boolean
+}
+
 export {
   MedalTaskSharedConfig,
   SharedMedalFilters,
@@ -33,4 +38,5 @@ export {
   TaskJumpType,
   WaitStrategy,
   WaitProbeResult,
+  TaskExecutionResult,
 }

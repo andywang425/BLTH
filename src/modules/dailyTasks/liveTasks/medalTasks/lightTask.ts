@@ -51,13 +51,41 @@ class LightTask extends MedalModule {
   }
 
   /**
-   * 点亮任务完成后，是否仍有任务需要最新的粉丝勋章点亮状态
+   * 点亮任务完成后，是否仍有下游任务需要最新的粉丝勋章点亮状态
    */
   private shouldRefreshFansMedals(): boolean {
     const { like, danmu, watch } = this.medalTasksConfig
     const downstreamTasks = [like, danmu, watch]
 
     return downstreamTasks.some((task) => task.enabled && !isTimestampToday(task._lastCompleteTime))
+  }
+
+  /**
+   * 校验本轮尝试点亮的粉丝勋章是否都已点亮
+   */
+  private verifyLightedMedals(medals: LiveData.FansMedalPanel.List[]): boolean {
+    const latestMedalMap = useBiliStore().filteredFansMedalsMap
+    let allVerified = true
+
+    medals.forEach((medal) => {
+      const latestMedal = latestMedalMap.get(medal.room_info.room_id)
+      if (!latestMedal) {
+        this.logger.warn(
+          `粉丝勋章【${medal.medal.medal_name}】点亮后，未在刷新后的粉丝勋章列表中找到该勋章，忽略该勋章`,
+          medal,
+        )
+        return
+      }
+
+      if (latestMedal.medal.is_lighted !== 1) {
+        this.logger.warn(
+          `粉丝勋章【${medal.medal.medal_name}】已执行点亮任务，但刷新粉丝勋章后仍未点亮，下次运行会继续尝试点亮`,
+        )
+        allVerified = false
+      }
+    })
+
+    return allVerified
   }
 
   /**
@@ -125,7 +153,11 @@ class LightTask extends MedalModule {
    * 给正在直播的直播间点赞
    * @param medals
    */
-  private async likeTask(medals: LiveData.FansMedalPanel.List[]): Promise<void> {
+  private async likeTask(
+    medals: LiveData.FansMedalPanel.List[],
+  ): Promise<LiveData.FansMedalPanel.List[]> {
+    const attemptedMedals: LiveData.FansMedalPanel.List[] = []
+
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
       const medalData = await this.fetchMedalData(medal.medal.target_id)
@@ -139,19 +171,25 @@ class LightTask extends MedalModule {
       const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
       const times = MedalModule.parseTitleCount(item?.title) ?? 30
       await this.like(medal, times)
+      attemptedMedals.push(medal)
 
       if (i < medals.length - 1) {
         await sleep(MedalModule.LIKE_DYNAMIC_INTERVAL)
       }
     }
+
+    return attemptedMedals
   }
 
   /**
    * 在未开播的直播间发弹幕
    * @param medals
    */
-  private async sendDanmuTask(medals: LiveData.FansMedalPanel.List[]): Promise<void> {
+  private async sendDanmuTask(
+    medals: LiveData.FansMedalPanel.List[],
+  ): Promise<LiveData.FansMedalPanel.List[]> {
     let danmuIndex = 0
+    const attemptedMedals: LiveData.FansMedalPanel.List[] = []
 
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
@@ -173,7 +211,7 @@ class LightTask extends MedalModule {
         if (!(await this.sendDanmu(medal, danmuText))) {
           if (++failedCount > MedalModule.DANMU_RETRY_LIMIT) {
             this.logger.warn(`当前直播间（${medal.room_info.room_id}）弹幕发送失败次数过多，跳过`)
-            await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
+            if (i < medals.length - 1) await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
             break
           }
           target++
@@ -183,7 +221,11 @@ class LightTask extends MedalModule {
           await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
         }
       }
+
+      attemptedMedals.push(medal)
     }
+
+    return attemptedMedals
   }
 
   public async run(): Promise<void> {
@@ -200,19 +242,42 @@ class LightTask extends MedalModule {
       const { notLivingMedals, livingMedals } = this.getMedals()
       // 是否有需要点亮的粉丝勋章（是不是一次有效运行？）
       const isEffectiveRun = notLivingMedals.length > 0 || livingMedals.length > 0
+      let allCompleted = true
+
       if (isEffectiveRun) {
-        await Promise.allSettled([this.sendDanmuTask(notLivingMedals), this.likeTask(livingMedals)])
+        const [danmuResult, likeResult] = await Promise.allSettled([
+          this.sendDanmuTask(notLivingMedals),
+          this.likeTask(livingMedals),
+        ])
+        // 尝试点亮过的粉丝勋章
+        const attemptedMedals = [
+          ...(danmuResult.status === 'fulfilled' ? danmuResult.value : []),
+          ...(likeResult.status === 'fulfilled' ? likeResult.value : []),
+        ]
+
+        if (attemptedMedals.length > 0 || this.shouldRefreshFansMedals()) {
+          // 刷新粉丝勋章，确保 点亮任务自身以及 点赞/发弹幕/观看直播 任务都能拿到最新勋章状态
+          await sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY)
+          const refreshed = await this.refreshFansMedals()
+
+          if (attemptedMedals.length > 0) {
+            if (refreshed) {
+              allCompleted = this.verifyLightedMedals(attemptedMedals)
+            } else {
+              this.logger.warn('无法确认点亮任务是否完成，本轮按未完成处理')
+              allCompleted = false
+            }
+          }
+        }
       }
 
-      this.config._lastCompleteTime = tsm()
-
-      if (isEffectiveRun && this.shouldRefreshFansMedals()) {
-        // 刷新粉丝勋章，确保 点赞/发弹幕/观看直播 任务运行时能获取到最新的点亮状态和直播状态
-        await sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY)
-        await this.refreshFansMedals()
+      if (allCompleted) {
+        this.config._lastCompleteTime = tsm()
+        this.status = 'done'
+        this.logger.log('点亮熄灭勋章任务已完成')
+      } else {
+        this.status = ''
       }
-      this.status = 'done'
-      this.logger.log('点亮熄灭勋章任务已完成')
     } else {
       if (isNowBefore(0, 5)) {
         this.logger.log('昨天的给点亮熄灭勋章任务已经完成过了，等到今天的00:05再执行')
