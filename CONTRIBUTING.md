@@ -55,8 +55,8 @@ npm run dev
 
 ### 分支
 
-- **master**: `master` 分支是发布分支，准备发版时会通过 Pull Request 将 `dev` 合并到 `master`，合并后会触发 GitHub Actions 构建并创建 Release。
-- **dev**: `dev` 分支是开发分支。日常开发请基于 `upstream/dev` 创建独立的功能分支（不要直接在 fork 的 `master` 上改动），发起 PR 时记得把目标分支设置为 `dev`。
+- **master**: `master` 分支是发布分支，准备发版时会通过 Pull Request 将 `dev` 合并到 `master`，合并后会触发 GitHub Actions 构建并创建 Release
+- **dev**: `dev` 分支是开发分支。日常开发请基于 `upstream/dev` 创建独立的功能分支（不要直接在 fork 的 `master` 上改动），发起 PR 时记得把目标分支设置为 `dev`
 
 ### 目录结构
 
@@ -72,7 +72,7 @@ BLTH
     │  └─icons             图标组件
     ├─library              库文件
     │  ├─...               每个文件夹代表一个库，此处省略
-    ├─modules              功能模块
+    ├─modules              模块
     │  ├─...               这里有很多模块，此处省略
     │  └─default           默认模块，性质较特殊
     ├─stores               Pinia store
@@ -85,7 +85,7 @@ BLTH
 
 假设现在B站给主站每日任务新添加了一个任务：给视频点赞。
 
-首先打开 `src/modules` 文件夹，你会发现已经有了 `dailyTasks/mainSiteTasks` 这个文件夹，那么你只需在这个文件夹下新建一个 ts 文件即可。内容大概如下：
+首先打开 `src/modules` 文件夹，你会发现已经有了 `dailyTasks/mainSiteTasks/` 这个文件夹，那么你只需在这个文件夹下新建一个 ts 文件即可。内容大概如下：
 
 ```ts
 import BaseModule from '@/modules/BaseModule'
@@ -104,9 +104,9 @@ export default LikeTask
 
 接着打开 `src/library/storage/defaultValue.ts`，加上该模块配置信息的默认值。
 
-点赞涉及到对B站API的请求。在 `src/library/bili-api` 中找找看有没有给视频点赞的API，如果没有得自己添加。参考已有的API即可。
+点赞涉及到对B站API的请求。在 `src/library/bili-api/` 中找找看有没有给视频点赞的API，如果没有得自己添加。参考已有的API即可。
 
-点赞的视频从哪来？如果仔细阅读代码你会发现 `src/stores/useBiliStore` 的 `dynamicVideos` 里已经存储了许多动态视频，你可以直接用。如果有特殊需求，自己获取视频当然也是可以的。
+点赞的视频从哪来？如果仔细阅读代码你会发现 `src/stores/useBiliStore.ts` 的 `dynamicVideos` 里已经存储了许多动态视频，你可以直接用。如果有特殊需求，自己获取视频当然也是可以的。
 
 完成模块的编写后，在 `src/modules/dailyTasks/mainSiteTasks/index.ts` 中添加新模块的导出。
 
@@ -134,13 +134,13 @@ npm run format
 
 ### 强制性
 
-- 对于`src/library/bili-api`中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](https://github.com/ritz078/transform) 和 [quicktype](https://github.com/quicktype/quicktype) 或许会有帮助。
-- 如果添加了新的第三方库或资源文件，请修改`vite.config.ts`使其通过`@require`或`@resource`引入。
+- 对于 `src/library/bili-api/` 中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](https://github.com/ritz078/transform) 和 [quicktype](https://github.com/quicktype/quicktype) 或许会有帮助
+- 如果添加了新的第三方库或资源文件，请修改 `vite.config.ts` 使其通过 `@require` 或 `@resource` 引入
 
 ### 建议性
 
-- 尽可能详细地写类型定义，必要时才使用`any`/`unknown`。
-- 为逻辑复杂的代码编写注释。
+- 尽可能详细地写类型定义，必要时才使用`any`/`unknown`
+- 为逻辑复杂的代码编写注释
 
 ## 编译
 
