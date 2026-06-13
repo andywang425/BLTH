@@ -3,6 +3,7 @@ import { useBiliStore, useModuleStore } from '@/stores'
 import { watch } from 'vue'
 import type {
   MedalTaskSharedConfig,
+  RequestQueueKey,
   SharedMedalFilters,
   TaskJumpType,
   WaitProbeResult,
@@ -91,17 +92,51 @@ class MedalModule extends BaseModule {
     },
   ]
   /**
-   * 简单限流队列
-   *
-   * 串行执行获取粉丝团升级任务信息请求
+   * 串行执行请求的限流队列
    */
-  private static taskInfoRequestQueue: Promise<void> = Promise.resolve()
+  private static readonly requestQueues: Record<RequestQueueKey, Promise<void>> = {
+    taskInfo: Promise.resolve(),
+    roomStatus: Promise.resolve(),
+  }
   /** 粉丝勋章数据在多久内视为新鲜（毫秒） */
   private static readonly RECENT_FETCH_THRESHOLD = 90_000
   /** 进行中的全量刷新粉丝勋章 Promise */
   private static ongoingFullRefreshPromise: Promise<boolean> | null = null
-  /** 单房间直播状态探测限流队列 */
-  private static roomStatusProbeQueue: Promise<void> = Promise.resolve()
+
+  /**
+   * 将异步请求加入串行队列，相邻请求之间加入随机延迟
+   */
+  private static enqueueRequest<T>(
+    queueKey: RequestQueueKey,
+    getDelay: () => Promise<void>,
+    requester: () => Promise<T>,
+  ): Promise<T> {
+    const task = MedalModule.requestQueues[queueKey].catch(() => {}).then(() => requester())
+    MedalModule.requestQueues[queueKey] = task.catch(() => {}).then(() => getDelay())
+    return task
+  }
+
+  /**
+   * 将获取粉丝团升级任务信息请求加入全局串行队列
+   */
+  private static enqueueTaskInfoRequest<T>(requester: () => Promise<T>): Promise<T> {
+    return MedalModule.enqueueRequest(
+      'taskInfo',
+      () => sleep(MedalModule.TASK_INFO_REQUEST_DYNAMIC_DELAY),
+      requester,
+    )
+  }
+
+  /**
+   * 将单房间直播状态探测请求加入串行限流队列
+   */
+  private static enqueueRoomStatusProbe<T>(requester: () => Promise<T>): Promise<T> {
+    return MedalModule.enqueueRequest(
+      'roomStatus',
+      () => sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY),
+      requester,
+    )
+  }
 
   medalTasksConfig = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
 
@@ -185,32 +220,6 @@ class MedalModule extends BaseModule {
     const match = title.match(/\d+/)
     if (!match) return null
     return Number(match[0])
-  }
-
-  /**
-   * 将获取粉丝团升级任务信息请求加入全局串行队列
-   */
-  private static enqueueTaskInfoRequest<T>(requester: () => Promise<T>): Promise<T> {
-    const task = MedalModule.taskInfoRequestQueue.catch(() => {}).then(() => requester())
-
-    MedalModule.taskInfoRequestQueue = task
-      .catch(() => {})
-      .then(() => sleep(MedalModule.TASK_INFO_REQUEST_DYNAMIC_DELAY))
-
-    return task
-  }
-
-  /**
-   * 将单房间直播状态探测请求加入串行限流队列
-   */
-  private static enqueueRoomStatusProbe<T>(requester: () => Promise<T>): Promise<T> {
-    const task = MedalModule.roomStatusProbeQueue.catch(() => {}).then(() => requester())
-
-    MedalModule.roomStatusProbeQueue = task
-      .catch(() => {})
-      .then(() => sleep(MedalModule.ROOM_STATUS_PROBE_DYNAMIC_DELAY))
-
-    return task
   }
 
   /**

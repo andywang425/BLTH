@@ -18,6 +18,7 @@ interface SharedMedalFilters {
 
 type GroupedMedals<K extends string> = Record<K, LiveData.FansMedalPanel.List[]>
 
+type RequestQueueKey = 'taskInfo' | 'roomStatus'
 type TaskJumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
 type WaitStrategy = 'single-probe' | 'refresh-fans-medals'
 
@@ -35,6 +36,7 @@ export {
   MedalTaskSharedConfig,
   SharedMedalFilters,
   GroupedMedals,
+  RequestQueueKey,
   TaskJumpType,
   WaitStrategy,
   WaitProbeResult,
