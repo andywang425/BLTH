@@ -58,7 +58,7 @@
 
 # 交流群
 
-- QQ 频道：[点我加入 aw 的频道](https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&appChannel=share&inviteCode=1W7eVLs&businessType=9&from=181074&biz=ka&shareSource=5)。
+- QQ 群：[点击链接加入群聊【BLTH交流群】（920309361）](https://qm.qq.com/q/thu1A6aRBC)
 
 # 参与开发
 
