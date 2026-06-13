@@ -256,7 +256,7 @@ class DanmuTask extends MedalModule {
 
           this.logger.log(
             `仍有 ${pendingRoomids.length} 个直播间未下播，${MedalModule.WAIT_POLL_INTERVAL / 1000} 秒后继续检查`,
-            pendingRoomsInfo,
+            { pendingRoomsInfo },
           )
           await sleep(MedalModule.WAIT_POLL_INTERVAL)
         }
