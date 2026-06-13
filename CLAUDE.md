@@ -1,6 +1,6 @@
 # 项目概述
 
-BLTH（Bilibili Live Tasks Helper）是基于 Vue 3 + Vite + vite-plugin-monkey + Element Plus + TypeScript 的**用户脚本（Userscript）**，通过用户脚本管理器（Tampermonkey/Violentmonkey）运行在 Bilibili 直播页面（`live.bilibili.com`），实现自动完成每日任务、观看体验优化和页面元素清理。
+BLTH（Bilibili Live Tasks Helper）是基于 Vue 3 + Vite + vite-plugin-monkey + Element Plus + TypeScript 的用户脚本（Userscript），通过用户脚本管理器（Tampermonkey/Violentmonkey）运行在 Bilibili 直播页面（`https://live.bilibili.com/直播间号`），实现自动完成每日任务、观看体验优化和页面元素清理。
 
 # 常用命令
 
@@ -32,7 +32,7 @@ npm run preview      # 打开提供编译产物安装链接的本地预览网页
 
 ## 多标签页安全
 
-脚本分三类：`Main`，`SubMain`，`Other`。同时打开多个直播间页面时，`src/stores/useCacheStore.ts` 会选出唯一 `Main` 脚本，避免部分模块重复执行。
+脚本分三类：`Main`，`SubMain`，`Other`。同时打开多个直播间页面时，`src/stores/useCacheStore.ts` 会选出唯一 `Main` 脚本，避免部分模块重复加载。
 
 # 分支
 
@@ -47,5 +47,5 @@ npm run preview      # 打开提供编译产物安装链接的本地预览网页
 
 # 易踩坑点
 
-- 新增第三方库须写进 `vite.config.ts` 的 `externalGlobals`/`externalResource` 中，使其通过 `@require`/`@resource` 引入，不打包进脚本
-- 调试早期模块（`runAt: RunAtMoment = 'document-start'`）时 dev 模式注入太晚，请用 `npm run build` 的产物测试
+- 新增第三方库须写进 `vite.config.ts` 的 `externalGlobals`/`externalResource` 中，通过 `@require`/`@resource` 引入，不打包进脚本
+- 调试早期模块（`runAt = 'document-start'`）时 dev 模式注入太晚，请用 `npm run build` 的产物测试
