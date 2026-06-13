@@ -353,7 +353,7 @@ const BAPI: BapiMethods = {
       ga = 1,
     ) => {
       const bili_jct = useBiliStore().cookies!.bili_jct
-      return request.main.post('/x/web-interface/coin/add ', {
+      return request.main.post('/x/web-interface/coin/add', {
         aid,
         multiply: num,
         select_like,

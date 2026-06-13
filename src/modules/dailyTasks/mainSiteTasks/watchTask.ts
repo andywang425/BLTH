@@ -45,7 +45,7 @@ class WatchTask extends BaseModule {
       this.status = 'error'
       return false
     }
-    if (!biliStore.dynamicVideos) {
+    if (!biliStore.dynamicVideos || biliStore.dynamicVideos.length === 0) {
       this.logger.error('动态视频数据不存在，不执行每日观看视频任务')
       this.status = 'error'
       return false

@@ -121,6 +121,7 @@ class LikeTask extends MedalModule {
       : parsed.limit
     const remaining = target - parsed.current
     let hasSuccessfulLike = false
+
     for (let j = 0; j < remaining; j++) {
       if (this.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
@@ -147,6 +148,7 @@ class LikeTask extends MedalModule {
       }
     }
 
+    // 所有点赞尝试均失败，估计是有什么异常状况，跳过
     return { interrupted: false, verifiedCompleted: true }
   }
 

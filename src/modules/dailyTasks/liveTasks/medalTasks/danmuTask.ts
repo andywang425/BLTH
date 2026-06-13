@@ -170,6 +170,7 @@ class DanmuTask extends MedalModule {
       }
     }
 
+    // 所有发弹幕尝试均失败，估计是有什么异常状况，跳过
     return { interrupted: false, verifiedCompleted: true }
   }
 

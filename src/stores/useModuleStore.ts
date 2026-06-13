@@ -301,8 +301,8 @@ export const useModuleStore = defineStore('module', () => {
    */
   ;(function clearStatus() {
     setTimeout(() => {
-      deepestIterate(moduleStatus, (_value: ModuleStatusTypes, path: string) => {
-        _.set(moduleStatus, path, '')
+      deepestIterate(moduleStatus.value, (_value: ModuleStatusTypes, path: string) => {
+        _.set(moduleStatus.value, path, '')
       })
       clearStatus()
     }, delayToNextMoment(0, 0).ms)
