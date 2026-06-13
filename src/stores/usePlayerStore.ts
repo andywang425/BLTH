@@ -2,6 +2,7 @@ import { unsafeWindow } from '$'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { waitForMoment } from '@/library/utils'
 import { ref } from 'vue'
+import _ from 'lodash'
 
 export interface PlayerStoreConfig {
   getPlayer: {
@@ -43,7 +44,7 @@ export const usePlayerStore = defineStore('player', () => {
   const getPlayer = async (
     config: PlayerStoreConfig['getPlayer'] = DEFAULT_CONFIG.getPlayer,
   ): Promise<Window['livePlayer']> => {
-    const mergedConfig = Object.assign({}, config, DEFAULT_CONFIG.getPlayer)
+    const mergedConfig = _.defaults({}, config, DEFAULT_CONFIG.getPlayer)
 
     if (player.value) {
       return player.value
@@ -88,7 +89,7 @@ export const usePlayerStore = defineStore('player', () => {
     status: 0 | 1,
     config: PlayerStoreConfig['waitForLiveStatus'] = DEFAULT_CONFIG.waitForLiveStatus,
   ): Promise<boolean> => {
-    const mergedConfig = Object.assign({}, config, DEFAULT_CONFIG.waitForLiveStatus)
+    const mergedConfig = _.defaults({}, config, DEFAULT_CONFIG.waitForLiveStatus)
 
     const player = await getPlayer()
 

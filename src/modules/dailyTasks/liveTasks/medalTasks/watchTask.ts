@@ -3,7 +3,7 @@ import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore, usePlayerStore } from '@/stores'
 import Logger from '@/library/logger'
 import CryptoJS from 'crypto-js'
-import { sleep, uuid } from '@/library/utils'
+import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes, RunAtMoment } from '@/types'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
@@ -68,7 +68,7 @@ class RoomHeart {
   /** Cookie LIVE_BUVID */
   private buvid?: string = useBiliStore().cookies!.LIVE_BUVID
 
-  private uuid = uuid()
+  private uuid = crypto.randomUUID()
 
   /** 计算签名和发送请求时均需要 JSON.stringify */
   private device: string[] = [this.buvid as string, this.uuid]

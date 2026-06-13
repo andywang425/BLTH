@@ -374,7 +374,7 @@ class BanP2P extends BaseModule {
       }
 
       /**
-       * 返回空 sender，占位满足 addTrack 的返回类型要求。
+       * 返回空 sender，占位满足 addTrack 的返回类型要求
        */
       addTrack(): RTCRtpSender {
         return {} as RTCRtpSender

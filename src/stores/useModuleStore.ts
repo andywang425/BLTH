@@ -60,7 +60,7 @@ export const useModuleStore = defineStore('module', () => {
           moduleConfig.value.DailyTasks.MainSiteTasks.login._lastCompleteTime = 0
 
           await rerunModule('Default_DailyRewardInfo', true)
-          await rerunModule('DailyTask_MainSiteTask_LoginTask')
+          rerunModule('DailyTask_MainSiteTask_LoginTask')
         },
         watch: async () => {
           moduleStatus.value.DailyTasks.MainSiteTasks.watch = ''
@@ -70,7 +70,7 @@ export const useModuleStore = defineStore('module', () => {
             rerunModule('Default_DailyRewardInfo', true),
             rerunModule('Default_DynamicVideos', true),
           ])
-          await rerunModule('DailyTask_MainSiteTask_WatchTask')
+          rerunModule('DailyTask_MainSiteTask_WatchTask')
         },
         coin: async () => {
           moduleStatus.value.DailyTasks.MainSiteTasks.coin = ''
@@ -183,6 +183,8 @@ export const useModuleStore = defineStore('module', () => {
     const promiseArray: Promise<void>[] = []
     for (const [name, module] of Object.entries(defaultModules)) {
       if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
+        // 默认模块一定会返回一个 Promise
+        // 即使意外返回 undefined，Promise.allSettled 会将其当作已 fulfilled 的 Promise
         promiseArray.push(_runModule(module, name)!)
       }
     }

@@ -5,17 +5,6 @@ import { ts } from '@/library/luxon'
 import { useBiliStore } from '@/stores'
 
 /**
- * 生成一个 version 4 uuid
- * @returns uuid
- */
-function uuid(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (char) {
-    const randomInt = (16 * Math.random()) | 0
-    return ('x' === char ? randomInt : (3 & randomInt) | 8).toString(16)
-  })
-}
-
-/**
  * 生成一个随机的 32 位 hash
  * @returns 32 位十六进制字符串
  */
@@ -235,7 +224,6 @@ function arrayToMap<T>(arr: T[]): Map<T, number> {
 }
 
 export {
-  uuid,
   random32Hash,
   sleep,
   getFilenameFromUrl,
