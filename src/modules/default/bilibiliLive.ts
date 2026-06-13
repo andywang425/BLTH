@@ -19,8 +19,8 @@ class BilibiliLive extends BaseModule {
         return
       }
       unsafeWindow.BilibiliLive = new Proxy(unsafeWindow.BilibiliLive, {
-        set(target: Window['BilibiliLive'], prop: keyof Window['BilibiliLive'], value: never) {
-          target[prop] = value
+        set(target: Window['BilibiliLive'], prop: keyof Window['BilibiliLive'], value: any) {
+          Reflect.set(target, prop, value)
           // UID 是最后被赋值的属性，等 UID 被赋值后 BilibiliLive 的所有属性就都被初始化了
           if (prop === 'UID') {
             // 取消代理，还原为 Object

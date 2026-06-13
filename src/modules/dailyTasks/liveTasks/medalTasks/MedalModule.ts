@@ -270,7 +270,7 @@ class MedalModule extends BaseModule {
    */
   protected decideWaitStrategy(pendingCount: number): WaitStrategy {
     const totalMedalCount = useBiliStore().filteredFansMedals.length
-    const fullRefreshCost = Math.ceil(totalMedalCount / 10)
+    const fullRefreshCost = Math.ceil(totalMedalCount / 10) // 每次请求能获取 10 个粉丝勋章
     return pendingCount <= fullRefreshCost ? 'single-probe' : 'refresh-fans-medals'
   }
 

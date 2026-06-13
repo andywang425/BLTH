@@ -214,10 +214,11 @@ class LightTask extends MedalModule {
         )
         continue
       }
-      let target = MedalModule.parseTitleCount(danmuItem.title) ?? 10
+
+      let remaining = MedalModule.parseTitleCount(danmuItem.title) ?? 10
       let failedCount = 0
 
-      for (let j = 0; j < target; j++) {
+      for (let j = 0; j < remaining; j++) {
         const danmuText = this.config.danmuList[danmuIndex++ % this.config.danmuList.length]
 
         if (!(await this.sendDanmu(medal, danmuText))) {
@@ -226,10 +227,10 @@ class LightTask extends MedalModule {
             if (i < medals.length - 1) await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
             break
           }
-          target++
+          remaining++
         }
 
-        if (i < medals.length - 1 || j < target - 1) {
+        if (i < medals.length - 1 || j < remaining - 1) {
           await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
         }
       }

@@ -8,7 +8,7 @@ import _ from 'lodash'
 const request: Requests = {
   live: new Request('https://api.live.bilibili.com', 'https://live.bilibili.com'),
   liveTrace: new Request('https://live-trace.bilibili.com', 'https://live.bilibili.com'),
-  passport: new Request('https://passport.bilibili.com', 'https://passport.bilibili.com/'),
+  passport: new Request('https://passport.bilibili.com', 'https://passport.bilibili.com'),
   main: new Request('https://api.bilibili.com', 'https://www.bilibili.com'),
   raw: new Request(),
 }
