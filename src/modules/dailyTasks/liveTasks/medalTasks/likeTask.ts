@@ -218,8 +218,16 @@ class LikeTask extends MedalModule {
         }
 
         if (pendingRoomids.length > 0) {
+          const medalMap = useBiliStore().filteredFansMedalsMap
+          const pendingRoomsInfo: Record<number, string | undefined> = {}
+
+          for (const roomid of pendingRoomids) {
+            pendingRoomsInfo[roomid] = medalMap.get(roomid)?.anchor_info.nick_name
+          }
+
           this.logger.log(
             `仍有 ${pendingRoomids.length} 个直播间未开播，${MedalModule.WAIT_POLL_INTERVAL / 1000} 秒后继续检查`,
+            pendingRoomsInfo,
           )
           await sleep(MedalModule.WAIT_POLL_INTERVAL)
         }

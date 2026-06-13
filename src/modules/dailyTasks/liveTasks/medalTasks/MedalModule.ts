@@ -303,7 +303,10 @@ class MedalModule extends BaseModule {
         continue
       }
       if (!this.SHARED_MEDAL_FILTERS.isLighted(medal)) {
-        this.logger.log(`直播间 ${roomid} 对应的粉丝勋章已熄灭，停止等待该房间`)
+        this.logger.log(
+          `粉丝勋章【${medal.medal.medal_name}】已熄灭，停止等待该房间（${roomid}）`,
+          medal,
+        )
         continue
       }
 
@@ -315,7 +318,10 @@ class MedalModule extends BaseModule {
         : medal.room_info.living_status
 
       if (hasProbedStatus && _.isNil(liveStatus)) {
-        this.logger.warn(`直播间 ${roomid} 本轮实时探测失败，继续等待下次检查`)
+        this.logger.warn(
+          `粉丝勋章【${medal.medal.medal_name}】对应的直播间 ${roomid} 本轮实时探测失败，继续等待下次检查`,
+          medal,
+        )
         pendingRoomids.push(roomid)
       } else if (!_.isNil(liveStatus) && targetPredicate(liveStatus)) {
         readyMedals.push(medal)
@@ -344,6 +350,8 @@ class MedalModule extends BaseModule {
   ): Promise<WaitProbeResult> {
     const biliStore = useBiliStore()
 
+    this.logger.log(`开始直播状态探测，待探测直播间数量：${roomids.length}`, { roomids })
+
     // 如果有进行中的全量刷新，等待其完成
     if (MedalModule.ongoingFullRefreshPromise) {
       this.logger.log('等待进行中的粉丝勋章刷新完成...')
@@ -359,7 +367,7 @@ class MedalModule extends BaseModule {
     // 数据不新鲜，决定探测策略
     const strategy = this.decideWaitStrategy(roomids.length)
     this.logger.log(
-      `待处理房间 ${roomids.length} 个，粉丝勋章数据不新鲜，使用${strategy === 'single-probe' ? '单房间探测' : '刷新粉丝勋章'}策略`,
+      `粉丝勋章数据不新鲜，使用${strategy === 'single-probe' ? '单房间探测' : '刷新粉丝勋章'}策略`,
     )
 
     if (strategy === 'refresh-fans-medals') {
