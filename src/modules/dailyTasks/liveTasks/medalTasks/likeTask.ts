@@ -139,7 +139,11 @@ class LikeTask extends MedalModule {
     if (hasSuccessfulLike) {
       return {
         interrupted: false,
-        verifiedCompleted: await this.confirmTaskCompletedAfterUpdate(medal, 'like'),
+        verifiedCompleted: await this.confirmTaskCompletedAfterUpdate(
+          medal,
+          'like',
+          this.config.useTargetRounds ? target : undefined,
+        ),
       }
     }
 

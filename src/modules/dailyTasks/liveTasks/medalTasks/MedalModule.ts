@@ -460,11 +460,15 @@ class MedalModule extends BaseModule {
   /**
    * 等待B站更新任务状态后，重新获取粉丝团升级任务信息确认任务是否真的完成
    *
+   * @param medal 粉丝勋章
+   * @param jump_type 任务类型
+   * @param requiredRounds 要求完成的目标轮次（仅"完成目标轮次"模式下需要传入）
    * @returns 任务实际是否完成
    */
   protected async confirmTaskCompletedAfterUpdate(
     medal: LiveData.FansMedalPanel.List,
     jump_type: TaskJumpType,
+    requiredRounds?: number,
   ): Promise<boolean> {
     await sleep(MedalModule.WAIT_MEDAL_UPDATE_DELAY)
 
@@ -487,14 +491,23 @@ class MedalModule extends BaseModule {
       return true
     }
 
-    if (!item.is_done) {
-      this.logger.warn(
-        `粉丝勋章【${medal.medal.medal_name}】已执行 ${actionText} 任务，但B站仍认为该任务未完成（实际进度：${item.sub_title}），下次运行会继续尝试`,
-      )
-      return false
+    if (item.is_done) return true
+
+    // "完成目标轮次"模式下，即使B站标为未完成，只要达到目标轮次也视为完成
+    if (requiredRounds !== undefined) {
+      const parsed = MedalModule.parseDailyLimit(item.sub_title)
+      if (parsed && parsed.current >= requiredRounds) {
+        this.logger.log(
+          `粉丝勋章【${medal.medal.medal_name}】已达到目标轮次 ${requiredRounds}（实际进度：${item.sub_title}），视为完成`,
+        )
+        return true
+      }
     }
 
-    return true
+    this.logger.warn(
+      `粉丝勋章【${medal.medal.medal_name}】已执行 ${actionText} 任务，但B站仍认为该任务未完成（实际进度：${item.sub_title}），下次运行会继续尝试`,
+    )
+    return false
   }
 
   /**

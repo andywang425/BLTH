@@ -168,8 +168,14 @@ class LightTask extends MedalModule {
         continue
       }
 
-      const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
-      const times = MedalModule.parseTitleCount(item?.title) ?? 30
+      const likeItem = MedalModule.findTaskInfo(medalData.task_info, 'like')
+      if (!likeItem) {
+        this.logger.error(
+          `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
+        )
+        continue
+      }
+      const times = MedalModule.parseTitleCount(likeItem.title) ?? 30
       await this.like(medal, times)
       attemptedMedals.push(medal)
 
@@ -201,8 +207,14 @@ class LightTask extends MedalModule {
         continue
       }
 
-      const item = MedalModule.findTaskInfo(medalData.task_info, 'sendDanmu')
-      let target = MedalModule.parseTitleCount(item?.title) ?? 10
+      const danmuItem = MedalModule.findTaskInfo(medalData.task_info, 'sendDanmu')
+      if (!danmuItem) {
+        this.logger.error(
+          `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到发弹幕任务，跳过发弹幕任务`,
+        )
+        continue
+      }
+      let target = MedalModule.parseTitleCount(danmuItem.title) ?? 10
       let failedCount = 0
 
       for (let j = 0; j < target; j++) {

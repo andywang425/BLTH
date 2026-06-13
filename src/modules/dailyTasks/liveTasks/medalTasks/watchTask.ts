@@ -406,6 +406,7 @@ class WatchTask extends MedalModule {
               const verifiedCompleted = await this.confirmTaskCompletedAfterUpdate(
                 medal,
                 'watchLive',
+                this.config.useTargetRounds ? target : undefined,
               )
               if (!verifiedCompleted) {
                 allCompleted = false

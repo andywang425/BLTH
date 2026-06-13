@@ -162,7 +162,11 @@ class DanmuTask extends MedalModule {
     if (hasSuccessfulDanmu) {
       return {
         interrupted: false,
-        verifiedCompleted: await this.confirmTaskCompletedAfterUpdate(medal, 'sendDanmu'),
+        verifiedCompleted: await this.confirmTaskCompletedAfterUpdate(
+          medal,
+          'sendDanmu',
+          this.config.useTargetRounds ? target : undefined,
+        ),
       }
     }
 
