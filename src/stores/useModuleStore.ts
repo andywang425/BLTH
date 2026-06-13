@@ -110,11 +110,6 @@ export const useModuleStore = defineStore('module', () => {
             rerunModule('DailyTask_LiveTask_LightTask')
           },
           like: () => {
-            if (moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light === 'running') {
-              logger.warn('【点亮熄灭勋章】模块仍在运行中，无法重新运行【点赞】模块')
-              return
-            }
-
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.like = ''
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.like._lastCompleteTime = 0
 
@@ -122,11 +117,6 @@ export const useModuleStore = defineStore('module', () => {
             rerunModule('DailyTask_LiveTask_LikeTask')
           },
           danmu: () => {
-            if (moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light === 'running') {
-              logger.warn('【点亮熄灭勋章】模块仍在运行中，无法重新运行【发弹幕】模块')
-              return
-            }
-
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.danmu = ''
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.danmu._lastCompleteTime = 0
 
