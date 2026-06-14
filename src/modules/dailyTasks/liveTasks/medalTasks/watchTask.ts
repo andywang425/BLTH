@@ -3,9 +3,8 @@ import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore, usePlayerStore } from '@/stores'
 import Logger from '@/library/logger'
 import CryptoJS from 'crypto-js'
-import { sleep, uuid } from '@/library/utils'
+import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes, RunAtMoment } from '@/types'
-import _ from 'lodash'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
 
@@ -69,7 +68,7 @@ class RoomHeart {
   /** Cookie LIVE_BUVID */
   private buvid?: string = useBiliStore().cookies!.LIVE_BUVID
 
-  private uuid = uuid()
+  private uuid = crypto.randomUUID()
 
   /** 计算签名和发送请求时均需要 JSON.stringify */
   private device: string[] = [this.buvid as string, this.uuid]
@@ -84,13 +83,16 @@ class RoomHeart {
 
   /**
    * 开始心跳
+   *
+   * @returns 是否成功观看过任意时长
    */
-  public start(): Promise<void> {
+  public async start(): Promise<boolean> {
     if (!this.buvid) {
       this.logger.error(`缺少buvid，无法为直播间 ${this.roomID} 执行观看直播任务，请尝试刷新页面`)
-      return Promise.resolve()
+      return false
     }
-    return this.E()
+    await this.E()
+    return this.watchedSeconds > 0
   }
 
   /**
@@ -319,46 +321,50 @@ class WatchTask extends MedalModule {
       }
 
       this.status = 'running'
-      MedalModule.clearTaskInfoCache()
 
       if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
         // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0
         this.config._watchingProgress = {}
-      } else {
-        // 因为连续看 5 分钟（300秒）才能加亲密度，所以上一次观看时最后不足 5 分钟的时间是无效的
-        _.forOwn(this.config._watchingProgress, (value, key, object) => {
-          object[key] -= value % 300
-        })
       }
 
       this.config._lastWatchTime = tsm()
       const fansMedals = this.getMedals()
 
       if (fansMedals.length > 0) {
-        let i: number
+        let allCompleted = true
 
-        for (i = 0; i < fansMedals.length; i++) {
+        for (let i = 0; i < fansMedals.length; i++) {
           if (isNowAfter(23, 55) || isNowBefore(0, 5)) {
             this.logger.log('即将或刚刚发生跨天，提早结束本轮观看直播任务')
+            allCompleted = false
             break
           }
 
           const medal = fansMedals[i]
           const roomid = medal.room_info.room_id
           const uid = medal.medal.target_id
+          const nick_name = medal.anchor_info.nick_name
+          const medal_name = medal.medal.medal_name
 
-          const taskInfo = await this.fetchTaskInfo(uid)
-          if (!taskInfo) {
+          const medalData = await this.fetchMedalData(uid)
+          if (!medalData) {
             this.logger.error(
-              `无法获取主播【${medal.anchor_info.nick_name}】（UID：${uid}）的粉丝团升级任务信息，跳过观看直播任务`,
+              `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${uid}，直播间：${roomid}）的粉丝团升级任务信息，跳过观看直播任务`,
             )
             continue
           }
 
-          const item = MedalModule.findTaskInfo(taskInfo, 'watchLive')
+          if (medalData.reach_free_intimacy_limit) {
+            this.logger.warn(
+              `粉丝勋章【${medal_name}】（主播【${nick_name}】，UID：${uid}，直播间：${roomid}）已达到储蓄亲密度上限（已储蓄 ${medalData.free_intimacy} 亲密度，投喂一个粉丝灯牌即可领取这些亲密度），无法通过观看直播获取更多亲密度，跳过观看直播任务`,
+            )
+            continue
+          }
+
+          const item = MedalModule.findTaskInfo(medalData.task_info, 'watchLive')
           if (!item) {
             this.logger.error(
-              `无法在主播【${medal.anchor_info.nick_name}】（UID：${uid}）的粉丝团升级任务信息中找到观看直播任务，跳过观看直播任务`,
+              `粉丝勋章【${medal_name}】 无法在主播【${nick_name}】（UID：${uid}，直播间：${roomid}）的粉丝团升级任务信息中找到观看直播任务，跳过观看直播任务`,
             )
             continue
           }
@@ -368,16 +374,20 @@ class WatchTask extends MedalModule {
           const parsed = MedalModule.parseDailyLimit(item.sub_title)
           if (!parsed) {
             this.logger.error(
-              `无法解析主播【${medal.anchor_info.nick_name}】（UID：${uid}）的观看直播任务的每日上限信息，跳过观看直播任务`,
+              `粉丝勋章【${medal_name}】 无法解析主播【${nick_name}】（UID：${uid}，直播间：${roomid}）的观看直播任务的每日上限信息，跳过观看直播任务`,
             )
             continue
           }
           if (parsed.current >= parsed.limit) continue
 
+          // 一轮的观看时间（默认 15 分钟）
           const minutes = MedalModule.parseTitleCount(item.title) ?? 15
-
-          // 目标秒数 = 每日上限 × minutes × 60s + 60s 缓冲（补偿心跳计时误差）
-          const targetSeconds = parsed.limit * minutes * 60 + 60
+          // 目标轮次（每日上限或配置的目标轮次）
+          const target = this.config.useTargetRounds
+            ? Math.min(parsed.limit, this.config.targetRounds)
+            : parsed.limit
+          // 目标秒数 = 目标轮次 × minutes × 60s
+          const targetSeconds = target * minutes * 60
 
           if ((this.config._watchingProgress[roomid] ?? 0) >= targetSeconds) {
             // 今日观看时间已达到目标值，跳过
@@ -389,10 +399,10 @@ class WatchTask extends MedalModule {
           if (area_id > 0 && parent_area_id > 0) {
             // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
             this.logger.log(
-              `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds / 60} 分钟）`,
+              `粉丝勋章【${medal_name}】 开始直播间 ${roomid}（主播【${nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds / 60} 分钟）`,
             )
 
-            await new RoomHeart(
+            const hasWatchingProgress = await new RoomHeart(
               roomid,
               area_id,
               parent_area_id,
@@ -400,11 +410,23 @@ class WatchTask extends MedalModule {
               this.config._watchingProgress[roomid] ?? 0,
               targetSeconds,
             ).start()
+
+            if (hasWatchingProgress) {
+              const verifiedCompleted = await this.confirmTaskCompletedAfterUpdate(
+                medal,
+                'watchLive',
+                this.config.useTargetRounds ? target : undefined,
+              )
+              if (!verifiedCompleted) {
+                allCompleted = false
+              }
+            } else {
+              allCompleted = false
+            }
           }
         }
 
-        if (i === fansMedals.length) {
-          // 没有提早跳出循环，说明所有直播间的观看任务均已完成
+        if (allCompleted) {
           this.config._lastCompleteTime = tsm()
           this.logger.log('观看直播任务已完成')
           this.status = 'done'

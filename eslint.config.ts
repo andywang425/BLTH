@@ -1,5 +1,4 @@
-import { globalIgnores } from 'eslint/config'
-import { includeIgnoreFile } from '@eslint/compat'
+import { globalIgnores, includeIgnoreFile } from 'eslint/config'
 import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
 import pluginVue from 'eslint-plugin-vue'
 import skipFormatting from 'eslint-config-prettier/flat'
@@ -35,7 +34,7 @@ export default defineConfigWithVueTs(
           argsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
           destructuredArrayIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
+          varsIgnorePattern: '^_.+',
           ignoreRestSiblings: true,
         },
       ],

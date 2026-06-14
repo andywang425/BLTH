@@ -13,8 +13,8 @@ const open = () => {
   const { title, message } = props.item
 
   ElMessageBox({
-    title: title,
-    message: message,
+    title,
+    message,
     lockScroll: false,
     autofocus: true,
     confirmButtonText: 'OK',

@@ -1,6 +1,7 @@
 import type { OnFrameTypes, RunAtMoment } from '@/types'
 import BaseModule from '@/modules/BaseModule'
 import { usePlayerStore, useModuleStore } from '@/stores'
+
 class SwitchLiveStreamQuality extends BaseModule {
   static runOnMultiplePages: boolean = true
   static runAt: RunAtMoment = 'window-load'
@@ -62,7 +63,7 @@ class SwitchLiveStreamQuality extends BaseModule {
 
     try {
       const livePlayer = await this.playerStore.getPlayer()
-      this.switchQuality(livePlayer)
+      await this.switchQuality(livePlayer)
     } catch (e) {
       this.logger.error('自动切换画质模块出错', e)
     }

@@ -148,16 +148,16 @@ const fproxy = (
   return {
     unProxy: () => {
       if (proxy.onRequest) {
-        onRequestHandlers.splice(
-          onRequestHandlers.findIndex((handler) => handler === proxy.onRequest),
-          1,
-        )
+        const index = onRequestHandlers.findIndex((handler) => handler === proxy.onRequest)
+        if (index !== -1) {
+          onRequestHandlers.splice(index, 1)
+        }
       }
       if (proxy.onResponse) {
-        onResponseHandlers.splice(
-          onResponseHandlers.findIndex((handler) => handler === proxy.onResponse),
-          1,
-        )
+        const index = onResponseHandlers.findIndex((handler) => handler === proxy.onResponse)
+        if (index !== -1) {
+          onResponseHandlers.splice(index, 1)
+        }
       }
     },
     unHook: () => {

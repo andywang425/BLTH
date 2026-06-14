@@ -10,9 +10,9 @@ class Request {
    */
   private readonly origin: string
 
-  constructor(url_prefix?: string, orgin?: string) {
+  constructor(url_prefix?: string, origin?: string) {
     this.url_prefix = url_prefix ?? ''
-    this.origin = orgin ?? 'https://bilibili.com'
+    this.origin = origin ?? 'https://bilibili.com'
   }
 
   /**

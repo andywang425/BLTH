@@ -1198,6 +1198,147 @@ declare namespace LiveData {
       tid: string
     }
   }
+
+  namespace GetRoomPlayInfo {
+    interface Data {
+      room_id: number
+      short_id: number
+      uid: number
+      is_hidden: boolean
+      is_locked: boolean
+      is_portrait: boolean
+      /** 0 未开播，1 直播中，2 轮播中 */
+      live_status: number
+      hidden_till: number
+      lock_till: number
+      encrypted: boolean
+      pwd_verified: boolean
+      live_time: number
+      room_shield: number
+      all_special_types: number[]
+      /** 未开播时为 null */
+      playurl_info: PlayurlInfo | null
+      official_type: number
+      official_room_id: number
+      risk_with_delay: number
+      multi_screen_info: string
+      pure_control_function: any
+      /** 降级播放地址信息，通常为 null */
+      degraded_playurl: PlayurlInfo | null
+      subtitle_cfg: SubtitleCfg | null
+      relay_room_id: number
+    }
+
+    interface PlayurlInfo {
+      conf_json: string
+      playurl: Playurl
+      expected_quality: ExpectedQuality
+      qn_desc_more_ab: number
+    }
+
+    interface Playurl {
+      cid: number
+      g_qn_desc: QnDesc[]
+      stream: Stream[]
+      p2p_data: P2pData
+      dolby_qn: number[] | null
+      hot: boolean
+      hdr_metadata_degrade_desc: HdrMetadataDegradeDesc[] | null
+    }
+
+    interface QnDesc {
+      qn: number
+      desc: string
+      hdr_desc: string
+      attr_desc: string[] | null
+      hdr_type: number
+      media_base_desc: MediaBaseDesc | null
+      eotf: number
+    }
+
+    interface MediaBaseDesc {
+      detail_desc: {
+        desc: string
+        tag?: string[]
+      }
+      brief_desc: {
+        desc: string
+        badge?: string
+      }
+    }
+
+    interface Stream {
+      protocol_name: string
+      format: Format[]
+    }
+
+    interface Format {
+      format_name: string
+      codec: Codec[]
+      master_url: string
+    }
+
+    interface Codec {
+      codec_name: string
+      current_qn: number
+      accept_qn: number[]
+      base_url: string
+      url_info: UrlInfo[]
+      hdr_qn: number[] | null
+      dolby_type: number
+      attr_name: string
+      hdr_type: number
+      drm: boolean
+      drm_key_systems: any
+      video_codecs: CodecDesc | null
+      audio_codecs: CodecDesc | null
+      session: string
+      is_pushing: boolean
+      stream_resource_req: any
+      video_color_info: VideoColorInfo | null
+    }
+
+    interface CodecDesc {
+      base: string
+      ext?: string[]
+    }
+
+    interface UrlInfo {
+      host: string
+      extra: string
+      stream_ttl: number
+    }
+
+    interface VideoColorInfo {
+      colorspace?: string
+      eotf?: number
+      metadata_types: string[]
+    }
+
+    interface P2pData {
+      p2p: boolean
+      p2p_type: number
+      m_p2p: boolean
+      m_servers: any[] | null
+    }
+
+    interface HdrMetadataDegradeDesc {
+      type: string
+      display_badge: string
+    }
+
+    interface ExpectedQuality {
+      qn: number
+      hdr_type: number
+      eotf: number
+    }
+
+    interface SubtitleCfg {
+      status: number
+      subtitle_buffer: number
+      skip_frame_threshold: number
+    }
+  }
 }
 
 declare namespace LiveTraceData {

@@ -34,12 +34,12 @@ class SilverToCoinTask extends BaseModule {
     }
   }
 
-  public run(): void {
+  public async run(): Promise<void> {
     this.logger.log('银瓜子换硬币模块开始运行')
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
       this.status = 'running'
-      this.exchange()
+      await this.exchange()
     } else {
       if (isNowBefore(0, 5)) {
         this.logger.log('昨天的银瓜子换硬币任务已经完成过了，等到今天的00:05再执行')

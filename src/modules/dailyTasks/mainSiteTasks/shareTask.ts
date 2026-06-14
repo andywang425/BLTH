@@ -45,7 +45,7 @@ class ShareTask extends BaseModule {
       return false
     }
 
-    if (!biliStore.dynamicVideos) {
+    if (!biliStore.dynamicVideos || biliStore.dynamicVideos.length === 0) {
       this.logger.error('动态视频数据不存在，不执行每日分享视频任务')
       this.status = 'error'
       return false

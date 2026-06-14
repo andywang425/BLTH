@@ -3,7 +3,7 @@ import BaseModule from '@/modules/BaseModule'
 import { useModuleStore } from '@/stores'
 
 class RemoveGameParty extends BaseModule {
-  static runMultiple = true
+  static runOnMultiplePages = true
 
   config = useModuleStore().moduleConfig.RemoveElement.removeGameParty
 

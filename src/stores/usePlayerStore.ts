@@ -44,7 +44,7 @@ export const usePlayerStore = defineStore('player', () => {
   const getPlayer = async (
     config: PlayerStoreConfig['getPlayer'] = DEFAULT_CONFIG.getPlayer,
   ): Promise<Window['livePlayer']> => {
-    _.defaults(config, DEFAULT_CONFIG.getPlayer)
+    const mergedConfig = _.defaults({}, config, DEFAULT_CONFIG.getPlayer)
 
     if (player.value) {
       return player.value
@@ -69,12 +69,12 @@ export const usePlayerStore = defineStore('player', () => {
           player.value = unsafeWindow.livePlayer
           resolve(player.value)
         }
-      }, config.interval)
+      }, mergedConfig.interval)
 
       const timeoutTimer = setTimeout(() => {
         clearInterval(findPlayerTimer)
         reject('等待播放器超时')
-      }, config.timeout)
+      }, mergedConfig.timeout)
     })
   }
 
@@ -89,18 +89,18 @@ export const usePlayerStore = defineStore('player', () => {
     status: 0 | 1,
     config: PlayerStoreConfig['waitForLiveStatus'] = DEFAULT_CONFIG.waitForLiveStatus,
   ): Promise<boolean> => {
-    _.defaults(config, DEFAULT_CONFIG.waitForLiveStatus)
+    const mergedConfig = _.defaults({}, config, DEFAULT_CONFIG.waitForLiveStatus)
 
     const player = await getPlayer()
 
     const liveStatus = player.getPlayerInfo().liveStatus
 
     if (liveStatus === status) {
-      config.onImmediateSuccess?.()
+      mergedConfig.onImmediateSuccess?.()
       return true
     }
 
-    config.onNeedWait?.()
+    mergedConfig.onNeedWait?.()
 
     return new Promise<boolean>((resolve) => {
       const liveStatusTimer = setInterval(() => {
@@ -110,14 +110,14 @@ export const usePlayerStore = defineStore('player', () => {
           clearInterval(liveStatusTimer)
           resolve(true)
         }
-      }, config.interval)
+      }, mergedConfig.interval)
 
       const timeoutTimer =
-        config.timeout &&
+        mergedConfig.timeout &&
         setTimeout(() => {
           clearInterval(liveStatusTimer)
           resolve(false)
-        }, config.timeout)
+        }, mergedConfig.timeout)
     })
   }
 

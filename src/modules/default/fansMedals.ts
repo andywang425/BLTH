@@ -1,7 +1,7 @@
 import { useBiliStore, useModuleStore } from '@/stores'
 import BAPI from '@/library/bili-api'
 import type { LiveData } from '@/library/bili-api/data'
-import { delayToNextMoment, isTimestampToday } from '@/library/luxon'
+import { delayToNextMoment, isTimestampToday, tsm } from '@/library/luxon'
 import { sleep } from '@/library/utils'
 import BaseModule from '@/modules/BaseModule'
 import ModuleError from '@/library/error/ModuleError'
@@ -34,13 +34,10 @@ class FansMedals extends BaseModule {
       for (let page = 2; page <= Math.min(total_page, pages); page++) {
         const response = await BAPI.live.fansMedalPanel(page)
         this.logger.log(`BAPI.live.fansMedalPanel(${page}) response`, response)
-        if (firstPageResponse.code === 0) {
+        if (response.code === 0) {
           fansMedalList.push(...response.data.list)
         } else {
-          this.logger.error(
-            `获取粉丝勋章列表第${page}页失败，提前结束获取`,
-            firstPageResponse.message,
-          )
+          this.logger.error(`获取粉丝勋章列表第${page}页失败，提前结束获取`, response.message)
           // 中途出错，返回已获取的粉丝勋章列表，不抛出错误
           return fansMedalList
         }
@@ -49,7 +46,7 @@ class FansMedals extends BaseModule {
       }
       return fansMedalList
     } catch (error: any) {
-      useBiliStore().fansMedalsStatus = 'error'
+      useBiliStore().fansMedalsMeta.status = 'error'
       throw new ModuleError(this.moduleName, `获取粉丝勋章列表出错: ${error.message}`)
     }
   }
@@ -71,9 +68,14 @@ class FansMedals extends BaseModule {
         // 开启了任意粉丝勋章相关功能且今天没完成过
         taskValues.some((t) => t.enabled && !isTimestampToday(t._lastCompleteTime, 0, 4))
       ) {
-        biliStore.fansMedalsStatus = 'loading'
-        biliStore.fansMedals = await this.getFansMedals()
-        biliStore.fansMedalsStatus = 'loaded'
+        biliStore.fansMedalsMeta.status = 'loading'
+        biliStore.fansMedalsMeta.lastFetchStartedAt = tsm()
+        try {
+          biliStore.fansMedals = await this.getFansMedals()
+          biliStore.fansMedalsMeta.status = 'loaded'
+        } finally {
+          biliStore.fansMedalsMeta.lastFetchFinishedAt = tsm()
+        }
       }
 
       this.nextRunTimer = setTimeout(

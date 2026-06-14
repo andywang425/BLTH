@@ -8,7 +8,7 @@ import _ from 'lodash'
 const request: Requests = {
   live: new Request('https://api.live.bilibili.com', 'https://live.bilibili.com'),
   liveTrace: new Request('https://live-trace.bilibili.com', 'https://live.bilibili.com'),
-  passport: new Request('https://passport.bilibili.com', 'https://passport.bilibili.com/'),
+  passport: new Request('https://passport.bilibili.com', 'https://passport.bilibili.com'),
   main: new Request('https://api.bilibili.com', 'https://www.bilibili.com'),
   raw: new Request(),
 }
@@ -121,6 +121,40 @@ const BAPI: BapiMethods = {
         csrf: bili_jct,
         visit_id,
       })
+    },
+    getRoomPlayInfo: (
+      room_id,
+      qn = 0,
+      protocol = '0,1',
+      format = '0,1,2',
+      codec = '0,1,2',
+      platform = 'web',
+      ptype = 8,
+      dolby = 5,
+      panorama = 1,
+      eotf = '0,1,2',
+      req_reason = 0,
+      supported_drms = '0,1,2,3',
+      web_location = '444.8',
+    ) => {
+      return request.live.get(
+        '/xlive/web-room/v2/index/getRoomPlayInfo',
+        wbiSign({
+          room_id,
+          protocol,
+          format,
+          codec,
+          qn,
+          platform,
+          ptype,
+          dolby,
+          panorama,
+          eotf,
+          req_reason,
+          supported_drms,
+          web_location,
+        }),
+      )
     },
   },
   liveTrace: {
@@ -319,7 +353,7 @@ const BAPI: BapiMethods = {
       ga = 1,
     ) => {
       const bili_jct = useBiliStore().cookies!.bili_jct
-      return request.main.post('/x/web-interface/coin/add ', {
+      return request.main.post('/x/web-interface/coin/add', {
         aid,
         multiply: num,
         select_like,

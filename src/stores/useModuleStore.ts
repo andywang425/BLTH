@@ -39,6 +39,8 @@ const defaultModuleStatus: ModuleStatus = {
   },
 }
 
+const logger = new Logger('ModuleStore')
+
 // 在所有 frame 或顶层 frame 上运行的被加载的模块名称
 const allAndTopFrameModuleNames: string[] = []
 
@@ -50,7 +52,7 @@ export const useModuleStore = defineStore('module', () => {
   // 模块实例映射（key: 模块名称, value: 模块实例）
   const moduleInstances = ref<Record<string, BaseModule>>({})
   // 模块状态、运行记录重置和再运行
-  const moduleReset = ref<ModuleReset>({
+  const moduleReset: ModuleReset = {
     DailyTasks: {
       MainSiteTasks: {
         login: async () => {
@@ -58,7 +60,7 @@ export const useModuleStore = defineStore('module', () => {
           moduleConfig.value.DailyTasks.MainSiteTasks.login._lastCompleteTime = 0
 
           await rerunModule('Default_DailyRewardInfo', true)
-          await rerunModule('DailyTask_MainSiteTask_LoginTask')
+          rerunModule('DailyTask_MainSiteTask_LoginTask')
         },
         watch: async () => {
           moduleStatus.value.DailyTasks.MainSiteTasks.watch = ''
@@ -68,7 +70,7 @@ export const useModuleStore = defineStore('module', () => {
             rerunModule('Default_DailyRewardInfo', true),
             rerunModule('Default_DynamicVideos', true),
           ])
-          await rerunModule('DailyTask_MainSiteTask_WatchTask')
+          rerunModule('DailyTask_MainSiteTask_WatchTask')
         },
         coin: async () => {
           moduleStatus.value.DailyTasks.MainSiteTasks.coin = ''
@@ -94,8 +96,14 @@ export const useModuleStore = defineStore('module', () => {
       LiveTasks: {
         medalTasks: {
           light: () => {
+            const medalTasksStatus = moduleStatus.value.DailyTasks.LiveTasks.medalTasks
+
+            if (medalTasksStatus.like === 'running' || medalTasksStatus.danmu === 'running') {
+              logger.warn('【点赞】或【发弹幕】模块仍在运行中，无法重新运行【点亮熄灭勋章】模块')
+              return
+            }
+
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.light = ''
-            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastEffectiveCompleteTime = 0
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.light._lastCompleteTime = 0
 
             rerunModule('Default_FansMedals', true)
@@ -147,7 +155,7 @@ export const useModuleStore = defineStore('module', () => {
         },
       },
     },
-  })
+  }
 
   /**
    * 运行模块
@@ -175,6 +183,8 @@ export const useModuleStore = defineStore('module', () => {
     const promiseArray: Promise<void>[] = []
     for (const [name, module] of Object.entries(defaultModules)) {
       if (module.runOnMultiplePages || cacheStore.currentScriptType !== 'Other') {
+        // 默认模块一定会返回一个 Promise
+        // 即使意外返回 undefined，Promise.allSettled 会将其当作已 fulfilled 的 Promise
         promiseArray.push(_runModule(module, name)!)
       }
     }
@@ -248,7 +258,7 @@ export const useModuleStore = defineStore('module', () => {
               new Logger(error.moduleName).error(error.message)
             } else {
               // 意外错误，停止运行（可能是默认模块编写有误）
-              new Logger('ModuleStore').error(`意外错误: ${error.message}`)
+              logger.error(`意外错误: ${error.message}`)
               return
             }
           }
@@ -293,8 +303,8 @@ export const useModuleStore = defineStore('module', () => {
    */
   ;(function clearStatus() {
     setTimeout(() => {
-      deepestIterate(moduleStatus, (_value: ModuleStatusTypes, path: string) => {
-        _.set(moduleStatus, path, '')
+      deepestIterate(moduleStatus.value, (_value: ModuleStatusTypes, path: string) => {
+        _.set(moduleStatus.value, path, '')
       })
       clearStatus()
     }, delayToNextMoment(0, 0).ms)

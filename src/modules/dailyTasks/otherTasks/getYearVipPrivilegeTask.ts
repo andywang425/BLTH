@@ -212,7 +212,7 @@ class GetYearVipPrivilegeTask extends BaseModule {
       }
     }
 
-    const diff = this.config._nextReceiveTime - ts() + 3e5 // 增加5分钟延时
+    const diff = this.config._nextReceiveTime - ts() + 300 // 增加5分钟延时
     if (diff < 86400) {
       this.logger.log(
         '领取年度大会员权益模块下次运行时间:',

@@ -10,7 +10,7 @@ class LoginTask extends BaseModule {
     useModuleStore().moduleStatus.DailyTasks.MainSiteTasks.login = s
   }
 
-  private async login(): Promise<void> {
+  private login(): void {
     // 触发每日登录任务的请求是 BAPI.main.nav
     // 这个请求脚本在默认模块 userInfo 中每天都会发送
     // 而且打开任意B站页面的时候都会有这个请求
@@ -19,10 +19,9 @@ class LoginTask extends BaseModule {
     // 记录当前时间戳
     this.config._lastCompleteTime = tsm()
     this.status = 'done'
-    return Promise.resolve()
   }
 
-  public async run(): Promise<void> {
+  public run(): void {
     this.logger.log('每日登录模块开始运行')
 
     // 上一次完成每日登录任务的时间不在今天
@@ -39,7 +38,7 @@ class LoginTask extends BaseModule {
 
       if (!biliStore.dailyRewardInfo!.login) {
         // 每日登录任务未完成
-        await this.login()
+        this.login()
       } else {
         // 用户在运行脚本前已经完成了任务，也记录完成时间
         this.config._lastCompleteTime = tsm()

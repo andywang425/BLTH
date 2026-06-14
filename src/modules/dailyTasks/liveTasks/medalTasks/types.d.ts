@@ -16,4 +16,29 @@ interface SharedMedalFilters {
   isLiving: (medal: LiveData.FansMedalPanel.List) => boolean
 }
 
-export { MedalTaskSharedConfig, SharedMedalFilters }
+type GroupedMedals<K extends string> = Record<K, LiveData.FansMedalPanel.List[]>
+
+type RequestQueueKey = 'taskInfo' | 'roomStatus'
+type TaskJumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
+type WaitStrategy = 'single-probe' | 'refresh-fans-medals'
+
+interface WaitProbeResult {
+  readyMedals: LiveData.FansMedalPanel.List[]
+  pendingRoomids: number[]
+}
+
+interface TaskExecutionResult {
+  interrupted: boolean
+  verifiedCompleted: boolean
+}
+
+export {
+  MedalTaskSharedConfig,
+  SharedMedalFilters,
+  GroupedMedals,
+  RequestQueueKey,
+  TaskJumpType,
+  WaitStrategy,
+  WaitProbeResult,
+  TaskExecutionResult,
+}
