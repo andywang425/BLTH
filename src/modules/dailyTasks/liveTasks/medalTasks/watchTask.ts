@@ -343,11 +343,20 @@ class WatchTask extends MedalModule {
           const medal = fansMedals[i]
           const roomid = medal.room_info.room_id
           const uid = medal.medal.target_id
+          const nick_name = medal.anchor_info.nick_name
+          const medal_name = medal.medal.medal_name
 
           const medalData = await this.fetchMedalData(uid)
           if (!medalData) {
             this.logger.error(
-              `无法获取主播【${medal.anchor_info.nick_name}】（UID：${uid}）的粉丝团升级任务信息，跳过观看直播任务`,
+              `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${uid}，直播间：${roomid}）的粉丝团升级任务信息，跳过观看直播任务`,
+            )
+            continue
+          }
+
+          if (medalData.reach_free_intimacy_limit) {
+            this.logger.warn(
+              `粉丝勋章【${medal_name}】（主播【${nick_name}】，UID：${uid}，直播间：${roomid}）已达到储蓄亲密度上限（已储蓄 ${medalData.free_intimacy} 亲密度，投喂一个粉丝灯牌即可领取这些亲密度），无法通过观看直播获取更多亲密度，跳过观看直播任务`,
             )
             continue
           }
@@ -355,7 +364,7 @@ class WatchTask extends MedalModule {
           const item = MedalModule.findTaskInfo(medalData.task_info, 'watchLive')
           if (!item) {
             this.logger.error(
-              `无法在主播【${medal.anchor_info.nick_name}】（UID：${uid}）的粉丝团升级任务信息中找到观看直播任务，跳过观看直播任务`,
+              `粉丝勋章【${medal_name}】 无法在主播【${nick_name}】（UID：${uid}，直播间：${roomid}）的粉丝团升级任务信息中找到观看直播任务，跳过观看直播任务`,
             )
             continue
           }
@@ -365,7 +374,7 @@ class WatchTask extends MedalModule {
           const parsed = MedalModule.parseDailyLimit(item.sub_title)
           if (!parsed) {
             this.logger.error(
-              `无法解析主播【${medal.anchor_info.nick_name}】（UID：${uid}）的观看直播任务的每日上限信息，跳过观看直播任务`,
+              `粉丝勋章【${medal_name}】 无法解析主播【${nick_name}】（UID：${uid}，直播间：${roomid}）的观看直播任务的每日上限信息，跳过观看直播任务`,
             )
             continue
           }
@@ -390,7 +399,7 @@ class WatchTask extends MedalModule {
           if (area_id > 0 && parent_area_id > 0) {
             // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
             this.logger.log(
-              `粉丝勋章【${medal.medal.medal_name}】 开始直播间 ${roomid}（主播【${medal.anchor_info.nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds / 60} 分钟）`,
+              `粉丝勋章【${medal_name}】 开始直播间 ${roomid}（主播【${nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds / 60} 分钟）`,
             )
 
             const hasWatchingProgress = await new RoomHeart(

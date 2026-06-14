@@ -79,7 +79,7 @@ const defaultValues: DefaultValues = {
             danmuList: [
               '(⌒▽⌒)',
               '（￣▽￣）',
-              '（＞ｙ＜）',
+              '（◕‿◕✿）',
               '(｀・ω・´)',
               '（ノ￣▽￣）',
               '(･∀･)',

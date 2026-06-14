@@ -160,10 +160,15 @@ class LightTask extends MedalModule {
 
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
-      const medalData = await this.fetchMedalData(medal.medal.target_id)
+      const room_id = medal.room_info.room_id
+      const target_id = medal.medal.target_id
+      const nick_name = medal.anchor_info.nick_name
+      const medal_name = medal.medal.medal_name
+
+      const medalData = await this.fetchMedalData(target_id)
       if (!medalData) {
         this.logger.error(
-          `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团点亮任务信息，跳过点赞任务`,
+          `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团点亮任务信息，跳过点赞任务`,
         )
         continue
       }
@@ -171,7 +176,7 @@ class LightTask extends MedalModule {
       const likeItem = MedalModule.findTaskInfo(medalData.task_info, 'like')
       if (!likeItem) {
         this.logger.error(
-          `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
+          `粉丝勋章【${medal_name}】 无法在主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团点亮任务信息中找到点赞任务，跳过点赞任务`,
         )
         continue
       }
@@ -199,10 +204,15 @@ class LightTask extends MedalModule {
 
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
-      const medalData = await this.fetchMedalData(medal.medal.target_id)
+      const room_id = medal.room_info.room_id
+      const target_id = medal.medal.target_id
+      const nick_name = medal.anchor_info.nick_name
+      const medal_name = medal.medal.medal_name
+
+      const medalData = await this.fetchMedalData(target_id)
       if (!medalData) {
         this.logger.error(
-          `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团点亮任务信息，跳过发弹幕任务`,
+          `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团点亮任务信息，跳过发弹幕任务`,
         )
         continue
       }
@@ -210,7 +220,7 @@ class LightTask extends MedalModule {
       const danmuItem = MedalModule.findTaskInfo(medalData.task_info, 'sendDanmu')
       if (!danmuItem) {
         this.logger.error(
-          `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到发弹幕任务，跳过发弹幕任务`,
+          `粉丝勋章【${medal_name}】 无法在主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团点亮任务信息中找到发弹幕任务，跳过发弹幕任务`,
         )
         continue
       }

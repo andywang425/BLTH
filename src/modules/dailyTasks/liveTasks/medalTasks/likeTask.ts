@@ -87,10 +87,22 @@ class LikeTask extends MedalModule {
       return { interrupted: true, verifiedCompleted: false }
     }
 
-    const medalData = await this.fetchMedalData(medal.medal.target_id)
+    const room_id = medal.room_info.room_id
+    const target_id = medal.medal.target_id
+    const nick_name = medal.anchor_info.nick_name
+    const medal_name = medal.medal.medal_name
+
+    const medalData = await this.fetchMedalData(target_id)
     if (!medalData) {
       this.logger.error(
-        `无法获取主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息，跳过点赞任务`,
+        `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团升级任务信息，跳过点赞任务`,
+      )
+      return { interrupted: false, verifiedCompleted: true }
+    }
+
+    if (medalData.reach_free_intimacy_limit) {
+      this.logger.warn(
+        `粉丝勋章【${medal_name}】（主播【${nick_name}】，UID：${target_id}，直播间：${room_id}）已达到储蓄亲密度上限（已储蓄 ${medalData.free_intimacy} 亲密度，投喂一个粉丝灯牌即可领取这些亲密度），无法通过点赞获取更多亲密度，跳过点赞任务`,
       )
       return { interrupted: false, verifiedCompleted: true }
     }
@@ -98,7 +110,7 @@ class LikeTask extends MedalModule {
     const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
     if (!item) {
       this.logger.error(
-        `无法在主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
+        `粉丝勋章【${medal_name}】 无法在主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
       )
       return { interrupted: false, verifiedCompleted: true }
     }
@@ -108,7 +120,7 @@ class LikeTask extends MedalModule {
     const parsed = MedalModule.parseDailyLimit(item.sub_title)
     if (!parsed) {
       this.logger.error(
-        `无法解析主播【${medal.anchor_info.nick_name}】（UID：${medal.medal.target_id}）的点赞任务的每日上限信息，跳过点赞任务`,
+        `粉丝勋章【${medal_name}】 无法解析主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的点赞任务的每日上限信息，跳过点赞任务`,
       )
       return { interrupted: false, verifiedCompleted: true }
     }
