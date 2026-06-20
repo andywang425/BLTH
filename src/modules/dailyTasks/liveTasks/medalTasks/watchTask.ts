@@ -80,6 +80,11 @@ class RoomHeart {
   private secretRule!: number[]
   /** ets */
   private timestamp!: number
+  /** 下一次 X 心跳的目标发送时间 */
+  private nextHeartbeatAt = 0
+
+  private static readonly HEARTBEAT_WAIT_SLICE_MS = 1000
+  private static readonly HEARTBEAT_DRIFT_WARN_MS = 5000
 
   /**
    * 开始心跳
@@ -95,6 +100,46 @@ class RoomHeart {
     return this.watchedSeconds > 0
   }
 
+  private setHeartbeatState(data: {
+    heartbeat_interval: number
+    secret_key: string
+    secret_rule: number[]
+    timestamp: number
+  }) {
+    ;({
+      heartbeat_interval: this.heartBeatInterval,
+      secret_key: this.secretKey,
+      secret_rule: this.secretRule,
+      timestamp: this.timestamp,
+    } = data)
+
+    // 根据观察，心跳响应中的 timestamp = 上次心跳响应中的 timestamp + 上次心跳响应中的 heartbeat_interval
+    // 如果是第一次心跳，timestamp = 发心跳时的秒级时间戳 -1或-2（可能是B站服务器的时间不准？误差不大实测可忽略）
+    // 总是使用最新心跳中返回的 timestamp 和 heartBeatInterval 来计算下次发送的时间
+    // 如果每次心跳后固定等待 heartBeatInterval 秒，发送时间误差会随时间推移变得越来越大
+    this.nextHeartbeatAt = (this.timestamp + this.heartBeatInterval) * 1000
+  }
+
+  /**
+   * 等待下一次心跳的发送时间到来，期间每隔一段时间检查一次剩余时间
+   */
+  private async waitForNextHeartbeat(): Promise<void> {
+    while (true) {
+      const remaining = this.nextHeartbeatAt - tsm()
+
+      if (remaining <= 0) {
+        const drift = -remaining
+        if (drift >= RoomHeart.HEARTBEAT_DRIFT_WARN_MS) {
+          this.logger.warn(
+            `直播间 ${this.roomID} 的 X 心跳发送已滞后 ${(drift / 1000).toFixed(2)} 秒，下次心跳可能触发服务端 time check failed`,
+          )
+        }
+        return
+      }
+      await sleep(Math.min(remaining, RoomHeart.HEARTBEAT_WAIT_SLICE_MS))
+    }
+  }
+
   /**
    * E心跳，开始时发送一次
    */
@@ -107,13 +152,8 @@ class RoomHeart {
       )
       if (response.code === 0) {
         this.seq += 1
-        ;({
-          heartbeat_interval: this.heartBeatInterval,
-          secret_key: this.secretKey,
-          secret_rule: this.secretRule,
-          timestamp: this.timestamp,
-        } = response.data)
-        await sleep(this.heartBeatInterval * 1000)
+        this.setHeartbeatState(response.data)
+        await this.waitForNextHeartbeat()
         return this.X()
       } else {
         this.logger.error(
@@ -169,13 +209,8 @@ class RoomHeart {
           // 达到目标观看时间，结束
           return
         }
-        ;({
-          heartbeat_interval: this.heartBeatInterval,
-          secret_key: this.secretKey,
-          secret_rule: this.secretRule,
-          timestamp: this.timestamp,
-        } = response.data)
-        await sleep(this.heartBeatInterval * 1000)
+        this.setHeartbeatState(response.data)
+        await this.waitForNextHeartbeat()
         return this.X()
       } else {
         this.logger.error(
