@@ -24,23 +24,21 @@ class RoomHeart {
     areaID: number,
     parentID: number,
     ruid: number,
-    watchedSeconds: number,
     targetSeconds: number,
   ) {
     this.roomID = roomID
     this.areaID = areaID
     this.parentID = parentID
     this.ruid = ruid
-    this.watchedSeconds = watchedSeconds
     this.targetSeconds = targetSeconds
   }
 
   private logger = new Logger('RoomHeart')
 
-  /** 今日当前直播间已观看时间（秒） */
-  private watchedSeconds: number
+  /** 已观看时间（秒） */
+  private watchedSeconds: number = 0
 
-  /** 当前直播间观看目标秒数 */
+  /** 目标观看时间（秒） */
   private readonly targetSeconds: number
 
   private readonly areaID: number
@@ -53,16 +51,6 @@ class RoomHeart {
   /** 计算签名和发送请求时均需要 JSON.stringify */
   private get id(): number[] {
     return [this.parentID, this.areaID, this.seq, this.roomID]
-  }
-
-  /** 更新当前直播间的观看任务进度 */
-  private updateProgress() {
-    // 记录观看时间
-    this.watchedSeconds += this.heartBeatInterval
-
-    useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress[
-      this.roomID
-    ] = this.watchedSeconds
   }
 
   /** Cookie LIVE_BUVID */
@@ -160,9 +148,13 @@ class RoomHeart {
           `BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) 失败`,
           response.message,
         )
+        this.logger.error(
+          `直播间 ${this.roomID} 的 E 心跳失败，无法继续执行观看直播任务，跳过该房间`,
+        )
       }
     } catch (error) {
       this.logger.error(`BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) 出错`, error)
+      this.logger.error(`直播间 ${this.roomID} 的 E 心跳失败，无法继续执行观看直播任务，跳过该房间`)
     }
   }
 
@@ -204,7 +196,10 @@ class RoomHeart {
       )
       if (response.code === 0) {
         this.seq += 1
-        this.updateProgress()
+        this.watchedSeconds += this.heartBeatInterval
+        this.logger.log(
+          `直播间 ${this.roomID} 的第 ${this.seq - 1} 次 X 心跳成功，已观看 ${this.watchedSeconds} 秒`,
+        )
         if (this.watchedSeconds >= this.targetSeconds) {
           // 达到目标观看时间，结束
           return
@@ -217,11 +212,17 @@ class RoomHeart {
           `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 失败`,
           response.message,
         )
+        this.logger.error(
+          `直播间 ${this.roomID} 的 X 心跳失败，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
+        )
       }
     } catch (error) {
       this.logger.error(
         `BAPI.liveTrace.X(s, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 出错`,
         error,
+      )
+      this.logger.error(
+        `直播间 ${this.roomID} 的 X 心跳失败，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
       )
     }
   }
@@ -356,13 +357,6 @@ class WatchTask extends MedalModule {
       }
 
       this.status = 'running'
-
-      if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
-        // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0
-        this.config._watchingProgress = {}
-      }
-
-      this.config._lastWatchTime = tsm()
       const fansMedals = this.getMedals()
 
       if (fansMedals.length > 0) {
@@ -421,10 +415,10 @@ class WatchTask extends MedalModule {
           const target = this.config.useTargetRounds
             ? Math.min(parsed.limit, this.config.targetRounds)
             : parsed.limit
-          // 目标秒数 = 目标轮次 × minutes × 60s
-          const targetSeconds = target * minutes * 60
+          // 剩余观看秒数 = (目标轮次 - 已完成轮次) × 分钟数 × 60s
+          const remainingSeconds = (target - parsed.current) * minutes * 60
 
-          if ((this.config._watchingProgress[roomid] ?? 0) >= targetSeconds) {
+          if (remainingSeconds <= 0) {
             // 今日观看时间已达到目标值，跳过
             continue
           }
@@ -434,7 +428,7 @@ class WatchTask extends MedalModule {
           if (area_id > 0 && parent_area_id > 0) {
             // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
             this.logger.log(
-              `粉丝勋章【${medal_name}】 开始直播间 ${roomid}（主播【${nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds / 60} 分钟）`,
+              `粉丝勋章【${medal_name}】 开始直播间 ${roomid}（主播【${nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${remainingSeconds / 60} 分钟`,
             )
 
             const hasWatchingProgress = await new RoomHeart(
@@ -442,8 +436,7 @@ class WatchTask extends MedalModule {
               area_id,
               parent_area_id,
               uid,
-              this.config._watchingProgress[roomid] ?? 0,
-              targetSeconds,
+              remainingSeconds,
             ).start()
 
             if (hasWatchingProgress) {

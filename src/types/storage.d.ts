@@ -54,8 +54,6 @@ interface ModuleConfig {
           targetRounds: number
           isWhiteList: boolean
           roomidList: number[]
-          _watchingProgress: Record<string, number>
-          _lastWatchTime: number
           _lastCompleteTime: number
         }
       }

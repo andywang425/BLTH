@@ -107,8 +107,6 @@ const defaultValues: DefaultValues = {
             targetRounds: 1,
             isWhiteList: false,
             roomidList: [],
-            _watchingProgress: {},
-            _lastWatchTime: 0,
             _lastCompleteTime: 0,
           },
         },

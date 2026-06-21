@@ -126,8 +126,6 @@ export const useModuleStore = defineStore('module', () => {
           watch: () => {
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.watch = ''
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastCompleteTime = 0
-            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastWatchTime = 0
-            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress = {}
 
             rerunModule('Default_FansMedals', true)
             rerunModule('DailyTask_LiveTask_WatchTask')
