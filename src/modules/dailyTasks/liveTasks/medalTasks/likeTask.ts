@@ -5,7 +5,7 @@ import type { ModuleStatusTypes } from '@/types'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
 import { sleep } from '@/library/utils'
-import type { GroupedMedals, TaskExecutionResult } from './types'
+import type { BatchExecutionResult, GroupedMedals, TaskExecutionResult } from './types'
 
 class LikeTask extends MedalModule {
   config = this.medalTasksConfig.like
@@ -127,6 +127,22 @@ class LikeTask extends MedalModule {
 
     if (parsed.current >= parsed.limit) return { interrupted: false, verifiedCompleted: true }
 
+    // 执行前校验：在发出第一个 likeReport 前确认直播间仍在直播
+    // 以「每房间一次」的粒度，避免按过期状态点赞
+    const verdict = await this.preExecuteVerify(
+      room_id,
+      (liveStatus) => liveStatus === 1,
+      this.config.waitUntilLiving,
+    )
+    if (verdict !== 'pass') {
+      this.logger.log(
+        `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前不在直播，${verdict === 'requeue' ? '回到等待队列' : '本轮跳过'}`,
+      )
+      return verdict === 'requeue'
+        ? { interrupted: false, verifiedCompleted: false, requeue: true }
+        : { interrupted: false, verifiedCompleted: true }
+    }
+
     const times = MedalModule.parseTitleCount(item.title) ?? 30
     const target = this.config.useTargetRounds
       ? Math.min(parsed.limit, this.config.targetRounds)
@@ -167,17 +183,22 @@ class LikeTask extends MedalModule {
   /**
    * 顺序执行多个直播间的点赞任务
    *
-   * @returns 执行结果，包含是否中断以及是否都确认完成
+   * @returns 执行结果，包含是否中断、是否都确认完成、以及执行前校验未通过需回到等待队列的直播间
    */
   private async executeLikeTasks(
     medals: LiveData.FansMedalPanel.List[],
-  ): Promise<TaskExecutionResult> {
+  ): Promise<BatchExecutionResult> {
     let verifiedCompleted = true
+    const requeueRoomids: number[] = []
 
     for (let i = 0; i < medals.length; i++) {
       const result = await this.executeLikeTask(medals[i])
-      if (result.interrupted) return result
-      if (!result.verifiedCompleted) {
+      if (result.interrupted) {
+        return { interrupted: true, verifiedCompleted: false, requeueRoomids }
+      }
+      if (result.requeue) {
+        requeueRoomids.push(medals[i].room_info.room_id)
+      } else if (!result.verifiedCompleted) {
         verifiedCompleted = false
       }
 
@@ -186,7 +207,7 @@ class LikeTask extends MedalModule {
       }
     }
 
-    return { interrupted: false, verifiedCompleted }
+    return { interrupted: false, verifiedCompleted, requeueRoomids }
   }
 
   public async run(): Promise<void> {
@@ -202,14 +223,16 @@ class LikeTask extends MedalModule {
       }
 
       this.status = 'running'
+      // 用最新列表状态播种直播状态样本，使紧接着执行的 readyMedals 尽量复用、少探测
+      this.syncSnapshotsFromMedals()
       const { readyMedals, waitingMedals } = this.getMedals()
       let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
       let allCompleted = true
 
       const initialResult = await this.executeLikeTasks(readyMedals)
-      if (initialResult.interrupted) {
-        allCompleted = false
-      } else if (!initialResult.verifiedCompleted) {
+      // 初始 readyMedals 中执行前校验发现已下播、且开启了等待开播的房间，并入等待队列
+      pendingRoomids.push(...initialResult.requeueRoomids)
+      if (initialResult.interrupted || !initialResult.verifiedCompleted) {
         allCompleted = false
       }
 
@@ -220,17 +243,14 @@ class LikeTask extends MedalModule {
           break
         }
 
-        const { readyMedals: newlyReadyMedals, pendingRoomids: nextPendingRoomids } =
-          await this.probeWaitingMedals(pendingRoomids, (liveStatus) => liveStatus === 1)
+        const roundResult = await this.runWaitingRound(
+          pendingRoomids,
+          (liveStatus) => liveStatus === 1,
+          (medal) => this.executeLikeTask(medal),
+        )
+        pendingRoomids = roundResult.pendingRoomids
 
-        pendingRoomids = nextPendingRoomids
-
-        const waitResult = await this.executeLikeTasks(newlyReadyMedals)
-        if (waitResult.interrupted) {
-          allCompleted = false
-          break
-        }
-        if (!waitResult.verifiedCompleted) {
+        if (roundResult.interrupted || !roundResult.verifiedCompleted) {
           allCompleted = false
           break
         }

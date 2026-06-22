@@ -22,14 +22,58 @@ type RequestQueueKey = 'taskInfo' | 'roomStatus'
 type TaskJumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
 type WaitStrategy = 'single-probe' | 'refresh-fans-medals'
 
-interface WaitProbeResult {
-  readyMedals: LiveData.FansMedalPanel.List[]
+/** 直播状态样本的来源 */
+type LiveStatusSnapshotSource = 'fans-medals' | 'single-probe'
+
+/** 最近一次观测到的直播间直播状态样本 */
+interface LiveStatusSnapshot {
+  /** 直播状态：1 直播中，0/2 未开播/轮播 */
+  liveStatus: number
+  /** 观测到该状态的时刻（毫秒时间戳） */
+  observedAt: number
+  /** 样本来源 */
+  source: LiveStatusSnapshotSource
+}
+
+/**
+ * 执行前直播状态校验结论
+ *
+ * - `pass`：符合目标状态，放行执行
+ * - `requeue`：不符或探测失败，且开启等待，回到等待队列
+ * - `skip`：不符或探测失败，且未开启等待，本轮跳过
+ */
+type PreExecuteVerdict = 'pass' | 'requeue' | 'skip'
+
+/** 单个直播间任务的执行结果 */
+interface TaskExecutionResult {
+  /** 是否因跨天等原因中断 */
+  interrupted: boolean
+  /** 是否确认任务已完成 */
+  verifiedCompleted: boolean
+  /** 执行前直播状态校验未通过，需要重新回到等待队列（仅 waitUntil* 开启时） */
+  requeue?: boolean
+}
+
+/** 顺序执行多个直播间任务的结果 */
+interface BatchExecutionResult {
+  interrupted: boolean
+  verifiedCompleted: boolean
+  /** 执行前校验未通过、需要回到等待队列的直播间ID */
+  requeueRoomids: number[]
+}
+
+/** 一轮等待轮询的执行结果 */
+interface WaitRoundResult {
+  interrupted: boolean
+  verifiedCompleted: boolean
+  /** 本轮结束后仍需继续等待的直播间ID */
   pendingRoomids: number[]
 }
 
-interface TaskExecutionResult {
-  interrupted: boolean
-  verifiedCompleted: boolean
+interface LightPathExecutionResult {
+  attemptedMedals: LiveData.FansMedalPanel.List[]
+  skippedByStatusMedals: LiveData.FansMedalPanel.List[]
+  probeFailed: boolean
 }
 
 export {
@@ -39,6 +83,11 @@ export {
   RequestQueueKey,
   TaskJumpType,
   WaitStrategy,
-  WaitProbeResult,
+  LiveStatusSnapshot,
+  LiveStatusSnapshotSource,
+  PreExecuteVerdict,
   TaskExecutionResult,
+  BatchExecutionResult,
+  WaitRoundResult,
+  LightPathExecutionResult,
 }

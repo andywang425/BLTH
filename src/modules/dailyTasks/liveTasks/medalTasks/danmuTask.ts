@@ -5,7 +5,7 @@ import type { ModuleStatusTypes } from '@/types'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
 import { sleep } from '@/library/utils'
-import type { GroupedMedals, TaskExecutionResult } from './types'
+import type { BatchExecutionResult, GroupedMedals, TaskExecutionResult } from './types'
 
 class DanmuTask extends MedalModule {
   config = this.medalTasksConfig.danmu
@@ -142,6 +142,24 @@ class DanmuTask extends MedalModule {
 
     if (parsed.current >= parsed.limit) return { interrupted: false, verifiedCompleted: true }
 
+    // 执行前校验：仅当开启「仅在未开播的直播间发弹幕」时，发弹幕才依赖直播状态
+    // 在发出第一条 sendMsg 前确认直播间当前确实未开播，避免按过期状态发弹幕
+    if (this.config.onlyWhenNotLiving) {
+      const verdict = await this.preExecuteVerify(
+        room_id,
+        (liveStatus) => liveStatus !== 1,
+        this.config.waitUntilNotLiving,
+      )
+      if (verdict !== 'pass') {
+        this.logger.log(
+          `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前正在直播，${verdict === 'requeue' ? '回到等待队列' : '本轮跳过'}`,
+        )
+        return verdict === 'requeue'
+          ? { interrupted: false, verifiedCompleted: false, requeue: true }
+          : { interrupted: false, verifiedCompleted: true }
+      }
+    }
+
     const target = this.config.useTargetRounds
       ? Math.min(parsed.limit, this.config.targetRounds)
       : parsed.limit
@@ -189,18 +207,23 @@ class DanmuTask extends MedalModule {
   /**
    * 顺序执行多个直播间的发弹幕任务
    *
-   * @returns 执行结果，包含是否中断以及是否都确认完成
+   * @returns 执行结果，包含是否中断、是否都确认完成、以及执行前校验未通过需回到等待队列的直播间
    */
   private async executeDanmuTasks(
     medals: LiveData.FansMedalPanel.List[],
     danmuIndexRef: { value: number },
-  ): Promise<TaskExecutionResult> {
+  ): Promise<BatchExecutionResult> {
     let verifiedCompleted = true
+    const requeueRoomids: number[] = []
 
     for (let i = 0; i < medals.length; i++) {
       const result = await this.executeDanmuTask(medals[i], danmuIndexRef)
-      if (result.interrupted) return result
-      if (!result.verifiedCompleted) {
+      if (result.interrupted) {
+        return { interrupted: true, verifiedCompleted: false, requeueRoomids }
+      }
+      if (result.requeue) {
+        requeueRoomids.push(medals[i].room_info.room_id)
+      } else if (!result.verifiedCompleted) {
         verifiedCompleted = false
       }
 
@@ -209,7 +232,7 @@ class DanmuTask extends MedalModule {
       }
     }
 
-    return { interrupted: false, verifiedCompleted }
+    return { interrupted: false, verifiedCompleted, requeueRoomids }
   }
 
   public async run(): Promise<void> {
@@ -225,15 +248,17 @@ class DanmuTask extends MedalModule {
       }
 
       this.status = 'running'
+      // 用最新列表状态播种直播状态样本，使紧接着执行的 readyMedals 尽量复用、少探测
+      this.syncSnapshotsFromMedals()
       const { readyMedals, waitingMedals } = this.getMedals()
       let allCompleted = true
       const danmuIndexRef = { value: 0 }
       let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
 
       const initialResult = await this.executeDanmuTasks(readyMedals, danmuIndexRef)
-      if (initialResult.interrupted) {
-        allCompleted = false
-      } else if (!initialResult.verifiedCompleted) {
+      // 初始 readyMedals 中执行前校验发现仍在直播、且开启了等待下播的房间，并入等待队列
+      pendingRoomids.push(...initialResult.requeueRoomids)
+      if (initialResult.interrupted || !initialResult.verifiedCompleted) {
         allCompleted = false
       }
 
@@ -244,17 +269,14 @@ class DanmuTask extends MedalModule {
           break
         }
 
-        const { readyMedals: newlyReadyMedals, pendingRoomids: nextPendingRoomids } =
-          await this.probeWaitingMedals(pendingRoomids, (liveStatus) => liveStatus !== 1)
+        const roundResult = await this.runWaitingRound(
+          pendingRoomids,
+          (liveStatus) => liveStatus !== 1,
+          (medal) => this.executeDanmuTask(medal, danmuIndexRef),
+        )
+        pendingRoomids = roundResult.pendingRoomids
 
-        pendingRoomids = nextPendingRoomids
-
-        const waitResult = await this.executeDanmuTasks(newlyReadyMedals, danmuIndexRef)
-        if (waitResult.interrupted) {
-          allCompleted = false
-          break
-        }
-        if (!waitResult.verifiedCompleted) {
+        if (roundResult.interrupted || !roundResult.verifiedCompleted) {
           allCompleted = false
           break
         }
