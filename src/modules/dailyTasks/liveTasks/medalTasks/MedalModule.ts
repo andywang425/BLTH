@@ -102,6 +102,10 @@ class MedalModule extends BaseModule {
 
         return {
           status,
+          // 目前B站的粉丝勋章排序规则为：点亮的勋章排在前面，未点亮的排在后面，然后分别再按等级由高到低排序
+          // 如果当前页上有未点亮的粉丝勋章，后面的页就都是未点亮的勋章
+          // 而点赞、发弹幕任务都是给点亮的勋章做的
+          // 因此如果当前页上有未点亮的粉丝勋章，就没必要再看后面的页了
           canTryNextPage: currentPage < totalPage && !hasUnlightedMedal,
         }
       }
@@ -127,7 +131,8 @@ class MedalModule extends BaseModule {
         }
       }
 
-      const page = Math.ceil(index / 10)
+      // fansMedalPanel 每页返回 10 个勋章，页码从 1 开始
+      const page = Math.floor(index / 10) + 1
 
       const { status, canTryNextPage } = await this.fetchMedalPageForLiveStatus(page, roomid)
 

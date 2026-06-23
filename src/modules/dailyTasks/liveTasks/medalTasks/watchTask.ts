@@ -162,68 +162,72 @@ class RoomHeart {
    * X心跳，E心跳过后都是X心跳
    */
   private async X(): Promise<void> {
-    if (isNowAfter(23, 58) || isNowBefore(0, 5)) {
-      this.logger.log(`即将或刚刚发生跨天，停止直播间 ${this.roomID} 的X心跳`)
-      return
-    }
-
-    try {
-      const spyderData: SpyderData = {
-        id: JSON.stringify(this.id),
-        device: JSON.stringify(this.device),
-        ets: this.timestamp,
-        benchmark: this.secretKey,
-        time: this.heartBeatInterval,
-        ts: tsm(),
-        ua: this.ua,
+    while (true) {
+      if (isNowAfter(23, 58) || isNowBefore(0, 5)) {
+        this.logger.log(`即将或刚刚发生跨天，停止直播间 ${this.roomID} 的X心跳`)
+        return
       }
-      // 签名
-      const s = this.spyder(JSON.stringify(spyderData), this.secretRule)
 
-      const response = await BAPI.liveTrace.X(
-        s,
-        this.id,
-        this.device,
-        this.ruid,
-        this.timestamp,
-        this.secretKey,
-        this.heartBeatInterval,
-        spyderData.ts,
-      )
-      this.logger.log(
-        `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}, ${spyderData.ts}) response`,
-        response,
-      )
-      if (response.code === 0) {
-        this.seq += 1
-        this.watchedSeconds += this.heartBeatInterval
-        this.logger.log(
-          `直播间 ${this.roomID} 的第 ${this.seq - 1} 次 X 心跳成功，已观看 ${this.watchedSeconds} 秒`,
+      try {
+        const spyderData: SpyderData = {
+          id: JSON.stringify(this.id),
+          device: JSON.stringify(this.device),
+          ets: this.timestamp,
+          benchmark: this.secretKey,
+          time: this.heartBeatInterval,
+          ts: tsm(),
+          ua: this.ua,
+        }
+        // 签名
+        const s = this.spyder(JSON.stringify(spyderData), this.secretRule)
+
+        const response = await BAPI.liveTrace.X(
+          s,
+          this.id,
+          this.device,
+          this.ruid,
+          this.timestamp,
+          this.secretKey,
+          this.heartBeatInterval,
+          spyderData.ts,
         )
-        if (this.watchedSeconds >= this.targetSeconds) {
-          // 达到目标观看时间，结束
+        this.logger.log(
+          `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}, ${spyderData.ts}) response`,
+          response,
+        )
+        if (response.code === 0) {
+          this.seq += 1
+          this.watchedSeconds += this.heartBeatInterval
+          this.logger.log(
+            `直播间 ${this.roomID} 的第 ${this.seq - 1} 次 X 心跳成功，已观看 ${this.watchedSeconds} 秒`,
+          )
+          if (this.watchedSeconds >= this.targetSeconds) {
+            // 达到目标观看时间，结束
+            return
+          }
+          this.setHeartbeatState(response.data)
+          await this.waitForNextHeartbeat()
+          // 继续下一轮 X 心跳
+        } else {
+          this.logger.error(
+            `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 失败`,
+            response.message,
+          )
+          this.logger.error(
+            `直播间 ${this.roomID} 的 X 心跳失败，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
+          )
           return
         }
-        this.setHeartbeatState(response.data)
-        await this.waitForNextHeartbeat()
-        return this.X()
-      } else {
+      } catch (error) {
         this.logger.error(
-          `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 失败`,
-          response.message,
+          `BAPI.liveTrace.X(s, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 出错`,
+          error,
         )
         this.logger.error(
           `直播间 ${this.roomID} 的 X 心跳失败，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
         )
+        return
       }
-    } catch (error) {
-      this.logger.error(
-        `BAPI.liveTrace.X(s, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 出错`,
-        error,
-      )
-      this.logger.error(
-        `直播间 ${this.roomID} 的 X 心跳失败，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
-      )
     }
   }
 

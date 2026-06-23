@@ -151,12 +151,14 @@ class LightTask extends MedalModule {
 
   /**
    * 在未开播的直播间发弹幕
-   * @param medals
+   *
+   * @param medals 待发弹幕的粉丝勋章
+   * @param danmuIndexRef 弹幕索引引用，用于记录当前正在发送的弹幕索引
    */
   private async sendDanmuTask(
     medals: LiveData.FansMedalPanel.List[],
+    danmuIndexRef: { value: number },
   ): Promise<LightPathExecutionResult> {
-    let danmuIndex = 0
     const attemptedMedals: LiveData.FansMedalPanel.List[] = []
     const skippedByStatusMedals: LiveData.FansMedalPanel.List[] = []
 
@@ -204,7 +206,8 @@ class LightTask extends MedalModule {
       let failedCount = 0
 
       for (let j = 0; j < remaining; j++) {
-        const danmuText = this.config.danmuList[danmuIndex++ % this.config.danmuList.length]
+        const danmuText =
+          this.config.danmuList[danmuIndexRef.value++ % this.config.danmuList.length]
 
         if (!(await this.sendDanmu(medal, danmuText))) {
           if (++failedCount > MedalModule.DANMU_RETRY_LIMIT) {
@@ -212,7 +215,7 @@ class LightTask extends MedalModule {
             if (i < medals.length - 1) await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
             break
           }
-          remaining++
+          remaining += 1
         }
 
         if (i < medals.length - 1 || j < remaining - 1) {
@@ -246,10 +249,12 @@ class LightTask extends MedalModule {
 
       if (isEffectiveRun) {
         const attemptedMedals: LiveData.FansMedalPanel.List[] = []
+        // 跨房间共享的弹幕索引，避免每个房间都从同一条弹幕开始发
+        const danmuIndexRef = { value: 0 }
 
         while (notLivingMedals.length > 0 || livingMedals.length > 0) {
           const [danmuResult, likeResult] = await Promise.allSettled([
-            this.sendDanmuTask(notLivingMedals),
+            this.sendDanmuTask(notLivingMedals, danmuIndexRef),
             this.likeTask(livingMedals),
           ])
           if (danmuResult.status === 'rejected' || likeResult.status === 'rejected') {

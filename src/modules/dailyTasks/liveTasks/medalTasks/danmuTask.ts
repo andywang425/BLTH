@@ -226,6 +226,7 @@ class DanmuTask extends MedalModule {
 
       const { readyMedals, waitingMedals } = this.getMedals()
       let allCompleted = true
+      // 跨房间共享的弹幕索引，避免每个房间都从同一条弹幕开始发
       const danmuIndexRef = { value: 0 }
       let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
 
