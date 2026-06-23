@@ -416,7 +416,7 @@ class MedalModule extends BaseModule {
    *
    * @param roomids 待探测的直播间ID列表
    * @param targetPredicate 目标状态判断函数
-   * @param runOne 执行单个直播间任务的回调（其内部应自行做执行前校验）
+   * @param runOne 执行单个直播间任务的回调（跳过执行前直播状态校验）
    */
   protected async runWaitingRound(
     roomids: number[],
@@ -445,37 +445,32 @@ class MedalModule extends BaseModule {
       const medal = medalMap.get(roomid)
 
       if (!medal) {
-        this.logger.warn(`直播间 ${roomid} 未在粉丝勋章列表中找到，停止等待该房间`)
-        continue
-      }
-      if (!this.SHARED_MEDAL_FILTERS.isLighted(medal)) {
-        this.logger.log(
-          `粉丝勋章【${medal.medal.medal_name}】已熄灭，停止等待该房间（${roomid}）`,
-          medal,
-        )
+        this.logger.error(`直播间 ${roomid} 未在粉丝勋章列表中找到，停止等待该房间`)
         continue
       }
 
-      const liveStatus = await MedalModule.enqueueRoomStatusProbe(() =>
-        this.fetchRoomLiveStatus(roomid),
+      const room_id = medal.room_info.room_id
+      const target_id = medal.medal.target_id
+      const nick_name = medal.anchor_info.nick_name
+      const medal_name = medal.medal.medal_name
+
+      const verdict = await this.preExecuteVerify(roomid, targetPredicate)
+
+      if (verdict !== 'pass') {
+        if (verdict === 'error') {
+          this.logger.error(
+            `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的直播状态，回到等待队列；可能遭遇风控，休眠 5 分钟再继续`,
+          )
+          await sleep(300e3)
+        }
+
+        nextPending.push(roomid)
+        continue
+      }
+
+      this.logger.log(
+        `粉丝勋章【${medal_name}】 主播【${nick_name}】（UID：${target_id}）的直播间 ${roomid} 已达到目标状态，立即执行`,
       )
-
-      if (liveStatus === null) {
-        this.logger.warn(
-          `粉丝勋章【${medal.medal.medal_name}】对应的直播间 ${roomid} 本轮实时探测失败，继续等待下次检查`,
-          medal,
-        )
-        nextPending.push(roomid)
-        continue
-      }
-
-      if (!targetPredicate(liveStatus)) {
-        nextPending.push(roomid)
-        continue
-      }
-
-      // 命中目标状态，立即执行该房间
-      this.logger.log(`直播间 ${roomid}（${medal.anchor_info.nick_name}）已达到目标状态，立即执行`)
       const result = await runOne(medal)
 
       if (result.interrupted) {
@@ -484,11 +479,6 @@ class MedalModule extends BaseModule {
           verifiedCompleted: false,
           pendingRoomids: [...nextPending, ...roomids.slice(i)],
         }
-      }
-      if (result.requeue) {
-        // 执行前校验未通过且可等待，回到等待队列
-        nextPending.push(roomid)
-        continue
       }
       if (!result.verifiedCompleted) {
         verifiedCompleted = false

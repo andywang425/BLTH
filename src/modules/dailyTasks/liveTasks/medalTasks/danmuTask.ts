@@ -91,11 +91,16 @@ class DanmuTask extends MedalModule {
   /**
    * 执行单个直播间的发弹幕任务
    *
+   * @param medal 粉丝勋章
+   * @param danmuIndexRef 弹幕索引引用，用于记录当前正在发送的弹幕索引
+   * @param skipPreVerify 是否跳过执行前直播状态校验，默认 false
+   *
    * @returns 执行结果，包含是否中断以及是否确认完成
    */
   private async executeDanmuTask(
     medal: LiveData.FansMedalPanel.List,
     danmuIndexRef: { value: number },
+    skipPreVerify = false,
   ): Promise<TaskExecutionResult> {
     if (this.shouldStopForCrossDay()) {
       this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
@@ -142,25 +147,27 @@ class DanmuTask extends MedalModule {
 
     if (parsed.current >= parsed.limit) return { interrupted: false, verifiedCompleted: true }
 
-    if (this.config.onlyWhenNotLiving) {
-      // 开启了「仅在未开播的直播间发弹幕」，校验直播状态
-      const verdict = await this.preExecuteVerify(room_id, (liveStatus) => liveStatus !== 1)
-      if (verdict === 'error') {
-        this.logger.log(
-          `粉丝勋章【${medal_name}】 执行前校验：无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的直播状态，${this.config.waitUntilNotLiving ? '回到等待队列' : '跳过发弹幕任务'}；可能遭遇风控，休眠 5 分钟再继续`,
-        )
-        await sleep(300e3)
+    if (!skipPreVerify) {
+      if (this.config.onlyWhenNotLiving) {
+        // 开启了「仅在未开播的直播间发弹幕」，校验直播状态
+        const verdict = await this.preExecuteVerify(room_id, (liveStatus) => liveStatus !== 1)
+        if (verdict === 'error') {
+          this.logger.error(
+            `粉丝勋章【${medal_name}】 执行前校验：无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的直播状态，${this.config.waitUntilNotLiving ? '回到等待队列' : '跳过发弹幕任务'}；可能遭遇风控，休眠 5 分钟再继续`,
+          )
+          await sleep(300e3)
 
-        return this.config.waitUntilNotLiving
-          ? { interrupted: false, verifiedCompleted: false, requeue: true }
-          : { interrupted: false, verifiedCompleted: true }
-      } else if (verdict === 'fail') {
-        this.logger.log(
-          `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前正在直播，${this.config.waitUntilNotLiving ? '回到等待队列' : '跳过发弹幕任务'}`,
-        )
-        return this.config.waitUntilNotLiving
-          ? { interrupted: false, verifiedCompleted: false, requeue: true }
-          : { interrupted: false, verifiedCompleted: true }
+          return this.config.waitUntilNotLiving
+            ? { interrupted: false, verifiedCompleted: false, requeue: true }
+            : { interrupted: false, verifiedCompleted: true }
+        } else if (verdict === 'fail') {
+          this.logger.log(
+            `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前正在直播，${this.config.waitUntilNotLiving ? '回到等待队列' : '跳过发弹幕任务'}`,
+          )
+          return this.config.waitUntilNotLiving
+            ? { interrupted: false, verifiedCompleted: false, requeue: true }
+            : { interrupted: false, verifiedCompleted: true }
+        }
       }
     }
 
@@ -276,7 +283,7 @@ class DanmuTask extends MedalModule {
         const roundResult = await this.runWaitingRound(
           pendingRoomids,
           (liveStatus) => liveStatus !== 1,
-          (medal) => this.executeDanmuTask(medal, danmuIndexRef),
+          (medal) => this.executeDanmuTask(medal, danmuIndexRef, true),
         )
         pendingRoomids = roundResult.pendingRoomids
 

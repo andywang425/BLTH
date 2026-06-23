@@ -186,7 +186,7 @@ class LightTask extends MedalModule {
 
       if (verdict === 'error') {
         skippedByStatusMedals.push(medal)
-        this.logger.warn(
+        this.logger.error(
           `粉丝勋章【${medal_name}】 执行前校验：无法确认主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前是否在直播，转交下一轮发弹幕点亮；可能遭遇风控，休眠 5 分钟再继续`,
         )
         await sleep(300e3)
@@ -249,7 +249,7 @@ class LightTask extends MedalModule {
 
       if (verdict === 'error') {
         skippedByStatusMedals.push(medal)
-        this.logger.warn(
+        this.logger.error(
           `粉丝勋章【${medal_name}】 执行前校验：无法确认主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前是否在直播，转交下一轮点赞点亮；可能遭遇风控，休眠 5 分钟再继续`,
         )
         await sleep(300e3)
