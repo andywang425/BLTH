@@ -223,8 +223,7 @@ class LikeTask extends MedalModule {
       }
 
       this.status = 'running'
-      // 用最新列表状态播种直播状态样本，使紧接着执行的 readyMedals 尽量复用、少探测
-      this.syncSnapshotsFromMedals()
+
       const { readyMedals, waitingMedals } = this.getMedals()
       let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
       let allCompleted = true

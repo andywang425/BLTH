@@ -303,8 +303,7 @@ class LightTask extends MedalModule {
       }
 
       this.status = 'running'
-      // 用最新列表状态播种直播状态样本，使 likeTask 执行前校验尽量复用、少探测
-      this.syncSnapshotsFromMedals()
+
       let { notLivingMedals, livingMedals } = this.getMedals()
       // 是否有需要点亮的粉丝勋章（是不是一次有效运行？）
       const isEffectiveRun = notLivingMedals.length > 0 || livingMedals.length > 0

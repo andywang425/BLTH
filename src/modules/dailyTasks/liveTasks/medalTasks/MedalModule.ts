@@ -3,7 +3,6 @@ import { useBiliStore, useModuleStore } from '@/stores'
 import { watch } from 'vue'
 import type {
   LiveStatusSnapshot,
-  LiveStatusSnapshotSource,
   MedalTaskSharedConfig,
   PreExecuteVerdict,
   RequestQueueKey,
@@ -11,7 +10,6 @@ import type {
   TaskExecutionResult,
   TaskJumpType,
   WaitRoundResult,
-  WaitStrategy,
 } from './types'
 import { arrayToMap, sleep } from '@/library/utils'
 import type { LiveData } from '@/library/bili-api/data'
@@ -102,13 +100,9 @@ class MedalModule extends BaseModule {
     taskInfo: Promise.resolve(),
     roomStatus: Promise.resolve(),
   }
-  /** 粉丝勋章数据在多久内视为新鲜（毫秒） */
-  private static readonly RECENT_FETCH_THRESHOLD = 90_000
   /**
    * 直播状态样本在多久内视为新鲜、可直接复用（毫秒）
    *
-   * 与 `RECENT_FETCH_THRESHOLD` 职责分离：
-   * - `RECENT_FETCH_THRESHOLD` 控制等待轮询是否复用粉丝勋章列表缓存
    * - 本阈值控制「执行前校验」是否需要补一次单房间实时探测
    */
   private static readonly LIVE_STATUS_SNAPSHOT_FRESHNESS_THRESHOLD = 30_000
@@ -119,8 +113,6 @@ class MedalModule extends BaseModule {
    * 共享能减少不必要的重复探测。
    */
   private static readonly liveStatusSnapshots = new Map<number, LiveStatusSnapshot>()
-  /** 进行中的全量刷新粉丝勋章 Promise */
-  private static ongoingFullRefreshPromise: Promise<boolean> | null = null
 
   /**
    * 将异步请求加入串行队列，相邻请求之间加入随机延迟
@@ -283,51 +275,6 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 计算等待探测策略
-   *
-   * @param pendingCount 当前待探测的直播间数量
-   */
-  protected decideWaitStrategy(pendingCount: number): WaitStrategy {
-    const totalMedalCount = useBiliStore().filteredFansMedals.length
-    const fullRefreshCost = Math.ceil(totalMedalCount / 10) // 每次请求能获取 10 个粉丝勋章
-    return pendingCount <= fullRefreshCost ? 'single-probe' : 'refresh-fans-medals'
-  }
-
-  /**
-   * 判断粉丝勋章数据是否足够新鲜
-   */
-  private isMedalDataFresh(): boolean {
-    const meta = useBiliStore().fansMedalsMeta
-    return (
-      meta.status === 'loaded' &&
-      tsm() - meta.lastFetchFinishedAt! < MedalModule.RECENT_FETCH_THRESHOLD
-    )
-  }
-
-  /**
-   * 用最新的粉丝勋章列表状态播种/更新直播状态样本
-   *
-   * 仅当列表数据比现有样本更新时才覆盖，避免把更新鲜的单房间探测结果倒退
-   */
-  protected syncSnapshotsFromMedals(): void {
-    const biliStore = useBiliStore()
-    const observedAt = biliStore.fansMedalsMeta.lastFetchFinishedAt
-    if (observedAt === undefined) return
-
-    for (const medal of biliStore.filteredFansMedals) {
-      const roomid = medal.room_info.room_id
-      const existing = MedalModule.liveStatusSnapshots.get(roomid)
-      if (!existing || existing.observedAt < observedAt) {
-        MedalModule.liveStatusSnapshots.set(roomid, {
-          liveStatus: medal.room_info.living_status,
-          observedAt,
-          source: 'fans-medals',
-        })
-      }
-    }
-  }
-
-  /**
    * 判断直播状态样本是否仍足够新鲜、可直接复用
    */
   private isSnapshotFresh(snapshot: LiveStatusSnapshot): boolean {
@@ -340,10 +287,9 @@ class MedalModule extends BaseModule {
   private recordLiveStatusSnapshot(
     roomid: number,
     liveStatus: number,
-    source: LiveStatusSnapshotSource,
     observedAt: number = tsm(),
   ): void {
-    MedalModule.liveStatusSnapshots.set(roomid, { liveStatus, observedAt, source })
+    MedalModule.liveStatusSnapshots.set(roomid, { liveStatus, observedAt })
   }
 
   /**
@@ -364,7 +310,7 @@ class MedalModule extends BaseModule {
       this.fetchRoomLiveStatus(roomid),
     )
     if (liveStatus !== null) {
-      this.recordLiveStatusSnapshot(roomid, liveStatus, 'single-probe')
+      this.recordLiveStatusSnapshot(roomid, liveStatus)
     }
     return liveStatus
   }
@@ -401,12 +347,7 @@ class MedalModule extends BaseModule {
   /**
    * 对等待中的直播间做一轮「探测一个，命中即执行一个」的轮询
    *
-   * 三种状态来源策略：
-   * - 列表数据新鲜：直接用样本/列表状态筛选，命中即执行
-   * - 列表数据不新鲜且待探测数较多：全量刷新一次后筛选
-   * - 列表数据不新鲜且待探测数较少：逐房间单独探测
-   *
-   * 无论哪种策略，命中目标状态后都立即执行该房间（runOne），不再等整轮探测结束。
+   * 命中目标状态后都立即执行该房间任务（runOne），不再等整轮探测结束。
    *
    * @param roomids 待探测的直播间ID列表
    * @param targetPredicate 目标状态判断函数
@@ -420,46 +361,6 @@ class MedalModule extends BaseModule {
     const biliStore = useBiliStore()
 
     this.logger.log(`开始等待轮询，待探测直播间数量：${roomids.length}`, { roomids })
-
-    // 如果有进行中的全量刷新，等待其完成
-    if (MedalModule.ongoingFullRefreshPromise) {
-      this.logger.log('等待进行中的粉丝勋章刷新完成...')
-      await MedalModule.ongoingFullRefreshPromise
-    }
-
-    // 决定本轮筛选时的状态来源：是否对每个房间单独探测
-    let useProbe = false
-
-    if (this.isMedalDataFresh()) {
-      this.logger.log('粉丝勋章数据较新，直接使用缓存数据筛选')
-      this.syncSnapshotsFromMedals()
-    } else {
-      const strategy = this.decideWaitStrategy(roomids.length)
-      this.logger.log(
-        `粉丝勋章数据不新鲜，使用${strategy === 'single-probe' ? '单房间探测' : '刷新粉丝勋章'}策略`,
-      )
-
-      if (strategy === 'refresh-fans-medals') {
-        const promise = this.refreshFansMedals()
-        MedalModule.ongoingFullRefreshPromise = promise
-        try {
-          await promise
-        } finally {
-          if (MedalModule.ongoingFullRefreshPromise === promise) {
-            MedalModule.ongoingFullRefreshPromise = null
-          }
-        }
-
-        if (biliStore.fansMedalsMeta.status === 'loaded') {
-          this.syncSnapshotsFromMedals()
-        } else {
-          // 刷新失败，本轮全部继续等待
-          return { interrupted: false, verifiedCompleted: true, pendingRoomids: roomids }
-        }
-      } else {
-        useProbe = true
-      }
-    }
 
     const medalMap = biliStore.filteredFansMedalsMap
     const nextPending: number[] = []
@@ -490,16 +391,11 @@ class MedalModule extends BaseModule {
         continue
       }
 
-      // 获取本轮筛选用的直播状态
-      let liveStatus: number | null
-      if (useProbe) {
-        liveStatus = await MedalModule.enqueueRoomStatusProbe(() => this.fetchRoomLiveStatus(roomid))
-        if (liveStatus !== null) {
-          this.recordLiveStatusSnapshot(roomid, liveStatus, 'single-probe')
-        }
-      } else {
-        const snapshot = MedalModule.liveStatusSnapshots.get(roomid)
-        liveStatus = snapshot ? snapshot.liveStatus : medal.room_info.living_status
+      const liveStatus = await MedalModule.enqueueRoomStatusProbe(() =>
+        this.fetchRoomLiveStatus(roomid),
+      )
+      if (liveStatus !== null) {
+        this.recordLiveStatusSnapshot(roomid, liveStatus)
       }
 
       if (liveStatus === null) {

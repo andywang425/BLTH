@@ -20,10 +20,6 @@ type GroupedMedals<K extends string> = Record<K, LiveData.FansMedalPanel.List[]>
 
 type RequestQueueKey = 'taskInfo' | 'roomStatus'
 type TaskJumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
-type WaitStrategy = 'single-probe' | 'refresh-fans-medals'
-
-/** 直播状态样本的来源 */
-type LiveStatusSnapshotSource = 'fans-medals' | 'single-probe'
 
 /** 最近一次观测到的直播间直播状态样本 */
 interface LiveStatusSnapshot {
@@ -31,8 +27,6 @@ interface LiveStatusSnapshot {
   liveStatus: number
   /** 观测到该状态的时刻（毫秒时间戳） */
   observedAt: number
-  /** 样本来源 */
-  source: LiveStatusSnapshotSource
 }
 
 /**
@@ -82,9 +76,7 @@ export {
   GroupedMedals,
   RequestQueueKey,
   TaskJumpType,
-  WaitStrategy,
   LiveStatusSnapshot,
-  LiveStatusSnapshotSource,
   PreExecuteVerdict,
   TaskExecutionResult,
   BatchExecutionResult,
