@@ -1,5 +1,4 @@
 import { delayToNextMoment, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
-import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore } from '@/stores'
 import type { ModuleStatusTypes } from '@/types'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
@@ -46,34 +45,6 @@ class LikeTask extends MedalModule {
     }
 
     return result
-  }
-
-  /**
-   * 点赞
-   *
-   * @returns 是否点赞成功
-   */
-  private async like(medal: LiveData.FansMedalPanel.List, click_time: number): Promise<boolean> {
-    const room_id = medal.room_info.room_id
-    const target_id = medal.medal.target_id
-    const nick_name = medal.anchor_info.nick_name
-    const medal_name = medal.medal.medal_name
-    const logMessage = `粉丝勋章【${medal_name}】 给主播【${nick_name}】（UID：${target_id}）的直播间（${room_id}）点赞 ${click_time} 次`
-
-    try {
-      const response = await BAPI.live.likeReport(room_id, target_id, click_time)
-      this.logger.log(`BAPI.live.likeReport(${room_id}, ${target_id}, ${click_time})`, response)
-      if (response.code === 0) {
-        this.logger.log(`点赞 ${logMessage} 成功`)
-        return true
-      } else {
-        this.logger.error(`点赞 ${logMessage} 失败`, response.message)
-      }
-    } catch (error) {
-      this.logger.error(`点赞 ${logMessage} 出错`, error)
-    }
-
-    return false
   }
 
   /**

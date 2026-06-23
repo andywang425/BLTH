@@ -111,8 +111,39 @@ class MedalModule extends BaseModule {
     }
     return { status: null, canTryNextPage: false }
   }
-  /** 直播间直播状态获取函数列表（获取失败时返回null） */
+  /**
+   * 直播间直播状态获取函数列表（获取失败时返回null）
+   *
+   * - 特别说明：第一个 fetcher 通过粉丝勋章API获取直播状态，一次获取一页（10个）房间的直播状态并全部写入状态快照（但是仅返回目标房间的直播状态）
+   */
   private readonly ROOM_LIVE_STATUS_FETCHERS: Array<(roomid: number) => Promise<number | null>> = [
+    async (roomid) => {
+      const roomids = useBiliStore().filteredFansMedalsMap.keys()
+      let index = -1
+      for (const r of roomids) {
+        index++
+        if (r === roomid) {
+          break
+        }
+      }
+
+      const page = Math.ceil(index / 10)
+
+      const { status, canTryNextPage } = await this.fetchMedalPageForLiveStatus(page, roomid)
+
+      if (status !== null) {
+        return status
+      }
+
+      if (canTryNextPage) {
+        await sleep(_.random(300, 500))
+        const { status } = await this.fetchMedalPageForLiveStatus(page + 1, roomid)
+
+        return status
+      }
+
+      return null
+    },
     async (roomid) => {
       try {
         const response = await BAPI.live.getInfoByRoom(roomid)
@@ -145,38 +176,6 @@ class MedalModule extends BaseModule {
 
       return null
     },
-    async (roomid) => {
-      console.log('roomid', roomid)
-
-      const roomids = useBiliStore().filteredFansMedalsMap.keys()
-      let index = -1
-      for (const r of roomids) {
-        index++
-        if (r === roomid) {
-          break
-        }
-      }
-
-      const page = Math.ceil(index / 10)
-
-      console.log('page', page)
-
-      const { status, canTryNextPage } = await this.fetchMedalPageForLiveStatus(page, roomid)
-      console.log('status, canTryNextPage', status, canTryNextPage)
-
-      if (status !== null) {
-        return status
-      }
-
-      if (canTryNextPage) {
-        await sleep(_.random(300, 500))
-        const { status } = await this.fetchMedalPageForLiveStatus(page + 1, roomid)
-
-        return status
-      }
-
-      return null
-    },
   ]
   /**
    * 串行执行请求的限流队列
@@ -204,10 +203,14 @@ class MedalModule extends BaseModule {
     const observedAt = biliStore.fansMedalsMeta.lastFetchStartedAt!
 
     for (const medal of biliStore.filteredFansMedals) {
-      MedalModule.liveStatusSnapshots.set(medal.room_info.room_id, {
-        liveStatus: medal.room_info.living_status,
-        observedAt,
-      })
+      const snapshot = MedalModule.liveStatusSnapshots.get(medal.room_info.room_id)
+
+      if (!snapshot || snapshot.observedAt < observedAt) {
+        MedalModule.liveStatusSnapshots.set(medal.room_info.room_id, {
+          liveStatus: medal.room_info.living_status,
+          observedAt,
+        })
+      }
     }
   }
   /**
@@ -295,6 +298,76 @@ class MedalModule extends BaseModule {
   }
 
   /**
+   * 点赞
+   *
+   * @param medal 粉丝勋章
+   * @param click_time 点赞次数
+   *
+   * @returns 是否点赞成功
+   */
+  protected async like(medal: LiveData.FansMedalPanel.List, click_time: number): Promise<boolean> {
+    const room_id = medal.room_info.room_id
+    const target_id = medal.medal.target_id
+    const nick_name = medal.anchor_info.nick_name
+    const medal_name = medal.medal.medal_name
+    const logMessage = `粉丝勋章【${medal_name}】 给主播【${nick_name}】（UID：${target_id}）的直播间（${room_id}）点赞 ${click_time} 次`
+
+    try {
+      const response = await BAPI.live.likeReport(room_id, target_id, click_time)
+      this.logger.log(`BAPI.live.likeReport(${room_id}, ${target_id}, ${click_time})`, response)
+      if (response.code === 0) {
+        this.logger.log(`点赞 ${logMessage} 成功`)
+        return true
+      } else {
+        this.logger.error(`点赞 ${logMessage} 失败`, response.message)
+      }
+    } catch (error) {
+      this.logger.error(`点赞 ${logMessage} 出错`, error)
+    }
+
+    return false
+  }
+
+  /**
+   * 发弹幕
+   *
+   * @param medal 粉丝勋章
+   * @param danmu 弹幕内容
+   *
+   * @returns 是否发送成功
+   */
+  protected async sendDanmu(medal: LiveData.FansMedalPanel.List, danmu: string): Promise<boolean> {
+    const room_id = medal.room_info.room_id
+    const target_id = medal.medal.target_id
+    const nick_name = medal.anchor_info.nick_name
+    const medal_name = medal.medal.medal_name
+    const logMessage = `粉丝勋章【${medal_name}】 在主播【${nick_name}】（UID：${target_id}）的直播间（${room_id}）发送弹幕 ${danmu}`
+
+    try {
+      const response = await BAPI.live.sendMsg(danmu, room_id)
+      this.logger.log(`BAPI.live.sendMsg(${danmu}, ${room_id})`, response)
+      if (response.code === 0) {
+        if (response.msg === '') {
+          this.logger.log(`发弹幕 ${logMessage} 成功`)
+          return true
+        } else if (response.msg === 'k') {
+          this.logger.warn(`发弹幕 ${logMessage} 异常，弹幕可能包含屏蔽词`)
+        } else if (response.msg === 'f') {
+          this.logger.warn(`发弹幕 ${logMessage} 异常，弹幕被过滤`)
+        } else {
+          this.logger.warn(`发弹幕 ${logMessage} 异常，未知错误：${response.msg}`)
+        }
+      } else {
+        this.logger.error(`发弹幕 ${logMessage} 失败`, response.message)
+      }
+    } catch (error) {
+      this.logger.error(`发弹幕 ${logMessage} 出错`, error)
+    }
+
+    return false
+  }
+
+  /**
    * 从粉丝团升级任务 sub_title 解析每日任务进度文案 "每日上限 X/Y"
    *
    * @param sub_title API 返回的 sub_title
@@ -347,15 +420,25 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 以随机顺序尝试多个接口，获取单个直播间的直播状态
+   * 获取单个直播间的直播状态
+   *
+   * - 默认以随机顺序尝试多个接口
+   *
+   * @param roomid 直播间号
+   * @param preferMedalAPI 是否优先使用粉丝勋章API获取直播状态（其余接口仍随机），默认 false
    *
    * @returns
    * - `1`：直播中
    * - `0`/`2`：未开播/轮播中
-   * - `null`：两个接口都获取失败
+   * - `null`：所有接口都获取失败
    */
-  protected async fetchRoomLiveStatus(roomid: number): Promise<number | null> {
-    const fetchers = _.shuffle(this.ROOM_LIVE_STATUS_FETCHERS)
+  protected async fetchRoomLiveStatus(
+    roomid: number,
+    preferMedalAPI = false,
+  ): Promise<number | null> {
+    const fetchers = preferMedalAPI
+      ? [this.ROOM_LIVE_STATUS_FETCHERS[0], ..._.shuffle(this.ROOM_LIVE_STATUS_FETCHERS.slice(1))]
+      : _.shuffle(this.ROOM_LIVE_STATUS_FETCHERS)
 
     for (let i = 0; i < fetchers.length; i++) {
       const liveStatus = await fetchers[i](roomid)
@@ -376,9 +459,12 @@ class MedalModule extends BaseModule {
    * - 快照仍新鲜：直接复用
    * - 快照过期或不存在：探测并更新快照
    *
+   * @param roomid 直播间号
+   * @param preferMedalAPI 是否优先使用粉丝勋章API获取直播状态，默认 false
+   *
    * @returns 直播状态；探测失败时返回 null
    */
-  private async resolveLiveStatus(roomid: number): Promise<number | null> {
+  private async resolveLiveStatus(roomid: number, preferMedalAPI = false): Promise<number | null> {
     const snapshot = MedalModule.liveStatusSnapshots.get(roomid)
     if (
       snapshot &&
@@ -387,7 +473,9 @@ class MedalModule extends BaseModule {
       return snapshot.liveStatus
     }
 
-    return await MedalModule.enqueueRoomStatusProbe(() => this.fetchRoomLiveStatus(roomid))
+    return await MedalModule.enqueueRoomStatusProbe(() =>
+      this.fetchRoomLiveStatus(roomid, preferMedalAPI),
+    )
   }
 
   /**
@@ -395,13 +483,16 @@ class MedalModule extends BaseModule {
    *
    * @param roomid 直播间号
    * @param targetPredicate 目标状态判断函数
+   * @param preferMedalAPI 是否优先使用粉丝勋章API获取直播状态，默认 false
+   *
    * @returns 校验结论
    */
   protected async preExecuteVerify(
     roomid: number,
     targetPredicate: (liveStatus: number) => boolean,
+    preferMedalAPI = false,
   ): Promise<PreExecuteVerdict> {
-    const liveStatus = await this.resolveLiveStatus(roomid)
+    const liveStatus = await this.resolveLiveStatus(roomid, preferMedalAPI)
 
     if (liveStatus === null) {
       // 探测失败
@@ -454,7 +545,12 @@ class MedalModule extends BaseModule {
       const nick_name = medal.anchor_info.nick_name
       const medal_name = medal.medal.medal_name
 
-      const verdict = await this.preExecuteVerify(roomid, targetPredicate)
+      // 遍历等待中的房间时优先用粉丝勋章API，一次获取一页（10个）房间的直播状态
+      // 因为在这种情况下房间直播状态不符合预期的可能性大，经常会连续判断多个房间的直播状态，能复用之前的探测结果
+      // 而在给第一批房间执行任务时，直播状态大概率正确，
+      // 执行完一个房间的任务后，先前获取的直播状态数据多半（具体概率和目标轮次相关）已经不新鲜了，又要重新探测直播状态，
+      // 所以没必要优先使用粉丝勋章API获取多个房间的直播状态
+      const verdict = await this.preExecuteVerify(roomid, targetPredicate, true)
 
       if (verdict !== 'pass') {
         if (verdict === 'error') {

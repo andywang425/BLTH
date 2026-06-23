@@ -1,5 +1,4 @@
 import { delayToNextMoment, isNowBefore, isTimestampToday, tsm } from '@/library/luxon'
-import BAPI from '@/library/bili-api'
 import { useBiliStore, useModuleStore } from '@/stores'
 import type { ModuleStatusTypes } from '@/types'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
@@ -50,42 +49,6 @@ class DanmuTask extends MedalModule {
     }
 
     return result
-  }
-
-  /**
-   * 发弹幕
-   *
-   * @returns 是否发送成功
-   */
-  private async sendDanmu(medal: LiveData.FansMedalPanel.List, danmu: string): Promise<boolean> {
-    const room_id = medal.room_info.room_id
-    const target_id = medal.medal.target_id
-    const nick_name = medal.anchor_info.nick_name
-    const medal_name = medal.medal.medal_name
-    const logMessage = `粉丝勋章【${medal_name}】 在主播【${nick_name}】（UID：${target_id}）的直播间（${room_id}）发送弹幕 ${danmu}`
-
-    try {
-      const response = await BAPI.live.sendMsg(danmu, room_id)
-      this.logger.log(`BAPI.live.sendMsg(${danmu}, ${room_id})`, response)
-      if (response.code === 0) {
-        if (response.msg === '') {
-          this.logger.log(`发弹幕 ${logMessage} 成功`)
-          return true
-        } else if (response.msg === 'k') {
-          this.logger.warn(`发弹幕 ${logMessage} 异常，弹幕可能包含屏蔽词`)
-        } else if (response.msg === 'f') {
-          this.logger.warn(`发弹幕 ${logMessage} 异常，弹幕被过滤`)
-        } else {
-          this.logger.warn(`发弹幕 ${logMessage} 异常，未知错误：${response.msg}`)
-        }
-      } else {
-        this.logger.error(`发弹幕 ${logMessage} 失败`, response.message)
-      }
-    } catch (error) {
-      this.logger.error(`发弹幕 ${logMessage} 出错`, error)
-    }
-
-    return false
   }
 
   /**
