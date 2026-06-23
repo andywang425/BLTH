@@ -62,6 +62,55 @@ class MedalModule extends BaseModule {
     // 直播中返回true，否则返回false
     isLiving: (medal) => medal.room_info.living_status === 1,
   }
+  /**
+   * 通过获取指定页的粉丝勋章，获取目标直播间的直播状态
+   *
+   * @param page 页码
+   * @param roomid 目标直播间ID
+   * @returns 直播状态和是否可以继续获取下一页的粉丝勋章
+   */
+  private async fetchMedalPageForLiveStatus(
+    page: number,
+    roomid: number,
+  ): Promise<{ status: number | null; canTryNextPage: boolean }> {
+    try {
+      const response = await BAPI.live.fansMedalPanel(page)
+      this.logger.log(`BAPI.live.fansMedalPanel(${page}) response`, response)
+      let status = null
+
+      if (response.code === 0) {
+        const medals = [...response.data.special_list, ...response.data.list]
+        const observedAt = tsm()
+
+        for (const medal of medals) {
+          const medalRoomid = medal.room_info.room_id
+          const medalLiveStatus = medal.room_info.living_status
+
+          MedalModule.liveStatusSnapshots.set(medalRoomid, {
+            liveStatus: medalLiveStatus,
+            observedAt,
+          })
+
+          if (medalRoomid === roomid) {
+            status = medalLiveStatus
+          }
+        }
+
+        const currentPage = response.data.page_info.current_page
+        const totalPage = response.data.page_info.total_page
+        const hasUnlightedMedal = medals.some((m) => !m.medal.is_lighted)
+
+        return {
+          status,
+          canTryNextPage: currentPage < totalPage && !hasUnlightedMedal,
+        }
+      }
+      this.logger.warn(`BAPI.live.fansMedalPanel(${page}) 失败`, response.message)
+    } catch (error) {
+      this.logger.warn(`BAPI.live.fansMedalPanel(${page}) 出错`, error)
+    }
+    return { status: null, canTryNextPage: false }
+  }
   /** 直播间直播状态获取函数列表（获取失败时返回null） */
   private readonly ROOM_LIVE_STATUS_FETCHERS: Array<(roomid: number) => Promise<number | null>> = [
     async (roomid) => {
@@ -69,7 +118,9 @@ class MedalModule extends BaseModule {
         const response = await BAPI.live.getInfoByRoom(roomid)
         this.logger.log(`BAPI.live.getInfoByRoom(${roomid}) response`, response)
         if (response.code === 0) {
-          return response.data.room_info.live_status
+          const liveStatus = response.data.room_info.live_status
+          MedalModule.liveStatusSnapshots.set(roomid, { liveStatus, observedAt: tsm() })
+          return liveStatus
         }
         this.logger.warn(`BAPI.live.getInfoByRoom(${roomid}) 失败`, response.message)
       } catch (error) {
@@ -83,11 +134,45 @@ class MedalModule extends BaseModule {
         const response = await BAPI.live.getRoomPlayInfo(roomid)
         this.logger.log(`BAPI.live.getRoomPlayInfo(${roomid}) response`, response)
         if (response.code === 0) {
-          return response.data.live_status
+          const liveStatus = response.data.live_status
+          MedalModule.liveStatusSnapshots.set(roomid, { liveStatus, observedAt: tsm() })
+          return liveStatus
         }
         this.logger.warn(`BAPI.live.getRoomPlayInfo(${roomid}) 失败`, response.message)
       } catch (error) {
         this.logger.warn(`BAPI.live.getRoomPlayInfo(${roomid}) 出错`, error)
+      }
+
+      return null
+    },
+    async (roomid) => {
+      console.log('roomid', roomid)
+
+      const roomids = useBiliStore().filteredFansMedalsMap.keys()
+      let index = -1
+      for (const r of roomids) {
+        index++
+        if (r === roomid) {
+          break
+        }
+      }
+
+      const page = Math.ceil(index / 10)
+
+      console.log('page', page)
+
+      const { status, canTryNextPage } = await this.fetchMedalPageForLiveStatus(page, roomid)
+      console.log('status, canTryNextPage', status, canTryNextPage)
+
+      if (status !== null) {
+        return status
+      }
+
+      if (canTryNextPage) {
+        await sleep(_.random(300, 500))
+        const { status } = await this.fetchMedalPageForLiveStatus(page + 1, roomid)
+
+        return status
       }
 
       return null
@@ -101,19 +186,30 @@ class MedalModule extends BaseModule {
     roomStatus: Promise.resolve(),
   }
   /**
-   * 直播状态样本在多久内视为新鲜、可直接复用（毫秒）
+   * 直播状态快照在多久内视为新鲜、可直接复用（毫秒）
    *
-   * - 本阈值控制「执行前校验」是否需要补一次单房间实时探测
+   * - 本阈值控制「执行前校验」是否需要做一次直播状态探测
    */
   private static readonly LIVE_STATUS_SNAPSHOT_FRESHNESS_THRESHOLD = 30_000
   /**
-   * 直播状态样本缓存（key：直播间号）
-   *
-   * 为 static，使 like / danmu / light 共享同一份样本——三者关心的都是同一个 `living_status`，
-   * 共享能减少不必要的重复探测。
+   * 直播状态快照（key：直播间号）
    */
   private static readonly liveStatusSnapshots = new Map<number, LiveStatusSnapshot>()
+  /**
+   * 用粉丝勋章列表初始化直播状态快照
+   */
+  protected static initSnapshotsWithFansMedalsData(): void {
+    const biliStore = useBiliStore()
+    // 把开始获取粉丝勋章列表的时间作为直播状态快照的观测时间
+    const observedAt = biliStore.fansMedalsMeta.lastFetchStartedAt!
 
+    for (const medal of biliStore.filteredFansMedals) {
+      MedalModule.liveStatusSnapshots.set(medal.room_info.room_id, {
+        liveStatus: medal.room_info.living_status,
+        observedAt,
+      })
+    }
+  }
   /**
    * 将异步请求加入串行队列，相邻请求之间加入随机延迟
    */
@@ -275,79 +371,48 @@ class MedalModule extends BaseModule {
   }
 
   /**
-   * 判断直播状态样本是否仍足够新鲜、可直接复用
-   */
-  private isSnapshotFresh(snapshot: LiveStatusSnapshot): boolean {
-    return tsm() - snapshot.observedAt < MedalModule.LIVE_STATUS_SNAPSHOT_FRESHNESS_THRESHOLD
-  }
-
-  /**
-   * 记录一条直播状态样本
-   */
-  private recordLiveStatusSnapshot(
-    roomid: number,
-    liveStatus: number,
-    observedAt: number = tsm(),
-  ): void {
-    MedalModule.liveStatusSnapshots.set(roomid, { liveStatus, observedAt })
-  }
-
-  /**
    * 解析直播间当前的直播状态（执行前校验使用）
    *
-   * - 样本仍新鲜：直接复用样本
-   * - 样本过期或不存在：补一次单房间实时探测，并更新样本
+   * - 快照仍新鲜：直接复用
+   * - 快照过期或不存在：探测并更新快照
    *
-   * @returns 直播状态；单房间探测失败时返回 null
+   * @returns 直播状态；探测失败时返回 null
    */
-  protected async resolveLiveStatus(roomid: number): Promise<number | null> {
+  private async resolveLiveStatus(roomid: number): Promise<number | null> {
     const snapshot = MedalModule.liveStatusSnapshots.get(roomid)
-    if (snapshot && this.isSnapshotFresh(snapshot)) {
+    if (
+      snapshot &&
+      tsm() - snapshot.observedAt < MedalModule.LIVE_STATUS_SNAPSHOT_FRESHNESS_THRESHOLD
+    ) {
       return snapshot.liveStatus
     }
 
-    const liveStatus = await MedalModule.enqueueRoomStatusProbe(() =>
-      this.fetchRoomLiveStatus(roomid),
-    )
-    if (liveStatus !== null) {
-      this.recordLiveStatusSnapshot(roomid, liveStatus)
-    }
-    return liveStatus
+    return await MedalModule.enqueueRoomStatusProbe(() => this.fetchRoomLiveStatus(roomid))
   }
 
   /**
    * 执行前直播状态校验
    *
-   * 在房间第一个依赖直播状态的副作用请求（如 likeReport / sendMsg）发出前调用，
-   * 以「每房间一次」的粒度确认当前状态仍满足任务要求。
-   *
    * @param roomid 直播间号
    * @param targetPredicate 目标状态判断函数
-   * @param canRequeue 校验未通过时是否回到等待队列（对应 waitUntilLiving / waitUntilNotLiving）
    * @returns 校验结论
    */
   protected async preExecuteVerify(
     roomid: number,
     targetPredicate: (liveStatus: number) => boolean,
-    canRequeue: boolean,
   ): Promise<PreExecuteVerdict> {
     const liveStatus = await this.resolveLiveStatus(roomid)
 
-    // 探测失败：不按旧样本执行
     if (liveStatus === null) {
-      return canRequeue ? 'requeue' : 'skip'
+      // 探测失败
+      return 'error'
     }
 
-    if (targetPredicate(liveStatus)) {
-      return 'pass'
-    }
-    return canRequeue ? 'requeue' : 'skip'
+    return targetPredicate(liveStatus) ? 'pass' : 'fail'
   }
 
   /**
-   * 对等待中的直播间做一轮「探测一个，命中即执行一个」的轮询
-   *
-   * 命中目标状态后都立即执行该房间任务（runOne），不再等整轮探测结束。
+   * 遍历一轮等待中的直播间，命中目标状态后都立即执行该房间任务
    *
    * @param roomids 待探测的直播间ID列表
    * @param targetPredicate 目标状态判断函数
@@ -394,9 +459,6 @@ class MedalModule extends BaseModule {
       const liveStatus = await MedalModule.enqueueRoomStatusProbe(() =>
         this.fetchRoomLiveStatus(roomid),
       )
-      if (liveStatus !== null) {
-        this.recordLiveStatusSnapshot(roomid, liveStatus)
-      }
 
       if (liveStatus === null) {
         this.logger.warn(

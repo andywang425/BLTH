@@ -158,7 +158,6 @@ class LightTask extends MedalModule {
   ): Promise<LightPathExecutionResult> {
     const attemptedMedals: LiveData.FansMedalPanel.List[] = []
     const skippedByStatusMedals: LiveData.FansMedalPanel.List[] = []
-    let probeFailed = false
 
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
@@ -183,17 +182,16 @@ class LightTask extends MedalModule {
         continue
       }
 
-      // 执行前校验：在发出 likeReport 前确认直播间仍在直播
-      // 点赞点亮依赖「仍在开播」；若已下播则转交给下一轮发弹幕点亮路径重试
-      const liveStatus = await this.resolveLiveStatus(room_id)
-      if (liveStatus === null) {
-        probeFailed = true
+      const verdict = await this.preExecuteVerify(room_id, (liveStatus) => liveStatus === 1)
+
+      if (verdict === 'error') {
+        skippedByStatusMedals.push(medal)
         this.logger.warn(
-          `粉丝勋章【${medal_name}】 执行前校验：无法确认主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前是否在直播，本轮跳过点赞点亮`,
+          `粉丝勋章【${medal_name}】 执行前校验：无法确认主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前是否在直播，转交下一轮发弹幕点亮；可能遭遇风控，休眠 5 分钟再继续`,
         )
+        await sleep(300e3)
         continue
-      }
-      if (liveStatus !== 1) {
+      } else if (verdict === 'fail') {
         skippedByStatusMedals.push(medal)
         this.logger.log(
           `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前不在直播，转交下一轮发弹幕点亮`,
@@ -210,7 +208,7 @@ class LightTask extends MedalModule {
       }
     }
 
-    return { attemptedMedals, skippedByStatusMedals, probeFailed }
+    return { attemptedMedals, skippedByStatusMedals }
   }
 
   /**
@@ -223,7 +221,6 @@ class LightTask extends MedalModule {
     let danmuIndex = 0
     const attemptedMedals: LiveData.FansMedalPanel.List[] = []
     const skippedByStatusMedals: LiveData.FansMedalPanel.List[] = []
-    let probeFailed = false
 
     for (let i = 0; i < medals.length; i++) {
       const medal = medals[i]
@@ -248,17 +245,16 @@ class LightTask extends MedalModule {
         continue
       }
 
-      // 执行前校验：在发出 sendMsg 前确认直播间当前未在直播
-      // 发弹幕点亮依赖「当前未开播」；若已开播则转交给下一轮点赞点亮路径重试
-      const liveStatus = await this.resolveLiveStatus(room_id)
-      if (liveStatus === null) {
-        probeFailed = true
+      const verdict = await this.preExecuteVerify(room_id, (liveStatus) => liveStatus !== 1)
+
+      if (verdict === 'error') {
+        skippedByStatusMedals.push(medal)
         this.logger.warn(
-          `粉丝勋章【${medal_name}】 执行前校验：无法确认主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前是否在直播，本轮跳过发弹幕点亮`,
+          `粉丝勋章【${medal_name}】 执行前校验：无法确认主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前是否在直播，转交下一轮点赞点亮；可能遭遇风控，休眠 5 分钟再继续`,
         )
+        await sleep(300e3)
         continue
-      }
-      if (liveStatus === 1) {
+      } else if (verdict === 'fail') {
         skippedByStatusMedals.push(medal)
         this.logger.log(
           `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前正在直播，转交下一轮点赞点亮`,
@@ -289,7 +285,7 @@ class LightTask extends MedalModule {
       attemptedMedals.push(medal)
     }
 
-    return { attemptedMedals, skippedByStatusMedals, probeFailed }
+    return { attemptedMedals, skippedByStatusMedals }
   }
 
   public async run(): Promise<void> {
@@ -303,6 +299,7 @@ class LightTask extends MedalModule {
       }
 
       this.status = 'running'
+      MedalModule.initSnapshotsWithFansMedalsData()
 
       let { notLivingMedals, livingMedals } = this.getMedals()
       // 是否有需要点亮的粉丝勋章（是不是一次有效运行？）
@@ -326,11 +323,6 @@ class LightTask extends MedalModule {
             ...danmuResult.value.attemptedMedals,
             ...likeResult.value.attemptedMedals,
           )
-          if (danmuResult.value.probeFailed || likeResult.value.probeFailed) {
-            // 探测失败，为了防止风控、API变更等原因导致的无限循环，停止点亮
-            allCompleted = false
-            break
-          }
 
           livingMedals = danmuResult.value.skippedByStatusMedals
           notLivingMedals = likeResult.value.skippedByStatusMedals
@@ -352,7 +344,7 @@ class LightTask extends MedalModule {
 
           if (attemptedMedals.length > 0) {
             if (refreshed) {
-              allCompleted = this.verifyLightedMedals(attemptedMedals) && allCompleted
+              allCompleted = this.verifyLightedMedals(attemptedMedals)
             } else {
               this.logger.warn('无法确认点亮任务是否完成，本轮按未完成处理')
               allCompleted = false

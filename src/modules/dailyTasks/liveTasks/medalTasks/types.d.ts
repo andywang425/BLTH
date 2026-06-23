@@ -32,11 +32,11 @@ interface LiveStatusSnapshot {
 /**
  * 执行前直播状态校验结论
  *
- * - `pass`：符合目标状态，放行执行
- * - `requeue`：不符或探测失败，且开启等待，回到等待队列
- * - `skip`：不符或探测失败，且未开启等待，本轮跳过
+ * - `pass`：符合目标状态
+ * - `fail`：不符合目标状态
+ * - `error`：探测失败
  */
-type PreExecuteVerdict = 'pass' | 'requeue' | 'skip'
+type PreExecuteVerdict = 'pass' | 'fail' | 'error'
 
 /** 单个直播间任务的执行结果 */
 interface TaskExecutionResult {
@@ -65,9 +65,10 @@ interface WaitRoundResult {
 }
 
 interface LightPathExecutionResult {
+  /** 尝试点亮过的粉丝勋章列表 */
   attemptedMedals: LiveData.FansMedalPanel.List[]
+  /** 因为直播状态不对被跳过的粉丝勋章列表 */
   skippedByStatusMedals: LiveData.FansMedalPanel.List[]
-  probeFailed: boolean
 }
 
 export {

@@ -142,19 +142,23 @@ class DanmuTask extends MedalModule {
 
     if (parsed.current >= parsed.limit) return { interrupted: false, verifiedCompleted: true }
 
-    // 执行前校验：仅当开启「仅在未开播的直播间发弹幕」时，发弹幕才依赖直播状态
-    // 在发出第一条 sendMsg 前确认直播间当前确实未开播，避免按过期状态发弹幕
     if (this.config.onlyWhenNotLiving) {
-      const verdict = await this.preExecuteVerify(
-        room_id,
-        (liveStatus) => liveStatus !== 1,
-        this.config.waitUntilNotLiving,
-      )
-      if (verdict !== 'pass') {
+      // 开启了「仅在未开播的直播间发弹幕」，校验直播状态
+      const verdict = await this.preExecuteVerify(room_id, (liveStatus) => liveStatus !== 1)
+      if (verdict === 'error') {
         this.logger.log(
-          `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前正在直播，${verdict === 'requeue' ? '回到等待队列' : '本轮跳过'}`,
+          `粉丝勋章【${medal_name}】 执行前校验：无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的直播状态，${this.config.waitUntilNotLiving ? '回到等待队列' : '跳过发弹幕任务'}；可能遭遇风控，休眠 5 分钟再继续`,
         )
-        return verdict === 'requeue'
+        await sleep(300e3)
+
+        return this.config.waitUntilNotLiving
+          ? { interrupted: false, verifiedCompleted: false, requeue: true }
+          : { interrupted: false, verifiedCompleted: true }
+      } else if (verdict === 'fail') {
+        this.logger.log(
+          `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前正在直播，${this.config.waitUntilNotLiving ? '回到等待队列' : '跳过发弹幕任务'}`,
+        )
+        return this.config.waitUntilNotLiving
           ? { interrupted: false, verifiedCompleted: false, requeue: true }
           : { interrupted: false, verifiedCompleted: true }
       }
@@ -248,6 +252,7 @@ class DanmuTask extends MedalModule {
       }
 
       this.status = 'running'
+      MedalModule.initSnapshotsWithFansMedalsData()
 
       const { readyMedals, waitingMedals } = this.getMedals()
       let allCompleted = true

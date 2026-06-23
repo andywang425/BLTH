@@ -127,18 +127,22 @@ class LikeTask extends MedalModule {
 
     if (parsed.current >= parsed.limit) return { interrupted: false, verifiedCompleted: true }
 
-    // 执行前校验：在发出第一个 likeReport 前确认直播间仍在直播
-    // 以「每房间一次」的粒度，避免按过期状态点赞
-    const verdict = await this.preExecuteVerify(
-      room_id,
-      (liveStatus) => liveStatus === 1,
-      this.config.waitUntilLiving,
-    )
-    if (verdict !== 'pass') {
+    const verdict = await this.preExecuteVerify(room_id, (liveStatus) => liveStatus === 1)
+
+    if (verdict === 'error') {
       this.logger.log(
-        `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前不在直播，${verdict === 'requeue' ? '回到等待队列' : '本轮跳过'}`,
+        `粉丝勋章【${medal_name}】 执行前校验：无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的直播状态，${this.config.waitUntilLiving ? '回到等待队列' : '跳过点赞任务'}；可能遭遇风控，休眠 5 分钟再继续`,
       )
-      return verdict === 'requeue'
+      await sleep(300e3)
+
+      return this.config.waitUntilLiving
+        ? { interrupted: false, verifiedCompleted: false, requeue: true }
+        : { interrupted: false, verifiedCompleted: true }
+    } else if (verdict === 'fail') {
+      this.logger.log(
+        `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前不在直播，${this.config.waitUntilLiving ? '回到等待队列' : '本轮跳过'}`,
+      )
+      return this.config.waitUntilLiving
         ? { interrupted: false, verifiedCompleted: false, requeue: true }
         : { interrupted: false, verifiedCompleted: true }
     }
@@ -223,6 +227,7 @@ class LikeTask extends MedalModule {
       }
 
       this.status = 'running'
+      MedalModule.initSnapshotsWithFansMedalsData()
 
       const { readyMedals, waitingMedals } = this.getMedals()
       let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
