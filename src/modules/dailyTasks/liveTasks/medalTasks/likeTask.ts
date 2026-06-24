@@ -4,7 +4,7 @@ import type { ModuleStatusTypes } from '@/types'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
 import { sleep } from '@/library/utils'
-import type { BatchExecutionResult, GroupedMedals, TaskExecutionResult } from './types'
+import type { AfterExecutionAction, BatchExecutionResult, GroupedMedals } from './types'
 
 class LikeTask extends MedalModule {
   config = this.medalTasksConfig.like
@@ -53,15 +53,23 @@ class LikeTask extends MedalModule {
    * @param medal 粉丝勋章
    * @param skipPreVerify 是否跳过执行前直播状态校验，默认 false
    *
-   * @returns 执行结果，包含是否中断以及是否确认完成
+   * @returns 执行结果
    */
   private async executeLikeTask(
     medal: LiveData.FansMedalPanel.List,
+    skipPreVerify?: false,
+  ): Promise<AfterExecutionAction>
+  private async executeLikeTask(
+    medal: LiveData.FansMedalPanel.List,
+    skipPreVerify?: true,
+  ): Promise<Exclude<AfterExecutionAction, 'requeue'>>
+  private async executeLikeTask(
+    medal: LiveData.FansMedalPanel.List,
     skipPreVerify = false,
-  ): Promise<TaskExecutionResult> {
-    if (this.shouldStopForCrossDay()) {
+  ): Promise<AfterExecutionAction | Exclude<AfterExecutionAction, 'requeue'>> {
+    if (MedalModule.shouldStopForCrossDay()) {
       this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
-      return { interrupted: true, verifiedCompleted: false }
+      return 'stop'
     }
 
     const room_id = medal.room_info.room_id
@@ -74,14 +82,14 @@ class LikeTask extends MedalModule {
       this.logger.error(
         `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团升级任务信息，跳过点赞任务`,
       )
-      return { interrupted: false, verifiedCompleted: true }
+      return null
     }
 
     if (medalData.reach_free_intimacy_limit) {
       this.logger.warn(
         `粉丝勋章【${medal_name}】（主播【${nick_name}】，UID：${target_id}，直播间：${room_id}）已达到储蓄亲密度上限（已储蓄 ${medalData.free_intimacy} 亲密度，投喂一个粉丝灯牌即可领取这些亲密度），无法通过点赞获取更多亲密度，跳过点赞任务`,
       )
-      return { interrupted: false, verifiedCompleted: true }
+      return null
     }
 
     const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
@@ -89,20 +97,20 @@ class LikeTask extends MedalModule {
       this.logger.error(
         `粉丝勋章【${medal_name}】 无法在主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
       )
-      return { interrupted: false, verifiedCompleted: true }
+      return null
     }
 
-    if (item.is_done) return { interrupted: false, verifiedCompleted: true }
+    if (item.is_done) return null
 
     const parsed = MedalModule.parseDailyLimit(item.sub_title)
     if (!parsed) {
       this.logger.error(
         `粉丝勋章【${medal_name}】 无法解析主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的点赞任务的每日上限信息，跳过点赞任务`,
       )
-      return { interrupted: false, verifiedCompleted: true }
+      return null
     }
 
-    if (parsed.current >= parsed.limit) return { interrupted: false, verifiedCompleted: true }
+    if (parsed.current >= parsed.limit) return null
 
     if (!skipPreVerify) {
       const verdict = await this.preExecuteVerify(room_id, (liveStatus) => liveStatus === 1)
@@ -113,16 +121,12 @@ class LikeTask extends MedalModule {
         )
         await sleep(300e3)
 
-        return this.config.waitUntilLiving
-          ? { interrupted: false, verifiedCompleted: false, requeue: true }
-          : { interrupted: false, verifiedCompleted: true }
+        return this.config.waitUntilLiving ? 'requeue' : null
       } else if (verdict === 'fail') {
         this.logger.log(
-          `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前不在直播，${this.config.waitUntilLiving ? '回到等待队列' : '本轮跳过'}`,
+          `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前不在直播，${this.config.waitUntilLiving ? '回到等待队列' : '跳过点赞任务'}`,
         )
-        return this.config.waitUntilLiving
-          ? { interrupted: false, verifiedCompleted: false, requeue: true }
-          : { interrupted: false, verifiedCompleted: true }
+        return this.config.waitUntilLiving ? 'requeue' : null
       }
     }
 
@@ -134,9 +138,9 @@ class LikeTask extends MedalModule {
     let hasSuccessfulLike = false
 
     for (let j = 0; j < remaining; j++) {
-      if (this.shouldStopForCrossDay()) {
+      if (MedalModule.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
-        return { interrupted: true, verifiedCompleted: false }
+        return 'stop'
       }
 
       if (await this.like(medal, times)) {
@@ -149,40 +153,38 @@ class LikeTask extends MedalModule {
     }
 
     if (hasSuccessfulLike) {
-      return {
-        interrupted: false,
-        verifiedCompleted: await this.confirmTaskCompletedAfterUpdate(
-          medal,
-          'like',
-          this.config.useTargetRounds ? target : undefined,
-        ),
-      }
+      return (await this.confirmTaskCompletedAfterUpdate(
+        medal,
+        'like',
+        this.config.useTargetRounds ? target : undefined,
+      ))
+        ? null
+        : 'markUncompleted'
     }
 
     // 所有点赞尝试均失败，估计是有什么异常状况，跳过
-    return { interrupted: false, verifiedCompleted: true }
+    return null
   }
 
   /**
    * 顺序执行多个直播间的点赞任务
    *
-   * @returns 执行结果，包含是否中断、是否都确认完成、以及执行前校验未通过需回到等待队列的直播间
+   * @returns 执行结果
    */
   private async executeLikeTasks(
     medals: LiveData.FansMedalPanel.List[],
   ): Promise<BatchExecutionResult> {
-    let verifiedCompleted = true
+    let markUncompleted = false
     const requeueRoomids: number[] = []
 
     for (let i = 0; i < medals.length; i++) {
-      const result = await this.executeLikeTask(medals[i])
-      if (result.interrupted) {
-        return { interrupted: true, verifiedCompleted: false, requeueRoomids }
-      }
-      if (result.requeue) {
+      const action = await this.executeLikeTask(medals[i])
+      if (action === 'stop') {
+        return { stop: true }
+      } else if (action === 'requeue') {
         requeueRoomids.push(medals[i].room_info.room_id)
-      } else if (!result.verifiedCompleted) {
-        verifiedCompleted = false
+      } else if (action === 'markUncompleted') {
+        markUncompleted = true
       }
 
       if (i < medals.length - 1) {
@@ -190,7 +192,7 @@ class LikeTask extends MedalModule {
       }
     }
 
-    return { interrupted: false, verifiedCompleted, requeueRoomids }
+    return { markUncompleted, requeueRoomids }
   }
 
   public async run(): Promise<void> {
@@ -199,7 +201,7 @@ class LikeTask extends MedalModule {
     if (!isTimestampToday(this.config._lastCompleteTime)) {
       await this.waitForLightTask()
 
-      if (!(await this.waitForFansMedals())) {
+      if (!(await MedalModule.waitForFansMedals())) {
         this.logger.error('粉丝勋章数据不存在，不执行点赞任务')
         this.status = 'error'
         return
@@ -212,50 +214,50 @@ class LikeTask extends MedalModule {
       let pendingRoomids = waitingMedals.map((medal) => medal.room_info.room_id)
       let allCompleted = true
 
-      const initialResult = await this.executeLikeTasks(readyMedals)
-      // 初始 readyMedals 中执行前校验发现已下播、且开启了等待开播的房间，并入等待队列
-      pendingRoomids.push(...initialResult.requeueRoomids)
-      if (initialResult.interrupted || !initialResult.verifiedCompleted) {
+      const { stop, markUncompleted, requeueRoomids } = await this.executeLikeTasks(readyMedals)
+      if (markUncompleted) {
         allCompleted = false
       }
-
-      while (allCompleted && pendingRoomids.length > 0) {
-        if (this.shouldStopForCrossDay()) {
-          this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
-          allCompleted = false
-          break
-        }
-
-        const roundResult = await this.runWaitingRound(
-          pendingRoomids,
-          (liveStatus) => liveStatus === 1,
-          (medal) => this.executeLikeTask(medal, true),
-        )
-        pendingRoomids = roundResult.pendingRoomids
-
-        if (roundResult.interrupted || !roundResult.verifiedCompleted) {
-          allCompleted = false
-          break
-        }
-
-        if (pendingRoomids.length > 0) {
-          const medalMap = useBiliStore().filteredFansMedalsMap
-          const pendingRoomsInfo: Record<number, string | undefined> = {}
-
-          for (const roomid of pendingRoomids) {
-            pendingRoomsInfo[roomid] = medalMap.get(roomid)?.anchor_info.nick_name
+      if (requeueRoomids) {
+        pendingRoomids.push(...requeueRoomids)
+      }
+      if (!stop) {
+        while (pendingRoomids.length > 0) {
+          if (MedalModule.shouldStopForCrossDay()) {
+            this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
+            allCompleted = false
+            break
           }
 
-          this.logger.log(
-            `仍有 ${pendingRoomids.length} 个直播间未开播，${MedalModule.WAIT_POLL_INTERVAL / 1000} 秒后继续检查`,
-            { pendingRoomsInfo },
+          const { stop, markUncompleted, requeueRoomids } = await this.runWaitingRound(
+            pendingRoomids,
+            (liveStatus) => liveStatus === 1,
+            (medal) => this.executeLikeTask(medal, true),
           )
-          await sleep(MedalModule.WAIT_POLL_INTERVAL)
-        }
-      }
+          if (stop) {
+            break
+          }
+          if (markUncompleted) {
+            allCompleted = false
+          }
 
-      if (pendingRoomids.length > 0) {
-        allCompleted = false
+          pendingRoomids = requeueRoomids!
+
+          if (pendingRoomids.length > 0) {
+            const medalMap = useBiliStore().filteredFansMedalsMap
+            const pendingRoomsInfo: Record<number, string | undefined> = {}
+
+            for (const roomid of pendingRoomids) {
+              pendingRoomsInfo[roomid] = medalMap.get(roomid)?.anchor_info.nick_name
+            }
+
+            this.logger.log(
+              `仍有 ${pendingRoomids.length} 个直播间未开播，${MedalModule.WAIT_POLL_INTERVAL / 1000} 秒后继续检查`,
+              { pendingRoomsInfo },
+            )
+            await sleep(MedalModule.WAIT_POLL_INTERVAL)
+          }
+        }
       }
 
       if (allCompleted) {

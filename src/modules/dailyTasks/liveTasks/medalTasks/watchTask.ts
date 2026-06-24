@@ -354,7 +354,7 @@ class WatchTask extends MedalModule {
     if (!isTimestampToday(this.config._lastCompleteTime)) {
       await this.waitForLightTask()
 
-      if (!(await this.waitForFansMedals())) {
+      if (!(await MedalModule.waitForFansMedals())) {
         this.logger.error('粉丝勋章数据不存在，不执行观看直播任务')
         this.status = 'error'
         return

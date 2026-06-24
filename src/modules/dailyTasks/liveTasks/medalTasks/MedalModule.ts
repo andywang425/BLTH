@@ -7,9 +7,9 @@ import type {
   PreExecuteVerdict,
   RequestQueueKey,
   SharedMedalFilters,
-  TaskExecutionResult,
   TaskJumpType,
-  WaitRoundResult,
+  AfterExecutionAction,
+  BatchExecutionResult,
 } from './types'
 import { arrayToMap, sleep } from '@/library/utils'
 import type { LiveData } from '@/library/bili-api/data'
@@ -63,9 +63,9 @@ class MedalModule extends BaseModule {
     isLiving: (medal) => medal.room_info.living_status === 1,
   }
   /**
-   * 通过获取指定页的粉丝勋章，获取目标直播间的直播状态
+   * 通过获取指定页的粉丝勋章，探测目标直播间的直播状态
    *
-   * @param page 页码
+   * @param page 粉丝勋章页码
    * @param roomid 目标直播间ID
    * @returns 直播状态和是否可以继续获取下一页的粉丝勋章
    */
@@ -122,6 +122,7 @@ class MedalModule extends BaseModule {
    */
   private readonly ROOM_LIVE_STATUS_FETCHERS: Array<(roomid: number) => Promise<number | null>> = [
     async (roomid) => {
+      // 计算 roomid 对应的粉丝勋章在第几页
       const roomids = useBiliStore().filteredFansMedalsMap.keys()
       let index = -1
       for (const r of roomids) {
@@ -131,7 +132,7 @@ class MedalModule extends BaseModule {
         }
       }
 
-      // fansMedalPanel 每页返回 10 个勋章，页码从 1 开始
+      // 获取粉丝勋章 API 每页返回 10 个勋章，页码从 1 开始
       const page = Math.floor(index / 10) + 1
 
       const { status, canTryNextPage } = await this.fetchMedalPageForLiveStatus(page, roomid)
@@ -271,7 +272,7 @@ class MedalModule extends BaseModule {
   /**
    * 是否需要因跨天而提前停止
    */
-  protected shouldStopForCrossDay(): boolean {
+  protected static shouldStopForCrossDay(): boolean {
     return isNowAfter(23, 55) || isNowBefore(0, 5)
   }
 
@@ -280,7 +281,7 @@ class MedalModule extends BaseModule {
    *
    * @returns 是否获取成功
    */
-  protected waitForFansMedals(): Promise<boolean> {
+  protected static waitForFansMedals(): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       const biliStore = useBiliStore()
       if (biliStore.fansMedalsMeta.status === 'loaded') {
@@ -376,7 +377,7 @@ class MedalModule extends BaseModule {
    * 从粉丝团升级任务 sub_title 解析每日任务进度文案 "每日上限 X/Y"
    *
    * @param sub_title API 返回的 sub_title
-   * @returns 解析成功返回 `{ current, limit }`，否则返回 `null`
+   * @returns 解析成功返回当前任务进度和任务上限，否则返回 `null`
    */
   protected static parseDailyLimit(sub_title?: string): { current: number; limit: number } | null {
     if (!sub_title) return null
@@ -389,7 +390,7 @@ class MedalModule extends BaseModule {
    * 按 jump_type 在粉丝团升级任务信息 task_info 中查找任务项
    */
   protected static findTaskInfo(
-    task_info: LiveData.GetActivatedMedalInfo.TaskInfo[] | null,
+    task_info: LiveData.GetActivatedMedalInfo.TaskInfo[],
     jump_type: TaskJumpType,
   ): LiveData.GetActivatedMedalInfo.TaskInfo | undefined {
     return task_info?.find((t) => t.jump_type === jump_type)
@@ -400,7 +401,7 @@ class MedalModule extends BaseModule {
    *
    * @returns 解析成功返回数字，否则返回 null
    */
-  protected static parseTitleCount(title?: string): number | null {
+  protected static parseTitleCount(title: string): number | null {
     if (!title) return null
     const match = title.match(/\d+/)
     if (!match) return null
@@ -417,7 +418,7 @@ class MedalModule extends BaseModule {
     try {
       await moduleStore.rerunModule('Default_FansMedals', true)
       const status = useBiliStore().fansMedalsMeta.status
-      return status === 'loading' ? await this.waitForFansMedals() : status === 'loaded'
+      return status === 'loading' ? await MedalModule.waitForFansMedals() : status === 'loaded'
     } catch (error) {
       this.logger.error('刷新粉丝勋章列表失败', error)
       return false
@@ -430,14 +431,14 @@ class MedalModule extends BaseModule {
    * - 默认以随机顺序尝试多个接口
    *
    * @param roomid 直播间号
-   * @param preferMedalAPI 是否优先使用粉丝勋章API获取直播状态（其余接口仍随机），默认 false
+   * @param preferMedalAPI 是否优先使用粉丝勋章API（其余接口仍随机），默认 false
    *
    * @returns
    * - `1`：直播中
    * - `0`/`2`：未开播/轮播中
    * - `null`：所有接口都获取失败
    */
-  protected async fetchRoomLiveStatus(
+  private async fetchRoomLiveStatus(
     roomid: number,
     preferMedalAPI = false,
   ): Promise<number | null> {
@@ -517,24 +518,22 @@ class MedalModule extends BaseModule {
   protected async runWaitingRound(
     roomids: number[],
     targetPredicate: (liveStatus: number) => boolean,
-    runOne: (medal: LiveData.FansMedalPanel.List) => Promise<TaskExecutionResult>,
-  ): Promise<WaitRoundResult> {
+    runOne: (
+      medal: LiveData.FansMedalPanel.List,
+    ) => Promise<Exclude<AfterExecutionAction, 'requeue'>>,
+  ): Promise<BatchExecutionResult> {
     const biliStore = useBiliStore()
 
     this.logger.log(`开始等待轮询，待探测直播间数量：${roomids.length}`, { roomids })
 
     const medalMap = biliStore.filteredFansMedalsMap
-    const nextPending: number[] = []
-    let verifiedCompleted = true
+    const requeueRoomids: number[] = []
+    let markUncompleted = false
 
     for (let i = 0; i < roomids.length; i++) {
-      if (this.shouldStopForCrossDay()) {
+      if (MedalModule.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，提早结束本轮等待轮询')
-        return {
-          interrupted: true,
-          verifiedCompleted,
-          pendingRoomids: [...nextPending, ...roomids.slice(i)],
-        }
+        return { stop: true }
       }
 
       const roomid = roomids[i]
@@ -545,7 +544,6 @@ class MedalModule extends BaseModule {
         continue
       }
 
-      const room_id = medal.room_info.room_id
       const target_id = medal.medal.target_id
       const nick_name = medal.anchor_info.nick_name
       const medal_name = medal.medal.medal_name
@@ -560,33 +558,28 @@ class MedalModule extends BaseModule {
       if (verdict !== 'pass') {
         if (verdict === 'error') {
           this.logger.error(
-            `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的直播状态，回到等待队列；可能遭遇风控，休眠 5 分钟再继续`,
+            `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${target_id}，直播间：${roomid}）的直播状态，回到等待队列；可能遭遇风控，休眠 5 分钟再继续`,
           )
           await sleep(300e3)
         }
 
-        nextPending.push(roomid)
+        requeueRoomids.push(roomid)
         continue
       }
 
       this.logger.log(
         `粉丝勋章【${medal_name}】 主播【${nick_name}】（UID：${target_id}）的直播间 ${roomid} 已达到目标状态，立即执行`,
       )
-      const result = await runOne(medal)
+      const action = await runOne(medal)
 
-      if (result.interrupted) {
-        return {
-          interrupted: true,
-          verifiedCompleted: false,
-          pendingRoomids: [...nextPending, ...roomids.slice(i)],
-        }
-      }
-      if (!result.verifiedCompleted) {
-        verifiedCompleted = false
+      if (action === 'stop') {
+        return { stop: true }
+      } else if (action === 'markUncompleted') {
+        markUncompleted = true
       }
     }
 
-    return { interrupted: false, verifiedCompleted, pendingRoomids: nextPending }
+    return { markUncompleted, requeueRoomids }
   }
 
   /**

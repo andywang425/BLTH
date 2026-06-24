@@ -4,7 +4,7 @@ import { sleep } from '@/library/utils'
 import type { ModuleStatusTypes } from '@/types'
 import MedalModule from '@/modules/dailyTasks/liveTasks/medalTasks/MedalModule'
 import type { LiveData } from '@/library/bili-api/data'
-import type { GroupedMedals, LightPathExecutionResult } from './types'
+import type { GroupedMedals } from './types'
 
 class LightTask extends MedalModule {
   config = this.medalTasksConfig.light
@@ -93,7 +93,7 @@ class LightTask extends MedalModule {
    */
   private async likeTask(
     medals: LiveData.FansMedalPanel.List[],
-  ): Promise<LightPathExecutionResult> {
+  ): Promise<GroupedMedals<'attemptedMedals' | 'skippedByStatusMedals'>> {
     const attemptedMedals: LiveData.FansMedalPanel.List[] = []
     const skippedByStatusMedals: LiveData.FansMedalPanel.List[] = []
 
@@ -158,7 +158,7 @@ class LightTask extends MedalModule {
   private async sendDanmuTask(
     medals: LiveData.FansMedalPanel.List[],
     danmuIndexRef: { value: number },
-  ): Promise<LightPathExecutionResult> {
+  ): Promise<GroupedMedals<'attemptedMedals' | 'skippedByStatusMedals'>> {
     const attemptedMedals: LiveData.FansMedalPanel.List[] = []
     const skippedByStatusMedals: LiveData.FansMedalPanel.List[] = []
 
@@ -233,7 +233,7 @@ class LightTask extends MedalModule {
     this.logger.log('点亮熄灭勋章模块开始运行')
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
-      if (!(await this.waitForFansMedals())) {
+      if (!(await MedalModule.waitForFansMedals())) {
         this.logger.error('粉丝勋章数据不存在，不执行点亮熄灭勋章任务')
         this.status = 'error'
         return
@@ -249,7 +249,6 @@ class LightTask extends MedalModule {
 
       if (isEffectiveRun) {
         const attemptedMedals: LiveData.FansMedalPanel.List[] = []
-        // 跨房间共享的弹幕索引，避免每个房间都从同一条弹幕开始发
         const danmuIndexRef = { value: 0 }
 
         while (notLivingMedals.length > 0 || livingMedals.length > 0) {
