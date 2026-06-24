@@ -66,7 +66,7 @@ class CoinTask extends BaseModule {
       // 剩余可投硬币数量
       const allowed_coin_num = this.MAX_COIN - coined_num
       if (allowed_coin_num > 0) {
-        // 剩余可投硬币数和剩余所需投币数取较小者
+        // 投币数量：剩余可投硬币数和剩余所需投币数取较小者
         const coin_num = Math.min(allowed_coin_num, left_coin_num)
         const result = await this.coin(aid, coin_num)
         if (result === 0) {
@@ -83,14 +83,11 @@ class CoinTask extends BaseModule {
           this.logger.warn('硬币余额不足，每日投币任务终止')
           this.status = 'error'
           break
+        } else {
+          // 接口报错或网络错误
+          break
         }
       }
-    }
-
-    if (left_coin_num > 0) {
-      // 硬币余额不足，终止任务，不记录完成时间
-      this.logger.warn('硬币余额不足，每日投币任务终止')
-      this.status = 'error'
     }
   }
 
@@ -153,7 +150,7 @@ class CoinTask extends BaseModule {
         // 剩余要投的硬币数量
         const left_coin_num = this.config.num - total_coined_num
         // 拥有的硬币数量
-        const money = biliStore.userInfo!.money ?? 5
+        const money = biliStore.userInfo!.money
         if (left_coin_num > money) {
           this.logger.log('硬币余额不足，不执行每日投币任务')
           this.status = 'done'

@@ -163,52 +163,52 @@ class GetYearVipPrivilegeTask extends BaseModule {
       // 当前时间已经超过了上次记录的下次领取时间，领取权益
       this.status = 'running'
       const list = await this.myPrivilege()
-      if (list) {
-        const isSuperVip = this.isSuperVip()
+      if (!list) return
 
-        for (const privilege of list) {
-          if (!this.canReceivePrivilege(privilege, isSuperVip)) {
-            continue
-          }
+      const isSuperVip = this.isSuperVip()
 
-          if (privilege.state === 0) {
-            if (privilege.type === 9) {
-              // 专属等级加速包
-              await this.addExperience()
-            } else {
-              await this.receivePrivilege(privilege.type)
-            }
-          } else if (privilege.state === 1) {
-            this.logger.log(
-              `该权益（type = ${privilege.type}, ${this.getPrivilegeName(privilege.type)}）已经领取过了`,
-            )
+      for (const privilege of list) {
+        if (!this.canReceivePrivilege(privilege, isSuperVip)) {
+          continue
+        }
+
+        if (privilege.state === 0) {
+          if (privilege.type === 9) {
+            // 专属等级加速包
+            await this.addExperience()
           } else {
-            // 需要完成任务才能领取
-            if (privilege.type === 9) {
-              const watchTaskConfig = useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.watch
-              if (watchTaskConfig.enabled) {
-                this.logger.log('等待观看视频任务完成后再领取专属等级加速包（10主站经验）...')
-                watch(
-                  () => watchTaskConfig._lastCompleteTime,
-                  () => sleep(3000).then(() => this.addExperience()),
-                  { once: true },
-                )
-              } else {
-                this.logger.warn(
-                  '领取专属等级加速包（10主站经验）前需要观看任意一个视频，请打开【主站任务】中的【每日观看视频】，或是在运行脚本前手动观看',
-                )
-              }
+            await this.receivePrivilege(privilege.type)
+          }
+        } else if (privilege.state === 1) {
+          this.logger.log(
+            `该权益（type = ${privilege.type}, ${this.getPrivilegeName(privilege.type)}）已经领取过了`,
+          )
+        } else {
+          // 需要完成任务才能领取
+          if (privilege.type === 9) {
+            const watchTaskConfig = useModuleStore().moduleConfig.DailyTasks.MainSiteTasks.watch
+            if (watchTaskConfig.enabled) {
+              this.logger.log('等待观看视频任务完成后再领取专属等级加速包（10主站经验）...')
+              watch(
+                () => watchTaskConfig._lastCompleteTime,
+                () => sleep(3000).then(() => this.addExperience()),
+                { once: true },
+              )
+            } else {
+              this.logger.warn(
+                '领取专属等级加速包（10主站经验）前需要观看任意一个视频，请打开【主站任务】中的【每日观看视频】，或是在运行脚本前手动观看',
+              )
             }
           }
-          await sleep(500)
         }
-        this.status = 'done'
-        const nextReceiveTimes = list.map((i) => i.period_end_unix).filter((unix) => unix > ts())
-        if (nextReceiveTimes.length > 0) {
-          this.config._nextReceiveTime = Math.min(...nextReceiveTimes)
-        } else {
-          this.config._nextReceiveTime = ts() + 86400
-        }
+        await sleep(500)
+      }
+      this.status = 'done'
+      const nextReceiveTimes = list.map((i) => i.period_end_unix).filter((unix) => unix > ts())
+      if (nextReceiveTimes.length > 0) {
+        this.config._nextReceiveTime = Math.min(...nextReceiveTimes)
+      } else {
+        this.config._nextReceiveTime = ts() + 86400
       }
     }
 

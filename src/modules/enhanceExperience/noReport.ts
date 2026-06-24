@@ -222,9 +222,6 @@ class NoReport extends BaseModule {
           handler.next(config)
         }
       },
-      onResponse(response, handler) {
-        handler.next(response)
-      },
     }
 
     proxy(ajaxHookProxyConfig, unsafeWindow)
