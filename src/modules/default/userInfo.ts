@@ -3,7 +3,7 @@ import BAPI from '@/library/bili-api'
 import type { MainData } from '@/library/bili-api/data'
 import { delayToNextMoment } from '@/library/luxon'
 import BaseModule from '@/modules/BaseModule'
-import ModuleCriticalError from '@/library/error/ModuleCriticalError'
+import { ModuleCriticalError } from '@/library/error'
 
 class UserInfo extends BaseModule {
   /**

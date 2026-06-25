@@ -12,8 +12,7 @@ import { deepestIterate, waitForMoment } from '@/library/utils'
 import { useCacheStore } from './useCacheStore'
 import { isSelfTopFrame } from '@/library/dom'
 import type BaseModule from '@/modules/BaseModule'
-import ModuleCriticalError from '@/library/error/ModuleCriticalError'
-import ModuleError from '@/library/error/ModuleError'
+import { ModuleError, ModuleCriticalError } from '@/library/error'
 
 const defaultModuleStatus: ModuleStatus = {
   DailyTasks: {
