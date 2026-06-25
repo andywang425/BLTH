@@ -20,16 +20,40 @@ type GroupedMedals<K extends string> = Record<K, LiveData.FansMedalPanel.List[]>
 
 type RequestQueueKey = 'taskInfo' | 'roomStatus'
 type TaskJumpType = 'like' | 'sendDanmu' | 'watchLive' | 'feedLight' | 'sendGift'
-type WaitStrategy = 'single-probe' | 'refresh-fans-medals'
 
-interface WaitProbeResult {
-  readyMedals: LiveData.FansMedalPanel.List[]
-  pendingRoomids: number[]
+/** 直播间直播状态快照 */
+interface LiveStatusSnapshot {
+  /** 直播状态：1 直播中，0/2 未开播/轮播 */
+  liveStatus: number
+  /** 观测到该状态的时刻（毫秒时间戳） */
+  observedAt: number
 }
 
-interface TaskExecutionResult {
-  interrupted: boolean
-  verifiedCompleted: boolean
+/**
+ * 直播间任务执行前直播状态校验结论
+ *
+ * - `pass`：符合目标状态
+ * - `fail`：不符合目标状态
+ * - `error`：探测失败
+ */
+type PreExecuteVerdict = 'pass' | 'fail' | 'error'
+
+/**
+ * 直播间任务执行后操作
+ *
+ * - `stop`：终止后续直播间任务（也意味着当前任务未完成）
+ * - `requeue`：把直播间放到等待队列
+ * - `markUncompleted`：把当前任务（点赞/发弹幕）标记为未完成
+ * - `skipSleep`：跳过执行下一个直播间任务之间的等待时间
+ */
+type AfterExecutionAction = 'stop' | 'requeue' | 'markUncompleted' | 'skipSleep' | null
+
+/** 直播间任务批量执行结果 */
+interface BatchExecutionResult {
+  stop?: boolean
+  markUncompleted?: boolean
+  /** 放到等待队列的直播间id列表 */
+  requeueRoomids?: number[]
 }
 
 export {
@@ -38,7 +62,8 @@ export {
   GroupedMedals,
   RequestQueueKey,
   TaskJumpType,
-  WaitStrategy,
-  WaitProbeResult,
-  TaskExecutionResult,
+  LiveStatusSnapshot,
+  PreExecuteVerdict,
+  AfterExecutionAction,
+  BatchExecutionResult,
 }

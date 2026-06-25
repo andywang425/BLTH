@@ -12,8 +12,7 @@ import { deepestIterate, waitForMoment } from '@/library/utils'
 import { useCacheStore } from './useCacheStore'
 import { isSelfTopFrame } from '@/library/dom'
 import type BaseModule from '@/modules/BaseModule'
-import ModuleCriticalError from '@/library/error/ModuleCriticalError'
-import ModuleError from '@/library/error/ModuleError'
+import { ModuleError, ModuleCriticalError } from '@/library/error'
 
 const defaultModuleStatus: ModuleStatus = {
   DailyTasks: {
@@ -50,7 +49,7 @@ export const useModuleStore = defineStore('module', () => {
   // 模块状态
   const moduleStatus = ref<ModuleStatus>(defaultModuleStatus)
   // 模块实例映射（key: 模块名称, value: 模块实例）
-  const moduleInstances = ref<Record<string, BaseModule>>({})
+  const moduleInstances: Record<string, BaseModule> = {}
   // 模块状态、运行记录重置和再运行
   const moduleReset: ModuleReset = {
     DailyTasks: {
@@ -126,8 +125,6 @@ export const useModuleStore = defineStore('module', () => {
           watch: () => {
             moduleStatus.value.DailyTasks.LiveTasks.medalTasks.watch = ''
             moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastCompleteTime = 0
-            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._lastWatchTime = 0
-            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress = {}
 
             rerunModule('Default_FansMedals', true)
             rerunModule('DailyTask_LiveTask_WatchTask')
@@ -166,7 +163,7 @@ export const useModuleStore = defineStore('module', () => {
    */
   function _runModule(module: typeof BaseModule, name: string): Promise<void> | void {
     const moduleInstance = new module(name)
-    moduleInstances.value[name] = moduleInstance
+    moduleInstances[name] = moduleInstance
 
     if (moduleInstance.isEnabled()) {
       return moduleInstance.run()
@@ -278,7 +275,7 @@ export const useModuleStore = defineStore('module', () => {
    * @param args `run()` 方法参数
    */
   function rerunModule(moduleName: string, ...args: any[]): Promise<void> | void {
-    const moduleInstance = moduleInstances.value[moduleName]
+    const moduleInstance = moduleInstances[moduleName]
 
     if (moduleInstance) {
       clearTimeout(moduleInstance.nextRunTimer)

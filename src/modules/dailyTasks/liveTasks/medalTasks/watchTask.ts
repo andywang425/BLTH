@@ -24,23 +24,21 @@ class RoomHeart {
     areaID: number,
     parentID: number,
     ruid: number,
-    watchedSeconds: number,
     targetSeconds: number,
   ) {
     this.roomID = roomID
     this.areaID = areaID
     this.parentID = parentID
     this.ruid = ruid
-    this.watchedSeconds = watchedSeconds
     this.targetSeconds = targetSeconds
   }
 
   private logger = new Logger('RoomHeart')
 
-  /** 今日当前直播间已观看时间（秒） */
-  private watchedSeconds: number
+  /** 已观看时间（秒） */
+  private watchedSeconds: number = 0
 
-  /** 当前直播间观看目标秒数 */
+  /** 目标观看时间（秒） */
   private readonly targetSeconds: number
 
   private readonly areaID: number
@@ -53,16 +51,6 @@ class RoomHeart {
   /** 计算签名和发送请求时均需要 JSON.stringify */
   private get id(): number[] {
     return [this.parentID, this.areaID, this.seq, this.roomID]
-  }
-
-  /** 更新当前直播间的观看任务进度 */
-  private updateProgress() {
-    // 记录观看时间
-    this.watchedSeconds += this.heartBeatInterval
-
-    useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks.watch._watchingProgress[
-      this.roomID
-    ] = this.watchedSeconds
   }
 
   /** Cookie LIVE_BUVID */
@@ -80,6 +68,11 @@ class RoomHeart {
   private secretRule!: number[]
   /** ets */
   private timestamp!: number
+  /** 下一次 X 心跳的目标发送时间 */
+  private nextHeartbeatAt = 0
+
+  private static readonly HEARTBEAT_WAIT_SLICE_MS = 1000
+  private static readonly HEARTBEAT_DRIFT_WARN_MS = 5000
 
   /**
    * 开始心跳
@@ -95,6 +88,46 @@ class RoomHeart {
     return this.watchedSeconds > 0
   }
 
+  private setHeartbeatState(data: {
+    heartbeat_interval: number
+    secret_key: string
+    secret_rule: number[]
+    timestamp: number
+  }) {
+    ;({
+      heartbeat_interval: this.heartBeatInterval,
+      secret_key: this.secretKey,
+      secret_rule: this.secretRule,
+      timestamp: this.timestamp,
+    } = data)
+
+    // 根据观察，心跳响应中的 timestamp = 上次心跳响应中的 timestamp + 上次心跳响应中的 heartbeat_interval
+    // 如果是第一次心跳，timestamp = 发心跳时的秒级时间戳 -1或-2（可能是B站服务器的时间不准？误差不大实测可忽略）
+    // 总是使用最新心跳中返回的 timestamp 和 heartBeatInterval 来计算下次发送的时间
+    // 如果每次心跳后固定等待 heartBeatInterval 秒，发送时间误差会随时间推移变得越来越大
+    this.nextHeartbeatAt = (this.timestamp + this.heartBeatInterval) * 1000
+  }
+
+  /**
+   * 等待下一次心跳的发送时间到来，期间每隔一段时间检查一次剩余时间
+   */
+  private async waitForNextHeartbeat(): Promise<void> {
+    while (true) {
+      const remaining = this.nextHeartbeatAt - tsm()
+
+      if (remaining <= 0) {
+        const drift = -remaining
+        if (drift >= RoomHeart.HEARTBEAT_DRIFT_WARN_MS) {
+          this.logger.warn(
+            `直播间 ${this.roomID} 的 X 心跳发送已滞后 ${(drift / 1000).toFixed(2)} 秒，下次心跳可能触发服务端 time check failed`,
+          )
+        }
+        return
+      }
+      await sleep(Math.min(remaining, RoomHeart.HEARTBEAT_WAIT_SLICE_MS))
+    }
+  }
+
   /**
    * E心跳，开始时发送一次
    */
@@ -107,22 +140,21 @@ class RoomHeart {
       )
       if (response.code === 0) {
         this.seq += 1
-        ;({
-          heartbeat_interval: this.heartBeatInterval,
-          secret_key: this.secretKey,
-          secret_rule: this.secretRule,
-          timestamp: this.timestamp,
-        } = response.data)
-        await sleep(this.heartBeatInterval * 1000)
+        this.setHeartbeatState(response.data)
+        await this.waitForNextHeartbeat()
         return this.X()
       } else {
         this.logger.error(
           `BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) 失败`,
           response.message,
         )
+        this.logger.error(
+          `直播间 ${this.roomID} 的 E 心跳失败，无法继续执行观看直播任务，跳过该房间`,
+        )
       }
     } catch (error) {
       this.logger.error(`BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) 出错`, error)
+      this.logger.error(`直播间 ${this.roomID} 的 E 心跳失败，无法继续执行观看直播任务，跳过该房间`)
     }
   }
 
@@ -130,64 +162,72 @@ class RoomHeart {
    * X心跳，E心跳过后都是X心跳
    */
   private async X(): Promise<void> {
-    if (isNowAfter(23, 58) || isNowBefore(0, 5)) {
-      this.logger.log(`即将或刚刚发生跨天，停止直播间 ${this.roomID} 的X心跳`)
-      return
-    }
-
-    try {
-      const spyderData: SpyderData = {
-        id: JSON.stringify(this.id),
-        device: JSON.stringify(this.device),
-        ets: this.timestamp,
-        benchmark: this.secretKey,
-        time: this.heartBeatInterval,
-        ts: tsm(),
-        ua: this.ua,
+    while (true) {
+      if (isNowAfter(23, 58) || isNowBefore(0, 5)) {
+        this.logger.log(`即将或刚刚发生跨天，停止直播间 ${this.roomID} 的X心跳`)
+        return
       }
-      // 签名
-      const s = this.spyder(JSON.stringify(spyderData), this.secretRule)
 
-      const response = await BAPI.liveTrace.X(
-        s,
-        this.id,
-        this.device,
-        this.ruid,
-        this.timestamp,
-        this.secretKey,
-        this.heartBeatInterval,
-        spyderData.ts,
-      )
-      this.logger.log(
-        `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}, ${spyderData.ts}) response`,
-        response,
-      )
-      if (response.code === 0) {
-        this.seq += 1
-        this.updateProgress()
-        if (this.watchedSeconds >= this.targetSeconds) {
-          // 达到目标观看时间，结束
+      try {
+        const spyderData: SpyderData = {
+          id: JSON.stringify(this.id),
+          device: JSON.stringify(this.device),
+          ets: this.timestamp,
+          benchmark: this.secretKey,
+          time: this.heartBeatInterval,
+          ts: tsm(),
+          ua: this.ua,
+        }
+        // 签名
+        const s = this.spyder(JSON.stringify(spyderData), this.secretRule)
+
+        const response = await BAPI.liveTrace.X(
+          s,
+          this.id,
+          this.device,
+          this.ruid,
+          this.timestamp,
+          this.secretKey,
+          this.heartBeatInterval,
+          spyderData.ts,
+        )
+        this.logger.log(
+          `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}, ${spyderData.ts}) response`,
+          response,
+        )
+        if (response.code === 0) {
+          this.seq += 1
+          this.watchedSeconds += this.heartBeatInterval
+          this.logger.log(
+            `直播间 ${this.roomID} 的第 ${this.seq - 1} 次 X 心跳成功，已观看 ${this.watchedSeconds} 秒`,
+          )
+          if (this.watchedSeconds >= this.targetSeconds) {
+            // 达到目标观看时间，结束
+            return
+          }
+          this.setHeartbeatState(response.data)
+          await this.waitForNextHeartbeat()
+          // 继续下一轮 X 心跳
+        } else {
+          this.logger.error(
+            `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 失败`,
+            response.message,
+          )
+          this.logger.error(
+            `直播间 ${this.roomID} 的 X 心跳失败，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
+          )
           return
         }
-        ;({
-          heartbeat_interval: this.heartBeatInterval,
-          secret_key: this.secretKey,
-          secret_rule: this.secretRule,
-          timestamp: this.timestamp,
-        } = response.data)
-        await sleep(this.heartBeatInterval * 1000)
-        return this.X()
-      } else {
+      } catch (error) {
         this.logger.error(
-          `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 失败`,
-          response.message,
+          `BAPI.liveTrace.X(s, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 出错`,
+          error,
         )
+        this.logger.error(
+          `直播间 ${this.roomID} 的 X 心跳失败，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
+        )
+        return
       }
-    } catch (error) {
-      this.logger.error(
-        `BAPI.liveTrace.X(s, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 出错`,
-        error,
-      )
     }
   }
 
@@ -314,20 +354,13 @@ class WatchTask extends MedalModule {
     if (!isTimestampToday(this.config._lastCompleteTime)) {
       await this.waitForLightTask()
 
-      if (!(await this.waitForFansMedals())) {
+      if (!(await MedalModule.waitForFansMedals())) {
         this.logger.error('粉丝勋章数据不存在，不执行观看直播任务')
         this.status = 'error'
         return
       }
 
       this.status = 'running'
-
-      if (!isTimestampToday(this.config._lastWatchTime, 0, 0)) {
-        // 如果上次观看（不是完成任务）的时间戳不在今天，将今天已观看的秒数置为0
-        this.config._watchingProgress = {}
-      }
-
-      this.config._lastWatchTime = tsm()
       const fansMedals = this.getMedals()
 
       if (fansMedals.length > 0) {
@@ -386,10 +419,10 @@ class WatchTask extends MedalModule {
           const target = this.config.useTargetRounds
             ? Math.min(parsed.limit, this.config.targetRounds)
             : parsed.limit
-          // 目标秒数 = 目标轮次 × minutes × 60s
-          const targetSeconds = target * minutes * 60
+          // 剩余观看秒数 = (目标轮次 - 已完成轮次) × 分钟数 × 60s
+          const remainingSeconds = (target - parsed.current) * minutes * 60
 
-          if ((this.config._watchingProgress[roomid] ?? 0) >= targetSeconds) {
+          if (remainingSeconds <= 0) {
             // 今日观看时间已达到目标值，跳过
             continue
           }
@@ -399,7 +432,7 @@ class WatchTask extends MedalModule {
           if (area_id > 0 && parent_area_id > 0) {
             // area_id 和 parent_area_id 都大于 0，说明直播间设置了分区，心跳有效
             this.logger.log(
-              `粉丝勋章【${medal_name}】 开始直播间 ${roomid}（主播【${nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${targetSeconds / 60} 分钟）`,
+              `粉丝勋章【${medal_name}】 开始直播间 ${roomid}（主播【${nick_name}】，UID：${uid}）的观看直播任务，目标时长 ${remainingSeconds / 60} 分钟`,
             )
 
             const hasWatchingProgress = await new RoomHeart(
@@ -407,8 +440,7 @@ class WatchTask extends MedalModule {
               area_id,
               parent_area_id,
               uid,
-              this.config._watchingProgress[roomid] ?? 0,
-              targetSeconds,
+              remainingSeconds,
             ).start()
 
             if (hasWatchingProgress) {

@@ -3,7 +3,7 @@ import BAPI from '@/library/bili-api'
 import type { MainData } from '@/library/bili-api/data'
 import { delayToNextMoment, isTimestampToday } from '@/library/luxon'
 import BaseModule from '@/modules/BaseModule'
-import ModuleError from '@/library/error/ModuleError'
+import { ModuleError } from '@/library/error'
 
 class DynamicVideos extends BaseModule {
   /**

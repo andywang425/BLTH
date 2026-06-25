@@ -193,7 +193,7 @@ const BAPI: BapiMethods = {
           id: JSON.stringify(id),
           device: JSON.stringify(device),
           ruid, // 主播 uid
-          ets: ets,
+          ets,
           benchmark,
           time,
           ts,
