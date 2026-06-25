@@ -524,7 +524,7 @@ class MedalModule extends BaseModule {
   ): Promise<BatchExecutionResult> {
     const biliStore = useBiliStore()
 
-    this.logger.log(`开始等待轮询，待探测直播间数量：${roomids.length}`, { roomids })
+    this.logger.log(`开始探测等待中的直播间，待探测直播间数量：${roomids.length}`, { roomids })
 
     const medalMap = biliStore.filteredFansMedalsMap
     const requeueRoomids: number[] = []
@@ -532,7 +532,7 @@ class MedalModule extends BaseModule {
 
     for (let i = 0; i < roomids.length; i++) {
       if (MedalModule.shouldStopForCrossDay()) {
-        this.logger.log('即将或刚刚发生跨天，提早结束本轮等待轮询')
+        this.logger.log('即将或刚刚发生跨天，不再等待剩余直播间，提早结束本轮任务')
         return { stop: true }
       }
 

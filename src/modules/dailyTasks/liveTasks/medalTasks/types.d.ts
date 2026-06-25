@@ -41,11 +41,12 @@ type PreExecuteVerdict = 'pass' | 'fail' | 'error'
 /**
  * 直播间任务执行后操作
  *
- * - `stop`：终止后续任务
+ * - `stop`：终止后续直播间任务（也意味着当前任务未完成）
  * - `requeue`：把直播间放到等待队列
- * - `markUncompleted`：当前任务标记未完成
+ * - `markUncompleted`：把当前任务（点赞/发弹幕）标记为未完成
+ * - `skipSleep`：跳过执行下一个直播间任务之间的等待时间
  */
-type AfterExecutionAction = 'stop' | 'requeue' | 'markUncompleted' | null
+type AfterExecutionAction = 'stop' | 'requeue' | 'markUncompleted' | 'skipSleep' | null
 
 /** 直播间任务批量执行结果 */
 interface BatchExecutionResult {

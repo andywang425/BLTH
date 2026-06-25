@@ -82,14 +82,14 @@ class LikeTask extends MedalModule {
       this.logger.error(
         `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团升级任务信息，跳过点赞任务`,
       )
-      return null
+      return 'skipSleep'
     }
 
     if (medalData.reach_free_intimacy_limit) {
       this.logger.warn(
         `粉丝勋章【${medal_name}】（主播【${nick_name}】，UID：${target_id}，直播间：${room_id}）已达到储蓄亲密度上限（已储蓄 ${medalData.free_intimacy} 亲密度，投喂一个粉丝灯牌即可领取这些亲密度），无法通过点赞获取更多亲密度，跳过点赞任务`,
       )
-      return null
+      return 'skipSleep'
     }
 
     const item = MedalModule.findTaskInfo(medalData.task_info, 'like')
@@ -97,20 +97,20 @@ class LikeTask extends MedalModule {
       this.logger.error(
         `粉丝勋章【${medal_name}】 无法在主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团升级任务信息中找到点赞任务，跳过点赞任务`,
       )
-      return null
+      return 'skipSleep'
     }
 
-    if (item.is_done) return null
+    if (item.is_done) return 'skipSleep'
 
     const parsed = MedalModule.parseDailyLimit(item.sub_title)
     if (!parsed) {
       this.logger.error(
         `粉丝勋章【${medal_name}】 无法解析主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的点赞任务的每日上限信息，跳过点赞任务`,
       )
-      return null
+      return 'skipSleep'
     }
 
-    if (parsed.current >= parsed.limit) return null
+    if (parsed.current >= parsed.limit) return 'skipSleep'
 
     if (!skipPreVerify) {
       const verdict = await this.preExecuteVerify(room_id, (liveStatus) => liveStatus === 1)
@@ -121,12 +121,12 @@ class LikeTask extends MedalModule {
         )
         await sleep(300e3)
 
-        return this.config.waitUntilLiving ? 'requeue' : null
+        return this.config.waitUntilLiving ? 'requeue' : 'skipSleep'
       } else if (verdict === 'fail') {
         this.logger.log(
           `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前不在直播，${this.config.waitUntilLiving ? '回到等待队列' : '跳过点赞任务'}`,
         )
-        return this.config.waitUntilLiving ? 'requeue' : null
+        return this.config.waitUntilLiving ? 'requeue' : 'skipSleep'
       }
     }
 
@@ -187,7 +187,7 @@ class LikeTask extends MedalModule {
         markUncompleted = true
       }
 
-      if (i < medals.length - 1) {
+      if (action !== 'skipSleep' && i < medals.length - 1) {
         await sleep(MedalModule.LIKE_DYNAMIC_INTERVAL)
       }
     }

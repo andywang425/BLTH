@@ -90,14 +90,14 @@ class DanmuTask extends MedalModule {
       this.logger.error(
         `粉丝勋章【${medal_name}】 无法获取主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团升级任务信息，跳过发弹幕任务`,
       )
-      return null
+      return 'skipSleep'
     }
 
     if (medalData.reach_free_intimacy_limit) {
       this.logger.warn(
         `粉丝勋章【${medal_name}】（主播【${nick_name}】，UID：${target_id}，直播间：${room_id}）已达到储蓄亲密度上限（已储蓄 ${medalData.free_intimacy} 亲密度，投喂一个粉丝灯牌即可领取这些亲密度），无法通过发弹幕获取更多亲密度，跳过发弹幕任务`,
       )
-      return null
+      return 'skipSleep'
     }
 
     const item = MedalModule.findTaskInfo(medalData.task_info, 'sendDanmu')
@@ -105,20 +105,20 @@ class DanmuTask extends MedalModule {
       this.logger.error(
         `粉丝勋章【${medal_name}】 无法在主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的粉丝团升级任务信息中找到发弹幕任务，跳过发弹幕任务`,
       )
-      return null
+      return 'skipSleep'
     }
 
-    if (item.is_done) return null
+    if (item.is_done) return 'skipSleep'
 
     const parsed = MedalModule.parseDailyLimit(item.sub_title)
     if (!parsed) {
       this.logger.error(
         `粉丝勋章【${medal_name}】 无法解析主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）的发弹幕任务的每日上限信息，跳过发弹幕任务`,
       )
-      return null
+      return 'skipSleep'
     }
 
-    if (parsed.current >= parsed.limit) return null
+    if (parsed.current >= parsed.limit) return 'skipSleep'
 
     if (!skipPreVerify) {
       if (this.config.onlyWhenNotLiving) {
@@ -130,12 +130,12 @@ class DanmuTask extends MedalModule {
           )
           await sleep(300e3)
 
-          return this.config.waitUntilNotLiving ? 'requeue' : null
+          return this.config.waitUntilNotLiving ? 'requeue' : 'skipSleep'
         } else if (verdict === 'fail') {
           this.logger.log(
             `粉丝勋章【${medal_name}】 执行前校验：主播【${nick_name}】（UID：${target_id}，直播间：${room_id}）当前正在直播，${this.config.waitUntilNotLiving ? '回到等待队列' : '跳过发弹幕任务'}`,
           )
-          return this.config.waitUntilNotLiving ? 'requeue' : null
+          return this.config.waitUntilNotLiving ? 'requeue' : 'skipSleep'
         }
       }
     }
@@ -205,7 +205,7 @@ class DanmuTask extends MedalModule {
         markUncompleted = true
       }
 
-      if (i < medals.length - 1) {
+      if (action !== 'skipSleep' && i < medals.length - 1) {
         await sleep(MedalModule.SEND_DANMU_DYNAMIC_INTERVAL)
       }
     }
