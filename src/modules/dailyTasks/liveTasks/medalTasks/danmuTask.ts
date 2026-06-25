@@ -237,27 +237,25 @@ class DanmuTask extends MedalModule {
         readyMedals,
         danmuIndexRef,
       )
-      if (markUncompleted) {
+
+      if (stop) {
         allCompleted = false
-      }
-      if (requeueRoomids) {
-        pendingRoomids.push(...requeueRoomids)
-      }
+      } else {
+        if (markUncompleted) {
+          allCompleted = false
+        }
+        if (requeueRoomids) {
+          pendingRoomids.push(...requeueRoomids)
+        }
 
-      if (!stop) {
         while (pendingRoomids.length > 0) {
-          if (MedalModule.shouldStopForCrossDay()) {
-            this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
-            allCompleted = false
-            break
-          }
-
           const { stop, markUncompleted, requeueRoomids } = await this.runWaitingRound(
             pendingRoomids,
             (liveStatus) => liveStatus !== 1,
             (medal) => this.executeDanmuTask(medal, danmuIndexRef, true),
           )
           if (stop) {
+            allCompleted = false
             break
           }
           if (markUncompleted) {

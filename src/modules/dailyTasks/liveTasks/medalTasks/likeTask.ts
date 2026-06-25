@@ -215,26 +215,25 @@ class LikeTask extends MedalModule {
       let allCompleted = true
 
       const { stop, markUncompleted, requeueRoomids } = await this.executeLikeTasks(readyMedals)
-      if (markUncompleted) {
-        allCompleted = false
-      }
-      if (requeueRoomids) {
-        pendingRoomids.push(...requeueRoomids)
-      }
-      if (!stop) {
-        while (pendingRoomids.length > 0) {
-          if (MedalModule.shouldStopForCrossDay()) {
-            this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
-            allCompleted = false
-            break
-          }
 
+      if (stop) {
+        allCompleted = false
+      } else {
+        if (markUncompleted) {
+          allCompleted = false
+        }
+        if (requeueRoomids) {
+          pendingRoomids.push(...requeueRoomids)
+        }
+
+        while (pendingRoomids.length > 0) {
           const { stop, markUncompleted, requeueRoomids } = await this.runWaitingRound(
             pendingRoomids,
             (liveStatus) => liveStatus === 1,
             (medal) => this.executeLikeTask(medal, true),
           )
           if (stop) {
+            allCompleted = false
             break
           }
           if (markUncompleted) {
