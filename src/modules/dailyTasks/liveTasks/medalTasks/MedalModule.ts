@@ -572,8 +572,8 @@ class MedalModule extends BaseModule {
       )
       const action = await runOne(medal)
 
-      if (action === 'stop') {
-        return { stop: true }
+      if (action === 'stop' || action === 'stopAndMarkUncompleted') {
+        return { stop: true, markUncompleted: action === 'stopAndMarkUncompleted' }
       } else if (action === 'markUncompleted') {
         markUncompleted = true
       }

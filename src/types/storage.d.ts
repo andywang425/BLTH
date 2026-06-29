@@ -35,6 +35,8 @@ interface ModuleConfig {
           waitUntilLiving: boolean
           isWhiteList: boolean
           roomidList: number[]
+          _lastSuccessLikeTime: number
+          _todayLikeCount: number
           _lastCompleteTime: number
         }
         danmu: {

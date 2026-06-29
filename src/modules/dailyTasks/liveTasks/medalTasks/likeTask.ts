@@ -9,6 +9,13 @@ import type { AfterExecutionAction, BatchExecutionResult, GroupedMedals } from '
 class LikeTask extends MedalModule {
   config = this.medalTasksConfig.like
 
+  /**
+   * 每日点赞次数上限
+   *
+   * 每个账号一天最多进行 5000 次有效点赞（能完成任务的点赞）
+   */
+  private static readonly DAILY_LIKE_LIMIT = 5000
+
   set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.like = s
   }
@@ -69,7 +76,7 @@ class LikeTask extends MedalModule {
   ): Promise<AfterExecutionAction | Exclude<AfterExecutionAction, 'requeue'>> {
     if (MedalModule.shouldStopForCrossDay()) {
       this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
-      return 'stop'
+      return 'stopAndMarkUncompleted'
     }
 
     const room_id = medal.room_info.room_id
@@ -140,11 +147,13 @@ class LikeTask extends MedalModule {
     for (let j = 0; j < remaining; j++) {
       if (MedalModule.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，提早结束本轮点赞任务')
-        return 'stop'
+        return 'stopAndMarkUncompleted'
       }
 
       if (await this.like(medal, times)) {
         hasSuccessfulLike = true
+        this.config._todayLikeCount += times
+        this.config._lastSuccessLikeTime = tsm()
       }
 
       if (j < remaining - 1) {
@@ -153,13 +162,24 @@ class LikeTask extends MedalModule {
     }
 
     if (hasSuccessfulLike) {
-      return (await this.confirmTaskCompletedAfterUpdate(
-        medal,
-        'like',
-        this.config.useTargetRounds ? target : undefined,
-      ))
-        ? null
-        : 'markUncompleted'
+      if (
+        await this.confirmTaskCompletedAfterUpdate(
+          medal,
+          'like',
+          this.config.useTargetRounds ? target : undefined,
+        )
+      ) {
+        if (this.config._todayLikeCount >= LikeTask.DAILY_LIKE_LIMIT) {
+          this.logger.log(
+            `今日已点赞 ${this.config._todayLikeCount} 次，达到每日点赞次数上限（${LikeTask.DAILY_LIKE_LIMIT}），跳过剩余点赞任务`,
+          )
+          return 'stop'
+        } else {
+          return null
+        }
+      } else {
+        return 'markUncompleted'
+      }
     }
 
     // 所有点赞尝试均失败，估计是有什么异常状况，跳过
@@ -179,8 +199,8 @@ class LikeTask extends MedalModule {
 
     for (let i = 0; i < medals.length; i++) {
       const action = await this.executeLikeTask(medals[i])
-      if (action === 'stop') {
-        return { stop: true }
+      if (action === 'stop' || action === 'stopAndMarkUncompleted') {
+        return { stop: true, markUncompleted: action === 'stopAndMarkUncompleted' }
       } else if (action === 'requeue') {
         requeueRoomids.push(medals[i].room_info.room_id)
       } else if (action === 'markUncompleted') {
@@ -199,6 +219,10 @@ class LikeTask extends MedalModule {
     this.logger.log('点赞模块开始运行')
 
     if (!isTimestampToday(this.config._lastCompleteTime)) {
+      if (!isTimestampToday(this.config._lastSuccessLikeTime, 0, 0)) {
+        this.config._todayLikeCount = 0
+      }
+
       await this.waitForLightTask()
 
       if (!(await MedalModule.waitForFansMedals())) {
@@ -216,28 +240,24 @@ class LikeTask extends MedalModule {
 
       const { stop, markUncompleted, requeueRoomids } = await this.executeLikeTasks(readyMedals)
 
-      if (stop) {
+      if (markUncompleted) {
         allCompleted = false
-      } else {
-        if (markUncompleted) {
-          allCompleted = false
-        }
-        if (requeueRoomids) {
-          pendingRoomids.push(...requeueRoomids)
-        }
-
+      }
+      if (requeueRoomids) {
+        pendingRoomids.push(...requeueRoomids)
+      }
+      if (!stop) {
         while (pendingRoomids.length > 0) {
           const { stop, markUncompleted, requeueRoomids } = await this.runWaitingRound(
             pendingRoomids,
             (liveStatus) => liveStatus === 1,
             (medal) => this.executeLikeTask(medal, true),
           )
-          if (stop) {
-            allCompleted = false
-            break
-          }
           if (markUncompleted) {
             allCompleted = false
+          }
+          if (stop) {
+            break
           }
 
           pendingRoomids = requeueRoomids!

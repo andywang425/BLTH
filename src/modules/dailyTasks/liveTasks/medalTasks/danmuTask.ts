@@ -77,7 +77,7 @@ class DanmuTask extends MedalModule {
   ): Promise<AfterExecutionAction | Exclude<AfterExecutionAction, 'requeue'>> {
     if (MedalModule.shouldStopForCrossDay()) {
       this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
-      return 'stop'
+      return 'stopAndMarkUncompleted'
     }
 
     const room_id = medal.room_info.room_id
@@ -150,7 +150,7 @@ class DanmuTask extends MedalModule {
     for (let j = 0; j < remaining; j++) {
       if (MedalModule.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，提早结束本轮发弹幕任务')
-        return 'stop'
+        return 'stopAndMarkUncompleted'
       }
 
       const danmuText = this.config.danmuList[danmuIndexRef.value++ % this.config.danmuList.length]
@@ -197,8 +197,8 @@ class DanmuTask extends MedalModule {
 
     for (let i = 0; i < medals.length; i++) {
       const action = await this.executeDanmuTask(medals[i], danmuIndexRef)
-      if (action === 'stop') {
-        return { stop: true }
+      if (action === 'stop' || action === 'stopAndMarkUncompleted') {
+        return { stop: true, markUncompleted: action === 'stopAndMarkUncompleted' }
       } else if (action === 'requeue') {
         requeueRoomids.push(medals[i].room_info.room_id)
       } else if (action === 'markUncompleted') {
@@ -238,28 +238,24 @@ class DanmuTask extends MedalModule {
         danmuIndexRef,
       )
 
-      if (stop) {
+      if (markUncompleted) {
         allCompleted = false
-      } else {
-        if (markUncompleted) {
-          allCompleted = false
-        }
-        if (requeueRoomids) {
-          pendingRoomids.push(...requeueRoomids)
-        }
-
+      }
+      if (requeueRoomids) {
+        pendingRoomids.push(...requeueRoomids)
+      }
+      if (!stop) {
         while (pendingRoomids.length > 0) {
           const { stop, markUncompleted, requeueRoomids } = await this.runWaitingRound(
             pendingRoomids,
             (liveStatus) => liveStatus !== 1,
             (medal) => this.executeDanmuTask(medal, danmuIndexRef, true),
           )
-          if (stop) {
-            allCompleted = false
-            break
-          }
           if (markUncompleted) {
             allCompleted = false
+          }
+          if (stop) {
+            break
           }
 
           pendingRoomids = requeueRoomids!
