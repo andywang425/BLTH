@@ -533,7 +533,7 @@ class MedalModule extends BaseModule {
     for (let i = 0; i < roomids.length; i++) {
       if (MedalModule.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，不再等待剩余直播间，提早结束本轮任务')
-        return { stop: true }
+        return { stop: true, markUncompleted: true }
       }
 
       const roomid = roomids[i]
