@@ -170,13 +170,13 @@ class DanmuTask extends MedalModule {
     }
 
     if (hasSuccessfulDanmu) {
-      return (await this.confirmTaskCompletedAfterUpdate(
+      const taskCompleted = await this.confirmTaskCompletedAfterUpdate(
         medal,
         'sendDanmu',
         this.config.useTargetRounds ? target : undefined,
-      ))
-        ? null
-        : 'markUncompleted'
+      )
+
+      return taskCompleted ? null : 'markUncompleted'
     }
 
     // 所有发弹幕尝试均失败，估计是有什么异常状况，跳过

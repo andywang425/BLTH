@@ -162,24 +162,20 @@ class LikeTask extends MedalModule {
     }
 
     if (hasSuccessfulLike) {
-      if (
-        await this.confirmTaskCompletedAfterUpdate(
-          medal,
-          'like',
-          this.config.useTargetRounds ? target : undefined,
+      const taskCompleted = await this.confirmTaskCompletedAfterUpdate(
+        medal,
+        'like',
+        this.config.useTargetRounds ? target : undefined,
+      )
+
+      if (this.config._todayLikeCount >= LikeTask.DAILY_LIKE_LIMIT) {
+        this.logger.log(
+          `今日已点赞 ${this.config._todayLikeCount} 次，达到每日点赞次数上限（${LikeTask.DAILY_LIKE_LIMIT}），跳过剩余点赞任务`,
         )
-      ) {
-        if (this.config._todayLikeCount >= LikeTask.DAILY_LIKE_LIMIT) {
-          this.logger.log(
-            `今日已点赞 ${this.config._todayLikeCount} 次，达到每日点赞次数上限（${LikeTask.DAILY_LIKE_LIMIT}），跳过剩余点赞任务`,
-          )
-          return 'stop'
-        } else {
-          return null
-        }
-      } else {
-        return 'markUncompleted'
+        return 'stop'
       }
+
+      return taskCompleted ? null : 'markUncompleted'
     }
 
     // 所有点赞尝试均失败，估计是有什么异常状况，跳过
