@@ -4,7 +4,6 @@ import { Live, LiveTrace, Main } from './response'
 interface Requests {
   live: Request
   liveTrace: Request
-  passport: Request
   main: Request
   raw: Request
 }
