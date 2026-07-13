@@ -72,6 +72,8 @@ const defaultValues: DefaultValues = {
             waitUntilLiving: false,
             isWhiteList: false,
             roomidList: [],
+            _lastSuccessLikeTime: 0,
+            _todayLikeCount: 0,
             _lastCompleteTime: 0,
           },
           danmu: {

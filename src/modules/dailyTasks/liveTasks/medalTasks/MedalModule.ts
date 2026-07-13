@@ -533,7 +533,7 @@ class MedalModule extends BaseModule {
     for (let i = 0; i < roomids.length; i++) {
       if (MedalModule.shouldStopForCrossDay()) {
         this.logger.log('即将或刚刚发生跨天，不再等待剩余直播间，提早结束本轮任务')
-        return { stop: true }
+        return { stop: true, markUncompleted: true }
       }
 
       const roomid = roomids[i]
@@ -572,8 +572,8 @@ class MedalModule extends BaseModule {
       )
       const action = await runOne(medal)
 
-      if (action === 'stop') {
-        return { stop: true }
+      if (action === 'stop' || action === 'stopAndMarkUncompleted') {
+        return { stop: true, markUncompleted: action === 'stopAndMarkUncompleted' }
       } else if (action === 'markUncompleted') {
         markUncompleted = true
       }
