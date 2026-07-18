@@ -10,7 +10,7 @@ class RemoveGiftPopover extends BaseModule {
   public async run() {
     this.logger.log('移除礼物赠送提示弹窗模块开始运行')
 
-    GM_addStyle('.function-card { display: none !important }')
+    GM_addStyle('.function-card, #all-guide-cards-child { display: none !important }')
   }
 }
 
