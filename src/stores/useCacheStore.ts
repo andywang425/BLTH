@@ -25,9 +25,6 @@ export const useCacheStore = defineStore('cache', () => {
    */
   const currentScriptType = ref<ScriptType>('Main')
 
-  /** 当前 Main BLTH 的标识 */
-  let mainScriptId = ''
-
   /**
    * Main BLTH 存活心跳
    */
@@ -62,9 +59,8 @@ export const useCacheStore = defineStore('cache', () => {
       currentScriptType.value = unsafeWindow.top!.__BLTH_MAIN_FLAG__ ? 'SubMain' : 'Other'
     } else {
       // 不存在 Main BLTH，当前脚本成为 Main BLTH
-      mainScriptId = crypto.randomUUID()
       const rawCache = toRaw(cache.value)
-      rawCache.mainScriptId = mainScriptId
+      rawCache.mainScriptId = crypto.randomUUID()
       // 立刻写缓存（不依赖 watch 监听写入，延迟太大）
       Storage.setCache(rawCache)
 
