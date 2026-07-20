@@ -151,7 +151,7 @@ interface UiConfig {
 
 interface Cache {
   lastAliveHeartBeatTime: number
-  mainScriptLocation: string
+  mainScriptId: string
 }
 
 export { ModuleConfig, UiConfig, Cache, MenuIndex }

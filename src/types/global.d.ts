@@ -48,6 +48,8 @@ declare global {
       }
       switchQuality: (qn: string, hdrType?: number) => void
     }
+
+    __BLTH_MAIN_FLAG__?: string
   }
 }
 
