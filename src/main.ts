@@ -21,7 +21,7 @@ const pinia = createPinia()
 const cacheStore = useCacheStore(pinia)
 const moduleStore = useModuleStore(pinia)
 
-await cacheStore.checkCurrentScriptType()
+cacheStore.checkCurrentScriptType()
 logger.log('当前脚本的类型为', cacheStore.currentScriptType)
 
 if (cacheStore.currentScriptType === 'Main') {

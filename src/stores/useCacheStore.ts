@@ -1,10 +1,9 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { toRaw, ref, watch } from 'vue'
 import Storage from '@/library/storage'
 import type { Cache } from '@/types'
 import { unsafeWindow } from '$'
 import { tsm } from '@/library/luxon'
-import { sleep } from '@/library/utils'
 
 type ScriptType = 'Main' | 'SubMain' | 'Other'
 
@@ -28,25 +27,6 @@ export const useCacheStore = defineStore('cache', () => {
 
   /** 当前 Main BLTH 的标识 */
   let mainScriptId = ''
-  let heartBeatTimer: number | undefined
-
-  /**
-   * 判断 Main BLTH 的心跳是否新鲜
-   */
-  function _isHeartBeatFresh(): boolean {
-    return (
-      cache.value.lastAliveHeartBeatTime !== 0 && tsm() - cache.value.lastAliveHeartBeatTime < 8000 // 容许 3 秒的误差
-    )
-  }
-
-  /**
-   * 解析非 Main 类型的脚本类型
-   *
-   * 如果当前标签页已存在 Main BLTH，则为 SubMain，否则为 Other
-   */
-  function _resolveNonMainType(): ScriptType {
-    return unsafeWindow.top!.__BLTH_MAIN_FLAG__ ? 'SubMain' : 'Other'
-  }
 
   /**
    * Main BLTH 存活心跳
@@ -54,13 +34,7 @@ export const useCacheStore = defineStore('cache', () => {
   function startMainBLTHAliveHeartBeat(): void {
     cache.value.lastAliveHeartBeatTime = tsm()
 
-    heartBeatTimer = setInterval(() => {
-      if (cache.value.mainScriptId !== mainScriptId && _isHeartBeatFresh()) {
-        // 有其它 Main BLTH 正在运行，自己失去 Main 资格
-        clearInterval(heartBeatTimer)
-        currentScriptType.value = _resolveNonMainType()
-        return
-      }
+    const heartBeatTimer = setInterval(() => {
       // 每隔 5 秒写一次时间戳，表示有一个 Main BLTH 正在运行
       cache.value.lastAliveHeartBeatTime = tsm()
     }, 5000)
@@ -68,41 +42,35 @@ export const useCacheStore = defineStore('cache', () => {
     window.addEventListener('unload', () => {
       clearInterval(heartBeatTimer)
 
-      if (cache.value.mainScriptId === mainScriptId) {
-        // 如果自己是 Main BLTH，卸载时清除 Main BLTH 的标记
-        cache.value.mainScriptId = ''
-        cache.value.lastAliveHeartBeatTime = 0
-      }
+      const rawCache = toRaw(cache.value)
+      rawCache.mainScriptId = ''
+      rawCache.lastAliveHeartBeatTime = 0
+      // 手动写缓存，防止 watch 监听写入延迟过大无法在页面关闭前写入缓存
+      Storage.setCache(rawCache)
     })
   }
 
   /**
    * 检查当前脚本的类型
    */
-  async function checkCurrentScriptType(): Promise<void> {
-    if (_isHeartBeatFresh()) {
+  function checkCurrentScriptType(): void {
+    if (
+      cache.value.lastAliveHeartBeatTime !== 0 &&
+      tsm() - cache.value.lastAliveHeartBeatTime < 8000 // 容许 3 秒的误差
+    ) {
       // 已存在 Main BLTH
-      currentScriptType.value = _resolveNonMainType()
-      return
-    }
+      currentScriptType.value = unsafeWindow.top!.__BLTH_MAIN_FLAG__ ? 'SubMain' : 'Other'
+    } else {
+      // 不存在 Main BLTH，当前脚本成为 Main BLTH
+      mainScriptId = crypto.randomUUID()
+      const rawCache = toRaw(cache.value)
+      rawCache.mainScriptId = mainScriptId
+      // 立刻写缓存（不依赖 watch 监听写入，延迟太大）
+      Storage.setCache(rawCache)
 
-    // 不存在 Main BLTH，尝试成为 Main BLTH
-    mainScriptId = crypto.randomUUID()
-    cache.value.mainScriptId = mainScriptId
-    // 立刻写缓存（watch 写入有延迟）
-    Storage.setCache(cache.value)
-    // 等待一个微小间隔后再读取缓存
-    await sleep(100)
-
-    if (Storage.getCache().mainScriptId === mainScriptId) {
-      // 如果在此期间其它标签页上没有 BLTH 尝试成为 Main BLTH，自己成为 Main BLTH
-      currentScriptType.value = 'Main'
       unsafeWindow.top!.__BLTH_MAIN_FLAG__ = '🚩'
-      return
+      currentScriptType.value = 'Main'
     }
-
-    // 否则让其它页面上的 BLTH 成为 Main，自己当 SubMain 或 Other
-    currentScriptType.value = _resolveNonMainType()
   }
 
   // 监听缓存信息的变化，写缓存
