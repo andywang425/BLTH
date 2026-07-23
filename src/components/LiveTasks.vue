@@ -50,13 +50,13 @@ const handleOpenDanmuPanel = (key: DanmuTaskKey) => {
   medalDanmuPanelVisible.value = true
 }
 
-const handleEditDanmu = (index: number, row: { content: string }) => {
+const handleEditDanmu = (index: number, content: string) => {
   ElMessageBox.prompt('请输入弹幕内容', '修改弹幕', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     inputPattern: /^.{1,30}$/,
     inputErrorMessage: '弹幕内容不得为空且长度不能超过30',
-    inputValue: row.content,
+    inputValue: content,
     lockScroll: false,
   })
     .then(({ value }) => {
@@ -192,7 +192,8 @@ function handleRowClick(row: MedalInfoRow) {
   if (currentTaskIsSortMode.value) return
 
   medalInfoTableRef.value?.toggleRowSelection(row)
-  const selection: MedalInfoRow[] = medalInfoTableRef.value?.getSelectionRows() ?? []
+  // TODO: TableInstance 未携带行类型泛型，getSelectionRows 返回 DefaultRow[]，等 element-plus 更新
+  const selection = (medalInfoTableRef.value?.getSelectionRows() ?? []) as MedalInfoRow[]
   currentTaskConfig.value.roomidList = selection.map((row) => row.roomid)
 }
 </script>
@@ -424,7 +425,7 @@ function handleRowClick(row: MedalInfoRow) {
         <el-table-column prop="content" label="弹幕内容" />
         <el-table-column label="操作" width="220" align="center">
           <template #default="scope">
-            <el-button text :icon="Edit" @click="handleEditDanmu(scope.$index, scope.row)">
+            <el-button text :icon="Edit" @click="handleEditDanmu(scope.$index, scope.row.content)">
               修改
             </el-button>
             <el-button text :icon="Delete" type="danger" @click="handleDeleteDanmu(scope.$index)">

@@ -38,11 +38,7 @@ type ModuleStatus = ModulesNeedStatus<ModuleStatusTypes>
 type ModuleReset = ModulesNeedStatus<() => void>
 
 type RunAtMoment =
-  | 'document-start'
-  | 'document-head'
-  | 'document-body'
-  | 'document-end'
-  | 'window-load'
+  'document-start' | 'document-head' | 'document-body' | 'document-end' | 'window-load'
 
 type OnFrameTypes = 'all' | 'target' | 'top'
 
