@@ -182,7 +182,6 @@ const defaultValues: DefaultValues = {
   },
   cache: {
     lastAliveHeartBeatTime: 0,
-    mainScriptId: '',
   },
 }
 
