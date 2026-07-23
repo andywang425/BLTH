@@ -29,8 +29,6 @@ export const useCacheStore = defineStore('cache', () => {
    * Main BLTH 存活心跳
    */
   function startMainBLTHAliveHeartBeat(): void {
-    cache.value.lastAliveHeartBeatTime = tsm()
-
     const heartBeatTimer = setInterval(() => {
       // 每隔 5 秒写一次时间戳，表示有一个 Main BLTH 正在运行
       cache.value.lastAliveHeartBeatTime = tsm()
@@ -40,7 +38,6 @@ export const useCacheStore = defineStore('cache', () => {
       clearInterval(heartBeatTimer)
 
       const rawCache = toRaw(cache.value)
-      rawCache.mainScriptId = ''
       rawCache.lastAliveHeartBeatTime = 0
       // 手动写缓存，防止 watch 监听写入延迟过大无法在页面关闭前写入缓存
       Storage.setCache(rawCache)
@@ -60,8 +57,9 @@ export const useCacheStore = defineStore('cache', () => {
     } else {
       // 不存在 Main BLTH，当前脚本成为 Main BLTH
       const rawCache = toRaw(cache.value)
-      rawCache.mainScriptId = crypto.randomUUID()
-      // 立刻写缓存（不依赖 watch 监听写入，延迟太大）
+      // 开始心跳
+      rawCache.lastAliveHeartBeatTime = tsm()
+      // 立刻写缓存
       Storage.setCache(rawCache)
 
       unsafeWindow.top!.__BLTH_MAIN_FLAG__ = '🚩'
