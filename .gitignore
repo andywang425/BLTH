@@ -10,6 +10,9 @@ node_modules
 .idea
 .trae
 .claude
+.agents
+.qoder
+opencode.json
 
 # Notes
 notes
