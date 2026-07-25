@@ -4,10 +4,7 @@ import type { ModuleConfig } from '@/types'
 type _MedalTasks = ModuleConfig['DailyTasks']['LiveTasks']['medalTasks']
 
 type MedalTaskSharedConfig =
-  | _MedalTasks['light']
-  | _MedalTasks['like']
-  | _MedalTasks['danmu']
-  | _MedalTasks['watch']
+  _MedalTasks['light'] | _MedalTasks['like'] | _MedalTasks['danmu'] | _MedalTasks['watch']
 
 interface SharedMedalFilters {
   meetWhiteOrBlackList: (medal: LiveData.FansMedalPanel.List) => boolean
@@ -49,12 +46,7 @@ type PreExecuteVerdict = 'pass' | 'fail' | 'error'
  * - `null`：无操作
  */
 type AfterExecutionAction =
-  | 'stop'
-  | 'markUncompleted'
-  | 'stopAndMarkUncompleted'
-  | 'requeue'
-  | 'skipSleep'
-  | null
+  'stop' | 'markUncompleted' | 'stopAndMarkUncompleted' | 'requeue' | 'skipSleep' | null
 
 /** 直播间任务批量执行结果 */
 interface BatchExecutionResult {

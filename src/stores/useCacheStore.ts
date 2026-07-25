@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { toRaw, ref, watch } from 'vue'
 import Storage from '@/library/storage'
 import type { Cache } from '@/types'
 import { unsafeWindow } from '$'
@@ -12,15 +12,15 @@ export const useCacheStore = defineStore('cache', () => {
   const cache = ref<Cache>(Storage.getCache())
 
   /**
-   * 表示当前BLTH的类型
+   * 表示当前 BLTH 的类型
    * - `Main`: 运行`runOnMultiplePages`为`false`的模块，有存活心跳
    * - `SubMain`: 运行`runOnMultiplePages`为`false`的模块，无存活心跳
    * - `Other`: 运行`runOnMultiplePages`为`true`的模块，无存活心跳
    *
-   * 用户在打开第一个直播间页面时运行的第一个BLTH一定是Main BLTH，
-   * 假如是特殊直播间，在第二个frame上还会有个SubMain BLTH。
-   * 之后打开的直播间页面上运行的则是Other BLTH。
-   * 如果关掉 Main BLTH 所在的页面，那么下一个打开的页面上所运行的 BLTH 则为 Main BLTH（也可能会有SubMain BLTH）。
+   * 用户在打开第一个直播间页面时运行的第一个 BLTH 一定是 Main BLTH，
+   * 假如是特殊直播间，在第二个 frame 上还会有个 SubMain BLTH。在这种情况下，SubMain 能通过 `isTargetFrame()` 判定而 Main 不行。
+   * 之后打开的直播间页面上运行的则是 Other BLTH。
+   * 如果关掉 Main BLTH 所在的页面，那么下一个打开的页面上所运行的 BLTH 则为 Main BLTH（也可能会有 SubMain BLTH）。
    * 增加这一概念主要时为了确保任务类模块不会重复运行（比如完成各种每日任务的模块）。
    */
   const currentScriptType = ref<ScriptType>('Main')
@@ -29,16 +29,18 @@ export const useCacheStore = defineStore('cache', () => {
    * Main BLTH 存活心跳
    */
   function startMainBLTHAliveHeartBeat(): void {
-    cache.value.lastAliveHeartBeatTime = tsm()
-    // 每隔5秒写一次时间戳，表示有一个Main BLTH正在运行
-    // 之所以写时间戳而不是布尔值，是因为出现类似于浏览器崩溃的情况时 window.onunload 不会触发
-    // 那样就会留下一个永久的有脚本在运行的标记
-    const timer = setInterval(() => (cache.value.lastAliveHeartBeatTime = tsm()), 5000)
+    const heartBeatTimer = setInterval(() => {
+      // 每隔 5 秒写一次时间戳，表示有一个 Main BLTH 正在运行
+      cache.value.lastAliveHeartBeatTime = tsm()
+    }, 5000)
 
     window.addEventListener('unload', () => {
-      clearInterval(timer)
-      cache.value.lastAliveHeartBeatTime = 0
-      cache.value.mainScriptLocation = ''
+      clearInterval(heartBeatTimer)
+
+      const rawCache = toRaw(cache.value)
+      rawCache.lastAliveHeartBeatTime = 0
+      // 手动写缓存，防止 watch 监听写入延迟过大无法在页面关闭前写入缓存
+      Storage.setCache(rawCache)
     })
   }
 
@@ -48,20 +50,20 @@ export const useCacheStore = defineStore('cache', () => {
   function checkCurrentScriptType(): void {
     if (
       cache.value.lastAliveHeartBeatTime !== 0 &&
-      tsm() - cache.value.lastAliveHeartBeatTime < 8000 // 允许最多3秒的误差
+      tsm() - cache.value.lastAliveHeartBeatTime < 8000 // 容许 3 秒的误差
     ) {
-      // 存在 Main BLTH
-      if (cache.value.mainScriptLocation === unsafeWindow.top!.location.pathname) {
-        // Main BLTH 位于当前页面
-        currentScriptType.value = 'SubMain'
-      } else {
-        // Main BLTH 在其它页面上
-        currentScriptType.value = 'Other'
-      }
+      // 已存在 Main BLTH
+      currentScriptType.value = unsafeWindow.top!.__BLTH_MAIN_FLAG__ ? 'SubMain' : 'Other'
     } else {
-      // 不存在 Main BLTH，则当前脚本成为 Main BLTH 并记录 mainScriptLocation
+      // 不存在 Main BLTH，当前脚本成为 Main BLTH
+      const rawCache = toRaw(cache.value)
+      // 开始心跳
+      rawCache.lastAliveHeartBeatTime = tsm()
+      // 立刻写缓存
+      Storage.setCache(rawCache)
+
+      unsafeWindow.top!.__BLTH_MAIN_FLAG__ = '🚩'
       currentScriptType.value = 'Main'
-      cache.value.mainScriptLocation = unsafeWindow.top!.location.pathname
     }
   }
 

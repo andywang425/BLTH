@@ -339,7 +339,8 @@ const helpInfo: HelpInfo = {
     },
     removeGiftPopover: {
       title: '移除礼物赠送提示弹窗',
-      message: '移除直播间右下角的礼物赠送提示弹窗（赠送一个牛蛙牛蛙支持主播）。',
+      message:
+        '移除直播间右下角的礼物赠送提示弹窗（赠送一个牛蛙牛蛙支持主播）和粉丝勋章过期后随机出现在聊天框上的送礼点亮勋章提醒（你和xxx的灯牌已熄灭，一键点亮（1电池））。',
     },
     removeMicPopover: {
       title: '移除连麦状态提示',
