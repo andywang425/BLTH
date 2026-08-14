@@ -13,6 +13,7 @@ node_modules
 .agents
 .qoder
 opencode.json
+artifacts
 
 # Notes
 notes
