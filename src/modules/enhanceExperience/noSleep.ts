@@ -4,7 +4,7 @@ import { useModuleStore } from '@/stores'
 
 class NoSleep extends BaseModule {
   static runOnMultiplePages: boolean = true
-  static runAt: RunAtMoment = 'window-load'
+  static runAt: RunAtMoment = 'document-start'
   static onFrame: OnFrameTypes = 'top'
   static runAfterDefault: boolean = false
 
@@ -17,14 +17,15 @@ class NoSleep extends BaseModule {
       document.dispatchEvent(new MouseEvent('mousemove'))
     }, 60e3)
 
-    // 修改页面可见性相关属性
+    // 修改页面可见性和焦点状态相关属性
     try {
       Object.defineProperties(document, {
         visibilityState: { value: 'visible' },
         hidden: { value: false },
+        hasFocus: { value: () => true },
       })
     } catch (e) {
-      this.logger.warn('修改页面可见性相关属性失败，可能已被其它脚本锁定', e)
+      this.logger.warn('修改页面可见性和焦点状态相关属性失败，可能已被其它脚本锁定', e)
     }
   }
 }
