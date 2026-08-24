@@ -86,7 +86,7 @@ class Request {
     } else if (typeof data === 'string') {
       // data 类型为 string，不做处理
     } else {
-      // data 类型为 Record，转换为 string
+      // data 类型为 Record，转换为 string（URL 编码的表单数据）
       data = new URLSearchParams(data).toString()
     }
 

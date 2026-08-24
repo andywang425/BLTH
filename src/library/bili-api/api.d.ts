@@ -57,6 +57,29 @@ interface BapiMethods {
       supported_drms?: string,
       web_location?: string,
     ) => Promise<Live.GetRoomPlayInfo>
+    Q3FansS1MiaoZaiHome: (
+      room_id: number,
+      ruid: number,
+      target_uid?: number | string,
+      act_id?: number,
+      web_location?: string,
+    ) => Promise<Live.Q3FansS1MiaoZaiHome>
+    Q3FansS1MiaoZaiSelectCat: (
+      ruid: number,
+      cat_type?: number,
+      act_id?: number,
+    ) => Promise<Live.Q3FansS1MiaoZaiSelectCat>
+    Q3FansS1MiaoZaiSignIn: (ruid: number, act_id?: number) => Promise<Live.Q3FansS1MiaoZaiSignIn>
+    Q3FansS1MiaoZaiPetCat: (
+      ruid: number,
+      target_uid?: number,
+      act_id?: number,
+    ) => Promise<Live.Q3FansS1MiaoZaiPetCat>
+    Q3FansS1MiaoZaiFeedCat: (
+      ruid: number,
+      target_uid?: number,
+      act_id?: number,
+    ) => Promise<Live.Q3FansS1MiaoZaiFeedCat>
   }
   liveTrace: {
     E: (
