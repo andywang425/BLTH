@@ -315,6 +315,12 @@ class MiaoZaiTask extends MedalModule {
       return 'activityInvalid'
     }
 
+    if (!home.can_intimacy_journey) {
+      this.logger.warn(`${logMessage} 不支持亲密喂养活动，跳过该直播间`)
+      // 不支持养猫活动，视为完成
+      return 'completed'
+    }
+
     // 还没选猫，先选一只
     if (!home.cat_selected) {
       this.logger.log(`${logMessage} 还没有选择喵崽，先选择一只`)
