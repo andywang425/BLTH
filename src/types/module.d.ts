@@ -23,6 +23,7 @@ interface ModulesNeedStatus<T> {
         like: T
         danmu: T
         watch: T
+        miaoZai: T
       }
     }
     OtherTasks: {

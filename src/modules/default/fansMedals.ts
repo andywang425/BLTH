@@ -61,7 +61,13 @@ class FansMedals extends BaseModule {
       const biliStore = useBiliStore()
 
       const medalTasks = useModuleStore().moduleConfig.DailyTasks.LiveTasks.medalTasks
-      const taskValues = [medalTasks.light, medalTasks.like, medalTasks.danmu, medalTasks.watch]
+      const taskValues = [
+        medalTasks.light,
+        medalTasks.like,
+        medalTasks.danmu,
+        medalTasks.watch,
+        medalTasks.miaoZai,
+      ]
 
       if (
         force ||

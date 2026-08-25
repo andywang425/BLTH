@@ -611,13 +611,13 @@ class MedalModule extends BaseModule {
   /**
    * 记录储蓄亲密度信息日志
    */
-  private logFreeIntimacyFromData(
+  protected logFreeIntimacyFromData(
     medal: LiveData.FansMedalPanel.List,
     data: LiveData.GetActivatedMedalInfo.Data,
   ): void {
     if (data.free_intimacy > 0) {
       const reachLimitText = data.reach_free_intimacy_limit ? '（已达到储蓄亲密度上限）' : ''
-      this.logger.log(
+      this.logger.warn(
         `粉丝勋章【${medal.medal.medal_name}】储蓄了 ${data.free_intimacy} 亲密度${reachLimitText}，投喂一个粉丝灯牌即可领取这些亲密度`,
       )
     }

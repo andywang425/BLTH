@@ -58,6 +58,12 @@ interface ModuleConfig {
           roomidList: number[]
           _lastCompleteTime: number
         }
+        miaoZai: {
+          enabled: boolean
+          isWhiteList: boolean
+          roomidList: number[]
+          _lastCompleteTime: number
+        }
       }
     }
     OtherTasks: {
@@ -146,6 +152,7 @@ interface UiConfig {
     like: boolean
     danmu: boolean
     watch: boolean
+    miaoZai: boolean
   }
 }
 

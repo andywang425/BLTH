@@ -28,6 +28,7 @@ const defaultModuleStatus: ModuleStatus = {
         like: '',
         danmu: '',
         watch: '',
+        miaoZai: '',
       },
     },
     OtherTasks: {
@@ -128,6 +129,13 @@ export const useModuleStore = defineStore('module', () => {
 
             rerunModule('Default_FansMedals', true)
             rerunModule('DailyTask_LiveTask_WatchTask')
+          },
+          miaoZai: () => {
+            moduleStatus.value.DailyTasks.LiveTasks.medalTasks.miaoZai = ''
+            moduleConfig.value.DailyTasks.LiveTasks.medalTasks.miaoZai._lastCompleteTime = 0
+
+            rerunModule('Default_FansMedals', true)
+            rerunModule('DailyTask_LiveTask_MiaoZaiTask')
           },
         },
       },
