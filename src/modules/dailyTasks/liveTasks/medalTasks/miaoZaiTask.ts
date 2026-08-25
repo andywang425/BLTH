@@ -27,7 +27,7 @@ class MiaoZaiTask extends MedalModule {
   /** 任务已完成的 task_status */
   private static readonly TASK_STATUS_DONE = 1
   /** 连续多少次撸猫没有获得成长值就视为今日撸猫任务已完成 */
-  private static readonly PET_CAT_ZERO_GROWTH_LIMIT = 5
+  private static readonly PET_CAT_ZERO_GROWTH_LIMIT = 6
   /** 单个直播间最多喂猫次数（兜底，避免猫粮数量异常时无限循环） */
   private static readonly FEED_CAT_MAX_TIMES = 40
   /** 单个直播间最多撸猫次数（兜底，避免 growth_delta 一直大于 0 时无限循环） */
