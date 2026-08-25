@@ -26,6 +26,10 @@ npm run preview      # 打开提供编译产物安装链接的本地预览网页
 - **默认模块**（`src/modules/default/`）：做准备工作，如基础数据获取，先于大多数功能模块加载
 - **功能模块**：实现具体业务逻辑，如完成每日任务
 
+## 内部库
+
+位于 `src/library/`，每个子目录对应一个库，均通过 `index.ts` 默认导出。
+
 ## 配置持久化
 
 `src/library/storage/` 通过 `GM_setValue`/`GM_getValue` 存取配置。

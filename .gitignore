@@ -4,7 +4,7 @@ node_modules
 # MacOS
 .DS_Store
 
-# Editor directories and files
+# Editor/Agent directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -13,6 +13,8 @@ node_modules
 .agents
 .qoder
 opencode.json
+artifacts
+.dsh
 
 # Notes
 notes

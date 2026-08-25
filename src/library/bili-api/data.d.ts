@@ -123,6 +123,27 @@ declare namespace LiveData {
       light_source: number
       free_intimacy: number
       reach_free_intimacy_limit: boolean
+      intimacy_journey_info: IntimacyJourneyInfo
+    }
+
+    interface IntimacyJourneyInfo {
+      enable: boolean
+      title_icon: string
+      completed_icon: string
+      incomplete_icon: string
+      gift_icon: string
+      badge_icon_intimacy: string
+      badge_icon_day: string
+      badge_icon_hour: string
+      total_days: number
+      completed_days: number
+      has_task_intimacy_journey_gift: boolean
+      task_intimacy_journey_gift_expire_ts: number
+      gift_intimacy: number
+      gift_id: number
+      background_color: string
+      font_color: string
+      gift_multiplier: string
     }
 
     interface TaskInfo {
@@ -1337,6 +1358,111 @@ declare namespace LiveData {
       status: number
       subtitle_buffer: number
       skip_frame_threshold: number
+    }
+  }
+
+  namespace Q3FansS1MiaoZai {
+    interface HomeData {
+      current_time: number
+      start_time: number
+      end_time: number
+      activity_status: number
+      /** 猫主人的 uid */
+      target_uid: number
+      fan_relation_status: number
+      cat_selected: boolean
+      cat_info: CatInfo | null
+      food_info: FoodInfo | null
+      cat_home_level: number
+      daily_tasks: DailyTask[] | null
+      level_configs: LevelConfig[] | null
+      food_level_configs: FoodLevelConfig[] | null
+      gift_open_time: number
+      gift_claim_status: number
+      gift_by_cat_level: GiftByCatLevel[] | null
+      medal_name: string
+      gift_intimacy: number
+      room_type: number
+      can_intimacy_journey: boolean
+    }
+
+    interface ActionData {
+      /** code: 0 表示成功 */
+      code: number
+      msg: string
+      cat_level: number
+      growth: number
+      food_balance: number
+      level_up_list: LevelUpInfo[] | null
+      growth_delta: number
+      cat_type: number
+    }
+
+    interface CatInfo {
+      cat_type: number
+      cat_name: string
+      growth: number
+      level: number
+      level_name: string
+      level_start_growth: number
+      next_level_growth: number
+    }
+
+    interface FoodInfo {
+      level: number
+      balance: number
+      growth_per_food: number
+    }
+
+    interface DailyTask {
+      task_key: string
+      progress: number
+      level_list: TaskLevel[]
+    }
+
+    interface TaskLevel {
+      level: number
+      target: number
+      reward_food: number
+      task_status: number
+    }
+
+    interface LevelConfig {
+      level: number
+      level_name: string
+      growth_threshold: number
+      rewards: Reward[] | null
+    }
+
+    interface FoodLevelConfig {
+      level: number
+      name: string
+      growth_per_food: number
+      price: number
+      can_upgrade: boolean
+      growth_boost_text: string
+    }
+
+    interface GiftByCatLevel {
+      level: number
+      name: string
+      desc: string
+      low: number
+      high: number
+    }
+
+    interface LevelUpInfo {
+      level: number
+      level_name: string
+      title: string
+      rewards: Reward[] | null
+    }
+
+    interface Reward {
+      reward_type: string
+      name: string
+      desc: string
+      image: string
     }
   }
 }

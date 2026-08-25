@@ -15,7 +15,7 @@ interface MedalInfoRow {
   roomid: number
 }
 
-type MedalTaskKey = 'light' | 'like' | 'danmu' | 'watch'
+type MedalTaskKey = 'light' | 'like' | 'danmu' | 'watch' | 'miaoZai'
 type DanmuTaskKey = 'light' | 'danmu'
 
 const TASK_LABELS: Record<MedalTaskKey, string> = {
@@ -23,6 +23,7 @@ const TASK_LABELS: Record<MedalTaskKey, string> = {
   like: '点赞',
   danmu: '发弹幕',
   watch: '观看直播',
+  miaoZai: '亲密喂养',
 }
 
 const moduleStore = useModuleStore()
@@ -391,6 +392,31 @@ function handleRowClick(row: MedalInfoRow) {
           @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelIsSortMode.watch = false)"
         />
         <el-button type="primary" size="small" :icon="Edit" @click="handleEditList('watch')"
+          >编辑名单
+        </el-button>
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.list" />
+      </el-space>
+    </el-row>
+
+    <el-divider />
+
+    <!-- 亲密喂养（养猫活动） -->
+    <el-row>
+      <el-space wrap :size="[8, 0]">
+        <el-switch v-model="config.medalTasks.miaoZai.enabled" active-text="亲密喂养" />
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.miaoZai" />
+        <TaskStatus :status="status.medalTasks.miaoZai" @click="reset.medalTasks.miaoZai" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap :size="[8, 0]">
+        <el-switch
+          v-model="config.medalTasks.miaoZai.isWhiteList"
+          active-text="白名单"
+          inactive-text="黑名单"
+          @change="(val) => !val && (uiStore.uiConfig.medalInfoPanelIsSortMode.miaoZai = false)"
+        />
+        <el-button type="primary" size="small" :icon="Edit" @click="handleEditList('miaoZai')"
           >编辑名单
         </el-button>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.list" />

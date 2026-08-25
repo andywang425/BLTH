@@ -23,6 +23,7 @@ interface HelpInfo {
         danmu: HelpInfoItem
         danmuWaitUntilNotLiving: HelpInfoItem
         watch: HelpInfoItem
+        miaoZai: HelpInfoItem
       }
     }
     OtherTasks: {

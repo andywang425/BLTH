@@ -17,6 +17,7 @@ const defaultValues: DefaultValues = {
       like: false,
       danmu: false,
       watch: false,
+      miaoZai: false,
     },
   },
   modules: {
@@ -107,6 +108,12 @@ const defaultValues: DefaultValues = {
             enabled: false,
             useTargetRounds: false,
             targetRounds: 1,
+            isWhiteList: false,
+            roomidList: [],
+            _lastCompleteTime: 0,
+          },
+          miaoZai: {
+            enabled: false,
             isWhiteList: false,
             roomidList: [],
             _lastCompleteTime: 0,

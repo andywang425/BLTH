@@ -155,6 +155,104 @@ const BAPI: BapiMethods = {
         }),
       )
     },
+    /**
+     * 获取超能粉丝节——粉丝福利——亲密喂养（养猫活动）主页数据
+     */
+    Q3FansS1MiaoZaiHome: (
+      room_id,
+      ruid,
+      target_uid = '',
+      act_id = 110505,
+      web_location = '445.25',
+    ) => {
+      const bili_jct = useBiliStore().cookies!.bili_jct
+      return request.live.get(
+        '/xlive/custom-activity-interface/activities2026/Q3FansS1MiaoZaiHome',
+        {
+          act_id,
+          csrf: bili_jct,
+          room_id,
+          ruid, // 主播 uid
+          target_uid, // 如果为空字符串，默认为当前用户的 uid
+          web_location,
+        },
+      )
+    },
+    /**
+     * 亲密喂养：选择一只要养的猫
+     */
+    Q3FansS1MiaoZaiSelectCat: (ruid, cat_type = 2, act_id = 110505) => {
+      const bili_jct = useBiliStore().cookies!.bili_jct
+      return request.live.post(
+        '/xlive/custom-activity-interface/activities2026/Q3FansS1MiaoZaiSelectCat',
+        JSON.stringify({
+          act_id,
+          ruid: String(ruid), // 主播 uid
+          cat_type,
+        }),
+        {
+          params: { csrf: bili_jct },
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    },
+    /**
+     * 亲密喂养：每日签到，获得猫粮
+     */
+    Q3FansS1MiaoZaiSignIn: (ruid, act_id = 110505) => {
+      const bili_jct = useBiliStore().cookies!.bili_jct
+      return request.live.post(
+        '/xlive/custom-activity-interface/activities2026/Q3FansS1MiaoZaiSignIn',
+        JSON.stringify({
+          act_id,
+          ruid: String(ruid), // 主播 uid
+        }),
+        {
+          params: { csrf: bili_jct },
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    },
+    /**
+     * 亲密喂养：撸猫（摸猫），有概率获得成长值
+     */
+    Q3FansS1MiaoZaiPetCat: (ruid, target_uid, act_id = 110505) => {
+      const biliStore = useBiliStore()
+      const bili_jct = biliStore.cookies!.bili_jct
+      const uid = target_uid ?? biliStore.BilibiliLive!.UID
+      return request.live.post(
+        '/xlive/custom-activity-interface/activities2026/Q3FansS1MiaoZaiPetCat',
+        JSON.stringify({
+          act_id,
+          ruid: String(ruid), // 主播 uid
+          target_uid: String(uid),
+        }),
+        {
+          params: { csrf: bili_jct },
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    },
+    /**
+     * 亲密喂养：喂猫，消耗一份猫粮获得成长值
+     */
+    Q3FansS1MiaoZaiFeedCat: (ruid, target_uid, act_id = 110505) => {
+      const biliStore = useBiliStore()
+      const bili_jct = biliStore.cookies!.bili_jct
+      const uid = target_uid ?? biliStore.BilibiliLive!.UID
+      return request.live.post(
+        '/xlive/custom-activity-interface/activities2026/Q3FansS1MiaoZaiFeedCat',
+        JSON.stringify({
+          act_id,
+          ruid: String(ruid), // 主播 uid
+          target_uid: String(uid),
+        }),
+        {
+          params: { csrf: bili_jct },
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    },
   },
   liveTrace: {
     E: (id, device, ruid, is_patch = 0, heart_beat = [], web_location = '444.8') => {
