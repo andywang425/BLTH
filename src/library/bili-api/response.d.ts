@@ -55,6 +55,13 @@ declare namespace Live {
     data: LiveData.GetRoomPlayInfo.Data
   }
 
+  interface GetWidgetBannerList {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.GetWidgetBannerList.Data
+  }
+
   interface Q3FansS1MiaoZaiHome {
     code: number
     message: string

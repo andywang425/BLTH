@@ -57,6 +57,15 @@ interface BapiMethods {
       supported_drms?: string,
       web_location?: string,
     ) => Promise<Live.GetRoomPlayInfo>
+    getWidgetBannerList: (
+      room_id: number,
+      page_source?: number,
+      platform?: string,
+      position?: number,
+      position_flag?: number,
+      source?: string,
+      web_location?: string,
+    ) => Promise<Live.GetWidgetBannerList>
     Q3FansS1MiaoZaiHome: (
       room_id: number,
       ruid: number,

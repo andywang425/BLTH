@@ -123,7 +123,7 @@ declare namespace LiveData {
       light_source: number
       free_intimacy: number
       reach_free_intimacy_limit: boolean
-      intimacy_journey_info: IntimacyJourneyInfo
+      intimacy_journey_info: IntimacyJourneyInfo | null
     }
 
     interface IntimacyJourneyInfo {
@@ -1358,6 +1358,56 @@ declare namespace LiveData {
       status: number
       subtitle_buffer: number
       skip_frame_threshold: number
+    }
+  }
+
+  namespace GetWidgetBannerList {
+    interface Data {
+      /** 键为组件 id 的字符串形式，没有任何组件时可能为 null */
+      list: Record<string, Banner> | null
+      room_id: number
+      /** 主播 uid */
+      ruid: number
+      /** 毫秒级时间戳 */
+      timestamp: number
+    }
+
+    interface Banner {
+      id: number
+      title: string
+      cover: string
+      tip_text: string
+      tip_text_color: string
+      tip_bottom_color: string
+      jump_url: string
+      url: string
+      stay_time: number
+      type: number
+      sub_key: string
+      /** JSON 字符串，内容随 type 变化，无附加数据时为空字符串 */
+      sub_data: string
+      site: number
+      band_id: number
+      web_cover: string
+      pc_link_conf: PcLinkConf
+      position: number
+      cover_pre: string
+      cover_horizontal: string
+      cover_vertical: string
+      horizon_show: number
+      target_url: string
+      schema_url: string
+      url_type: number
+      /** 秒级时间戳 */
+      biz_time: number
+      not_merge_tab: number
+    }
+
+    interface PcLinkConf {
+      cover: string
+      title: string
+      title_text: string
+      cover_w: string
     }
   }
 

@@ -156,6 +156,30 @@ const BAPI: BapiMethods = {
       )
     },
     /**
+     * 获取直播间画面上方右侧的活动组件（挂件）列表
+     */
+    getWidgetBannerList: (
+      room_id,
+      page_source = 1,
+      platform = 'pc',
+      position = 0,
+      position_flag = 0,
+      source = 'web',
+      web_location = '444.8',
+    ) => {
+      const bili_jct = useBiliStore().cookies!.bili_jct
+      return request.live.get('/xlive/play-interface/widgetService/GetWidgetBannerList', {
+        csrf: bili_jct,
+        page_source,
+        platform,
+        position,
+        position_flag,
+        room_id,
+        source,
+        web_location,
+      })
+    },
+    /**
      * 获取超能粉丝节——粉丝福利——亲密喂养（养猫活动）主页数据
      */
     Q3FansS1MiaoZaiHome: (

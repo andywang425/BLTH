@@ -18,6 +18,10 @@ class MiaoZaiTask extends MedalModule {
   private static readonly ACTIVITY_END_TIME = 1789315199 // 2026-09-13 23:59:59
   /** 活动进行中的 activity_status */
   private static readonly ACTIVITY_STATUS_ONGOING = 1
+  /** 亲密喂养挂件的组件 id */
+  private static readonly MIAO_ZAI_WIDGET_ID = 3310
+  /** 亲密喂养挂件的标题，组件 id 变化时作为兜底判断依据 */
+  private static readonly MIAO_ZAI_WIDGET_TITLE = '亲密喂养'
   /** 签到任务的 task_key */
   private static readonly SIGN_IN_TASK_KEY = 'signin'
   /** 任务已完成的 task_status */
@@ -62,6 +66,51 @@ class MiaoZaiTask extends MedalModule {
     }
 
     return result
+  }
+
+  /**
+   * 判断直播间是否支持亲密喂养活动
+   *
+   * 依据直播间画面上方右侧的活动组件（挂件）列表里有没有亲密喂养挂件
+   *
+   * @param medal 粉丝勋章
+   * @param logMessage 直播间描述信息，用于日志
+   * @returns 支持返回 true，不支持返回 false；请求失败时无法判断，返回 true 交由后续流程处理
+   */
+  private async isMiaoZaiSupported(
+    medal: LiveData.FansMedalPanel.List,
+    logMessage: string,
+  ): Promise<boolean> {
+    const room_id = medal.room_info.room_id
+
+    try {
+      const response = await BAPI.live.getWidgetBannerList(room_id)
+      this.logger.log(`BAPI.live.getWidgetBannerList(${room_id}) response`, response)
+
+      if (response.code !== 0) {
+        this.logger.error(`BAPI.live.getWidgetBannerList(${room_id}) 失败`, response.message)
+        this.logger.warn(
+          `${logMessage} 无法判断该直播间是否支持亲密喂养活动，仍然尝试参与，后续任务流程可能会失败`,
+        )
+        return true
+      }
+
+      const widget = Object.values(response.data.list ?? {}).find(
+        (banner) =>
+          banner.id === MiaoZaiTask.MIAO_ZAI_WIDGET_ID ||
+          banner.title.includes(MiaoZaiTask.MIAO_ZAI_WIDGET_TITLE),
+      )
+
+      if (!widget) return false
+
+      return true
+    } catch (error) {
+      this.logger.error(`BAPI.live.getWidgetBannerList(${room_id}) 出错`, error)
+      this.logger.warn(
+        `${logMessage} 无法判断该直播间是否支持亲密喂养活动，仍然尝试参与，后续任务流程可能会失败`,
+      )
+      return true
+    }
   }
 
   /**
@@ -306,6 +355,14 @@ class MiaoZaiTask extends MedalModule {
     const medal_name = medal.medal.medal_name
     const logMessage = `粉丝勋章【${medal_name}】（主播【${nick_name}】，UID：${ruid}，直播间：${room_id}）`
 
+    if (!(await this.isMiaoZaiSupported(medal, logMessage))) {
+      this.logger.warn(`${logMessage} 不支持亲密喂养活动，跳过该直播间`)
+      // 不支持养猫活动，视为完成
+      return 'completed'
+    }
+
+    await sleep(MiaoZaiTask.ACTION_DYNAMIC_LONG_INTERVAL)
+
     let home = await this.fetchHome(medal)
     if (!home) {
       this.logger.error(`${logMessage} 无法获取养猫活动数据，跳过该直播间`)
@@ -317,12 +374,6 @@ class MiaoZaiTask extends MedalModule {
         `超能粉丝节——亲密喂养活动当前不可用（activity_status：${home.activity_status}），中断养猫任务`,
       )
       return 'activityInvalid'
-    }
-
-    if (!home.can_intimacy_journey) {
-      this.logger.warn(`${logMessage} 不支持亲密喂养活动，跳过该直播间`)
-      // 不支持养猫活动，视为完成
-      return 'completed'
     }
 
     // 还没选猫，先选一只
