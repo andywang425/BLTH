@@ -96,7 +96,7 @@ class MiaoZaiTask extends MedalModule {
    */
   private static isSignInDone(home: LiveData.Q3FansS1MiaoZai.HomeData): boolean {
     const task = home.daily_tasks?.find((t) => t.task_key === MiaoZaiTask.SIGN_IN_TASK_KEY)
-    return task?.level_list?.[0]?.task_status === MiaoZaiTask.TASK_STATUS_DONE
+    return task?.level_list?.[0].task_status === MiaoZaiTask.TASK_STATUS_DONE
   }
 
   /**
@@ -184,7 +184,9 @@ class MiaoZaiTask extends MedalModule {
       await sleep(MiaoZaiTask.ACTION_DYNAMIC_SHORT_INTERVAL)
     }
 
-    this.logger.warn(`${logMessage} 喂猫次数已达上限 ${MiaoZaiTask.FEED_CAT_MAX_TIMES}，停止喂猫`)
+    this.logger.warn(
+      `${logMessage} 喂猫次数已达上限（${MiaoZaiTask.FEED_CAT_MAX_TIMES} 次），停止喂猫`,
+    )
     return false
   }
 
@@ -221,7 +223,7 @@ class MiaoZaiTask extends MedalModule {
 
         if (zeroGrowthCount >= MiaoZaiTask.PET_CAT_ZERO_GROWTH_LIMIT) {
           this.logger.log(
-            `${logMessage} 连续 ${MiaoZaiTask.PET_CAT_ZERO_GROWTH_LIMIT} 次撸猫没有获得成长值，今日撸猫任务已完成，本次共获得 ${totalGrowth} 点成长值`,
+            `${logMessage} 连续 ${MiaoZaiTask.PET_CAT_ZERO_GROWTH_LIMIT} 次撸猫没有获得成长值，今日撸猫任务已完成，共获得 ${totalGrowth} 点成长值`,
           )
           return true
         }
@@ -230,7 +232,9 @@ class MiaoZaiTask extends MedalModule {
       await sleep(MiaoZaiTask.ACTION_DYNAMIC_SHORT_INTERVAL)
     }
 
-    this.logger.warn(`${logMessage} 撸猫次数已达上限 ${MiaoZaiTask.PET_CAT_MAX_TIMES}，停止撸猫`)
+    this.logger.warn(
+      `${logMessage} 撸猫次数已达上限（${MiaoZaiTask.PET_CAT_MAX_TIMES} 次），停止撸猫`,
+    )
     return false
   }
 
