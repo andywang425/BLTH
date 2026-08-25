@@ -229,7 +229,6 @@ const helpInfo: HelpInfo = {
                 h('li', '撸猫，直到不再获得成长值。'),
               ]),
               h('hr'),
-              h('ul', []),
               h('div', [
                 h('strong', '注意：'),
                 h('ul', [
