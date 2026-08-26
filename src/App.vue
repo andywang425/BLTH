@@ -19,11 +19,21 @@ const isShowPanel = uiStore.uiConfig.isShowPanel
 // 太早显示会导致几个字悬浮在屏幕左上角的问题
 uiStore.uiConfig.isShowPanel = false
 // 显示/隐藏控制面板按钮
-let button: HTMLButtonElement
+let button: HTMLButtonElement | null = null
+// 按钮的定位锚点（.normal-row-ctnr 的第一个子节点）
+let buttonAnchor: HTMLElement | null = null
 /**
- * 更新播放器的大小、位置和滚动条位置
+ * 更新显示/隐藏控制面板按钮的位置
  */
-function updatePosition() {
+function updateButtonPosition() {
+  if (!button || !buttonAnchor) return
+  // 15 是按钮与左侧内容之间的间距
+  button.style.left = `${buttonAnchor.offsetLeft + buttonAnchor.offsetWidth + 15}px`
+}
+/**
+ * 同步播放器的大小、位置和窗口滚动条位置到 uiStore
+ */
+function syncLivePlayerRect() {
   const rect: DOMRect = livePlayer!.getBoundingClientRect()
 
   uiStore.livePlayerRect.top = rect.top
@@ -39,14 +49,17 @@ function updatePosition() {
  */
 function buttonOnClick() {
   uiStore.changeShowPanel()
-  button.innerText = uiStore.isShowPanelButtonText
+
+  if (button) {
+    button.innerText = uiStore.isShowPanelButtonText
+  }
 }
 // 节流，防止点击过快，减小渲染压力
 const throttleButtonOnClick = _.throttle(buttonOnClick, 300)
 // 播放器节点出现在最初的html中，可以直接获取
 const livePlayer = dq('.player-section')
 if (livePlayer) {
-  updatePosition()
+  syncLivePlayerRect()
   // 节点 #player-ctnr 在初始 html 中出现
   waitForElement(dq('#player-ctnr')!, '.header-info-ctnr .normal-row-ctnr', 10e3)
     .then((normalRowCtnr) => {
@@ -62,6 +75,18 @@ if (livePlayer) {
       } else {
         logger.warn('.normal-row-ctnr 没有子节点', normalRowCtnr)
         normalRowCtnr.appendChild(button)
+      }
+      // 记录按钮的定位锚点
+      buttonAnchor =
+        normalRowCtnr.firstElementChild instanceof HTMLElement
+          ? normalRowCtnr.firstElementChild
+          : null
+      // 初始化按钮位置
+      updateButtonPosition()
+      // 锚点宽度变化时更新按钮位置
+      if (buttonAnchor) {
+        const buttonAnchorObserver = new ResizeObserver(() => updateButtonPosition())
+        buttonAnchorObserver.observe(buttonAnchor)
       }
       if (!isSelfTopFrame()) {
         // 在特殊直播间，脚本所在的目标 frame 只占屏幕中间一块地方
@@ -80,10 +105,10 @@ if (livePlayer) {
     .catch((e: Error) => logger.error(e))
   // 监听页面缩放，调整控制面板大小
   // 因为这个操作频率不高就不节流或防抖了
-  window.addEventListener('resize', () => updatePosition())
+  window.addEventListener('resize', () => syncLivePlayerRect())
   // 监听 html 根节点和 body 节点
   // 适配播放器网页模式
-  const observer = new MutationObserver(() => updatePosition())
+  const observer = new MutationObserver(() => syncLivePlayerRect())
   observer.observe(document.body, { attributes: true })
   observer.observe(document.documentElement, { attributes: true })
 

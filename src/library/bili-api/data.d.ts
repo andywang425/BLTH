@@ -1363,7 +1363,7 @@ declare namespace LiveData {
 
   namespace GetWidgetBannerList {
     interface Data {
-      /** 键为组件 id 的字符串形式，没有任何组件时可能为 null */
+      /** 键为组件 id 的字符串形式，没有任何组件时为 null */
       list: Record<string, Banner> | null
       room_id: number
       /** 主播 uid */
