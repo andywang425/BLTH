@@ -47,6 +47,7 @@ npm run preview      # 打开提供编译产物安装链接的本地预览网页
 
 - `src/library/bili-api/` 中的 API 必须有详细的请求/响应类型定义
 - 路径别名 `@/` 映射到 `src/`
+- 代码中的 import 语句一律省略 TypeScript 文件扩展名（`.ts`、`.d.ts`）和目录的 `/index` 后缀
 - Commit message 使用约定式提交格式
 
 # 易踩坑点

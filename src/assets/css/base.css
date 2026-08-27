@@ -1,7 +1,13 @@
-/* 显示/隐藏控制面板按钮 */
+/**
+  显示/隐藏控制面板按钮
+  按钮使用绝对定位，不参与 .normal-row-ctnr 的 flex 布局，避免挤占右侧活动组件的显示空间；
+  left 由 JS 根据锚点宽度动态设置
+*/
 .blth-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 1003;
   padding: 5px;
-  margin-left: 15px;
   font-size: small;
   line-height: 10px;
   color: #fff;
@@ -10,6 +16,7 @@
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 2px #00000075;
+  transform: translateY(-50%);
 }
 
 .blth-btn:hover {
@@ -17,9 +24,8 @@
 }
 
 .blth-btn:hover:active {
-  position: relative;
-  top: 1px;
   background-color: #0e86b6;
+  transform: translateY(calc(-50% + 1px));
 }
 
 /**

@@ -145,16 +145,15 @@ class RoomHeart {
         return this.X()
       } else {
         this.logger.error(
-          `BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) 失败`,
-          response.message,
-        )
-        this.logger.error(
           `直播间 ${this.roomID} 的 E 心跳失败，无法继续执行观看直播任务，跳过该房间`,
+          response.message,
         )
       }
     } catch (error) {
-      this.logger.error(`BAPI.liveTrace.E(${this.id}, ${this.device}, ${this.ruid}) 出错`, error)
-      this.logger.error(`直播间 ${this.roomID} 的 E 心跳失败，无法继续执行观看直播任务，跳过该房间`)
+      this.logger.error(
+        `直播间 ${this.roomID} 的 E 心跳出错，无法继续执行观看直播任务，跳过该房间`,
+        error,
+      )
     }
   }
 
@@ -210,21 +209,15 @@ class RoomHeart {
           // 继续下一轮 X 心跳
         } else {
           this.logger.error(
-            `BAPI.liveTrace.X(${s}, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 失败`,
-            response.message,
-          )
-          this.logger.error(
             `直播间 ${this.roomID} 的 X 心跳失败，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
+            response.message,
           )
           return
         }
       } catch (error) {
         this.logger.error(
-          `BAPI.liveTrace.X(s, ${this.id}, ${this.device}, ${this.ruid}, ${this.timestamp}, ${this.secretKey}, ${this.heartBeatInterval}) 出错`,
+          `直播间 ${this.roomID} 的 X 心跳出错，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
           error,
-        )
-        this.logger.error(
-          `直播间 ${this.roomID} 的 X 心跳失败，无法继续执行观看直播任务，跳过该房间（目前已观看 ${this.watchedSeconds} 秒）`,
         )
         return
       }
