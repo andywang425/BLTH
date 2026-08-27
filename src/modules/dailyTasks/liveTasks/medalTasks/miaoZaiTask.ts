@@ -74,7 +74,7 @@ class MiaoZaiTask extends MedalModule {
    * 依据直播间画面上方右侧的活动组件（挂件）列表里有没有亲密喂养挂件
    *
    * @param medal 粉丝勋章
-   * @param logMessage 直播间描述信息，用于日志
+   * @param logMessage 粉丝勋章描述信息，用于日志
    * @returns 支持返回 true，不支持返回 false；请求失败时无法判断，返回 true 交由后续流程处理
    */
   private async isMiaoZaiSupported(
@@ -88,9 +88,9 @@ class MiaoZaiTask extends MedalModule {
       this.logger.log(`BAPI.live.getWidgetBannerList(${room_id}) response`, response)
 
       if (response.code !== 0) {
-        this.logger.error(`BAPI.live.getWidgetBannerList(${room_id}) 失败`, response.message)
         this.logger.warn(
-          `${logMessage} 无法判断该直播间是否支持亲密喂养活动，仍然尝试参与，后续任务流程可能会失败`,
+          `${logMessage}获取直播间活动组件失败，无法判断该直播间是否支持亲密喂养活动，仍然尝试参与，后续任务流程可能会失败`,
+          response.message,
         )
         return true
       }
@@ -105,9 +105,9 @@ class MiaoZaiTask extends MedalModule {
 
       return true
     } catch (error) {
-      this.logger.error(`BAPI.live.getWidgetBannerList(${room_id}) 出错`, error)
       this.logger.warn(
-        `${logMessage} 无法判断该直播间是否支持亲密喂养活动，仍然尝试参与，后续任务流程可能会失败`,
+        `${logMessage}获取直播间活动组件出错，无法判断该直播间是否支持亲密喂养活动，仍然尝试参与，后续任务流程可能会失败`,
+        error,
       )
       return true
     }
@@ -128,12 +128,20 @@ class MiaoZaiTask extends MedalModule {
     try {
       const response = await BAPI.live.Q3FansS1MiaoZaiHome(room_id, ruid)
       this.logger.log(`BAPI.live.Q3FansS1MiaoZaiHome(${room_id}, ${ruid}) response`, response)
+
       if (response.code === 0) {
         return response.data
       }
-      this.logger.error(`BAPI.live.Q3FansS1MiaoZaiHome(${room_id}, ${ruid}) 失败`, response.message)
+
+      this.logger.error(
+        `获取亲密喂养活动主页数据失败 room_id = ${room_id}, 主播uid = ${ruid}`,
+        response.message,
+      )
     } catch (error) {
-      this.logger.error(`BAPI.live.Q3FansS1MiaoZaiHome(${room_id}, ${ruid}) 出错`, error)
+      this.logger.error(
+        `获取亲密喂养活动主页数据出错 room_id = ${room_id}, 主播uid = ${ruid}`,
+        error,
+      )
     }
 
     return null
@@ -153,12 +161,14 @@ class MiaoZaiTask extends MedalModule {
    *
    * 外层 code 和 data.code 都为 0 才算成功
    *
+   * @param apiPath API 路径和参数，用于日志
    * @param actionText 操作名称，用于日志
-   * @param logMessage 直播间描述信息，用于日志
+   * @param logMessage 粉丝勋章描述信息，用于日志
    * @param requester 请求函数
    * @returns 成功返回 ActionData，失败返回 null
    */
   private async executeAction(
+    apiPath: string,
     actionText: string,
     logMessage: string,
     requester: () => Promise<{
@@ -169,14 +179,14 @@ class MiaoZaiTask extends MedalModule {
   ): Promise<LiveData.Q3FansS1MiaoZai.ActionData | null> {
     try {
       const response = await requester()
-      this.logger.log(`${actionText} ${logMessage} response`, response)
+      this.logger.log(`${apiPath} response`, response)
 
       if (response.code !== 0) {
-        this.logger.error(`${actionText} ${logMessage} 失败`, response.message)
+        this.logger.error(`${logMessage}${actionText}失败`, response.message)
         return null
       }
       if (response.data.code !== 0) {
-        this.logger.error(`${actionText} ${logMessage} 失败`, response.data.msg)
+        this.logger.error(`${logMessage}${actionText}失败`, response.data.msg)
         return null
       }
 
@@ -185,13 +195,13 @@ class MiaoZaiTask extends MedalModule {
         const levelUpInfo = response.data.level_up_list[0]
         const rewardInfo = levelUpInfo.rewards?.map((r) => `${r.name}${r.desc}`).join('，')
         this.logger.log(
-          `${actionText} ${logMessage} 已升级到 ${levelUpInfo.level_name}（Lv.${levelUpInfo.level}）${rewardInfo ? `，获得奖励：${rewardInfo}` : ''}`,
+          `${logMessage}${actionText}后升级至 ${levelUpInfo.level_name}（Lv.${levelUpInfo.level}）${rewardInfo ? `，获得奖励：${rewardInfo}` : ''}`,
         )
       }
 
       return response.data
     } catch (error) {
-      this.logger.error(`${actionText} ${logMessage} 出错`, error)
+      this.logger.error(`${logMessage}${actionText}出错`, error)
       return null
     }
   }
@@ -200,7 +210,7 @@ class MiaoZaiTask extends MedalModule {
    * 喂猫，消耗掉所有剩余猫粮
    *
    * @param medal 粉丝勋章
-   * @param logMessage 直播间描述信息，用于日志
+   * @param logMessage 粉丝勋章描述信息，用于日志
    * @param balance 剩余猫粮数量
    * @returns 是否把猫粮都喂完了
    */
@@ -210,22 +220,25 @@ class MiaoZaiTask extends MedalModule {
     balance: number,
   ): Promise<boolean> {
     if (balance <= 0) {
-      this.logger.log(`${logMessage} 没有剩余猫粮，跳过喂猫`)
+      this.logger.log(`${logMessage}没有剩余猫粮，跳过喂猫`)
       return true
     }
 
     const ruid = medal.medal.target_id
-    this.logger.log(`${logMessage} 开始喂猫，剩余猫粮 ${balance} 份`)
+    this.logger.log(`${logMessage}开始喂猫，剩余猫粮 ${balance} 份`)
 
     for (let i = 0; i < MiaoZaiTask.FEED_CAT_MAX_TIMES; i++) {
-      const data = await this.executeAction('喂猫', logMessage, () =>
-        BAPI.live.Q3FansS1MiaoZaiFeedCat(ruid),
+      const data = await this.executeAction(
+        `BAPI.live.Q3FansS1MiaoZaiFeedCat(${ruid})`,
+        '喂猫',
+        logMessage,
+        () => BAPI.live.Q3FansS1MiaoZaiFeedCat(ruid),
       )
 
       if (!data) return false
 
       this.logger.log(
-        `${logMessage} 喂猫成功，获得 ${data.growth_delta} 点成长值（当前成长值 ${data.growth}），剩余猫粮 ${data.food_balance} 份`,
+        `${logMessage}喂猫成功，获得 ${data.growth_delta} 点成长值（当前成长值 ${data.growth}），剩余猫粮 ${data.food_balance} 份`,
       )
 
       if (data.food_balance <= 0) return true
@@ -234,7 +247,7 @@ class MiaoZaiTask extends MedalModule {
     }
 
     this.logger.warn(
-      `${logMessage} 喂猫次数已达上限（${MiaoZaiTask.FEED_CAT_MAX_TIMES} 次），停止喂猫`,
+      `${logMessage}喂猫次数已达上限（${MiaoZaiTask.FEED_CAT_MAX_TIMES} 次），停止喂猫`,
     )
     return false
   }
@@ -243,7 +256,7 @@ class MiaoZaiTask extends MedalModule {
    * 撸猫，直到连续多次没有获得成长值
    *
    * @param medal 粉丝勋章
-   * @param logMessage 直播间描述信息，用于日志
+   * @param logMessage 粉丝勋章描述信息，用于日志
    * @returns 是否正常完成今日撸猫任务
    */
   private async petCat(medal: LiveData.FansMedalPanel.List, logMessage: string): Promise<boolean> {
@@ -251,11 +264,14 @@ class MiaoZaiTask extends MedalModule {
     let zeroGrowthCount = 0
     let totalGrowth = 0
 
-    this.logger.log(`${logMessage} 开始撸猫`)
+    this.logger.log(`${logMessage}开始撸猫`)
 
     for (let i = 0; i < MiaoZaiTask.PET_CAT_MAX_TIMES; i++) {
-      const data = await this.executeAction('撸猫', logMessage, () =>
-        BAPI.live.Q3FansS1MiaoZaiPetCat(ruid),
+      const data = await this.executeAction(
+        `BAPI.live.Q3FansS1MiaoZaiPetCat(${ruid})`,
+        '撸猫',
+        logMessage,
+        () => BAPI.live.Q3FansS1MiaoZaiPetCat(ruid),
       )
 
       if (!data) return false
@@ -264,15 +280,15 @@ class MiaoZaiTask extends MedalModule {
         zeroGrowthCount = 0
         totalGrowth += data.growth_delta
         this.logger.log(
-          `${logMessage} 撸猫成功，获得 ${data.growth_delta} 点成长值（当前成长值 ${data.growth}）`,
+          `${logMessage}撸猫成功，获得 ${data.growth_delta} 点成长值（当前成长值 ${data.growth}）`,
         )
       } else {
         zeroGrowthCount++
-        this.logger.log(`${logMessage} 撸猫成功，但没有获得成长值（连续 ${zeroGrowthCount} 次）`)
+        this.logger.log(`${logMessage}撸猫成功，但没有获得成长值（连续 ${zeroGrowthCount} 次）`)
 
         if (zeroGrowthCount >= MiaoZaiTask.PET_CAT_ZERO_GROWTH_LIMIT) {
           this.logger.log(
-            `${logMessage} 连续 ${MiaoZaiTask.PET_CAT_ZERO_GROWTH_LIMIT} 次撸猫没有获得成长值，今日撸猫任务已完成，共获得 ${totalGrowth} 点成长值`,
+            `${logMessage}连续 ${MiaoZaiTask.PET_CAT_ZERO_GROWTH_LIMIT} 次撸猫没有获得成长值，今日撸猫任务已完成，共获得 ${totalGrowth} 点成长值`,
           )
           return true
         }
@@ -282,7 +298,7 @@ class MiaoZaiTask extends MedalModule {
     }
 
     this.logger.warn(
-      `${logMessage} 撸猫次数已达上限（${MiaoZaiTask.PET_CAT_MAX_TIMES} 次），停止撸猫`,
+      `${logMessage}撸猫次数已达上限（${MiaoZaiTask.PET_CAT_MAX_TIMES} 次），停止撸猫`,
     )
     return false
   }
@@ -291,7 +307,7 @@ class MiaoZaiTask extends MedalModule {
    * 复查养猫结果并输出喵崽的当前数据
    *
    * @param medal 粉丝勋章
-   * @param logMessage 直播间描述信息，用于日志
+   * @param logMessage 粉丝勋章描述信息，用于日志
    * @returns 签到和喂猫是否都已完成
    */
   private async verifyResult(
@@ -301,27 +317,27 @@ class MiaoZaiTask extends MedalModule {
     const home = await this.fetchHome(medal)
 
     if (!home) {
-      this.logger.error(`${logMessage} 无法获取最新养猫活动数据，无法确认任务是否完成，默认已完成`)
+      this.logger.error(`${logMessage}无法获取最新养猫活动数据，无法确认任务是否完成，默认已完成`)
       return true
     }
 
     const cat = home.cat_info
     if (cat) {
       this.logger.log(
-        `${logMessage} 喵崽【${cat.cat_name}】当前为 ${cat.level_name}（Lv.${cat.level}），成长值 ${cat.growth}/${cat.next_level_growth}`,
+        `${logMessage}喵崽【${cat.cat_name}】当前为 ${cat.level_name}（Lv.${cat.level}），成长值 ${cat.growth}/${cat.next_level_growth}`,
       )
     }
 
     let completed = true
 
     if (!MiaoZaiTask.isSignInDone(home)) {
-      this.logger.warn(`${logMessage} 签到任务仍未完成，下次运行会继续尝试`)
+      this.logger.warn(`${logMessage}签到任务仍未完成，下次运行会继续尝试`)
       completed = false
     }
 
     const balance = home.food_info?.balance ?? 0
     if (balance > 0) {
-      this.logger.warn(`${logMessage} 仍剩余 ${balance} 份猫粮没有喂完，下次运行会继续尝试`)
+      this.logger.warn(`${logMessage}仍剩余 ${balance} 份猫粮没有喂完，下次运行会继续尝试`)
       completed = false
     }
 
@@ -356,7 +372,7 @@ class MiaoZaiTask extends MedalModule {
     const logMessage = `粉丝勋章【${medal_name}】（主播【${nick_name}】，UID：${ruid}，直播间：${room_id}）`
 
     if (!(await this.isMiaoZaiSupported(medal, logMessage))) {
-      this.logger.warn(`${logMessage} 不支持亲密喂养活动，跳过该直播间`)
+      this.logger.warn(`${logMessage}不支持亲密喂养活动，跳过该直播间`)
       // 不支持养猫活动，视为完成
       return 'completed'
     }
@@ -365,7 +381,7 @@ class MiaoZaiTask extends MedalModule {
 
     let home = await this.fetchHome(medal)
     if (!home) {
-      this.logger.error(`${logMessage} 无法获取养猫活动数据，跳过该直播间`)
+      this.logger.error(`${logMessage}无法获取养猫活动数据，跳过该直播间`)
       return 'uncompleted'
     }
 
@@ -378,14 +394,17 @@ class MiaoZaiTask extends MedalModule {
 
     // 还没选猫，先选一只
     if (!home.cat_selected) {
-      this.logger.log(`${logMessage} 还没有选择喵崽，先选择一只`)
+      this.logger.log(`${logMessage}还没有选择喵崽，先选择一只`)
 
-      const data = await this.executeAction('选择喵崽', logMessage, () =>
-        BAPI.live.Q3FansS1MiaoZaiSelectCat(ruid),
+      const data = await this.executeAction(
+        `BAPI.live.Q3FansS1MiaoZaiSelectCat(${ruid})`,
+        '选择喵崽',
+        logMessage,
+        () => BAPI.live.Q3FansS1MiaoZaiSelectCat(ruid),
       )
 
       if (!data) {
-        this.logger.error(`${logMessage} 选择喵崽失败，跳过该直播间`)
+        this.logger.error(`${logMessage}选择喵崽失败，跳过该直播间`)
         return 'uncompleted'
       }
 
@@ -394,7 +413,7 @@ class MiaoZaiTask extends MedalModule {
       // 重新获取主页数据，拿到选完猫之后的猫粮数量和任务状态
       home = await this.fetchHome(medal)
       if (!home) {
-        this.logger.error(`${logMessage} 选择喵崽后无法获取养猫活动数据，跳过该直播间`)
+        this.logger.error(`${logMessage}选择喵崽后无法获取养猫活动数据，跳过该直播间`)
         return 'uncompleted'
       }
     }
@@ -403,17 +422,20 @@ class MiaoZaiTask extends MedalModule {
 
     // 签到领猫粮
     if (MiaoZaiTask.isSignInDone(home)) {
-      this.logger.log(`${logMessage} 今天已经签到过了`)
+      this.logger.log(`${logMessage}今天已经签到过了`)
     } else {
-      const data = await this.executeAction('签到', logMessage, () =>
-        BAPI.live.Q3FansS1MiaoZaiSignIn(ruid),
+      const data = await this.executeAction(
+        `BAPI.live.Q3FansS1MiaoZaiSignIn(${ruid})`,
+        '签到',
+        logMessage,
+        () => BAPI.live.Q3FansS1MiaoZaiSignIn(ruid),
       )
 
       if (data) {
-        this.logger.log(`${logMessage} 签到成功，当前共有 ${data.food_balance} 份猫粮`)
+        this.logger.log(`${logMessage}签到成功，当前共有 ${data.food_balance} 份猫粮`)
         balance = data.food_balance
       } else {
-        this.logger.error(`${logMessage} 签到失败，仍然尝试喂完已有的猫粮`)
+        this.logger.error(`${logMessage}签到失败，仍然尝试喂完已有的猫粮`)
       }
 
       await sleep(MiaoZaiTask.ACTION_DYNAMIC_LONG_INTERVAL)
