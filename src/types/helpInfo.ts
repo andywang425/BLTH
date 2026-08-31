@@ -1,4 +1,4 @@
-import { VNode } from 'vue'
+import type { VNode } from 'vue'
 
 interface HelpInfoItem {
   title: string
@@ -53,4 +53,4 @@ interface HelpInfo {
   }
 }
 
-export { HelpInfoItem, HelpInfo }
+export type { HelpInfoItem, HelpInfo }

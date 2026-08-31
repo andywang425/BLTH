@@ -68,7 +68,7 @@ interface BatchExecutionResult {
  */
 type MiaoZaiTaskResult = 'activityInvalid' | 'completed' | 'uncompleted'
 
-export {
+export type {
   MedalTaskSharedConfig,
   SharedMedalFilters,
   GroupedMedals,

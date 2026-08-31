@@ -40,4 +40,12 @@ export default defineConfigWithVueTs(
       ],
     },
   },
+
+  {
+    name: 'app/bili-api-namespaces',
+    files: ['src/library/bili-api/data.ts', 'src/library/bili-api/response.ts'],
+    rules: {
+      '@typescript-eslint/no-namespace': ['error', { allowDeclarations: true }],
+    },
+  },
 )

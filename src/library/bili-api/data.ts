@@ -1,4 +1,4 @@
-declare namespace LiveData {
+export declare namespace LiveData {
   namespace FansMedalPanel {
     interface Data {
       list: List[]
@@ -1517,7 +1517,7 @@ declare namespace LiveData {
   }
 }
 
-declare namespace LiveTraceData {
+export declare namespace LiveTraceData {
   namespace E {
     interface Data {
       timestamp: number
@@ -1538,7 +1538,7 @@ declare namespace LiveTraceData {
   }
 }
 
-declare namespace MainData {
+export declare namespace MainData {
   namespace Nav {
     interface Data {
       isLogin: boolean
@@ -1890,6 +1890,11 @@ declare namespace MainData {
       placeholder: number
       local?: number
       remote?: Remote
+    }
+
+    interface Remote {
+      url: string
+      bfs_style: string
     }
 
     interface ResAnimation {
@@ -2275,5 +2280,3 @@ declare namespace MainData {
     }
   }
 }
-
-export { LiveData, LiveTraceData, MainData }

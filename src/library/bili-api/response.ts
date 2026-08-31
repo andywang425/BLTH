@@ -1,6 +1,6 @@
-import { LiveData, LiveTraceData, MainData } from './data'
+import type { LiveData, LiveTraceData, MainData } from './data'
 
-declare namespace Live {
+export declare namespace Live {
   interface FansMedalPanel {
     code: number
     message: string
@@ -98,7 +98,7 @@ declare namespace Live {
   }
 }
 
-declare namespace LiveTrace {
+export declare namespace LiveTrace {
   interface E {
     code: number
     message: string
@@ -114,7 +114,7 @@ declare namespace LiveTrace {
   }
 }
 
-declare namespace Main {
+export declare namespace Main {
   interface Nav {
     code: number
     message: string
@@ -186,5 +186,3 @@ declare namespace Main {
     }
   }
 }
-
-export { Live, LiveTrace, Main }

@@ -1,5 +1,5 @@
-import Request from '../request'
-import { Live, LiveTrace, Main } from './response'
+import type Request from '../request'
+import type { Live, LiveTrace, Main } from './response'
 
 interface Requests {
   live: Request
@@ -184,4 +184,4 @@ interface BapiMethods {
   }
 }
 
-export { Requests, BapiMethods }
+export type { Requests, BapiMethods }

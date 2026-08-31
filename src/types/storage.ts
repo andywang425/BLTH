@@ -160,4 +160,4 @@ interface Cache {
   lastAliveHeartBeatTime: number
 }
 
-export { ModuleConfig, UiConfig, Cache, MenuIndex }
+export type { ModuleConfig, UiConfig, Cache, MenuIndex }
