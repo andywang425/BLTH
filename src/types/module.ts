@@ -45,7 +45,7 @@ type OnFrameTypes = 'all' | 'target' | 'top'
 
 type IsOnTargetFrameTypes = 'unknown' | 'yes'
 
-export {
+export type {
   ModuleStatusTypes,
   ModulesNeedStatus,
   ModuleStatus,

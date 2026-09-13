@@ -8,6 +8,9 @@ import type { LiveData } from '@/library/bili-api/data'
 import _ from 'lodash'
 import type { MiaoZaiTaskResult } from './types'
 
+/** 超能粉丝节——亲密喂养活动结束时间戳（秒），2026-09-13 23:59:59 */
+export const MIAO_ZAI_ACTIVITY_END_TIME = 1789315199
+
 /**
  * 超能粉丝节——粉丝福利——亲密喂养（养猫活动）
  *
@@ -15,7 +18,7 @@ import type { MiaoZaiTaskResult } from './types'
  */
 class MiaoZaiTask extends MedalModule {
   /** 活动结束时间戳（秒） */
-  private static readonly ACTIVITY_END_TIME = 1789315199 // 2026-09-13 23:59:59
+  private static readonly ACTIVITY_END_TIME = MIAO_ZAI_ACTIVITY_END_TIME
   /** 活动进行中的 activity_status */
   private static readonly ACTIVITY_STATUS_ONGOING = 1
   /** 亲密喂养挂件的组件 id */
@@ -26,6 +29,8 @@ class MiaoZaiTask extends MedalModule {
   private static readonly SIGN_IN_TASK_KEY = 'signin'
   /** 任务已完成的 task_status */
   private static readonly TASK_STATUS_DONE = 1
+  /** 可领取喵崽的馈赠的 gift_claim_status */
+  private static readonly GIFT_CLAIM_STATUS_CLAIMABLE = 1
   /** 连续多少次撸猫没有获得成长值就视为今日撸猫任务已完成 */
   private static readonly PET_CAT_ZERO_GROWTH_LIMIT = 6
   /** 单个直播间最多喂猫次数（兜底，避免猫粮数量异常时无限循环） */
@@ -46,6 +51,9 @@ class MiaoZaiTask extends MedalModule {
   }
 
   config = this.medalTasksConfig.miaoZai
+
+  /** 是否正在领取喵崽的馈赠（防止按钮重复触发） */
+  private isClaimingGifts = false
 
   set status(s: ModuleStatusTypes) {
     useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.miaoZai = s
@@ -520,6 +528,219 @@ class MiaoZaiTask extends MedalModule {
     const diff = delayToNextMoment()
     this.nextRunTimer = setTimeout(() => this.run(), diff.ms)
     this.logger.log('距离亲密喂养模块下次运行时间:', diff.str)
+  }
+
+  /**
+   * 领取并赠送喵崽的馈赠（由控制面板的按钮手动触发）
+   *
+   * 遍历按黑白名单过滤后的粉丝勋章，对于 Q3FansS1MiaoZaiHome 返回 gift_claim_status 为 1（可领取）的直播间，
+   * 领取喵崽的馈赠，再从礼物包裹中把它赠送给该勋章对应的主播
+   *
+   * @returns 成功领取和成功赠送的数量
+   */
+  public async claimAndSendGifts(): Promise<{ claimed: number; sent: number }> {
+    const result = { claimed: 0, sent: 0 }
+
+    if (ts() > MiaoZaiTask.ACTIVITY_END_TIME) {
+      this.logger.warn('超能粉丝节——亲密喂养活动已结束，无法领取喵崽的馈赠')
+      return result
+    }
+
+    if (this.isClaimingGifts) {
+      this.logger.warn('正在领取喵崽的馈赠，请勿重复触发')
+      return result
+    }
+
+    if (useModuleStore().moduleStatus.DailyTasks.LiveTasks.medalTasks.miaoZai === 'running') {
+      this.logger.warn('亲密喂养模块正在运行中，请等它运行结束后再领取喵崽的馈赠')
+      return result
+    }
+
+    if (!useBiliStore().fansMedalsMeta.status) {
+      useModuleStore().rerunModule('Default_FansMedals', true)
+    }
+
+    if (!(await MedalModule.waitForFansMedals())) {
+      this.logger.error('粉丝勋章数据获取失败，无法领取喵崽的馈赠')
+      return result
+    }
+
+    const medals = this.getMedals()
+    if (medals.length === 0) {
+      this.logger.warn('没有符合黑白名单条件的粉丝勋章，无需领取喵崽的馈赠')
+      return result
+    }
+
+    this.isClaimingGifts = true
+    this.logger.log(`开始检查并领取喵崽的馈赠，共 ${medals.length} 个粉丝勋章待检查`)
+
+    try {
+      for (let i = 0; i < medals.length; i++) {
+        const medalResult = await this.claimAndSendGiftForMedal(medals[i])
+        if (medalResult.claimed) result.claimed++
+        if (medalResult.sent) result.sent++
+
+        if (i < medals.length - 1) {
+          await sleep(MiaoZaiTask.ROOM_DYNAMIC_INTERVAL)
+        }
+      }
+    } finally {
+      this.isClaimingGifts = false
+    }
+
+    this.logger.log(
+      `喵崽的馈赠处理完毕，成功领取 ${result.claimed} 份，成功赠送 ${result.sent} 份，详情见上方日志`,
+    )
+    return result
+  }
+
+  /**
+   * 为单个粉丝勋章对应的直播间领取并赠送喵崽的馈赠
+   *
+   * @param medal 粉丝勋章
+   * @returns 该直播间是否成功领取、是否成功赠送
+   */
+  private async claimAndSendGiftForMedal(
+    medal: LiveData.FansMedalPanel.List,
+  ): Promise<{ claimed: boolean; sent: boolean }> {
+    const room_id = medal.room_info.room_id
+    const ruid = medal.medal.target_id
+    const nick_name = medal.anchor_info.nick_name
+    const medal_name = medal.medal.medal_name
+    const logMessage = `粉丝勋章【${medal_name}】（主播【${nick_name}】，UID：${ruid}，直播间：${room_id}）`
+
+    const home = await this.fetchHome(medal)
+    if (!home) {
+      this.logger.warn(`${logMessage}无法获取养猫活动数据，跳过领取馈赠`)
+      return { claimed: false, sent: false }
+    }
+
+    if (home.gift_claim_status !== MiaoZaiTask.GIFT_CLAIM_STATUS_CLAIMABLE) {
+      // 没有可领取的馈赠（尚未满足条件或已领取过），跳过
+      return { claimed: false, sent: false }
+    }
+
+    // 当前喵崽等级对应的馈赠礼物名（gift_by_cat_level 中 desc 才是实际礼物名，name 是馈赠档位名）
+    // 领取后用它按 gift_name 在礼物包裹中识别该礼物
+    const expectedGiftName = home.gift_by_cat_level?.find(
+      (g) => g.level === home.cat_info?.level,
+    )?.desc
+
+    this.logger.log(
+      `${logMessage}有可领取的喵崽的馈赠${expectedGiftName ? `（${expectedGiftName}）` : ''}，开始领取`,
+    )
+
+    if (!(await this.claimGift(ruid, logMessage))) {
+      return { claimed: false, sent: false }
+    }
+
+    await sleep(MiaoZaiTask.ACTION_DYNAMIC_LONG_INTERVAL)
+
+    const sent = await this.sendClaimedGift(medal, expectedGiftName, logMessage)
+    return { claimed: true, sent }
+  }
+
+  /**
+   * 领取喵崽的馈赠
+   *
+   * 外层 code 和 data.code 都为 0 才算成功
+   *
+   * @param ruid 主播 uid
+   * @param logMessage 粉丝勋章描述信息，用于日志
+   * @returns 是否领取成功
+   */
+  private async claimGift(ruid: number, logMessage: string): Promise<boolean> {
+    try {
+      const response = await BAPI.live.Q3FansS1MiaoZaiClaimGift(ruid)
+      this.logger.log(`BAPI.live.Q3FansS1MiaoZaiClaimGift(${ruid}) response`, response)
+
+      if (response.code !== 0) {
+        this.logger.error(`${logMessage}领取喵崽的馈赠失败`, response.message)
+        return false
+      }
+      if (response.data.code !== 0) {
+        this.logger.error(`${logMessage}领取喵崽的馈赠失败`, response.data.msg)
+        return false
+      }
+
+      this.logger.log(`${logMessage}领取喵崽的馈赠成功`)
+      return true
+    } catch (error) {
+      this.logger.error(`${logMessage}领取喵崽的馈赠出错`, error)
+      return false
+    }
+  }
+
+  /**
+   * 从礼物包裹中找出喵崽的馈赠并赠送给主播
+   *
+   * @param medal 粉丝勋章
+   * @param expectedGiftName 期望的馈赠名称（依据当前喵崽等级推断），用于识别包裹中的礼物
+   * @param logMessage 粉丝勋章描述信息，用于日志
+   * @returns 是否赠送成功
+   */
+  private async sendClaimedGift(
+    medal: LiveData.FansMedalPanel.List,
+    expectedGiftName: string | undefined,
+    logMessage: string,
+  ): Promise<boolean> {
+    const room_id = medal.room_info.room_id
+    const ruid = medal.medal.target_id
+
+    let bagGift: LiveData.GetGiftBagList.BagGift | undefined
+    try {
+      const response = await BAPI.live.getGiftBagList(room_id)
+      this.logger.log(`BAPI.live.getGiftBagList(${room_id}) response`, response)
+
+      if (response.code !== 0) {
+        this.logger.error(`${logMessage}获取礼物包裹失败，无法赠送喵崽的馈赠`, response.message)
+        return false
+      }
+
+      const list = response.data.list
+      // 按礼物名称匹配当前喵崽等级对应的馈赠
+      bagGift = list.find(
+        (g) => g.gift_num > 0 && expectedGiftName !== undefined && g.gift_name === expectedGiftName,
+      )
+    } catch (error) {
+      this.logger.error(`${logMessage}获取礼物包裹出错，无法赠送喵崽的馈赠`, error)
+      return false
+    }
+
+    if (!bagGift) {
+      this.logger.error(
+        `${logMessage}在礼物包裹中没有找到喵崽的馈赠${expectedGiftName ? `（${expectedGiftName}）` : ''}，无法赠送`,
+      )
+      return false
+    }
+
+    await sleep(MiaoZaiTask.ACTION_DYNAMIC_SHORT_INTERVAL)
+
+    try {
+      const response = await BAPI.live.sendBagMultiUser(
+        bagGift.gift_id,
+        ruid,
+        bagGift.gift_num,
+        bagGift.bag_id,
+        room_id,
+      )
+      this.logger.log(
+        `BAPI.live.sendBagMultiUser(${bagGift.gift_id}, ${ruid}, ${bagGift.gift_num}, ${bagGift.bag_id}, ${room_id}) response`,
+        response,
+      )
+
+      if (response.code === 0) {
+        this.logger.log(
+          `${logMessage}成功赠送 ${bagGift.gift_num} 个【${bagGift.gift_name}】给主播`,
+        )
+        return true
+      }
+      this.logger.error(`${logMessage}赠送喵崽的馈赠失败`, response.message)
+    } catch (error) {
+      this.logger.error(`${logMessage}赠送喵崽的馈赠出错`, error)
+    }
+
+    return false
   }
 }
 

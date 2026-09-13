@@ -1,6 +1,6 @@
-import { LiveData, LiveTraceData, MainData } from './data'
+import type { LiveData, LiveTraceData, MainData } from './data'
 
-declare namespace Live {
+export declare namespace Live {
   interface FansMedalPanel {
     code: number
     message: string
@@ -62,6 +62,20 @@ declare namespace Live {
     data: LiveData.GetWidgetBannerList.Data
   }
 
+  interface GetGiftBagList {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.GetGiftBagList.Data
+  }
+
+  interface SendBagMultiUser {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.SendBagMultiUser.Data
+  }
+
   interface Q3FansS1MiaoZaiHome {
     code: number
     message: string
@@ -96,9 +110,16 @@ declare namespace Live {
     ttl: number
     data: LiveData.Q3FansS1MiaoZai.ActionData
   }
+
+  interface Q3FansS1MiaoZaiClaimGift {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.Q3FansS1MiaoZai.ClaimGiftData
+  }
 }
 
-declare namespace LiveTrace {
+export declare namespace LiveTrace {
   interface E {
     code: number
     message: string
@@ -114,7 +135,7 @@ declare namespace LiveTrace {
   }
 }
 
-declare namespace Main {
+export declare namespace Main {
   interface Nav {
     code: number
     message: string
@@ -186,5 +207,3 @@ declare namespace Main {
     }
   }
 }
-
-export { Live, LiveTrace, Main }

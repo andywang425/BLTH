@@ -1,4 +1,4 @@
-import { VNode } from 'vue'
+import type { VNode } from 'vue'
 
 interface HelpInfoItem {
   title: string
@@ -24,6 +24,7 @@ interface HelpInfo {
         danmuWaitUntilNotLiving: HelpInfoItem
         watch: HelpInfoItem
         miaoZai: HelpInfoItem
+        miaoZaiClaimGift: HelpInfoItem
       }
     }
     OtherTasks: {
@@ -53,4 +54,4 @@ interface HelpInfo {
   }
 }
 
-export { HelpInfoItem, HelpInfo }
+export type { HelpInfoItem, HelpInfo }

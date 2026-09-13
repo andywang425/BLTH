@@ -100,9 +100,9 @@ export default LikeTask
 
 具体写法可以参考已经写好的模块。
 
-你写的这个模块肯定会有相关的配置项（至少得有一个开启/关闭的选项吧），打开 `src/types/storage.d.ts`，加上该模块配置信息的类型声明。
+你写的这个模块肯定会有相关的配置项（至少得有一个开启/关闭的选项吧），打开 `src/types/storage.ts`，加上该模块配置信息的类型声明。
 
-接着打开 `src/library/storage/defaultValue.ts`，加上该模块配置信息的默认值。
+接着打开 `src/library/storage/defaultValues.ts`，加上该模块配置信息的默认值。
 
 点赞涉及到对B站API的请求。在 `src/library/bili-api/` 中找找看有没有给视频点赞的API，如果没有得自己添加。参考已有的API即可。
 

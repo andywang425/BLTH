@@ -1,5 +1,5 @@
-import Request from '../request'
-import { Live, LiveTrace, Main } from './response'
+import type Request from '../request'
+import type { Live, LiveTrace, Main } from './response'
 
 interface Requests {
   live: Request
@@ -66,6 +66,29 @@ interface BapiMethods {
       source?: string,
       web_location?: string,
     ) => Promise<Live.GetWidgetBannerList>
+    getGiftBagList: (
+      room_id: number,
+      receive_users?: { uid: number }[],
+      mobi_app?: string,
+      web_location?: string,
+    ) => Promise<Live.GetGiftBagList>
+    sendBagMultiUser: (
+      gift_id: number,
+      ruid: number,
+      gift_num: number,
+      bag_id: number,
+      biz_id: number,
+      price?: number,
+      platform?: string,
+      biz_code?: string,
+      send_ruid?: number,
+      storm_beat_id?: number,
+      metadata?: string,
+      receive_users?: { uid: number }[],
+      live_statistics?: string,
+      statistics?: string,
+      web_location?: string,
+    ) => Promise<Live.SendBagMultiUser>
     Q3FansS1MiaoZaiHome: (
       room_id: number,
       ruid: number,
@@ -89,6 +112,10 @@ interface BapiMethods {
       target_uid?: number,
       act_id?: number,
     ) => Promise<Live.Q3FansS1MiaoZaiFeedCat>
+    Q3FansS1MiaoZaiClaimGift: (
+      ruid: number,
+      act_id?: number,
+    ) => Promise<Live.Q3FansS1MiaoZaiClaimGift>
   }
   liveTrace: {
     E: (
@@ -184,4 +211,4 @@ interface BapiMethods {
   }
 }
 
-export { Requests, BapiMethods }
+export type { Requests, BapiMethods }

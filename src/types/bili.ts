@@ -11,4 +11,4 @@ interface FansMedalsMeta {
   lastFetchFinishedAt?: number
 }
 
-export { BiliCookies, FansMedalsStatus, FansMedalsMeta }
+export type { BiliCookies, FansMedalsStatus, FansMedalsMeta }

@@ -180,6 +180,66 @@ const BAPI: BapiMethods = {
       })
     },
     /**
+     * 获取礼物包裹信息（包裹中的礼物列表及其配置）
+     */
+    getGiftBagList: (room_id, receive_users = [], mobi_app = 'web', web_location = '444.8') => {
+      return request.live.get(
+        '/xlive/web-room/v1/gift/bag_list',
+        wbiSign({
+          t: tsm(),
+          room_id,
+          mobi_app,
+          receive_users: JSON.stringify(receive_users),
+          web_location,
+        }),
+      )
+    },
+    /**
+     * 从礼物包裹中给主播赠送礼物（多用户送礼接口，默认 receive_users 只有主播一人）
+     */
+    sendBagMultiUser: (
+      gift_id,
+      ruid,
+      gift_num,
+      bag_id,
+      biz_id,
+      price = 0,
+      platform = 'pc',
+      biz_code = 'Live',
+      send_ruid = 0,
+      storm_beat_id = 0,
+      metadata = '',
+      receive_users = [{ uid: ruid }],
+      live_statistics = '{"pc_client":"pcWeb","jumpfrom":"-99998","room_category":"0","source_event":0,"trackid":"-99998","official_channel":{"program_room_id":"-99998","program_up_id":"-99998"}}',
+      statistics = '{"platform":5,"pc_client":"pcWeb","appId":100}',
+      web_location = '444.8',
+    ) => {
+      const biliStore = useBiliStore()
+      const bili_jct = biliStore.cookies!.bili_jct
+      const uid = biliStore.BilibiliLive!.UID
+      return request.live.post('/xlive/revenue/v2/gift/sendBagMultiUser', null, {
+        params: wbiSign({
+          uid,
+          gift_id,
+          ruid,
+          send_ruid,
+          gift_num,
+          bag_id,
+          platform,
+          biz_code,
+          biz_id,
+          storm_beat_id,
+          metadata,
+          price,
+          receive_users: JSON.stringify(receive_users),
+          live_statistics,
+          statistics,
+          web_location,
+          csrf: bili_jct,
+        }),
+      })
+    },
+    /**
      * 获取超能粉丝节——粉丝福利——亲密喂养（养猫活动）主页数据
      */
     Q3FansS1MiaoZaiHome: (
@@ -270,6 +330,23 @@ const BAPI: BapiMethods = {
           act_id,
           ruid: String(ruid), // 主播 uid
           target_uid: String(uid),
+        }),
+        {
+          params: { csrf: bili_jct },
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    },
+    /**
+     * 亲密喂养：领取喵崽的馈赠（赠送该礼物可获得亲密度）
+     */
+    Q3FansS1MiaoZaiClaimGift: (ruid, act_id = 110505) => {
+      const bili_jct = useBiliStore().cookies!.bili_jct
+      return request.live.post(
+        '/xlive/custom-activity-interface/activities2026/Q3FansS1MiaoZaiClaimGift',
+        JSON.stringify({
+          act_id,
+          ruid: String(ruid), // 主播 uid
         }),
         {
           params: { csrf: bili_jct },
