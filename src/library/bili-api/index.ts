@@ -277,6 +277,23 @@ const BAPI: BapiMethods = {
         },
       )
     },
+    /**
+     * 亲密喂养：领取喵崽的馈赠（赠送该礼物可获得亲密度）
+     */
+    Q3FansS1MiaoZaiClaimGift: (ruid, act_id = 110505) => {
+      const bili_jct = useBiliStore().cookies!.bili_jct
+      return request.live.post(
+        '/xlive/custom-activity-interface/activities2026/Q3FansS1MiaoZaiClaimGift',
+        JSON.stringify({
+          act_id,
+          ruid: String(ruid), // 主播 uid
+        }),
+        {
+          params: { csrf: bili_jct },
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    },
   },
   liveTrace: {
     E: (id, device, ruid, is_patch = 0, heart_beat = [], web_location = '444.8') => {

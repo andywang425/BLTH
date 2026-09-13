@@ -96,6 +96,13 @@ export declare namespace Live {
     ttl: number
     data: LiveData.Q3FansS1MiaoZai.ActionData
   }
+
+  interface Q3FansS1MiaoZaiClaimGift {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.Q3FansS1MiaoZai.ClaimGiftData
+  }
 }
 
 export declare namespace LiveTrace {

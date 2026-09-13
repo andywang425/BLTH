@@ -89,6 +89,10 @@ interface BapiMethods {
       target_uid?: number,
       act_id?: number,
     ) => Promise<Live.Q3FansS1MiaoZaiFeedCat>
+    Q3FansS1MiaoZaiClaimGift: (
+      ruid: number,
+      act_id?: number,
+    ) => Promise<Live.Q3FansS1MiaoZaiClaimGift>
   }
   liveTrace: {
     E: (

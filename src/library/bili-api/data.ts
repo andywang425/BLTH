@@ -1448,6 +1448,15 @@ export declare namespace LiveData {
       cat_type: number
     }
 
+    interface ClaimGiftData {
+      /** code: 0 表示成功 */
+      code: number
+      msg: string
+      /** 馈赠领取状态，领取成功后为 2 */
+      gift_claim_status: number
+      gift_intimacy: number
+    }
+
     interface CatInfo {
       cat_type: number
       cat_name: string
