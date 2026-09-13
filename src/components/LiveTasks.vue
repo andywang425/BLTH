@@ -6,6 +6,10 @@ import { ElMessage, ElMessageBox, ElTable, type TableInstance } from 'element-pl
 import helpInfo from '@/library/help-info'
 import { VueDraggable } from 'vue-draggable-plus'
 import { arrayToMap } from '@/library/utils'
+import { ts } from '@/library/luxon'
+import MiaoZaiTask, {
+  MIAO_ZAI_ACTIVITY_END_TIME,
+} from '@/modules/dailyTasks/liveTasks/medalTasks/miaoZaiTask'
 
 interface MedalInfoRow {
   avatar: string
@@ -196,6 +200,39 @@ function handleRowClick(row: MedalInfoRow) {
   // TODO: TableInstance 未携带行类型泛型，getSelectionRows 返回 DefaultRow[]，等 element-plus 更新
   const selection = (medalInfoTableRef.value?.getSelectionRows() ?? []) as MedalInfoRow[]
   currentTaskConfig.value.roomidList = selection.map((row) => row.roomid)
+}
+
+// ───── 领取并赠送喵崽的馈赠 ─────
+/** 按钮是否执行中（防止重复点击） */
+const miaoZaiClaiming = ref<boolean>(false)
+/** 亲密喂养活动是否已结束（结束后禁用按钮） */
+const miaoZaiActivityEnded = ts() > MIAO_ZAI_ACTIVITY_END_TIME
+
+/**
+ * 领取并赠送喵崽的馈赠
+ */
+const handleClaimMiaoZaiGift = async () => {
+  const instance = moduleStore.moduleInstances['DailyTask_LiveTask_MiaoZaiTask'] as
+    MiaoZaiTask | undefined
+
+  if (!instance) {
+    ElMessage.warning('亲密喂养模块尚未就绪，请稍后再试')
+    return
+  }
+
+  miaoZaiClaiming.value = true
+  try {
+    const { claimed, sent } = await instance.claimAndSendGifts()
+    if (claimed === 0) {
+      ElMessage.info('没有可领取的喵崽的馈赠')
+    } else {
+      ElMessage.success(`成功领取 ${claimed} 份喵崽的馈赠，赠送 ${sent} 份`)
+    }
+  } catch {
+    ElMessage.error('领取喵崽的馈赠时发生错误，详情请查看控制台日志')
+  } finally {
+    miaoZaiClaiming.value = false
+  }
 }
 </script>
 
@@ -420,6 +457,20 @@ function handleRowClick(row: MedalInfoRow) {
           >编辑名单
         </el-button>
         <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.list" />
+      </el-space>
+    </el-row>
+    <el-row>
+      <el-space wrap :size="[8, 0]">
+        <el-button
+          type="primary"
+          size="small"
+          :loading="miaoZaiClaiming"
+          :disabled="miaoZaiActivityEnded"
+          @click="handleClaimMiaoZaiGift"
+        >
+          领取并赠送喵崽的馈赠
+        </el-button>
+        <Info :item="helpInfo.DailyTasks.LiveTasks.medalTasks.miaoZaiClaimGift" />
       </el-space>
     </el-row>
 

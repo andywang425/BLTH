@@ -1503,10 +1503,15 @@ export declare namespace LiveData {
     }
 
     interface GiftByCatLevel {
+      /** 喵崽等级 */
       level: number
+      /** 馈赠档位名（如“普通馈赠”“稀有馈赠”“传说馈赠”） */
       name: string
+      /** 实际礼物名（如“奶喵爪印”），与礼物包裹中的 gift_name 对应 */
       desc: string
+      /** 赠送该馈赠可得亲密度的下限 */
       low: number
+      /** 赠送该馈赠可得亲密度的上限 */
       high: number
     }
 
