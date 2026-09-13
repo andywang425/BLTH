@@ -1524,6 +1524,301 @@ export declare namespace LiveData {
       image: string
     }
   }
+
+  namespace GetGiftBagList {
+    interface Data {
+      /** 包裹中的礼物列表 */
+      list: BagGift[]
+      time: number
+      /** 包裹中每种礼物的详细配置 */
+      gift_config: GiftConfig[]
+    }
+
+    interface BagGift {
+      /** 包裹 id，送礼时作为 bag_id 传入 */
+      bag_id: number
+      gift_id: number
+      gift_name: string
+      /** 该礼物在包裹中的数量 */
+      gift_num: number
+      gift_type: number
+      /** 过期时间（秒级时间戳），永久礼物为 0 */
+      expire_at: number
+      /** 角标文字，如“限定主播”“永久” */
+      corner_mark: string
+      corner_color: string
+      /** 可一次性送出的数量档位 */
+      count_map: CountMap[]
+      bind_roomid: number
+      bind_room_text: string
+      type: number
+      card_image: string
+      card_gif: string
+      card_id: number
+      card_record_id: number
+      is_show_send: boolean
+      expire_text: string
+      max_send_limit: number
+      diy_count_map: number
+      effect_id: number
+      is_locked: boolean
+      locked_text: string
+      dynamic_corner: boolean
+    }
+
+    interface CountMap {
+      num: number
+      text: string
+      flags: number[]
+    }
+
+    interface GiftConfig {
+      /** 礼物 id，与 BagGift.gift_id 对应 */
+      id: number
+      name: string
+      /** 礼物单价（金瓜子） */
+      price: number
+      type: number
+      coin_type: string
+      /** 是否为包裹礼物 */
+      bag_gift: number
+      effect: number
+      corner_mark: string
+      corner_background: string
+      broadcast: number
+      draw: number
+      stay_time: number
+      animation_frame_num: number
+      desc: string
+      rule: string
+      rights: string
+      privilege_required: number
+      count_map: GiftConfigCountMap[]
+      img_basic: string
+      img_dynamic: string
+      frame_animation: string
+      gif: string
+      webp: string
+      full_sc_web: string
+      full_sc_horizontal: string
+      full_sc_vertical: string
+      full_sc_horizontal_svga: string
+      full_sc_vertical_svga: string
+      bullet_head: string
+      bullet_tail: string
+      limit_interval: number
+      bind_ruid: number
+      bind_roomid: number
+      gift_type: number
+      combo_resources_id: number
+      max_send_limit: number
+      weight: number
+      goods_id: number
+      has_imaged_gift: number
+      left_corner_text: string
+      left_corner_background: string
+      gift_banner: any
+      diy_count_map: number
+      effect_id: number
+      first_tips: string
+      gift_attrs: number[]
+      corner_mark_color: string
+      corner_color_bg: string
+      web_light: CornerStyle
+      web_dark: CornerStyle
+    }
+
+    interface GiftConfigCountMap {
+      num: number
+      text: string
+      desc: string
+      web_svga: string
+      vertical_svga: string
+      horizontal_svga: string
+      special_color: string
+      effect_id: number
+    }
+
+    interface CornerStyle {
+      corner_mark: string
+      corner_background: string
+      corner_mark_color: string
+      corner_color_bg: string
+    }
+  }
+
+  namespace SendBagMultiUser {
+    interface Data {
+      /** 送礼用户（自己）的 uid */
+      uid: number
+      uname: string
+      face: string
+      guard_level: number
+      /** 收礼主播的 uid */
+      ruid: number
+      room_id: number
+      /** 主播累计收到的金瓜子 */
+      rcost: number
+      total_coin: number
+      pay_coin: number
+      blow_switch: number
+      send_tips: string
+      discount_id: number
+      send_master: any
+      button_combo_type: number
+      send_gift_countdown: number
+      blind_gift: any
+      fulltext: string
+      crit_prob: number
+      price: number
+      left_num: number
+      need_num: number
+      available_num: number
+      bp_cent_balance: number
+      gift_list: Gift[]
+      send_id: string
+      /** 送礼用户（自己）的信息 */
+      sender_uinfo: UInfo
+    }
+
+    interface Gift {
+      tid: string
+      gift_id: number
+      gift_type: number
+      gift_name: string
+      gift_num: number
+      /** 送礼动作文案，如“投喂” */
+      gift_action: string
+      gift_price: number
+      coin_type: string
+      tag_image: string
+      effect_block: number
+      extra: GiftExtra
+      gift_effect: GiftEffect
+      is_special_batch: number
+      combo_stay_time: number
+      combo_total_coin: number
+      demarcation: number
+      magnification: number
+      combo_resources_id: number
+      float_sc_resource_id: number
+      is_naming: boolean
+      receive_user_info: ReceiveUserInfo
+      is_join_receiver: boolean
+      gift_tag: any
+      /** 收礼用户（主播）的信息 */
+      receiver_uinfo: UInfo
+      gift_info: GiftInfo
+      benefits: any
+    }
+
+    interface GiftExtra {
+      wallet: any
+      gift_bag: GiftBag
+      pk: Pk
+      lottery_id: string
+      medal: ExtraMedal
+    }
+
+    interface GiftBag {
+      bag_id: number
+      /** 送出后包裹中剩余的该礼物数量 */
+      gift_num: number
+    }
+
+    interface Pk {
+      pk_gift_tips: string
+    }
+
+    interface ExtraMedal {
+      new: number
+      medal_id: number
+      medal_name: string
+      level: number
+    }
+
+    interface GiftEffect {
+      combo_timeout: number
+      super_gift_num: number
+      super_batch_gift_num: number
+      batch_combo_id: string
+      combo_id: string
+    }
+
+    interface ReceiveUserInfo {
+      uname: string
+      uid: number
+    }
+
+    interface GiftInfo {
+      img_basic: string
+      webp: string
+      effect_id: number
+      has_imaged_gift: number
+    }
+
+    interface UInfo {
+      uid: number
+      base: UInfoBase
+      /** 收礼主播通常为 null，送礼用户为自己的粉丝勋章信息 */
+      medal: UInfoMedal | null
+      wealth: any
+      title: any
+      guard: any
+      uhead_frame: any
+      guard_leader: any
+      anon: any
+      bubble_box: any
+      dm_config: any
+      name_color: any
+    }
+
+    interface UInfoBase {
+      name: string
+      face: string
+      name_color: number
+      is_mystery: boolean
+      risk_ctrl_info: any
+      origin_info: OriginInfo
+      official_info: OfficialInfo
+      name_color_str: string
+    }
+
+    interface OriginInfo {
+      name: string
+      face: string
+    }
+
+    interface OfficialInfo {
+      role: number
+      title: string
+      desc: string
+      type: number
+    }
+
+    interface UInfoMedal {
+      name: string
+      level: number
+      color_start: number
+      color_end: number
+      color_border: number
+      color: number
+      id: number
+      typ: number
+      is_light: number
+      ruid: number
+      guard_level: number
+      score: number
+      guard_icon: string
+      honor_icon: string
+      v2_medal_color_start: string
+      v2_medal_color_end: string
+      v2_medal_color_border: string
+      v2_medal_color_text: string
+      v2_medal_color_level: string
+      user_receive_count: number
+    }
+  }
 }
 
 export declare namespace LiveTraceData {

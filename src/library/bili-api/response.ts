@@ -62,6 +62,20 @@ export declare namespace Live {
     data: LiveData.GetWidgetBannerList.Data
   }
 
+  interface GetGiftBagList {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.GetGiftBagList.Data
+  }
+
+  interface SendBagMultiUser {
+    code: number
+    message: string
+    ttl: number
+    data: LiveData.SendBagMultiUser.Data
+  }
+
   interface Q3FansS1MiaoZaiHome {
     code: number
     message: string
