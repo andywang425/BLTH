@@ -295,12 +295,12 @@ class LightTask extends MedalModule {
         }
       }
 
+      this.status = 'done'
       if (allCompleted) {
         this.config._lastCompleteTime = tsm()
-        this.status = 'done'
         this.logger.log('点亮熄灭勋章任务已完成')
       } else {
-        this.status = ''
+        this.logger.warn('点亮熄灭勋章任务结束，未能完成部分粉丝勋章的点亮任务，下次运行会继续尝试')
       }
     } else {
       if (isNowBefore(0, 5)) {

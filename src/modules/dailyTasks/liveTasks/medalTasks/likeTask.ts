@@ -275,12 +275,12 @@ class LikeTask extends MedalModule {
         }
       }
 
+      this.status = 'done'
       if (allCompleted) {
         this.config._lastCompleteTime = tsm()
-        this.status = 'done'
         this.logger.log('点赞任务已完成')
       } else {
-        this.status = ''
+        this.logger.warn('点赞任务结束，未能完成部分粉丝勋章的点赞任务，下次运行会继续尝试')
       }
     } else {
       if (isNowBefore(0, 5)) {

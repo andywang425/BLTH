@@ -75,48 +75,6 @@ export declare namespace Live {
     ttl: number
     data: LiveData.SendBagMultiUser.Data
   }
-
-  interface Q3FansS1MiaoZaiHome {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.Q3FansS1MiaoZai.HomeData
-  }
-
-  interface Q3FansS1MiaoZaiSelectCat {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.Q3FansS1MiaoZai.ActionData
-  }
-
-  interface Q3FansS1MiaoZaiSignIn {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.Q3FansS1MiaoZai.ActionData
-  }
-
-  interface Q3FansS1MiaoZaiPetCat {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.Q3FansS1MiaoZai.ActionData
-  }
-
-  interface Q3FansS1MiaoZaiFeedCat {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.Q3FansS1MiaoZai.ActionData
-  }
-
-  interface Q3FansS1MiaoZaiClaimGift {
-    code: number
-    message: string
-    ttl: number
-    data: LiveData.Q3FansS1MiaoZai.ClaimGiftData
-  }
 }
 
 export declare namespace LiveTrace {

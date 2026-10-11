@@ -21,6 +21,8 @@ class SwitchLiveStreamQuality extends BaseModule {
       },
     })
 
+    playerInfo = livePlayer.getPlayerInfo()
+
     const isHDR = this.config.qualityDesc.includes('HDR')
     const searchStr = this.config.qualityDesc.replace(/（.*）/, '')
 

@@ -164,6 +164,7 @@ const fproxy = (
       win.fetch = _fetch
       onRequestHandlers = []
       onResponseHandlers = []
+      isHooked = false
     },
     originFetch: _fetch,
   }
