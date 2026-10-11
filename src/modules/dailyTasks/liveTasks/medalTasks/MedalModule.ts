@@ -286,6 +286,8 @@ class MedalModule extends BaseModule {
       const biliStore = useBiliStore()
       if (biliStore.fansMedalsMeta.status === 'loaded') {
         resolve(true)
+      } else if (biliStore.fansMedalsMeta.status === 'error') {
+        resolve(false)
       } else {
         const unwatch = watch(
           () => biliStore.fansMedalsMeta.status,

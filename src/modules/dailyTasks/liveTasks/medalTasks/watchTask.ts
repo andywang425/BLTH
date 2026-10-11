@@ -451,12 +451,14 @@ class WatchTask extends MedalModule {
           }
         }
 
+        this.status = 'done'
         if (allCompleted) {
           this.config._lastCompleteTime = tsm()
           this.logger.log('观看直播任务已完成')
-          this.status = 'done'
         } else {
-          this.status = ''
+          this.logger.warn(
+            '观看直播任务结束，未能完成部分粉丝勋章的观看直播任务，下次运行会继续尝试',
+          )
         }
       } else {
         this.status = 'done'
