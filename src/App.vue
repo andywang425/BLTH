@@ -123,11 +123,7 @@ if (livePlayer) {
         </el-aside>
         <el-main class="main">
           <el-scrollbar :height="uiStore.scrollBarHeight">
-            <KeepAlive>
-              <Transition name="fade" mode="out-in">
-                <PanelMain class="panel-main" />
-              </Transition>
-            </KeepAlive>
+            <PanelMain class="panel-main" />
           </el-scrollbar>
         </el-main>
       </el-container>
@@ -165,10 +161,5 @@ if (livePlayer) {
 
 .panel-main {
   padding: calc(var(--el-main-padding) * 0.625) var(--el-main-padding);
-}
-
-/* PanelMain切换时的动画效果 */
-.fade-enter-active {
-  animation: fade-in linear 0.2s;
 }
 </style>

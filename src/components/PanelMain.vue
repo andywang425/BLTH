@@ -26,5 +26,20 @@ const uiStore = useUIStore()
 </script>
 
 <template>
-  <component :is="uiStore.uiConfig.activeMenuIndex"></component>
+  <Transition mode="out-in">
+    <KeepAlive>
+      <component :is="uiStore.uiConfig.activeMenuIndex" />
+    </KeepAlive>
+  </Transition>
 </template>
+
+<style scoped>
+.v-enter-active {
+  transition: opacity 0.2s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>
