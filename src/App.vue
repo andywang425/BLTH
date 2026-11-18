@@ -79,22 +79,20 @@ if (livePlayer) {
       buttonAnchorObserver.observe(buttonAnchor)
     })
     .catch((e: Error) => logger.error(e))
-    .finally(() => {
-      // 即使按钮创建失败，也要注册快捷键
-      if (!isSelfTopFrame()) {
-        // 在特殊直播间，脚本所在的目标 frame 只占屏幕中间一块地方
-        // 如果焦点不在里面，快捷键会失效
-        // 所以这里额外把 hotkeys 注入到顶层 frame 确保快捷键总是可用
-        hotkeys(
-          'alt+b',
-          {
-            element: topFrameDocumentElement(),
-          },
-          throttleButtonOnClick,
-        )
-      }
-      hotkeys('alt+b', throttleButtonOnClick)
-    })
+  // 即使按钮创建失败，也要注册快捷键，否则用户将无法开关控制面板
+  if (!isSelfTopFrame()) {
+    // 在特殊直播间，脚本所在的目标 frame 只占屏幕中间一块地方
+    // 如果焦点不在里面，快捷键会失效
+    // 所以这里额外把 hotkeys 注入到顶层 frame 确保快捷键总是可用
+    hotkeys(
+      'alt+b',
+      {
+        element: topFrameDocumentElement(),
+      },
+      throttleButtonOnClick,
+    )
+  }
+  hotkeys('alt+b', throttleButtonOnClick)
   // 监听页面缩放，调整控制面板大小
   // 因为这个操作频率不高就不节流或防抖了
   window.addEventListener('resize', () => syncLivePlayerRect())
