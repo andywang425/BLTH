@@ -20,7 +20,7 @@ const isShowPanel = uiStore.uiConfig.isShowPanel
 uiStore.uiConfig.isShowPanel = false
 // 显示/隐藏控制面板按钮
 let button: HTMLButtonElement | null = null
-// 按钮的定位锚点（.normal-row-ctnr 的第一个子节点）
+// 按钮的定位锚点（#head-info-vm 的 .header-left 子节点）
 let buttonAnchor: HTMLElement | null = null
 /**
  * 更新显示/隐藏控制面板按钮的位置
@@ -61,48 +61,38 @@ const livePlayer = dq('.player-section')
 if (livePlayer) {
   syncLivePlayerRect()
   // 节点 #player-ctnr 在初始 html 中出现
-  waitForElement(dq('#player-ctnr')!, '.header-info-ctnr .normal-row-ctnr', 10e3)
-    .then((normalRowCtnr) => {
+  // #head-info-vm 早期是占位节点，稍后会被B站的Vue整体替换，不能直接作为等待的目标元素
+  waitForElement(dq('#player-ctnr')!, '#head-info-vm > .header-left', 10e3)
+    .then((anchor) => {
+      buttonAnchor = anchor as HTMLElement
       // 创建显示/隐藏控制面板按钮
       button = dce('button')
       button.setAttribute('class', 'blth-btn')
       button.onclick = throttleButtonOnClick
       button.innerText = uiStore.isShowPanelButtonText
-      // 把按钮插入到 normal-row-ctnr 的第一个子节点后面
-      const firstChild = normalRowCtnr.firstChild
-      if (firstChild) {
-        firstChild.after(button)
-      } else {
-        logger.warn('.normal-row-ctnr 没有子节点', normalRowCtnr)
-        normalRowCtnr.appendChild(button)
-      }
-      // 记录按钮的定位锚点
-      buttonAnchor =
-        normalRowCtnr.firstElementChild instanceof HTMLElement
-          ? normalRowCtnr.firstElementChild
-          : null
+      // 把按钮插入到定位锚点后面
+      buttonAnchor.after(button)
       // 初始化按钮位置
       updateButtonPosition()
       // 锚点宽度变化时更新按钮位置
-      if (buttonAnchor) {
-        const buttonAnchorObserver = new ResizeObserver(() => updateButtonPosition())
-        buttonAnchorObserver.observe(buttonAnchor)
-      }
-      if (!isSelfTopFrame()) {
-        // 在特殊直播间，脚本所在的目标 frame 只占屏幕中间一块地方
-        // 如果焦点不在里面，快捷键会失效
-        // 所以这里额外把 hotkeys 注入到顶层 frame 确保快捷键总是可用
-        hotkeys(
-          'alt+b',
-          {
-            element: topFrameDocumentElement(),
-          },
-          throttleButtonOnClick,
-        )
-      }
-      hotkeys('alt+b', throttleButtonOnClick)
+      const buttonAnchorObserver = new ResizeObserver(() => updateButtonPosition())
+      buttonAnchorObserver.observe(buttonAnchor)
     })
     .catch((e: Error) => logger.error(e))
+  // 即使按钮创建失败，也要注册快捷键，否则用户将无法开关控制面板
+  if (!isSelfTopFrame()) {
+    // 在特殊直播间，脚本所在的目标 frame 只占屏幕中间一块地方
+    // 如果焦点不在里面，快捷键会失效
+    // 所以这里额外把 hotkeys 注入到顶层 frame 确保快捷键总是可用
+    hotkeys(
+      'alt+b',
+      {
+        element: topFrameDocumentElement(),
+      },
+      throttleButtonOnClick,
+    )
+  }
+  hotkeys('alt+b', throttleButtonOnClick)
   // 监听页面缩放，调整控制面板大小
   // 因为这个操作频率不高就不节流或防抖了
   window.addEventListener('resize', () => syncLivePlayerRect())
@@ -133,11 +123,7 @@ if (livePlayer) {
         </el-aside>
         <el-main class="main">
           <el-scrollbar :height="uiStore.scrollBarHeight">
-            <KeepAlive>
-              <Transition name="fade" mode="out-in">
-                <PanelMain class="panel-main" />
-              </Transition>
-            </KeepAlive>
+            <PanelMain class="panel-main" />
           </el-scrollbar>
         </el-main>
       </el-container>
@@ -175,10 +161,5 @@ if (livePlayer) {
 
 .panel-main {
   padding: calc(var(--el-main-padding) * 0.625) var(--el-main-padding);
-}
-
-/* PanelMain切换时的动画效果 */
-.fade-enter-active {
-  animation: fade-in linear 0.2s;
 }
 </style>
