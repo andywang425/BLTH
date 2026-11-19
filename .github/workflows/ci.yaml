@@ -17,5 +17,12 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - name: Validate release version and changelog
+        if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'dev'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --depth=1 origin "$BASE_SHA"
+          node scripts/check-release-version.mjs "$BASE_SHA"
       - run: npm ci
       - run: npm run build
