@@ -9,50 +9,94 @@ on:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'dev'
+    permissions:
+      contents: write
+      pull-requests: read
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'dev'
     runs-on: ubuntu-latest
+
+    env:
+      MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "24.13.0"
+          node-version-file: .nvmrc
+          cache: npm
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build
         run: npm run build
 
-      - name: Get package version
-        id: package_version
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-
-      - name: Read changelog for current version
-        id: changelog
+      - name: Extract and check release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION="${{ steps.package_version.outputs.version }}"
-          {
-            echo "body<<EOF"
-            awk -v version="$VERSION" '
-              $0 ~ "^## \\[" version "\\]" {flag=1}
-              flag && /^## \[/ && $0 !~ "^## \\[" version "\\]" {exit}
-              flag
-            ' CHANGELOG.md
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          version=$(node -p "require('./package.json').version")
+          node scripts/extract-changelog.mjs "$version" "$RUNNER_TEMP/release.md"
+          gh pr view "$PR_NUMBER" --json body > "$RUNNER_TEMP/pr.json"
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const pr = JSON.parse(readFileSync(process.env.RUNNER_TEMP + '/pr.json'))
+          const expected = readFileSync(process.env.RUNNER_TEMP + '/release.md', 'utf8')
+          if (pr.body?.replaceAll('\r\n', '\n') !== expected) throw new Error('Merged PR body differs from changelog')
+          NODE
+
+      - name: Check tag, release and files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        id: check
+        run: node scripts/check-release.mjs inspect "$MERGE_SHA" "$RUNNER_TEMP/release.md"
+
+      - name: Create tag at merge commit
+        if: steps.check.outputs.create_tag == 'true'
+        env:
+          TAG: ${{ steps.check.outputs.tag }}
+        run: git push origin "$MERGE_SHA:refs/tags/$TAG"
 
       - name: Create GitHub Release
+        if: steps.check.outputs.state == 'create'
         uses: softprops/action-gh-release@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.package_version.outputs.version }}
-          name: v${{ steps.package_version.outputs.version }}
-          body: ${{ steps.changelog.outputs.body }}
-          draft: false
-          prerelease: false
-          files: dist/*
+          tag_name: ${{ steps.check.outputs.tag }}
+          name: ${{ steps.check.outputs.tag }}
+          target_commitish: ${{ github.event.pull_request.merge_commit_sha }}
+          body_path: ${{ runner.temp }}/release.md
+          overwrite_files: false
+          fail_on_unmatched_files: true
+          files: |
+            dist/bilibili-live-tasks-helper.user.js
+            dist/bilibili-live-tasks-helper.min.user.js
+            dist/bilibili-live-tasks-helper.meta.js
+
+      - name: Resume incomplete release
+        if: steps.check.outputs.state == 'repair' || steps.check.outputs.state == 'draft'
+        env:
+          TAG: ${{ steps.check.outputs.tag }}
+          MISSING: ${{ steps.check.outputs.missing }}
+          GH_TOKEN: ${{ github.token }}
+          STATE: ${{ steps.check.outputs.state }}
+        run: |
+          for file in $MISSING; do
+            gh release upload "$TAG" "$file"
+          done
+          if [[ "$STATE" == draft ]]; then
+            gh release edit "$TAG" --draft=false
+          fi
+
+      - name: Verify published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/check-release.mjs verify "$MERGE_SHA" "$RUNNER_TEMP/release.md"
