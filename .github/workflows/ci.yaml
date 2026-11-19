@@ -13,6 +13,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
@@ -21,8 +23,7 @@ jobs:
         if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'dev'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          git fetch --depth=1 origin "$BASE_SHA"
-          node scripts/check-release-version.mjs "$BASE_SHA"
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node scripts/check-release-version.mjs "$BASE_SHA" "$HEAD_SHA"
       - run: npm ci
       - run: npm run build
