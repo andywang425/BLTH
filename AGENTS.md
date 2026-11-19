@@ -5,12 +5,14 @@ BLTH（Bilibili Live Tasks Helper）是基于 Vue 3 + Vite + vite-plugin-monkey 
 # 常用命令
 
 ```sh
-npm run dev          # 启动 Vite 开发服务器并安装脚本（支持 HMR）
-npm run build        # type-check 与 build+minify 并行
-npm run type-check   # 仅 Vue TypeScript 类型检查
-npm run lint         # ESLint + Stylelint 自动修复
-npm run format       # 使用 Prettier 格式化 src/
-npm run preview      # 打开提供编译产物安装链接的本地预览网页
+npm run dev           # 启动 Vite 开发服务器并安装脚本（支持 HMR）
+npm run build         # type-check 与 build+minify 并行
+npm run type-check    # 仅 Vue TypeScript 类型检查
+npm run lint          # ESLint + Stylelint 自动修复
+npm run lint:check    # 依次运行 ESLint 和 Stylelint，仅检查
+npm run format        # 使用 Prettier 格式化 src/
+npm run format:check  # 使用 Prettier 检查 src/ 的代码格式
+npm run preview       # 打开提供编译产物安装链接的本地预览网页
 ```
 
 无自动化测试。
