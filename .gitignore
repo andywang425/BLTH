@@ -7,17 +7,20 @@ node_modules
 # Editor/Agent directories and files
 .vscode/*
 !.vscode/extensions.json
+.agents/*
+!.agents/skills/
+.claude
 .idea
 .trae
-.claude
-.agents
-!/.agents/
-/.agents/*
-!/.agents/skills/
 .qoder
+.workbuddy
 opencode.json
-artifacts
-.dsh
+.opencode
+.cursor
+.codex
+.gemini
+.windsurf
+.kiro
 
 # Notes
 notes
@@ -25,6 +28,6 @@ notes
 # Build output
 dist
 
-# ESLint & stylelint cache
+# ESLint & Stylelint cache
 .eslintcache
 .stylelintcache
