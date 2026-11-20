@@ -34,7 +34,7 @@ export const useCacheStore = defineStore('cache', () => {
       cache.value.lastAliveHeartBeatTime = tsm()
     }, 5000)
 
-    window.addEventListener('unload', () => {
+    window.addEventListener('pagehide', () => {
       clearInterval(heartBeatTimer)
 
       const rawCache = toRaw(cache.value)
