@@ -25,5 +25,6 @@ notes
 # Build output
 dist
 
-# ESLint cache
+# ESLint & stylelint cache
 .eslintcache
+.stylelintcache
