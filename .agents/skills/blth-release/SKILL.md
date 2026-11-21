@@ -5,7 +5,7 @@ description: Automates the BLTH release flow. Invoke when the user wants to prep
 
 # BLTH Release
 
-执行 BLTH 项目的发版流程。如果仓库根目录下存在 `.agents/local/blth-release.md`，开始前先读取其中的本地发版约定。
+执行 BLTH 项目的发版流程。
 
 ## 目标
 
