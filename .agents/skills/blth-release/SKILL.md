@@ -170,13 +170,14 @@ git log --oneline <previousTag>..HEAD
 
 ### 5. 本地校验
 
-在仓库根目录核对当前 Node 版本与 `.nvmrc` 完全一致。版本不符时先切换，再按锁文件安装依赖，依次运行与 CI 相同的 lint 检查、格式检查和构建。
+在仓库根目录核对当前 Node 版本与 `.nvmrc` 完全一致。版本不符时先切换，再按锁文件安装依赖，依次运行与 CI 相同的代码检查、格式检查、Markdown 检查和构建。
 
 ```bash
 node -e "if (process.versions.node !== require('node:fs').readFileSync('.nvmrc', 'utf8').trim()) process.exit(1)"
 npm ci
 npm run lint:check
 npm run format:check
+npm run docs:check
 npm run build
 ```
 

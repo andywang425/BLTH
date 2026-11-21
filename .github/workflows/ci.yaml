@@ -33,5 +33,7 @@ jobs:
         run: npm run lint:check
       - name: Check formatting with Prettier
         run: npm run format:check
+      - name: Check Markdown with markdownlint
+        run: npm run docs:check
       - name: Type-check and build userscript
         run: npm run build
