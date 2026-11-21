@@ -10,8 +10,8 @@ BLTH 是一个基于 [Vue3](https://cn.vuejs.org), [Element Plus](https://elemen
 
 ## 环境搭建
 
-- 安装 [Node.js](https://nodejs.org/) (建议安装最新的 LTS 版本)
-- 如果使用 [Visual Studio Code](https://code.visualstudio.com/)，安装以下几个拓展（打开项目时会提示你安装）：[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Styleint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint), [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- 安装 [Node.js](https://nodejs.org/) (建议安装 `.nvmrc` 文件中指定的版本)
+- 如果使用 [Visual Studio Code](https://code.visualstudio.com/)，安装以下几个拓展（打开项目时会提示你安装）：[Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint), [Styleint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint), [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig), [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [markdownlint](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint)
 
 ## 开始
 
@@ -60,18 +60,18 @@ npm run dev
 
 ### 目录结构
 
-```
+```text
 BLTH
 ├─.vscode
 ├─dist                     npm run build 得到的用户脚本
-├─scripts                  一些npm scripts，通过 npm run ... 调用
+├─scripts                  一些js脚本，通过 npm run ... 调用或在 GitHub Actions 工作流中使用
 └─src
     ├─assets               资源文件
     │  └─css
     ├─components           vue组件
     │  └─icons             图标组件
     ├─library              库文件
-    │  ├─...               每个文件夹代表一个库，此处省略
+    │  ├─...               每个目录代表一个库，此处省略
     ├─modules              模块
     │  ├─...               这里有很多模块，此处省略
     │  └─default           默认模块，性质较特殊
@@ -85,7 +85,7 @@ BLTH
 
 假设现在B站给主站每日任务新添加了一个任务：给视频点赞。
 
-首先打开 `src/modules` 文件夹，你会发现已经有了 `dailyTasks/mainSiteTasks/` 这个文件夹，那么你只需在这个文件夹下新建一个 ts 文件即可。内容大概如下：
+首先打开 `src/modules/` 目录，你会发现已经有了 `dailyTasks/mainSiteTasks/` 这个目录，那么你只需在这个目录下新建一个 ts 文件即可。内容大概如下：
 
 ```ts
 import BaseModule from '@/modules/BaseModule'
@@ -114,11 +114,9 @@ export default LikeTask
 
 为了更好的用户体验，建议加上帮助信息（`Info` 组件）、模块状态和模块再运行功能（`TaskStatus` 组件）。参考已有的模块即可。
 
-## 代码风格
+## 代码和文档风格
 
-编写的代码需要能够通过 ESlint 和 Stylelint 检查。在你编写代码的过程中 [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) 和 [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint) 拓展会实时地检查打开的代码文件。
-
-你也可以使用以下命令检查所有文件：
+编写的代码需通过 ESlint 和 Stylelint 检查。你可以使用以下命令检查所有文件：
 
 ```sh
 npm run lint
@@ -130,16 +128,23 @@ npm run lint
 npm run format
 ```
 
+如果你修改了文档，需通过 markdownlint 检查。
+
+```sh
+npm run docs:check  # 仅检查
+npm run docs:fix    # 自动修复（修复方式不一定符合你的预期，使用后请核验修复结果）
+```
+
 ## 编码准则
 
 ### 强制性
 
-- 对于 `src/library/bili-api/` 中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](https://github.com/ritz078/transform) 和 [quicktype](https://github.com/quicktype/quicktype) 或许会有帮助
+- 对于 `src/library/bili-api/` 中的每个 API，必须为其请求参数和响应内容编写详细的类型定义。[transform](https://github.com/ritz078/transform) 和 [quicktype](https://github.com/quicktype/quicktype) 或许会有帮助。另外，LLM 挺擅长干这个的，生成的类型定义通常比上述工具生成的更好
 - 如果添加了新的第三方库或资源文件，请修改 `vite.config.ts` 使其通过 `@require` 或 `@resource` 引入
 
 ### 建议性
 
-- 尽可能详细地写类型定义，必要时才使用`any`/`unknown`
+- 尽可能详细地写类型定义，必要时才使用 `any`/`unknown`
 - 为逻辑复杂的代码编写注释
 
 ## 编译
@@ -150,7 +155,7 @@ npm run format
 npm run build
 ```
 
-这会在`dist`文件夹下生成一个后缀为`.user.js`的文件和一个后缀为`.min.user.js`的文件，分别是未压缩的和压缩后的用户脚本。
+这会在 `dist/` 目录下生成一个后缀为 `.user.js` 的文件和一个后缀为 `.min.user.js` 的文件，分别是未压缩的和压缩后的用户脚本。
 
 最后输入以下命令在浏览器中打开预览页面：
 
@@ -170,4 +175,4 @@ npm run preview
 
 ## 发起 PR
 
-把你的分支合并到主仓库的`dev`分支即可。
+把你的分支合并到主仓库的 `dev` 分支即可。

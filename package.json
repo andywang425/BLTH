@@ -18,6 +18,8 @@
     "lint:check": "run-p -c lint:eslint:check lint:stylelint:check",
     "format": "prettier --write --experimental-cli src/",
     "format:check": "prettier --check --experimental-cli src/",
+    "docs:check": "markdownlint-cli2",
+    "docs:fix": "markdownlint-cli2 --fix",
     "minify": "node scripts/minifyUserscript.js",
     "svg2vue": "node scripts/convertSvgToVue.js"
   },
@@ -56,6 +58,7 @@
     "typescript": "~6.0.3",
     "vite": "^8.3.8",
     "vite-plugin-monkey": "^8.1.1",
-    "vue-tsc": "3.3.11"
+    "vue-tsc": "3.3.11",
+    "markdownlint-cli2": "^0.24.2"
   }
 }

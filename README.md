@@ -6,7 +6,7 @@
 
 # 环境要求
 
-- 浏览器：推荐使用 Chrome, Edge, Firefox, Safari 或 Opera。
+- 浏览器：推荐使用 Chrome, Edge 或 Firefox。
 - 用户脚本管理器：推荐使用 [Tampermonkey](https://www.tampermonkey.net) 或 [Violentmonkey](https://violentmonkey.github.io)。
 
 # 安装
@@ -15,8 +15,8 @@
 
 点击下方表格中的任一链接即可从你喜欢的源安装脚本：
 
-| Github min（推荐）                                                                                          | Github                                                                                                  | GreasyFork                                                                         |
-| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Github min（推荐） | Github | GreasyFork |
+| --- | --- | --- |
 | [安装](https://github.com/andywang425/BLTH/releases/latest/download/bilibili-live-tasks-helper.min.user.js) | [安装](https://github.com/andywang425/BLTH/releases/latest/download/bilibili-live-tasks-helper.user.js) | [前往安装](https://greasyfork.org/zh-CN/scripts/406048-bilibili-live-tasks-helper) |
 
 - Github min: Github 源，代码经过压缩，运行效率最高。以后脚本也会从 Github 更新。
@@ -28,7 +28,7 @@
 
 在用户脚本管理器中启用脚本，登陆 bilibili 后打开任意 b 站直播间。如果一切正常你将在直播画面左侧找到一个[控制面板](https://github.com/andywang425/BLTH/blob/master/images/example.png)。
 
-- 隐藏/显示控制面板：点击位于直播画面上方的蓝底白字按钮即可开/关控制面板。你也可以使用键盘快捷键`alt+b`。
+- 隐藏/显示控制面板：点击位于直播画面上方的蓝底白字按钮即可开/关控制面板。你也可以使用键盘快捷键 `alt+b`。
 - 展开/收起侧边栏：点击控制面板左上角的按钮展开/收起左侧菜单。
 - 点击控制面板上带有圆圈的蓝色小`i`图标可以显示各项功能的详细信息。
 - 部分功能右侧会显示一个小图标以表示今天该任务的状态：
@@ -41,20 +41,20 @@
   建议首次使用时仔细阅读各项功能的说明，然后一次完成所有功能的设置。
 - 打开多个直播间页面时，每日任务中的功能仅会在第一个直播间页面生效以防止任务被重复执行。体验优化、移除元素中的功能总是会生效。
 - 每日任务中大部分任务的任务周期是每天半夜00:05到下一个半夜00:05，即只要过了每天的00:05就会自动执行下一轮。
-- 控制台日志：如果想查看控制台日志，请打开浏览器的开发者工具（快捷键`ctrl+shift+i`或`F12`）并切换到控制台（`Console`）。开头为`BLTH`的日志即为脚本日志。
+- 控制台日志：如果想查看控制台日志，请打开浏览器的开发者工具并切换到控制台（`Console`，快捷键 `ctrl+shift+j`）。开头为 `BLTH` 的日志即为脚本日志。
   部分日志可能只有高级用户才看得懂，大家各取所需看自己想看的即可。善用过滤（`Filter`）和搜索（快捷键`ctrl+f`）功能。
 
 # 兼容性
 
-[BLTH](https://github.com/andywang425/BLTH)在设计上希望与[Bilibili Evolved](https://github.com/the1812/Bilibili-Evolved)和[bilibili 直播净化](https://greasyfork.org/zh-CN/scripts/21416-bilibili%E7%9B%B4%E6%92%AD%E5%87%80%E5%8C%96)兼容，即三个脚本能同时正常运行。
+[BLTH](https://github.com/andywang425/BLTH) 在设计上希望与 [Bilibili Evolved](https://github.com/the1812/Bilibili-Evolved) 和 [bilibili 直播净化](https://greasyfork.org/zh-CN/scripts/21416-bilibili%E7%9B%B4%E6%92%AD%E5%87%80%E5%8C%96)兼容，即三个脚本能同时正常运行。
 
-如果你发现存在兼容性问题可以[创建一个issue](https://github.com/andywang425/BLTH/issues/new?template=bug_report.yaml)来反馈。
+如果你发现存在兼容性问题可以[创建一个 issue](https://github.com/andywang425/BLTH/issues/new?template=bug_report.yaml) 来反馈。
 
 # 反馈
 
-如果想反馈 Bug 或者提出建议，请在[Issues](https://github.com/andywang425/BLTH/issues)页面点击[New issue](https://github.com/andywang425/BLTH/issues/new/choose)，然后选择对应的 issue 模板。
+如果想反馈 Bug 或者提出建议，请在 [Issues](https://github.com/andywang425/BLTH/issues) 页面点击 [New issue](https://github.com/andywang425/BLTH/issues/new/choose)，然后选择对应的 issue 模板。
 
-为了方便管理issue，请在 GreasyFork 安装脚本的用户尽量到 Github 反馈。
+为了方便管理 issues，请在 GreasyFork 安装脚本的用户尽量到 Github 反馈。
 
 # 交流群
 
@@ -66,7 +66,7 @@
 
 # 许可证
 
-本项目以[MIT](https://github.com/andywang425/BLTH/blob/master/LICENSE)许可证开源。
+本项目以 [MIT](https://github.com/andywang425/BLTH/blob/master/LICENSE) 许可证开源。
 
 # 鸣谢
 
@@ -91,7 +91,7 @@
 
 # 更新日志
 
-请查看[CHANGELOG](https://github.com/andywang425/BLTH/blob/master/CHANGELOG.md)。
+请查看 [CHANGELOG](https://github.com/andywang425/BLTH/blob/master/CHANGELOG.md)。
 
 # 相关推荐
 

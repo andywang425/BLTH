@@ -12,10 +12,12 @@ npm run lint          # ESLint + Stylelint 自动修复
 npm run lint:check    # 并行运行 ESLint 和 Stylelint，仅检查
 npm run format        # 使用 Prettier 格式化 src/
 npm run format:check  # 使用 Prettier 检查 src/ 的代码格式
+npm run docs:check    # 使用 markdownlint-cli2 检查 Markdown 文档
+npm run docs:fix      # 使用 markdownlint-cli2 自动修复 Markdown 文档
 npm run preview       # 打开提供编译产物安装链接的本地预览网页
 ```
 
-无自动化测试。
+提交前需通过 `lint:check`，`format:check`，`docs:check` 和 `build`。无自动化测试。
 
 ## 架构
 
@@ -30,7 +32,7 @@ npm run preview       # 打开提供编译产物安装链接的本地预览网�
 
 ### 内部库
 
-位于 `src/library/`，每个子目录对应一个库，均通过 `index.ts` 默认导出。
+位于 `src/library/`，每个子目录对应一个库。
 
 ### 配置持久化
 
@@ -43,7 +45,7 @@ npm run preview       # 打开提供编译产物安装链接的本地预览网�
 ## 分支
 
 - `master`：发布分支。合并来自 `dev` 的 PR 后触发 GitHub Actions 自动构建并创建 Release
-- `dev`：开发分支。非发布 PR 的目标分支
+- `dev`：开发分支。日常开发基于 `dev`，普通 PR 合并到 `dev`；发布通过 `dev` 合并到 `master` 完成。
 
 ## 规范
 

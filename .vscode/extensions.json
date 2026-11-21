@@ -4,6 +4,7 @@
     "dbaeumer.vscode-eslint",
     "stylelint.vscode-stylelint",
     "EditorConfig.EditorConfig",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "DavidAnson.vscode-markdownlint"
   ]
 }
