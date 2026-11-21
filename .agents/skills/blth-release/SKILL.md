@@ -124,11 +124,7 @@ npm version <newVersion> --no-git-tag-version
 
 1. 先用 `gh release list --limit 1 --json tagName` 拿到最近一次 release 的 tag；若 `gh` 取不到，再从 `CHANGELOG.md` 解析最近一个已发布版本号作为兜底
 2. `git fetch --tags` 确保本地 tag 是新的
-3. 查看上一版本到 HEAD 的提交：
-
-```bash
-git log --oneline <previousTag>..HEAD
-```
+3. 用 `git log --oneline <previousTag>..HEAD` 查找上次发布后值得写入更新日志的变更。这个范围也可能包含上次打 tag 后已经合入 `master` 的提交。归纳本次发布 PR 引入的改动时，以步骤 8 的文件差异为准。
 
 处理原则：
 
@@ -236,7 +232,7 @@ gh pr create --base master --head dev --title "<newVersion>" --body-file <tempBo
 
 合并前再次确认：
 
-- 用 `gh pr view <prNumber> --json headRefOid` 记录源提交 SHA，审阅该提交的 PR 内容。源提交变化时重新审阅。
+- 用 `gh pr view <prNumber> --json baseRefOid,headRefOid` 记录发布 PR 的目标和源提交 SHA。用 `git diff <baseRefOid>...<headRefOid>` 审阅两个分支的共同祖先到源提交的文件差异。两端分别对应 `origin/master` 和已推送的 `dev`。合并前若任一 SHA 变化，重新审阅。
 - 用 `gh pr checks <prNumber> --required --json name,state,link` 查找 `Check code and build userscript`。检查尚未出现、排队或运行中时每 15 秒重查。只有状态为 `SUCCESS` 才继续；失败时从检查链接的 `/actions/runs/<runID>/` 取得 run ID，用 `gh run view <runID> --log-failed` 展示失败日志。修复后重新审阅并检查新提交。
 - 是否需要填写 issue 关闭语句
 
