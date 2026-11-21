@@ -1,23 +1,27 @@
-# 项目概述
+# AGENTS.md
 
 BLTH（Bilibili Live Tasks Helper）是基于 Vue 3 + Vite + vite-plugin-monkey + Element Plus + TypeScript 的用户脚本（Userscript），通过用户脚本管理器（Tampermonkey/Violentmonkey）运行在 Bilibili 直播页面（`https://live.bilibili.com/直播间号`），实现自动完成每日任务、观看体验优化和页面元素清理。
 
-# 常用命令
+## 常用命令
 
 ```sh
-npm run dev          # 启动 Vite 开发服务器并安装脚本（支持 HMR）
-npm run build        # type-check 与 build+minify 并行
-npm run type-check   # 仅 Vue TypeScript 类型检查
-npm run lint         # ESLint + Stylelint 自动修复
-npm run format       # 使用 Prettier 格式化 src/
-npm run preview      # 打开提供编译产物安装链接的本地预览网页
+npm run dev           # 启动 Vite 开发服务器并安装脚本（支持 HMR）
+npm run build         # type-check 与 build+minify 并行
+npm run type-check    # 仅 Vue TypeScript 类型检查
+npm run lint          # ESLint + Stylelint 自动修复
+npm run lint:check    # 并行运行 ESLint 和 Stylelint，仅检查
+npm run format        # 使用 Prettier 格式化 src/
+npm run format:check  # 使用 Prettier 检查 src/ 的代码格式
+npm run docs:check    # 使用 markdownlint-cli2 检查 Markdown 文档
+npm run docs:fix      # 使用 markdownlint-cli2 自动修复 Markdown 文档
+npm run preview       # 打开提供编译产物安装链接的本地预览网页
 ```
 
-无自动化测试。
+提交前需通过 `lint:check`，`format:check`，`docs:check` 和 `build`。无自动化测试。
 
-# 架构
+## 架构
 
-## 模块系统
+### 模块系统
 
 所有模块继承 `src/modules/BaseModule.ts`，由 `src/stores/useModuleStore.ts` 管理生命周期。
 
@@ -26,31 +30,31 @@ npm run preview      # 打开提供编译产物安装链接的本地预览网页
 - **默认模块**（`src/modules/default/`）：做准备工作，如基础数据获取，先于大多数功能模块加载
 - **功能模块**：实现具体业务逻辑，如完成每日任务
 
-## 内部库
+### 内部库
 
-位于 `src/library/`，每个子目录对应一个库，均通过 `index.ts` 默认导出。
+位于 `src/library/`，每个子目录对应一个库。
 
-## 配置持久化
+### 配置持久化
 
 `src/library/storage/` 通过 `GM_setValue`/`GM_getValue` 存取配置。
 
-## 多标签页安全
+### 多标签页安全
 
 脚本分三类：`Main`，`SubMain`，`Other`。同时打开多个直播间页面时，`src/stores/useCacheStore.ts` 会选出唯一 `Main` 脚本，避免部分模块重复加载。
 
-# 分支
+## 分支
 
 - `master`：发布分支。合并来自 `dev` 的 PR 后触发 GitHub Actions 自动构建并创建 Release
-- `dev`：开发分支。非发布 PR 的目标分支
+- `dev`：开发分支。日常开发基于 `dev`，普通 PR 合并到 `dev`；发布通过 `dev` 合并到 `master` 完成。
 
-# 规范
+## 规范
 
 - `src/library/bili-api/` 中的 API 必须有详细的请求/响应类型定义
 - 路径别名 `@/` 映射到 `src/`
 - 代码中的 import 语句一律省略 TypeScript 文件扩展名（`.ts`、`.d.ts`）和目录的 `/index` 后缀
 - Commit message 使用约定式提交格式
 
-# 易踩坑点
+## 易踩坑点
 
 - 新增第三方库须写进 `vite.config.ts` 的 `externalGlobals`/`externalResource` 中，通过 `@require`/`@resource` 引入，不打包进脚本
 - 调试早期模块（`runAt = 'document-start'`）时 dev 模式注入太晚，请用 `npm run build` 的产物测试

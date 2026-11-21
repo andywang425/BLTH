@@ -2,28 +2,38 @@ name: CI
 
 on:
   pull_request:
-    branches: [master]
+    branches: [dev, master]
     types: [opened, synchronize, reopened]
 
 jobs:
   build:
-    name: BLTH build
+    name: Check code and build userscript
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - name: Check out source
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
       - name: Validate release version and changelog
-        if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'dev'
+        if: github.base_ref == 'master' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'dev'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: node scripts/check-release-version.mjs "$BASE_SHA" "$HEAD_SHA"
-      - run: npm ci
-      - run: npm run build
+      - name: Install dependencies
+        run: npm ci
+      - name: Run ESLint and Stylelint
+        run: npm run lint:check
+      - name: Check formatting with Prettier
+        run: npm run format:check
+      - name: Check Markdown with markdownlint
+        run: npm run docs:check
+      - name: Type-check and build userscript
+        run: npm run build

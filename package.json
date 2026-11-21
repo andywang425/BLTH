@@ -1,7 +1,7 @@
 {
   "name": "bilibili-live-tasks-helper",
   "private": true,
-  "version": "7.3.9",
+  "version": "7.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,10 +10,16 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "lint": "run-s -c lint:script lint:style",
-    "lint:script": "eslint . --fix --cache",
-    "lint:style": "stylelint \"src/**/*.{css,less,scss,vue}\" --fix",
+    "lint": "run-s -c lint:eslint lint:stylelint",
+    "lint:eslint": "eslint . --fix --cache",
+    "lint:stylelint": "stylelint \"src/**/*.{css,less,scss,vue}\" --fix --cache",
+    "lint:eslint:check": "eslint . --cache",
+    "lint:stylelint:check": "stylelint \"src/**/*.{css,less,scss,vue}\" --cache",
+    "lint:check": "run-p -c lint:eslint:check lint:stylelint:check",
     "format": "prettier --write --experimental-cli src/",
+    "format:check": "prettier --check --experimental-cli src/",
+    "docs:check": "markdownlint-cli2",
+    "docs:fix": "markdownlint-cli2 --fix",
     "minify": "node scripts/minifyUserscript.js",
     "svg2vue": "node scripts/convertSvgToVue.js"
   },
@@ -52,6 +58,7 @@
     "typescript": "~6.0.3",
     "vite": "^8.3.8",
     "vite-plugin-monkey": "^8.1.1",
-    "vue-tsc": "3.3.11"
+    "vue-tsc": "3.3.11",
+    "markdownlint-cli2": "^0.24.2"
   }
 }

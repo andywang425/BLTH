@@ -5,9 +5,9 @@ import _ from 'lodash'
 
 class Storage {
   /**
-   * 递归合并配置项。删除当前配置中不存在于默认配置的键，补上相对于默认配置缺少的键值，其它键值不变
+   * 递归合并配置项。补上默认配置中新增的字段，并删除默认配置中不存在的旧字段
    *
-   * 该方法不会修改当前配置
+   * 该方法不会修改入参
    *
    * @param currentConfig 当前配置
    * @param defaultConfig 默认配置

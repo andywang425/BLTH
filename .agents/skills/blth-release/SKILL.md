@@ -5,7 +5,7 @@ description: Automates the BLTH release flow. Invoke when the user wants to prep
 
 # BLTH Release
 
-执行 BLTH 项目的发版流程。如果仓库根目录下存在 `.agents/local/blth-release.md`，开始前先读取其中的本地发版约定。
+执行 BLTH 项目的发版流程。
 
 ## 目标
 
@@ -149,42 +149,39 @@ git log --oneline <previousTag>..HEAD
 4. 将 `Unreleased` 下方现有内容（含步骤 3 已补写进去的条目）原样移动到一个新的版本条目，紧跟在 `## [Unreleased]` 下方
 5. 新版本标题格式为：
 
-```md
-## [<newVersion>] - <YYYY-M-D>
-```
+   ```md
+   ## [<newVersion>] - <YYYY-M-D>
+   ```
 
-处理后的顶部结构示例：
+   处理后的顶部结构示例：
 
-```md
-## [Unreleased]
+   ```md
+   ## [Unreleased]
 
-## [7.3.0] - 2026-5-24
+   ## [7.3.0] - 2026-5-24
 
-### 新增
+   ### 新增
 
-- 某个新功能
-```
+   - 某个新功能
+   ```
 
 6. 日期使用当前本地日期，月份和日期不要补零
 7. 保留文件其他历史条目不变
 
 ### 5. 本地校验
 
-在仓库根目录读取 `.nvmrc` 并核对当前 Node 精确版本。版本不符时先切换，再按锁文件安装和构建：
+在仓库根目录核对当前 Node 版本与 `.nvmrc` 完全一致。版本不符时先切换，再按锁文件安装依赖，依次运行与 CI 相同的代码检查、格式检查、Markdown 检查和构建。
 
 ```bash
 node -e "if (process.versions.node !== require('node:fs').readFileSync('.nvmrc', 'utf8').trim()) process.exit(1)"
 npm ci
+npm run lint:check
+npm run format:check
+npm run docs:check
 npm run build
 ```
 
-如果只是文档和版本号改动，也仍然执行一次构建，确保发布工作流大概率正常。
-
-若构建失败：
-
-- 先分析是否为当前改动引起
-- 如果是仓库原有问题，清楚告知用户后再决定是否继续
-- 不要在未经用户确认的情况下跳过明显失败的构建
+即使只改了文档和版本号，也执行完整校验。任一步失败时，先定位原因，修复后重新校验。若为仓库已有问题，向维护者说明失败的命令和原因，由维护者决定是否继续发版。
 
 ### 6. 提交并推送
 
@@ -240,7 +237,7 @@ gh pr create --base master --head dev --title "<newVersion>" --body-file <tempBo
 合并前再次确认：
 
 - 用 `gh pr view <prNumber> --json headRefOid` 记录源提交 SHA，审阅该提交的 PR 内容。源提交变化时重新审阅。
-- 用 `gh pr checks <prNumber> --required --json name,state,link` 查找 `BLTH build`。检查尚未出现、排队或运行中时每 15 秒重查。只有状态为 `SUCCESS` 才继续；失败时从检查链接的 `/actions/runs/<runID>/` 取得 run ID，用 `gh run view <runID> --log-failed` 展示失败日志。修复后重新审阅并检查新提交。
+- 用 `gh pr checks <prNumber> --required --json name,state,link` 查找 `Check code and build userscript`。检查尚未出现、排队或运行中时每 15 秒重查。只有状态为 `SUCCESS` 才继续；失败时从检查链接的 `/actions/runs/<runID>/` 取得 run ID，用 `gh run view <runID> --log-failed` 展示失败日志。修复后重新审阅并检查新提交。
 - 是否需要填写 issue 关闭语句
 
 关于 issue 关闭的处理规则：
@@ -288,7 +285,7 @@ gh run watch <runID> --exit-status
 
 - tag 指向其他提交时展示期望和实际 SHA；正文、名称、附件大小或 SHA-256 不符时展示差异，交维护者决定。
 - 网络或上传中断后，使用 `gh run rerun <runID> --failed` 重跑原提交的任务并重新 watch。若已成功的发布随后缺少附件，重跑该 run。工作流会检查现有内容、只补缺少的文件，核验通过后完成发布。
-- 完整成功的 run 应包含 Verify published release 成功记录。续跑时同时读取远端 tag（注解 tag 取 peeled SHA）、PR 和 Release 正文及附件。用原 run 构建结果核对附件（成功日志中的文件大小与 SHA-256）；缺项时按上条处理。已完成版本可直接进入回同步核对。
+- 完整成功的 run 应包含 `Verify release tag, notes and assets` 步骤的成功记录。续跑时同时读取远端 tag（注解 tag 取 peeled SHA）、PR 和 Release 正文及附件。用原 run 构建结果核对附件（成功日志中的文件大小与 SHA-256）；缺项时按上条处理。已完成版本可直接进入回同步核对。
 
 ### 10. 将 master 同步回 dev
 
