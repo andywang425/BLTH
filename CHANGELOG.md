@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [7.4.0] - 2026-11-21
+
 ### 新增
 
 - 💻 引入 markdownlint-cli2
